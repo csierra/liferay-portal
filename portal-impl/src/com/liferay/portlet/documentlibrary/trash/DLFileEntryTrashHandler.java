@@ -29,13 +29,16 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.RepositoryServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
@@ -197,14 +200,10 @@ public class DLFileEntryTrashHandler extends DLBaseTrashHandler {
 	public boolean isRestorable(long classPK)
 		throws PortalException, SystemException {
 
-		try {
-			DLFileEntry dlFileEntry = getDLFileEntry(classPK);
+		boolean parentFolderExists = parentFolderExists(classPK);
+		boolean inTrashContainer = isInTrashContainer(classPK);
 
-			return !dlFileEntry.isInTrashContainer();
-		}
-		catch (InvalidRepositoryException ire) {
-			return false;
-		}
+		return (parentFolderExists && !inTrashContainer);
 	}
 
 	@Override
@@ -228,6 +227,32 @@ public class DLFileEntryTrashHandler extends DLBaseTrashHandler {
 		DLAppHelperLocalServiceUtil.moveFileEntryFromTrash(
 			userId, repository.getFileEntry(classPK), containerModelId,
 			serviceContext);
+	}
+
+	public boolean parentFolderExists(long classPK)
+		throws PortalException, SystemException {
+
+		try {
+			DLFileEntry dlFileEntry = getDLFileEntry(classPK);
+			long folderId = dlFileEntry.getFolderId();
+
+			if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+				return true;
+			}
+			else {
+				try {
+					DLFolderLocalServiceUtil.getFolder(folderId);
+					return true;
+				}
+				catch (NoSuchFolderException nsfe) {
+					return false;
+				}
+			}
+
+		}
+		catch (InvalidRepositoryException ire) {
+			return false;
+		}
 	}
 
 	@Override
