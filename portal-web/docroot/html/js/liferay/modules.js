@@ -98,6 +98,14 @@ window.YUI_config = {
 					path: 'browser_selectors.js',
 					requires: ['yui-base']
 				},
+				'liferay-layout-customization-settings': {
+					path: 'layout_customization_settings.js',
+					requires: [
+						'aui-base',
+						'aui-io-request',
+						'liferay-portlet-base'
+					]
+				},
 				'liferay-ddm-repeatable-fields': {
 					path: 'ddm_repeatable_fields.js',
 					requires: [

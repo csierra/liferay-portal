@@ -66,6 +66,51 @@ UnicodeProperties layoutTypeSettings = selLayout.getTypeSettingsProperties();
 			</div>
 		</c:if>
 	</aui:field-wrapper>
+
+	<div class="<%= selLayout.isLayoutPrototypeLinkEnabled() ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />typeOptions">
+		<aui:select name="type">
+
+			<%
+			for (int i = 0; i < PropsValues.LAYOUT_TYPES.length; i++) {
+				if (PropsValues.LAYOUT_TYPES[i].equals("article") && (group.isLayoutPrototype() || group.isLayoutSetPrototype())) {
+					continue;
+				}
+			%>
+
+				<aui:option disabled="<%= selLayout.isFirstParent() && !PortalUtil.isLayoutFirstPageable(PropsValues.LAYOUT_TYPES[i]) %>" label='<%= "layout.types." + PropsValues.LAYOUT_TYPES[i] %>' selected="<%= selLayout.getType().equals(PropsValues.LAYOUT_TYPES[i]) %>" value="<%= PropsValues.LAYOUT_TYPES[i] %>" />
+
+			<%
+			}
+			%>
+
+		</aui:select>
+
+		<div id="<portlet:namespace />layoutTypeForm">
+
+			<%
+			for (int i = 0; i < PropsValues.LAYOUT_TYPES.length; i++) {
+				String curLayoutType = PropsValues.LAYOUT_TYPES[i];
+
+				if (PropsValues.LAYOUT_TYPES[i].equals("article") && (group.isLayoutPrototype() || group.isLayoutSetPrototype())) {
+					continue;
+				}
+			%>
+
+				<div class="layout-type-form layout-type-form-<%= curLayoutType %> <%= selLayout.getType().equals(PropsValues.LAYOUT_TYPES[i]) ? "" : "hide" %>">
+
+					<%
+					request.setAttribute(WebKeys.SEL_LAYOUT, selLayout);
+					%>
+
+					<liferay-util:include page="<%= StrutsUtil.TEXT_HTML_DIR + PortalUtil.getLayoutEditPage(curLayoutType) %>" />
+				</div>
+
+			<%
+			}
+			%>
+
+		</div>
+	</div>
 </aui:fieldset>
 
 <aui:script use="aui-base">
@@ -80,7 +125,9 @@ UnicodeProperties layoutTypeSettings = selLayout.getTypeSettingsProperties();
 		var changeLogo = (event.type == 'change');
 
 		iconImageInput.val(changeLogo);
-		layoutIconContainer.hide();
+		if(layoutIconContainer) {
+			layoutIconContainer.hide();
+		}
 	};
 
 	if (deleteLogoLink) {
@@ -88,4 +135,50 @@ UnicodeProperties layoutTypeSettings = selLayout.getTypeSettingsProperties();
 	}
 
 	iconFileNameInput.on('change', changeLogo);
+
+	var templateLink = A.one('#templateLink');
+
+	function toggleLayoutTypeFields(type) {
+		var currentType = 'layout-type-form-' + type;
+
+		var typeFormContainer = A.one('#<portlet:namespace />layoutTypeForm');
+
+		typeFormContainer.all('.layout-type-form').each(
+			function(item, index, collection) {
+				var visible = item.hasClass(currentType);
+
+				var disabled = !visible;
+
+				item.toggle(visible);
+
+				item.all('input, select, textarea').set('disabled', disabled);
+			}
+		);
+
+		if (templateLink) {
+			templateLink.toggle(type == 'portlet');
+		}
+	}
+
+	toggleLayoutTypeFields('<%= selLayout.getType() %>');
+
+	var typeSelector = A.one('#<portlet:namespace />type');
+
+	if (typeSelector) {
+		typeSelector.on(
+			'change',
+			function(event) {
+				var type = event.currentTarget.val();
+
+				toggleLayoutTypeFields(type);
+
+				Liferay.fire(
+					'<portlet:namespace />toggleLayoutTypeFields',
+					{
+						type: type
+					}
+				);
+			}
+		);
+	}
 </aui:script>
