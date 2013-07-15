@@ -33,6 +33,8 @@
 		<liferay-util:param name="displayStyle" value="panel" />
 		<liferay-util:param name="showToolbar" value="<%= Boolean.FALSE.toString() %>" />
 	</liferay-util:include>
+
+	<aui:a cssClass="site-admin-link" href='<%= themeDisplay.getURLPageSettings().toString() + "#tab=details" %>' label="action.VIEW_SITE_ADMINISTRATION" />
 </div>
 
 <c:if test='<%= SessionMessages.contains(renderRequest, "requestProcessed") %>'>

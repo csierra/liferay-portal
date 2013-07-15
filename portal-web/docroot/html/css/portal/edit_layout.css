@@ -17,6 +17,12 @@
 		width: 440px;
 	}
 
+	.site-admin-link {
+		bottom: 0;
+		padding: 10px;
+		position: fixed;
+	}
+
 	.taglib-form-navigator .accordion {
 		background: #FFF;
 		margin: 30px -10px 50px;
