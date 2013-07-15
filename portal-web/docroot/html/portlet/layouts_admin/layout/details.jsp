@@ -103,7 +103,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 		<c:when test="<%= !group.isLayoutPrototype() %>">
 			<aui:input name="name" />
 
-			<aui:input label="html-title" name="title" />
+			<aui:input helpMessage="if-checked-this-page-wont-show-up-in-the-navigation-menu" label="hide-from-navigation-menu" name="hidden" />
 
 			<c:choose>
 				<c:when test="<%= PortalUtil.isLayoutFriendliable(selLayout) %>">
@@ -117,8 +117,6 @@ StringBuilder friendlyURLBase = new StringBuilder();
 					<aui:input name="friendlyURL" type="hidden" value="<%= (selLayout != null) ? selLayout.getFriendlyURL() : StringPool.BLANK %>" />
 				</c:otherwise>
 			</c:choose>
-
-			<aui:input helpMessage="if-checked-this-page-wont-show-up-in-the-navigation-menu" label="hide-from-navigation-menu" name="hidden" />
 
 			<c:if test="<%= group.isLayoutSetPrototype() %>">
 
@@ -159,102 +157,9 @@ StringBuilder friendlyURLBase = new StringBuilder();
 			<liferay-util:include page="/html/portlet/layout_prototypes/merge_alert.jsp" />
 		</div>
 	</c:if>
-
-	<div class="<%= selLayout.isLayoutPrototypeLinkEnabled() ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />typeOptions">
-		<aui:select name="type">
-
-			<%
-			for (int i = 0; i < PropsValues.LAYOUT_TYPES.length; i++) {
-				if (PropsValues.LAYOUT_TYPES[i].equals("article") && (group.isLayoutPrototype() || group.isLayoutSetPrototype())) {
-					continue;
-				}
-			%>
-
-				<aui:option disabled="<%= selLayout.isFirstParent() && !PortalUtil.isLayoutFirstPageable(PropsValues.LAYOUT_TYPES[i]) %>" label='<%= "layout.types." + PropsValues.LAYOUT_TYPES[i] %>' selected="<%= selLayout.getType().equals(PropsValues.LAYOUT_TYPES[i]) %>" value="<%= PropsValues.LAYOUT_TYPES[i] %>" />
-
-			<%
-			}
-			%>
-
-		</aui:select>
-
-		<div id="<portlet:namespace />layoutTypeForm">
-
-			<%
-			for (int i = 0; i < PropsValues.LAYOUT_TYPES.length; i++) {
-				String curLayoutType = PropsValues.LAYOUT_TYPES[i];
-
-				if (PropsValues.LAYOUT_TYPES[i].equals("article") && (group.isLayoutPrototype() || group.isLayoutSetPrototype())) {
-					continue;
-				}
-			%>
-
-				<div class="layout-type-form layout-type-form-<%= curLayoutType %> <%= selLayout.getType().equals(PropsValues.LAYOUT_TYPES[i]) ? "" : "hide" %>">
-
-					<%
-					request.setAttribute(WebKeys.SEL_LAYOUT, selLayout);
-					%>
-
-					<liferay-util:include page="<%= StrutsUtil.TEXT_HTML_DIR + PortalUtil.getLayoutEditPage(curLayoutType) %>" />
-				</div>
-
-			<%
-			}
-			%>
-
-		</div>
-	</div>
 </aui:fieldset>
 
 <aui:script>
 	Liferay.Util.toggleBoxes('<portlet:namespace />layoutPrototypeLinkEnabledCheckbox','<portlet:namespace />layoutPrototypeMergeAlert');
 	Liferay.Util.toggleBoxes('<portlet:namespace />layoutPrototypeLinkEnabledCheckbox','<portlet:namespace />typeOptions', true);
-</aui:script>
-
-<aui:script use="aui-base">
-	var templateLink = A.one('#templateLink');
-
-	function toggleLayoutTypeFields(type) {
-		var currentType = 'layout-type-form-' + type;
-
-		var typeFormContainer = A.one('#<portlet:namespace />layoutTypeForm');
-
-		typeFormContainer.all('.layout-type-form').each(
-			function(item, index, collection) {
-				var visible = item.hasClass(currentType);
-
-				var disabled = !visible;
-
-				item.toggle(visible);
-
-				item.all('input, select, textarea').set('disabled', disabled);
-			}
-		);
-
-		if (templateLink) {
-			templateLink.toggle(type == 'portlet');
-		}
-	}
-
-	toggleLayoutTypeFields('<%= selLayout.getType() %>');
-
-	var typeSelector = A.one('#<portlet:namespace />type');
-
-	if (typeSelector) {
-		typeSelector.on(
-			'change',
-			function(event) {
-				var type = event.currentTarget.val();
-
-				toggleLayoutTypeFields(type);
-
-				Liferay.fire(
-					'<portlet:namespace />toggleLayoutTypeFields',
-					{
-						type: type
-					}
-				);
-			}
-		);
-	}
 </aui:script>
