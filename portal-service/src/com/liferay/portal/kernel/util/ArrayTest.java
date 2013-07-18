@@ -119,8 +119,8 @@ public class ArrayTest {
 			long t1 = System.currentTimeMillis();
 
 			for (int j=0; j<repeats; j++) {
-				Predicate<Long> predicate = new All();
-				f1 = ArrayUtil.filter(randomArray, predicate);
+				FilterPredicate<Long> filterPredicate = new All();
+				f1 = ArrayUtil.filter(randomArray, filterPredicate);
 			}
 
 			long t2 = System.currentTimeMillis();
@@ -148,7 +148,7 @@ public class ArrayTest {
 //			long t1 = System.currentTimeMillis();
 //
 //			for (int j=0; j<repeats; j++) {
-//				Predicate<Long> predicate = new None();
+//				FilterPredicate<Long> predicate = new None();
 //				f1 = ArrayUtil.filter(randomArray, predicate);
 //			}
 //
@@ -170,14 +170,14 @@ public class ArrayTest {
 //		}
 	}
 
-	public static class All implements Predicate<Long> {
+	public static class All implements FilterPredicate<Long> {
 		@Override
 		public boolean keep(Long item) {
 			return false;
 		}
 	};
 
-	public static class Even implements Predicate<Long> {
+	public static class Even implements FilterPredicate<Long> {
 		@Override
 		public boolean keep(Long item) {
 			if (item % 2 == 0) {
@@ -188,7 +188,7 @@ public class ArrayTest {
 		}
 	};
 
-	public static class None implements Predicate<Long> {
+	public static class None implements FilterPredicate<Long> {
 		@Override
 		public boolean keep(Long item) {
 			boolean even = (item % 2 == 0);

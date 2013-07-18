@@ -711,168 +711,159 @@ public class ArrayUtil {
 	}
 
 	public static boolean[] filter(
-		boolean[] input, Predicate<Boolean> predicate) {
+		boolean[] array, FilterPredicate<Boolean> filterPredicate) {
 
-		if (input == null) {
-			return null;
-		}
-
-		if (input.length == 0) {
-			return input;
+		if ((array == null) || (array.length == 0)) {
+			return array;
 		}
 
 		List<Boolean> survivors = new ArrayList<Boolean>();
 
-		for (int i = 0; i < input.length; i++) {
-			if (predicate.keep(input[i])) {
-				survivors.add(input[i]);
+		for (int i = 0; i < array.length; i++) {
+			boolean b = array[i];
+
+			if (filterPredicate.keep(b)) {
+				survivors.add(b);
 			}
 		}
 
 		return toArray(survivors.toArray(new Boolean[survivors.size()]));
 	}
 
-	public static byte[] filter(byte[] input, Predicate<Byte> predicate) {
+	public static byte[] filter(
+		byte[] array, FilterPredicate<Byte> filterPredicate) {
 
-		if (input == null) {
-			return null;
-		}
-
-		if (input.length == 0) {
-			return input;
+		if ((array == null) || (array.length == 0)) {
+			return array;
 		}
 
 		List<Byte> survivors = new ArrayList<Byte>();
 
-		for (int i = 0; i < input.length; i++) {
-			if (predicate.keep(input[i])) {
-				survivors.add(input[i]);
+		for (int i = 0; i < array.length; i++) {
+			byte b = array[i];
+
+			if (filterPredicate.keep(b)) {
+				survivors.add(b);
 			}
 		}
 
 		return toArray(survivors.toArray(new Byte[survivors.size()]));
 	}
 
-	public static char[] filter(char[] input, Predicate<Character> predicate) {
+	public static char[] filter(
+		char[] array, FilterPredicate<Character> filterPredicate) {
 
-		if (input == null) {
-			return null;
-		}
-
-		if (input.length == 0) {
-			return input;
+		if ((array == null) || (array.length == 0)) {
+			return array;
 		}
 
 		List<Character> survivors = new ArrayList<Character>();
 
-		for (int i = 0; i < input.length; i++) {
-			if (predicate.keep(input[i])) {
-				survivors.add(input[i]);
+		for (int i = 0; i < array.length; i++) {
+			char c = array[i];
+
+			if (filterPredicate.keep(c)) {
+				survivors.add(c);
 			}
 		}
 
 		return toArray(survivors.toArray(new Character[survivors.size()]));
 	}
 
-	public static double[] filter(double[] input, Predicate<Double> predicate) {
+	public static double[] filter(
+		double[] array, FilterPredicate<Double> filterPredicate) {
 
-		if (input == null) {
-			return null;
-		}
-
-		if (input.length == 0) {
-			return input;
+		if ((array == null) || (array.length == 0)) {
+			return array;
 		}
 
 		List<Double> survivors = new ArrayList<Double>();
 
-		for (int i = 0; i < input.length; i++) {
-			if (predicate.keep(input[i])) {
-				survivors.add(input[i]);
+		for (int i = 0; i < array.length; i++) {
+			double d = array[i];
+
+			if (filterPredicate.keep(d)) {
+				survivors.add(d);
 			}
 		}
 
 		return toArray(survivors.toArray(new Double[survivors.size()]));
 	}
 
-	public static float[] filter(float[] input, Predicate<Float> predicate) {
+	public static float[] filter(
+		float[] array, FilterPredicate<Float> filterPredicate) {
 
-		if (input == null) {
-			return null;
-		}
-
-		if (input.length == 0) {
-			return input;
+		if ((array == null) || (array.length == 0)) {
+			return array;
 		}
 
 		List<Float> survivors = new ArrayList<Float>();
 
-		for (int i = 0; i < input.length; i++) {
-			if (predicate.keep(input[i])) {
-				survivors.add(input[i]);
+		for (int i = 0; i < array.length; i++) {
+			float f = array[i];
+
+			if (filterPredicate.keep(f)) {
+				survivors.add(f);
 			}
 		}
 
 		return toArray(survivors.toArray(new Float[survivors.size()]));
 	}
 
-	public static int[] filter(int[] input, Predicate<Integer> predicate) {
+	public static int[] filter(
+		int[] array, FilterPredicate<Integer> filterPredicate) {
 
-		if (input == null) {
-			return null;
-		}
-
-		if (input.length == 0) {
-			return input;
+		if ((array == null) || (array.length == 0)) {
+			return array;
 		}
 
 		List<Integer> survivors = new ArrayList<Integer>();
 
-		for (int i = 0; i < input.length; i++) {
-			if (predicate.keep(input[i])) {
-				survivors.add(input[i]);
+		for (int i = 0; i < array.length; i++) {
+			int i1 = array[i];
+
+			if (filterPredicate.keep(i1)) {
+				survivors.add(i1);
 			}
 		}
 
 		return toArray(survivors.toArray(new Integer[survivors.size()]));
 	}
 
-	public static long[] filter(long[] input, Predicate<Long> predicate) {
+	public static long[] filter(
+		long[] array, FilterPredicate<Long> filterPredicate) {
 
-		if (input == null) {
-			return null;
-		}
-
-		if (input.length == 0) {
-			return input;
+		if ((array == null) ||(array.length == 0)) {
+			return array;
 		}
 
 		List<Long> survivors = new ArrayList<Long>();
 
-		for (int i = 0; i < input.length; i++) {
-			if (predicate.keep(input[i])) {
-				survivors.add(input[i]);
+		for (int i = 0; i < array.length; i++) {
+			long l = array[i];
+
+			if (filterPredicate.keep(l)) {
+				survivors.add(l);
 			}
 		}
 
 		return toArray(survivors.toArray(new Long[survivors.size()]));
 	}
 
-	public static short[] filter(short[] input, Predicate<Short> predicate) {
+	public static short[] filter(
+		short[] array, FilterPredicate<Short> filterPredicate) {
 
-		if (input == null) {
-			return null;
-		}
-
-		if (input.length == 0) {
-			return input;
+		if ((array == null) || (array.length == 0)) {
+			return array;
 		}
 
 		List<Short> survivors = new ArrayList<Short>();
 
-		for (int i = 0; i < input.length; i++) {
-			if (predicate.keep(input[i])) {
-				survivors.add(input[i]);
+		for (int i = 0; i < array.length; i++) {
+			short s = array[i];
+
+			if (filterPredicate.keep(s)) {
+				survivors.add(s);
 			}
 		}
 
@@ -880,27 +871,24 @@ public class ArrayUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T[] filter(T[] input, Predicate<T> predicate) {
+	public static <T> T[] filter(
+		T[] array, FilterPredicate<T> filterPredicate) {
 
-		if (input == null) {
-			return null;
+		if ((array == null) || (array.length == 0)) {
+			return array;
 		}
 
-		if (input.length == 0) {
-			return input;
-		}
-
-		List<T> origin = (List<T>)Arrays.asList(input);
+		List<T> origin = (List<T>)Arrays.asList(array);
 		ArrayList<T> survivors = new ArrayList<T>();
 
 		for (T item : origin) {
-			if (predicate.keep(item)) {
+			if (filterPredicate.keep(item)) {
 				survivors.add(item);
 			}
 		}
 
 		Object[] result = survivors.toArray();
-		return (T[])Arrays.copyOf(result, result.length, input.getClass());
+		return (T[])Arrays.copyOf(result, result.length, array.getClass());
 	}
 
 	public static int getLength(Object[] array) {
