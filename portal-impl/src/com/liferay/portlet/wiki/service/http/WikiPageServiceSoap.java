@@ -419,11 +419,11 @@ public class WikiPageServiceSoap {
 
 	public static com.liferay.portlet.wiki.model.WikiPageSoap[] getPages(
 		long nodeId, java.lang.String title, int start, int max,
-		com.liferay.portlet.wiki.util.comparator.PageCreateDateComparator pageCreateDateComparator)
+		com.liferay.portal.kernel.util.OrderByComparator obc)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.portlet.wiki.model.WikiPage> returnValue = WikiPageServiceUtil.getPages(nodeId,
-					title, start, max, pageCreateDateComparator);
+					title, start, max, obc);
 
 			return com.liferay.portlet.wiki.model.WikiPageSoap.toSoapModels(returnValue);
 		}

@@ -998,17 +998,15 @@ public class WikiPageServiceHttp {
 
 	public static java.util.List<com.liferay.portlet.wiki.model.WikiPage> getPages(
 		HttpPrincipal httpPrincipal, long nodeId, java.lang.String title,
-		int start, int max,
-		com.liferay.portlet.wiki.util.comparator.PageCreateDateComparator pageCreateDateComparator)
+		int start, int max, com.liferay.portal.kernel.util.OrderByComparator obc)
 		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException,
-			com.liferay.portal.security.auth.PrincipalException {
+			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(WikiPageServiceUtil.class,
 					"getPages", _getPagesParameterTypes26);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, nodeId,
-					title, start, max, pageCreateDateComparator);
+					title, start, max, obc);
 
 			Object returnObj = null;
 
@@ -1022,10 +1020,6 @@ public class WikiPageServiceHttp {
 
 				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
 					throw (com.liferay.portal.kernel.exception.SystemException)e;
-				}
-
-				if (e instanceof com.liferay.portal.security.auth.PrincipalException) {
-					throw (com.liferay.portal.security.auth.PrincipalException)e;
 				}
 
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
@@ -1759,7 +1753,7 @@ public class WikiPageServiceHttp {
 		};
 	private static final Class<?>[] _getPagesParameterTypes26 = new Class[] {
 			long.class, java.lang.String.class, int.class, int.class,
-			com.liferay.portlet.wiki.util.comparator.PageCreateDateComparator.class
+			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
 	private static final Class<?>[] _getPagesCountParameterTypes27 = new Class[] {
 			long.class, long.class, boolean.class

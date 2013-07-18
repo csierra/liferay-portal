@@ -270,12 +270,10 @@ public class WikiPageServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.wiki.model.WikiPage> getPages(
 		long nodeId, java.lang.String title, int start, int max,
-		com.liferay.portlet.wiki.util.comparator.PageCreateDateComparator pageCreateDateComparator)
+		com.liferay.portal.kernel.util.OrderByComparator obc)
 		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException,
-			com.liferay.portal.security.auth.PrincipalException {
-		return getService()
-				   .getPages(nodeId, title, start, max, pageCreateDateComparator);
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getPages(nodeId, title, start, max, obc);
 	}
 
 	public static int getPagesCount(long groupId, long nodeId, boolean head)

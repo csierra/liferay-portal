@@ -286,12 +286,10 @@ public class WikiPageServiceWrapper implements WikiPageService,
 	@Override
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getPages(
 		long nodeId, java.lang.String title, int start, int max,
-		com.liferay.portlet.wiki.util.comparator.PageCreateDateComparator pageCreateDateComparator)
+		com.liferay.portal.kernel.util.OrderByComparator obc)
 		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException,
-			com.liferay.portal.security.auth.PrincipalException {
-		return _wikiPageService.getPages(nodeId, title, start, max,
-			pageCreateDateComparator);
+			com.liferay.portal.kernel.exception.SystemException {
+		return _wikiPageService.getPages(nodeId, title, start, max, obc);
 	}
 
 	@Override
