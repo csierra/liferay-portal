@@ -43,13 +43,15 @@ public class RSSAction extends DefaultRSSAction {
 
 		if (nodeId > 0) {
 			if (Validator.isNotNull(title)) {
-				List<WikiPage> pages = WikiPageServiceUtil. getPages(
+				List<WikiPage> pages = WikiPageServiceUtil.getPages(
 					nodeId, title, 0, max, new PageCreateDateComparator(true));
+
 				return new WikiRSSRenderer(request, pages, true);
 			}
 			else {
 				List<WikiPage> pages = WikiPageServiceUtil.getNodePages(
 					nodeId, max);
+
 				return new WikiRSSRenderer(request, pages, false);
 			}
 		}

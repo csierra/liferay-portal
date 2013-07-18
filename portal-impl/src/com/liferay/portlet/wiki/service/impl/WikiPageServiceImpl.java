@@ -438,15 +438,14 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 
 	public List<WikiPage> getPages(
 			long nodeId, String title, int start, int max,
-			PageCreateDateComparator pageCreateDateComparator)
-		throws PortalException, PrincipalException, SystemException {
+			OrderByComparator obc)
+		throws PortalException, SystemException {
 
 		WikiPagePermission.check(
 			getPermissionChecker(), nodeId, title, ActionKeys.VIEW);
 
 		return wikiPageLocalService.getPages(
-			nodeId, title, start, max, pageCreateDateComparator);
-
+			nodeId, title, start, max, obc);
 	}
 
 	@Override
@@ -507,7 +506,6 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 		return exportToRSS(
 			companyId, title, title, type, version, displayStyle, feedURL,
 			entryURL, attachmentURLPrefix, pages, true, locale);
-
 	}
 
 	@Override

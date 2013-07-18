@@ -27,21 +27,22 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 public class BlogsGroupRSSRenderer extends BlogsBaseRSSRenderer {
 
-	public BlogsGroupRSSRenderer(
+	/*public BlogsGroupRSSRenderer(
 		Group group, List<BlogsEntry> blogsEntries,
 		HttpServletRequest request) {
 
 		this(group, blogsEntries, request, false);
 	}
-
+*/
 	public BlogsGroupRSSRenderer(
 		Group group, List<BlogsEntry> blogsEntries, HttpServletRequest request,
 		boolean isScopeGroup) {
 
 		super(blogsEntries, request);
-		this._group = group;
-		this._isScopeGroup = isScopeGroup;
-		this._plid = ParamUtil.getLong(getRequest(), "p_l_id");
+
+		_group = group;
+		_isScopeGroup = isScopeGroup;
+		_plid = ParamUtil.getLong(getRequest(), "p_l_id");
 	}
 
 	@Override

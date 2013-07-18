@@ -53,14 +53,13 @@ public class ActivitiesRSSRenderer extends DefaultRSSRenderer {
 		PortletRequest request, PortletResponse response) {
 
 		super(PortalUtil.getHttpServletRequest(request));
+
 		_portletRequest = request;
-		_themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
 	}
 
 	@Override
 	public String getFeedURL() throws PortalException, SystemException {
-		return PortalUtil.getLayoutFullURL(_themeDisplay) +
+		return PortalUtil.getLayoutFullURL(getThemeDisplay()) +
 			Portal.FRIENDLY_URL_SEPARATOR + "activities/rss";
 	}
 
@@ -124,15 +123,16 @@ public class ActivitiesRSSRenderer extends DefaultRSSRenderer {
 
 			syndEntries.add(syndEntry);
 		}
-
 	}
 
 	protected List<SocialActivity> getActivities(
 			PortletRequest portletRequest, int max)
 		throws PortalException, SystemException {
 
+		ThemeDisplay themeDisplay = getThemeDisplay();
+
 		Group group = GroupLocalServiceUtil.getGroup(
-			_themeDisplay.getScopeGroupId());
+			themeDisplay.getScopeGroupId());
 
 		int start = 0;
 
@@ -153,6 +153,5 @@ public class ActivitiesRSSRenderer extends DefaultRSSRenderer {
 }
 
 	private PortletRequest _portletRequest;
-	private ThemeDisplay _themeDisplay;
 
 }

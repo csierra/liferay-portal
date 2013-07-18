@@ -50,12 +50,13 @@ public class WikiRSSRenderer extends DefaultRSSRenderer {
 		boolean diff) {
 
 		super(request);
-		this._pages = pagesToExport;
-		this._diff = diff;
+
+		_diff = diff;
+		_nodeId = ParamUtil.getLong(request, "nodeId");
+		_pages = pagesToExport;
+		_request = request;
 		_themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
-		this._request = request;
-		_nodeId = ParamUtil.getLong(request, "nodeId");
 	}
 
 	@Override

@@ -64,20 +64,19 @@ import javax.portlet.ResourceResponse;
 import javax.portlet.ResourceURL;
 public class JournalRSSRenderer extends DefaultRSSRenderer {
 
-	ThemeDisplay themeDisplay;
 	public JournalRSSRenderer(
 		ResourceRequest request, ResourceResponse response) {
 
 		super(PortalUtil.getHttpServletRequest(request));
-		this._request = request;
-		this._response = response;
-		themeDisplay = (ThemeDisplay)request.getAttribute(
+
+		_request = request;
+		_response = response;
+		_themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
 	@Override
 	public String getFeedURL() throws PortalException, SystemException {
-
 		ResourceURL feedURL = _response.createResourceURL();
 
 		JournalFeed feed = getJournalFeed();
@@ -92,8 +91,8 @@ public class JournalRSSRenderer extends DefaultRSSRenderer {
 
 	@Override
 	public String getRSSFeedType() throws PortalException, SystemException {
-
 		JournalFeed feed = getJournalFeed();
+
 		return feed.getFeedFormat() + "_" + feed.getFeedVersion();
 	}
 
@@ -111,9 +110,9 @@ public class JournalRSSRenderer extends DefaultRSSRenderer {
 		String languageId = LanguageUtil.getLanguageId(_request);
 
 		long plid = PortalUtil.getPlidFromFriendlyURL(
-			themeDisplay.getCompanyId(), feed.getTargetLayoutFriendlyUrl());
+			_themeDisplay.getCompanyId(), feed.getTargetLayoutFriendlyUrl());
 
-		Layout layout = themeDisplay.getLayout();
+		Layout layout = _themeDisplay.getLayout();
 
 		if (plid > 0) {
 			try {
@@ -146,7 +145,7 @@ public class JournalRSSRenderer extends DefaultRSSRenderer {
 			try {
 				value =
 					processContent(
-						feed, article, languageId, themeDisplay, syndEntry,
+						feed, article, languageId, _themeDisplay, syndEntry,
 						syndContent);
 			}
 			catch (DocumentException e) {
@@ -158,7 +157,7 @@ public class JournalRSSRenderer extends DefaultRSSRenderer {
 			syndEntry.setDescription(syndContent);
 
 			String link;
-			link = getEntryURL(feed, article, layout, themeDisplay);
+			link = getEntryURL(feed, article, layout, _themeDisplay);
 
 			syndEntry.setLink(link);
 
@@ -169,7 +168,6 @@ public class JournalRSSRenderer extends DefaultRSSRenderer {
 
 			syndEntries.add(syndEntry);
 		}
-
 	}
 
 	protected String getEntryURL(
@@ -235,6 +233,7 @@ public class JournalRSSRenderer extends DefaultRSSRenderer {
 		}
 
 		_request.setAttribute("rssJournalFeed", feed);
+
 		return feed;
 	}
 
@@ -354,5 +353,6 @@ public class JournalRSSRenderer extends DefaultRSSRenderer {
 
 	private ResourceRequest _request;
 	private ResourceResponse _response;
+	private ThemeDisplay _themeDisplay;
 
 }

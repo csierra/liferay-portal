@@ -45,15 +45,16 @@ public abstract class DefaultRSSAction extends RSSAction {
 
 	protected RSSRenderer createRSSRenderer(HttpServletRequest request)
 		throws Exception {
-			throw new UnsupportedOperationException();
+
+		throw new UnsupportedOperationException();
 	}
 
 	protected RSSRenderer createRSSRenderer(
 			ResourceRequest portletRequest, ResourceResponse portletResponse)
 		throws Exception {
 
-		return createRSSRenderer(
-			PortalUtil.getHttpServletRequest(portletRequest));
+		return createRSSRenderer(PortalUtil.getHttpServletRequest(
+			portletRequest));
 	}
 
 	@Override
@@ -103,7 +104,9 @@ public abstract class DefaultRSSAction extends RSSAction {
 
 		if (alternateURL != null) {
 			SyndLink alternateSyndLink = new SyndLinkImpl();
+
 			syndLinks.add(alternateSyndLink);
+
 			alternateSyndLink.setHref(alternateURL);
 			alternateSyndLink.setRel("alternate");
 		}
@@ -113,8 +116,7 @@ public abstract class DefaultRSSAction extends RSSAction {
 		syndFeed.setUri(feedURL);
 
 		try {
-			String export = RSSUtil.export(syndFeed);
-			return export;
+			return RSSUtil.export(syndFeed);
 		}
 		catch (FeedException fe) {
 			throw new SystemException(fe);
