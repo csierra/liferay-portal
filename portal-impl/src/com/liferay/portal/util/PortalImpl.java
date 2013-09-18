@@ -6113,7 +6113,7 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
-	public boolean isLoginNeedsRedirect(HttpServletRequest request) {
+	public boolean isLoginRedirectRequired(HttpServletRequest request) {
 		long companyId = PortalUtil.getCompanyId(request);
 
 		if (PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS &&
@@ -7567,7 +7567,7 @@ public class PortalImpl implements Portal {
 		themeDisplay.setI18nPath(i18nPath);
 	}
 
-	private boolean _safePrefPropsUtilGetBoolean(
+	protected boolean _safePrefPropsUtilGetBoolean(
 		long companyId, String key, boolean defaultValue) {
 
 		try {

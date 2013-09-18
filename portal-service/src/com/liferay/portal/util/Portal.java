@@ -1239,7 +1239,7 @@ public interface Portal {
 
 	public boolean isLayoutSitemapable(Layout layout);
 
-	public boolean isLoginNeedsRedirect(HttpServletRequest request);
+	public boolean isLoginRedirectRequired(HttpServletRequest request);
 
 	public boolean isMethodGet(PortletRequest portletRequest);
 
