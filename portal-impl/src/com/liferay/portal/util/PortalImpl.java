@@ -6122,23 +6122,34 @@ public class PortalImpl implements Portal {
 			return true;
 		}
 
-		boolean isCasAuthEnabled = _safePrefPropsUtilGetBoolean(
-			companyId, PropsKeys.CAS_AUTH_ENABLED,
-			PropsValues.CAS_AUTH_ENABLED);
-		boolean isOpenSSOAuthEnabled = _safePrefPropsUtilGetBoolean(
-			companyId, PropsKeys.OPEN_SSO_AUTH_ENABLED,
-			PropsValues.OPEN_SSO_AUTH_ENABLED);
-		boolean isPortalJAASEnabled = _safePrefPropsUtilGetBoolean(
-			companyId, PropsKeys.PORTAL_JAAS_ENABLE,
-			PropsValues.PORTAL_JAAS_ENABLE);
-		boolean isSiteMinderAuthEnabled = _safePrefPropsUtilGetBoolean(
-			companyId, PropsKeys.SITEMINDER_AUTH_ENABLED,
-			PropsValues.SITEMINDER_AUTH_ENABLED);
+		try {
+			boolean isCasAuthEnabled = PrefsPropsUtil.getBoolean(
+				companyId, PropsKeys.CAS_AUTH_ENABLED,
+				PropsValues.CAS_AUTH_ENABLED);
+			boolean isOpenSSOAuthEnabled = PrefsPropsUtil.getBoolean(
+				companyId, PropsKeys.OPEN_SSO_AUTH_ENABLED,
+				PropsValues.OPEN_SSO_AUTH_ENABLED);
+			boolean isPortalJAASEnabled = PrefsPropsUtil.getBoolean(
+				companyId, PropsKeys.PORTAL_JAAS_ENABLE,
+				PropsValues.PORTAL_JAAS_ENABLE);
+			boolean isSiteMinderAuthEnabled = PrefsPropsUtil.getBoolean(
+				companyId, PropsKeys.SITEMINDER_AUTH_ENABLED,
+				PropsValues.SITEMINDER_AUTH_ENABLED);
 
-		if (isCasAuthEnabled || isOpenSSOAuthEnabled || isPortalJAASEnabled ||
-			isSiteMinderAuthEnabled) {
+			if (isCasAuthEnabled || isOpenSSOAuthEnabled ||
+				isPortalJAASEnabled || isSiteMinderAuthEnabled) {
 
-			return true;
+				return true;
+			}
+		}
+		catch (SystemException se) {
+			if (PropsValues.CAS_AUTH_ENABLED ||
+				PropsValues.OPEN_SSO_AUTH_ENABLED ||
+				PropsValues.PORTAL_JAAS_ENABLE ||
+				PropsValues.SITEMINDER_AUTH_ENABLED) {
+
+				return true;
+			}
 		}
 
 		return false;
@@ -7565,17 +7576,6 @@ public class PortalImpl implements Portal {
 
 		themeDisplay.setI18nLanguageId(i18nLanguageId);
 		themeDisplay.setI18nPath(i18nPath);
-	}
-
-	protected boolean _safePrefPropsUtilGetBoolean(
-		long companyId, String key, boolean defaultValue) {
-
-		try {
-			return PrefsPropsUtil.getBoolean(companyId, key, defaultValue);
-		}
-		catch (Exception e) {
-			return defaultValue;
-		}
 	}
 
 	private static final String _J_SECURITY_CHECK = "j_security_check";
