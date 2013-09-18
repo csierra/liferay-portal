@@ -6113,6 +6113,49 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
+	public boolean isLoginRedirectRequired(HttpServletRequest request) {
+		long companyId = PortalUtil.getCompanyId(request);
+
+		if (PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS &&
+			!request.isSecure()) {
+
+			return true;
+		}
+
+		try {
+			boolean isCasAuthEnabled = PrefsPropsUtil.getBoolean(
+				companyId, PropsKeys.CAS_AUTH_ENABLED,
+				PropsValues.CAS_AUTH_ENABLED);
+			boolean isOpenSSOAuthEnabled = PrefsPropsUtil.getBoolean(
+				companyId, PropsKeys.OPEN_SSO_AUTH_ENABLED,
+				PropsValues.OPEN_SSO_AUTH_ENABLED);
+			boolean isPortalJAASEnabled = PrefsPropsUtil.getBoolean(
+				companyId, PropsKeys.PORTAL_JAAS_ENABLE,
+				PropsValues.PORTAL_JAAS_ENABLE);
+			boolean isSiteMinderAuthEnabled = PrefsPropsUtil.getBoolean(
+				companyId, PropsKeys.SITEMINDER_AUTH_ENABLED,
+				PropsValues.SITEMINDER_AUTH_ENABLED);
+
+			if (isCasAuthEnabled || isOpenSSOAuthEnabled ||
+				isPortalJAASEnabled || isSiteMinderAuthEnabled) {
+
+				return true;
+			}
+		}
+		catch (SystemException se) {
+			if (PropsValues.CAS_AUTH_ENABLED ||
+				PropsValues.OPEN_SSO_AUTH_ENABLED ||
+				PropsValues.PORTAL_JAAS_ENABLE ||
+				PropsValues.SITEMINDER_AUTH_ENABLED) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean isMethodGet(PortletRequest portletRequest) {
 		HttpServletRequest request = getHttpServletRequest(portletRequest);
 
