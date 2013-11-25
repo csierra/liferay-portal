@@ -16,6 +16,8 @@ package com.liferay.portal.sso.cas;
 
 import aQute.bnd.annotation.metatype.Configurable;
 
+import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
+import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.BaseFilter;
@@ -28,17 +30,23 @@ import com.liferay.portal.sso.cas.configuration.CASConfiguration;
 import com.liferay.portal.sso.cas.constants.CASWebKeys;
 import com.liferay.portal.util.PortalUtil;
 
+import java.io.Serializable;
+import java.security.AccessController;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
+import javax.security.auth.Subject;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.jasig.cas.client.authentication.AttributePrincipal;
+import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 import org.jasig.cas.client.util.CommonUtils;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.Cas20ProxyTicketValidator;
@@ -104,7 +112,8 @@ public class CASFilter extends BaseFilter {
 		return _log;
 	}
 
-	protected TicketValidator getTicketValidator(long companyId)
+	protected TicketValidator getTicketValidator(
+			long companyId, HttpServletRequest request)
 		throws Exception {
 
 		TicketValidator ticketValidator = _ticketValidators.get(companyId);
@@ -130,6 +139,12 @@ public class CASFilter extends BaseFilter {
 		parameters.put("casServerUrlPrefix", serverUrl);
 		parameters.put("casServerLoginUrl", loginUrl);
 		parameters.put("redirectAfterValidation", "false");
+
+		cas20ProxyTicketValidator.setProxyGrantingTicketStorage(
+			_proxyGrantingTicketStorage);
+
+		cas20ProxyTicketValidator.setProxyCallbackUrl(
+			PortalUtil.getPortalURL(request) + "/casProxyCallbackUrl");
 
 		cas20ProxyTicketValidator.setCustomParameters(parameters);
 
@@ -214,7 +229,8 @@ public class CASFilter extends BaseFilter {
 				return;
 			}
 
-			TicketValidator ticketValidator = getTicketValidator(companyId);
+			TicketValidator ticketValidator = getTicketValidator(
+				companyId, request);
 
 			Assertion assertion = ticketValidator.validate(ticket, serviceUrl);
 
@@ -224,7 +240,7 @@ public class CASFilter extends BaseFilter {
 
 				login = attributePrincipal.getName();
 
-				session.setAttribute(CASWebKeys.CAS_LOGIN, login);
+				session.setAttribute("LIFERAY_SHARED_CAS_PRINCIPAL", attributePrincipal);
 			}
 		}
 
@@ -233,9 +249,12 @@ public class CASFilter extends BaseFilter {
 
 	private static final Log _log = LogFactoryUtil.getLog(CASFilter.class);
 
-	private static final Map<Long, TicketValidator> _ticketValidators =
-		new ConcurrentHashMap<>();
-
 	private volatile CASConfiguration _casConfiguration;
+
+	private static ProxyGrantingTicketStorage _proxyGrantingTicketStorage = new
+		LiferayEHCacheProxyGrantingTicketStorage();
+
+	private static Map<Long, TicketValidator> _ticketValidators =
+		new ConcurrentHashMap<Long, TicketValidator>();
 
 }
