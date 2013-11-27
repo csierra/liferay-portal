@@ -24,11 +24,11 @@ import javax.portlet.PortletSession;
  */
 public class CasServiceUtil {
 
-	public static String getProxyTicketFor(
-			PortletSession portletSession, String service)
+	public static LiferayCasPrincipal getLiferayCasPrincipal(
+			PortletSession portletSession)
 		throws CasNotAvailableException {
 
-		return _casService.getProxyTicketFor(portletSession, service);
+		return _casService.getLiferayCasPrincipal(portletSession);
 	}
 
 	public void setCasService(CasService casService) {

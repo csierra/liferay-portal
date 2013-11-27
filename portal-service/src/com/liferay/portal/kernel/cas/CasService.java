@@ -23,6 +23,8 @@ import javax.portlet.PortletSession;
  */
 public interface CasService {
 
+	public static final String CAS_PRINCIPAL_SESSION_KEY = "LIFERAY_SHARED_CAS_PRINCIPAL";
+
 	public LiferayCasPrincipal getLiferayCasPrincipal(
 			PortletSession portletSession)
 		throws CasNotAvailableException;

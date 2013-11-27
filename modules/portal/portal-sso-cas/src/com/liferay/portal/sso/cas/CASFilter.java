@@ -16,6 +16,7 @@ package com.liferay.portal.sso.cas;
 
 import aQute.bnd.annotation.metatype.Configurable;
 
+import com.liferay.portal.kernel.cas.CasService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.BaseFilter;
@@ -138,7 +139,7 @@ public class CASFilter extends BaseFilter {
 			_proxyGrantingTicketStorage);
 
 		cas20ProxyTicketValidator.setProxyCallbackUrl(
-			PortalUtil.getPortalURL(request) + "/casProxyCallbackUrl");
+			PortalUtil.getPortalURL(request) + _CAS_PGT_SERVLET_URL);
 
 		cas20ProxyTicketValidator.setCustomParameters(parameters);
 
@@ -235,6 +236,9 @@ public class CASFilter extends BaseFilter {
 				login = attributePrincipal.getName();
 
 				session.setAttribute("LIFERAY_SHARED_CAS_PRINCIPAL", attributePrincipal);
+				session.setAttribute(WebKeys.CAS_LOGIN, login);
+				session.setAttribute(
+					CasService.CAS_PRINCIPAL_SESSION_KEY, attributePrincipal);
 			}
 		}
 
@@ -244,6 +248,9 @@ public class CASFilter extends BaseFilter {
 	private static final Log _log = LogFactoryUtil.getLog(CASFilter.class);
 
 	private volatile CASConfiguration _casConfiguration;
+
+	//This value must match web.xml and portal.properties
+	private static final String _CAS_PGT_SERVLET_URL = "/casProxyCallbackUrl";
 
 	private static ProxyGrantingTicketStorage _proxyGrantingTicketStorage = new
 		CacheProxyGrantingTicketStorage();

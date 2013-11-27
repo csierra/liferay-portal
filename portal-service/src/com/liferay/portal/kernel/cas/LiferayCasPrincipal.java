@@ -14,14 +14,26 @@
 
 package com.liferay.portal.kernel.cas;
 
-import org.jasig.cas.client.authentication.AttributePrincipal;
-
 import java.io.Serializable;
+
+import java.util.Map;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface LiferayCasPrincipal extends AttributePrincipal, Serializable {
+public interface LiferayCasPrincipal extends Serializable {
 
+	/**
+	 * Retrieves a CAS proxy ticket for this specific principal.
+	 *
+	 * @param service the service we wish to proxy this user to.
+	 * @return a String representing the proxy ticket.
+	 */
+	String getProxyTicketFor(String service);
 
+	/**
+	 * The Map of key/value pairs associated with this principal.
+	 * @return the map of key/value pairs associated with this principal.
+	 */
+	Map getAttributes();
 }

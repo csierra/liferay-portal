@@ -15,6 +15,7 @@
 package com.liferay.portal.security.cas;
 
 import com.liferay.portal.kernel.cas.LiferayCasPrincipal;
+
 import org.jasig.cas.client.authentication.AttributePrincipal;
 
 import java.util.Map;
@@ -28,17 +29,14 @@ public class LiferayCasPrincipalImpl implements LiferayCasPrincipal {
 		_attributePrincipal = attributePrincipal;
 	}
 
-	@Override
 	public Map getAttributes() {
 		return _attributePrincipal.getAttributes();
 	}
 
-	@Override
 	public String getName() {
 		return _attributePrincipal.getName();
 	}
 
-	@Override
 	public String getProxyTicketFor(String service) {
 		return _attributePrincipal.getProxyTicketFor(service);
 	}
