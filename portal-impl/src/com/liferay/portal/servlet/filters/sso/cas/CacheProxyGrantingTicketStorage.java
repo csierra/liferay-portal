@@ -20,12 +20,12 @@ import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 
 import java.io.Serializable;
 
-public class LiferayEHCacheProxyGrantingTicketStorage
+public class CacheProxyGrantingTicketStorage
 	implements ProxyGrantingTicketStorage {
 
-	public LiferayEHCacheProxyGrantingTicketStorage() {
+	public CacheProxyGrantingTicketStorage() {
 		_cache = MultiVMPoolUtil.getCache(
-			LiferayEHCacheProxyGrantingTicketStorage.class.getName());
+			CacheProxyGrantingTicketStorage.class.getName());
 	}
 
 	@Override
@@ -34,8 +34,8 @@ public class LiferayEHCacheProxyGrantingTicketStorage
 	}
 
 	@Override
-	public String retrieve(String s) {
-		return (String)_cache.get(s);
+	public String retrieve(String key) {
+		return (String)_cache.get(key);
 	}
 
 	@Override
@@ -44,4 +44,5 @@ public class LiferayEHCacheProxyGrantingTicketStorage
 	}
 
 	private PortalCache<Serializable,Serializable> _cache;
+
 }

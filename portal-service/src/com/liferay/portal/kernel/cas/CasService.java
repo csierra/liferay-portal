@@ -12,29 +12,16 @@
  * details.
  */
 
-package com.liferay.portal.kernel.util;
-
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+package com.liferay.portal.kernel.cas;
 
 import javax.portlet.PortletSession;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class CasServiceUtil {
+public interface CasService {
 
-	public static String getProxyTicketFor(
+	public String getProxyTicketFor(
 			PortletSession portletSession, String service)
-		throws CasNotAvailableException {
-
-		return _casService.getProxyTicketFor(portletSession, service);
-	}
-
-	public void setCasService(CasService casService) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
-		_casService = casService;
-	}
-
-	private static CasService _casService;
+		throws CasNotAvailableException;
 }
