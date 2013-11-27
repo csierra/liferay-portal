@@ -16,8 +16,6 @@ package com.liferay.portal.sso.cas;
 
 import aQute.bnd.annotation.metatype.Configurable;
 
-import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
-import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.BaseFilter;
@@ -30,16 +28,12 @@ import com.liferay.portal.sso.cas.configuration.CASConfiguration;
 import com.liferay.portal.sso.cas.constants.CASWebKeys;
 import com.liferay.portal.util.PortalUtil;
 
-import java.io.Serializable;
-import java.security.AccessController;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.Filter;
 import javax.security.auth.Subject;
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -252,7 +246,7 @@ public class CASFilter extends BaseFilter {
 	private volatile CASConfiguration _casConfiguration;
 
 	private static ProxyGrantingTicketStorage _proxyGrantingTicketStorage = new
-		LiferayEHCacheProxyGrantingTicketStorage();
+		CacheProxyGrantingTicketStorage();
 
 	private static Map<Long, TicketValidator> _ticketValidators =
 		new ConcurrentHashMap<Long, TicketValidator>();

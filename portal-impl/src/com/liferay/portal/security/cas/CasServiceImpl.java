@@ -14,8 +14,8 @@
 
 package com.liferay.portal.security.cas;
 
-import com.liferay.portal.kernel.util.CasNotAvailableException;
-import com.liferay.portal.kernel.util.CasService;
+import com.liferay.portal.kernel.cas.CasService;
+import com.liferay.portal.kernel.cas.exception.CasNotAvailableException;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 
 import javax.portlet.PortletSession;

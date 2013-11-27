@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.cas;
 
+import com.liferay.portal.kernel.cas.exception.CasNotAvailableException;
+
 import javax.portlet.PortletSession;
 
 /**
@@ -24,4 +26,5 @@ public interface CasService {
 	public String getProxyTicketFor(
 			PortletSession portletSession, String service)
 		throws CasNotAvailableException;
+
 }

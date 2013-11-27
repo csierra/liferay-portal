@@ -1242,7 +1242,7 @@
 	</bean>
 	<bean id="com.liferay.portal.kernel.util.CasServiceUtil" class="com.liferay.portal.kernel.util.CasServiceUtil">
 		<property name="casService">
-			<bean class="com.liferay.portal.security.cas.CasServiceImpl"/>
+			<bean class="com.liferay.portal.security.cas.CasServiceImpl" />
 		</property>
 	</bean>
 </beans>

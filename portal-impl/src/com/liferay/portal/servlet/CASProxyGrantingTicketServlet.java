@@ -14,7 +14,7 @@
 
 package com.liferay.portal.servlet;
 
-import com.liferay.portal.servlet.filters.sso.cas.LiferayEHCacheProxyGrantingTicketStorage;
+import com.liferay.portal.servlet.filters.sso.cas.CacheProxyGrantingTicketStorage;
 import org.jasig.cas.client.proxy.ProxyGrantingTicketStorage;
 
 import javax.servlet.ServletException;
@@ -37,10 +37,8 @@ public class CASProxyGrantingTicketServlet extends HttpServlet {
 		String pgtIou = request.getParameter("pgtIou");
 
 		_proxyGrantingTicketStorage.save(pgtIou, pgtId);
-
-		System.out.println("CAS PGT: " + pgtId + " -> " + pgtIou);
 	}
 
 	private ProxyGrantingTicketStorage _proxyGrantingTicketStorage =
-		new LiferayEHCacheProxyGrantingTicketStorage();
+		new CacheProxyGrantingTicketStorage();
 }

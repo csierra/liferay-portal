@@ -422,7 +422,7 @@
 	<cache
 		eternal="false"
 		maxElementsInMemory="100"
-		name="com.liferay.portal.servlet.filters.sso.cas.LiferayEHCacheProxyGrantingTicketStorage"
+		name="com.liferay.portal.servlet.filters.sso.cas.CacheProxyGrantingTicketStorage"
 		overflowToDisk="false"
 		timeToIdleSeconds="60"
 	>

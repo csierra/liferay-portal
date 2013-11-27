@@ -14,8 +14,8 @@
 
 package com.liferay.portal.kernel.cas;
 
+import com.liferay.portal.kernel.cas.exception.CasNotAvailableException;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
-import com.liferay.portal.kernel.util.CasNotAvailableException;
 
 import javax.portlet.PortletSession;
 

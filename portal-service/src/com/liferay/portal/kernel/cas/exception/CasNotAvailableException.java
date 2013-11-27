@@ -14,10 +14,12 @@
 
 package com.liferay.portal.kernel.cas.exception;
 
+import com.liferay.portal.kernel.exception.PortalException;
+
 /**
  * @author Carlos Sierra Andrés
  */
-public class CasNotAvailableException extends Exception {
+public class CasNotAvailableException extends PortalException {
 
 	public CasNotAvailableException() {
 	}
