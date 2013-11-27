@@ -14,38 +14,34 @@
 
 package com.liferay.portal.security.cas;
 
-import com.liferay.portal.kernel.cas.CasService;
 import com.liferay.portal.kernel.cas.LiferayCasPrincipal;
-import com.liferay.portal.kernel.cas.exception.CasNotAvailableException;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 
-import javax.portlet.PortletSession;
+import java.util.Map;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class CasServiceImpl implements CasService {
+public class LiferayCasPrincipalImpl implements LiferayCasPrincipal {
 
-	public static String LIFERAY_SHARED_CAS_PRINCIPIAL =
-		"LIFERAY_SHARED_CAS_PRINCIPAL";
-
-	@Override
-	public LiferayCasPrincipal getLiferayCasPrincipal(
-			PortletSession portletSession)
-		throws CasNotAvailableException {
-
-		AttributePrincipal attributePrincipal =
-			(AttributePrincipal)portletSession.getAttribute(
-				LIFERAY_SHARED_CAS_PRINCIPIAL,
-				PortletSession.APPLICATION_SCOPE);
-
-		if (attributePrincipal == null) {
-			throw new CasNotAvailableException(
-				"Could not find " + LIFERAY_SHARED_CAS_PRINCIPIAL +
-					" in the provided session");
-		}
-
-		return new LiferayCasPrincipalImpl(attributePrincipal);
+	public LiferayCasPrincipalImpl(AttributePrincipal attributePrincipal) {
+		_attributePrincipal = attributePrincipal;
 	}
 
+	@Override
+	public Map getAttributes() {
+		return _attributePrincipal.getAttributes();
+	}
+
+	@Override
+	public String getName() {
+		return _attributePrincipal.getName();
+	}
+
+	@Override
+	public String getProxyTicketFor(String service) {
+		return _attributePrincipal.getProxyTicketFor(service);
+	}
+
+	private final AttributePrincipal _attributePrincipal;
 }

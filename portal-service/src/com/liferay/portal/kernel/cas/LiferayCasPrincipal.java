@@ -14,17 +14,14 @@
 
 package com.liferay.portal.kernel.cas;
 
-import com.liferay.portal.kernel.cas.exception.CasNotAvailableException;
+import org.jasig.cas.client.authentication.AttributePrincipal;
 
-import javax.portlet.PortletSession;
+import java.io.Serializable;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface CasService {
+public interface LiferayCasPrincipal extends AttributePrincipal, Serializable {
 
-	public LiferayCasPrincipal getLiferayCasPrincipal(
-			PortletSession portletSession)
-		throws CasNotAvailableException;
 
 }
