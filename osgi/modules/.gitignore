@@ -1,3 +1,7 @@
 .gradle
 
+<<<<<<< HEAD
 /registry/registry-api/build
+=======
+/**/build
+>>>>>>> Ignore the build folders in all the projects
