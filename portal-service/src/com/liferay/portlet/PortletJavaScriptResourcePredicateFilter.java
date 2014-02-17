@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
@@ -12,26 +11,27 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<c:if test="<%= (portlets != null) && !portlets.isEmpty() %>">
+package com.liferay.portlet;
 
-	<%
-	PredicateFilter<String> predicateFilter = PredicateFilter.ALL;
+import com.liferay.portal.kernel.util.PredicateFilter;
+import com.liferay.portal.theme.ThemeDisplay;
 
-	PortletResourceAccessor[] portletResourceAccessors = new PortletResourceAccessor[] {PortletResourceAccessor.footerPortalCss, PortletResourceAccessor.footerPortletCss};
-	%>
+/**
+ * @author Carlos Sierra Andrés
+ */
+public class PortletJavaScriptResourcePredicateFilter
+	implements PredicateFilter<String> {
 
-	<%@ include file="/html/common/themes/portlet_resources.jspf" %>
-
-	<%
-	for (String url : resourceURLs) {
-	%>
-
-		<link href="<%= url %>" rel="stylesheet" type="text/css" />
-
-	<%
+	public PortletJavaScriptResourcePredicateFilter(ThemeDisplay themeDisplay) {
+		_themeDisplay = themeDisplay;
 	}
-	%>
 
-</c:if>
+	@Override
+	public boolean filter(String resource) {
+		return !_themeDisplay.isIncludedJs(resource);
+	}
+
+	private ThemeDisplay _themeDisplay;
+
+}
