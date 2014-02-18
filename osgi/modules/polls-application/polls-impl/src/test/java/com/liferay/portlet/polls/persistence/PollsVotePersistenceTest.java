@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portlet.polls.service.persistence;
+package com.liferay.portlet.polls.persistence;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -41,6 +41,8 @@ import com.liferay.portlet.polls.NoSuchVoteException;
 import com.liferay.portlet.polls.model.PollsVote;
 import com.liferay.portlet.polls.model.impl.PollsVoteModelImpl;
 
+import com.liferay.portlet.polls.service.persistence.PollsVoteActionableDynamicQuery;
+import com.liferay.portlet.polls.service.persistence.PollsVotePersistence;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
