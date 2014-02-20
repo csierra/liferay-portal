@@ -1,0 +1,9 @@
+allprojects {
+
+	task format(type: JavaExec) {
+		allJvmArgs='-Xms512m -Xmx1024m -Xss2048k -XX:MaxPermSize=512m'
+		args=''
+		classpath = portalClasspath
+		main = 'com.liferay.portal.tools.servicebuilder.ServiceBuilder'
+	}
+}
