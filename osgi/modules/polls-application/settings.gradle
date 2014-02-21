@@ -1,1 +1,1 @@
-include 'polls-api', 'polls-impl'
+include 'polls-api', 'polls-impl', 'polls-web'
