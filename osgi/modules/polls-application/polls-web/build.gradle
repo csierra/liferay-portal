@@ -5,3 +5,5 @@ dependencies {
 
 	compile files(["${project.ext.liferayProjectDir}/portal-impl/classes"])
 }
+
+project.ext.deployDir = project.osgiLibDir ?: null 
