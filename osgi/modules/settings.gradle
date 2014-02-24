@@ -1,3 +1,4 @@
-include 'registry', 'polls-application'
+include 'registry'
+include 'polls-application'
 
 rootProject.name = 'osgi-modules'
