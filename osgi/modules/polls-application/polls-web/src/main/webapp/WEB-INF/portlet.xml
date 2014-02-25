@@ -17,7 +17,13 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
+		<portlet-info>
+            <title>Polls</title>
+            <short-title>Polls</short-title>
+            <keywords>Polls</keywords>
+
+        </portlet-info>
+		<!--<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>-->
 		<security-role-ref>
 			<role-name>power-user</role-name>
 		</security-role-ref>
@@ -45,7 +51,12 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
+		<portlet-info>
+            <title>Polls Display</title>
+            <short-title>Polls Display</short-title>
+            <keywords>Polls</keywords>
+        </portlet-info>
+		<!-- <resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle> -->
 		<security-role-ref>
 			<role-name>power-user</role-name>
 		</security-role-ref>
