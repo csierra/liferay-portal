@@ -2,6 +2,16 @@ Bundle-Version: 1.0.0
 Export-Package: *
 Include-Resource: build/classes/main
 
-Web-ClassPath: /polls-web
+Import-Package: \
+	com.liferay.portal.kernel.xml,\
+	com.liferay.portal.kernel.exception,\
+	com.liferay.portal.kernel.lar,\
+	com.liferay.portlet,\
+	com.liferay.portlet.polls.*,\
+	com.liferay.portlet.polls.lar,\
+	com.liferay.util.bean,\
+	*
+
+Web-ContextPath: /polls-web
 
 -wab: src/main/webapp
