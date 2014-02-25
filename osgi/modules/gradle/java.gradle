@@ -37,6 +37,11 @@ dependencies {
 		dir:"${liferayProjectDir}/lib/portal",
 		includes: ["**/*.jar"]
 	)
+
+}
+
+processResources {
+	from ("src/main/webapp")
 }
 
 jar {
@@ -45,6 +50,7 @@ jar {
 	doLast {
 		tasks.baseline.execute()
 	}
+
 	
 	outputs.upToDateWhen { task ->
 		project.file('bnd.bnd')?.lastModified() < project.file(archivePath)?.lastModified()
