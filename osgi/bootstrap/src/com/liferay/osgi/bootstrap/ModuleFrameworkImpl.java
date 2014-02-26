@@ -1053,6 +1053,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				_registerService(bundleContext, beanName, bean);
 			}
 		}
+
+		bundleContext.registerService(
+			ApplicationContext.class, applicationContext, null);
 	}
 
 	private void _registerService(

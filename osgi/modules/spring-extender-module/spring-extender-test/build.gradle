@@ -1,0 +1,16 @@
+project.ext.deployDir = project.hasProperty('osgiLibDir') ? project.osgiLibDir : null
+
+allprojects {
+	repositories {
+		mavenCentral()
+	}
+}
+
+dependencies {
+	compile files(["${project.ext.liferayProjectDir}/portal-impl/classes"])
+
+	compile (
+		[group: 'org.osgi', name: 'org.osgi.core', version: '4.3.1'],
+		[group: 'org.osgi', name: 'org.osgi.compendium', version: '4.3.1']
+	)
+}

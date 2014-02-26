@@ -14,14 +14,9 @@
 
 package com.liferay.portlet.pollsdisplay.action;
 
-import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.struts.PortletAction;
-import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.polls.NoSuchQuestionException;
-import com.liferay.portlet.polls.model.PollsQuestion;
-import com.liferay.portlet.polls.service.PollsQuestionServiceUtil;
 
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletPreferences;
@@ -52,18 +47,24 @@ public class ViewAction extends PortletAction {
 				portletPreferences.getValue("questionId", StringPool.BLANK));
 
 			if (questionId > 0) {
+				// TODO
+				/*
 				PollsQuestion question = PollsQuestionServiceUtil.getQuestion(
 					questionId);
 
 				renderRequest.setAttribute(WebKeys.POLLS_QUESTION, question);
+				*/
 			}
 		}
 		catch (Exception e) {
+			// TODO
+			/*
 			if (!(e instanceof NoSuchQuestionException)) {
 				SessionErrors.add(renderRequest, e.getClass());
 
 				return actionMapping.findForward("portlet.polls_display.error");
 			}
+			*/
 		}
 
 		return actionMapping.findForward("portlet.polls_display.view");

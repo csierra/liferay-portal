@@ -1,3 +1,5 @@
+project.ext.deployDir = project.hasProperty('portalLibDir') ? project.portalLibDir : null
+
 evaluationDependsOn(':polls-api')
 
 dependencies {

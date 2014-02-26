@@ -1,4 +1,14 @@
 Bundle-Version: 6.2.0
+Export-Package:\
+	com.liferay.portal.dao.orm.hibernate,\
+	com.liferay.portal.dao.shard,\
+	com.liferay.portal.kernel.util,\
+	com.liferay.portal.spring.aop,\
+	com.liferay.portal.spring.bean,\
+	com.liferay.portal.spring.context,\
+	com.liferay.portal.spring.hibernate,\
+	javax.sql,org.hibernate,\
+	org.hibernate.engine
 Import-Package: *
 Include-Resource: classes
 Private-Package: com.liferay.*
