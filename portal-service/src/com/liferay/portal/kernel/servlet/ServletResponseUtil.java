@@ -175,17 +175,18 @@ public class ServletResponseUtil {
 
 	public static void sendFile(
 			HttpServletRequest request, HttpServletResponse response,
-			String fileName, InputStream inputStream, long contentLength,
+			String fileName, InputStream inputStream, int contentLength,
 			String contentType)
 		throws IOException {
 
 		sendFile(
-			request, response, fileName, inputStream, 0, contentType, null);
+			request, response, fileName, inputStream, contentLength,
+			contentType, null);
 	}
 
 	public static void sendFile(
 			HttpServletRequest request, HttpServletResponse response,
-			String fileName, InputStream inputStream, long contentLength,
+			String fileName, InputStream inputStream, int contentLength,
 			String contentType, String contentDispositionType)
 		throws IOException {
 
@@ -557,7 +558,7 @@ public class ServletResponseUtil {
 
 	public static void write(
 			HttpServletResponse response, InputStream inputStream,
-			long contentLength)
+			int contentLength)
 		throws IOException {
 
 		OutputStream outputStream = null;
@@ -568,8 +569,7 @@ public class ServletResponseUtil {
 			}
 
 			if (contentLength > 0) {
-				response.setHeader(
-					HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength));
+				response.setContentLength(contentLength);
 			}
 
 			response.flushBuffer();
