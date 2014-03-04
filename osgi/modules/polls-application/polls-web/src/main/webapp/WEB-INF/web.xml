@@ -65,6 +65,11 @@
 		<servlet-class>com.liferay.portal.webserver.DynamicResourceServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet>
+		<servlet-name>Portlet Action Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.struts.PortletActionServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>1 Servlet</servlet-name>
 		<url-pattern>/1/*</url-pattern>
