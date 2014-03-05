@@ -1,4 +1,4 @@
-package com.liferay.hibernate.configuration;
+package com.liferay.spring.extender.hibernate.configuration;
 
 import com.liferay.portal.spring.hibernate.PortalHibernateConfiguration;
 

@@ -1,10 +1,12 @@
 package com.liferay.spring.extender.internal;
 
 import com.liferay.spring.extender.SpringExtender;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceReference;
+
 import org.springframework.context.ApplicationContext;
 
 /**

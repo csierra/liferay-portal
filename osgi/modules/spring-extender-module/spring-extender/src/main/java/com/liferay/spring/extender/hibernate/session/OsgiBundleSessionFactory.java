@@ -1,6 +1,6 @@
-package com.liferay.hibernate.session;
+package com.liferay.spring.extender.hibernate.session;
 
-import com.liferay.hibernate.configuration.OsgiBundleHibernateConfiguration;
+import com.liferay.spring.extender.hibernate.configuration.OsgiBundleHibernateConfiguration;
 import com.liferay.portal.dao.orm.hibernate.PortletSessionFactoryImpl;
 import com.liferay.portal.dao.shard.ShardDataSourceTargetSource;
 import com.liferay.portal.kernel.util.InfrastructureUtil;

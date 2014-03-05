@@ -1,10 +1,11 @@
 package com.liferay.spring.extender.context;
 
-import com.liferay.hibernate.configuration.OsgiBundleHibernateConfiguration;
-import com.liferay.hibernate.session.OsgiBundleSessionFactory;
 import com.liferay.portal.spring.aop.ServiceBeanAutoProxyCreator;
 import com.liferay.portal.spring.aop.ServiceBeanMatcher;
 import com.liferay.portal.spring.bean.BeanReferenceAnnotationBeanPostProcessor;
+
+import com.liferay.spring.extender.hibernate.configuration.OsgiBundleHibernateConfiguration;
+import com.liferay.spring.extender.hibernate.session.OsgiBundleSessionFactory;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;

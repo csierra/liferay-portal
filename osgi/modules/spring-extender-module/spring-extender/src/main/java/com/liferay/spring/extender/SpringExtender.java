@@ -1,12 +1,15 @@
 package com.liferay.spring.extender;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.spring.context.PortletBeanFactoryPostProcessor;
+import com.liferay.spring.extender.classloader.BundleDelegatedClassLoaderFactory;
+import com.liferay.spring.extender.context.OsgiBundleApplicationContext;
+
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.liferay.portal.spring.bean.BeanReferenceAnnotationBeanPostProcessor;
-import com.liferay.portal.spring.context.PortletBeanFactoryPostProcessor;
-import com.liferay.spring.extender.context.OsgiBundleApplicationContext;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
@@ -14,8 +17,6 @@ import org.osgi.framework.Constants;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 
 /**
  * @author Miguel Pastor
@@ -66,12 +67,12 @@ public class SpringExtender implements BundleListener {
 	private void _registerApplicationContext(
 		Bundle bundle, String[] locations) {
 
-		Class bundleClass = bundle.getClass();
+		ClassLoader bundleClassLoader =
+			BundleDelegatedClassLoaderFactory.createClassLoader(bundle);
 
 		OsgiBundleApplicationContext applicationContext =
 			new OsgiBundleApplicationContext(
-				_parentApplicationContext, locations,
-				bundleClass.getClassLoader());
+				_parentApplicationContext, locations, bundleClassLoader);
 
 		applicationContext.addBeanFactoryPostProcessor(
 			new PortletBeanFactoryPostProcessor());
@@ -87,17 +88,20 @@ public class SpringExtender implements BundleListener {
 			_springContexts.remove(bundleId);
 
 		if (configurableApplicationContext != null) {
-			// TODO Use proper logging
 			Dictionary<String, String> headers = bundle.getHeaders();
 			String bundleName = headers.get(Constants.BUNDLE_NAME);
 
-			System.out.println(
-				"Closing application context for bundle with id " + bundleId +
-					" and name " + bundleName);
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Closing application context for bundle with id " +
+						bundleId + " and name " + bundleName);
+			}
 
 			configurableApplicationContext.close();
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(SpringExtender.class);
 
 	private ApplicationContext _parentApplicationContext;
 	private Map<Long, ConfigurableApplicationContext> _springContexts =
