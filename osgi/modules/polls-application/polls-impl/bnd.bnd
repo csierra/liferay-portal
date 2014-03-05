@@ -1,3 +1,6 @@
 Bundle-Version: 1.0.0
 Export-Package: *
-Include-Resource: build/classes/main
+Include-Resource: \
+	build/classes/main,
+	src/main/resources
+Spring-Context: META-INF/*-spring.xml
