@@ -6,25 +6,19 @@
 		<!-- Polls -->
 
 		<action path="/polls/edit_question" type="com.liferay.portlet.polls.action.EditQuestionAction">
-			<forward name="portlet.polls.edit_question" path="portlet.polls.edit_question" />
+			<forward name="portlet.polls.edit_question" path="/portlet/polls/edit_question.jsp" />
 			<forward name="portlet.polls.error" path="portlet.polls.error" />
 		</action>
 
-		<action path="/polls/view" forward="portlet.polls.view" />
+		<action path="/polls/view" forward="/portlet/polls/view.jsp" />
 
 		<action path="/polls/view_chart" type="com.liferay.portlet.polls.action.ViewChartAction" />
 
 		<action path="/polls/view_question" type="com.liferay.portlet.polls.action.ViewQuestionAction">
-			<forward name="portlet.polls.edit_question" path="portlet.polls.view_question" />
+			<forward name="portlet.polls.edit_question" path="/portlet/polls/view_question.jsp" />
 			<forward name="portlet.polls.error" path="portlet.polls.error" />
 		</action>
 
 	</action-mappings>
-
-	<plug-in className="com.liferay.portal.struts.PortalTilesPlugin">
-		<set-property property="definitions-config" value="/WEB-INF/tiles-defs.xml,/WEB-INF/tiles-defs-ext.xml" />
-		<set-property property="definitions-factory-class" value="com.liferay.portal.struts.PortalI18nFactorySet" />
-		<set-property property="moduleAware" value="true" />
-	</plug-in>
 
 </struts-config>

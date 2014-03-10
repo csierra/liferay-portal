@@ -2,18 +2,40 @@ Bundle-Version: 1.0.0
 Export-Package: *
 Include-Resource: build/classes/main
 
+Bundle-ClassPath: WEB-INF/lib/util-taglib.jar 
 Import-Package: \
 	com.liferay.httpservice.servlet,\
 	com.liferay.portal.kernel.xml,\
 	com.liferay.portal.kernel.exception,\
 	com.liferay.portal.kernel.servlet.filters.invoker,\
+	com.liferay.portal.kernel.servlet.*,\
 	com.liferay.portal.kernel.lar,\
+	com.liferay.portal.kernel.portlet,\
+	com.liferay.portal.lar,\
+	com.liferay.portal.model,\
+	com.liferay.portal.security.permission,\
+	com.liferay.portal.struts,\
+	com.liferay.portal.theme,\
 	com.liferay.portal.webserver,\
-	com.liferay.portlet,\
-	com.liferay.portlet.polls.*,\
 	com.liferay.portlet.polls.lar,\
+	com.liferay.portlet.polls.lar.*,\
 	com.liferay.util.bean,\
+	com.liferay.portlet.polls.model.impl,\
+	com.liferay.portlet.polls.service.permission,\
+	com.liferay.servletjspcompiler.jsp,\
+	\
+	org.apache.el,\
 	org.apache.jasper.servlet,\
+	org.apache.struts.action,\
+	org.apache.struts.action.*,\
+	org.apache.struts.config,\
+	org.apache.struts.config.*,\
+	org.apache.jasper.runtime,\
+	org.eclipse.jetty.servlet.listener,\
+	org.glassfish.jsp.api,\
+	\
+	javax.portlet,\
+	javax.portlet.*,\
 	*
 
 Web-ContextPath: /polls-web

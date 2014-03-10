@@ -1,3 +1,6 @@
+<%@ page import="com.liferay.portal.security.permission.ActionKeys" %>
+<%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
+<%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %>
 <%--
 /**
  * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
@@ -15,6 +18,8 @@
 --%>
 
 <%@ include file="/html/portlet/polls/init.jsp" %>
+
+<%@ taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %>
 
 <aui:form method="post" name="fm">
 
