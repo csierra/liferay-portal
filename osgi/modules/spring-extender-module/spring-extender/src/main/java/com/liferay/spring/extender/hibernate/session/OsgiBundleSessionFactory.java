@@ -1,18 +1,29 @@
 package com.liferay.spring.extender.hibernate.session;
 
-import com.liferay.spring.extender.hibernate.configuration.OsgiBundleHibernateConfiguration;
 import com.liferay.portal.dao.orm.hibernate.PortletSessionFactoryImpl;
 import com.liferay.portal.dao.shard.ShardDataSourceTargetSource;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
+import com.liferay.spring.extender.classloader.BundleDelegatedClassLoader;
+import com.liferay.spring.extender.hibernate.configuration.OsgiBundleHibernateConfiguration;
 
 import javax.sql.DataSource;
 
+import org.eclipse.gemini.blueprint.context.BundleContextAware;
+
 import org.hibernate.SessionFactory;
+
+import org.osgi.framework.BundleContext;
 
 /**
  * @author Miguel Pastor
  */
-public class OsgiBundleSessionFactory extends PortletSessionFactoryImpl {
+public class OsgiBundleSessionFactory extends PortletSessionFactoryImpl
+	implements BundleContextAware {
+
+	@Override
+	public ClassLoader getSessionFactoryClassLoader() {
+		return _classLoader;
+	}
 
 	@Override
 	protected SessionFactory getSessionFactory() {
@@ -45,5 +56,13 @@ public class OsgiBundleSessionFactory extends PortletSessionFactoryImpl {
 
 		return sessionFactory;
 	}
+
+	@Override
+	public void setBundleContext(BundleContext bundleContext) {
+		_classLoader = new BundleDelegatedClassLoader(
+			bundleContext.getBundle());
+	}
+
+	private ClassLoader _classLoader;
 
 }

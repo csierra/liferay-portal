@@ -59,7 +59,7 @@ public class SessionFactoryImpl implements SessionFactory {
 	}
 
 	public ClassLoader getSessionFactoryClassLoader() {
-		return _sessionFactoryClassLoader;
+		return sessionFactoryClassLoader;
 	}
 
 	public SessionFactoryImplementor getSessionFactoryImplementor() {
@@ -100,10 +100,10 @@ public class SessionFactoryImpl implements SessionFactory {
 		ClassLoader portalClassLoader = ClassLoaderUtil.getPortalClassLoader();
 
 		if (sessionFactoryClassLoader == portalClassLoader) {
-			_sessionFactoryClassLoader = sessionFactoryClassLoader;
+			this.sessionFactoryClassLoader = sessionFactoryClassLoader;
 		}
 		else {
-			_sessionFactoryClassLoader = new PreloadClassLoader(
+			this.sessionFactoryClassLoader = new PreloadClassLoader(
 				sessionFactoryClassLoader, getPreloadClassLoaderClasses());
 		}
 	}
@@ -137,16 +137,18 @@ public class SessionFactoryImpl implements SessionFactory {
 	protected Session wrapSession(org.hibernate.Session session) {
 		Session liferaySession = new SessionImpl(session);
 
-		if (_sessionFactoryClassLoader != null) {
+		if (sessionFactoryClassLoader != null) {
 
 			// LPS-4190
 
 			liferaySession = new ClassLoaderSession(
-				liferaySession, _sessionFactoryClassLoader);
+				liferaySession, sessionFactoryClassLoader);
 		}
 
 		return liferaySession;
 	}
+
+	protected ClassLoader sessionFactoryClassLoader;
 
 	private static final String[] _PRELOAD_CLASS_NAMES =
 		PropsValues.
@@ -154,7 +156,6 @@ public class SessionFactoryImpl implements SessionFactory {
 
 	private static Log _log = LogFactoryUtil.getLog(SessionFactoryImpl.class);
 
-	private ClassLoader _sessionFactoryClassLoader;
 	private SessionFactoryImplementor _sessionFactoryImplementor;
 
 }

@@ -1,6 +1,19 @@
-Bundle-Activator:${classes;IMPLEMENTS;org.osgi.framework.BundleActivator}
 Bundle-Version: 1.0.0
-Private-Package: *
-Include-Resource: build/classes/main,\
+Export-Package: com.liferay.spring.extender.*
+Import-Package:\
+	org.springframework.aop.config,\
+	org.springframework.beans.factory.xml,\
+	org.springframework.context.config,\
+	org.springframework.ejb.config,\
+	org.springframework.scripting.config,\
+	org.springframework.scheduling.config,\
+	org.springframework.jdbc.config,\
+	org.springframework.jms.config,\
+	org.springframework.oxm.config,\
+	org.springframework.transaction.config,\
+	org.springframework.web.servlet.config,\
+	*
+Include-Resource:\
+	build/classes/main,\
 	src/main/resources/
 

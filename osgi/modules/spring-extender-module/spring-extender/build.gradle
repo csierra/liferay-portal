@@ -9,8 +9,12 @@ allprojects {
 dependencies {
 	compile files(["${project.ext.liferayProjectDir}/portal-impl/classes"])
 
+	compile fileTree(
+		dir:"${project.ext.liferayProjectDir}/osgi/lib/common/portal",
+		includes: ["gemini-blueprint-*.jar"]
+	)
+
 	compile (
-		[group: 'org.osgi', name: 'org.osgi.core', version: '4.3.1'],
-		[group: 'org.osgi', name: 'org.osgi.compendium', version: '4.3.1']
+		[group: 'org.osgi', name: 'org.osgi.core', version: '4.3.1']
 	)
 }

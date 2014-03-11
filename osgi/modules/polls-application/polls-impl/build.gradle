@@ -1,10 +1,9 @@
-project.ext.deployDir = project.hasProperty('portalLibDir') ? project.portalLibDir : null
+project.ext.deployDir = project.hasProperty('osgiLibDir') ? project.osgiLibDir : null
+
 project.ext.apiDir = '../polls-api'
 project.ext.webDir = '../polls-web'
 
 evaluationDependsOn(':polls-api')
-
-apply from: '../../gradle/servicebuilder.gradle'
 
 dependencies {
 	compile project(':polls-api')

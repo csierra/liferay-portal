@@ -1,5 +1,6 @@
 Bundle-Activator: ${classes;IMPLEMENTS;org.osgi.framework.BundleActivator}
 Bundle-Version: 1.0.0
 Private-Package: *
-Include-Resource: build/classes/main,\
+Include-Resource:\
+	build/classes/main,\
 	src/main/resources/
