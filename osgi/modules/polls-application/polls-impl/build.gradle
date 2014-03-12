@@ -5,6 +5,8 @@ project.ext.webDir = '../polls-web'
 
 evaluationDependsOn(':polls-api')
 
+apply from: '../../gradle/servicebuilder.gradle'
+
 dependencies {
 	compile project(':polls-api')
 
