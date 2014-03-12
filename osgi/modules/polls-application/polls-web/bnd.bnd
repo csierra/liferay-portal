@@ -17,12 +17,14 @@ Import-Package: \
 	com.liferay.portal.struts,\
 	com.liferay.portal.theme,\
 	com.liferay.portal.webserver,\
+	\
+	com.liferay.portlet.polls,\
+	com.liferay.portlet.polls.*,\
 	com.liferay.portlet.polls.lar,\
-	com.liferay.portlet.polls.lar.*,\
-	com.liferay.util.bean,\
 	com.liferay.portlet.polls.model.impl,\
 	com.liferay.portlet.polls.service.permission,\
 	com.liferay.servletjspcompiler.jsp,\
+	com.liferay.util.bean,\
 	\
 	org.apache.el,\
 	org.apache.jasper.servlet,\
