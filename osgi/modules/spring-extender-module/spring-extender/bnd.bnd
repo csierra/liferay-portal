@@ -27,6 +27,8 @@ Import-Package:\
 	\
 	org.apache.commons.logging.impl,\
 	\
+	org.hibernate,\
+	\
 	org.springframework.aop,\
 	org.springframework.aop.config,\
 	org.springframework.aop.framework,\
@@ -37,6 +39,9 @@ Import-Package:\
 	org.springframework.beans.factory.xml,\
 	\
 	org.springframework.context.config,\
+	org.springframework.context.support,\
+	\
+	org.springframework.core.io,\
 	\
 	org.springframework.ejb.config,\
 	\
@@ -52,8 +57,7 @@ Import-Package:\
 	\
 	org.springframework.transaction.config,\
 	\
-	org.springframework.web.servlet.config,\
-	*
+	org.springframework.web.servlet.config
 Include-Resource:\
 	build/classes/main,\
 	src/main/resources/

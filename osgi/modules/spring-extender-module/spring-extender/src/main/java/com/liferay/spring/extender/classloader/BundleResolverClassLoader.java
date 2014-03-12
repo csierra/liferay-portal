@@ -14,59 +14,82 @@
 
 package com.liferay.spring.extender.classloader;
 
-import com.liferay.portal.kernel.spring.util.SpringFactoryUtil;
-import com.liferay.portal.spring.aop.ChainableMethodAdviceInjectorCollector;
-import org.eclipse.gemini.blueprint.extender.OsgiBeanFactoryPostProcessor;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanIsAbstractException;
-import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Map;
 
 /**
  * @author Miguel Pastor
  */
-public class BundleDelegatedClassLoader extends ClassLoader {
+public class BundleResolverClassLoader extends ClassLoader {
 
-	public BundleDelegatedClassLoader(Bundle bundle) {
-		if (bundle == null) {
-			throw new IllegalArgumentException("A valid bundle is required!");
+	public BundleResolverClassLoader(
+		Bundle ... bundles) {
+
+		if (bundles == null) {
+			throw new IllegalArgumentException(
+				"At least one valid bundle is required!");
 		}
 
-		_bundle = bundle;
+		_bundles = bundles;
 	}
 
 	@Override
 	protected URL findResource(String name) {
-		return _bundle.getResource(name);
+		for (Bundle bundle : _bundles) {
+			URL url = bundle.getResource(name);
+
+			if (url != null) {
+				return url;
+			}
+		}
+
+		return null;
 	}
 
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		return _bundle.loadClass(name);
+		for (Bundle bundle : _bundles) {
+			try {
+				return bundle.loadClass(name);
+			}
+			catch (ClassNotFoundException cnfe) {
+				continue;
+			}
+		}
+
+		throw new ClassNotFoundException(name);
 	}
 
 	@Override
 	protected Enumeration<URL> findResources(String name) throws IOException {
-		return _bundle.getResources(name);
+		for (Bundle bundle : _bundles) {
+			try {
+
+				Enumeration<URL> resources = bundle.getResources(name);
+
+				if ((resources != null) && (resources.hasMoreElements())) {
+					return resources;
+				}
+			}
+			catch (IOException ioe) {
+			}
+		}
+
+		return Collections.emptyEnumeration();
 	}
 
 	@Override
 	public URL getResource(String name) {
-		return _bundle.getResource(name);
+		return findResource(name);
 	}
 
 	@Override
 	public Enumeration<URL> getResources(String name) throws IOException {
-		return _bundle.getResources(name);
+		return findResources(name);
 	}
 
 	protected Class<?> loadClass(String name, boolean resolve)
@@ -81,6 +104,6 @@ public class BundleDelegatedClassLoader extends ClassLoader {
 		return clazz;
 	}
 
-	private final Bundle _bundle;
+	private final Bundle[] _bundles;
 
 }

@@ -14,94 +14,26 @@
 
 package com.liferay.spring.extender.blueprint;
 
-import com.liferay.portal.kernel.spring.util.SpringFactoryUtil;
-import com.liferay.portal.spring.aop.ChainableMethodAdviceInjectorCollector;
+import com.liferay.portal.spring.context.PortletBeanFactoryPostProcessor;
 
-import java.util.Map;
-
-import org.eclipse.gemini.blueprint.extender.OsgiBeanFactoryPostProcessor;
-
-import org.osgi.framework.BundleContext;
-
-import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanIsAbstractException;
-import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * @author Miguel Pastor
  */
 public class ModuleBeanFactoryPostProcessor
-	implements OsgiBeanFactoryPostProcessor {
+	extends PortletBeanFactoryPostProcessor {
+
+	public ModuleBeanFactoryPostProcessor(
+		ClassLoader classLoader) {
+
+		_classLoader = classLoader;
+	}
 
 	@Override
-	public void postProcessBeanFactory(
-		BundleContext bundleContext,
-		ConfigurableListableBeanFactory configurableListableBeanFactory) {
-
-		ChainableMethodAdviceInjectorCollector.collect(
-			configurableListableBeanFactory);
-
-		configurableListableBeanFactory.setBeanClassLoader(
-			bundleContext.getClass().getClassLoader());
-
-		ListableBeanFactory parentListableBeanFactory =
-			(ListableBeanFactory)
-				configurableListableBeanFactory.getParentBeanFactory();
-
-		if (parentListableBeanFactory != null) {
-			Map<String, BeanPostProcessor> beanPostProcessors =
-				parentListableBeanFactory.getBeansOfType(
-					BeanPostProcessor.class, true, false);
-
-			for (BeanPostProcessor beanPostProcessor :
-					beanPostProcessors.values()) {
-
-				if (beanPostProcessor instanceof BeanFactoryAware) {
-					BeanFactoryAware beanFactoryAware =
-						(BeanFactoryAware)beanPostProcessor;
-
-					beanFactoryAware.setBeanFactory(
-						configurableListableBeanFactory);
-				}
-
-				if (beanPostProcessor instanceof
-						AbstractAutoProxyCreator) {
-
-					AbstractAutoProxyCreator abstractAutoProxyCreator =
-						(AbstractAutoProxyCreator)beanPostProcessor;
-
-					abstractAutoProxyCreator.setProxyClassLoader(
-						bundleContext.getClass().getClassLoader());
-				}
-
-				configurableListableBeanFactory.addBeanPostProcessor(
-					beanPostProcessor);
-			}
-		}
-
-		String[] names =
-			configurableListableBeanFactory.getBeanDefinitionNames();
-
-		for (String name : names) {
-			if (!name.contains(SpringFactoryUtil.class.getName())) {
-				continue;
-			}
-
-			try {
-				Object bean = configurableListableBeanFactory.getBean(name);
-
-				if (bean instanceof BeanPostProcessor) {
-					configurableListableBeanFactory.addBeanPostProcessor(
-						(BeanPostProcessor)bean);
-				}
-			}
-			catch (BeanIsAbstractException biae) {
-				continue;
-			}
-		}
+	protected ClassLoader getClassLoader() {
+		return _classLoader;
 	}
+
+	private ClassLoader _classLoader;
 
 }

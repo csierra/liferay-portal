@@ -15,7 +15,6 @@
 		<property name="methodInterceptor" ref="serviceAdvice" />
 	</bean>
 	<bean class="com.liferay.portal.spring.bean.BeanReferenceAnnotationBeanPostProcessor" />
-	<bean class="com.liferay.spring.extender.blueprint.ModuleBeanFactoryPostProcessor" />
 
 	<bean class="com.liferay.portal.spring.context.PortletBeanFactoryCleaner" />
 	<bean id="basePersistence" abstract="true">

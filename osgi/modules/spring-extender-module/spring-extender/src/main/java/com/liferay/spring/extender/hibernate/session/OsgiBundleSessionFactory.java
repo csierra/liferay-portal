@@ -3,7 +3,7 @@ package com.liferay.spring.extender.hibernate.session;
 import com.liferay.portal.dao.orm.hibernate.PortletSessionFactoryImpl;
 import com.liferay.portal.dao.shard.ShardDataSourceTargetSource;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
-import com.liferay.spring.extender.classloader.BundleDelegatedClassLoader;
+import com.liferay.spring.extender.classloader.BundleResolverClassLoader;
 import com.liferay.spring.extender.hibernate.configuration.OsgiBundleHibernateConfiguration;
 
 import javax.sql.DataSource;
@@ -59,8 +59,8 @@ public class OsgiBundleSessionFactory extends PortletSessionFactoryImpl
 
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
-		_classLoader = new BundleDelegatedClassLoader(
-			bundleContext.getBundle());
+		_classLoader = new BundleResolverClassLoader(
+			bundleContext.getBundle(), null);
 	}
 
 	private ClassLoader _classLoader;

@@ -2,16 +2,23 @@ package com.liferay.spring.extender.hibernate.configuration;
 
 import com.liferay.portal.spring.hibernate.PortletHibernateConfiguration;
 
-import com.liferay.spring.extender.classloader.BundleDelegatedClassLoader;
-import org.eclipse.gemini.blueprint.context.BundleContextAware;
-
-import org.osgi.framework.BundleContext;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author Miguel Pastor
  */
-public class OsgiBundleHibernateConfiguration extends
-	PortletHibernateConfiguration implements BundleContextAware {
+public class OsgiBundleHibernateConfiguration
+	extends PortletHibernateConfiguration implements ApplicationContextAware {
+
+	@Override
+	public void setApplicationContext(
+		ApplicationContext applicationContext)
+		throws BeansException {
+
+		_classLoader = applicationContext.getClassLoader();
+	}
 
 	@Override
 	protected ClassLoader getConfigurationClassLoader() {
@@ -21,12 +28,6 @@ public class OsgiBundleHibernateConfiguration extends
 	@Override
 	protected String[] getConfigurationResources() {
 		return new String[] {"META-INF/module-hbm.xml"};
-	}
-
-	@Override
-	public void setBundleContext(BundleContext bundleContext) {
-		_classLoader = new BundleDelegatedClassLoader(
-			bundleContext.getBundle());
 	}
 
 	private ClassLoader _classLoader;
