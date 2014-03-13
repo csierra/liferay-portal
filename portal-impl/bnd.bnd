@@ -1,5 +1,6 @@
 Bundle-Version: 6.2.0
 Export-Package:\
+	com.liferay.portal.bean,\
 	com.liferay.portal.cache,\
 	com.liferay.portal.cluster,\
 	com.liferay.portal.increment,\
