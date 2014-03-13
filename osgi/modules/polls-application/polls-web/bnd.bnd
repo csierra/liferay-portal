@@ -2,7 +2,7 @@ Bundle-Version: 1.0.0
 Export-Package: *
 Include-Resource: build/classes/main
 
-Bundle-ClassPath: WEB-INF/lib/util-taglib.jar 
+Bundle-ClassPath: WEB-INF/lib/util-taglib.jar
 Import-Package: \
 	com.liferay.httpservice.servlet,\
 	com.liferay.portal.kernel.xml,\
@@ -32,6 +32,8 @@ Import-Package: \
 	org.apache.struts.action.*,\
 	org.apache.struts.config,\
 	org.apache.struts.config.*,\
+	org.apache.struts.util,\
+	\
 	org.apache.jasper.runtime,\
 	org.eclipse.jetty.servlet.listener,\
 	org.glassfish.jsp.api,\
