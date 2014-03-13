@@ -17,6 +17,10 @@
 
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 
+<%@ taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %>
+
+<%@ taglib uri="http://alloy.liferay.com/tld/aui" prefix="aui" %>
+
 <%@ page import="com.liferay.portlet.polls.DuplicateVoteException" %><%@
 page import="com.liferay.portlet.polls.NoSuchChoiceException" %><%@
 page import="com.liferay.portlet.polls.NoSuchQuestionException" %><%@
@@ -55,6 +59,10 @@ page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %>
 <%@ page import="com.liferay.portal.kernel.dao.search.SearchEntry" %>
 <%@ page
 	import="com.liferay.portlet.polls.service.permission.PollsPermission" %>
+<%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %>
+
+<%@ page import="com.liferay.portal.security.permission.ActionKeys" %>
+<%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
 <%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %>
 
 <portlet:defineObjects />
