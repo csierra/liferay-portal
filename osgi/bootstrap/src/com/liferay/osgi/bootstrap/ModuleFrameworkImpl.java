@@ -51,8 +51,10 @@ import com.liferay.portal.util.PropsValues;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.PrintStream;
 
 import java.net.JarURLConnection;
@@ -729,14 +731,26 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		File coreDir = new File(
 			PropsValues.LIFERAY_WEB_PORTAL_CONTEXT_TEMPDIR, "osgi");
 
-		File cacheFile = new File(coreDir, "system-packages.txt");
+		File cacheFile = new File(coreDir, "system-packages.dat");
 		File hashcodeFile = new File(coreDir, "system-packages.hash");
 
 		if (cacheFile.exists() && hashcodeFile.exists() &&
 			_hasMatchingHashcode(hashcodeFile, hashcode)) {
 
 			try {
+				ObjectInputStream objectInputStream =
+					new ObjectInputStream(new FileInputStream(cacheFile));
+
+				_extraPackageMap =
+					(Map<String, List<URL>>) objectInputStream.readObject();
+
 				return FileUtil.read(cacheFile);
+			}
+			catch (ClassCastException cce) {
+				_log.error(cce, cce);
+			}
+			catch (ClassNotFoundException cnfe) {
+				_log.error(cnfe, cnfe);
 			}
 			catch (IOException ioe) {
 				_log.error(ioe, ioe);

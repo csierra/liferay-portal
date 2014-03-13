@@ -16,10 +16,12 @@ package com.liferay.portlet.polls.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.util.ReferenceRegistry;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-
-import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Provides the local service utility for PollsQuestion. This utility wraps
@@ -447,17 +449,30 @@ public class PollsQuestionLocalServiceUtil {
 	}
 
 	public static PollsQuestionLocalService getService() {
-		return _serviceTracker.getService();
+		if (_service == null) {
+			Bundle bundle = FrameworkUtil.getBundle(
+				com.liferay.portlet.polls.service.PollsQuestionLocalServiceUtil.class);
+
+			BundleContext bundleContext = bundle.getBundleContext();
+
+			ServiceReference<PollsQuestionLocalService> serviceReference =
+				bundleContext.getServiceReference(PollsQuestionLocalService.class);
+
+			_service = bundleContext.getService(serviceReference);
+
+			ReferenceRegistry.registerReference(PollsQuestionLocalServiceUtil.class,
+				"_service");
+		}
+
+		return _service;
 	}
 
-	private static ServiceTracker<PollsQuestionLocalService, PollsQuestionLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(PollsQuestionLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<PollsQuestionLocalService, PollsQuestionLocalService>(bundle.getBundleContext(),
-				PollsQuestionLocalService.class, null);
-
-		_serviceTracker.open();
+	/**
+	 * @deprecated As of 6.2.0
+	 */
+	@Deprecated
+	public void setService(PollsQuestionLocalService service) {
 	}
+
+	private static PollsQuestionLocalService _service;
 }
