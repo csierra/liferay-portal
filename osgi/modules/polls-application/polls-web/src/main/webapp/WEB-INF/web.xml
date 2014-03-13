@@ -80,7 +80,7 @@
 	</servlet-mapping>
 	<jsp-config>
 		<taglib>
-			<taglib-uri>http://liferay.com/tld/aui</taglib-uri>
+			<taglib-uri>http://alloy.liferay.com/tld/aui</taglib-uri>
 			<taglib-location>/META-INF/aui.tld</taglib-location>
 		</taglib>
 		<taglib>
