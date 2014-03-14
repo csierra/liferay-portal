@@ -1,9 +1,9 @@
 Bundle-Version: 1.0.0
-Export-Package: *
 Import-Package:\
 	com.liferay.portlet.polls.service.persistence,\
 	*
 Include-Resource:\
 	build/classes/main,\
 	src/main/resources
+Private-Package: *
 Spring-Context: META-INF/*-spring.xml
