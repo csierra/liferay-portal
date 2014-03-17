@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portlet.polls.service.persistence.impl;
+package com.liferay.portlet.polls.service.persistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -45,7 +45,6 @@ import com.liferay.portlet.polls.NoSuchQuestionException;
 import com.liferay.portlet.polls.model.PollsQuestion;
 import com.liferay.portlet.polls.model.impl.PollsQuestionImpl;
 import com.liferay.portlet.polls.model.impl.PollsQuestionModelImpl;
-import com.liferay.portlet.polls.service.persistence.PollsQuestionPersistence;
 
 import java.io.Serializable;
 
