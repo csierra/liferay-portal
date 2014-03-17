@@ -45,7 +45,7 @@ task buildService(type: JavaExec) {
 	args "service.impl.dir=src/main/java"
 	args "service.api.dir=${project.ext.apiDir}/src/main/java"
 	args "service.remoting.file=${project.ext.webDir}/src/main/resources/WEB-INF/remoting-servlet.xml"
-	args "service.sql.dir=src/main/resources/sql"
+	args "service.sql.dir=src/main/resources/META-INF/sql"
 	args "service.sql.file=tables.sql"
 	args "service.sql.indexes.file=indexes.sql"
 	args "service.sql.sequences.file=sequences.sql"
