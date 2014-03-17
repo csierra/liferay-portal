@@ -2030,9 +2030,22 @@ public class ServiceBuilder {
 			return;
 		}
 
-		JavaClass javaClass = _getJavaClass(
+		File finderImplFile = new File(
 			_outputPath + "/service/persistence/" + entity.getName() +
 				"FinderImpl.java");
+
+		String relocatedFinderImpl = _outputPath + "/service/persistence/impl/"
+			+ entity.getName() + "FinderImpl.java";
+
+		if (finderImplFile.exists()) {
+			finderImplFile.renameTo(new File(relocatedFinderImpl));
+
+			System.out.println(
+				"Relocated file " + finderImplFile.getAbsoluteFile() + " to " +
+					relocatedFinderImpl);
+		}
+
+		JavaClass javaClass = _getJavaClass(relocatedFinderImpl);
 
 		Map<String, Object> context = _getContext();
 
@@ -2070,7 +2083,7 @@ public class ServiceBuilder {
 		}
 
 		JavaClass javaClass = _getJavaClass(
-			_outputPath + "/service/persistence/" + entity.getName() +
+			_outputPath + "/service/persistence/impl/" + entity.getName() +
 				"FinderImpl.java");
 
 		Map<String, Object> context = _getContext();
@@ -2105,7 +2118,7 @@ public class ServiceBuilder {
 
 	private void _createHbm(Entity entity) {
 		File ejbFile = new File(
-			_outputPath + "/service/persistence/" + entity.getName() +
+			_outputPath + "/service/persistence/impl/" + entity.getName() +
 				"HBM.java");
 
 		if (ejbFile.exists()) {
@@ -2117,7 +2130,7 @@ public class ServiceBuilder {
 
 	private void _createHbmUtil(Entity entity) {
 		File ejbFile = new File(
-			_outputPath + "/service/persistence/" + entity.getName() +
+			_outputPath + "/service/persistence/impl/" + entity.getName() +
 				"HBMUtil.java");
 
 		if (ejbFile.exists()) {
@@ -2458,7 +2471,7 @@ public class ServiceBuilder {
 
 	private void _createPersistence(Entity entity) throws Exception {
 		JavaClass javaClass = _getJavaClass(
-			_outputPath + "/service/persistence/" + entity.getName() +
+			_outputPath + "/service/persistence/impl/" + entity.getName() +
 				"PersistenceImpl.java");
 
 		Map<String, Object> context = _getContext();
@@ -2508,10 +2521,22 @@ public class ServiceBuilder {
 		// Write file
 
 		File ejbFile = new File(
-			_outputPath + "/service/persistence/" + entity.getName() +
+			_outputPath + "/service/persistence/impl/" + entity.getName() +
 				"PersistenceImpl.java");
 
 		writeFile(ejbFile, content, _author);
+
+		File persistenceImpl = new File(
+			_outputPath + "/service/persistence/" + entity.getName() +
+				"PersistenceImpl.java");
+
+		if (persistenceImpl.exists()) {
+			persistenceImpl.delete();
+
+			System.out.println(
+				"Relocated file " + persistenceImpl + " to " +
+					ejbFile.getAbsoluteFile());
+		}
 	}
 
 	private void _createPersistenceTest(Entity entity) throws Exception {
@@ -2534,7 +2559,7 @@ public class ServiceBuilder {
 
 	private void _createPersistenceUtil(Entity entity) throws Exception {
 		JavaClass javaClass = _getJavaClass(
-			_outputPath + "/service/persistence/" + entity.getName() +
+			_outputPath + "/service/persistence/impl/" + entity.getName() +
 				"PersistenceImpl.java");
 
 		Map<String, Object> context = _getContext();
@@ -4345,13 +4370,13 @@ public class ServiceBuilder {
 			entityElement.attributeValue("remote-service"), true);
 		String persistenceClass = GetterUtil.getString(
 			entityElement.attributeValue("persistence-class"),
-			_packagePath + ".service.persistence." + ejbName +
+			_packagePath + ".service.persistence.impl." + ejbName +
 				"PersistenceImpl");
 
 		String finderClass = "";
 
 		if (FileUtil.exists(
-				_outputPath + "/service/persistence/" + ejbName +
+				_outputPath + "/service/persistence/impl/" + ejbName +
 					"FinderImpl.java")) {
 
 			finderClass =
