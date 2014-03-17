@@ -13,6 +13,7 @@ dependencies {
 	servicebuilder files(["${liferayProjectDir}/util-taglib/classes"])
 	servicebuilder files(["${liferayProjectDir}/portal-service/classes"])
 	servicebuilder files(["${liferayProjectDir}/portal-impl/classes"])
+	servicebuilder files(["${liferayProjectDir}/tools/"])
 
 	servicebuilder fileTree(
 		dir:"${liferayProjectDir}/lib/development",
