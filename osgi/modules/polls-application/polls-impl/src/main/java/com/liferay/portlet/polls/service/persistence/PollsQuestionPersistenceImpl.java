@@ -45,6 +45,7 @@ import com.liferay.portlet.polls.NoSuchQuestionException;
 import com.liferay.portlet.polls.model.PollsQuestion;
 import com.liferay.portlet.polls.model.impl.PollsQuestionImpl;
 import com.liferay.portlet.polls.model.impl.PollsQuestionModelImpl;
+import com.liferay.portlet.polls.service.persistence.PollsQuestionPersistence;
 
 import java.io.Serializable;
 

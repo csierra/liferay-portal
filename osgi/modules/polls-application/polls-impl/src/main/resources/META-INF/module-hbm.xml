@@ -2,11 +2,9 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false" auto-import="false">
-
 	<import class="com.liferay.portlet.polls.model.PollsChoice" />
 	<import class="com.liferay.portlet.polls.model.PollsQuestion" />
 	<import class="com.liferay.portlet.polls.model.PollsVote" />
-
 	<class name="com.liferay.portlet.polls.model.impl.PollsChoiceImpl" table="PollsChoice">
 		<cache usage="read-write" />
 		<id name="choiceId" type="long">
