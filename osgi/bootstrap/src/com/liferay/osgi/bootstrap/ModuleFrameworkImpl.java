@@ -52,9 +52,11 @@ import com.liferay.portal.util.PropsValues;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 
 import java.net.JarURLConnection;
@@ -744,7 +746,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				_extraPackageMap =
 					(Map<String, List<URL>>) objectInputStream.readObject();
 
-				return FileUtil.read(cacheFile);
+				String extraPackages = (String) objectInputStream.readObject();
+
+				return extraPackages;
 			}
 			catch (ClassCastException cce) {
 				_log.error(cce, cce);
@@ -818,7 +822,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		}
 
 		try {
-			FileUtil.write(cacheFile, sb.toString());
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+				new FileOutputStream(cacheFile));
+
+			objectOutputStream.writeObject(_extraPackageMap);
+			objectOutputStream.writeObject(sb.toString());
+
 			FileUtil.write(hashcodeFile, hashcode);
 		}
 		catch (IOException ioe) {
