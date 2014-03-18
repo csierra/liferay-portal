@@ -83,7 +83,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2030,22 +2029,9 @@ public class ServiceBuilder {
 			return;
 		}
 
-		File finderImplFile = new File(
-			_outputPath + "/service/persistence/" + entity.getName() +
+		JavaClass javaClass = _getJavaClass(
+			_outputPath + "/service/persistence/impl/" + entity.getName() +
 				"FinderImpl.java");
-
-		String relocatedFinderImpl = _outputPath + "/service/persistence/impl/"
-			+ entity.getName() + "FinderImpl.java";
-
-		if (finderImplFile.exists()) {
-			finderImplFile.renameTo(new File(relocatedFinderImpl));
-
-			System.out.println(
-				"Relocated file " + finderImplFile.getAbsoluteFile() + " to " +
-					relocatedFinderImpl);
-		}
-
-		JavaClass javaClass = _getJavaClass(relocatedFinderImpl);
 
 		Map<String, Object> context = _getContext();
 
@@ -4376,11 +4362,14 @@ public class ServiceBuilder {
 		String finderClass = "";
 
 		if (FileUtil.exists(
-				_outputPath + "/service/persistence/impl/" + ejbName +
+				_outputPath + "/service/persistence/" + ejbName +
 					"FinderImpl.java")) {
 
+			_relocateFinderImpl(humanName);
+
 			finderClass =
-				_packagePath + ".service.persistence.impl." + ejbName + "FinderImpl";
+				_packagePath + ".service.persistence.impl." + ejbName +
+					"FinderImpl";
 		}
 
 		String dataSource = entityElement.attributeValue("data-source");
@@ -4850,6 +4839,23 @@ public class ServiceBuilder {
 		}
 
 		entity.setResolved();
+	}
+
+	private void _relocateFinderImpl(String name) {
+		File finderImplFile = new File(
+			_outputPath + "/service/persistence/" + name + "FinderImpl.java");
+
+		String relocatedFinderImpl =
+			_outputPath + "/service/persistence/impl/" + name +
+				"FinderImpl.java";
+
+		if (finderImplFile.exists()) {
+			finderImplFile.renameTo(new File(relocatedFinderImpl));
+
+			System.out.println(
+				"Relocated file " + finderImplFile.getAbsoluteFile() + " to " +
+					relocatedFinderImpl);
+		}
 	}
 
 	private void _updateSQLFile(
