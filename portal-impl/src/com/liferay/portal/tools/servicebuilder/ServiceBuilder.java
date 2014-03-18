@@ -4140,6 +4140,7 @@ public class ServiceBuilder {
 			ClassLibrary classLibrary = new ClassLibrary();
 
 			classLibrary.addClassLoader(getClass().getClassLoader());
+			classLibrary.addSourceFolder(new File(_implDir));
 
 			JavaDocBuilder builder = new JavaDocBuilder(classLibrary);
 
