@@ -4842,12 +4842,16 @@ public class ServiceBuilder {
 		entity.setResolved();
 	}
 
-	private void _relocateFinderImpl(String name) {
+	private void _relocateFinderImpl(String name) throws IOException {
 		File finderImplFile = new File(
 			_outputPath + "/service/persistence/" + name + "FinderImpl.java");
 
-
 		if (finderImplFile.exists()) {
+			String content = FileUtil.read(finderImplFile);
+
+			String replacedContent = content.replaceFirst(
+				"package (com.liferay.[^;]*)","package $1.impl" );
+
 			String relocatedFinderImplFolder =
 				_outputPath + "/service/persistence/impl/";
 
@@ -4856,8 +4860,9 @@ public class ServiceBuilder {
 
 			FileUtil.mkdirs(relocatedFinderImplFolder);
 
-			FileUtil.move(
-				finderImplFile.getAbsolutePath(), relocatedFinderImplPath);
+			FileUtil.write(relocatedFinderImplPath, replacedContent);
+
+			finderImplFile.delete();
 
 			System.out.println(
 				"Relocated file " + finderImplFile.getAbsoluteFile() + " to " +
