@@ -4380,7 +4380,7 @@ public class ServiceBuilder {
 					"FinderImpl.java")) {
 
 			finderClass =
-				_packagePath + ".service.persistence." + ejbName + "FinderImpl";
+				_packagePath + ".service.persistence.impl." + ejbName + "FinderImpl";
 		}
 
 		String dataSource = entityElement.attributeValue("data-source");
