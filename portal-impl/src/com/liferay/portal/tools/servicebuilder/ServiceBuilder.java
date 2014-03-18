@@ -4360,18 +4360,7 @@ public class ServiceBuilder {
 			_packagePath + ".service.persistence.impl." + ejbName +
 				"PersistenceImpl");
 
-		String finderClass = "";
-
-		if (FileUtil.exists(
-				_outputPath + "/service/persistence/" + ejbName +
-					"FinderImpl.java")) {
-
-			_relocateFinderImpl(ejbName);
-
-			finderClass =
-				_packagePath + ".service.persistence.impl." + ejbName +
-					"FinderImpl";
-		}
+		String finderClass = _relocateFinderImpl(ejbName);
 
 		String dataSource = entityElement.attributeValue("data-source");
 		String sessionFactory = entityElement.attributeValue("session-factory");
@@ -4842,32 +4831,53 @@ public class ServiceBuilder {
 		entity.setResolved();
 	}
 
-	private void _relocateFinderImpl(String name) throws IOException {
+	private String _relocateFinderImpl(String name) throws IOException {
 		File finderImplFile = new File(
 			_outputPath + "/service/persistence/" + name + "FinderImpl.java");
+
+		String relocatedFinderImplFolder =
+			_outputPath + "/service/persistence/impl/";
+
+		String relocatedFinderImplPath =
+			relocatedFinderImplFolder + name + "FinderImpl.java";
+
+		File relocatedFinderFile = new File(relocatedFinderImplPath);
+
+		String finderClass = "";
 
 		if (finderImplFile.exists()) {
 			String content = FileUtil.read(finderImplFile);
 
 			String replacedContent = content.replaceFirst(
-				"package (com.liferay.[^;]*)","package $1.impl" );
+				"(package com.liferay.[^;]*)","$1.impl" );
 
-			String relocatedFinderImplFolder =
-				_outputPath + "/service/persistence/impl/";
-
-			String relocatedFinderImplPath =
-				relocatedFinderImplFolder + name + "FinderImpl.java";
+			replacedContent = replacedContent.replace(
+				"package (com.liferay.[^;]*)",
+				"package $1;\n\nimport " + _packagePath +
+					".service.persistence." + name + "FinderImpl");
 
 			FileUtil.mkdirs(relocatedFinderImplFolder);
 
-			FileUtil.write(relocatedFinderImplPath, replacedContent);
+			writeFile(relocatedFinderFile, replacedContent);
+
+			// FileUtil.write(relocatedFinderImplPath, replacedContent);
 
 			finderImplFile.delete();
 
 			System.out.println(
 				"Relocated file " + finderImplFile.getAbsoluteFile() + " to " +
 					relocatedFinderImplPath);
+
+			finderClass =
+				_packagePath + ".service.persistence.impl." + name +
+					"FinderImpl";
+		} else if (relocatedFinderFile.exists()) {
+			finderClass =
+				_packagePath + ".service.persistence.impl." + name +
+					"FinderImpl";
 		}
+
+		return finderClass;
 	}
 
 	private void _updateSQLFile(
