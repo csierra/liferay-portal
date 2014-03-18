@@ -4365,7 +4365,7 @@ public class ServiceBuilder {
 				_outputPath + "/service/persistence/" + ejbName +
 					"FinderImpl.java")) {
 
-			_relocateFinderImpl(humanName);
+			_relocateFinderImpl(ejbName);
 
 			finderClass =
 				_packagePath + ".service.persistence.impl." + ejbName +
