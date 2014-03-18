@@ -4845,16 +4845,16 @@ public class ServiceBuilder {
 		File finderImplFile = new File(
 			_outputPath + "/service/persistence/" + name + "FinderImpl.java");
 
-		String relocatedFinderImpl =
+		String relocatedFinderImplPath =
 			_outputPath + "/service/persistence/impl/" + name +
 				"FinderImpl.java";
 
 		if (finderImplFile.exists()) {
-			finderImplFile.renameTo(new File(relocatedFinderImpl));
+			finderImplFile.renameTo(new File(relocatedFinderImplPath));
 
 			System.out.println(
 				"Relocated file " + finderImplFile.getAbsoluteFile() + " to " +
-					relocatedFinderImpl);
+					relocatedFinderImplPath);
 		}
 	}
 
