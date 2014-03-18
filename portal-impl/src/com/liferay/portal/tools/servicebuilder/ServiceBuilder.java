@@ -4851,10 +4851,14 @@ public class ServiceBuilder {
 			String replacedContent = content.replaceFirst(
 				"(package com.liferay.[^;]*)","$1.impl" );
 
-			replacedContent = replacedContent.replace(
-				"package (com.liferay.[^;]*)",
-				"package $1;\n\nimport " + _packagePath +
-					".service.persistence." + name + "FinderImpl");
+			// replacedContent = replacedContent.replaceFirst(
+			// 	"(package com.liferay.[^;]*)",
+			// 	"$1;\n\nimport " + _packagePath +
+			// 		".service.persistence." + name + "Finder");
+
+			replacedContent = replacedContent.replaceFirst(
+				"(package com.liferay.[^;]*)",
+				"$1;\n\nimport " + _packagePath + ".service.persistence.*");
 
 			FileUtil.mkdirs(relocatedFinderImplFolder);
 
