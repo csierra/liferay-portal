@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.persistence;
 
+import com.liferay.portal.service.persistence.impl.AddressPersistenceImpl;
+
 /**
  * @author Brian Wing Shun Chan
  */
