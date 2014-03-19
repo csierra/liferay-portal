@@ -828,7 +828,7 @@ public class Creole10Parser]]></replacevalue>
 			<jvmarg value="-Xms512m" />
 			<jvmarg value="-Xmx1024m" />
 			<jvmarg value="-Xss2048k" />
-			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8003" />
+			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8003" />
 			<jvmarg value="-XX:MaxPermSize=512m" />
 			<arg value="-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties" />
 			<arg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger" />
