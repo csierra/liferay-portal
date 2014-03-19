@@ -4862,9 +4862,17 @@ public class ServiceBuilder {
 
 			FileUtil.mkdirs(relocatedFinderImplFolder);
 
-			writeFile(relocatedFinderFile, replacedContent);
+			// writeFile(relocatedFinderFile, replacedContent);
 
-			// FileUtil.write(relocatedFinderImplPath, replacedContent);
+			finderClass =
+				_packagePath + ".service.persistence.impl." + name +
+					"FinderImpl";
+
+			JavaSourceProcessor.stripJavaImports(
+				replacedContent, _outputPath + "/service/persistence/impl/",
+				finderClass);
+
+			FileUtil.write(relocatedFinderImplPath, replacedContent);
 
 			finderImplFile.delete();
 
@@ -4872,9 +4880,6 @@ public class ServiceBuilder {
 				"Relocated file " + finderImplFile.getAbsoluteFile() + " to " +
 					relocatedFinderImplPath);
 
-			finderClass =
-				_packagePath + ".service.persistence.impl." + name +
-					"FinderImpl";
 		} else if (relocatedFinderFile.exists()) {
 			finderClass =
 				_packagePath + ".service.persistence.impl." + name +
