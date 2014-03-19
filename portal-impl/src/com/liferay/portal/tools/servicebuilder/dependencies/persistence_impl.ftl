@@ -21,6 +21,11 @@ import ${packagePath}.model.impl.${entity.name}ModelImpl;
 
 import ${packagePath}.service.persistence.${entity.name}Persistence;
 
+<#if entity.hasCompoundPK()>
+	import ${packagePath}.service.persistence.${entity.PKClassName};
+</#if>
+
+
 import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
