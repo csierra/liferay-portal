@@ -14,21 +14,21 @@
 
 package com.liferay.spring.extender.classloader;
 
-import org.osgi.framework.Bundle;
-
 import java.io.IOException;
+
 import java.net.URL;
+
 import java.util.Collections;
 import java.util.Enumeration;
+
+import org.osgi.framework.Bundle;
 
 /**
  * @author Miguel Pastor
  */
 public class BundleResolverClassLoader extends ClassLoader {
 
-	public BundleResolverClassLoader(
-		Bundle ... bundles) {
-
+	public BundleResolverClassLoader(Bundle ... bundles) {
 		if (bundles == null) {
 			throw new IllegalArgumentException(
 				"At least one valid bundle is required!");
@@ -38,16 +38,13 @@ public class BundleResolverClassLoader extends ClassLoader {
 	}
 
 	@Override
-	protected URL findResource(String name) {
-		for (Bundle bundle : _bundles) {
-			URL url = bundle.getResource(name);
+	public URL getResource(String name) {
+		return findResource(name);
+	}
 
-			if (url != null) {
-				return url;
-			}
-		}
-
-		return null;
+	@Override
+	public Enumeration<URL> getResources(String name) throws IOException {
+		return findResources(name);
 	}
 
 	@Override
@@ -65,10 +62,22 @@ public class BundleResolverClassLoader extends ClassLoader {
 	}
 
 	@Override
+	protected URL findResource(String name) {
+		for (Bundle bundle : _bundles) {
+			URL url = bundle.getResource(name);
+
+			if (url != null) {
+				return url;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	protected Enumeration<URL> findResources(String name) throws IOException {
 		for (Bundle bundle : _bundles) {
 			try {
-
 				Enumeration<URL> resources = bundle.getResources(name);
 
 				if ((resources != null) && (resources.hasMoreElements())) {
@@ -80,16 +89,6 @@ public class BundleResolverClassLoader extends ClassLoader {
 		}
 
 		return Collections.emptyEnumeration();
-	}
-
-	@Override
-	public URL getResource(String name) {
-		return findResource(name);
-	}
-
-	@Override
-	public Enumeration<URL> getResources(String name) throws IOException {
-		return findResources(name);
 	}
 
 	protected Class<?> loadClass(String name, boolean resolve)

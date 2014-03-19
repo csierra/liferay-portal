@@ -31,9 +31,10 @@ public class BeanLocatorLifecycleManager
 				symbolicName, buildBeanLocator(event));
 		}
 		else if (event instanceof OsgiBundleContextClosedEvent) {
-			OsgiBundleContextClosedEvent closedEvent = (OsgiBundleContextClosedEvent) event;
+			OsgiBundleContextClosedEvent closedEvent = (OsgiBundleContextClosedEvent)event;
 
 			// TODO Handle both situations??
+
 			Throwable error = closedEvent.getFailureCause();
 
 			PortletBeanLocatorUtil.setBeanLocator(symbolicName, null);

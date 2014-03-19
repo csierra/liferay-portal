@@ -26,6 +26,12 @@ public class OsgiBundleSessionFactory extends PortletSessionFactoryImpl
 	}
 
 	@Override
+	public void setBundleContext(BundleContext bundleContext) {
+		_classLoader = new BundleResolverClassLoader(
+			bundleContext.getBundle(), null);
+	}
+
+	@Override
 	protected SessionFactory getSessionFactory() {
 		ShardDataSourceTargetSource shardDataSourceTargetSource =
 			(ShardDataSourceTargetSource)
@@ -55,12 +61,6 @@ public class OsgiBundleSessionFactory extends PortletSessionFactoryImpl
 		}
 
 		return sessionFactory;
-	}
-
-	@Override
-	public void setBundleContext(BundleContext bundleContext) {
-		_classLoader = new BundleResolverClassLoader(
-			bundleContext.getBundle(), null);
 	}
 
 	private ClassLoader _classLoader;

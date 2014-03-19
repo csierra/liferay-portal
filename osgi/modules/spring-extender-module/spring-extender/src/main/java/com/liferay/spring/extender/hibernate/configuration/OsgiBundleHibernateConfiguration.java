@@ -13,8 +13,7 @@ public class OsgiBundleHibernateConfiguration
 	extends PortletHibernateConfiguration implements ApplicationContextAware {
 
 	@Override
-	public void setApplicationContext(
-		ApplicationContext applicationContext)
+	public void setApplicationContext(ApplicationContext applicationContext)
 		throws BeansException {
 
 		_classLoader = applicationContext.getClassLoader();

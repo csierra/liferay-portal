@@ -16,16 +16,13 @@ package com.liferay.spring.extender.blueprint;
 
 import com.liferay.portal.spring.context.PortletBeanFactoryPostProcessor;
 
-
 /**
  * @author Miguel Pastor
  */
 public class ModuleBeanFactoryPostProcessor
 	extends PortletBeanFactoryPostProcessor {
 
-	public ModuleBeanFactoryPostProcessor(
-		ClassLoader classLoader) {
-
+	public ModuleBeanFactoryPostProcessor(ClassLoader classLoader) {
 		_classLoader = classLoader;
 	}
 

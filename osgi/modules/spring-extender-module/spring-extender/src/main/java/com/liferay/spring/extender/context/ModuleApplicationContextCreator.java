@@ -2,23 +2,26 @@ package com.liferay.spring.extender.context;
 
 import com.liferay.spring.extender.blueprint.ModuleBeanFactoryPostProcessor;
 import com.liferay.spring.extender.classloader.BundleResolverClassLoader;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.net.URL;
+
+import java.util.Enumeration;
+
 import org.eclipse.gemini.blueprint.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.eclipse.gemini.blueprint.context.support.OsgiBundleXmlApplicationContext;
 import org.eclipse.gemini.blueprint.extender.OsgiApplicationContextCreator;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-
 import org.osgi.framework.FrameworkUtil;
+
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.InputStreamResource;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
 
 /**
  * @author Miguel Pastor

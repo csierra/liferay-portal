@@ -15,12 +15,6 @@
 package com.liferay.spring.extender.classloader;
 
 import org.junit.Test;
-import org.osgi.framework.Bundle;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
 
 /**
  * @author Miguel Pastor
@@ -29,7 +23,6 @@ public class BundleResolverClassLoaderTest {
 
 	@Test
 	public void testEmptyClassLoaders() {
-
 	}
 
 	private BundleResolverClassLoader _bundleResolverClassLoader;

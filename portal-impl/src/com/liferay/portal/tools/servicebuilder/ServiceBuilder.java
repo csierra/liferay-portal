@@ -84,6 +84,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -491,20 +492,6 @@ public class ServiceBuilder {
 		writeFileRaw(file, newContent);
 
 		tempFile.deleteOnExit();
-	}
-
-	private static File _readJalopyConfFromClasspath() {
-		ClassLoader classLoader = ServiceBuilder.class.getClassLoader();
-
-		URL jalopyURL = classLoader.getResource("jalopy.xml");
-
-		try {
-			return new File(jalopyURL.toURI());
-		}
-		catch (Exception e) {
-			throw new RuntimeException(
-				"No jalopy conf could be found in classpath", e);
-		}
 	}
 
 	public static void writeFileRaw(File file, String content)
@@ -1724,6 +1711,20 @@ public class ServiceBuilder {
 		fileName = fileName.substring(x + 4, y);
 
 		return StringUtil.replace(fileName, "/", ".");
+	}
+
+	private static File _readJalopyConfFromClasspath() {
+		ClassLoader classLoader = ServiceBuilder.class.getClassLoader();
+
+		URL jalopyURL = classLoader.getResource("jalopy.xml");
+
+		try {
+			return new File(jalopyURL.toURI());
+		}
+		catch (Exception e) {
+			throw new RuntimeException(
+				"No jalopy conf could be found in classpath", e);
+		}
 	}
 
 	private void _addIndexMetadata(
@@ -4811,26 +4812,6 @@ public class ServiceBuilder {
 		return lines;
 	}
 
-	private void _resolveEntity(Entity entity) throws IOException {
-		if (entity.isResolved()) {
-			return;
-		}
-
-		for (String referenceName : entity.getUnresolvedReferenceList()) {
-			Entity referenceEntity = getEntity(referenceName);
-
-			if (referenceEntity == null) {
-				throw new RuntimeException(
-					"Unable to resolve reference " + referenceName + " in " +
-						ListUtil.toString(_ejbList, Entity.NAME_ACCESSOR));
-			}
-
-			entity.addReference(referenceEntity);
-		}
-
-		entity.setResolved();
-	}
-
 	private String _relocateFinderImpl(String name) throws IOException {
 		File finderImplFile = new File(
 			_outputPath + "/service/persistence/" + name + "FinderImpl.java");
@@ -4887,6 +4868,26 @@ public class ServiceBuilder {
 		}
 
 		return finderClass;
+	}
+
+	private void _resolveEntity(Entity entity) throws IOException {
+		if (entity.isResolved()) {
+			return;
+		}
+
+		for (String referenceName : entity.getUnresolvedReferenceList()) {
+			Entity referenceEntity = getEntity(referenceName);
+
+			if (referenceEntity == null) {
+				throw new RuntimeException(
+					"Unable to resolve reference " + referenceName + " in " +
+						ListUtil.toString(_ejbList, Entity.NAME_ACCESSOR));
+			}
+
+			entity.addReference(referenceEntity);
+		}
+
+		entity.setResolved();
 	}
 
 	private void _updateSQLFile(
