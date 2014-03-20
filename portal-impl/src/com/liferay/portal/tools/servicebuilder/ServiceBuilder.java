@@ -3152,6 +3152,11 @@ public class ServiceBuilder {
 
 		context.put("entities", _ejbList);
 
+		String springXmlSessionTemplate = _getTplProperty(
+			"spring_xml_session", "spring_xml_session.ftl");
+
+		context.put("springXmlSessionTemplate", springXmlSessionTemplate);
+
 		// Content
 
 		String content = _processTemplate(_tplSpringXml, context);

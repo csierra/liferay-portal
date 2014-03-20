@@ -25,7 +25,6 @@ dependencies {
         )
 	servicebuilder fileTree(
 		dir:"${liferayProjectDir}/lib/portal",
-		//includes: ["easyconf.jar","commons-beanutils.jar", "commons-collections.jar", "commons-configuration.jar", "commons-digester.jar", "commons-lang.jar", "commons-logging.jar", "log4j.jar","log4j-extras.jar", "rome.jar", "tomcat-jdbc.jar", "xstream.jar", "kxml2.jar", "xercesImpl.jar", "xml-apis.jar", "dom4j.jar"]
 		includes: ["*.jar"]
 	)
 }
@@ -34,7 +33,7 @@ task buildService(type: JavaExec) {
 	classpath = configurations.servicebuilder
 	maxHeapSize '1024M'
 	minHeapSize '512M'
-	jvmArgs = ['-Xss2048k', '-XX:MaxPermSize=512m', "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8003"]
+	jvmArgs = ['-Xss2048k', '-XX:MaxPermSize=512m', "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8003"]
 	main = 'com.liferay.portal.tools.servicebuilder.ServiceBuilder'
 	args "-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties"
 	args "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"
@@ -53,4 +52,5 @@ task buildService(type: JavaExec) {
 	args "service.props.util=com.liferay.portal.util.PropsUtil"
 	args "service.target.entity.name=${project.ext.targetEntityName}"
 	args "service.test.dir=src/test/java"
+	args "-Dservice.tpl.spring_xml_session=${liferayProjectDir}/osgi/modules/gradle/servicebuilder/blueprint_xml.ftl"
 }
