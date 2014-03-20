@@ -14,6 +14,7 @@ dependencies {
 	servicebuilder files(["${liferayProjectDir}/portal-service/classes"])
 	servicebuilder files(["${liferayProjectDir}/portal-impl/classes"])
 	servicebuilder files(["${liferayProjectDir}/tools/"])
+	servicebuilder files(["${liferayProjectDir}/osgi/modules/gradle/servicebuilder"])
 
 	servicebuilder fileTree(
 		dir:"${liferayProjectDir}/lib/development",
@@ -52,5 +53,6 @@ task buildService(type: JavaExec) {
 	args "service.props.util=com.liferay.portal.util.PropsUtil"
 	args "service.target.entity.name=${project.ext.targetEntityName}"
 	args "service.test.dir=src/test/java"
-	args "-Dservice.tpl.spring_xml_session=${liferayProjectDir}/osgi/modules/gradle/servicebuilder/blueprint_xml.ftl"
+	args "-Dservice.tpl.spring_xml_session=/blueprint_xml.ftl"
+	args "-Dservice.tpl.spring.extra.namespaces=osgi"
 }

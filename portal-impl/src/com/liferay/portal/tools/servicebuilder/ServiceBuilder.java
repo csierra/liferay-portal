@@ -3163,6 +3163,11 @@ public class ServiceBuilder {
 
 		File xmlFile = new File(_springFileName);
 
+		String extraNamespacesString = _getTplProperty(
+			"spring.extra.namespaces", "");
+
+		String[] extraNamespaces = extraNamespacesString.split(" ");
+
 		String xml =
 			"<?xml version=\"1.0\"?>\n" +
 			"\n" +
@@ -3171,8 +3176,9 @@ public class ServiceBuilder {
 			"\tdefault-init-method=\"afterPropertiesSet\"\n" +
 			"\txmlns=\"http://www.springframework.org/schema/beans\"\n" +
 			"\txmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-			"\txsi:schemaLocation=\"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd\"\n" +
-			">\n" +
+			_addExtraSpringNamespacesDeclaration(extraNamespaces) +
+			"\txsi:schemaLocation=\"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd\n" +
+			_addExtraSpringSchemaLocations(extraNamespaces) + "\">\n" +
 			"</beans>";
 
 		if (!xmlFile.exists()) {
@@ -3226,6 +3232,36 @@ public class ServiceBuilder {
 		if (!oldContent.equals(newContent)) {
 			FileUtil.write(xmlFile, newContent);
 		}
+	}
+
+	private String _addExtraSpringNamespacesDeclaration(String... extraNamespaces) {
+		StringBundler sb = new StringBundler(extraNamespaces.length * 4);
+
+		for (String extraNamespace : extraNamespaces) {
+			sb.append("\txmlns:");
+			sb.append(extraNamespace);
+			sb.append("=\"http://www.springframework.org/schema/");
+			sb.append(extraNamespace + "\"\n");
+		}
+
+		return sb.toString();
+	}
+
+	private String _addExtraSpringSchemaLocations(
+		String... extraNamespaces) {
+
+		StringBundler sb = new StringBundler(extraNamespaces.length * 6);
+
+		for (String extraNamespace : extraNamespaces) {
+			sb.append("\thttp://www.springframework.org/schema/");
+			sb.append(extraNamespace);
+			sb.append(" http://www.springframework.org/schema/");
+			sb.append(extraNamespace);
+			sb.append("/spring-" + extraNamespace);
+			sb.append(".xsd");
+		}
+
+		return sb.toString();
 	}
 
 	private void _createSQLIndexes() throws IOException {

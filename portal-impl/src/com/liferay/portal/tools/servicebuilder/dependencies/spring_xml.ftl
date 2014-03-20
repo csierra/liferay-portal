@@ -2,13 +2,13 @@
 	<#if entity.hasLocalService()>
 		<#assign sessionType = "Local">
 
-		<#include ${springXmlSessionTemplate} >
+		<#include springXmlSessionTemplate >
 	</#if>
 
 	<#if entity.hasRemoteService()>
 		<#assign sessionType = "">
 
-		<#include ${springXmlSessionTemplate}>
+		<#include springXmlSessionTemplate>
 	</#if>
 
 	<#if entity.hasColumns()>
