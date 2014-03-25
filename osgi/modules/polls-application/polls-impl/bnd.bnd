@@ -5,7 +5,8 @@ Import-Package:\
 Include-Resource:\
 	build/classes/main,\
 	src/main/resources
-Export-Package: com.liferay.portlet.polls.service.permission
+Export-Package: com.liferay.portlet.polls.service.permission,\
+				com.liferay.portlet.polls.lar
 Private-Package: *
 Service-Builder: REPLACE_WITH_TIMESTAMP_OF_BUILD
 Spring-Context: META-INF/spring/*.xml
