@@ -34,7 +34,7 @@ task buildService(type: JavaExec) {
 	classpath = configurations.servicebuilder
 	maxHeapSize '1024M'
 	minHeapSize '512M'
-	jvmArgs = ['-Xss2048k', '-XX:MaxPermSize=512m', "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8003"]
+	jvmArgs = ['-Xss2048k', '-XX:MaxPermSize=512m', "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8003"]
 	main = 'com.liferay.portal.tools.servicebuilder.ServiceBuilder'
 	args "-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties"
 	args "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"
