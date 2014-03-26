@@ -5,18 +5,21 @@ Include-Resource: build/classes/main
 Bundle-ClassPath: WEB-INF/lib/util-taglib.jar
 Import-Package: \
 	com.liferay.httpservice.servlet,\
+	com.liferay.portal.kernel.bean,\
 	com.liferay.portal.kernel.xml,\
 	com.liferay.portal.kernel.exception,\
 	com.liferay.portal.kernel.servlet.filters.invoker,\
 	com.liferay.portal.kernel.servlet.*,\
 	com.liferay.portal.kernel.lar,\
 	com.liferay.portal.kernel.portlet,\
+	com.liferay.portal.kernel.util,\
 	com.liferay.portal.lar,\
 	com.liferay.portal.model,\
 	com.liferay.portal.security.permission,\
 	com.liferay.portal.struts,\
 	com.liferay.portal.theme,\
 	com.liferay.portal.webserver,\
+	com.liferay.portal.util,\
 	\
 	com.liferay.portlet.polls,\
 	com.liferay.portlet.polls.*,\
