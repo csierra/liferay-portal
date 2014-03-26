@@ -29,7 +29,7 @@ import org.osgi.framework.Bundle;
 public class BundleResolverClassLoader extends ClassLoader {
 
 	public BundleResolverClassLoader(Bundle ... bundles) {
-		if (bundles == null) {
+		if (bundles.length == 0) {
 			throw new IllegalArgumentException(
 				"At least one valid bundle is required!");
 		}
