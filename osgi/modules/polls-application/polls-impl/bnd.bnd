@@ -1,10 +1,7 @@
 Bundle-Version: 1.0.0
-Import-Package:\
-	com.liferay.portlet.polls.service.persistence,\
-	*
 Include-Resource:\
 	build/classes/main,\
-	src/main/resources
+	build/resources/main
 Private-Package: *
-Service-Builder: REPLACE_WITH_TIMESTAMP_OF_BUILD
+Liferay-Service: true
 Spring-Context: META-INF/spring/*.xml
