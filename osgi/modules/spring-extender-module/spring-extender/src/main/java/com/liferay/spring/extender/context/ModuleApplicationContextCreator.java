@@ -66,6 +66,15 @@ public class ModuleApplicationContextCreator
 			Bundle bundle, ClassLoader classLoader)
 		throws IOException {
 
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		String liferayService = bundleContext.getBundle().getHeaders().get(
+			"Liferay-Service");
+
+		if (liferayService == null) {
+			return null;
+		}
+
 		GenericApplicationContext applicationContext =
 			new GenericApplicationContext();
 

@@ -22,26 +22,25 @@ public class BeanLocatorLifecycleManager
 	public void onOsgiApplicationEvent(
 		OsgiBundleApplicationContextEvent event) {
 
-		// TODO Multiple versions of the same bundle? Need different keys?
-
 		String symbolicName = event.getBundle().getSymbolicName();
 
 		if (event instanceof OsgiBundleContextRefreshedEvent) {
 			PortletBeanLocatorUtil.setBeanLocator(
-				symbolicName, buildBeanLocator(event));
+				symbolicName, _buildBeanLocator(event));
 		}
 		else if (event instanceof OsgiBundleContextClosedEvent) {
-			OsgiBundleContextClosedEvent closedEvent = (OsgiBundleContextClosedEvent)event;
-
-			// TODO Handle both situations??
+			OsgiBundleContextClosedEvent closedEvent =
+				(OsgiBundleContextClosedEvent)event;
 
 			Throwable error = closedEvent.getFailureCause();
 
-			PortletBeanLocatorUtil.setBeanLocator(symbolicName, null);
+			if (error != null) {
+				PortletBeanLocatorUtil.setBeanLocator(symbolicName, null);
+			}
 		}
 	}
 
-	private BeanLocator buildBeanLocator(
+	private BeanLocator _buildBeanLocator(
 		OsgiBundleApplicationContextEvent event) {
 
 		Bundle bundle = event.getBundle();

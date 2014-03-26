@@ -32,25 +32,13 @@ public class OsgiBundleSessionFactory extends PortletSessionFactoryImpl
 	}
 
 	@Override
-	protected SessionFactory getSessionFactory() {
-		ShardDataSourceTargetSource shardDataSourceTargetSource =
-			(ShardDataSourceTargetSource)
-				InfrastructureUtil.getShardDataSourceTargetSource();
-
-		if (shardDataSourceTargetSource == null) {
-			return getSessionFactoryImplementor();
-		}
-
-		DataSource dataSource = shardDataSourceTargetSource.getDataSource();
-
-		// TODO Add proper caching (need to rewrite parent class)
-
-		SessionFactory sessionFactory = null;
-
+	protected SessionFactory createSessionFactory(DataSource dataSource) {
 		OsgiBundleHibernateConfiguration osgiBundleHibernateConfiguration =
 			new OsgiBundleHibernateConfiguration();
 
 		osgiBundleHibernateConfiguration.setDataSource(dataSource);
+
+		SessionFactory sessionFactory;
 
 		try {
 			sessionFactory =
