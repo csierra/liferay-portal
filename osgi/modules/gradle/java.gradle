@@ -5,6 +5,12 @@ ext.liferayProjectDir = "${rootDir}/../../.."
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
+allprojects {
+	repositories {
+		mavenCentral()
+	}
+}
+
 configurations {
 	bnd
 }
