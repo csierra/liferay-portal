@@ -15,6 +15,7 @@
 --%>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
+<%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 
 <%@ taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %>
@@ -47,6 +48,7 @@ page import="com.liferay.portlet.polls.util.WebKeys" %><%@
 page import="java.text.Format" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %>
 <%@ page import="javax.portlet.PortletURL" %>
+<%@ page import="javax.portlet.WindowState" %>
 <%@ page import="com.liferay.portlet.PortletURLUtil" %>
 
 <%@ page import="javax.portlet.PortletURL" %>
@@ -74,6 +76,10 @@ page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %>
 
 <%
 	PortletURL currentURLObj = PortletURLUtil.getCurrent(liferayPortletRequest, liferayPortletResponse);
+
 	String currentURL = currentURLObj.toString();
+
 	Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+
+	WindowState windowState = liferayPortletRequest.getWindowState();
 %>
