@@ -115,7 +115,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 					choice = (PollsChoice)choices.get(i - 1);
 				}
 				else {
-					choice = new PollsChoiceImpl();
+					choice = PollsChoiceLocalServiceUtil.createPollsChoice(0);
 				}
 			%>
 
