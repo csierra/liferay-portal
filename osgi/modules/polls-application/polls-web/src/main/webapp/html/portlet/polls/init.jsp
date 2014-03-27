@@ -47,6 +47,7 @@ page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
 page import="com.liferay.portal.model.User" %><%@
 page import="com.liferay.portal.service.UserLocalServiceUtil" %><%@
+page import="com.liferay.portal.security.auth.PrincipalException" %><%@
 page import="com.liferay.portal.util.PortalUtil" %><%@
 page import="com.liferay.portal.util.WebKeys" %><%@
 page import="com.liferay.portlet.polls.util.PollsUtil"%><%@
