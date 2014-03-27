@@ -43,12 +43,16 @@ page import="com.liferay.portlet.polls.service.permission.PollsQuestionPermissio
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
+page import="com.liferay.portal.kernel.util.StringUtil" %><%@
+page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
+page import="com.liferay.portal.service.UserLocalServiceUtil" %><%@
 page import="com.liferay.portal.util.PortalUtil" %><%@
 page import="com.liferay.portal.util.WebKeys" %><%@
 page import="com.liferay.portlet.polls.util.PollsUtil"%><%@
 page import="com.liferay.portlet.polls.util.PollsWebKeys" %><%@
 
 page import="java.text.Format" %><%@
+page import="java.text.NumberFormat" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %>
 <%@ page import="javax.portlet.PortletURL" %>
 <%@ page import="javax.portlet.WindowState" %>
