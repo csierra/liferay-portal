@@ -1,3 +1,4 @@
+<%@ page import="com.liferay.portlet.polls.util.PollsWebKeys" %>
 <%--
 /**
  * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
@@ -21,7 +22,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 
-PollsQuestion question = (PollsQuestion)request.getAttribute(WebKeys.POLLS_QUESTION);
+PollsQuestion question = (PollsQuestion)request.getAttribute(PollsWebKeys.POLLS_QUESTION);
 
 long questionId = BeanParamUtil.getLong(question, request, "questionId");
 

@@ -44,8 +44,9 @@ page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.util.PortalUtil" %><%@
+page import="com.liferay.portal.util.WebKeys" %><%@
 page import="com.liferay.portlet.polls.util.PollsUtil"%><%@
-page import="com.liferay.portlet.polls.util.WebKeys" %><%@
+page import="com.liferay.portlet.polls.util.PollsWebKeys" %><%@
 
 page import="java.text.Format" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %>
@@ -53,25 +54,17 @@ page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %>
 <%@ page import="javax.portlet.WindowState" %>
 <%@ page import="com.liferay.portlet.PortletURLUtil" %>
 
-<%@ page import="javax.portlet.PortletURL" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.liferay.portal.kernel.util.StringPool" %>
 <%@ page import="com.liferay.portal.kernel.dao.search.SearchContainer" %>
-<%@ page
-	import="com.liferay.portlet.polls.service.PollsQuestionLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.polls.model.PollsQuestion" %>
 <%@ page import="com.liferay.portal.kernel.dao.search.ResultRow" %>
-<%@ page import="com.liferay.portlet.polls.service.PollsVoteLocalServiceUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.dao.search.SearchEntry" %>
-<%@ page
-	import="com.liferay.portlet.polls.service.permission.PollsPermission" %>
 <%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %>
 
 <%@ page import="com.liferay.portal.security.permission.ActionKeys" %>
 <%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
-<%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %>
 
 <portlet:defineObjects />
 <liferay-theme:defineObjects/>
