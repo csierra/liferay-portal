@@ -37,6 +37,8 @@ Import-Package: \
 	org.apache.struts.util,\
 	\
 	org.apache.jasper.runtime,\
+	org.apache.taglibs.standard.tei,\
+	org.apache.taglibs.standard.tlv,\
 	org.eclipse.jetty.servlet.listener,\
 	org.glassfish.jsp.api,\
 	\
