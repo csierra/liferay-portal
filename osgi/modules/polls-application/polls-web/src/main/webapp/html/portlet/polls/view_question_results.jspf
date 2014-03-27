@@ -94,103 +94,101 @@ for (int i = 0; i < choices.size(); i++) {
 	<strong><liferay-ui:message key="total-votes" />:</strong> <%= numberFormat.format(totalVotes) %>
 </div>
 
-<c:if test="<%= portletName.equals(PortletKeys.POLLS) %>">
+<br />
+
+<div>
+	<strong><liferay-ui:message key="charts" />:</strong>
+
+	<%
+	for (int i = 0; i < _CHARTS.length; i++) {
+		String chart = _CHARTS[i];
+
+		String hrefTaglib = "javascript:var viewChartWindow = window.open('" + themeDisplay.getPathMain() + "/polls/view_chart?questionId=" + question.getQuestionId() +"&chartType=" + TextFormatter.format(chart, TextFormatter.N) + "', 'viewChart', 'directories=no,height=430,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no,width=420'); void(''); viewChartWindow.focus();";
+	%>
+
+		<aui:a href="<%= hrefTaglib %>"><liferay-ui:message key="<%= chart %>" /></aui:a><%= (i != (_CHARTS.length - 1)) ? StringPool.COMMA_AND_SPACE : StringPool.BLANK %>
+
+	<%
+		}
+	%>
+
+</div>
+
+<c:if test="<%= PollsQuestionPermission.contains(permissionChecker, question, ActionKeys.UPDATE) %>">
 	<br />
 
-	<div>
-		<strong><liferay-ui:message key="charts" />:</strong>
+	<liferay-ui:header
+		showBackURL="<%= false %>"
+		title="actual-votes"
+	/>
 
-		<%
-		for (int i = 0; i < _CHARTS.length; i++) {
-			String chart = _CHARTS[i];
+	<%
+	PortletURL portletURL = renderResponse.createRenderURL();
 
-			String hrefTaglib = "javascript:var viewChartWindow = window.open('" + themeDisplay.getPathMain() + "/polls/view_chart?questionId=" + question.getQuestionId() +"&chartType=" + TextFormatter.format(chart, TextFormatter.N) + "', 'viewChart', 'directories=no,height=430,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no,width=420'); void(''); viewChartWindow.focus();";
-		%>
+	portletURL.setParameter("struts_action", "/polls/view_question");
+	portletURL.setParameter("redirect", redirect);
+	portletURL.setParameter("questionId", String.valueOf(question.getQuestionId()));
+	portletURL.setParameter("viewResults", Boolean.TRUE.toString());
 
-			<aui:a href="<%= hrefTaglib %>"><liferay-ui:message key="<%= chart %>" /></aui:a><%= (i != (_CHARTS.length - 1)) ? StringPool.COMMA_AND_SPACE : StringPool.BLANK %>
+	List<String> headerNames = new ArrayList<String>();
 
-		<%
-			}
-		%>
+	headerNames.add("user");
+	headerNames.add("choice");
+	headerNames.add("vote-date");
 
-	</div>
+	SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, null);
 
-	<c:if test="<%= PollsQuestionPermission.contains(permissionChecker, question, ActionKeys.UPDATE) %>">
-		<br />
+	int total = PollsVoteLocalServiceUtil.getQuestionVotesCount(question.getQuestionId());
 
-		<liferay-ui:header
-			showBackURL="<%= false %>"
-			title="actual-votes"
-		/>
+	searchContainer.setTotal(total);
 
-		<%
-		PortletURL portletURL = renderResponse.createRenderURL();
+	List results = PollsVoteLocalServiceUtil.getQuestionVotes(question.getQuestionId(), searchContainer.getStart(), searchContainer.getEnd());
 
-		portletURL.setParameter("struts_action", "/polls/view_question");
-		portletURL.setParameter("redirect", redirect);
-		portletURL.setParameter("questionId", String.valueOf(question.getQuestionId()));
-		portletURL.setParameter("viewResults", Boolean.TRUE.toString());
+	searchContainer.setResults(results);
 
-		List<String> headerNames = new ArrayList<String>();
+	List resultRows = searchContainer.getResultRows();
 
-		headerNames.add("user");
-		headerNames.add("choice");
-		headerNames.add("vote-date");
+	for (int i = 0; i < results.size(); i++) {
+		PollsVote vote = (PollsVote)results.get(i);
 
-		SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, null);
+		ResultRow row = new ResultRow(vote, vote.getVoteId(), i);
 
-		int total = PollsVoteLocalServiceUtil.getQuestionVotesCount(question.getQuestionId());
+		// User
 
-		searchContainer.setTotal(total);
+		User user2 = null;
 
-		List results = PollsVoteLocalServiceUtil.getQuestionVotes(question.getQuestionId(), searchContainer.getStart(), searchContainer.getEnd());
-
-		searchContainer.setResults(results);
-
-		List resultRows = searchContainer.getResultRows();
-
-		for (int i = 0; i < results.size(); i++) {
-			PollsVote vote = (PollsVote)results.get(i);
-
-			ResultRow row = new ResultRow(vote, vote.getVoteId(), i);
-
-			// User
-
-			User user2 = null;
-
-			try {
-				user2 = UserLocalServiceUtil.getUserById(vote.getUserId());
-			}
-			catch (Exception e) {
-			}
-
-			if (user2 != null) {
-				row.addText(HtmlUtil.escape(user2.getFullName()), user2.getDisplayURL(themeDisplay));
-			}
-			else {
-				row.addText(String.valueOf(vote.getUserId()));
-			}
-
-			// Choice
-
-			PollsChoice choice = vote.getChoice();
-
-			choice = choice.toEscapedModel();
-
-			row.addText(choice.getName() + ". " + choice.getDescription(locale));
-
-			// Vote date
-
-			row.addDate(vote.getVoteDate());
-
-			// Add result row
-
-			resultRows.add(row);
+		try {
+			user2 = UserLocalServiceUtil.getUserById(vote.getUserId());
 		}
-		%>
+		catch (Exception e) {
+		}
 
-		<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
-	</c:if>
+		if (user2 != null) {
+			row.addText(HtmlUtil.escape(user2.getFullName()), user2.getDisplayURL(themeDisplay));
+		}
+		else {
+			row.addText(String.valueOf(vote.getUserId()));
+		}
+
+		// Choice
+
+		PollsChoice choice = vote.getChoice();
+
+		choice = choice.toEscapedModel();
+
+		row.addText(choice.getName() + ". " + choice.getDescription(locale));
+
+		// Vote date
+
+		row.addDate(vote.getVoteDate());
+
+		// Add result row
+
+		resultRows.add(row);
+	}
+	%>
+
+	<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
 </c:if>
 
 <c:if test="<%= question.isExpired() %>">
@@ -202,5 +200,5 @@ for (int i = 0; i < choices.size(); i++) {
 </c:if>
 
 <%!
-private static final String[] _CHARTS = {"area", "horizontal-bar", "line", "pie", "vertical-bar"};
+	private static final String[] _CHARTS = {"area", "horizontal-bar", "line", "pie", "vertical-bar"};
 %>
