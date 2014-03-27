@@ -53,7 +53,9 @@ task buildService(type: JavaExec) {
 	args "service.props.util=com.liferay.portal.util.PropsUtil"
 	args "service.target.entity.name=${project.ext.targetEntityName}"
 	args "service.test.dir=src/test/java"
+	args "-Dservice.tpl.persistence_util=/osgi_persistence_util.ftl"
 	args "-Dservice.tpl.service_util=/osgi_service_util.ftl"
+	args "-Dservice.tpl.spring_xml=osgi_spring_xml.ftl"
 	args "-Dservice.tpl.spring_xml_session=/blueprint_xml.ftl"
 	args "-Dservice.tpl.spring.extra.namespaces=osgi"
 }
