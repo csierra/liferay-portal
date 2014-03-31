@@ -533,6 +533,8 @@ public class ServiceBuilder {
 		String targetEntityName, String testDir, boolean build,
 		long buildNumber, boolean buildNumberIncrement) {
 
+		_tplActionableDynamicQuery = _getTplProperty(
+			"actionable_dynamic_query", _tplActionableDynamicQuery);
 		_tplBadAliasNames = _getTplProperty(
 			"bad_alias_names", _tplBadAliasNames);
 		_tplBadColumnNames = _getTplProperty(
@@ -542,6 +544,9 @@ public class ServiceBuilder {
 		_tplBlobModel = _getTplProperty("blob_model", _tplBlobModel);
 		_tplEjbPk = _getTplProperty("ejb_pk", _tplEjbPk);
 		_tplException = _getTplProperty("exception", _tplException);
+		_tplExportActionableDynamicQuery = _getTplProperty(
+			"export_actionable_dynamic_query",
+			_tplExportActionableDynamicQuery);
 		_tplExtendedModel = _getTplProperty(
 			"extended_model", _tplExtendedModel);
 		_tplExtendedModelBaseImpl = _getTplProperty(
@@ -1777,7 +1782,7 @@ public class ServiceBuilder {
 		// Write file
 
 		File ejbFile = new File(
-			_serviceOutputPath + "/service/persistence/" +
+			_outputPath + "/service/persistence/impl/" +
 				entity.getName() + "ActionableDynamicQuery.java");
 
 		writeFile(ejbFile, content, _author);
@@ -1919,7 +1924,7 @@ public class ServiceBuilder {
 		// Write file
 
 		File ejbFile = new File(
-			_serviceOutputPath + "/service/persistence/" +
+			_outputPath + "/service/persistence/impl/" +
 				entity.getName() + "ExportActionableDynamicQuery.java");
 
 		writeFile(ejbFile, content, _author);
