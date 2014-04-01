@@ -8,6 +8,7 @@ import java.io.InputStream;
 
 import java.net.URL;
 
+import java.util.Dictionary;
 import java.util.Enumeration;
 
 import org.eclipse.gemini.blueprint.context.DelegatedExecutionOsgiBundleApplicationContext;
@@ -34,8 +35,10 @@ public class ModuleApplicationContextCreator
 			createApplicationContext(BundleContext bundleContext)
 		throws Exception {
 
-		String configs =
-			bundleContext.getBundle().getHeaders().get("Spring-Context");
+		Dictionary<String, String> headers =
+			bundleContext.getBundle().getHeaders();
+
+		String configs = headers.get("Spring-Context");
 
 		if (configs == null) {
 			return null;
@@ -47,8 +50,13 @@ public class ModuleApplicationContextCreator
 		ClassLoader classLoader = new BundleResolverClassLoader(
 			bundle, extenderBundle);
 
-		ApplicationContext parentAppContext = _buildParentContext(
-			extenderBundle, classLoader);
+		String liferayService = headers.get("Liferay-Service");
+
+		ApplicationContext parentAppContext = null;
+
+		if (liferayService != null) {
+			parentAppContext = _buildParentContext(extenderBundle, classLoader);
+		}
 
 		OsgiBundleXmlApplicationContext osgiBundleXmlApplicationContext =
 			new OsgiBundleXmlApplicationContext(
@@ -65,15 +73,6 @@ public class ModuleApplicationContextCreator
 	private ApplicationContext _buildParentContext(
 			Bundle bundle, ClassLoader classLoader)
 		throws IOException {
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		String liferayService = bundleContext.getBundle().getHeaders().get(
-			"Liferay-Service");
-
-		if (liferayService == null) {
-			return null;
-		}
 
 		GenericApplicationContext applicationContext =
 			new GenericApplicationContext();
