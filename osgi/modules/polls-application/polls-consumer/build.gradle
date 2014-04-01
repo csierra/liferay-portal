@@ -1,0 +1,7 @@
+evaluationDependsOn(':polls-api')
+
+dependencies {
+	compile project(':polls-api')
+}
+
+project.ext.deployDir = project.hasProperty('osgiLibDir') ? project.osgiLibDir : null

@@ -1,0 +1,9 @@
+Bundle-Version: 1.0.0
+Include-Resource:\
+	build/classes/main,\
+	build/resources/main
+Import-Package:\
+	"!aQute.bnd.annotation.*",\
+	"*"
+Private-Package: *
+Service-Component: com.liferay.examples.scala.*
