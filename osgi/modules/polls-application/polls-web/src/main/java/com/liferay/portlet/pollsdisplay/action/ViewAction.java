@@ -48,27 +48,20 @@ public class ViewAction extends PortletAction {
 
 			if (questionId > 0) {
 
-				// TODO
-
-				/*
 				PollsQuestion question = PollsQuestionServiceUtil.getQuestion(
 					questionId);
 
-				renderRequest.setAttribute(PollsWebKeys.POLLS_QUESTION, question);
-				*/
+				renderRequest.setAttribute(
+					PollsWebKeys.POLLS_QUESTION, question);
 			}
 		}
 		catch (Exception e) {
 
-			// TODO
-
-			/*
 			if (!(e instanceof NoSuchQuestionException)) {
 				SessionErrors.add(renderRequest, e.getClass());
 
 				return actionMapping.findForward("portlet.polls_display.error");
 			}
-			*/
 		}
 
 		return actionMapping.findForward("portlet.polls_display.view");

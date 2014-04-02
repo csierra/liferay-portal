@@ -52,15 +52,6 @@
 		<listener-class>com.liferay.portal.kernel.servlet.PluginContextListener</listener-class>
 	</listener>
 	<servlet>
-		<servlet-name>1 Servlet</servlet-name>
-		<servlet-class>com.liferay.portal.kernel.servlet.PortletServlet</servlet-class>
-		<init-param>
-			<param-name>portlet-class</param-name>
-			<param-value>com.liferay.moduleadmin.portlet.ModuleAdminPortlet</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet>
 		<servlet-name>Dynamic Resource Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.webserver.DynamicResourceServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
