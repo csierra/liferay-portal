@@ -51,8 +51,12 @@ import com.liferay.portal.util.PropsValues;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 
 import java.net.JarURLConnection;
@@ -729,14 +733,28 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		File coreDir = new File(
 			PropsValues.LIFERAY_WEB_PORTAL_CONTEXT_TEMPDIR, "osgi");
 
-		File cacheFile = new File(coreDir, "system-packages.txt");
+		File cacheFile = new File(coreDir, "system-packages.dat");
 		File hashcodeFile = new File(coreDir, "system-packages.hash");
 
 		if (cacheFile.exists() && hashcodeFile.exists() &&
 			_hasMatchingHashcode(hashcodeFile, hashcode)) {
 
 			try {
-				return FileUtil.read(cacheFile);
+				ObjectInputStream objectInputStream =
+					new ObjectInputStream(new FileInputStream(cacheFile));
+
+				_extraPackageMap =
+					(Map<String, List<URL>>) objectInputStream.readObject();
+
+				String extraPackages = (String) objectInputStream.readObject();
+
+				return extraPackages;
+			}
+			catch (ClassCastException cce) {
+				_log.error(cce, cce);
+			}
+			catch (ClassNotFoundException cnfe) {
+				_log.error(cnfe, cnfe);
 			}
 			catch (IOException ioe) {
 				_log.error(ioe, ioe);
@@ -804,7 +822,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		}
 
 		try {
-			FileUtil.write(cacheFile, sb.toString());
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+				new FileOutputStream(cacheFile));
+
+			objectOutputStream.writeObject(_extraPackageMap);
+			objectOutputStream.writeObject(sb.toString());
+
 			FileUtil.write(hashcodeFile, hashcode);
 		}
 		catch (IOException ioe) {

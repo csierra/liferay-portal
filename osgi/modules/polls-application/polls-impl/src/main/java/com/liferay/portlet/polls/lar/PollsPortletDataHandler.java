@@ -27,9 +27,9 @@ import com.liferay.portlet.polls.model.PollsQuestion;
 import com.liferay.portlet.polls.model.PollsVote;
 import com.liferay.portlet.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.portlet.polls.service.permission.PollsPermission;
-import com.liferay.portlet.polls.service.persistence.PollsChoiceExportActionableDynamicQuery;
-import com.liferay.portlet.polls.service.persistence.PollsQuestionExportActionableDynamicQuery;
-import com.liferay.portlet.polls.service.persistence.PollsVoteExportActionableDynamicQuery;
+import com.liferay.portlet.polls.service.persistence.impl.PollsChoiceExportActionableDynamicQuery;
+import com.liferay.portlet.polls.service.persistence.impl.PollsQuestionExportActionableDynamicQuery;
+import com.liferay.portlet.polls.service.persistence.impl.PollsVoteExportActionableDynamicQuery;
 
 import java.util.List;
 

@@ -1,7 +1,9 @@
-evaluationDependsOn(':polls-api')
+evaluationDependsOn(':polls-impl')
 
 dependencies {
-	compile project(':polls-api')
+	compile project(':polls-impl')
 
 	compile files(["${project.ext.liferayProjectDir}/portal-impl/classes"])
 }
+
+project.ext.deployDir = project.osgiLibDir ?: null 
