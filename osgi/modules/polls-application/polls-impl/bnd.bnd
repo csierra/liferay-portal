@@ -8,3 +8,4 @@ Include-Resource:\
 Private-Package: *
 Liferay-Service: true
 Spring-Context: META-INF/spring/*.xml
+Web-ContextPath: /polls-impl
