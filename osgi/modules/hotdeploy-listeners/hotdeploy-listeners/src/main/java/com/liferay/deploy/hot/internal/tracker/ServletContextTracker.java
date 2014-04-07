@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.deploy.hot.listeners;
+package com.liferay.deploy.hot.internal.tracker;
 
 import com.liferay.portal.deploy.hot.JSONWebServiceHotDeployListener;
 import com.liferay.portal.deploy.hot.MessagingHotDeployListener;
@@ -28,14 +28,16 @@ import java.util.Dictionary;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.wiring.BundleWiring;
+import org.osgi.util.tracker.ServiceTracker;
 
 import javax.servlet.ServletContext;
 
 /**
- * This bundle listener tries to mimic the behaviour of our current hot deploy
+ * This Service tracker tries to mimic the behaviour of our current hot deploy
  * mechanism.
  *
  * This is not the final solution: the next step will be removing the
@@ -47,9 +49,12 @@ import javax.servlet.ServletContext;
  *
  * @author Miguel Pastor
  */
-public class HotDeployBundleListener implements SynchronousBundleListener {
+public class ServletContextTracker extends
+	ServiceTracker<ServletContext, ServletContext> {
 
-	public HotDeployBundleListener() {
+	public ServletContextTracker(BundleContext bundleContext) {
+		super(bundleContext, ServletContext.class, null);
+
 		_hotDeployListeners = new ArrayList<HotDeployListener>();
 
 		_hotDeployListeners.add(new JSONWebServiceHotDeployListener());
@@ -59,23 +64,42 @@ public class HotDeployBundleListener implements SynchronousBundleListener {
 	}
 
 	@Override
-	public void bundleChanged(BundleEvent event) {
-		Bundle bundle = event.getBundle();
+	public ServletContext addingService(
+		ServiceReference<ServletContext> serviceReference) {
 
-		HotDeployEvent hotDeployEvent = _buildHotDeployEvent(bundle);
+		Bundle bundle = serviceReference.getBundle();
 
-		switch (event.getType()) {
-			case BundleEvent.STARTED:
-				_invokeDeploy(hotDeployEvent);
-
-			case BundleEvent.STOPPED:
-				_invokeUndeploy(hotDeployEvent);
+		if (bundle.getBundleId() == 0) {
+			return getService();
 		}
+
+		ServletContext servletContext = super.addingService(serviceReference);
+
+		_invokeDeploy(bundle, servletContext);
+
+		return servletContext;
 	}
 
-	private HotDeployEvent _buildHotDeployEvent(Bundle bundle) {
+	@Override
+	public void removedService(
+		ServiceReference<ServletContext> serviceReference,
+		ServletContext servletContext) {
+
+		Bundle bundle = serviceReference.getBundle();
+
+		if (bundle.getBundleId() == 0) {
+			return;
+		}
+
+		_invokeUndeploy(bundle, servletContext);
+
+		super.removedService(serviceReference, servletContext);
+	}
+
+	private HotDeployEvent _buildHotDeployEvent(
+		Bundle bundle, ServletContext servletContext) {
+
 		ClassLoader bundleClassLoader = _getBundleClassLoader(bundle);
-		ServletContext servletContext = _getServletContext(bundle);
 
 		HotDeployEvent hotDeployEvent = new HotDeployEvent(
 			servletContext, bundleClassLoader);
@@ -102,7 +126,9 @@ public class HotDeployBundleListener implements SynchronousBundleListener {
 		return ServletContextPool.get(webContextPath.substring(1));
 	}
 
-	private void _invokeDeploy(HotDeployEvent hotDeployEvent) {
+	private void _invokeDeploy(Bundle bundle, ServletContext servletContext) {
+		HotDeployEvent hotDeployEvent = _buildHotDeployEvent(bundle, servletContext);
+
 		for (HotDeployListener hotDeployListener : _hotDeployListeners) {
 			try {
 				hotDeployListener.invokeDeploy(hotDeployEvent);
@@ -114,7 +140,10 @@ public class HotDeployBundleListener implements SynchronousBundleListener {
 		}
 	}
 
-	private void _invokeUndeploy(HotDeployEvent hotDeployEvent) {
+	private void _invokeUndeploy(Bundle bundle, ServletContext servletContext) {
+		HotDeployEvent hotDeployEvent = _buildHotDeployEvent(
+			bundle, servletContext);
+
 		for (HotDeployListener hotDeployListener : _hotDeployListeners) {
 			try {
 				hotDeployListener.invokeUndeploy(hotDeployEvent);

@@ -3,6 +3,7 @@ package com.liferay.spring.extender.context.event;
 import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.kernel.bean.BeanLocator;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
+import com.liferay.portal.util.Portal;
 import com.liferay.spring.extender.classloader.BundleResolverClassLoader;
 
 import org.eclipse.gemini.blueprint.context.event.OsgiBundleApplicationContextEvent;
@@ -26,7 +27,7 @@ public class BeanLocatorLifecycleManager
 
 		if (event instanceof OsgiBundleContextRefreshedEvent) {
 			PortletBeanLocatorUtil.setBeanLocator(
-				symbolicName, _buildBeanLocator(event));
+				_buildBeanLocatorName(symbolicName), _buildBeanLocator(event));
 		}
 		else if (event instanceof OsgiBundleContextClosedEvent) {
 			OsgiBundleContextClosedEvent closedEvent =
@@ -35,7 +36,8 @@ public class BeanLocatorLifecycleManager
 			Throwable error = closedEvent.getFailureCause();
 
 			if (error != null) {
-				PortletBeanLocatorUtil.setBeanLocator(symbolicName, null);
+				PortletBeanLocatorUtil.setBeanLocator(
+					_buildBeanLocatorName(symbolicName), null);
 			}
 		}
 	}
@@ -50,4 +52,7 @@ public class BeanLocatorLifecycleManager
 		return new BeanLocatorImpl(classLoader, event.getApplicationContext());
 	}
 
+	private String _buildBeanLocatorName(String bundleSymbolicName) {
+		return (Portal.PATH_MODULE + "/" + bundleSymbolicName).substring(1);
+	}
 }

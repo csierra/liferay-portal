@@ -1,3 +1,4 @@
+include 'hotdeploy-listeners'
 include 'registry'
 include 'polls-application'
 

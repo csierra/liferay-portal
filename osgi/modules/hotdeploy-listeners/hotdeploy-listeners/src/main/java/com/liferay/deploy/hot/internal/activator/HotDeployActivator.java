@@ -12,12 +12,12 @@
  * details.
  */
 
-package com.liferay.deploy.internal.activator;
+package com.liferay.deploy.hot.internal.activator;
 
-import com.liferay.deploy.hot.listeners.HotDeployBundleListener;
+import com.liferay.deploy.hot.internal.tracker.ServletContextTracker;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.SynchronousBundleListener;
 
 /**
  * @author Miguel Pastor
@@ -26,15 +26,18 @@ public class HotDeployActivator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
-		bundleContext.addBundleListener(_hotDeployBundleListener);
+		_servletContextTracker = new ServletContextTracker(bundleContext);
+
+		_servletContextTracker.open();
 	}
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		bundleContext.removeBundleListener(_hotDeployBundleListener);
+		_servletContextTracker.close();
+
+		_servletContextTracker = null;
 	}
 
-	private SynchronousBundleListener _hotDeployBundleListener =
-		new HotDeployBundleListener();
+	private ServletContextTracker _servletContextTracker;
 
 }
