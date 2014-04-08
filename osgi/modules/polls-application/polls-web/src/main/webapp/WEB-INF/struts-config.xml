@@ -7,7 +7,7 @@
 
 		<action path="/polls/edit_question" type="com.liferay.portlet.polls.action.EditQuestionAction">
 			<forward name="portlet.polls.edit_question" path="/portlet/polls/edit_question.jsp" />
-			<forward name="portlet.polls.error" path="portlet.polls.error" />
+			<forward name="portlet.polls.error" path="/portlet/polls/error.jsp" />
 		</action>
 
 		<action path="/polls/view" forward="/portlet/polls/view.jsp" />
@@ -16,7 +16,7 @@
 
 		<action path="/polls/view_question" type="com.liferay.portlet.polls.action.ViewQuestionAction">
 			<forward name="portlet.polls.edit_question" path="/portlet/polls/view_question.jsp" />
-			<forward name="portlet.polls.error" path="portlet.polls.error" />
+			<forward name="portlet.polls.error" path="/portlet/polls/error.jsp" />
 		</action>
 
 	</action-mappings>
