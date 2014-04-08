@@ -95,14 +95,15 @@ for (int i = 0; i < choices.size(); i++) {
 	<strong><liferay-ui:message key="total-votes" />:</strong> <%= numberFormat.format(totalVotes) %>
 </div>
 
-<br />
+<c:if test="<%= portletName.equals(PollsPortletKeys.POLLS) %>">
+	<br />
 
-<div>
-	<strong><liferay-ui:message key="charts" />:</strong>
+	<div>
+		<strong><liferay-ui:message key="charts" />:</strong>
 
-	<%
-	for (int i = 0; i < _CHARTS.length; i++) {
-		String chart = _CHARTS[i];
+		<%
+		for (int i = 0; i < _CHARTS.length; i++) {
+			String chart = _CHARTS[i];
 
 		ResourceURL viewChartUrl = renderResponse.createResourceURL();
 
@@ -115,87 +116,88 @@ for (int i = 0; i < choices.size(); i++) {
 
 		<aui:a href="<%= hrefTaglib %>"><liferay-ui:message key="<%= chart %>" /></aui:a><%= (i != (_CHARTS.length - 1)) ? StringPool.COMMA_AND_SPACE : StringPool.BLANK %>
 
-	<%
+		<%
+			}
+		%>
+
+	</div>
+
+	<c:if test="<%= PollsQuestionPermission.contains(permissionChecker, question, ActionKeys.UPDATE) %>">
+		<br />
+
+		<liferay-ui:header
+			showBackURL="<%= false %>"
+			title="actual-votes"
+		/>
+
+		<%
+		PortletURL portletURL = renderResponse.createRenderURL();
+
+		portletURL.setParameter("struts_action", "/polls/view_question");
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter("questionId", String.valueOf(question.getQuestionId()));
+		portletURL.setParameter("viewResults", Boolean.TRUE.toString());
+
+		List<String> headerNames = new ArrayList<String>();
+
+		headerNames.add("user");
+		headerNames.add("choice");
+		headerNames.add("vote-date");
+
+		SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, null);
+
+		int total = PollsVoteLocalServiceUtil.getQuestionVotesCount(question.getQuestionId());
+
+		searchContainer.setTotal(total);
+
+		List results = PollsVoteLocalServiceUtil.getQuestionVotes(question.getQuestionId(), searchContainer.getStart(), searchContainer.getEnd());
+
+		searchContainer.setResults(results);
+
+		List resultRows = searchContainer.getResultRows();
+
+		for (int i = 0; i < results.size(); i++) {
+			PollsVote vote = (PollsVote)results.get(i);
+
+			ResultRow row = new ResultRow(vote, vote.getVoteId(), i);
+
+			// User
+
+			User user2 = null;
+
+			try {
+				user2 = UserLocalServiceUtil.getUserById(vote.getUserId());
+			}
+			catch (Exception e) {
+			}
+
+			if (user2 != null) {
+				row.addText(HtmlUtil.escape(user2.getFullName()), user2.getDisplayURL(themeDisplay));
+			}
+			else {
+				row.addText(String.valueOf(vote.getUserId()));
+			}
+
+			// Choice
+
+			PollsChoice choice = vote.getChoice();
+
+			choice = choice.toEscapedModel();
+
+			row.addText(choice.getName() + ". " + choice.getDescription(locale));
+
+			// Vote date
+
+			row.addDate(vote.getVoteDate());
+
+			// Add result row
+
+			resultRows.add(row);
 		}
-	%>
+		%>
 
-</div>
-
-<c:if test="<%= PollsQuestionPermission.contains(permissionChecker, question, ActionKeys.UPDATE) %>">
-	<br />
-
-	<liferay-ui:header
-		showBackURL="<%= false %>"
-		title="actual-votes"
-	/>
-
-	<%
-	PortletURL portletURL = renderResponse.createRenderURL();
-
-	portletURL.setParameter("struts_action", "/polls/view_question");
-	portletURL.setParameter("redirect", redirect);
-	portletURL.setParameter("questionId", String.valueOf(question.getQuestionId()));
-	portletURL.setParameter("viewResults", Boolean.TRUE.toString());
-
-	List<String> headerNames = new ArrayList<String>();
-
-	headerNames.add("user");
-	headerNames.add("choice");
-	headerNames.add("vote-date");
-
-	SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, null);
-
-	int total = PollsVoteLocalServiceUtil.getQuestionVotesCount(question.getQuestionId());
-
-	searchContainer.setTotal(total);
-
-	List results = PollsVoteLocalServiceUtil.getQuestionVotes(question.getQuestionId(), searchContainer.getStart(), searchContainer.getEnd());
-
-	searchContainer.setResults(results);
-
-	List resultRows = searchContainer.getResultRows();
-
-	for (int i = 0; i < results.size(); i++) {
-		PollsVote vote = (PollsVote)results.get(i);
-
-		ResultRow row = new ResultRow(vote, vote.getVoteId(), i);
-
-		// User
-
-		User user2 = null;
-
-		try {
-			user2 = UserLocalServiceUtil.getUserById(vote.getUserId());
-		}
-		catch (Exception e) {
-		}
-
-		if (user2 != null) {
-			row.addText(HtmlUtil.escape(user2.getFullName()), user2.getDisplayURL(themeDisplay));
-		}
-		else {
-			row.addText(String.valueOf(vote.getUserId()));
-		}
-
-		// Choice
-
-		PollsChoice choice = vote.getChoice();
-
-		choice = choice.toEscapedModel();
-
-		row.addText(choice.getName() + ". " + choice.getDescription(locale));
-
-		// Vote date
-
-		row.addDate(vote.getVoteDate());
-
-		// Add result row
-
-		resultRows.add(row);
-	}
-	%>
-
-	<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
+		<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
+	</c:if>
 </c:if>
 
 <c:if test="<%= question.isExpired() %>">
@@ -207,5 +209,5 @@ for (int i = 0; i < choices.size(); i++) {
 </c:if>
 
 <%!
-	private static final String[] _CHARTS = {"area", "horizontal-bar", "line", "pie", "vertical-bar"};
+private static final String[] _CHARTS = {"area", "horizontal-bar", "line", "pie", "vertical-bar"};
 %>
