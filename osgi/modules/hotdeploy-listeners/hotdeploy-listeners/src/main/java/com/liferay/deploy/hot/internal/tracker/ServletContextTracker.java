@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.util.tracker.ServiceTracker;
@@ -127,7 +126,8 @@ public class ServletContextTracker extends
 	}
 
 	private void _invokeDeploy(Bundle bundle, ServletContext servletContext) {
-		HotDeployEvent hotDeployEvent = _buildHotDeployEvent(bundle, servletContext);
+		HotDeployEvent hotDeployEvent = _buildHotDeployEvent(
+			bundle, servletContext);
 
 		for (HotDeployListener hotDeployListener : _hotDeployListeners) {
 			try {
