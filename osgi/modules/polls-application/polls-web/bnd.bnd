@@ -1,8 +1,12 @@
 Bundle-Version: 1.0.0
-Export-Package: *
-Include-Resource: build/classes/main
-
 Bundle-ClassPath: WEB-INF/lib/util-taglib.jar
+
+Export-Package: *
+
+Include-Resource: \
+	build/classes/main,\
+	WEB-INF/lib/util-taglib.jar=../../../../util-taglib/util-taglib.jar
+
 Import-Package: \
 	com.liferay.httpservice.servlet,\
 	com.liferay.portal.kernel.bean,\
