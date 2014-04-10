@@ -243,6 +243,7 @@ public class ServiceBuilder {
 		String testDir = arguments.get("service.test.dir");
 		long buildNumber = GetterUtil.getLong(arguments.get("service.build.number"), 1);
 		boolean buildNumberIncrement = GetterUtil.getBoolean(arguments.get("service.build.number.increment"), true);
+		boolean osgiModule = GetterUtil.getBoolean(arguments.get("service.plugin.osgi"), false);
 
 		try {
 			new ServiceBuilder(
@@ -251,7 +252,7 @@ public class ServiceBuilder {
 				sqlIndexesFileName, sqlSequencesFileName,
 				autoImportDefaultReferences, autoNamespaceTables,
 				beanLocatorUtil, propsUtil, pluginName, targetEntityName,
-				testDir, true, buildNumber, buildNumberIncrement);
+				testDir, true, buildNumber, buildNumberIncrement, osgiModule);
 		}
 		catch (RuntimeException re) {
 			System.out.println(
@@ -520,7 +521,7 @@ public class ServiceBuilder {
 			implDir, remotingFileName, sqlDir, sqlFileName, sqlIndexesFileName,
 			sqlSequencesFileName, autoImportDefaultReferences,
 			autoNamespaceTables, beanLocatorUtil, propsUtil, pluginName,
-			targetEntityName, testDir, true, 1, true);
+			targetEntityName, testDir, true, 1, true, false);
 	}
 
 	public ServiceBuilder(
@@ -531,7 +532,7 @@ public class ServiceBuilder {
 		boolean autoImportDefaultReferences, boolean autoNamespaceTables,
 		String beanLocatorUtil, String propsUtil, String pluginName,
 		String targetEntityName, String testDir, boolean build,
-		long buildNumber, boolean buildNumberIncrement) {
+		long buildNumber, boolean buildNumberIncrement, boolean osgiModule) {
 
 		_tplActionableDynamicQuery = _getTplProperty(
 			"actionable_dynamic_query", _tplActionableDynamicQuery);
@@ -617,6 +618,7 @@ public class ServiceBuilder {
 			_build = build;
 			_buildNumber = buildNumber;
 			_buildNumberIncrement = buildNumberIncrement;
+			_osgiModule = osgiModule;
 
 			String content = getContent(fileName);
 
@@ -1009,7 +1011,7 @@ public class ServiceBuilder {
 			_sqlIndexesFileName, _sqlSequencesFileName,
 			_autoImportDefaultReferences, _autoNamespaceTables,
 			_beanLocatorUtil, _propsUtil, _pluginName, _targetEntityName,
-			_testDir, false, _buildNumber, _buildNumberIncrement);
+			_testDir, false, _buildNumber, _buildNumberIncrement, _osgiModule);
 
 		entity = serviceBuilder.getEntity(refEntity);
 
@@ -1781,8 +1783,10 @@ public class ServiceBuilder {
 
 		// Write file
 
+		String path = _osgiModule ? _outputPath : _serviceOutputPath;
+
 		File ejbFile = new File(
-			_outputPath + "/service/persistence/impl/" +
+			path + "/service/persistence/impl/" +
 				entity.getName() + "ActionableDynamicQuery.java");
 
 		writeFile(ejbFile, content, _author);
@@ -1923,8 +1927,10 @@ public class ServiceBuilder {
 
 		// Write file
 
+		String path = _osgiModule ? _outputPath : _serviceOutputPath;
+
 		File ejbFile = new File(
-			_outputPath + "/service/persistence/impl/" +
+			path + "/service/persistence/impl/" +
 				entity.getName() + "ExportActionableDynamicQuery.java");
 
 		writeFile(ejbFile, content, _author);
@@ -4983,6 +4989,7 @@ public class ServiceBuilder {
 		new HashMap<String, JavaClass>();
 	private String _modelHintsFileName;
 	private boolean _mvccEnabled;
+	private boolean _osgiModule;
 	private String _outputPath;
 	private String _packagePath;
 	private String _pluginName;

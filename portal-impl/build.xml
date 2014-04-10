@@ -1003,7 +1003,6 @@ public class Creole10Parser]]></replacevalue>
 		<antcall target="build-service-portlet-journal" />
 		<antcall target="build-service-portlet-messageboards" />
 		<antcall target="build-service-portlet-mobiledevicerules" />
-		<antcall target="build-service-portlet-polls" />
 		<antcall target="build-service-portlet-ratings" />
 		<antcall target="build-service-portlet-shopping" />
 		<antcall target="build-service-portlet-social" />
