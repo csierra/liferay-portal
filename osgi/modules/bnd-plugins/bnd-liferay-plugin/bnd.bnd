@@ -1,0 +1,3 @@
+Bundle-Name: Liferay BND plugin
+Export-Package: com.liferay.annotations
+Private-Package: *
