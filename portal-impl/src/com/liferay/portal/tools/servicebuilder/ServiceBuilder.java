@@ -1784,9 +1784,10 @@ public class ServiceBuilder {
 		// Write file
 
 		String path = _osgiModule ? _outputPath : _serviceOutputPath;
+		String pkg = _osgiModule ? "impl/" : StringPool.BLANK;
 
 		File ejbFile = new File(
-			path + "/service/persistence/impl/" +
+			path + "/service/persistence/" + pkg +
 				entity.getName() + "ActionableDynamicQuery.java");
 
 		writeFile(ejbFile, content, _author);
