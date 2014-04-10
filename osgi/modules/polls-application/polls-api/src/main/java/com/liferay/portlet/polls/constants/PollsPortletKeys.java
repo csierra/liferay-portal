@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portlet.polls.util;
+package com.liferay.portlet.polls.constants;
 
 /**
  * @author Carlos Sierra Andrés

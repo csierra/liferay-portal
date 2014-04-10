@@ -57,7 +57,7 @@ page import="com.liferay.portlet.polls.service.PollsQuestionLocalServiceUtil" %>
 page import="com.liferay.portlet.polls.service.PollsVoteLocalServiceUtil" %><%@
 page import="com.liferay.portlet.polls.service.permission.PollsPermission" %><%@
 page import="com.liferay.portlet.polls.service.permission.PollsQuestionPermission" %><%@
-page import="com.liferay.portlet.polls.util.PollsPortletKeys" %><%@
+page import="com.liferay.portlet.polls.constants.PollsPortletKeys" %><%@
 page import="com.liferay.portlet.polls.util.PollsUtil" %><%@
 page import="com.liferay.portlet.polls.util.PollsWebKeys" %>
 

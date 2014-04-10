@@ -125,6 +125,7 @@ public class PollsPortletDataHandler extends BasePortletDataHandler {
 			PortletPreferences portletPreferences, String data)
 		throws Exception {
 
+		portletDataContext.setClassLoader(this.getClass().getClassLoader());
 		portletDataContext.importPortletPermissions(
 			PollsPermission.RESOURCE_NAME);
 

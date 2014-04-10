@@ -48,9 +48,6 @@
 		<url-pattern>/*</url-pattern>
 		<dispatcher>INCLUDE</dispatcher>
 	</filter-mapping>
-	<listener>
-		<listener-class>com.liferay.portal.kernel.servlet.PluginContextListener</listener-class>
-	</listener>
 	<servlet>
 		<servlet-name>1 Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.kernel.servlet.PortletServlet</servlet-class>

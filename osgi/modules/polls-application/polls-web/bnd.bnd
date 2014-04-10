@@ -29,6 +29,7 @@ Import-Package: \
 	\
 	com.liferay.portlet.polls,\
 	com.liferay.portlet.polls.*,\
+	com.liferay.portlet.polls.constants,\
 	com.liferay.portlet.polls.lar,\
 	com.liferay.portlet.polls.service.permission,\
 	com.liferay.servletjspcompiler.jsp,\
