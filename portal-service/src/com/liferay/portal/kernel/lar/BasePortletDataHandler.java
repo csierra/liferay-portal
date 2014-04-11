@@ -40,6 +40,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.portlet.PortletPreferences;
 
@@ -50,8 +51,8 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 	@Override
 	public PortletPreferences deleteData(
-			PortletDataContext portletDataContext, String portletId,
-			PortletPreferences portletPreferences)
+			PortletDataContext portletDataContext, final String portletId,
+			final PortletPreferences portletPreferences)
 		throws PortletDataException {
 
 		long startTime = 0;
@@ -63,11 +64,19 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 
 		try {
-			return doDeleteData(
-				portletDataContext, portletId, portletPreferences);
-		}
-		catch (PortletDataException pde) {
-			throw pde;
+			return _call(
+				new PortletDataContextClassLoaderCallable<PortletPreferences>(
+					portletDataContext) {
+
+					@Override
+					public PortletPreferences doWithClassLoader(
+							PortletDataContext portletDataContext)
+						throws Exception {
+
+						return doDeleteData(
+							portletDataContext, portletId, portletPreferences);
+					}
+				});
 		}
 		catch (Exception e) {
 			throw new PortletDataException(e);
@@ -79,12 +88,12 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 				_log.info("Deleted portlet in " + Time.getDuration(duration));
 			}
 		}
-	}
+	};
 
 	@Override
 	public String exportData(
-			PortletDataContext portletDataContext, String portletId,
-			PortletPreferences portletPreferences)
+			PortletDataContext portletDataContext, final String portletId,
+			final PortletPreferences portletPreferences)
 		throws PortletDataException {
 
 		long startTime = 0;
@@ -96,34 +105,48 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 
 		try {
-			portletDataContext.addDeletionSystemEventStagedModelTypes(
-				getDeletionSystemEventStagedModelTypes());
+			return _call(
+				new PortletDataContextClassLoaderCallable<String>(
+					portletDataContext) {
 
-			for (PortletDataHandlerControl portletDataHandlerControl :
-					getExportControls()) {
+					@Override
+					public String doWithClassLoader(
+							PortletDataContext portletDataContext)
+						throws Exception {
 
-				addUncheckedModelAdditionCount(
-					portletDataContext, portletDataHandlerControl);
-			}
+						portletDataContext.
+							addDeletionSystemEventStagedModelTypes(
+								getDeletionSystemEventStagedModelTypes());
 
-			if (BackgroundTaskThreadLocal.hasBackgroundTask()) {
-				PortletDataContext clonePortletDataContext =
-					PortletDataContextFactoryUtil.clonePortletDataContext(
-						portletDataContext);
+						for (
+							PortletDataHandlerControl
+								portletDataHandlerControl :
+									getExportControls()) {
 
-				prepareManifestSummary(
-					clonePortletDataContext, portletPreferences);
+							addUncheckedModelAdditionCount(
+								portletDataContext, portletDataHandlerControl);
+						}
 
-				PortletDataHandlerStatusMessageSenderUtil.sendStatusMessage(
-					"portlet", portletId,
-					clonePortletDataContext.getManifestSummary());
-			}
+						if (BackgroundTaskThreadLocal.hasBackgroundTask()) {
+							PortletDataContext clonePortletDataContext =
+								PortletDataContextFactoryUtil.
+									clonePortletDataContext(portletDataContext);
 
-			return doExportData(
-				portletDataContext, portletId, portletPreferences);
-		}
-		catch (PortletDataException pde) {
-			throw pde;
+							prepareManifestSummary(
+								clonePortletDataContext, portletPreferences);
+
+							ManifestSummary manifestSummary =
+								clonePortletDataContext.getManifestSummary();
+
+							PortletDataHandlerStatusMessageSenderUtil.
+								sendStatusMessage(
+									"portlet", portletId, manifestSummary);
+						}
+
+						return doExportData(
+							portletDataContext, portletId, portletPreferences);
+					}
+				});
 		}
 		catch (Exception e) {
 			throw new PortletDataException(e);
@@ -319,8 +342,8 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 	@Override
 	public PortletPreferences importData(
-			PortletDataContext portletDataContext, String portletId,
-			PortletPreferences portletPreferences, String data)
+			PortletDataContext portletDataContext, final String portletId,
+			final PortletPreferences portletPreferences, final String data)
 		throws PortletDataException {
 
 		long startTime = 0;
@@ -341,11 +364,20 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			portletDataContext.addDeletionSystemEventStagedModelTypes(
 				getDeletionSystemEventStagedModelTypes());
 
-			return doImportData(
-				portletDataContext, portletId, portletPreferences, data);
-		}
-		catch (PortletDataException pde) {
-			throw pde;
+			return _call(
+				new PortletDataContextClassLoaderCallable<PortletPreferences>(
+					portletDataContext) {
+
+					@Override
+					public PortletPreferences doWithClassLoader(
+							PortletDataContext portletDataContext)
+						throws Exception {
+
+						return doImportData(
+							portletDataContext, portletId, portletPreferences,
+							data);
+					}
+				});
 		}
 		catch (Exception e) {
 			throw new PortletDataException(e);
@@ -412,14 +444,24 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	@Override
 	public void prepareManifestSummary(
 			PortletDataContext portletDataContext,
-			PortletPreferences portletPreferences)
+			final PortletPreferences portletPreferences)
 		throws PortletDataException {
 
 		try {
-			doPrepareManifestSummary(portletDataContext, portletPreferences);
-		}
-		catch (PortletDataException pde) {
-			throw pde;
+			_call(
+				new PortletDataContextClassLoaderCallable(portletDataContext) {
+
+				@Override
+				public Void doWithClassLoader(
+						PortletDataContext portletDataContext)
+					throws Exception {
+
+					doPrepareManifestSummary(
+						portletDataContext, portletPreferences);
+
+					return null;
+				}
+			});
 		}
 		catch (Exception e) {
 			throw new PortletDataException(e);
@@ -428,8 +470,8 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 	@Override
 	public PortletPreferences processExportPortletPreferences(
-			PortletDataContext portletDataContext, String portletId,
-			PortletPreferences portletPreferences)
+			PortletDataContext portletDataContext, final String portletId,
+			final PortletPreferences portletPreferences)
 		throws PortletDataException {
 
 		String displayStyle = getDisplayTemplate(
@@ -461,11 +503,19 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 
 		try {
-			return doProcessExportPortletPreferences(
-				portletDataContext, portletId, portletPreferences);
-		}
-		catch (PortletDataException pde) {
-			throw pde;
+			return _call(
+				new PortletDataContextClassLoaderCallable<PortletPreferences>(
+					portletDataContext) {
+
+					@Override
+					public PortletPreferences doWithClassLoader(
+							PortletDataContext portletDataContext)
+						throws Exception {
+
+						return doProcessExportPortletPreferences(
+							portletDataContext, portletId, portletPreferences);
+					}
+				});
 		}
 		catch (Exception e) {
 			throw new PortletDataException(e);
@@ -474,8 +524,8 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 	@Override
 	public PortletPreferences processImportPortletPreferences(
-			PortletDataContext portletDataContext, String portletId,
-			PortletPreferences portletPreferences)
+			PortletDataContext portletDataContext, final String portletId,
+			final PortletPreferences portletPreferences)
 		throws PortletDataException {
 
 		try {
@@ -594,11 +644,19 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 					"displayStyleGroupId", StringPool.BLANK);
 			}
 
-			return doProcessImportPortletPreferences(
-				portletDataContext, portletId, portletPreferences);
-		}
-		catch (PortletDataException pde) {
-			throw pde;
+			return _call(
+				new PortletDataContextClassLoaderCallable<PortletPreferences>(
+					portletDataContext) {
+
+					@Override
+					public PortletPreferences doWithClassLoader(
+							PortletDataContext portletDataContext)
+						throws Exception {
+
+						return doProcessImportPortletPreferences(
+							portletDataContext, portletId, portletPreferences);
+					}
+				});
 		}
 		catch (Exception e) {
 			throw new PortletDataException(e);
@@ -909,10 +967,52 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		_supportsDataStrategyCopyAsNew = supportsDataStrategyCopyAsNew;
 	}
 
+	private <T> T _call(PortletDataContextClassLoaderCallable<T> callable)
+		throws Exception {
+
+		callable.setClassLoader(this.getClass().getClassLoader());
+
+		return callable.call();
+	}
+
+	private static abstract class PortletDataContextClassLoaderCallable<T>
+		implements Callable<T> {
+
+		PortletDataContextClassLoaderCallable(
+			PortletDataContext portletDataContext) {
+
+			_portletDataContext = portletDataContext;
+		}
+
+		@Override
+		public T call() throws Exception {
+			ClassLoader classLoader = _portletDataContext.getClassLoader();
+
+			_portletDataContext.setClassLoader(_classLoader);
+
+			try {
+				return doWithClassLoader(_portletDataContext);
+			}
+			finally {
+				_portletDataContext.setClassLoader(classLoader);
+			}
+		}
+
+		protected void setClassLoader(ClassLoader classLoader) {
+			_classLoader = classLoader;
+		}
+
+		public abstract T doWithClassLoader(
+			PortletDataContext portletDataContext) throws Exception;
+
+		private PortletDataContext _portletDataContext;
+		private ClassLoader _classLoader;
+
+	} private DataLevel _dataLevel = DataLevel.SITE;
+
 	private static Log _log = LogFactoryUtil.getLog(
 		BasePortletDataHandler.class);
 
-	private DataLevel _dataLevel = DataLevel.SITE;
 	private boolean _dataLocalized;
 	private String[] _dataPortletPreferences = StringPool.EMPTY_ARRAY;
 	private StagedModelType[] _deletionSystemEventStagedModelTypes =
