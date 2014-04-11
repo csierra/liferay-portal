@@ -43,6 +43,7 @@ task buildService(type: JavaExec) {
 	args "service.model.hints.file=src/main/resources/META-INF/portlet-model-hints.xml"
 	args "service.spring.file=src/main/resources/META-INF/spring/module.xml"
 	args "service.impl.dir=src/main/java"
+	args "service.resources.dir=src/main/resources"
 	args "service.api.dir=${project.ext.apiDir}/src/main/java"
 	args "service.remoting.file=${project.ext.webDir}/src/main/resources/WEB-INF/remoting-servlet.xml"
 	args "service.sql.dir=src/main/resources/WEB-INF/sql"
