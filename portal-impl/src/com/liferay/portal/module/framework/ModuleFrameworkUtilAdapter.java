@@ -56,8 +56,16 @@ public class ModuleFrameworkUtilAdapter {
 		return _moduleFramework.getState(bundleId);
 	}
 
+	public static void postEvent(String topic, Map payload) {
+		_moduleFramework.postEvent(topic, payload);
+	}
+
 	public static void registerContext(Object context) {
 		_moduleFramework.registerContext(context);
+	}
+
+	public static void sendEvent(String topic, Map payload) {
+		_moduleFramework.sendEvent(topic, payload);
 	}
 
 	public static void setBundleStartLevel(long bundleId, int startLevel)

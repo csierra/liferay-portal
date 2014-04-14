@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.webcache.WebCachePoolUtil;
 import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 import com.liferay.portal.security.lang.SecurityManagerUtil;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
+import com.liferay.portal.servlet.MainServletHelper;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
 import com.liferay.portal.spring.bean.BeanReferenceRefreshUtil;
 import com.liferay.portal.util.ClassLoaderUtil;
@@ -70,6 +71,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletException;
 
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -160,6 +162,9 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 			try {
 				ModuleFrameworkUtilAdapter.stopFramework();
+
+				_stopMainServletAndStartupAction(
+					servletContextEvent.getServletContext());
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -289,6 +294,8 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		clearFilteredPropertyDescriptorsCache(autowireCapableBeanFactory);
 
 		try {
+			_startMainServletAndStartupAction(servletContext);
+
 			ModuleFrameworkUtilAdapter.registerContext(applicationContext);
 			ModuleFrameworkUtilAdapter.registerContext(servletContext);
 
@@ -297,6 +304,28 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void _startMainServletAndStartupAction(
+			ServletContext servletContext)
+		throws ServletException {
+
+		MainServletHelper mainServletHelper = new MainServletHelper(
+			servletContext);
+
+		mainServletHelper.init();
+
+	}
+
+	private void _stopMainServletAndStartupAction(
+			ServletContext servletContext)
+		throws ServletException {
+
+		MainServletHelper mainServletHelper = new MainServletHelper(
+			servletContext);
+
+		mainServletHelper.destroy();
+
 	}
 
 	protected void clearFilteredPropertyDescriptorsCache(

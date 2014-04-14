@@ -42,7 +42,11 @@ public interface ModuleFramework {
 
 	public String getState(long bundleId) throws PortalException;
 
+	public void postEvent(String topic, Map payload);
+
 	public void registerContext(Object context);
+
+	public void sendEvent(String topic, Map payload);
 
 	public void setBundleStartLevel(long bundleId, int startLevel)
 		throws PortalException;

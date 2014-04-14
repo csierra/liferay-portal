@@ -47,6 +47,7 @@ import com.liferay.portal.model.Account;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.User;
+import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 import com.liferay.portal.security.auth.FullNameGenerator;
 import com.liferay.portal.security.auth.FullNameGeneratorFactory;
 import com.liferay.portal.security.auth.ScreenNameGenerator;
@@ -67,11 +68,7 @@ import java.io.IOException;
 
 import java.sql.Connection;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -254,6 +251,9 @@ public class SetupWizardUtil {
 		HotDeployUtil.setCapturePrematureEvents(false);
 
 		PortalLifecycleUtil.flushInits();
+
+		ModuleFrameworkUtilAdapter.postEvent(
+			"com/liferay/portal/applications/RELOAD", new HashMap());
 	}
 
 	private static boolean _isDatabaseConfigured(

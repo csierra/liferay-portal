@@ -90,18 +90,15 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
-import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.FrameworkListener;
+import org.osgi.framework.*;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.osgi.framework.wiring.FrameworkWiring;
 
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.context.ApplicationContext;
 
@@ -299,6 +296,13 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	@Override
+	public void postEvent(String topic, Map payload) {
+		EventAdmin eventAdminService = _getEventAdminService();
+
+		eventAdminService.postEvent(new Event(topic, payload));
+	}
+
+	@Override
 	public void registerContext(Object context) {
 		if (context == null) {
 			return;
@@ -316,6 +320,13 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			_registerServletContext(servletContext);
 		}
+	}
+
+	@Override
+	public void sendEvent(String topic, Map payload) {
+		EventAdmin eventAdminService = _getEventAdminService();
+
+		eventAdminService.sendEvent(new Event(topic, payload));
 	}
 
 	@Override
@@ -666,6 +677,15 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		if ((permissionChecker == null) || !permissionChecker.isOmniadmin()) {
 			throw new PrincipalException();
 		}
+	}
+
+	private EventAdmin _getEventAdminService() {
+		BundleContext bundleContext = getFramework().getBundleContext();
+
+		ServiceReference<EventAdmin> serviceReference =
+			bundleContext.getServiceReference(EventAdmin.class);
+
+		return bundleContext.getService(serviceReference);
 	}
 
 	private String _getFelixFileInstallDir() {
