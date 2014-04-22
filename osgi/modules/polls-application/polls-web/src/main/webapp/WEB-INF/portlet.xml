@@ -6,9 +6,9 @@
 		<display-name>Polls</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
 		<init-param>
-            <name>com.liferay.portal.invokerPortletName</name>
-            <value>o/polls-web/1</value>
-        </init-param>
+			<name>com.liferay.portal.invokerPortletName</name>
+			<value>o/polls-web/1</value>
+		</init-param>
 		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/polls/</value>
@@ -22,11 +22,11 @@
 			<mime-type>text/html</mime-type>
 		</supports>
 		<portlet-info>
-            <title>Polls</title>
-            <short-title>Polls</short-title>
-            <keywords>Polls</keywords>
+			<title>Polls</title>
+			<short-title>Polls</short-title>
+			<keywords>Polls</keywords>
 
-        </portlet-info>
+		</portlet-info>
 		<!--<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>-->
 		<security-role-ref>
 			<role-name>power-user</role-name>
@@ -40,9 +40,9 @@
 		<display-name>Polls Display</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
 		<init-param>
-            <name>com.liferay.portal.invokerPortletName</name>
-            <value>o/polls-web/1</value>
-        </init-param>
+			<name>com.liferay.portal.invokerPortletName</name>
+			<value>o/polls-web/1</value>
+		</init-param>
 		<init-param>
 			<name>config-template</name>
 			<value>/html/portlet/polls_display/configuration.jsp</value>
@@ -60,11 +60,13 @@
 			<mime-type>text/html</mime-type>
 		</supports>
 		<portlet-info>
-            <title>Polls Display</title>
-            <short-title>Polls Display</short-title>
-            <keywords>Polls</keywords>
-        </portlet-info>
+			<title>Polls Display</title>
+			<short-title>Polls Display</short-title>
+			<keywords>Polls</keywords>
+		</portlet-info>
+
 		<!-- <resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle> -->
+
 		<security-role-ref>
 			<role-name>power-user</role-name>
 		</security-role-ref>

@@ -3,6 +3,7 @@
 
 <struts-config>
 	<action-mappings>
+
 		<!-- Polls -->
 
 		<action path="/polls/edit_question" type="com.liferay.portlet.polls.action.EditQuestionAction">

@@ -52,7 +52,6 @@ public class ViewAction extends PortletAction {
 				portletPreferences.getValue("questionId", StringPool.BLANK));
 
 			if (questionId > 0) {
-
 				PollsQuestion question = PollsQuestionServiceUtil.getQuestion(
 					questionId);
 
@@ -61,7 +60,6 @@ public class ViewAction extends PortletAction {
 			}
 		}
 		catch (Exception e) {
-
 			if (!(e instanceof NoSuchQuestionException)) {
 				SessionErrors.add(renderRequest, e.getClass());
 
