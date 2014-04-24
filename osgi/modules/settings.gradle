@@ -2,5 +2,6 @@ include 'hotdeploy-listeners'
 include 'registry'
 include 'polls-application'
 include 'bnd-plugins'
+include 'example'
 
 rootProject.name = 'osgi-modules'

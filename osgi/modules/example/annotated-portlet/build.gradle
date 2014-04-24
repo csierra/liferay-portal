@@ -1,0 +1,10 @@
+project.ext.deployDir = project.hasProperty('osgiLibDir') ? project.osgiLibDir : null
+
+dependencies {
+	compile project(':bnd-plugins:bnd-liferay-plugin')
+	
+	compile (
+		[group: 'javax.portlet', name: 'portlet-api', version: '2.0']
+	)
+	
+}

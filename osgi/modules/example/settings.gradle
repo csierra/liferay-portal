@@ -1,0 +1,4 @@
+include 'annotated-portlet'
+
+include 'bnd-plugins:bnd-liferay-plugin'
+project(':bnd-plugins:bnd-liferay-plugin').projectDir = new File(settingsDir, '../bnd-plugins/bnd-liferay-plugin')
