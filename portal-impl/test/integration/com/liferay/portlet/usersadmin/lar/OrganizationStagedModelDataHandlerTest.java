@@ -87,8 +87,8 @@ public class OrganizationStagedModelDataHandlerTest
 
 		OrganizationTestUtil.addOrgLabor(organization);
 
-		ServiceContext serviceContext = ServiceContextTestUtil.getServiceContext(
-			group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(group.getGroupId());
 
 		PasswordPolicy passwordPolicy =
 			OrganizationTestUtil.addPasswordPolicyRel(
