@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-ClassPath: .,lib/a.jar
+Bundle-Name: osgi.util.test
+Bundle-SymbolicName: osgi.util.test
+Bundle-Version: 1.0.0
+Export-Package: com.liferay.osgi.util.a,com.liferay.osgi.util.b
+Import-Package: com.liferay.other.module.c
