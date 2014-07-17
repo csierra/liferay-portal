@@ -37,8 +37,6 @@ import com.liferay.portal.kernel.events.LifecycleAction;
 import com.liferay.portal.kernel.events.SessionAction;
 import com.liferay.portal.kernel.events.SimpleAction;
 import com.liferay.portal.kernel.format.PhoneNumberFormat;
-import com.liferay.portal.kernel.format.PhoneNumberFormatUtil;
-import com.liferay.portal.kernel.format.PhoneNumberFormatWrapper;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lock.LockListener;
 import com.liferay.portal.kernel.lock.LockListenerRegistryUtil;
@@ -115,14 +113,10 @@ import com.liferay.portal.security.membershippolicy.RoleMembershipPolicy;
 import com.liferay.portal.security.membershippolicy.RoleMembershipPolicyFactoryImpl;
 import com.liferay.portal.security.membershippolicy.RoleMembershipPolicyFactoryUtil;
 import com.liferay.portal.security.membershippolicy.SiteMembershipPolicy;
-import com.liferay.portal.security.membershippolicy.SiteMembershipPolicyFactoryImpl;
-import com.liferay.portal.security.membershippolicy.SiteMembershipPolicyFactoryUtil;
 import com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicy;
 import com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicyFactoryImpl;
 import com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicyFactoryUtil;
-import com.liferay.portal.security.pwd.PwdToolkitUtil;
 import com.liferay.portal.security.pwd.Toolkit;
-import com.liferay.portal.security.pwd.ToolkitWrapper;
 import com.liferay.portal.service.ReleaseLocalServiceUtil;
 import com.liferay.portal.service.ServiceWrapper;
 import com.liferay.portal.service.persistence.BasePersistence;
@@ -549,15 +543,6 @@ public class HookHotDeployListener
 			roleMembershipPolicyFactoryImpl.setRoleMembershipPolicy(null);
 		}
 
-		if (portalProperties.containsKey(PropsKeys.MEMBERSHIP_POLICY_SITES)) {
-			SiteMembershipPolicyFactoryImpl siteMembershipPolicyFactoryImpl =
-				(SiteMembershipPolicyFactoryImpl)
-					SiteMembershipPolicyFactoryUtil.
-						getSiteMembershipPolicyFactory();
-
-			siteMembershipPolicyFactoryImpl.setSiteMembershipPolicy(null);
-		}
-
 		if (portalProperties.containsKey(
 				PropsKeys.MEMBERSHIP_POLICY_USER_GROUPS)) {
 
@@ -569,21 +554,6 @@ public class HookHotDeployListener
 
 			userGroupMembershipPolicyFactoryImpl.setUserGroupMembershipPolicy(
 				null);
-		}
-
-		if (portalProperties.containsKey(PropsKeys.PASSWORDS_TOOLKIT)) {
-			ToolkitWrapper toolkitWrapper =
-				(ToolkitWrapper)PwdToolkitUtil.getToolkit();
-
-			toolkitWrapper.setToolkit(null);
-		}
-
-		if (portalProperties.containsKey(PropsKeys.PHONE_NUMBER_FORMAT_IMPL)) {
-			PhoneNumberFormatWrapper phoneNumberFormatWrapper =
-				(PhoneNumberFormatWrapper)
-					PhoneNumberFormatUtil.getPhoneNumberFormat();
-
-			phoneNumberFormatWrapper.setPhoneNumberFormat(null);
 		}
 
 		if (portalProperties.containsKey(PropsKeys.SANITIZER_IMPL)) {
@@ -1796,22 +1766,14 @@ public class HookHotDeployListener
 			String siteMembershipPolicyClassName = portalProperties.getProperty(
 				PropsKeys.MEMBERSHIP_POLICY_SITES);
 
-			SiteMembershipPolicyFactoryImpl siteMembershipPolicyFactoryImpl =
-				(SiteMembershipPolicyFactoryImpl)
-					SiteMembershipPolicyFactoryUtil.
-						getSiteMembershipPolicyFactory();
-
 			SiteMembershipPolicy siteMembershipPolicy =
 				(SiteMembershipPolicy)newInstance(
 					portletClassLoader, SiteMembershipPolicy.class,
 					siteMembershipPolicyClassName);
 
-			siteMembershipPolicyFactoryImpl.setSiteMembershipPolicy(
-				siteMembershipPolicy);
-
-			if (PropsValues.MEMBERSHIP_POLICY_AUTO_VERIFY) {
-				siteMembershipPolicy.verifyPolicy();
-			}
+			registerService(
+				servletContextName, siteMembershipPolicyClassName,
+				SiteMembershipPolicy.class, siteMembershipPolicy);
 		}
 
 		if (portalProperties.containsKey(
@@ -1847,10 +1809,8 @@ public class HookHotDeployListener
 			Toolkit toolkit = (Toolkit)newInstance(
 				portletClassLoader, Toolkit.class, toolkitClassName);
 
-			ToolkitWrapper toolkitWrapper =
-				(ToolkitWrapper)PwdToolkitUtil.getToolkit();
-
-			toolkitWrapper.setToolkit(toolkit);
+			registerService(
+				servletContextName, toolkitClassName, Toolkit.class, toolkit);
 		}
 
 		if (portalProperties.containsKey(PropsKeys.PHONE_NUMBER_FORMAT_IMPL)) {
@@ -1862,11 +1822,9 @@ public class HookHotDeployListener
 					portletClassLoader, PhoneNumberFormat.class,
 					phoneNumberFormatClassName);
 
-			PhoneNumberFormatWrapper phoneNumberFormatWrapper =
-				(PhoneNumberFormatWrapper)
-					PhoneNumberFormatUtil.getPhoneNumberFormat();
-
-			phoneNumberFormatWrapper.setPhoneNumberFormat(phoneNumberFormat);
+			registerService(
+				servletContextName, phoneNumberFormatClassName,
+				PhoneNumberFormat.class, phoneNumberFormat);
 		}
 
 		if (portalProperties.containsKey(PropsKeys.SANITIZER_IMPL)) {

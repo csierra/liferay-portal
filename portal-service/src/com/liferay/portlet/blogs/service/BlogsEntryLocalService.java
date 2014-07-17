@@ -59,6 +59,7 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	public com.liferay.portlet.blogs.model.BlogsEntry addBlogsEntry(
 		com.liferay.portlet.blogs.model.BlogsEntry blogsEntry);
 
+	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
 	public com.liferay.portlet.blogs.model.BlogsEntry addEntry(long userId,
 		java.lang.String title, java.lang.String deckTitle,
 		java.lang.String description, java.lang.String content,
@@ -231,17 +232,6 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 		long entryId);
 
 	/**
-	* Returns the blogs entry with the matching UUID and company.
-	*
-	* @param uuid the blogs entry's UUID
-	* @param companyId the primary key of the company
-	* @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.blogs.model.BlogsEntry fetchBlogsEntryByUuidAndCompanyId(
-		java.lang.String uuid, long companyId);
-
-	/**
 	* Returns the blogs entry matching the UUID and group.
 	*
 	* @param uuid the blogs entry's UUID
@@ -277,6 +267,15 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getBlogsEntries(
 		int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getBlogsEntriesByUuidAndCompanyId(
+		java.lang.String uuid, long companyId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getBlogsEntriesByUuidAndCompanyId(
+		java.lang.String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> orderByComparator);
+
 	/**
 	* Returns the number of blogs entries.
 	*
@@ -295,19 +294,6 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.blogs.model.BlogsEntry getBlogsEntry(
 		long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
-	/**
-	* Returns the blogs entry with the matching UUID and company.
-	*
-	* @param uuid the blogs entry's UUID
-	* @param companyId the primary key of the company
-	* @return the matching blogs entry
-	* @throws PortalException if a matching blogs entry could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.blogs.model.BlogsEntry getBlogsEntryByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -637,6 +623,7 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	public com.liferay.portlet.blogs.model.BlogsEntry updateBlogsEntry(
 		com.liferay.portlet.blogs.model.BlogsEntry blogsEntry);
 
+	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
 	public com.liferay.portlet.blogs.model.BlogsEntry updateEntry(long userId,
 		long entryId, java.lang.String title, java.lang.String deckTitle,
 		java.lang.String description, java.lang.String content,

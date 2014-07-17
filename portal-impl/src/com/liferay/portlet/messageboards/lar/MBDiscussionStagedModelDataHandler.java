@@ -44,9 +44,7 @@ public class MBDiscussionStagedModelDataHandler
 	public void deleteStagedModel(
 		String uuid, long groupId, String className, String extraData) {
 
-		MBDiscussion discussion =
-			MBDiscussionLocalServiceUtil.fetchMBDiscussionByUuidAndGroupId(
-				uuid, groupId);
+		MBDiscussion discussion = fetchExistingStagedModel(uuid, groupId);
 
 		if (discussion != null) {
 			MBDiscussionLocalServiceUtil.deleteMBDiscussion(discussion);
@@ -82,6 +80,14 @@ public class MBDiscussionStagedModelDataHandler
 		portletDataContext.addClassedModel(
 			discussionElement, ExportImportPathUtil.getModelPath(discussion),
 			discussion);
+	}
+
+	@Override
+	protected MBDiscussion doFetchExistingStagedModel(
+		String uuid, long groupId) {
+
+		return MBDiscussionLocalServiceUtil.fetchMBDiscussionByUuidAndGroupId(
+			uuid, groupId);
 	}
 
 	@Override

@@ -8,8 +8,9 @@
 		</if>
 
 		<execute action="Dockbar#click" locator-key1="ADD" value1="Add" />
-		<execute action="Dockbar#assertClick" locator-key1="ADD_PAGE_LINK" value1="Page" />
-		<execute action="Dockbar#type" locator-key1="ADD_PAGE_NAME_FIELD" value1="${pageName}" />
+
+		<execute action="DockbarAddpanelpage#assertClick" locator-key1="NAVIGATION_PAGE" value1="Page" />
+		<execute action="DockbarAddpanelpage#type" locator-key1="NAME_FIELD" value1="${pageName}" />
 
 		<if>
 			<isset var="pageType" />
@@ -20,8 +21,8 @@
 			</then>
 		</if>
 
-		<execute action="Dockbar#assertClick" locator-key1="ADD_PAGE_BUTTON" value1="Add Page" />
-		<execute action="Dockbar#pause" locator1="1000" />
+		<execute action="DockbarAddpanelpage#assertClick" locator-key1="ADD_PAGE_BUTTON" value1="Add Page" />
+		<execute action="DockbarAddpanelpage#pause" locator1="1000" />
 
 		<var name="key_pageName" value="${pageName}" />
 
@@ -431,6 +432,112 @@
 				<execute macro="SOUserBar#gotoDashboardPG" />
 			</then>
 		</while>
+	</command>
+
+	<command name="viewDisabledSOSiteTypes">
+		<execute macro="SOUserBar#gotoDashboardPG" />
+
+		<execute action="SOUserBar#selectFrameTop" />
+		<execute action="SOUserBar#click" locator-key1="GO_TO" />
+		<execute action="SOUserBar#click" locator-key1="GO_TO_ADD_SITE_BUTTON" />
+
+		<execute action="SOUserBarAddSite#selectFrameTop" />
+		<execute action="SOUserBarAddSite#click" locator-key1="NEXT_BUTTON" />
+
+		<if>
+			<isset var="siteTypeList" />
+			<then>
+				<for list="${siteTypeList}" param="siteType">
+					<if>
+						<equals arg1="${siteType}" arg2="Open" />
+						<then>
+							<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="OPEN_SELECT_OPTION" />
+						</then>
+						<elseif>
+							<equals arg1="${siteType}" arg2="Public Restricted" />
+							<then>
+								<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="PUBLIC_RESTRICTED_SELECT_OPTION" />
+							</then>
+						</elseif>
+						<elseif>
+							<equals arg1="${siteType}" arg2="Private Restricted" />
+							<then>
+								<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="PRIVATE_RESTRICTED_SELECT_OPTION" />
+							</then>
+						</elseif>
+						<else>
+							<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="PRIVATE_SELECT_OPTION" />
+						</else>
+					</if>
+				</for>
+			</then>
+			<else>
+				<if>
+					<equals arg1="${siteType}" arg2="Open" />
+					<then>
+						<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="OPEN_SELECT_OPTION" />
+					</then>
+					<elseif>
+						<equals arg1="${siteType}" arg2="Public Restricted" />
+						<then>
+							<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="PUBLIC_RESTRICTED_SELECT_OPTION" />
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${siteType}" arg2="Private Restricted" />
+						<then>
+							<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="PRIVATE_RESTRICTED_SELECT_OPTION" />
+						</then>
+					</elseif>
+					<else>
+						<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="PRIVATE_SELECT_OPTION" />
+					</else>
+				</if>
+			</else>
+		</if>
+	</command>
+
+	<command name="viewEnabledSOSiteTypes">
+		<execute macro="SOUserBar#gotoDashboardPG" />
+
+		<execute action="SOUserBar#selectFrameTop" />
+		<execute action="SOUserBar#click" locator-key1="GO_TO" />
+		<execute action="SOUserBar#click" locator-key1="GO_TO_ADD_SITE_BUTTON" />
+
+		<execute action="SOUserBarAddSite#selectFrameTop" />
+		<execute action="SOUserBarAddSite#click" locator-key1="NEXT_BUTTON" />
+
+		<if>
+			<isset var="siteTypeList" />
+			<then>
+				<for list="${siteTypeList}" param="siteType">
+					<if>
+						<equals arg1="${siteType}" arg2="Private" />
+						<then>
+							<execute action="SOUserBarAddSite#select" locator-key1="TYPE_SELECT" value1="value=3" />
+							<execute action="SOUserBarAddSite#assertSelectedLabel" locator-key1="TYPE_SELECT" value1="Private" />
+						</then>
+						<else>
+							<execute action="SOUserBarAddSite#select" locator-key1="TYPE_SELECT" value1="${siteType}" />
+							<execute action="SOUserBarAddSite#assertSelectedLabel" locator-key1="TYPE_SELECT" value1="${siteType}" />
+						</else>
+					</if>
+				</for>
+			</then>
+			<else>
+				<if>
+					<equals arg1="${siteType}" arg2="Private" />
+					<then>
+						<execute action="SOUserBarAddSite#select" locator-key1="TYPE_SELECT" value1="value=3" />
+						<execute action="SOUserBarAddSite#assertSelectedLabel" locator-key1="TYPE_SELECT" value1="Private" />
+					</then>
+					<else>
+						<execute action="SOUserBarAddSite#select" locator-key1="TYPE_SELECT" value1="${siteType}" />
+						<execute action="SOUserBarAddSite#assertSelectedLabel" locator-key1="TYPE_SELECT" value1="${siteType}" />
+					</else>
+				</if>
+			</else>
+		</if>
 	</command>
 
 	<command name="viewNoNotifications">

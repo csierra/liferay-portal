@@ -34,9 +34,7 @@ public class MDRRuleGroupStagedModelDataHandler
 	public void deleteStagedModel(
 		String uuid, long groupId, String className, String extraData) {
 
-		MDRRuleGroup ruleGroup =
-			MDRRuleGroupLocalServiceUtil.fetchMDRRuleGroupByUuidAndGroupId(
-				uuid, groupId);
+		MDRRuleGroup ruleGroup = fetchExistingStagedModel(uuid, groupId);
 
 		if (ruleGroup != null) {
 			MDRRuleGroupLocalServiceUtil.deleteRuleGroup(ruleGroup);
@@ -67,6 +65,14 @@ public class MDRRuleGroupStagedModelDataHandler
 	}
 
 	@Override
+	protected MDRRuleGroup doFetchExistingStagedModel(
+		String uuid, long groupId) {
+
+		return MDRRuleGroupLocalServiceUtil.fetchMDRRuleGroupByUuidAndGroupId(
+			uuid, groupId);
+	}
+
+	@Override
 	protected void doImportStagedModel(
 			PortletDataContext portletDataContext, MDRRuleGroup ruleGroup)
 		throws Exception {
@@ -81,9 +87,8 @@ public class MDRRuleGroupStagedModelDataHandler
 		MDRRuleGroup importedRuleGroup = null;
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			MDRRuleGroup existingRuleGroup =
-				MDRRuleGroupLocalServiceUtil.fetchMDRRuleGroupByUuidAndGroupId(
-					ruleGroup.getUuid(), portletDataContext.getScopeGroupId());
+			MDRRuleGroup existingRuleGroup = fetchExistingStagedModel(
+				ruleGroup.getUuid(), portletDataContext.getScopeGroupId());
 
 			if (existingRuleGroup == null) {
 				serviceContext.setUuid(ruleGroup.getUuid());

@@ -875,6 +875,8 @@ public interface PropsKeys {
 
 	public static final String DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_REPEATABLE = "dynamic.data.mapping.structure.private.field.repeatable";
 
+	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_FORCE_AUTOGENERATE_KEY = "dynamic.data.mapping.template.force.autogenerate.key";
+
 	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_CONTENT = "dynamic.data.mapping.template.language.content";
 
 	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_DEFAULT = "dynamic.data.mapping.template.language.default";
@@ -1198,6 +1200,8 @@ public interface PropsKeys {
 	public static final String JOURNAL_ARTICLE_FORM_TRANSLATE = "journal.article.form.translate";
 
 	public static final String JOURNAL_ARTICLE_FORM_UPDATE = "journal.article.form.update";
+
+	public static final String JOURNAL_ARTICLE_INDEX_ALL_VERSIONS = "journal.articles.index.all.versions";
 
 	public static final String JOURNAL_ARTICLE_STORAGE_TYPE = "journal.article.storage.type";
 

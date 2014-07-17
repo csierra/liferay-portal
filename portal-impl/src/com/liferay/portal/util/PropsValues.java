@@ -682,6 +682,8 @@ public class PropsValues {
 
 	public static final String[] DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES = PropsUtil.getArray(PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES);
 
+	public static final boolean DYNAMIC_DATA_MAPPING_TEMPLATE_FORCE_AUTOGENERATE_KEY = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DYNAMIC_DATA_MAPPING_TEMPLATE_FORCE_AUTOGENERATE_KEY));
+	
 	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_DEFAULT = PropsUtil.get(PropsKeys.DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_DEFAULT);
 
 	public static final String[] DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS = PropsUtil.getArray(PropsKeys.DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS);
@@ -925,6 +927,8 @@ public class PropsValues {
 	public static final String JOURNAL_EMAIL_FROM_NAME = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_FROM_NAME);
 
 	public static final boolean JOURNAL_FEED_FORCE_AUTOGENERATE_ID = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_FEED_FORCE_AUTOGENERATE_ID));
+
+	public static boolean JOURNAL_ARTICLE_INDEX_ALL_VERSIONS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_ARTICLE_INDEX_ALL_VERSIONS));
 
 	public static final String JOURNAL_LAR_CREATION_STRATEGY = PropsUtil.get(PropsKeys.JOURNAL_LAR_CREATION_STRATEGY);
 
@@ -1177,8 +1181,6 @@ public class PropsValues {
 	public static final boolean MEMBERSHIP_POLICY_AUTO_VERIFY = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MEMBERSHIP_POLICY_AUTO_VERIFY));
 
 	public static final String MEMBERSHIP_POLICY_ROLES = PropsUtil.get(PropsKeys.MEMBERSHIP_POLICY_ROLES);
-
-	public static final String MEMBERSHIP_POLICY_SITES = PropsUtil.get(PropsKeys.MEMBERSHIP_POLICY_SITES);
 
 	public static final String MEMBERSHIP_POLICY_USER_GROUPS = PropsUtil.get(PropsKeys.MEMBERSHIP_POLICY_USER_GROUPS);
 

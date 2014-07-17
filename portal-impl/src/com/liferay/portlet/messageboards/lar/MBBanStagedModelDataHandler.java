@@ -38,8 +38,7 @@ public class MBBanStagedModelDataHandler
 	public void deleteStagedModel(
 		String uuid, long groupId, String className, String extraData) {
 
-		MBBan ban = MBBanLocalServiceUtil.fetchMBBanByUuidAndGroupId(
-			uuid, groupId);
+		MBBan ban = fetchExistingStagedModel(uuid, groupId);
 
 		if (ban != null) {
 			MBBanLocalServiceUtil.deleteBan(ban);
@@ -68,6 +67,11 @@ public class MBBanStagedModelDataHandler
 
 		portletDataContext.addClassedModel(
 			userBanElement, ExportImportPathUtil.getModelPath(ban), ban);
+	}
+
+	@Override
+	protected MBBan doFetchExistingStagedModel(String uuid, long groupId) {
+		return MBBanLocalServiceUtil.fetchMBBanByUuidAndGroupId(uuid, groupId);
 	}
 
 	@Override

@@ -14,16 +14,18 @@
 
 package com.liferay.portal.kernel.spring.osgi;
 
-import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Array;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,33 +64,26 @@ public @interface OSGiBeanProperties {
 
 			Map<String, Object> properties = new HashMap<String, Object>();
 
-			String[] propertiesArray = osgiBeanProperties.property();
-
-			for (String propertyString : propertiesArray) {
-				String[] parts = propertyString.split(StringPool.EQUAL, 1);
+			for (String property : osgiBeanProperties.property()) {
+				String[] parts = property.split(StringPool.EQUAL, 2);
 
 				if (parts.length <= 1) {
 					continue;
 				}
 
-				Object object = properties.get(parts[0]);
+				String key = parts[0];
+				String className = String.class.getSimpleName();
 
-				if (object == null) {
-					properties.put(parts[0], parts[1]);
-				}
-				else if (object instanceof String) {
-					properties.put(
-						parts[0], new String[] {(String)object, parts[1]});
-				}
-				else {
-					Class<?> clazz = object.getClass();
+				if (key.indexOf(StringPool.COLON) != -1) {
+					String[] keyParts = StringUtil.split(key, StringPool.COLON);
 
-					if (clazz.isArray()) {
-						properties.put(
-							parts[0],
-							ArrayUtil.append((String[])object, parts[1]));
-					}
+					key = keyParts[0];
+					className = keyParts[1];
 				}
+
+				String value = parts[1];
+
+				_put(key, value, className, properties);
 			}
 
 			String portalPropertyPrefix =
@@ -103,6 +98,125 @@ public @interface OSGiBeanProperties {
 			}
 
 			return properties;
+		}
+
+		private static void _put(
+			String key, String value, String className,
+			Map<String, Object> properties) {
+
+			Type type = Type._getType(className);
+
+			Object previousValue = properties.get(key);
+
+			properties.put(key, type._convert(value, previousValue));
+		}
+
+	}
+
+	public enum Type {
+
+		BOOLEAN, BYTE, CHARACTER, DOUBLE, FLOAT, INTEGER, LONG, SHORT, STRING;
+
+		private static Type _getType(String name) {
+			name = StringUtil.toUpperCase(name);
+
+			for (Type type : values()) {
+				if (name.equals(type.name())) {
+					return type;
+				}
+			}
+
+			return Type.STRING;
+		}
+
+		private Object _convert(String value, Object previousValue) {
+			if (previousValue == null) {
+				return _getTypedValue(value);
+			}
+
+			Class<?> clazz = previousValue.getClass();
+
+			if (!clazz.isArray()) {
+				Object array = Array.newInstance(_getTypeClass(), 2);
+
+				Array.set(array, 0, previousValue);
+				Array.set(array, 1, _getTypedValue(value));
+
+				return array;
+			}
+
+			Object array = Array.newInstance(
+				_getTypeClass(), Array.getLength(previousValue) + 1);
+
+			for (int i = 0; i < Array.getLength(previousValue); i++) {
+				Array.set(array, i, Array.get(previousValue, i));
+			}
+
+			Array.set(
+				array, Array.getLength(previousValue), _getTypedValue(value));
+
+			return array;
+		}
+
+		private Class<?> _getTypeClass() {
+			if (this == Type.BOOLEAN) {
+				return java.lang.Boolean.class;
+			}
+			else if (this == Type.BYTE) {
+				return java.lang.Byte.class;
+			}
+			else if (this == Type.CHARACTER) {
+				return java.lang.Character.class;
+			}
+			else if (this == Type.DOUBLE) {
+				return java.lang.Double.class;
+			}
+			else if (this == Type.FLOAT) {
+				return java.lang.Float.class;
+			}
+			else if (this == Type.INTEGER) {
+				return java.lang.Integer.class;
+			}
+			else if (this == Type.LONG) {
+				return java.lang.Long.class;
+			}
+			else if (this == Type.SHORT) {
+				return java.lang.Short.class;
+			}
+			else if (this == Type.STRING) {
+				return java.lang.String.class;
+			}
+
+			return null;
+		}
+
+		private Object _getTypedValue(String value) {
+			if (this == Type.BOOLEAN) {
+				return GetterUtil.getBoolean(value);
+			}
+			else if (this == Type.BYTE) {
+				return new java.lang.Byte(value).byteValue();
+			}
+			else if (this == Type.CHARACTER) {
+				return value.charAt(0);
+			}
+			else if (this == Type.DOUBLE) {
+				return GetterUtil.getDouble(value);
+			}
+			else if (this == Type.FLOAT) {
+				return GetterUtil.getFloat(value);
+			}
+			else if (this == Type.INTEGER) {
+				return GetterUtil.getInteger(value);
+			}
+			else if (this == Type.LONG) {
+				return GetterUtil.getLong(value);
+			}
+			else if (this == Type.SHORT) {
+				return GetterUtil.getShort(value);
+			}
+
+			return value;
 		}
 
 	}

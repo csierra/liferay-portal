@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.layoutsadmin.lar;
 
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -38,12 +37,10 @@ public class LayoutFriendlyURLStagedModelDataHandler
 
 	@Override
 	public void deleteStagedModel(
-			String uuid, long groupId, String className, String extraData)
-		throws PortalException {
+		String uuid, long groupId, String className, String extraData) {
 
-		LayoutFriendlyURL layoutFriendlyURL =
-			LayoutFriendlyURLLocalServiceUtil.
-				getLayoutFriendlyURLByUuidAndGroupId(uuid, groupId);
+		LayoutFriendlyURL layoutFriendlyURL = fetchExistingStagedModel(
+			uuid, groupId);
 
 		LayoutFriendlyURLLocalServiceUtil.deleteLayoutFriendlyURL(
 			layoutFriendlyURL);
@@ -67,6 +64,14 @@ public class LayoutFriendlyURLStagedModelDataHandler
 			layoutFriendlyURLElement,
 			ExportImportPathUtil.getModelPath(layoutFriendlyURL),
 			layoutFriendlyURL);
+	}
+
+	@Override
+	protected LayoutFriendlyURL doFetchExistingStagedModel(
+		String uuid, long groupId) {
+
+		return LayoutFriendlyURLLocalServiceUtil.
+			fetchLayoutFriendlyURLByUuidAndGroupId(uuid, groupId);
 	}
 
 	@Override
@@ -141,11 +146,8 @@ public class LayoutFriendlyURLStagedModelDataHandler
 		PortletDataContext portletDataContext,
 		LayoutFriendlyURL layoutFriendlyURL, long plid) {
 
-		LayoutFriendlyURL existingLayoutFriendlyURL =
-			LayoutFriendlyURLLocalServiceUtil.
-				fetchLayoutFriendlyURLByUuidAndGroupId(
-					layoutFriendlyURL.getUuid(),
-					portletDataContext.getScopeGroupId());
+		LayoutFriendlyURL existingLayoutFriendlyURL = fetchExistingStagedModel(
+			layoutFriendlyURL.getUuid(), portletDataContext.getScopeGroupId());
 
 		if (existingLayoutFriendlyURL == null) {
 			existingLayoutFriendlyURL =

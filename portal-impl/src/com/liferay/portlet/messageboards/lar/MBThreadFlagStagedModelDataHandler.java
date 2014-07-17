@@ -47,9 +47,7 @@ public class MBThreadFlagStagedModelDataHandler
 	public void deleteStagedModel(
 		String uuid, long groupId, String className, String extraData) {
 
-		MBThreadFlag threadFlag =
-			MBThreadFlagLocalServiceUtil.fetchMBThreadFlagByUuidAndGroupId(
-				uuid, groupId);
+		MBThreadFlag threadFlag = fetchExistingStagedModel(uuid, groupId);
 
 		if (threadFlag != null) {
 			MBThreadFlagLocalServiceUtil.deleteThreadFlag(threadFlag);
@@ -91,6 +89,14 @@ public class MBThreadFlagStagedModelDataHandler
 		portletDataContext.addClassedModel(
 			threadFlagElement, ExportImportPathUtil.getModelPath(threadFlag),
 			threadFlag);
+	}
+
+	@Override
+	protected MBThreadFlag doFetchExistingStagedModel(
+		String uuid, long groupId) {
+
+		return MBThreadFlagLocalServiceUtil.fetchMBThreadFlagByUuidAndGroupId(
+			uuid, groupId);
 	}
 
 	@Override

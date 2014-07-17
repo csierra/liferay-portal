@@ -109,7 +109,7 @@ else {
 	<div id="<portlet:namespace />folderContainer">
 		<aui:nav cssClass="list-group">
 			<c:if test="<%= Validator.isNotNull(parentTitle) %>">
-				<li class="dropdown-header list-group-item">
+				<li class="list-group-item nav-header">
 					<%= HtmlUtil.escape(parentTitle) %>
 				</li>
 			</c:if>
@@ -318,7 +318,7 @@ else {
 					%>
 
 					<liferay-portlet:renderURL varImpl="viewURL">
-						<portlet:param name="struts_action" value="/journal/view" />
+						<portlet:param name="struts_action" value="/document_library/view" />
 						<portlet:param name="structureId" value="<%= String.valueOf(0) %>" />
 						<portlet:param name="entryStart" value="0" />
 						<portlet:param name="entryEnd" value="<%= String.valueOf(entryEnd - entryStart) %>" />
