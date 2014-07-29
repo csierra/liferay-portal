@@ -108,7 +108,13 @@ public class IncludeTag extends AttributesTagSupport {
 				return processEndTag();
 			}
 
+			invokeExtensionAt(
+				TagViewExtension.ExtensionPoint.BEFORE_END, false);
+
 			doInclude(page);
+
+			invokeExtensionAt(
+				TagViewExtension.ExtensionPoint.AFTER_END, false);
 
 			return EVAL_PAGE;
 		}
@@ -148,7 +154,13 @@ public class IncludeTag extends AttributesTagSupport {
 				return processStartTag();
 			}
 
+			invokeExtensionAt(
+				TagViewExtension.ExtensionPoint.BEFORE_START, true);
+
 			doInclude(page);
+
+			invokeExtensionAt(
+				TagViewExtension.ExtensionPoint.AFTER_START, true);
 
 			return EVAL_BODY_INCLUDE;
 		}
@@ -159,6 +171,7 @@ public class IncludeTag extends AttributesTagSupport {
 
 	private void invokeExtensionAt(
 		TagViewExtension.ExtensionPoint point, boolean ascending) {
+
 
 		TagIdResolver tagResolver = _tagResolvers.getService(
 			this.getClass().getName());
