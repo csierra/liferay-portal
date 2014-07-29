@@ -73,6 +73,7 @@ import javax.servlet.jsp.JspException;
  * @author Shuyang Zhou
  * @author Eduardo Lundgren
  * @author Raymond Augé
+ * @author Carlos Sierra
  */
 public class IncludeTag extends AttributesTagSupport {
 
