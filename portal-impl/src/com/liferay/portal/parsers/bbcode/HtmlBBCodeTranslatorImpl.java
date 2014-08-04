@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslator;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.IntegerWrapper;
@@ -31,8 +30,10 @@ import com.liferay.portlet.messageboards.util.MBUtil;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -235,6 +236,46 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		return sb.toString();
 	}
 
+	protected String getImageStyle(Map<String, String> imageAttributes) {
+		String imageStyle = "";
+
+		if (Validator.isNotNull(imageAttributes.get("style"))) {
+			imageStyle = imageAttributes.get("style");
+		}
+
+		String imageWidth = imageAttributes.get("width");
+
+		if (Validator.isNotNull(imageWidth)) {
+			String attrWidth = "width: " + imageWidth;
+
+			Matcher matcher = _styleWidthPattern.matcher(imageStyle);
+
+			if (matcher.find()) {
+				imageStyle = matcher.replaceFirst(attrWidth);
+			}
+			else {
+				imageStyle += attrWidth;
+			}
+		}
+
+		String imageHeight = imageAttributes.get("height");
+
+		if (Validator.isNotNull(imageHeight)) {
+			String attrHeight = "height: " + imageHeight;
+
+			Matcher matcher = _styleHeightPattern.matcher(imageStyle);
+
+			if (matcher.find()) {
+				imageStyle = matcher.replaceFirst(attrHeight);
+			}
+			else {
+				imageStyle += attrHeight;
+			}
+		}
+
+		return imageStyle;
+	}
+
 	protected void handleBold(StringBundler sb, Stack<String> tags) {
 		handleSimpleTag(sb, tags, "strong");
 	}
@@ -403,29 +444,62 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 
 		BBCodeItem bbCodeItem = bbCodeItems.get(pos);
 
-		String dimensions = bbCodeItem.getAttribute();
+		String attributes = bbCodeItem.getAttribute();
 
-		if (Validator.isNotNull(dimensions)) {
-			String[] dim = StringUtil.split(dimensions, CharPool.LOWER_CASE_X);
-
-			sb.append("style=\"");
-
-			if (!dim[0].equals("auto")) {
-				sb.append("width:");
-				sb.append(HtmlUtil.escapeAttribute(dim[0]));
-				sb.append("px;");
-			}
-
-			if (!dim[1].equals("auto")) {
-				sb.append("height:");
-				sb.append(HtmlUtil.escapeAttribute(dim[1]));
-				sb.append("px;");
-			}
-
-			sb.append("\"");
+		if (Validator.isNotNull(attributes)) {
+			sb.append(StringPool.SPACE);
+			handleImageAttributes(sb, attributes);
 		}
 
 		sb.append(" />");
+	}
+
+	protected void handleImageAttributes(StringBundler sb, String attributes) {
+		Map<String, String> imageAttributes = new HashMap<String, String>();
+		Matcher matcher = _attrPattern.matcher(attributes);
+
+		while (matcher.find()) {
+			String attributeName = matcher.group(1);
+			String attributeValue = matcher.group(2);
+
+			imageAttributes.put(attributeName, attributeValue);
+		}
+
+		Set<String> availableAttributes = imageAttributes.keySet();
+
+		Iterator<String> iterator = availableAttributes.iterator();
+
+		while (iterator.hasNext()) {
+			String attributeName = iterator.next();
+
+			if (StringUtil.equalsIgnoreCase(attributeName, "alt") ||
+				StringUtil.equalsIgnoreCase(attributeName, "class") ||
+				StringUtil.equalsIgnoreCase(attributeName, "dir") ||
+				StringUtil.equalsIgnoreCase(attributeName, "id") ||
+				StringUtil.equalsIgnoreCase(attributeName, "lang") ||
+				StringUtil.equalsIgnoreCase(attributeName, "longdesc") ||
+				StringUtil.equalsIgnoreCase(attributeName, "title")) {
+
+				sb.append(StringPool.SPACE);
+				sb.append(attributeName);
+				sb.append(StringPool.EQUAL);
+				sb.append(StringPool.QUOTE);
+				sb.append(
+					HtmlUtil.escapeAttribute(
+						imageAttributes.get(attributeName)));
+				sb.append(StringPool.QUOTE);
+			}
+			else if (StringUtil.equalsIgnoreCase(attributeName, "style")) {
+				String attributeValue = getImageStyle(imageAttributes);
+
+				sb.append(StringPool.SPACE);
+				sb.append(attributeName);
+				sb.append(StringPool.EQUAL);
+				sb.append(StringPool.QUOTE);
+				sb.append(HtmlUtil.escapeAttribute(attributeValue));
+				sb.append(StringPool.QUOTE);
+			}
+		}
 	}
 
 	protected void handleItalic(StringBundler sb, Stack<String> tags) {
@@ -738,6 +812,8 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 	private static Log _log = LogFactoryUtil.getLog(
 		HtmlBBCodeTranslatorImpl.class);
 
+	private Pattern _attrPattern = Pattern.compile(
+		"\\s*([^=]+)\\s*=\\s*\"([^\"]+)\"\\s*");
 	private Map<String, String> _bbCodeCharacters;
 	private BBCodeParser _bbCodeParser = new BBCodeParser();
 	private Pattern _bbCodePattern = Pattern.compile("[]&<>'\"`\\[()]");
@@ -754,6 +830,10 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		"^(?:https?://|/)[-;/?:@&=+$,_.!~*'()%0-9a-z]{1,512}$",
 		Pattern.CASE_INSENSITIVE);
 	private Map<String, String> _listStyles;
+	private Pattern _styleHeightPattern = Pattern.compile(
+		"height:\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
+	private Pattern _styleWidthPattern = Pattern.compile(
+		"width:\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
 	private Pattern _tagPattern = Pattern.compile(
 		"^/?(?:b|center|code|colou?r|email|i|img|justify|left|pre|q|quote|" +
 			"right|\\*|s|size|table|tr|th|td|li|list|font|u|url)$",

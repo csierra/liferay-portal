@@ -6,10 +6,10 @@
 	var entities = A.merge(
 		LiferayUtil.MAP_HTML_CHARS_ESCAPED,
 		{
-			'(': '&#40;',
-			')': '&#41;',
 			'[': '&#91;',
-			']': '&#93;'
+			']': '&#93;',
+			'(': '&#40;',
+			')': '&#41;'
 		}
 	);
 
@@ -18,7 +18,7 @@
 	BBCodeUtil.escape = A.rbind('escapeHTML', LiferayUtil, true, entities);
 	BBCodeUtil.unescape = A.rbind('unescapeHTML', LiferayUtil, entities);
 }());;(function() {
-	var REGEX_BBCODE = /(?:\[((?:[a-z]|\*){1,16})(?:=([^\x00-\x1F"'\(\)<>\[\]]{1,2083}))?\])|(?:\[\/([a-z]{1,16})\])/ig;
+	var REGEX_BBCODE = /(?:\[((?:[a-z]|\*){1,16})(?:[=\s]([^\x00-\x1F'\(\)<>\[\]]{1,2083}))?\])|(?:\[\/([a-z]{1,16})\])/ig;
 
 	var Lexer = function(data) {
 		var instance = this;
@@ -321,6 +321,20 @@
 		right: '_handleTextAlign'
 	};
 
+	var MAP_IMAGE_ATTRIBUTES = [
+		'alt',
+		'class',
+		'dir',
+		'id',
+		'lang',
+		'longdesc',
+		'title',
+		{
+			fn: '_getImgStyle',
+			name: 'style'
+		}
+	];
+
 	var MAP_LIST_STYLES = {
 		1: 'list-style-type: decimal;',
 		a: 'list-style-type: lower-alpha;'
@@ -335,6 +349,8 @@
 		table: 2
 	};
 
+	var REGEX_ATTRS = /\s*([^=]+)\s*=\s*"([^"]+)"\s*/g;
+
 	var REGEX_COLOR = /^(:?aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|purple|red|silver|teal|white|yellow|#(?:[0-9a-f]{3})?[0-9a-f]{3})$/i;
 
 	var REGEX_IMAGE_SRC = /^(?:https?:\/\/|\/)[-;\/\?:@&=\+\$,_\.!~\*'\(\)%0-9a-z]{1,512}$/i;
@@ -346,6 +362,10 @@
 	var REGEX_NUMBER = /^[\\.0-9]{1,8}$/;
 
 	var REGEX_STRING_IS_NEW_LINE = /^\r?\n$/;
+
+	var REGEX_STYLE_HEIGHT = /height:\s*(\d+)/;
+
+	var REGEX_STYLE_WIDTH = /width:\s*(\d+)/;
 
 	var REGEX_TAG_NAME = /^\/?(?:b|center|code|colou?r|email|i|img|justify|left|pre|q|quote|right|\*|s|size|table|tr|th|td|li|list|font|u|url)$/i;
 
@@ -393,7 +413,7 @@
 
 	var TOKEN_TAG_START = Parser.TOKEN_TAG_START;
 
-	var tplImage = new CKEDITOR.template('<img src="{imageSrc}" {imageSize} />');
+	var tplImage = new CKEDITOR.template('<img src="{imageSrc}" {attributes} />');
 
 	var Converter = function(config) {
 		var instance = this;
@@ -470,7 +490,8 @@
 					result.push(token.value);
 				}
 
-			} while ((token.type != TOKEN_TAG_END) && (token.value != toTagName));
+			}
+			while ((token.type != TOKEN_TAG_END) && (token.value != toTagName));
 
 			if (consume) {
 				instance._tokenPointer = index - 1;
@@ -481,6 +502,73 @@
 
 		_getFontSize: function(fontSize) {
 			return MAP_FONT_SIZE[fontSize] || MAP_FONT_SIZE.defaultSize;
+		},
+
+		_getImgStyle: function(attributes) {
+			var imgStyle = attributes.style || '';
+
+			if (attributes.width) {
+				var attrWidth = 'width: ' + attributes.width;
+
+				if (REGEX_STYLE_WIDTH.test(imgStyle)) {
+					imgStyle = imgStyle.replace(REGEX_STYLE_WIDTH, attrWidth);
+				}
+				else {
+					imgStyle += attrWidth;
+				}
+			}
+
+			if (attributes.height) {
+				var attrHeight = 'height: ' + attributes.height;
+
+				if (REGEX_STYLE_HEIGHT.test(imgStyle)) {
+					imgStyle = imgStyle.replace(REGEX_STYLE_HEIGHT, attrHeight);
+				}
+				else {
+					imgStyle += attrHeight;
+				}
+			}
+
+			return imgStyle;
+		},
+
+		_handleImageAttributes: function(token) {
+			var instance = this;
+
+			var attrs = '';
+
+			if (token.attribute) {
+				var attributes = {};
+
+				var bbCodeAttr;
+
+				while ((bbCodeAttr = REGEX_ATTRS.exec(token.attribute))) {
+					attributes[bbCodeAttr[1]] = bbCodeAttr[2];
+				}
+
+				for (var i = 0, length = MAP_IMAGE_ATTRIBUTES.length; i < length; i++) {
+					var attr = MAP_IMAGE_ATTRIBUTES[i];
+
+					var attrName;
+
+					var attrValue;
+
+					if (typeof attr === 'string') {
+						attrName = attr;
+						attrValue = attributes[attr];
+					}
+					else if (typeof attr === 'object') {
+						attrName = attr.name;
+						attrValue = instance[attr.fn].call(instance, attributes);
+					}
+
+					if (attrValue) {
+						attrs += ' ' + attrName + '="' + attrValue + '"';
+					}
+				}
+			}
+
+			return attrs;
 		},
 
 		_handleCode: function(token) {
@@ -566,31 +654,9 @@
 				imageSrc = CKTools.htmlEncodeAttr(imageSrcInput);
 			}
 
-			var imageSize = '';
-
-			if (token.attribute) {
-				var dimensions = token.attribute.split('x');
-
-				imageSize = 'style="';
-
-				var width = dimensions[0];
-
-				if (width && width !== 'auto') {
-					imageSize += 'width: ' + CKTools.htmlEncodeAttr(width) + 'px;';
-				}
-
-				var height = dimensions[1];
-
-				if (height && height !== 'auto') {
-					imageSize += 'height: ' + CKTools.htmlEncodeAttr(height) + 'px;';
-				}
-
-				imageSize += '"';
-			}
-
 			var result = tplImage.output(
 				{
-					imageSize: imageSize,
+					attributes: instance._handleImageAttributes(token, token.value),
 					imageSrc: imageSrc
 				}
 			);
