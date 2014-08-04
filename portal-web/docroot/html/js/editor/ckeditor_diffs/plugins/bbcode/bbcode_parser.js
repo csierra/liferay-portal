@@ -6,10 +6,10 @@
 	var entities = A.merge(
 		LiferayUtil.MAP_HTML_CHARS_ESCAPED,
 		{
-			'(': '&#40;',
-			')': '&#41;',
 			'[': '&#91;',
-			']': '&#93;'
+			']': '&#93;',
+			'(': '&#40;',
+			')': '&#41;'
 		}
 	);
 
@@ -279,22 +279,6 @@
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 
-	var MAP_ATTRIBUTES = {
-		img: [
-			'alt',
-			'class',
-			'dir',
-			'id',
-			'lang',
-			'longdesc',
-			'title',
-			{
-				fn: '_setImgStyle',
-				name: 'style'
-			}
-		]
-	};
-
 	var MAP_FONT_SIZE = {
 		1: 10,
 		2: 12,
@@ -337,6 +321,20 @@
 		right: '_handleTextAlign'
 	};
 
+	var MAP_IMAGE_ATTRIBUTES = [
+		'alt',
+		'class',
+		'dir',
+		'id',
+		'lang',
+		'longdesc',
+		'title',
+		{
+			fn: '_getImgStyle',
+			name: 'style'
+		}
+	];
+
 	var MAP_LIST_STYLES = {
 		1: 'list-style-type: decimal;',
 		a: 'list-style-type: lower-alpha;'
@@ -351,6 +349,8 @@
 		table: 2
 	};
 
+	var REGEX_ATTRS = /\s*([^=]+)\s*=\s*"([^"]+)"\s*/g;
+
 	var REGEX_COLOR = /^(:?aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|purple|red|silver|teal|white|yellow|#(?:[0-9a-f]{3})?[0-9a-f]{3})$/i;
 
 	var REGEX_IMAGE_SRC = /^(?:https?:\/\/|\/)[-;\/\?:@&=\+\$,_\.!~\*'\(\)%0-9a-z]{1,512}$/i;
@@ -362,6 +362,10 @@
 	var REGEX_NUMBER = /^[\\.0-9]{1,8}$/;
 
 	var REGEX_STRING_IS_NEW_LINE = /^\r?\n$/;
+
+	var REGEX_STYLE_HEIGHT = /height:\s*(\d+)/;
+
+	var REGEX_STYLE_WIDTH = /width:\s*(\d+)/;
 
 	var REGEX_TAG_NAME = /^\/?(?:b|center|code|colou?r|email|i|img|justify|left|pre|q|quote|right|\*|s|size|table|tr|th|td|li|list|font|u|url)$/i;
 
@@ -486,7 +490,8 @@
 					result.push(token.value);
 				}
 
-			} while ((token.type != TOKEN_TAG_END) && (token.value != toTagName));
+			}
+			while ((token.type != TOKEN_TAG_END) && (token.value != toTagName));
 
 			if (consume) {
 				instance._tokenPointer = index - 1;
@@ -499,26 +504,50 @@
 			return MAP_FONT_SIZE[fontSize] || MAP_FONT_SIZE.defaultSize;
 		},
 
-		_handleAttributes: function(token, tagName) {
+		_getImgStyle: function(attributes) {
+			var imgStyle = attributes.style || '';
+
+			if (attributes.width) {
+				var attrWidth = 'width: ' + attributes.width;
+
+				if (REGEX_STYLE_WIDTH.test(imgStyle)) {
+					imgStyle = imgStyle.replace(REGEX_STYLE_WIDTH, attrWidth);
+				}
+				else {
+					imgStyle += attrWidth;
+				}
+			}
+
+			if (attributes.height) {
+				var attrHeight = 'height: ' + attributes.height;
+
+				if (REGEX_STYLE_HEIGHT.test(imgStyle)) {
+					imgStyle = imgStyle.replace(REGEX_STYLE_HEIGHT, attrHeight);
+				}
+				else {
+					imgStyle += attrHeight;
+				}
+			}
+
+			return imgStyle;
+		},
+
+		_handleImageAttributes: function(token) {
 			var instance = this;
 
 			var attrs = '';
 
-			var attributesMap = MAP_ATTRIBUTES[tagName];
-
-			if (attributesMap && token.attribute) {
-				var attrRegex = /\s*([^=]+)\s*=\s*"([^"]+)"\s*/g;
-
+			if (token.attribute) {
 				var attributes = {};
 
 				var bbCodeAttr;
 
-				while (bbCodeAttr = attrRegex.exec(token.attribute)) {
+				while ((bbCodeAttr = REGEX_ATTRS.exec(token.attribute))) {
 					attributes[bbCodeAttr[1]] = bbCodeAttr[2];
 				}
 
-				for (i=0; i < attributesMap.length; i++) {
-					var attr = attributesMap[i];
+				for (var i = 0, length = MAP_IMAGE_ATTRIBUTES.length; i < length; i++) {
+					var attr = MAP_IMAGE_ATTRIBUTES[i];
 
 					var attrName;
 
@@ -527,7 +556,6 @@
 					if (typeof attr === 'string') {
 						attrName = attr;
 						attrValue = attributes[attr];
-
 					}
 					else if (typeof attr === 'object') {
 						attrName = attr.name;
@@ -626,11 +654,9 @@
 				imageSrc = CKTools.htmlEncodeAttr(imageSrcInput);
 			}
 
-			var imageSize = '';
-
 			var result = tplImage.output(
 				{
-					attributes: instance._handleAttributes(token, token.value),
+					attributes: instance._handleImageAttributes(token, token.value),
 					imageSrc: imageSrc
 				}
 			);
@@ -858,38 +884,6 @@
 			instance._parsedData = null;
 
 			instance._noParse = false;
-		},
-
-		_setImgStyle: function(attributes) {
-			var instance = this;
-
-			var imgStyle = attributes.style || '';
-
-			if (attributes.width) {
-				var attrWidth = 'width: ' + attributes.width + 'px;';
-				var styleWidthRegex = /width: (\d*)px;/;
-
-				if (styleWidthRegex.test(imgStyle)) {
-					imgStyle = imgStyle.replace(styleWidthRegex, attrWidth);
-				}
-				else {
-					imgStyle += attrWidth;
-				}
-			}
-
-			if (attributes.height) {
-				var attrHeight = 'height: ' + attributes.height + 'px;';
-				var styleHeightRegex = /height: (\d*)px;/;
-
-				if (styleHeightRegex.test(imgStyle)) {
-					imgStyle = imgStyle.replace(styleHeightRegex, attrHeight);
-				}
-				else {
-					imgStyle += attrHeight;
-				}
-			}
-
-			return imgStyle;
 		}
 	};
 
