@@ -1,0 +1,9 @@
+Bundle-Name: Sample View Extension
+Bundle-Version: ${plugin.full.version}
+Import-Package:\
+	${bnd.jsp.support.imports},\
+	*
+Include-Resource:\
+	classes,\
+	@../../../util-taglib/util-taglib.jar,\
+	@lib/javax.servlet.jsp.jstl.jar!/META-INF/*.tld

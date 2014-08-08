@@ -12,19 +12,20 @@
  * details.
  */
 
-package com.liferay.kernel.taglib;
+package com.liferay.portal.kernel.servlet.taglib;
 
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PortletViewExtension {
+public interface ViewExtension {
 
 	public void render(
-			RenderRequest renderRequest, RenderResponse renderResponse)
+			HttpServletRequest request, HttpServletResponse response)
 		throws IOException;
 
 }
