@@ -17,37 +17,66 @@ package com.liferay.taglib.util;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.log.LogUtil;
+
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
+
 import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
 import com.liferay.portal.kernel.servlet.TrackedServletRequest;
+
 import com.liferay.portal.kernel.staging.StagingUtil;
+
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.Theme;
+
 import com.liferay.portal.theme.ThemeDisplay;
+
 import com.liferay.portal.util.CustomJspRegistryUtil;
+
+import com.liferay.portal.util.TagIdResolver;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
+
+import com.liferay.registry.collections.ServiceTrackerMap;
+import com.liferay.registry.collections.ServiceReferenceMapper;
+import com.liferay.registry.collections.ServiceTrackerMapFactory;
+
 import com.liferay.taglib.FileAvailabilityUtil;
+
 import com.liferay.taglib.servlet.PipingServletResponse;
+
+import com.liferay.taglib.util.TagViewExtension.ExtensionPoint;
+
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.tagext.BodyContent;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
  * @author Eduardo Lundgren
  * @author Raymond Augé
+ * @author Carlos Sierra
  */
 public class IncludeTag extends AttributesTagSupport {
 
@@ -80,7 +109,13 @@ public class IncludeTag extends AttributesTagSupport {
 				return processEndTag();
 			}
 
+			invokeExtensionAt(
+				TagViewExtension.ExtensionPoint.BEFORE_END, false);
+
 			doInclude(page);
+
+			invokeExtensionAt(
+				TagViewExtension.ExtensionPoint.AFTER_END, false);
 
 			return EVAL_PAGE;
 		}
@@ -120,12 +155,51 @@ public class IncludeTag extends AttributesTagSupport {
 				return processStartTag();
 			}
 
+			invokeExtensionAt(
+				TagViewExtension.ExtensionPoint.BEFORE_START, true);
+
 			doInclude(page);
+
+			invokeExtensionAt(
+				TagViewExtension.ExtensionPoint.AFTER_START, true);
 
 			return EVAL_BODY_INCLUDE;
 		}
 		catch (Exception e) {
 			throw new JspException(e);
+		}
+	}
+
+	private void invokeExtensionAt(
+		TagViewExtension.ExtensionPoint point, boolean ascending) {
+
+
+		TagIdResolver tagResolver = _tagResolvers.getService(
+			this.getClass().getName());
+
+		if (tagResolver != null) {
+			String extensionId = tagResolver.getId(pageContext, this);
+
+			if (extensionId != null) {
+				List<TagViewExtension> viewExtensions =
+					_viewExtensions.getService(extensionId + ":" + point);
+
+				if (viewExtensions != null) {
+					Iterator<TagViewExtension> iterator;
+
+					if (ascending) {
+						iterator = viewExtensions.iterator();
+					}
+					else {
+						iterator = ListUtil.descendingIterator(viewExtensions);
+					}
+					while (iterator.hasNext()) {
+						TagViewExtension tagViewExtension =  iterator.next();
+
+						tagViewExtension.render(pageContext, point);
+					}
+				}
+			}
 		}
 	}
 
@@ -165,7 +239,7 @@ public class IncludeTag extends AttributesTagSupport {
 			request = _trackedRequest;
 		}
 
-		setNamespacedAttribute(request, "bodyContent", getBodyContent());
+		setNamespacedAttribute(request, "bodyContent", getBodyContentWrapper());
 		setNamespacedAttribute(
 			request, "dynamicAttributes", getDynamicAttributes());
 		setNamespacedAttribute(
@@ -214,6 +288,23 @@ public class IncludeTag extends AttributesTagSupport {
 		Theme theme = (Theme)request.getAttribute(WebKeys.THEME);
 
 		ThemeUtil.include(servletContext, request, response, page, theme);
+	}
+
+	protected Object getBodyContentWrapper() {
+		final BodyContent bodyContent = getBodyContent();
+
+		if (bodyContent == null) {
+			return null;
+		}
+
+		return new Object() {
+
+			@Override
+			public String toString() {
+				return bodyContent.getString();
+			}
+
+		};
 	}
 
 	protected String getCustomPage(
@@ -356,6 +447,41 @@ public class IncludeTag extends AttributesTagSupport {
 			PropsUtil.get(PropsKeys.THEME_JSP_OVERRIDE_ENABLED));
 
 	private static Log _log = LogFactoryUtil.getLog(IncludeTag.class);
+
+	private static ServiceTrackerMap<String, TagIdResolver>
+		_tagResolvers = ServiceTrackerMapFactory.createObjectServiceTrackerMap(
+			TagIdResolver.class, "target");
+
+	private static
+		ServiceTrackerMap<String, List<TagViewExtension>>
+		_viewExtensions = ServiceTrackerMapFactory.createListServiceTrackerMap(
+			TagViewExtension.class, "(tagId=*)",
+			new ServiceReferenceMapper<String>() {
+
+				@Override
+				public void map(
+					ServiceReference<?> serviceReference,
+					Emitter<String> emitter) {
+
+					Registry registry = RegistryUtil.getRegistry();
+
+					TagViewExtension extension =
+						(TagViewExtension)registry.getService(serviceReference);
+
+					EnumSet<ExtensionPoint> extensionPoints =
+						extension.getExtensionPoints();
+
+					for (ExtensionPoint extensionPoint : extensionPoints) {
+						String prefix = (String)serviceReference.getProperty(
+							"tagId");
+
+						String key = prefix + ":" + extensionPoint;
+
+						emitter.emit(key);
+					}
+				}
+			}
+		);
 
 	private String _page;
 	private boolean _strict;
