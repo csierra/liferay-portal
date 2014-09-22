@@ -44,10 +44,14 @@ public class ServiceTrackerUtil {
 					ServiceReference<T> serviceReference =
 						bundleContext.getServiceReference(clazz);
 
+					if (serviceReference == null) {
+						throw new UnavailableServiceException(clazz);
+					}
+
 					T service = bundleContext.getService(serviceReference);
 
 					if (service == null) {
-						throw new ServiceUnavailableException(clazz);
+						throw new UnavailableServiceException(clazz);
 					}
 
 					try {
@@ -55,6 +59,9 @@ public class ServiceTrackerUtil {
 					}
 					catch (InvocationTargetException ite) {
 						throw ite.getTargetException();
+					}
+					finally {
+						bundleContext.ungetService(serviceReference);
 					}
 				}
 

@@ -468,6 +468,17 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
+	public void saveScreenshotBeforeAction(boolean actionFailed)
+		throws Exception {
+
+		if (!TestPropsValues.SAVE_SCREENSHOT) {
+			return;
+		}
+
+		LiferaySeleniumHelper.saveScreenshotBeforeAction(this, actionFailed);
+	}
+
+	@Override
 	public void scrollWebElementIntoView(String locator) throws Exception {
 		throw new UnsupportedOperationException();
 	}
@@ -495,7 +506,7 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public void sendKeys(String locator, String value) {
-		throw new UnsupportedOperationException();
+		WebDriverHelper.type(this, locator, value);
 	}
 
 	@Override

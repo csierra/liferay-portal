@@ -264,7 +264,7 @@ public class MobileDriverToSeleniumBridge
 
 	@Override
 	public String getAttribute(String attributeLocator) {
-		throw new UnsupportedOperationException();
+		return WebDriverHelper.getAttribute(this, attributeLocator);
 	}
 
 	@Override
@@ -329,7 +329,7 @@ public class MobileDriverToSeleniumBridge
 
 	@Override
 	public String getEval(String script) {
-		throw new UnsupportedOperationException();
+		return WebDriverHelper.getEval(this, script);
 	}
 
 	@Override
@@ -435,11 +435,11 @@ public class MobileDriverToSeleniumBridge
 
 	@Override
 	public String getText(String locator) {
-		throw new UnsupportedOperationException();
+		return getText(locator, null);
 	}
 
 	public String getText(String locator, String timeout) {
-		throw new UnsupportedOperationException();
+		return WebDriverHelper.getText(this, locator, timeout);
 	}
 
 	@Override
@@ -542,7 +542,7 @@ public class MobileDriverToSeleniumBridge
 
 	@Override
 	public boolean isVisible(String locator) {
-		throw new UnsupportedOperationException();
+		return WebDriverHelper.isVisible(this, locator);
 	}
 
 	@Override
@@ -622,7 +622,6 @@ public class MobileDriverToSeleniumBridge
 
 	@Override
 	public void mouseOver(String locator) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -692,7 +691,7 @@ public class MobileDriverToSeleniumBridge
 
 	@Override
 	public void runScript(String script) {
-		throw new UnsupportedOperationException();
+		getEval(script);
 	}
 
 	@Override
@@ -731,7 +730,7 @@ public class MobileDriverToSeleniumBridge
 	}
 
 	public void setDefaultTimeoutImplicit() {
-		throw new UnsupportedOperationException();
+		WebDriverHelper.setDefaultTimeoutImplicit(this);
 	}
 
 	@Override
@@ -755,7 +754,7 @@ public class MobileDriverToSeleniumBridge
 	}
 
 	public void setTimeoutImplicit(String timeout) {
-		WebDriverHelper.setDefaultTimeoutImplicit(this);
+		WebDriverHelper.setTimeoutImplicit(this, timeout);
 	}
 
 	@Override
@@ -810,7 +809,7 @@ public class MobileDriverToSeleniumBridge
 
 	@Override
 	public void type(String locator, String value) {
-		throw new UnsupportedOperationException();
+		WebDriverHelper.type(this, locator, value);
 	}
 
 	@Override

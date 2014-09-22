@@ -302,30 +302,6 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
-		<portlet-name>30</portlet-name>
-		<display-name>Network</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/network/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/network/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
 		<portlet-name>31</portlet-name>
 		<display-name>Media Gallery</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
@@ -532,33 +508,6 @@
 			<mime-type>text/html</mime-type>
 		</supports>
 		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>50</portlet-name>
-		<display-name>Hello Velocity</display-name>
-		<portlet-class>com.liferay.portlet.VelocityPortlet</portlet-class>
-		<init-param>
-			<name>view-template</name>
-			<value>/portlet/hello_velocity/view.vm</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<portlet-info>
-			<title>Hello Velocity</title>
-			<short-title>Hello Velocity</short-title>
-			<keywords>Hello Velocity</keywords>
-		</portlet-info>
-		<security-role-ref>
-			<role-name>guest</role-name>
-		</security-role-ref>
 		<security-role-ref>
 			<role-name>power-user</role-name>
 		</security-role-ref>
@@ -1073,34 +1022,6 @@
 		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
 		<security-role-ref>
 			<role-name>administrator</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>100</portlet-name>
-		<display-name>Invitation</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/invitation/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/invitation/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/invitation/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
 		</security-role-ref>
 	</portlet>
 	<portlet>
