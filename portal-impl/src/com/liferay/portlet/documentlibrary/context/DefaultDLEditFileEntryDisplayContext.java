@@ -175,6 +175,10 @@ public class DefaultDLEditFileEntryDisplayContext
 
 	private boolean _hasFolderWorkflowDefinitionLink() {
 		try {
+			if (_dlFileEntryType == null) {
+				return false;
+			}
+
 			ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
@@ -200,11 +204,6 @@ public class DefaultDLEditFileEntryDisplayContext
 		_dlFileEntryType = dlFileEntryType;
 		_fileEntry = fileEntry;
 
-		if ((_dlFileEntryType == null) && (_fileEntry != null)) {
-			_dlFileEntryType =
-				_fileEntryDisplayContextHelper.getDLFileEntryType();
-		}
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -214,6 +213,11 @@ public class DefaultDLEditFileEntryDisplayContext
 			themeDisplay.getLayout(), portletDisplay.getId());
 		_fileEntryDisplayContextHelper = new FileEntryDisplayContextHelper(
 			themeDisplay.getPermissionChecker(), _fileEntry);
+
+		if ((_dlFileEntryType == null) && (_fileEntry != null)) {
+			_dlFileEntryType =
+				_fileEntryDisplayContextHelper.getDLFileEntryType();
+		}
 
 		if (fileEntry != null) {
 			_fileVersion = fileEntry.getFileVersion();
