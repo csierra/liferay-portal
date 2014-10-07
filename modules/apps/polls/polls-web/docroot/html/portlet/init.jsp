@@ -39,6 +39,7 @@ page import="com.liferay.polls.service.PollsQuestionLocalServiceUtil" %><%@
 page import="com.liferay.polls.service.PollsVoteLocalServiceUtil" %><%@
 page import="com.liferay.polls.service.permission.PollsPermission" %><%@
 page import="com.liferay.polls.service.permission.PollsQuestionPermission" %><%@
+page import="com.liferay.polls.service.permission.PollsQuestionPermissionUtil" %><%@
 page import="com.liferay.polls.util.PollsPortletKeys" %><%@
 page import="com.liferay.polls.web.polls.portlet.action.EditQuestionAction" %><%@
 page import="com.liferay.polls.web.util.PollsUtil" %><%@

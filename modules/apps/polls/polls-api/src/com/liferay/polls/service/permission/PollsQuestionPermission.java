@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,91 +15,37 @@
 package com.liferay.polls.service.permission;
 
 import com.liferay.polls.model.PollsQuestion;
-import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
-import com.liferay.polls.util.PollsPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
-import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.BaseModelPermissionChecker;
 import com.liferay.portal.security.permission.PermissionChecker;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
- * @author Brian Wing Shun Chan
+ * @author Carlos Sierra Andrés
  */
-@Component(
-	immediate = true,
-	property = {
-		"model.class.name=com.liferay.polls.model.PollsQuestion"
-	},
-	service = BaseModelPermissionChecker.class
-)
-public class PollsQuestionPermission implements BaseModelPermissionChecker {
+public interface PollsQuestionPermission extends BaseModelPermissionChecker {
 
-	public static void check(
+	void check(
 			PermissionChecker permissionChecker, long questionId,
 			String actionId)
-		throws PortalException {
+		throws PortalException;
 
-		if (!contains(permissionChecker, questionId, actionId)) {
-			throw new PrincipalException();
-		}
-	}
-
-	public static void check(
+	void check(
 			PermissionChecker permissionChecker, PollsQuestion question,
 			String actionId)
-		throws PortalException {
+		throws PortalException;
 
-		if (!contains(permissionChecker, question, actionId)) {
-			throw new PrincipalException();
-		}
-	}
-
-	public static boolean contains(
+	boolean contains(
 			PermissionChecker permissionChecker, long questionId,
 			String actionId)
-		throws PortalException {
+		throws PortalException;
 
-		PollsQuestion question = PollsQuestionLocalServiceUtil.getQuestion(
-			questionId);
-
-		return contains(permissionChecker, question, actionId);
-	}
-
-	public static boolean contains(
+	boolean contains(
 		PermissionChecker permissionChecker, PollsQuestion question,
-		String actionId) {
+		String actionId);
 
-		Boolean hasPermission = StagingPermissionUtil.hasPermission(
-			permissionChecker, question.getGroupId(),
-			PollsQuestion.class.getName(), question.getQuestionId(),
-			PollsPortletKeys.POLLS, actionId);
-
-		if (hasPermission != null) {
-			return hasPermission.booleanValue();
-		}
-
-		if (permissionChecker.hasOwnerPermission(
-				question.getCompanyId(), PollsQuestion.class.getName(),
-				question.getQuestionId(), question.getUserId(), actionId)) {
-
-			return true;
-		}
-
-		return permissionChecker.hasPermission(
-			question.getGroupId(), PollsQuestion.class.getName(),
-			question.getQuestionId(), actionId);
-	}
-
-	@Override
-	public void checkBaseModel(
+	void checkBaseModel(
 			PermissionChecker permissionChecker, long groupId, long primaryKey,
 			String actionId)
-		throws PortalException {
-
-		check(permissionChecker, primaryKey, actionId);
-	}
+		throws PortalException;
 
 }
