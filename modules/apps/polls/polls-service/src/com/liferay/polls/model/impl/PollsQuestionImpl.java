@@ -44,7 +44,8 @@ import java.util.concurrent.Callable;
 /**
  * @author Brian Wing Shun Chan
  */
-public class PollsQuestionImpl extends PollsQuestionBaseImpl {
+public class PollsQuestionImpl extends PollsQuestionModelImpl
+	implements PollsQuestion {
 
 	private String[] _groupPermissions;
 	private String[] _guestPermissions;

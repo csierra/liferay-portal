@@ -15,13 +15,16 @@
 package com.liferay.polls.model.impl;
 
 import com.liferay.polls.model.PollsChoice;
+import com.liferay.polls.model.PollsVote;
 import com.liferay.polls.service.PollsChoiceLocalServiceUtil;
+import com.liferay.polls.service.PollsVoteLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 
 /**
  * @author Brian Wing Shun Chan
  */
-public class PollsVoteImpl extends PollsVoteBaseImpl {
+public class PollsVoteImpl extends PollsVoteModelImpl
+	implements PollsVote {
 
 	public PollsVoteImpl() {
 	}
@@ -30,5 +33,16 @@ public class PollsVoteImpl extends PollsVoteBaseImpl {
 	public PollsChoice getChoice() throws PortalException {
 		return PollsChoiceLocalServiceUtil.getChoice(getChoiceId());
 	}
+
+	@Override
+	public void persist() {
+		if (this.isNew()) {
+			PollsVoteLocalServiceUtil.addPollsVote(this);
+		}
+		else {
+			PollsVoteLocalServiceUtil.updatePollsVote(this);
+		}
+	}
+
 
 }

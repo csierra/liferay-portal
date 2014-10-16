@@ -31,7 +31,8 @@ import java.util.concurrent.Callable;
 /**
  * @author Brian Wing Shun Chan
  */
-public class PollsChoiceImpl extends PollsChoiceBaseImpl {
+public class PollsChoiceImpl extends PollsChoiceModelImpl
+		implements PollsChoice {
 
 	public PollsChoiceImpl() {
 	}
