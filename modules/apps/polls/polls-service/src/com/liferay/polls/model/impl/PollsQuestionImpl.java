@@ -208,6 +208,14 @@ public class PollsQuestionImpl extends PollsQuestionModelImpl
 		_guestPermissions = permissions;
 	}
 
+	public String[] getGroupPermissions() {
+		return _groupPermissions;
+	}
+
+	public String[] getGuestPermissions() {
+		return _guestPermissions;
+	}
+
 	@Override
 	public void validate() throws PortalException {
 
@@ -242,5 +250,13 @@ public class PollsQuestionImpl extends PollsQuestionModelImpl
 	}
 
 	private List<PollsChoice> _addedChoices = new ArrayList<>();
+
+	public List<PollsChoice> getAddedChoices() {
+		return _addedChoices;
+	}
+
+	public void clearAddedChoices() {
+		_addedChoices.clear();
+	}
 
 }

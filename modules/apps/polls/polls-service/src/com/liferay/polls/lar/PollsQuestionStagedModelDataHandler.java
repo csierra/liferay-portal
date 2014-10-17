@@ -95,7 +95,7 @@ public class PollsQuestionStagedModelDataHandler
 
 		portletDataContext.addClassedModel(
 			questionElement,
-			ExportImportPathUtil.getModelPath((PollsQuestionImpl)question),
+			ExportImportPathUtil.getModelPath(question),
 			question);
 	}
 
@@ -143,6 +143,7 @@ public class PollsQuestionStagedModelDataHandler
 		importedQuestion.setModelAttributes(
 			question.getModelAttributes());
 
+		// todo: DO WE HAVE PERSIST() JUST BECAUSE OF STAGING?
 		importedQuestion.persist();
 
 		portletDataContext.importClassedModel(question, importedQuestion);
