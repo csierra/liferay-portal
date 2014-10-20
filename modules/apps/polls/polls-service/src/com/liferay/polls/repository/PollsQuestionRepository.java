@@ -15,15 +15,22 @@
 package com.liferay.polls.repository;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.polls.exception.NoSuchQuestionException;
 import com.liferay.polls.model.PollsChoice;
+import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.model.impl.PollsQuestionImpl;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
+import com.liferay.polls.service.persistence.PollsQuestionPersistence;
 import com.liferay.polls.service.persistence.PollsQuestionUtil;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import java8.util.Optional;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
@@ -32,11 +39,60 @@ import java.util.concurrent.Callable;
  */
 public class PollsQuestionRepository {
 
-	public void persist(final PollsQuestionImpl pq) {
+	public static final String ID_PREFIX = "PollsQuestion:";
+
+	public PollsQuestion create(String title) {
+		PollsQuestion pollsQuestion = pollsQuestionPersistence.create();
+
+		pollsQuestion.setTitle(title);
+
+		return pollsQuestion;
+	}
+
+	public Optional<PollsQuestion> findById(String id) {
+		if (!id.startsWith(ID_PREFIX)) {
+			throw new IllegalArgumentException(
+				"Invalid id for this repo:\nRepo: "+ this +"\nId: " + id);
+		}
+
+		String longString = id.substring(14);
+
 		try {
-			// [[@]] should repo validate? should not - we should validate
-			// entity only when it is actually modified. but we can't move from
-			// here.
+			long primaryKey = GetterUtil.getLong(longString);
+
+			return Optional.of(pollsQuestionPersistence.findByPrimaryKey(primaryKey));
+		}
+		catch (NoSuchQuestionException e) {
+			return Optional.empty();
+		}
+		catch (NumberFormatException e) {
+			throw new IllegalArgumentException(
+				"Invalid id for this repo:\nRepo: "+ this +"\nId: " + id);
+		}
+	}
+
+	public Optional<String> toId(PollsQuestion pq) {
+		if (pq.getPrimaryKey() == 0) {
+			return Optional.empty();
+		}
+
+		return Optional.of(doToId(pq));
+	}
+
+	private String doToId(PollsQuestion pq) {
+		return ID_PREFIX + Long.toString(pq.getPrimaryKey());
+	}
+
+	public String persist(final PollsQuestionImpl pq) {
+		try {
+			/* [[@]] should repo validate? should not - we should validate
+			 entity only when it is actually modified. but we can't move from
+			 here.
+			 I guess the repo should validate and the model could cache the
+			 validation. Validation should not throw exceptions but to
+			 return a List<ConstraintValidation> as in JSR 303. If the model
+			 has not been modified it could return always the same set of
+			 validations. Although properly invalidate caches is always tricky*/
 			pq.validate();
 		} catch (PortalException pe) {
 			throw new IllegalStateException(pe);
@@ -60,7 +116,7 @@ public class PollsQuestionRepository {
 							pq.setCreateDate(now);
 							pq.setPrimaryKey(CounterLocalServiceUtil.increment());
 
-							PollsQuestionUtil.update(pq);
+							pollsQuestionPersistence.update(pq);
 
 							// Resources
 
@@ -94,7 +150,7 @@ public class PollsQuestionRepository {
 							}
 						//}
 
-						PollsQuestionUtil.update(pq);
+						pollsQuestionPersistence.update(pq);
 
 						return null;
 					}
@@ -106,6 +162,10 @@ public class PollsQuestionRepository {
 
 		pq.clearAddedChoices();
 		pq.setNew(false);
+
+		return doToId(pq);
 	}
 
+	@BeanReference(type = PollsQuestionPersistence.class)
+	protected PollsQuestionPersistence pollsQuestionPersistence;
 }
