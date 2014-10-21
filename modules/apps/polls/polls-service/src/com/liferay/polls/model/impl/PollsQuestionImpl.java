@@ -22,15 +22,10 @@ import com.liferay.polls.model.PollsChoice;
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.model.PollsVote;
 import com.liferay.polls.service.PollsChoiceLocalServiceUtil;
-import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.polls.service.PollsVoteLocalServiceUtil;
 import com.liferay.polls.service.persistence.PollsChoiceUtil;
-import com.liferay.polls.service.persistence.PollsQuestionUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.transaction.Propagation;
-import com.liferay.portal.kernel.transaction.TransactionAttribute;
-import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceContext;
@@ -39,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Callable;
 
 /**
  * @author Brian Wing Shun Chan
@@ -122,80 +116,6 @@ public class PollsQuestionImpl extends PollsQuestionModelImpl
 		else {
 			return false;
 		}
-	}
-
-	@Override
-	public void persist() {
-		try {
-			validate();
-		} catch (PortalException pe) {
-			throw new IllegalStateException(pe);
-		}
-
-		try {
-			TransactionAttribute.Builder builder =
-				new TransactionAttribute.Builder();
-
-			TransactionAttribute transactionAttribute = builder.setPropagation(
-				Propagation.SUPPORTS).build();
-
-			final Date now = new Date();
-
-			TransactionInvokerUtil.invoke(
-				transactionAttribute, new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					if (isNew()) {
-						setCreateDate(now);
-						setPrimaryKey(CounterLocalServiceUtil.increment());
-
-						PollsQuestionUtil.update(PollsQuestionImpl.this);
-
-						// Resources
-
-						boolean defaultGroupPermissions =
-							_groupPermissions == null;
-
-						boolean defaultGuestPermissions =
-							_guestPermissions == null;
-
-						if (defaultGroupPermissions ||
-							defaultGuestPermissions) {
-
-							PollsQuestionLocalServiceUtil.addQuestionResources(
-								PollsQuestionImpl.this, defaultGroupPermissions,
-								defaultGuestPermissions);
-						}
-						else {
-							PollsQuestionLocalServiceUtil.addQuestionResources(
-								PollsQuestionImpl.this, _groupPermissions,
-								_guestPermissions);
-						}
-					}
-
-					setModifiedDate(now);
-
-					if (!_addedChoices.isEmpty()) {
-						for (PollsChoice choice : _addedChoices) {
-							choice.setQuestionId(getQuestionId());
-
-							choice.persist();
-						}
-					}
-
-					PollsQuestionUtil.update(PollsQuestionImpl.this);
-
-					return null;
-				};
-			});
-		}
-		catch (Throwable throwable) {
-			throw new RuntimeException(throwable);
-		}
-
-		_addedChoices.clear();
-		setNew(false);
 	}
 
 	@Override

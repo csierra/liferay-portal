@@ -411,11 +411,6 @@ public class PollsQuestionWrapper implements PollsQuestion,
 	}
 
 	@Override
-	public void persist() {
-		_pollsQuestion.persist();
-	}
-
-	@Override
 	public void prepareLocalizedFieldsForImport()
 		throws com.liferay.portal.LocaleException {
 		_pollsQuestion.prepareLocalizedFieldsForImport();

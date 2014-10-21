@@ -29,7 +29,7 @@ import com.liferay.portal.model.PersistedModel;
  * @generated
  */
 @ProviderType
-public interface PollsQuestion extends PollsQuestionModel, PersistedModel {
+public interface PollsQuestion extends PollsQuestionModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *

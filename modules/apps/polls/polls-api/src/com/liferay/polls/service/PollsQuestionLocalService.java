@@ -41,8 +41,7 @@ import com.liferay.portal.service.PersistedModelLocalService;
 @ProviderType
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface PollsQuestionLocalService extends BaseLocalService,
-	PersistedModelLocalService {
+public interface PollsQuestionLocalService extends BaseLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -74,14 +73,6 @@ public interface PollsQuestionLocalService extends BaseLocalService,
 	 * @return the new polls question
 	 */
 	public com.liferay.polls.model.PollsQuestion createPollsQuestion();
-
-	/**
-	 * @throws PortalException
-	 */
-	@Override
-	public com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	 * Deletes the polls question from the database. Also notifies the appropriate model listeners.
@@ -208,12 +199,6 @@ public interface PollsQuestionLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext);
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	 * Returns the polls question with the primary key.

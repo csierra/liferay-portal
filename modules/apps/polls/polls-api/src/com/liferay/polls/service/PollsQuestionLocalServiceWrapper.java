@@ -80,16 +80,6 @@ public class PollsQuestionLocalServiceWrapper
 	}
 
 	/**
-	* @throws PortalException
-	*/
-	@Override
-	public com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _pollsQuestionLocalService.deletePersistedModel(persistedModel);
-	}
-
-	/**
 	* Deletes the polls question from the database. Also notifies the appropriate model listeners.
 	*
 	* @param pollsQuestion the polls question
@@ -257,13 +247,6 @@ public class PollsQuestionLocalServiceWrapper
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
 		return _pollsQuestionLocalService.getExportActionableDynamicQuery(portletDataContext);
-	}
-
-	@Override
-	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _pollsQuestionLocalService.getPersistedModel(primaryKeyObj);
 	}
 
 	/**

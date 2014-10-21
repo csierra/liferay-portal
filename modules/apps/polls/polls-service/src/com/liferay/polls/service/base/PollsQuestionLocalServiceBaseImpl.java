@@ -309,21 +309,6 @@ public abstract class PollsQuestionLocalServiceBaseImpl
 		return exportActionableDynamicQuery;
 	}
 
-	/**
-	 * @throws PortalException
-	 */
-	@Override
-	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
-		throws PortalException {
-		return pollsQuestionLocalService.deletePollsQuestion((PollsQuestion)persistedModel);
-	}
-
-	@Override
-	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException {
-		return pollsQuestionPersistence.findByPrimaryKey(primaryKeyObj);
-	}
-
 	@Override
 	public List<PollsQuestion> getPollsQuestionsByUuidAndCompanyId(
 		String uuid, long companyId) {
@@ -679,11 +664,6 @@ public abstract class PollsQuestionLocalServiceBaseImpl
 	public void setPollsVotePersistence(
 		PollsVotePersistence pollsVotePersistence) {
 		this.pollsVotePersistence = pollsVotePersistence;
-	}
-
-	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.polls.model.PollsQuestion",
-			pollsQuestionLocalService);
 	}
 
 	public void destroy() {
