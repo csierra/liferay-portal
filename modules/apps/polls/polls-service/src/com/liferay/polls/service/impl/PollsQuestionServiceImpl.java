@@ -18,6 +18,7 @@ import com.liferay.polls.exception.QuestionExpirationDateException;
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.polls.model.PollsChoiceModel;
 import com.liferay.polls.model.PollsQuestion;
+import com.liferay.polls.repository.PollsQuestionRepository;
 import com.liferay.polls.service.base.PollsQuestionServiceBaseImpl;
 import com.liferay.polls.service.permission.PollsPermission;
 import com.liferay.polls.service.permission.PollsQuestionPermission;
@@ -56,7 +57,7 @@ public class PollsQuestionServiceImpl extends PollsQuestionServiceBaseImpl {
 			ActionKeys.ADD_QUESTION);
 
 		PollsQuestion pollsQuestion =
-			pollsQuestionLocalService.createPollsQuestion();
+			_pollsQuestionRepository.create(titleMap.get("title"));
 
 		pollsQuestion.setTitleMap(titleMap);
 		pollsQuestion.setDescriptionMap(descriptionMap);
@@ -78,7 +79,7 @@ public class PollsQuestionServiceImpl extends PollsQuestionServiceBaseImpl {
 			pollsQuestion.addChoice(choice);
 		}
 
-		pollsQuestion.persist();
+		_pollsQuestionRepository.persist(pollsQuestion);
 
 		return pollsQuestion;
 	}
@@ -156,12 +157,15 @@ public class PollsQuestionServiceImpl extends PollsQuestionServiceBaseImpl {
 			choice.persist();
 		}
 
-		pollsQuestion.persist();
+		_pollsQuestionRepository.persist(pollsQuestion);
 
 		return pollsQuestion;
 	}
 	
 	@BeanReference(type = PollsQuestionPermission.class)
 	private PollsQuestionPermission _pollsQuestionPermission;
+
+	@BeanReference(type = PollsQuestionRepository.class)
+	private PollsQuestionRepository _pollsQuestionRepository;
 
 }

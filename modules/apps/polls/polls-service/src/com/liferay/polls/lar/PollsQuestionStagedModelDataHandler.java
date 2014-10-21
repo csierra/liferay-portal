@@ -14,8 +14,11 @@
 
 package com.liferay.polls.lar;
 
+import com.liferay.osgi.util.service.Reference;
+import com.liferay.osgi.util.service.ReflectionServiceTracker;
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.model.impl.PollsQuestionImpl;
+import com.liferay.polls.repository.PollsQuestionRepository;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -37,6 +40,11 @@ public class PollsQuestionStagedModelDataHandler
 	extends BaseStagedModelDataHandler<PollsQuestionImpl> {
 
 	public static final String[] CLASS_NAMES = {PollsQuestion.class.getName()};
+	private final ReflectionServiceTracker _reflectionServiceTracker;
+
+	public PollsQuestionStagedModelDataHandler() {
+		_reflectionServiceTracker = new ReflectionServiceTracker(this);
+	}
 
 	@Override
 	public void deleteStagedModel(
@@ -121,6 +129,8 @@ public class PollsQuestionStagedModelDataHandler
 
 		PollsQuestionImpl importedQuestion = null;
 
+
+		//TODO: This should be executed in a context
 		long scopeGroupId = portletDataContext.getScopeGroupId();
 
 		if (portletDataContext.isDataStrategyMirror()) {
@@ -143,10 +153,18 @@ public class PollsQuestionStagedModelDataHandler
 		importedQuestion.setModelAttributes(
 			question.getModelAttributes());
 
-		// todo: DO WE HAVE PERSIST() JUST BECAUSE OF STAGING?
-		importedQuestion.persist();
+		_pollQuestionRepository.persist(importedQuestion);
 
 		portletDataContext.importClassedModel(question, importedQuestion);
 	}
+
+	@Reference
+	public void setPollQuestionRepository(
+		PollsQuestionRepository pollQuestionRepository) {
+
+		_pollQuestionRepository = pollQuestionRepository;
+	}
+
+	private PollsQuestionRepository _pollQuestionRepository;
 
 }

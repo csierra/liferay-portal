@@ -14,14 +14,14 @@
 
 package com.liferay.polls.lar;
 
+import com.liferay.osgi.util.service.Reference;
+import com.liferay.osgi.util.service.ReflectionServiceTracker;
 import com.liferay.polls.configuration.PollsConfigurationValues;
-import com.liferay.polls.exception.NoSuchQuestionException;
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.model.PollsVote;
-import com.liferay.polls.model.impl.PollsQuestionImpl;
+import com.liferay.polls.repository.PollsQuestionRepository;
 import com.liferay.polls.service.permission.PollsPermission;
-import com.liferay.polls.service.persistence.PollsQuestionUtil;
 import com.liferay.portal.kernel.lar.DataLevel;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.StagedModel;
+import java8.util.Optional;
 
 import java.util.Map;
 
@@ -48,6 +49,9 @@ public class PollsDisplayPortletDataHandler extends PollsPortletDataHandler {
 		setExportControls(new PortletDataHandlerControl[0]);
 		setPublishToLiveByDefault(
 			PollsConfigurationValues.PUBLISH_TO_LIVE_BY_DEFAULT);
+
+		ReflectionServiceTracker reflectionServiceTracker =
+			new ReflectionServiceTracker(this);
 	}
 
 	@Override
@@ -71,10 +75,9 @@ public class PollsDisplayPortletDataHandler extends PollsPortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		long questionId = GetterUtil.getLong(
-			portletPreferences.getValue("questionId", StringPool.BLANK));
+		String questionId = portletPreferences.getValue("questionId", null);
 
-		if (questionId <= 0) {
+		if (questionId == null) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"No question id found in preferences of portlet " +
@@ -84,23 +87,25 @@ public class PollsDisplayPortletDataHandler extends PollsPortletDataHandler {
 			return portletPreferences;
 		}
 
-		PollsQuestion question = null;
+		Optional<PollsQuestion> maybeQuestion =
+			_pollsQuestionRepository.findById(questionId);
 
-		try {
-			question = PollsQuestionUtil.findByPrimaryKey(questionId);
-		}
-		catch (NoSuchQuestionException nsqe) {
+		if (!maybeQuestion.isPresent()) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(nsqe, nsqe);
+				_log.warn(
+					"No question with id " + questionId + " found in repository"
+						+ _pollsQuestionRepository);
 			}
 
 			return portletPreferences;
 		}
 
+		PollsQuestion question = maybeQuestion.get();
+
 		portletDataContext.addPortletPermissions(PollsPermission.RESOURCE_NAME);
 
 		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, portletId, (PollsQuestionImpl)question);
+			portletDataContext, portletId, (StagedModel)question);
 
 		for (PollsChoice choice : question.getChoices()) {
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
@@ -157,4 +162,12 @@ public class PollsDisplayPortletDataHandler extends PollsPortletDataHandler {
 	private static Log _log = LogFactoryUtil.getLog(
 		PollsDisplayPortletDataHandler.class);
 
+	private PollsQuestionRepository _pollsQuestionRepository;
+
+	@Reference
+	public void setPollsQuestionRepository(
+		PollsQuestionRepository pollsQuestionRepository) {
+
+		_pollsQuestionRepository = pollsQuestionRepository;
+	}
 }

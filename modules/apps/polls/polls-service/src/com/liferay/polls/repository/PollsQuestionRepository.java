@@ -21,7 +21,6 @@ import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.model.impl.PollsQuestionImpl;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.polls.service.persistence.PollsQuestionPersistence;
-import com.liferay.polls.service.persistence.PollsQuestionUtil;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -30,7 +29,6 @@ import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import java8.util.Optional;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
@@ -83,7 +81,7 @@ public class PollsQuestionRepository {
 		return ID_PREFIX + Long.toString(pq.getPrimaryKey());
 	}
 
-	public String persist(final PollsQuestionImpl pq) {
+	public String persist(final PollsQuestion pollsQuestion) {
 		try {
 			/* [[@]] should repo validate? should not - we should validate
 			 entity only when it is actually modified. but we can't move from
@@ -93,10 +91,12 @@ public class PollsQuestionRepository {
 			 return a List<ConstraintValidation> as in JSR 303. If the model
 			 has not been modified it could return always the same set of
 			 validations. Although properly invalidate caches is always tricky*/
-			pq.validate();
+			pollsQuestion.validate();
 		} catch (PortalException pe) {
 			throw new IllegalStateException(pe);
 		}
+
+		final PollsQuestionImpl pq = (PollsQuestionImpl)pollsQuestion;
 
 		try {
 			TransactionAttribute.Builder builder =
