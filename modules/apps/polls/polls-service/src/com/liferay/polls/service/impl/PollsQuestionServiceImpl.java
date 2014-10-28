@@ -17,16 +17,14 @@ package com.liferay.polls.service.impl;
 import com.liferay.polls.exception.QuestionExpirationDateException;
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.polls.model.PollsQuestion;
-import com.liferay.polls.repository.PollsQuestionRepository;
+import com.liferay.polls.model.PollsQuestionRepository;
 import com.liferay.polls.service.base.PollsQuestionServiceBaseImpl;
-import com.liferay.polls.service.permission.PollsPermission;
-import com.liferay.polls.service.permission.PollsQuestionPermission;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
+import java8.util.Optional;
 
 import java.util.Date;
 import java.util.List;
@@ -47,10 +45,6 @@ public class PollsQuestionServiceImpl extends PollsQuestionServiceBaseImpl {
 			int expirationDateMinute, boolean neverExpire,
 			List<Map<String, Object>> choices, ServiceContext serviceContext)
 		throws PortalException {
-
-		PollsPermission.check(
-			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ActionKeys.ADD_QUESTION);
 
 		PollsQuestion pollsQuestion = new PollsQuestion();
 
@@ -74,25 +68,31 @@ public class PollsQuestionServiceImpl extends PollsQuestionServiceBaseImpl {
 			pollsQuestion.addChoice(choice);
 		}
 
-		_pollsQuestionRepository.persist(pollsQuestion);
+		_pollsQuestionRepository.store(pollsQuestion);
 
 		return pollsQuestion;
 	}
 
 	@Override
 	public void deleteQuestion(long questionId) throws PortalException {
-		_pollsQuestionPermission.check(
-			getPermissionChecker(), questionId, ActionKeys.DELETE);
+		Optional<PollsQuestion> maybeQuestion =
+			_pollsQuestionRepository.retrieve(Long.toString(questionId));
 
-		pollsQuestionLocalService.deleteQuestion(questionId);
+		if (maybeQuestion.isPresent()) {
+			_pollsQuestionRepository.delete(maybeQuestion.get());
+		}
 	}
 
 	@Override
 	public PollsQuestion getQuestion(long questionId) throws PortalException {
-		_pollsQuestionPermission.check(
-			getPermissionChecker(), questionId, ActionKeys.VIEW);
+		Optional<PollsQuestion> maybeQuestion =
+			_pollsQuestionRepository.retrieve(Long.toString(questionId));
 
-		return pollsQuestionLocalService.getQuestion(questionId);
+		if (!maybeQuestion.isPresent()) {
+			throw new IllegalArgumentException();
+		}
+
+		return maybeQuestion.get();
 	}
 
 	@Override
@@ -105,11 +105,10 @@ public class PollsQuestionServiceImpl extends PollsQuestionServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		_pollsQuestionPermission.check(
-			getPermissionChecker(), questionId, ActionKeys.UPDATE);
+		Optional<PollsQuestion> maybeQuestion =
+			_pollsQuestionRepository.retrieve(Long.toString(questionId));
 
-		PollsQuestion pollsQuestion =
-			pollsQuestionLocalService.getPollsQuestion(questionId);
+		PollsQuestion pollsQuestion = maybeQuestion.get();
 
 		pollsQuestion.setTitleMap(titleMap);
 		pollsQuestion.setDescriptionMap(descriptionMap);
@@ -149,17 +148,14 @@ public class PollsQuestionServiceImpl extends PollsQuestionServiceBaseImpl {
 			choice.setModelAttributes(choiceMap);
 
 			//[[*]] maybe the persist(question) actually saves choices for us now.
-			_pollsQuestionRepository.persist(choice);
+			_pollsQuestionRepository.store(choice);
 		}
 
-		_pollsQuestionRepository.persist(pollsQuestion);
+		_pollsQuestionRepository.store(pollsQuestion);
 
 		return pollsQuestion;
 	}
 	
-	@BeanReference(type = PollsQuestionPermission.class)
-	private PollsQuestionPermission _pollsQuestionPermission;
-
 	@BeanReference(type = PollsQuestionRepository.class)
 	private PollsQuestionRepository _pollsQuestionRepository;
 

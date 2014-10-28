@@ -42,34 +42,24 @@ import java.util.Locale;
  */
 @ProviderType
 public class PollsQuestion extends PollsQuestionModelImpl implements PollsQuestionModel {
-	private String[] _groupPermissions;
-	private String[] _guestPermissions;
 
 	public PollsQuestion() {
 		setNew(true);
 	}
 
-	public boolean addChoice(PollsChoice pollsChoice) {
+	public void addChoice(PollsChoice pollsChoice) {
 		pollsChoice._pollsQuestion = this;
-		return _choices.add(pollsChoice);
+		_choices.add(pollsChoice);
+	}
+
+	public void addChoices(List<PollsChoice> choices) {
+		for (PollsChoice choice : choices) {
+			addChoice(choice);
+		}
 	}
 
 	public List<PollsChoice> getChoices() {
 		return _choices;
-	}
-
-	public List<PollsVote> getVotes() {
-		return PollsVoteLocalServiceUtil.getQuestionVotes(
-			getQuestionId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-	}
-
-	public List<PollsVote> getVotes(int start, int end) {
-		return PollsVoteLocalServiceUtil.getQuestionVotes(
-			getQuestionId(), start, end);
-	}
-
-	public int getVotesCount() {
-		return PollsVoteLocalServiceUtil.getQuestionVotesCount(getQuestionId());
 	}
 
 	public boolean isExpired() {
@@ -150,5 +140,9 @@ public class PollsQuestion extends PollsQuestionModelImpl implements PollsQuesti
 		}
 	}
 
-	private List<PollsChoice> _choices = new ArrayList<>();
+	protected List<PollsChoice> _choices = new ArrayList<>();
+
+	private String[] _groupPermissions;
+	private String[] _guestPermissions;
+
 }

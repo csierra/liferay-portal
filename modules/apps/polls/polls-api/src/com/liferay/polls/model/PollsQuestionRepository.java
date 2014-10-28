@@ -12,16 +12,16 @@
  * details.
  */
 
-package com.liferay.polls.repository;
+package com.liferay.polls.model;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.kernel.Repository;
 import com.liferay.polls.exception.NoSuchQuestionException;
-import com.liferay.polls.model.PollsChoice;
-import com.liferay.polls.model.PollsQuestion;
-import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
+import com.liferay.polls.service.PollsQuestionLocalService;
+import com.liferay.polls.service.permission.PollsQuestionPermission;
 import com.liferay.polls.service.persistence.PollsChoicePersistence;
-import com.liferay.polls.service.persistence.PollsChoiceUtil;
 import com.liferay.polls.service.persistence.PollsQuestionPersistence;
+import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.CompanyProvider;
 import com.liferay.portal.kernel.GroupProvider;
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -30,38 +30,37 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.security.permission.PermissionThreadLocal;
+import com.liferay.portal.service.ResourceLocalService;
 import java8.util.Optional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
  * [[@]] Trying a Repo.
  */
-public class PollsQuestionRepository {
+public class PollsQuestionRepository implements Repository<PollsQuestion> {
 
 	public static final String ID_PREFIX = "PollsQuestion:";
 
-	public PollsQuestion create(String title) {
-		PollsQuestion pollsQuestion = pollsQuestionPersistence.create();
-
-		pollsQuestion.setTitle(title);
-
-		return pollsQuestion;
-	}
-
-	public Optional<PollsQuestion> findById(String id) {
-		if (!id.startsWith(ID_PREFIX)) {
-			throw new IllegalArgumentException(
-				"Invalid id for this repo:\nRepo: "+ this +"\nId: " + id);
-		}
-
-		String longString = id.substring(14);
+	@Override
+	public Optional<PollsQuestion> retrieve(String id) {
+		String longString = parseId(id);
 
 		try {
 			long primaryKey = GetterUtil.getLong(longString);
 
-			return Optional.of(pollsQuestionPersistence.findByPrimaryKey(primaryKey));
+			PollsQuestion pollsQuestion =
+				pollsQuestionPersistence.findByPrimaryKey(primaryKey);
+
+			pollsQuestion.addChoices(
+				pollsChoicePersistence.findByQuestionId(primaryKey));
+
+			return Optional.of(pollsQuestion);
 		}
 		catch (NoSuchQuestionException e) {
 			return Optional.empty();
@@ -72,6 +71,16 @@ public class PollsQuestionRepository {
 		}
 	}
 
+	private String parseId(String rawString) {
+		if (!rawString.startsWith(ID_PREFIX)) {
+			throw new IllegalArgumentException(
+				"Invalid id for this repo:\nRepo: "+ this +"\nId: " + rawString);
+		}
+
+		return rawString.substring(14);
+	}
+
+	@Override
 	public Optional<String> toId(PollsQuestion pq) {
 		if (pq.getPrimaryKey() == 0) {
 			return Optional.empty();
@@ -80,11 +89,73 @@ public class PollsQuestionRepository {
 		return Optional.of(doToId(pq));
 	}
 
-	private String doToId(PollsQuestion pq) {
+	@Override
+	public void delete(String id) {
+
+		long questionId = Long.parseLong(parseId(id));
+
+		try {
+			_pollsQuestionPermission.check(
+				PermissionThreadLocal.getPermissionChecker(),
+				questionId, ActionKeys.DELETE);
+		}
+		catch (PortalException e) {
+			throw new RuntimeException(e);
+		}
+
+		try {
+			pollsQuestionPersistence.remove(questionId);
+		}
+		catch (NoSuchQuestionException e) {
+			//TODO: [[@]] Should we care?!?!
+		}
+	}
+
+	@Override
+	public void delete(PollsQuestion question) {
+		try {
+			_pollsQuestionPermission.check(
+				PermissionThreadLocal.getPermissionChecker(),
+				question.getQuestionId(), ActionKeys.DELETE);
+
+
+			pollsQuestionPersistence.remove(question);
+
+			// Resources
+
+			long companyId = _companyProvider.get().getCompanyId();
+
+			resourceLocalService.deleteResource(
+				companyId, PollsQuestion.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL, question.getQuestionId());
+
+			// Choices
+
+			List<PollsChoice> choices = question.getChoices();
+
+			for (PollsChoice choice : choices) {
+				remove(choice);
+			}
+		}
+		catch (PortalException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void remove(PollsChoice choice) {
+		try {
+			pollsQuestionPersistence.remove(choice);
+		} catch (NoSuchModelException e) {
+			// TODO: [[@]] Should we care?!?!
+		}
+	}
+
+	protected String doToId(PollsQuestion pq) {
 		return ID_PREFIX + Long.toString(pq.getPrimaryKey());
 	}
 
-	public String persist(final PollsQuestion pq) {
+	@Override
+	public String store(final PollsQuestion pq) {
 		try {
 			/* [[@]] should repo validate? should not - we should validate
 			 entity only when it is actually modified. but we can't move from
@@ -114,13 +185,21 @@ public class PollsQuestionRepository {
 					@Override
 					public Void call() throws Exception {
 						if (pq.isNew()) {
+							long scopeGroupId =
+								_groupProvider.get().getGroupId();
+
+							_pollsQuestionPermission.check(
+								PermissionThreadLocal.getPermissionChecker(),
+								scopeGroupId, ActionKeys.ADD_QUESTION);
+
 							pq.setCreateDate(now);
-							pq.setPrimaryKey(CounterLocalServiceUtil.increment());
+							pq.setPrimaryKey(
+								CounterLocalServiceUtil.increment());
 
 							// [[*]] REMOVE THIS
 
 							pq.setCompanyId(_companyProvider.get().getCompanyId());
-							pq.setGroupId(_groupProvider.get().getGroupId());
+							pq.setGroupId(scopeGroupId);
 
 							pollsQuestionPersistence.update(pq);
 
@@ -135,15 +214,20 @@ public class PollsQuestionRepository {
 							if (defaultGroupPermissions ||
 								defaultGuestPermissions) {
 
-								PollsQuestionLocalServiceUtil.addQuestionResources(
+								_pollsQuestionLocalService.addQuestionResources(
 									pq, defaultGroupPermissions,
 									defaultGuestPermissions);
 							}
 							else {
-								PollsQuestionLocalServiceUtil.addQuestionResources(
+								_pollsQuestionLocalService.addQuestionResources(
 									pq, pq.getGroupPermissions(),
 									pq.getGuestPermissions());
 							}
+						}
+						else {
+							_pollsQuestionPermission.check(
+								PermissionThreadLocal.getPermissionChecker(),
+								pq.getQuestionId(), ActionKeys.UPDATE);
 						}
 
 						pq.setModifiedDate(now);
@@ -154,7 +238,7 @@ public class PollsQuestionRepository {
 
 								if (id == 0) {
 									choice.setQuestionId(pq.getQuestionId());
-									persist(choice);
+									store(choice);
 								}
 							}
 						//}
@@ -175,7 +259,7 @@ public class PollsQuestionRepository {
 	}
 
 
-	public void persist(final PollsChoice pc) {
+	public void store(final PollsChoice pc) {
 		try {
 			pc.validate();
 		} catch (PortalException pe) {
@@ -224,11 +308,19 @@ public class PollsQuestionRepository {
 	@BeanReference(type = PollsChoicePersistence.class)
 	protected PollsChoicePersistence pollsChoicePersistence;
 
+	@BeanReference(type = ResourceLocalService.class)
+	protected ResourceLocalService resourceLocalService;
+
 	@BeanReference(type = GroupProvider.class)
 	protected GroupProvider _groupProvider;
 
 	@BeanReference(type = CompanyProvider.class)
 	protected CompanyProvider _companyProvider;
 
+	@BeanReference(type = PollsQuestionPermission.class)
+	private PollsQuestionPermission _pollsQuestionPermission;
+
+	@BeanReference(type = PollsQuestionLocalService.class)
+	private PollsQuestionLocalService _pollsQuestionLocalService;
 
 }

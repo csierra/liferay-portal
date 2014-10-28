@@ -158,7 +158,7 @@ public class PollsChoiceStagedModelDataHandler
 
 		importedChoice.setModelAttributes(choice.getModelAttributes());
 
-		_pollsQuestionRepository.persist(importedChoice);
+		_pollsQuestionRepository.store(importedChoice);
 
 		portletDataContext.importClassedModel(choice, importedChoice);
 	}

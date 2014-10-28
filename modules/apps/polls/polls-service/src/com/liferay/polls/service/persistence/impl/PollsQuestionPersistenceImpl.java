@@ -2538,8 +2538,7 @@ public class PollsQuestionPersistenceImpl extends BasePersistenceImpl<PollsQuest
 
 		boolean isNew = pollsQuestion.isNew();
 
-		PollsQuestionModelImpl pollsQuestionModelImpl =
-			(PollsQuestionModelImpl)pollsQuestion;
+		PollsQuestionModelImpl pollsQuestionModelImpl = pollsQuestion;
 
 		if (Validator.isNull(pollsQuestionModelImpl.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
