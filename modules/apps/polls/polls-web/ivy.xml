@@ -18,5 +18,6 @@
 
 	<dependencies defaultconf="default">
 		<dependency name="org.osgi.compendium" org="org.osgi" rev="5.0.0" />
+		<dependency name="com.liferay.osgi.util" org="com.liferay" rev="latest.integration" />
 	</dependencies>
 </ivy-module>
