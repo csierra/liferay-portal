@@ -177,6 +177,20 @@ public final class Optional<T> {
 	}
 
 	/**
+	 * Return the value if present, otherwise invoke {@code other} and return
+	 * the result of that invocation.
+	 *
+	 * @param other a {@code Supplier} whose result is returned if no value
+	 * is present
+	 * @return the value if present otherwise the result of {@code other.get()}
+	 * @throws NullPointerException if value is not present and {@code other} is
+	 * null
+	 */
+	public T orElseGet(Supplier<? extends T> other) {
+		return value != null ? value : other.get();
+	}
+
+	/**
 	 * If a value is present, apply the provided mapping function to it,
 	 * and if the result is non-null, return an {@code Optional} describing the
 	 * result.  Otherwise return an empty {@code Optional}.
