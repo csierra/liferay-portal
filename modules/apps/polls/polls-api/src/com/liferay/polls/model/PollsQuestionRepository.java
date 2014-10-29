@@ -34,7 +34,7 @@ import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.ResourceLocalService;
-import java8.util.Optional;
+import com.liferay.java8.util.Optional;
 
 import java.util.Date;
 import java.util.List;

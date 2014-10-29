@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
-import java8.util.Optional;
+import com.liferay.java8.util.Optional;
 
 import java.util.Date;
 import java.util.List;

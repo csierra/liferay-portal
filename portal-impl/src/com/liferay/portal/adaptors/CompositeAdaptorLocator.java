@@ -17,7 +17,7 @@ package com.liferay.portal.adaptors;
 import com.liferay.portal.kernel.adaptors.Adaptor;
 import com.liferay.portal.kernel.adaptors.AdaptorLocator;
 import com.liferay.registry.collections.ServiceTrackerCollections;
-import java8.util.Optional;
+import com.liferay.java8.util.Optional;
 
 import java.util.List;
 

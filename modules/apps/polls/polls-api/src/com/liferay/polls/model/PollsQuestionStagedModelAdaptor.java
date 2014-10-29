@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -12,15 +12,21 @@
  * details.
  */
 
-package com.liferay.kernel;
+package com.liferay.polls.model;
 
-import com.liferay.java8.util.Optional;
+import com.liferay.portal.kernel.adaptors.Adaptor;
+import com.liferay.portal.model.StagedGroupedModel;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface ReadOnlyRepository<T> {
-	Optional<T> retrieve(String model);
+@Component(immediate = true)
+public class PollsQuestionStagedModelAdaptor
+	implements Adaptor<PollsQuestion, StagedGroupedModel> {
 
-	Optional<String> toId(T model);
+	@Override
+	public StagedGroupedModel apply(PollsQuestion question) {
+		return null;
+	}
 }

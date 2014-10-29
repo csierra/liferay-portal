@@ -22,22 +22,34 @@ import com.liferay.registry.ServiceReference;
 import com.liferay.registry.collections.ServiceReferenceMapper;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
-import java8.util.Optional;
+import com.liferay.java8.util.Optional;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class ServiceTrackerMapAdaptorLocator implements AdaptorLocator {
+public class ServiceTrackerMapAdaptorLocator
+	implements AdaptorLocator, Closeable {
 
+	public ServiceTrackerMapAdaptorLocator() {
+		_adaptorsMap.open();
+	}
 
 	@Override
 	public <R, T> Optional<Adaptor<R, T>> locate(Class<R> from, Class<T> to) {
-		return Optional.empty();
+		return Optional.<Adaptor<R,T>>ofNullable(
+			_adaptorsMap.getService(getKey(from, to)));
 	}
-	
-	private static ServiceTrackerMap<String, Adaptor> _adaptorsMap =
+
+	private <R, T> String getKey(Class<R> from, Class<T> to) {
+		return from.getName() + "->" + to.getName();
+	}
+
+	private ServiceTrackerMap<String, Adaptor> _adaptorsMap =
 		ServiceTrackerCollections.singleValueMap(
 			Adaptor.class, null, 
 			new ServiceReferenceMapper<String, Adaptor>() {
@@ -54,9 +66,20 @@ public class ServiceTrackerMapAdaptorLocator implements AdaptorLocator {
 					Type[] genericInterfaces =
 						adaptor.getClass().getGenericInterfaces();
 
-					emitter.emit(
-						genericInterfaces[0].toString() + "->" +
-							genericInterfaces[1].toString());
+					ParameterizedType type =
+						(ParameterizedType) genericInterfaces[0];
+
+					Type[] typeArguments = type.getActualTypeArguments();
+
+					Class from = (Class) typeArguments[0];
+					Class to = (Class) typeArguments[1];
+
+					emitter.emit(getKey(from, to));
 				}
 			});
+
+	@Override
+	public void close() throws IOException {
+		_adaptorsMap.close();
+	}
 }

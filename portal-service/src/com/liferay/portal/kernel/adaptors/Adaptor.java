@@ -19,6 +19,6 @@ import com.liferay.portal.kernel.util.Function;
 /**
  * @author Carlos Sierra Andrés
  */
-public interface Adaptor<R,T> extends Function<R, T>{
+public interface Adaptor<R,T> extends Function<R, T> {
 
 }

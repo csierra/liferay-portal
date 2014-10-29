@@ -12,26 +12,13 @@
  * details.
  */
 
-package java8.util;
+package com.liferay.java8.util;
 
 /**
- * Represents a supplier of results.
- *
- * <p>There is no requirement that a new or distinct result be returned each
- * time the supplier is invoked.
- *
- * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #get()}.
- *
- * @param <T> the type of results supplied by this supplier
- *
+ * @author Carlos Sierra Andrés
  */
-public interface Supplier<T> {
+public interface Consumer<T> {
 
-	/**
-	 * Gets a result.
-	 *
-	 * @return a result
-	 */
-	T get();
+	public void accept(T value);
+
 }

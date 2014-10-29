@@ -16,7 +16,7 @@ package com.liferay.polls.lar;
 
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.polls.model.PollsQuestion;
-import com.liferay.polls.repository.PollsQuestionRepository;
+import com.liferay.polls.model.PollsQuestionRepository;
 import com.liferay.polls.service.PollsChoiceLocalServiceUtil;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;

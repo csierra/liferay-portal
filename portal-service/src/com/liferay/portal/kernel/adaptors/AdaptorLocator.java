@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.adaptors;
 
-import java8.util.Optional;
+import com.liferay.java8.util.Optional;
 
 /**
  * @author Carlos Sierra Andrés

@@ -12,7 +12,7 @@
  * details.
  */
 
-package java8.util;
+package com.liferay.java8.util;
 
 /**
  * [[@]] Stripped down version of java 8 Function type

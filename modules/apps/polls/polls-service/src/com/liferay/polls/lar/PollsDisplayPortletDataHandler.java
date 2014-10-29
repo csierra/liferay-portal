@@ -18,9 +18,11 @@ import com.liferay.polls.configuration.PollsConfigurationValues;
 import com.liferay.polls.exception.NoSuchQuestionException;
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.polls.model.PollsQuestion;
+import com.liferay.polls.model.PollsQuestionWithVotes;
 import com.liferay.polls.model.PollsVote;
 import com.liferay.polls.service.permission.PollsPermission;
 import com.liferay.polls.service.persistence.PollsQuestionUtil;
+import com.liferay.portal.kernel.adaptors.Adaptor;
 import com.liferay.portal.kernel.lar.DataLevel;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
@@ -109,7 +111,12 @@ public class PollsDisplayPortletDataHandler extends PollsPortletDataHandler {
 		if (portletDataContext.getBooleanParameter(
 				PollsPortletDataHandler.NAMESPACE, "votes")) {
 
-			for (PollsVote vote : question.getVotes()) {
+			Adaptor<PollsQuestion, PollsQuestionWithVotes> adaptor = null;
+
+			PollsQuestionWithVotes pollsQuestionWithVotes = adaptor.apply(
+				question);
+
+			for (PollsVote vote : pollsQuestionWithVotes.getVotes().all()) {
 				StagedModelDataHandlerUtil.exportReferenceStagedModel(
 					portletDataContext, portletId, vote);
 			}
