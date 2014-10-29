@@ -14,11 +14,14 @@
 
 package com.liferay.portal.spring.context;
 
+import com.liferay.portal.adaptors.CompositeAdaptorLocator;
+import com.liferay.portal.adaptors.ServiceTrackerMapAdaptorLocator;
 import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.cache.ehcache.ClearEhcacheThreadUtil;
 import com.liferay.portal.deploy.hot.IndexerPostProcessorRegistry;
 import com.liferay.portal.deploy.hot.SchedulerEntryRegistry;
 import com.liferay.portal.deploy.hot.ServiceWrapperRegistry;
+import com.liferay.portal.kernel.adaptors.AdaptorLocator;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
@@ -77,6 +80,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
+import com.liferay.registry.RegistryUtil;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
@@ -279,6 +283,14 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		ClassLoader portalClassLoader = ClassLoaderUtil.getPortalClassLoader();
 
 		ClassLoaderPool.register(_portalServletContextName, portalClassLoader);
+
+		CompositeAdaptorLocator compositeAdaptorLocator =
+			new CompositeAdaptorLocator();
+
+		compositeAdaptorLocator.register(new ServiceTrackerMapAdaptorLocator());
+
+		RegistryUtil.getRegistry().registerService(
+			AdaptorLocator.class, compositeAdaptorLocator);
 
 		ServletContextPool.put(_portalServletContextName, servletContext);
 

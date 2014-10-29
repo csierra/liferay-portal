@@ -15,46 +15,37 @@
 package com.liferay.polls.model;
 
 import com.liferay.kernel.LazyPageableResult;
-import com.liferay.kernel.ReadOnlyRepository;
 import com.liferay.polls.service.PollsVoteLocalService;
-import com.liferay.polls.service.persistence.PollsQuestionPersistence;
-import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.adaptors.Adaptor;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import java8.util.Function;
-import java8.util.Optional;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class PollsQuestionWithVotesRepository
-	implements ReadOnlyRepository<PollsQuestionWithVotes> {
+@Component(immediate = true)
+public class PollsQuestionWithVotesAdaptor
+	implements Adaptor<PollsQuestion, PollsQuestionWithVotes> {
+
+	private PollsVoteLocalService pollsVoteLocalService;
 
 	@Override
-	public Optional<PollsQuestionWithVotes> retrieve(String id) {
-		return pollsQuestionRepository.retrieve(id).map(
-			new Function<PollsQuestion, PollsQuestionWithVotes>() {
-
-			@Override
-			public PollsQuestionWithVotes apply(final PollsQuestion question) {
-				return new PollsQuestionWithVotes(
-					question, new PollsVoteLazyResult(question));
-			}
-		});
+	public PollsQuestionWithVotes apply(PollsQuestion question) {
+		return new PollsQuestionWithVotes(question,
+			new PollsVoteLazyResult(question));
 	}
 
-	@Override
-	public Optional<String> toId(PollsQuestionWithVotes question) {
-		return pollsQuestionRepository.toId(question.getWrappedQuestion());
+	@Reference
+	public void setPollsVoteService(
+		PollsVoteLocalService pollsVoteLocalService) {
+
+		this.pollsVoteLocalService = pollsVoteLocalService;
 	}
 
-	public PollsQuestionWithVotes withVotes(PollsQuestion question) {
-		return new PollsQuestionWithVotes(
-			question, new PollsVoteLazyResult(question));
-	}
-
-	private class PollsVoteLazyResult
+	protected class PollsVoteLazyResult
 		implements LazyPageableResult<PollsVote> {
 
 		private PollsVoteLazyResult(PollsQuestion question) {
@@ -77,12 +68,4 @@ public class PollsQuestionWithVotesRepository
 		private PollsQuestion _question;
 	}
 
-	@BeanReference(type = PollsQuestionRepository.class)
-	PollsQuestionRepository pollsQuestionRepository;
-
-	@BeanReference(type = PollsQuestionPersistence.class)
-	PollsQuestionPersistence pollsQuestionPersistence;
-
-	@BeanReference(type = PollsVoteLocalService.class)
-	PollsVoteLocalService pollsVoteLocalService;
 }
