@@ -15,6 +15,7 @@
 package com.liferay.portal.viex.extender;
 
 import com.liferay.kernel.servlet.taglib.TagExtension;
+import org.apache.jasper.servlet.JspServlet;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -29,6 +30,7 @@ import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URL;
@@ -43,11 +45,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component(immediate = true)
 public class ViewBundleTracker {
 
+	private ServiceRegistration<Servlet> _servletServiceRegistration;
+
 	@Activate
 	public void activate(ComponentContext context) {
 		_bundleContext = context.getBundleContext();
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME,
@@ -62,8 +66,8 @@ public class ViewBundleTracker {
 				public URL getResource(String name) {
 					String[] tokens = name.split("/");
 
-					if (tokens.length == 4) {
-						long bundleId = Long.parseLong(tokens[0]);
+					if (tokens.length == 5) {
+						long bundleId = Long.parseLong(tokens[1]);
 
 						Bundle bundle = _bundleContext.getBundle(bundleId);
 
@@ -71,17 +75,17 @@ public class ViewBundleTracker {
 							"View-Extensions");
 
 						return bundle.getEntry(
-							extensionPath + tokens[1] + "/" + tokens[2] + "/" +
-								tokens[3]);
+							extensionPath + "/" + tokens[2] + "/" + tokens[3] + "/" +
+								tokens[4]);
 					}
 
-					throw new IllegalArgumentException(name);
+					return null;
 				}
 			}, properties
 		);
 
 		_bundleTracker = new BundleTracker<>(
-			_bundleContext, Bundle.RESOLVED,
+			_bundleContext, Bundle.ACTIVE,
 			new BundleTrackerCustomizer<Bundle>() {
 
 			@Override
@@ -117,11 +121,34 @@ public class ViewBundleTracker {
 			}
 		});
 
+		_bundleTracker.open();
+
+		properties = new Hashtable<>();
+
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+			"view-extensions");
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "jsp");
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "*.jsp");
+		properties.put(
+			"servlet.init.compilerClassName",
+			"com.liferay.portal.servlet.jsp.compiler.compiler.JspCompiler");
+		properties.put("servlet.init.httpMethods", "GET,POST,HEAD");
+		properties.put("servlet.init.keepgenerated", "true");
+		properties.put("servlet.init.logVerbosityLevel", "DEBUG");
+
+		_servletServiceRegistration = _bundleContext.registerService(
+			Servlet.class, new JspServlet(), properties);
+
 	}
 
 	@Deactivate
 	public void deactivate() {
 		_servletContextHelperRegistration.unregister();
+
+		_servletServiceRegistration.unregister();
 
 		_bundleTracker.close();
 	}
@@ -140,7 +167,7 @@ public class ViewBundleTracker {
 						String requestPath =
 							"/o/view-extensions/" + Long.toString(
 								bundle.getBundleId()) + "/" + tagClassName +
-								"/" + tagKey + "/" + itemKey;
+								"/" + tagKey + "/" + itemKey + ".jsp";
 
 						RequestDispatcher dispatcher =
 							request.getRequestDispatcher(requestPath);
@@ -165,13 +192,13 @@ public class ViewBundleTracker {
 							URL url = entries.nextElement();
 
 							String path = url.getPath().substring(
-								extensionPath.length());
+								extensionPath.length() + 1);
 
 							String[] tokens = path.split("/");
 
 							if (tokens.length == 3) {
 								registry.register(
-									tokens[0], tokens[1], tokens[2]);
+									tokens[0], tokens[1], tokens[2].substring(0, tokens[2].length() - 4));
 							}
 						}
 					}
