@@ -1,5 +1,5 @@
 Bundle-Name: Liferay View Extension Example
 Bundle-SymbolicName: com.liferay.portal.view.extension.example
 Bundle-Version: 1.0.0
-Include-Resource: view-extensions=view-extensions
+Include-Resource: view-extensions=view-extensions, classes
 View-Extensions: /view-extensions
