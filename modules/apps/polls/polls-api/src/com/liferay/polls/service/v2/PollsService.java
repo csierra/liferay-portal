@@ -16,13 +16,11 @@ package com.liferay.polls.service.v2;
 
 import com.liferay.polls.model.v2.PollsBuilder;
 import com.liferay.polls.model.v2.PollsQuestionQuerier;
-import com.liferay.portal.kernel.PortalContextAware;
 import com.liferay.services.v2.Service;
 
 /**
  * @author Carlos Sierra Andrés
  */
 public interface PollsService
-	extends Service<PollsBuilder, PollsQuestionQuerier, PollsContext>,
-	PortalContextAware {
+	extends Service<PollsBuilder, PollsQuestionQuerier, PollsContext> {
 }
