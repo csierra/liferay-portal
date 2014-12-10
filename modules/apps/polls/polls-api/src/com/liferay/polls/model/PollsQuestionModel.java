@@ -16,6 +16,7 @@ package com.liferay.polls.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.polls.model.v2.PollsQuestionQuerier;
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.model.BaseModel;
@@ -69,28 +70,12 @@ public interface PollsQuestionModel extends BaseModel<PollsQuestion>,
 	public void setPrimaryKey(long primaryKey);
 
 	/**
-	 * Returns the uuid of this polls question.
-	 *
-	 * @return the uuid of this polls question
-	 */
-	@AutoEscape
-	@Override
-	public String getUuid();
-
-	/**
 	 * Sets the uuid of this polls question.
 	 *
 	 * @param uuid the uuid of this polls question
 	 */
 	@Override
 	public void setUuid(String uuid);
-
-	/**
-	 * Returns the question ID of this polls question.
-	 *
-	 * @return the question ID of this polls question
-	 */
-	public long getQuestionId();
 
 	/**
 	 * Sets the question ID of this polls question.
@@ -181,14 +166,6 @@ public interface PollsQuestionModel extends BaseModel<PollsQuestion>,
 	public void setUserName(String userName);
 
 	/**
-	 * Returns the create date of this polls question.
-	 *
-	 * @return the create date of this polls question
-	 */
-	@Override
-	public Date getCreateDate();
-
-	/**
 	 * Sets the create date of this polls question.
 	 *
 	 * @param createDate the create date of this polls question
@@ -197,78 +174,12 @@ public interface PollsQuestionModel extends BaseModel<PollsQuestion>,
 	public void setCreateDate(Date createDate);
 
 	/**
-	 * Returns the modified date of this polls question.
-	 *
-	 * @return the modified date of this polls question
-	 */
-	@Override
-	public Date getModifiedDate();
-
-	/**
 	 * Sets the modified date of this polls question.
 	 *
 	 * @param modifiedDate the modified date of this polls question
 	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate);
-
-	/**
-	 * Returns the title of this polls question.
-	 *
-	 * @return the title of this polls question
-	 */
-	public String getTitle();
-
-	/**
-	 * Returns the localized title of this polls question in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized title of this polls question
-	 */
-	@AutoEscape
-	public String getTitle(Locale locale);
-
-	/**
-	 * Returns the localized title of this polls question in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized title of this polls question. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
-	@AutoEscape
-	public String getTitle(Locale locale, boolean useDefault);
-
-	/**
-	 * Returns the localized title of this polls question in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized title of this polls question
-	 */
-	@AutoEscape
-	public String getTitle(String languageId);
-
-	/**
-	 * Returns the localized title of this polls question in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized title of this polls question
-	 */
-	@AutoEscape
-	public String getTitle(String languageId, boolean useDefault);
-
-	@AutoEscape
-	public String getTitleCurrentLanguageId();
-
-	@AutoEscape
-	public String getTitleCurrentValue();
-
-	/**
-	 * Returns a map of the locales and localized titles of this polls question.
-	 *
-	 * @return the locales and localized titles of this polls question
-	 */
-	public Map<Locale, String> getTitleMap();
 
 	/**
 	 * Sets the title of this polls question.
@@ -310,64 +221,6 @@ public interface PollsQuestionModel extends BaseModel<PollsQuestion>,
 	 * @param defaultLocale the default locale
 	 */
 	public void setTitleMap(Map<Locale, String> titleMap, Locale defaultLocale);
-
-	/**
-	 * Returns the description of this polls question.
-	 *
-	 * @return the description of this polls question
-	 */
-	public String getDescription();
-
-	/**
-	 * Returns the localized description of this polls question in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized description of this polls question
-	 */
-	@AutoEscape
-	public String getDescription(Locale locale);
-
-	/**
-	 * Returns the localized description of this polls question in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this polls question. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
-	@AutoEscape
-	public String getDescription(Locale locale, boolean useDefault);
-
-	/**
-	 * Returns the localized description of this polls question in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized description of this polls question
-	 */
-	@AutoEscape
-	public String getDescription(String languageId);
-
-	/**
-	 * Returns the localized description of this polls question in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this polls question
-	 */
-	@AutoEscape
-	public String getDescription(String languageId, boolean useDefault);
-
-	@AutoEscape
-	public String getDescriptionCurrentLanguageId();
-
-	@AutoEscape
-	public String getDescriptionCurrentValue();
-
-	/**
-	 * Returns a map of the locales and localized descriptions of this polls question.
-	 *
-	 * @return the locales and localized descriptions of this polls question
-	 */
-	public Map<Locale, String> getDescriptionMap();
 
 	/**
 	 * Sets the description of this polls question.
@@ -413,25 +266,11 @@ public interface PollsQuestionModel extends BaseModel<PollsQuestion>,
 		Locale defaultLocale);
 
 	/**
-	 * Returns the expiration date of this polls question.
-	 *
-	 * @return the expiration date of this polls question
-	 */
-	public Date getExpirationDate();
-
-	/**
 	 * Sets the expiration date of this polls question.
 	 *
 	 * @param expirationDate the expiration date of this polls question
 	 */
 	public void setExpirationDate(Date expirationDate);
-
-	/**
-	 * Returns the last vote date of this polls question.
-	 *
-	 * @return the last vote date of this polls question
-	 */
-	public Date getLastVoteDate();
 
 	/**
 	 * Sets the last vote date of this polls question.

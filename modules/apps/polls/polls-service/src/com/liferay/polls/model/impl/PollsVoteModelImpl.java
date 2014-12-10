@@ -308,7 +308,6 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 	}
 
 	@JSON
-	@Override
 	public long getVoteId() {
 		return _voteId;
 	}
@@ -488,7 +487,6 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 	}
 
 	@JSON
-	@Override
 	public Date getVoteDate() {
 		return _voteDate;
 	}

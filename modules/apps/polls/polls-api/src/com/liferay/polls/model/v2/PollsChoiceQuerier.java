@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,97 +14,127 @@
 
 package com.liferay.polls.model.v2;
 
-import com.liferay.polls.model.PollsChoice;
-import com.liferay.polls.service.persistence.PollsQuestionUtil;
+import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.kernel.util.Function;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class PollsChoiceQuerier {
+public interface PollsChoiceQuerier {
+	/*
+		 * NOTE FOR DEVELOPERS:
+		 *
+		 * Never modify this interface directly. Add methods to {@link com.liferay.polls.model.impl.PollsChoiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+		 */
+	int getVotesCount();
 
-	PollsChoice _pollsChoice;
-	PollsQuerier _pollsQuerier;
+	/**
+	 * Returns the uuid of this polls choice.
+	 *
+	 * @return the uuid of this polls choice
+	 */
+	@AutoEscape
+	String getUuid();
 
-	public PollsChoiceQuerier(PollsChoice pollsChoice) {
-		_pollsChoice = pollsChoice;
-	}
+	/**
+	 * Returns the choice ID of this polls choice.
+	 *
+	 * @return the choice ID of this polls choice
+	 */
+	long getChoiceId();
 
-	public int getVotesCount() {
-		return _pollsChoice.getVotesCount();
-	}
+	/**
+	 * Returns the user ID of this polls choice.
+	 *
+	 * @return the user ID of this polls choice
+	 */
+	long getUserId();
 
-	public String getUuid() {
-		return _pollsChoice.getUuid();
-	}
+	/**
+	 * Returns the create date of this polls choice.
+	 *
+	 * @return the create date of this polls choice
+	 */
+	Date getCreateDate();
 
-	public long getChoiceId() {
-		return _pollsChoice.getChoiceId();
-	}
+	/**
+	 * Returns the modified date of this polls choice.
+	 *
+	 * @return the modified date of this polls choice
+	 */
+	Date getModifiedDate();
 
-	public long getUserId() {
-		return _pollsChoice.getUserId();
-	}
+	/**
+	 * Returns the name of this polls choice.
+	 *
+	 * @return the name of this polls choice
+	 */
+	@AutoEscape
+	String getName();
 
-	public Date getCreateDate() {
-		return _pollsChoice.getCreateDate();
-	}
+	/**
+	 * Returns the description of this polls choice.
+	 *
+	 * @return the description of this polls choice
+	 */
+	String getDescription();
 
-	public Date getModifiedDate() {
-		return _pollsChoice.getModifiedDate();
-	}
+	/**
+	 * Returns the localized description of this polls choice in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized description of this polls choice
+	 */
+	@AutoEscape
+	String getDescription(Locale locale);
 
-	public String getName() {
-		return _pollsChoice.getName();
-	}
+	/**
+	 * Returns the localized description of this polls choice in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale     the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized description of this polls choice. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
+	@AutoEscape
+	String getDescription(Locale locale, boolean useDefault);
 
-	public String getDescription() {
-		return _pollsChoice.getDescription();
-	}
+	/**
+	 * Returns the localized description of this polls choice in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized description of this polls choice
+	 */
+	@AutoEscape
+	String getDescription(String languageId);
 
-	public String getDescription(Locale locale) {
-		return _pollsChoice.getDescription(locale);
-	}
+	/**
+	 * Returns the localized description of this polls choice in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized description of this polls choice
+	 */
+	@AutoEscape
+	String getDescription(String languageId, boolean useDefault);
 
-	public String getDescription(Locale locale, boolean useDefault) {
-		return _pollsChoice.getDescription(locale, useDefault);
-	}
+	@AutoEscape
+	String getDescriptionCurrentLanguageId();
 
-	public String getDescription(String languageId) {
-		return _pollsChoice.getDescription(languageId);
-	}
+	@AutoEscape
+	String getDescriptionCurrentValue();
 
-	public String getDescription(String languageId, boolean useDefault) {
-		return _pollsChoice.getDescription(languageId, useDefault);
-	}
+	/**
+	 * Returns a map of the locales and localized descriptions of this polls choice.
+	 *
+	 * @return the locales and localized descriptions of this polls choice
+	 */
+	Map<Locale, String> getDescriptionMap();
 
-	public String getDescriptionCurrentLanguageId() {
-		return _pollsChoice.getDescriptionCurrentLanguageId();
-	}
-
-	public String getDescriptionCurrentValue() {
-		return _pollsChoice.getDescriptionCurrentValue();
-	}
-
-	public Map<Locale, String> getDescriptionMap() {
-		return _pollsChoice.getDescriptionMap();
-	}
-
-	public PollsQuerier getQuestion() {
-		if (_pollsQuerier == null) {
-				_pollsQuerier = new PollsQuerier(
-					PollsQuestionUtil.fetchByPrimaryKey(
-						_pollsChoice.getQuestionId()));
-		}
-
-		return _pollsQuerier;
-	}
-
-	protected void setPollsQuerier(PollsQuerier pollsQuerier) {
-		_pollsQuerier = pollsQuerier;
-	}
+	public <T> T getQuestion(Function<PollsQuestionQuerier, T> function);
 
 }

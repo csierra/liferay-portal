@@ -12,21 +12,17 @@
  * details.
  */
 
-package com.liferay.polls.model.v2;
+package com.liferay.polls.service.v2;
 
-import java.util.Date;
+import com.liferay.polls.model.v2.PollsBuilder;
+import com.liferay.polls.model.v2.PollsQuestionQuerier;
+import com.liferay.portal.kernel.PortalContextAware;
+import com.liferay.services.v2.Service;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsUpdater {
-	void setTitle(String title);
-
-	void setExpirationDate(Date expirationDate);
-
-	void unsetExpiration();
-
-	void appendChoice(String description);
-
-	void changeChoiceDescription(String name, String newDescription);
+public interface PollsService
+	extends Service<PollsBuilder, PollsQuestionQuerier, PollsContext>,
+	PortalContextAware {
 }

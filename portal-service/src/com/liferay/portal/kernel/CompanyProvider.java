@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -12,21 +12,18 @@
  * details.
  */
 
-package com.liferay.polls.model.v2;
+package com.liferay.portal.kernel;
 
-import java.util.Date;
+import com.liferay.portal.model.Company;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsUpdater {
-	void setTitle(String title);
+public class CompanyProvider implements Provider<Company> {
 
-	void setExpirationDate(Date expirationDate);
+	@Override
+	public Company get() {
+		return null;
+	}
 
-	void unsetExpiration();
-
-	void appendChoice(String description);
-
-	void changeChoiceDescription(String name, String newDescription);
 }

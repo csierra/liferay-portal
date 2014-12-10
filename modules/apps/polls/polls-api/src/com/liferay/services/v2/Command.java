@@ -17,7 +17,7 @@ package com.liferay.services.v2;
 /**
  * @author Carlos Sierra Andrés
  */
-public abstract class Command<S extends ServiceContext, Q> {
+public abstract class Command<S extends CommandContext<S>, Q> {
 
 	public abstract void execute(S context, Q querier);
 

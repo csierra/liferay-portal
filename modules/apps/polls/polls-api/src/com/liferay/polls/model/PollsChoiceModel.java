@@ -16,6 +16,7 @@ package com.liferay.polls.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.polls.model.v2.PollsChoiceQuerier;
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.model.BaseModel;
@@ -69,28 +70,12 @@ public interface PollsChoiceModel extends BaseModel<PollsChoice>, LocalizedModel
 	public void setPrimaryKey(long primaryKey);
 
 	/**
-	 * Returns the uuid of this polls choice.
-	 *
-	 * @return the uuid of this polls choice
-	 */
-	@AutoEscape
-	@Override
-	public String getUuid();
-
-	/**
 	 * Sets the uuid of this polls choice.
 	 *
 	 * @param uuid the uuid of this polls choice
 	 */
 	@Override
 	public void setUuid(String uuid);
-
-	/**
-	 * Returns the choice ID of this polls choice.
-	 *
-	 * @return the choice ID of this polls choice
-	 */
-	public long getChoiceId();
 
 	/**
 	 * Sets the choice ID of this polls choice.
@@ -130,14 +115,6 @@ public interface PollsChoiceModel extends BaseModel<PollsChoice>, LocalizedModel
 	 */
 	@Override
 	public void setCompanyId(long companyId);
-
-	/**
-	 * Returns the user ID of this polls choice.
-	 *
-	 * @return the user ID of this polls choice
-	 */
-	@Override
-	public long getUserId();
 
 	/**
 	 * Sets the user ID of this polls choice.
@@ -181,28 +158,12 @@ public interface PollsChoiceModel extends BaseModel<PollsChoice>, LocalizedModel
 	public void setUserName(String userName);
 
 	/**
-	 * Returns the create date of this polls choice.
-	 *
-	 * @return the create date of this polls choice
-	 */
-	@Override
-	public Date getCreateDate();
-
-	/**
 	 * Sets the create date of this polls choice.
 	 *
 	 * @param createDate the create date of this polls choice
 	 */
 	@Override
 	public void setCreateDate(Date createDate);
-
-	/**
-	 * Returns the modified date of this polls choice.
-	 *
-	 * @return the modified date of this polls choice
-	 */
-	@Override
-	public Date getModifiedDate();
 
 	/**
 	 * Sets the modified date of this polls choice.
@@ -227,77 +188,11 @@ public interface PollsChoiceModel extends BaseModel<PollsChoice>, LocalizedModel
 	public void setQuestionId(long questionId);
 
 	/**
-	 * Returns the name of this polls choice.
-	 *
-	 * @return the name of this polls choice
-	 */
-	@AutoEscape
-	public String getName();
-
-	/**
 	 * Sets the name of this polls choice.
 	 *
 	 * @param name the name of this polls choice
 	 */
 	public void setName(String name);
-
-	/**
-	 * Returns the description of this polls choice.
-	 *
-	 * @return the description of this polls choice
-	 */
-	public String getDescription();
-
-	/**
-	 * Returns the localized description of this polls choice in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized description of this polls choice
-	 */
-	@AutoEscape
-	public String getDescription(Locale locale);
-
-	/**
-	 * Returns the localized description of this polls choice in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this polls choice. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
-	@AutoEscape
-	public String getDescription(Locale locale, boolean useDefault);
-
-	/**
-	 * Returns the localized description of this polls choice in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized description of this polls choice
-	 */
-	@AutoEscape
-	public String getDescription(String languageId);
-
-	/**
-	 * Returns the localized description of this polls choice in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this polls choice
-	 */
-	@AutoEscape
-	public String getDescription(String languageId, boolean useDefault);
-
-	@AutoEscape
-	public String getDescriptionCurrentLanguageId();
-
-	@AutoEscape
-	public String getDescriptionCurrentValue();
-
-	/**
-	 * Returns a map of the locales and localized descriptions of this polls choice.
-	 *
-	 * @return the locales and localized descriptions of this polls choice
-	 */
-	public Map<Locale, String> getDescriptionMap();
 
 	/**
 	 * Sets the description of this polls choice.

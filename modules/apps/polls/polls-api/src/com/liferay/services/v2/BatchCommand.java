@@ -12,21 +12,37 @@
  * details.
  */
 
-package com.liferay.polls.model.v2;
-
-import java.util.Date;
+package com.liferay.services.v2;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsUpdater {
-	void setTitle(String title);
+public abstract class BatchCommand<S extends CommandContext<S>> {
 
-	void setExpirationDate(Date expirationDate);
+	public abstract void execute(S context);
 
-	void unsetExpiration();
+	public final BatchCommand<S> and(final BatchCommand<S> next) {
+		return new BatchCommand<S>() {
 
-	void appendChoice(String description);
+			@Override
+			public void execute(S context) {
+				BatchCommand.this.execute(context);
 
-	void changeChoiceDescription(String name, String newDescription);
+				next.execute(context);
+			};
+		};
+	};
+
+	public final <Q> Command<S, Q> and(final Command<S, Q> next) {
+		return new Command<S, Q>() {
+
+			@Override
+			public void execute(S context, Q querier) {
+				BatchCommand.this.execute(context);
+
+				next.execute(context, querier);
+			};
+		};
+	}
+
 }

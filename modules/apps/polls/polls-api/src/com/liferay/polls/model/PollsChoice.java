@@ -16,6 +16,7 @@ package com.liferay.polls.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.polls.model.v2.PollsChoiceQuerier;
 import com.liferay.portal.model.PersistedModel;
 
 /**
@@ -28,11 +29,7 @@ import com.liferay.portal.model.PersistedModel;
  * @generated
  */
 @ProviderType
-public interface PollsChoice extends PollsChoiceModel, PersistedModel {
-	/*
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.polls.model.impl.PollsChoiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
-	public int getVotesCount();
+public interface PollsChoice
+	extends PollsChoiceModel, PersistedModel, PollsChoiceQuerier {
+
 }

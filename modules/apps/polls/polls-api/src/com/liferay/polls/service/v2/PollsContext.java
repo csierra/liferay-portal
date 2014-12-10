@@ -14,10 +14,26 @@
 
 package com.liferay.polls.service.v2;
 
-import com.liferay.services.v2.Service;
+import com.liferay.polls.model.PollsQuestion;
+import com.liferay.services.v2.CommandContext;
+
+import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class PollsService implements Service<> {
+public class PollsContext extends CommandContext<PollsContext> {
+
+	private Callable<List<PollsQuestion>> _filterCallable;
+
+	public Callable<List<PollsQuestion>> getFilterCallable() {
+		return _filterCallable;
+	}
+
+	public void setFilterCallable(Callable<List<PollsQuestion>> executable) {
+
+		_filterCallable = executable;
+	}
+
 }

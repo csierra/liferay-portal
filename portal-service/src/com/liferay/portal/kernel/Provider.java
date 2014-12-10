@@ -12,37 +12,12 @@
  * details.
  */
 
-package com.liferay.services.v2;
+package com.liferay.portal.kernel;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public abstract class BatchCommand<S extends ServiceContext> {
+public interface Provider<T> {
 
-	public abstract void execute(S context);
-
-	public final BatchCommand<S> and(final BatchCommand<S> next) {
-		return new BatchCommand<S>() {
-
-			@Override
-			public void execute(S context) {
-				BatchCommand.this.execute(context);
-
-				next.execute(context);
-			};
-		};
-	};
-
-	public final <Q> Command<S, Q> and(final Command<S, Q> next) {
-		return new Command<S, Q>() {
-
-			@Override
-			public void execute(S context, Q querier) {
-				BatchCommand.this.execute(context);
-
-				next.execute(context, querier);
-			};
-		};
-	}
-
+	public T get();
 }

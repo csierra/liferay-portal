@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,80 +14,40 @@
 
 package com.liferay.polls.model.v2;
 
-import com.liferay.polls.model.PollsChoice;
-import com.liferay.polls.model.PollsQuestion;
-
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class PollsBuilder {
+public interface PollsBuilder {
 
-	PollsQuestion _pollsQuestion;
+	public void appendChoice(String description);
 
-	List<PollsChoice> _addedChoices;
+	void setTitle(String title);
 
-	public PollsBuilder(
-		PollsQuestion pollsQuestion, List<PollsChoice> addedChoices) {
+	void setTitle(String title, Locale locale);
 
-		_pollsQuestion = pollsQuestion;
+	void setTitle(String title, Locale locale, Locale defaultLocale);
 
-		_addedChoices = addedChoices;
-	}
+	void setTitleCurrentLanguageId(String languageId);
 
-	public void setTitle(String title) {
-		_pollsQuestion.setTitle(title);
-	}
+	void setTitleMap(Map<Locale, String> titleMap);
 
-	public void setTitle(String title, Locale locale) {
-		_pollsQuestion.setTitle(title, locale);
-	}
+	void setTitleMap(Map<Locale, String> titleMap, Locale defaultLocale);
 
-	public void setTitle(String title, Locale locale, Locale defaultLocale) {
-		_pollsQuestion.setTitle(title, locale, defaultLocale);
-	}
+	void setDescription(String description);
 
-	public void setTitleCurrentLanguageId(String languageId) {
-		_pollsQuestion.setTitleCurrentLanguageId(languageId);
-	}
+	void setDescription(String description, Locale locale);
 
-	public void setTitleMap(Map<Locale, String> titleMap) {
-		_pollsQuestion.setTitleMap(titleMap);
-	}
+	void setDescription(String description, Locale locale, Locale defaultLocale);
 
-	public void setTitleMap(Map<Locale, String> titleMap, Locale defaultLocale) {
-		_pollsQuestion.setTitleMap(titleMap, defaultLocale);
-	}
+	void setDescriptionCurrentLanguageId(String languageId);
 
-	public void setDescription(String description) {
-		_pollsQuestion.setDescription(description);
-	}
+	void setDescriptionMap(Map<Locale, String> descriptionMap);
 
-	public void setDescription(String description, Locale locale) {
-		_pollsQuestion.setDescription(description, locale);
-	}
+	void setDescriptionMap(Map<Locale, String> descriptionMap, Locale defaultLocale);
 
-	public void setDescription(String description, Locale locale, Locale defaultLocale) {
-		_pollsQuestion.setDescription(description, locale, defaultLocale);
-	}
-
-	public void setDescriptionCurrentLanguageId(String languageId) {
-		_pollsQuestion.setDescriptionCurrentLanguageId(languageId);
-	}
-
-	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
-		_pollsQuestion.setDescriptionMap(descriptionMap);
-	}
-
-	public void setDescriptionMap(Map<Locale, String> descriptionMap, Locale defaultLocale) {
-		_pollsQuestion.setDescriptionMap(descriptionMap, defaultLocale);
-	}
-
-	public void setExpirationDate(Date expirationDate) {
-		_pollsQuestion.setExpirationDate(expirationDate);
-	}
+	void setExpirationDate(Date expirationDate);
 }

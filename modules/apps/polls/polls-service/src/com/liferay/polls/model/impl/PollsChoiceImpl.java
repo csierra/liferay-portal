@@ -14,7 +14,14 @@
 
 package com.liferay.polls.model.impl;
 
+import com.liferay.polls.model.PollsQuestion;
+import com.liferay.polls.model.v2.PollsQuestionQuerier;
+import com.liferay.polls.model.v2.PollsVoteQuerier;
 import com.liferay.polls.service.PollsVoteLocalServiceUtil;
+import com.liferay.polls.service.persistence.PollsQuestionUtil;
+import com.liferay.portal.kernel.util.Function;
+
+import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
@@ -24,6 +31,14 @@ public class PollsChoiceImpl extends PollsChoiceBaseImpl {
 	@Override
 	public int getVotesCount() {
 		return PollsVoteLocalServiceUtil.getChoiceVotesCount(getChoiceId());
+	}
+
+	@Override
+	public <T> T getQuestion(Function<PollsQuestionQuerier, T> function) {
+		PollsQuestion pollsQuestion = PollsQuestionUtil.fetchByPrimaryKey(
+			getQuestionId());
+
+		return function.apply(pollsQuestion);
 	}
 
 }

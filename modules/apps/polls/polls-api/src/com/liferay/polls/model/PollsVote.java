@@ -16,6 +16,7 @@ package com.liferay.polls.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.polls.model.v2.PollsVoteQuerier;
 import com.liferay.portal.model.PersistedModel;
 
 /**
@@ -28,7 +29,8 @@ import com.liferay.portal.model.PersistedModel;
  * @generated
  */
 @ProviderType
-public interface PollsVote extends PollsVoteModel, PersistedModel {
+public interface PollsVote
+	extends PollsVoteModel, PersistedModel, PollsVoteQuerier {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *

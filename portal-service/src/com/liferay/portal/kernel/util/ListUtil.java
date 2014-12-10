@@ -612,4 +612,16 @@ public class ListUtil {
 			(Class<? extends List<?>>)unmodifiableList.getClass();
 	}
 
+	public static <F, T> List<T> map(
+		Function<F, T> function, List<? extends F> from) {
+
+		ArrayList<T> result = new ArrayList<T>(from.size());
+
+		for (F f : from) {
+			result.add(function.apply(f));
+		}
+
+		return result;
+	}
+
 }

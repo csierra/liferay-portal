@@ -12,13 +12,17 @@
 */
 package com.liferay.services.v2;
 
-
 /**
 *
 */
-public interface SingleProducer<Q, S extends ServiceContext<S>> extends SingleRenderer<Q> {
+public interface Service<B, Q, S extends CommandContext<S>> {
     /**
     **/
-    public SingleRenderer<Q> execute(Command<S, Q> consumer) ;
-
+    public SingleProducer<Q, S> create(ModelAction<B> consumer) ;/**
+    **/
+    public SingleProducer<Q, S> with(String id) ;/**
+    **/
+    public MultipleProducer<Q, S> find(Filter<S> filter) ;/**
+    **/
+    public MultipleProducer<Q, S> all() ;
 }

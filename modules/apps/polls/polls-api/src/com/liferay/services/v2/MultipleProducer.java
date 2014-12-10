@@ -18,10 +18,10 @@ import com.liferay.portal.kernel.util.Function;
 /**
 *
 */
-public interface MultipleProducer<Q, S extends ServiceContext<S>> {
+public interface MultipleProducer<Q, S extends CommandContext<S>> {
     /**
     **/
     public <R> Result<List<R>> map(Function<Q, R> function) ;/**
     **/
-    public MultipleRenderer execute(Command<S, Q> command) ;
+    public MultipleRenderer<Q> execute(Command<S, Q> command) ;
 }

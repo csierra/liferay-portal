@@ -16,6 +16,7 @@ package com.liferay.polls.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.polls.model.v2.PollsQuestionQuerier;
 import com.liferay.portal.model.PersistedModel;
 
 /**
@@ -28,7 +29,8 @@ import com.liferay.portal.model.PersistedModel;
  * @generated
  */
 @ProviderType
-public interface PollsQuestion extends PollsQuestionModel, PersistedModel {
+public interface PollsQuestion
+	extends PollsQuestionModel, PersistedModel, PollsQuestionQuerier {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,10 +42,6 @@ public interface PollsQuestion extends PollsQuestionModel, PersistedModel {
 
 	public java.util.List<com.liferay.polls.model.PollsVote> getVotes(
 		int start, int end);
-
-	public int getVotesCount();
-
-	public boolean isExpired();
 
 	public boolean isExpired(
 		com.liferay.portal.service.ServiceContext serviceContext,

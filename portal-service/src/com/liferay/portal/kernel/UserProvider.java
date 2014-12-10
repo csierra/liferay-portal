@@ -12,25 +12,18 @@
  * details.
  */
 
-package com.liferay.services.v2;
+package com.liferay.portal.kernel;
+
+import com.liferay.portal.model.User;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public abstract class Filter<S extends ServiceContext<S>> {
+public class UserProvider implements Provider<User> {
 
-	public abstract void execute(S context);
-
-	public final Filter<S> and(final Filter<S> next) {
-		return new Filter<S>() {
-
-			@Override
-			public void execute(S context) {
-				Filter.this.execute(context);
-
-				next.execute(context);
-			}
-		};
-	};
+	@Override
+	public User get() {
+		return null;
+	}
 
 }

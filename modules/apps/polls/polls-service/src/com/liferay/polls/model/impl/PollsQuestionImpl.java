@@ -16,11 +16,15 @@ package com.liferay.polls.model.impl;
 
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.polls.model.PollsVote;
+import com.liferay.polls.model.v2.PollsChoiceQuerier;
+import com.liferay.polls.model.v2.PollsVoteQuerier;
 import com.liferay.polls.service.PollsChoiceLocalServiceUtil;
 import com.liferay.polls.service.PollsVoteLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.service.ServiceContext;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +48,32 @@ public class PollsQuestionImpl extends PollsQuestionBaseImpl {
 	public List<PollsVote> getVotes(int start, int end) {
 		return PollsVoteLocalServiceUtil.getQuestionVotes(
 			getQuestionId(), start, end);
+	}
+
+	@Override
+	public <T> List<T> getChoices(Function<PollsChoiceQuerier, T> function) {
+		List<PollsChoice> choices = getChoices();
+
+		List<T> list = new ArrayList<>(choices.size());
+
+		for (PollsChoice choice : choices) {
+			list.add(function.apply(choice));
+		}
+
+		return list;
+	}
+
+	@Override
+	public <T> List<T> getVotes(Function<PollsVoteQuerier, T> function) {
+		List<PollsVote> votes = getVotes();
+
+		List<T> list = new ArrayList<>(votes.size());
+
+		for (PollsVote vote : votes) {
+			list.add(function.apply(vote));
+		}
+
+		return list;
 	}
 
 	@Override

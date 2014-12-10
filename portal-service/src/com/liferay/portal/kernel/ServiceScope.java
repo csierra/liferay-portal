@@ -12,40 +12,41 @@
  * details.
  */
 
-package com.liferay.services.v2;
+package com.liferay.portal.kernel;
 
-import java.util.List;
-import com.liferay.portal.kernel.util.Function;
+import com.liferay.portal.model.Company;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.model.User;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface Result<T> {
+public abstract class ServiceScope implements AutoCloseable {
 
-	public List<ConstraintViolation> getViolations();
+	public static class Provided extends ServiceScope {
 
-	public T get();
-
-	public static class ResultImpl<Q, T> implements Result {
-
-		private ServiceContext<?> _serviceContext;
-		private Q _q;
-		private Function<Q, T> _function;
-
-		public ResultImpl(ServiceContext<?> serviceContext, Q q, Function<Q, T> function) {
-			_serviceContext = serviceContext;
-			_q = q;
-			_function = function;
+		@Override
+		public Company getCompany() {
+			return null;
 		}
 
 		@Override
-		public List<ConstraintViolation> getViolations() {
-			return _serviceContext.getViolations();
+		public Group getGroup() {
+			return null;
 		}
 
 		@Override
-		public T get() {
-			return _function.apply(_q);
+		public User getUser() {
+			return null;
 		}
+	}
+
+	public abstract Company getCompany();
+	public abstract Group getGroup();
+	public abstract User getUser();
+
+	@Override
+	public void close() {
+
 	}
 }

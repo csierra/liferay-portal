@@ -16,6 +16,7 @@ package com.liferay.polls.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.polls.model.v2.PollsVoteQuerier;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CacheModel;
@@ -42,7 +43,8 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface PollsVoteModel extends BaseModel<PollsVote>, StagedGroupedModel {
+public interface PollsVoteModel
+	extends BaseModel<PollsVote>, StagedGroupedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -64,28 +66,12 @@ public interface PollsVoteModel extends BaseModel<PollsVote>, StagedGroupedModel
 	public void setPrimaryKey(long primaryKey);
 
 	/**
-	 * Returns the uuid of this polls vote.
-	 *
-	 * @return the uuid of this polls vote
-	 */
-	@AutoEscape
-	@Override
-	public String getUuid();
-
-	/**
 	 * Sets the uuid of this polls vote.
 	 *
 	 * @param uuid the uuid of this polls vote
 	 */
 	@Override
 	public void setUuid(String uuid);
-
-	/**
-	 * Returns the vote ID of this polls vote.
-	 *
-	 * @return the vote ID of this polls vote
-	 */
-	public long getVoteId();
 
 	/**
 	 * Sets the vote ID of this polls vote.
@@ -125,14 +111,6 @@ public interface PollsVoteModel extends BaseModel<PollsVote>, StagedGroupedModel
 	 */
 	@Override
 	public void setCompanyId(long companyId);
-
-	/**
-	 * Returns the user ID of this polls vote.
-	 *
-	 * @return the user ID of this polls vote
-	 */
-	@Override
-	public long getUserId();
 
 	/**
 	 * Sets the user ID of this polls vote.
@@ -176,28 +154,12 @@ public interface PollsVoteModel extends BaseModel<PollsVote>, StagedGroupedModel
 	public void setUserName(String userName);
 
 	/**
-	 * Returns the create date of this polls vote.
-	 *
-	 * @return the create date of this polls vote
-	 */
-	@Override
-	public Date getCreateDate();
-
-	/**
 	 * Sets the create date of this polls vote.
 	 *
 	 * @param createDate the create date of this polls vote
 	 */
 	@Override
 	public void setCreateDate(Date createDate);
-
-	/**
-	 * Returns the modified date of this polls vote.
-	 *
-	 * @return the modified date of this polls vote
-	 */
-	@Override
-	public Date getModifiedDate();
 
 	/**
 	 * Sets the modified date of this polls vote.
@@ -234,13 +196,6 @@ public interface PollsVoteModel extends BaseModel<PollsVote>, StagedGroupedModel
 	 * @param choiceId the choice ID of this polls vote
 	 */
 	public void setChoiceId(long choiceId);
-
-	/**
-	 * Returns the vote date of this polls vote.
-	 *
-	 * @return the vote date of this polls vote
-	 */
-	public Date getVoteDate();
 
 	/**
 	 * Sets the vote date of this polls vote.

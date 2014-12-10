@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -12,21 +12,33 @@
  * details.
  */
 
-package com.liferay.polls.model.v2;
+package com.liferay.services.v2;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsUpdater {
-	void setTitle(String title);
+public class CommandContext<S> {
 
-	void setExpirationDate(Date expirationDate);
+	private List<ConstraintViolation> _violations = new ArrayList<>();
+	private String id;
 
-	void unsetExpiration();
+	public String getId() {
+		return id;
+	}
 
-	void appendChoice(String description);
+	public void setId(String id) {
+		this.id = id;
+	}
 
-	void changeChoiceDescription(String name, String newDescription);
+	public List<ConstraintViolation> getViolations() {
+		return _violations;
+	}
+
+	public void addViolation(ConstraintViolation violation) {
+		_violations.add(violation);
+	}
+
 }
