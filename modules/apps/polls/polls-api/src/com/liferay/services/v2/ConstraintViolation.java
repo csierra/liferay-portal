@@ -18,4 +18,6 @@ package com.liferay.services.v2;
  * @author Carlos Sierra Andrés
  */
 public class ConstraintViolation {
+	public ConstraintViolation(Exception e) {
+	}
 }

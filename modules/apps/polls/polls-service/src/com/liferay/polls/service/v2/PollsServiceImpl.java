@@ -27,13 +27,15 @@ import com.liferay.polls.model.v2.PollsVoteQuerier;
 import com.liferay.polls.service.persistence.PollsChoicePersistence;
 import com.liferay.polls.service.persistence.PollsQuestionPersistence;
 import com.liferay.portal.kernel.DateContext;
-import com.liferay.portal.kernel.ServiceScope;
+import com.liferay.portal.kernel.AuditableScope;
 import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.User;
+import com.liferay.portal.service.ResourceLocalServiceUtil;
+import com.liferay.services.v2.Command;
+import com.liferay.services.v2.ConstraintViolation;
 import com.liferay.services.v2.Filter;
 import com.liferay.services.v2.ModelAction;
 import com.liferay.services.v2.MultipleProducer;
@@ -60,29 +62,18 @@ public class PollsServiceImpl implements PollsService {
 
 		consumer.consume(new PollsBuilderImpl(pollsQuestion, addedChoices));
 
-		Group group = _serviceScope.getGroup();
-		User user = _serviceScope.getUser();
+		_auditableScope.propagate(pollsQuestion);
 
-		pollsQuestion.setCreateDate(_dateContext.getCurrentDate());
-		pollsQuestion.setCompanyId(group.getCompanyId());
-		pollsQuestion.setGroupId(group.getGroupId());
-		pollsQuestion.setModifiedDate(_dateContext.getCurrentDate());
 		pollsQuestion.setPrimaryKey(_counterLocalService.increment());
-		pollsQuestion.setUserId(user.getUserId());
-		pollsQuestion.setUserName(user.getFullName());
 		pollsQuestion.setUuid(PortalUUIDUtil.generate());
 
 		_pollsQuestionPersistence.update(pollsQuestion);
 
 		for (PollsChoice choice : addedChoices) {
-			choice.setUuid(PortalUUIDUtil.generate());
-			choice.setGroupId(pollsQuestion.getGroupId());
-			choice.setCompanyId(pollsQuestion.getCompanyId());
-			choice.setUserId(pollsQuestion.getUserId());
-			choice.setUserName(pollsQuestion.getUserName());
-			choice.setCreateDate(pollsQuestion.getCreateDate());
-			choice.setModifiedDate(pollsQuestion.getModifiedDate());
 			choice.setQuestionId(pollsQuestion.getQuestionId());
+			choice.setUuid(PortalUUIDUtil.generate());
+
+			_auditableScope.propagate(choice);
 
 			_pollsChoicePersistence.update(choice);
 		}
@@ -93,7 +84,52 @@ public class PollsServiceImpl implements PollsService {
 			new PollsQuestionQuerierFromBuilder(
 				pollsQuestion, addedChoices);
 
+		addGroupPermissions().execute(pollsContext, querierFromBuilder);
+		addGuestPermissions().execute(pollsContext, querierFromBuilder);
+
 		return new DefaultSingleProducer<>(pollsContext, querierFromBuilder);
+	}
+
+	public static Command<PollsContext, PollsQuestionQuerier>
+		addGroupPermissions() {
+
+		return new Command<PollsContext, PollsQuestionQuerier>() {
+			@Override
+			public void execute(
+				PollsContext context, PollsQuestionQuerier question) {
+
+				try {
+					ResourceLocalServiceUtil.addResources(
+						question.getCompanyId(), question.getGroupId(),
+						question.getUserId(), PollsQuestion.class.getName(),
+						question.getQuestionId(), false, true, false);
+				}
+				catch (PortalException e) {
+					context.addViolation(new ConstraintViolation(e));
+				}
+			}
+		};
+	}
+
+	public static Command<PollsContext, PollsQuestionQuerier>
+		addGuestPermissions() {
+
+		return new Command<PollsContext, PollsQuestionQuerier>() {
+			@Override
+			public void execute(
+				PollsContext context, PollsQuestionQuerier question) {
+
+				try {
+					ResourceLocalServiceUtil.addResources(
+						question.getCompanyId(), question.getGroupId(),
+						question.getUserId(), PollsQuestion.class.getName(),
+						question.getQuestionId(), false, false, true);
+				}
+				catch (PortalException e) {
+					context.addViolation(new ConstraintViolation(e));
+				}
+			}
+		};
 	}
 
 	@Override
@@ -159,7 +195,7 @@ public class PollsServiceImpl implements PollsService {
 	DateContext _dateContext;
 
 	@BeanReference
-	ServiceScope _serviceScope;
+	AuditableScope _auditableScope;
 
 	private static class PollsQuestionQuerierFromBuilder
 		extends PollsQuestionWrapper {

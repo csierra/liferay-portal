@@ -16,6 +16,7 @@ package com.liferay.polls.model.v2;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.util.Function;
+import com.liferay.portal.model.GroupedModel;
 
 import java.util.Date;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.Map;
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsQuestionQuerier {
+public interface PollsQuestionQuerier extends GroupedModel {
 	/**
 	 * Returns the uuid of this polls question.
 	 *

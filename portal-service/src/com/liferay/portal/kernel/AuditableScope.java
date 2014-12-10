@@ -16,37 +16,36 @@ package com.liferay.portal.kernel;
 
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupedModel;
 import com.liferay.portal.model.User;
+
 
 /**
  * @author Carlos Sierra Andrés
  */
-public abstract class ServiceScope implements AutoCloseable {
-
-	public static class Provided extends ServiceScope {
-
-		@Override
-		public Company getCompany() {
-			return null;
-		}
-
-		@Override
-		public Group getGroup() {
-			return null;
-		}
-
-		@Override
-		public User getUser() {
-			return null;
-		}
-	}
+public abstract class AuditableScope implements AutoCloseable {
 
 	public abstract Company getCompany();
+	public abstract DateContext getDateContext();
 	public abstract Group getGroup();
 	public abstract User getUser();
 
 	@Override
 	public void close() {
 
+	}
+	
+	public void propagate(GroupedModel model) {
+
+		DateContext dateContext = getDateContext();
+		Group group = getGroup();
+		User user = getUser();
+
+		model.setCompanyId(group.getCompanyId());
+		model.setCreateDate(dateContext.getCurrentDate());
+		model.setGroupId(group.getGroupId());
+		model.setModifiedDate(dateContext.getCurrentDate());
+		model.setUserId(user.getUserId());
+		model.setUserName(user.getFullName());
 	}
 }
