@@ -59,13 +59,8 @@ public class PollsUpdaterImpl implements PollsUpdater {
 	}
 
 	@Override
-	public void appendChoice(String name, String description) {
-		PollsChoiceImpl pollsChoice = new PollsChoiceImpl();
+	public void appendChoice(String description) {
 
-		pollsChoice.setDescription(description);
-		pollsChoice.setName(name);
-
-		_addedChoices.add(pollsChoice);
 	}
 
 	@Override

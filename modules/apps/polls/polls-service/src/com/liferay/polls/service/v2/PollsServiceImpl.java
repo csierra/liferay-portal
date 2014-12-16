@@ -23,6 +23,8 @@ import com.liferay.polls.model.impl.v2.PollsBuilderImpl;
 import com.liferay.polls.model.v2.PollsBuilder;
 import com.liferay.polls.model.v2.PollsChoiceQuerier;
 import com.liferay.polls.model.v2.PollsQuestionQuerier;
+import com.liferay.polls.model.v2.PollsUpdater;
+import com.liferay.polls.model.v2.PollsUpdaterImpl;
 import com.liferay.polls.model.v2.PollsVoteQuerier;
 import com.liferay.polls.service.persistence.PollsChoicePersistence;
 import com.liferay.polls.service.persistence.PollsQuestionPersistence;
@@ -90,7 +92,8 @@ public class PollsServiceImpl implements PollsService {
 		return new DefaultSingleProducer<>(pollsContext, querierFromBuilder);
 	}
 
-	public static Command<PollsContext, PollsQuestionQuerier>
+	@Override
+	public Command<PollsContext, PollsQuestionQuerier>
 		addGroupPermissions() {
 
 		return new Command<PollsContext, PollsQuestionQuerier>() {
@@ -111,7 +114,8 @@ public class PollsServiceImpl implements PollsService {
 		};
 	}
 
-	public static Command<PollsContext, PollsQuestionQuerier>
+	@Override
+	public Command<PollsContext, PollsQuestionQuerier>
 		addGuestPermissions() {
 
 		return new Command<PollsContext, PollsQuestionQuerier>() {
@@ -128,6 +132,20 @@ public class PollsServiceImpl implements PollsService {
 				catch (PortalException e) {
 					context.addViolation(new ConstraintViolation(e));
 				}
+			}
+		};
+	}
+
+	@Override
+	public Command<PollsContext, PollsQuestionQuerier> update(
+		final ModelAction<PollsUpdater> updater) {
+
+		return new Command<PollsContext, PollsQuestionQuerier>() {
+			@Override
+			public void execute(
+				PollsContext context, PollsQuestionQuerier querier) {
+
+				updater.consume(new PollsUpdaterImpl(null, null, null));
 			}
 		};
 	}

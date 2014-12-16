@@ -16,6 +16,9 @@ package com.liferay.polls.service.v2;
 
 import com.liferay.polls.model.v2.PollsBuilder;
 import com.liferay.polls.model.v2.PollsQuestionQuerier;
+import com.liferay.polls.model.v2.PollsUpdater;
+import com.liferay.services.v2.Command;
+import com.liferay.services.v2.ModelAction;
 import com.liferay.services.v2.Service;
 
 /**
@@ -23,4 +26,12 @@ import com.liferay.services.v2.Service;
  */
 public interface PollsService
 	extends Service<PollsBuilder, PollsQuestionQuerier, PollsContext> {
+	Command<PollsContext, PollsQuestionQuerier>
+		addGroupPermissions();
+
+	Command<PollsContext, PollsQuestionQuerier>
+			addGuestPermissions();
+
+	Command<PollsContext, PollsQuestionQuerier> update(
+		ModelAction<PollsUpdater> updater);
 }

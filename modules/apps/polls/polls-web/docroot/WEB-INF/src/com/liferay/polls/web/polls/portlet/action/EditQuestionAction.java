@@ -24,13 +24,18 @@ import com.liferay.polls.exception.QuestionExpiredException;
 import com.liferay.polls.exception.QuestionTitleException;
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.polls.model.PollsQuestion;
+import com.liferay.polls.model.v2.PollsBuilder;
+import com.liferay.polls.model.v2.PollsQuestionQuerier;
+import com.liferay.polls.model.v2.PollsUpdater;
 import com.liferay.polls.service.PollsQuestionServiceUtil;
 import com.liferay.polls.service.persistence.PollsChoiceUtil;
+import com.liferay.polls.service.v2.PollsService;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -61,10 +66,15 @@ import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
+import javax.servlet.http.HttpServletRequest;
 
+import com.liferay.services.v2.ModelAction;
+import com.liferay.services.v2.Result;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+
+import static com.liferay.polls.model.v2.PollsCommands.*;
 
 /**
  * @author Brian Wing Shun Chan
@@ -75,6 +85,18 @@ public class EditQuestionAction extends PortletAction {
 
 	public static final String CHOICE_NAME_PREFIX = "choiceName";
 
+	public static final ModelAction<PollsBuilder> fromRequest(
+		final HttpServletRequest request) {
+
+		return new ModelAction<PollsBuilder>() {
+			@Override
+			public void consume(PollsBuilder builder) {
+
+				builder.setTitle(request.getParameter("title"));
+			}
+		};
+	}
+
 	@Override
 	public void processAction(
 			ActionMapping actionMapping, ActionForm actionForm,
@@ -83,6 +105,10 @@ public class EditQuestionAction extends PortletAction {
 		throws Exception {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		PollsService service = null;
+
+		service.create(fromRequest())
 
 		try {
 			if (Validator.isNull(cmd)) {
