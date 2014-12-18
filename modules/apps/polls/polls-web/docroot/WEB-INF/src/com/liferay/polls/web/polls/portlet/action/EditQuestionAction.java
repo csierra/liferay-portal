@@ -74,8 +74,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import static com.liferay.polls.model.v2.PollsCommands.*;
-
 /**
  * @author Brian Wing Shun Chan
  */
@@ -84,6 +82,12 @@ public class EditQuestionAction extends PortletAction {
 	public static final String CHOICE_DESCRIPTION_PREFIX = "choiceDescription";
 
 	public static final String CHOICE_NAME_PREFIX = "choiceName";
+	public static final ModelAction<PollsBuilder> NORMAL = new ModelAction<PollsBuilder>() {
+		@Override
+		public void consume(PollsBuilder builder) {
+			builder.setTitle("blah");
+		}
+	};
 
 	public static final ModelAction<PollsBuilder> fromRequest(
 		final HttpServletRequest request) {
@@ -105,10 +109,6 @@ public class EditQuestionAction extends PortletAction {
 		throws Exception {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		PollsService service = null;
-
-		service.create(fromRequest())
 
 		try {
 			if (Validator.isNull(cmd)) {
