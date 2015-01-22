@@ -1,0 +1,16 @@
+Bundle-Name: Liferay Portal AXIS Web Service Extender
+Bundle-SymbolicName: com.liferay.portal.axis.legacy.web.service.extender
+Bundle-Version: 1.0.0
+libs: ${lsr;lib;*.jar}
+Import-Package:\
+	!com.ibm.*,\
+	!com.sun.*,\
+	!javax.jms.*,\
+	!org.apache.commons.net.*,\
+	!org.exolab.castor.xml.*,\
+	!sun.*,\
+	com.liferay.portal.theme,\
+	*
+Include-Resource:\
+	${replace;${libs};^;@lib/},\
+	classes
