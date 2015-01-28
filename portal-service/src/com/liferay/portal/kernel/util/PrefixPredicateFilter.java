@@ -14,10 +14,13 @@
 
 package com.liferay.portal.kernel.util;
 
+import java.util.Map;
+
 /**
  * @author Sampsa Sohlman
  */
-public class PrefixPredicateFilter implements PredicateFilter<String> {
+public class PrefixPredicateFilter<V>
+	implements PredicateFilter<Map.Entry<String, V>> {
 
 	public PrefixPredicateFilter(String prefix) {
 		this(prefix, false);
@@ -29,12 +32,14 @@ public class PrefixPredicateFilter implements PredicateFilter<String> {
 	}
 
 	@Override
-	public boolean filter(String string) {
+	public boolean filter(Map.Entry<String, V> entry) {
+		String key = entry.getKey();
+
 		if (_include) {
-			return string.startsWith(_prefix);
+			return key.startsWith(_prefix);
 		}
 		else {
-			return !string.startsWith(_prefix);
+			return !key.startsWith(_prefix);
 		}
 	}
 
