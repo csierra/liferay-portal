@@ -14,9 +14,7 @@
 
 package com.liferay.arquillian.extension.transactional.internal.container;
 
-import com.liferay.arquillian.extension.transactional.internal.observer.TransactionalExecutorInstanceProducer;
 import com.liferay.arquillian.extension.transactional.internal.observer.TransactionalObserver;
-
 import org.jboss.arquillian.container.test.spi.RemoteLoadableExtension;
 
 /**
@@ -27,8 +25,6 @@ public class TransactionalRemoteExtension implements RemoteLoadableExtension {
 	@Override
 	public void register(ExtensionBuilder builder) {
 		builder.observer(TransactionalObserver.class);
-
-		builder.observer(TransactionalExecutorInstanceProducer.class);
 	}
 
 }
