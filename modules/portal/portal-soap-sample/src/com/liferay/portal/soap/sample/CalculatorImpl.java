@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.soap.service.sample;
+package com.liferay.portal.soap.sample;
 
 import javax.jws.WebService;
 
@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Component;
 	service = Object.class
 )
 @WebService(
-	endpointInterface = "com.liferay.portal.soap.service.sample.Calculator"
+	endpointInterface = "com.liferay.portal.soap.sample.Calculator"
 )
 public class CalculatorImpl implements Calculator {
 

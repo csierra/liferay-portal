@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.soap.service.sample;
+package com.liferay.portal.soap.sample;
 
 import aQute.bnd.annotation.metatype.Meta;
 

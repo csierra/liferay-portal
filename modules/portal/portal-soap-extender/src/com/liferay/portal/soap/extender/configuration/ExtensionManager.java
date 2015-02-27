@@ -12,33 +12,28 @@
  * details.
  */
 
-package com.liferay.portal.soap.service.sample;
+package com.liferay.portal.soap.extender.configuration;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@XmlRootElement
-public class ComplicatedThing {
+public class ExtensionManager {
 
-	public String getName() {
-		return name;
+	public Map<Class<?>, Object> getExtensions() {
+		return _extensions;
 	}
 
-	public String getSomething() {
-		return something;
+	protected void addExtension(
+		Map<String, Object> properties, Object extension) {
+
+		Class<?> extensionClass = (Class<?>) properties.get("extension.class");
+
+		_extensions.put(extensionClass, extension);
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setSomething(String something) {
-		this.something = something;
-	}
-
-	private String name;
-	private String something;
+	private final Map<Class<?>, Object> _extensions = new HashMap<>();
 
 }

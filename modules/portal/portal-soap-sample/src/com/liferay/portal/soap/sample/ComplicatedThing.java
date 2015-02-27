@@ -12,22 +12,33 @@
  * details.
  */
 
-package com.liferay.portal.soap.service.sample;
+package com.liferay.portal.soap.sample;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@WebService(wsdlLocation = "classpath:/META-INF/resources/calculator.wsdl")
-public interface Calculator {
+@XmlRootElement
+public class ComplicatedThing {
 
-	@WebMethod(operationName = "calculate")
-	public int calcula(int a, int b);
+	public String getName() {
+		return name;
+	}
 
-	public ComplicatedThing getComplicatedThing();
+	public String getSomething() {
+		return something;
+	}
 
-	public int notExportedInWSDL();
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setSomething(String something) {
+		this.something = something;
+	}
+
+	private String name;
+	private String something;
 
 }

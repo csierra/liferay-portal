@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.soap.service.sample;
+package com.liferay.portal.soap.sample;
 
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;

@@ -12,28 +12,22 @@
  * details.
  */
 
-package com.liferay.portal.soap.web.service.extender.configuration;
+package com.liferay.portal.soap.sample;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.jws.WebMethod;
+import javax.jws.WebService;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class ExtensionManager {
+@WebService(wsdlLocation = "classpath:/META-INF/resources/calculator.wsdl")
+public interface Calculator {
 
-	public Map<Class<?>, Object> getExtensions() {
-		return _extensions;
-	}
+	@WebMethod(operationName = "calculate")
+	public int calcula(int a, int b);
 
-	protected void addExtension(
-		Map<String, Object> properties, Object extension) {
+	public ComplicatedThing getComplicatedThing();
 
-		Class<?> extensionClass = (Class<?>) properties.get("extension.class");
-
-		_extensions.put(extensionClass, extension);
-	}
-
-	private final Map<Class<?>, Object> _extensions = new HashMap<>();
+	public int notExportedInWSDL();
 
 }

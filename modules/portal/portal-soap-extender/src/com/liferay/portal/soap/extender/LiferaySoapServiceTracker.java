@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.portal.soap.web.service.extender;
+package com.liferay.portal.soap.extender;
 
-import com.liferay.portal.soap.web.service.extender.configuration.ExtensionManager;
+import com.liferay.portal.soap.extender.configuration.ExtensionManager;
 
 import java.util.Dictionary;
 import java.util.HashMap;
