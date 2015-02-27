@@ -18,12 +18,9 @@ import aQute.bnd.annotation.metatype.Configurable;
 
 import com.liferay.portal.soap.extender.LiferaySoapServiceTracker;
 
-import java.io.IOException;
-
 import org.apache.felix.dm.DependencyManager;
 import org.apache.felix.dm.ServiceDependency;
 
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -41,9 +38,7 @@ import org.osgi.service.component.annotations.Modified;
 public class LiferaySoapServiceTrackerConfigAdmin {
 
 	@Activate
-	protected void activate(final ComponentContext componentContext)
-		throws InvalidSyntaxException, IOException {
-
+	protected void activate(final ComponentContext componentContext) {
 		DependencyManager dependencyManager = new DependencyManager(
 			componentContext.getBundleContext());
 
