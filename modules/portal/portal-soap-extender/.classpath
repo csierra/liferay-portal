@@ -28,7 +28,6 @@
 	<classpathentry kind="lib" path="lib/cxf-rt-bindings-soap.jar" />
 	<classpathentry kind="lib" path="lib/cxf-rt-bindings-xml.jar" />
 	<classpathentry kind="lib" path="lib/cxf-rt-databinding-jaxb.jar" />
-	<classpathentry kind="lib" path="lib/cxf-rt-frontend-jaxrs.jar" />
 	<classpathentry kind="lib" path="lib/cxf-rt-frontend-simple.jar" />
 	<classpathentry kind="lib" path="lib/cxf-rt-transports-http.jar" />
 	<classpathentry kind="lib" path="lib/cxf-rt-ws-addr.jar" />
@@ -37,7 +36,6 @@
 	<classpathentry kind="lib" path="lib/cxf-tools-common.jar" />
 	<classpathentry kind="lib" path="lib/cxf-tools-validator.jar" />
 	<classpathentry kind="lib" path="lib/javax.annotation-api.jar" />
-	<classpathentry kind="lib" path="lib/javax.ws.rs-api.jar" />
 	<classpathentry kind="lib" path="lib/javax.xml.soap-api.jar" />
 	<classpathentry kind="lib" path="lib/jaxb-api.jar" />
 	<classpathentry kind="lib" path="lib/jaxb-core.jar" />
