@@ -524,6 +524,23 @@ public class VerifyProperties extends VerifyProcess {
 		// LDAP
 
 		new String[] {
+			"ldap.auth.enabled", "enabled",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.method", "method",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.password.encryption.algorithm",
+			"passwordEncryptionAlgorithm",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.required", "required",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
 			"ldap.export.enabled", "export.enabled", "com.liferay.portal.ldap"
 		},
 		new String[] {
@@ -1043,8 +1060,8 @@ public class VerifyProperties extends VerifyProcess {
 			"passwords.passwordpolicytoolkit.validator.charset.uppercase"
 		},
 		new String[] {
-			"permissions.inline.sql.resource.block.query.threshhold=100",
-			"permissions.inline.sql.resource.block.query.threshold=100"
+			"permissions.inline.sql.resource.block.query.threshhold",
+			"permissions.inline.sql.resource.block.query.threshold"
 		},
 		new String[] {
 			"portal.instance.http.port", "portal.instance.http.socket.address"
