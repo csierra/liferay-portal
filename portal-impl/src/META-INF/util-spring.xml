@@ -503,6 +503,7 @@
 	<bean id="com.liferay.portal.kernel.zip.ZipWriterFactoryUtil" class="com.liferay.portal.kernel.zip.ZipWriterFactoryUtil">
 		<property name="zipWriterFactory" ref="com.liferay.portal.kernel.zip.ZipWriterFactory" />
 	</bean>
+	<bean id="com.liferay.portal.kernel.language.LanguageResourceManager" class="com.liferay.portal.language.LanguageResourceManagerImpl" />
 	<bean id="com.liferay.portal.language.LanguageResources" class="com.liferay.portal.language.LanguageResources">
 		<property name="config" value="content.Language,content.Language-ext" />
 	</bean>
