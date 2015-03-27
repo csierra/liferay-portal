@@ -36,6 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -67,7 +68,7 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
-		throw new UnsupportedOperationException();
+		return new LanguageResourcesBundle(locale);
 	}
 
 	public void setConfig(String config) {
@@ -214,5 +215,56 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 	private final Map<Locale, Map<String, String>> _languageMaps =
 		new ConcurrentHashMap<>(64);
 	private final Map<Locale, Locale> _superLocales = new ConcurrentHashMap<>();
+
+	private class LanguageResourcesBundle extends ResourceBundle {
+
+		@Override
+		public Enumeration<String> getKeys() {
+			Set<String> keySet = _languageMap.keySet();
+
+			if (parent == null) {
+				return Collections.enumeration(keySet);
+			}
+
+			return new ResourceBundleEnumeration(keySet, parent.getKeys());
+		}
+
+		@Override
+		public Locale getLocale() {
+			return _locale;
+		}
+
+		@Override
+		protected Object handleGetObject(String key) {
+			return _languageMap.get(key);
+		}
+
+		@Override
+		protected Set<String> handleKeySet() {
+			return _languageMap.keySet();
+		}
+
+		private LanguageResourcesBundle(Locale locale) {
+			_locale = locale;
+
+			Map<String, String> languageMap = _languageMaps.get(locale);
+
+			if (languageMap == null) {
+				languageMap = _loadLocale(locale);
+			}
+
+			_languageMap = languageMap;
+
+			Locale superLocale = getSuperLocale(locale);
+
+			if (superLocale != null) {
+				setParent(new LanguageResourcesBundle(superLocale));
+			}
+		}
+
+		private final Map<String, String> _languageMap;
+		private final Locale _locale;
+
+	}
 
 }
