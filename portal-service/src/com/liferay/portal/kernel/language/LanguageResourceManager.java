@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.language;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -25,5 +26,8 @@ public interface LanguageResourceManager {
 	public String getMessage(Locale locale, String key);
 
 	public ResourceBundle getResourceBundle(Locale locale);
+
+	public Map<String, String> putLanguageMap(
+		Locale locale, Map<String, String> languageMap);
 
 }

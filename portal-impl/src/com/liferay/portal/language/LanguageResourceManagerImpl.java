@@ -71,6 +71,31 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 		return new LanguageResourcesBundle(locale);
 	}
 
+	@Override
+	public Map<String, String> putLanguageMap(
+		Locale locale, Map<String, String> languageMap) {
+
+		Map<String, String> oldLanguageMap = _languageMaps.get(locale);
+
+		if (oldLanguageMap == null) {
+			_loadLocale(locale);
+
+			oldLanguageMap = _languageMaps.get(locale);
+		}
+
+		Map<String, String> newLanguageMap = new HashMap<>();
+
+		if (oldLanguageMap != null) {
+			newLanguageMap.putAll(oldLanguageMap);
+		}
+
+		newLanguageMap.putAll(languageMap);
+
+		_languageMaps.put(locale, newLanguageMap);
+
+		return oldLanguageMap;
+	}
+
 	public void setConfig(String config) {
 		_configNames = StringUtil.split(
 			config.replace(CharPool.PERIOD, CharPool.SLASH));
