@@ -15,6 +15,8 @@
 package com.liferay.portal.language;
 
 import com.liferay.portal.kernel.language.LanguageResourceManager;
+import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -33,5 +35,12 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 	public ResourceBundle getResourceBundle(Locale locale) {
 		throw new UnsupportedOperationException();
 	}
+
+	public void setConfig(String config) {
+		_configNames = StringUtil.split(
+			config.replace(CharPool.PERIOD, CharPool.SLASH));
+	}
+
+	private String[] _configNames;
 
 }
