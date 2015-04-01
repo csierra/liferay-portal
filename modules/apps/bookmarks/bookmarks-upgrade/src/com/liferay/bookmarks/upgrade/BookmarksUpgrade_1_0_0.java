@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		UpgradeWhiteboardConstants.UPGRADE_WHITEBOARD_RELEASE_NAME + "=com.liferay.bookmarks.service",
+		UpgradeWhiteboardConstants.UPGRADE_WHITEBOARD_RELEASE_PREVIOUS_VERSION + "=0",
 		UpgradeWhiteboardConstants.UPGRADE_WHITEBOARD_RELEASE_VERSION + "=" + BookmarksUpgrade_1_0_0.BUILD_NUMBER
 	},
 	service = UpgradeProcess.class
