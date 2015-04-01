@@ -14,8 +14,6 @@
 
 package com.liferay.bookmarks.upgrade.v1_0_0;
 
-import com.liferay.bookmarks.constants.BookmarksConstants;
-import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.util.PortletKeys;
 
@@ -32,7 +30,7 @@ public class UpgradePortletSettings
 	@Override
 	protected void doUpgrade() throws Exception {
 		upgradeMainPortlet(
-			BookmarksPortletKeys.BOOKMARKS, BookmarksConstants.SERVICE_NAME,
+			"28_WAR_bookmarksweb", "com.liferay.bookmarks",
 			PortletKeys.PREFS_OWNER_TYPE_LAYOUT, false);
 	}
 
