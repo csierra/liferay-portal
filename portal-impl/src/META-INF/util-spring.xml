@@ -503,12 +503,18 @@
 	<bean id="com.liferay.portal.kernel.zip.ZipWriterFactoryUtil" class="com.liferay.portal.kernel.zip.ZipWriterFactoryUtil">
 		<property name="zipWriterFactory" ref="com.liferay.portal.kernel.zip.ZipWriterFactory" />
 	</bean>
-	<bean id="com.liferay.portal.kernel.language.LanguageResourceManager" class="com.liferay.portal.language.LanguageResourceManagerImpl">
-		<property name="config" value="content.Language,content.Language-ext" />
-	</bean>
 	<bean id="com.liferay.portal.kernel.language.LanguageResourceManagerFactory" class="com.liferay.portal.language.LanguageResourceManagerFactoryImpl" />
 	<bean id="com.liferay.portal.language.LanguageResources" class="com.liferay.portal.language.LanguageResources">
-		<property name="languageResourceManager" ref="com.liferay.portal.kernel.language.LanguageResourceManager" />
+		<property name="languageResourceManager">
+			<bean factory-bean="com.liferay.portal.kernel.language.LanguageResourceManagerFactory" factory-method="createPortalLanguageResourceManager">
+				<constructor-arg>
+					<array>
+						<value>content.Language</value>
+						<value>content.Language-ext</value>
+					</array>
+				</constructor-arg>
+			</bean>
+		</property>
 	</bean>
 	<bean id="com.liferay.portal.lar.PortletDataContextIndexer" class="com.liferay.portal.lar.PortletDataContextIndexer" />
 	<bean id="com.liferay.portal.layoutconfiguration.util.JettyThreadLocalBinder" class="com.liferay.portal.layoutconfiguration.util.JettyThreadLocalBinder">

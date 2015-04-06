@@ -27,14 +27,14 @@ public class LanguageResourceManagerFactoryImpl
 	public LanguageResourceManager createLanguageResourceManager(
 		ClassLoader classLoader, String... configNames) {
 
-		throw new UnsupportedOperationException();
+		return new LanguageResourceManagerImpl(classLoader, configNames);
 	}
 
 	@Override
 	public LanguageResourceManager createPortalLanguageResourceManager(
 		String... configNames) {
 
-		throw new UnsupportedOperationException();
+		return new LanguageResourceManagerImpl(configNames);
 	}
 
 }

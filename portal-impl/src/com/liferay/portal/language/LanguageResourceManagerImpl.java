@@ -44,6 +44,23 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LanguageResourceManagerImpl implements LanguageResourceManager {
 
+	public LanguageResourceManagerImpl(
+		ClassLoader classLoader, String[] configNames) {
+
+		_classLoader = classLoader;
+
+		_configNames = new String[configNames.length];
+
+		for (int i = 0; i < configNames.length; i++) {
+			_configNames[i] = StringUtil.replace(
+				configNames[i], CharPool.PERIOD, CharPool.SLASH);
+		}
+	}
+
+	public LanguageResourceManagerImpl(String[] configNames) {
+		this(LanguageResources.class.getClassLoader(), configNames);
+	}
+
 	@Override
 	public String getMessage(Locale locale, String key) {
 		if (locale == null) {
@@ -103,11 +120,6 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 		_languageMaps.put(locale, newLanguageMap);
 
 		return oldLanguageMap;
-	}
-
-	public void setConfig(String config) {
-		_configNames = StringUtil.split(
-			config.replace(CharPool.PERIOD, CharPool.SLASH));
 	}
 
 	private Locale _createSuperLocale(Locale locale) {
@@ -201,9 +213,7 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 		Properties properties = new Properties();
 
 		try {
-			ClassLoader classLoader = LanguageResources.class.getClassLoader();
-
-			Enumeration<URL> enu = classLoader.getResources(name);
+			Enumeration<URL> enu = _classLoader.getResources(name);
 
 			if (_log.isDebugEnabled() && !enu.hasMoreElements()) {
 				_log.debug("No resources found for " + name);
@@ -245,7 +255,8 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 	private static final Locale _blankLocale = new Locale(StringPool.BLANK);
 	private static final Locale _nullLocale = new Locale(StringPool.BLANK);
 
-	private String[] _configNames;
+	private final ClassLoader _classLoader;
+	private final String[] _configNames;
 	private final Map<Locale, Map<String, String>> _languageMaps =
 		new ConcurrentHashMap<>(64);
 	private final Map<Locale, Locale> _superLocales = new ConcurrentHashMap<>();
