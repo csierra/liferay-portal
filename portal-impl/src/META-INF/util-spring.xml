@@ -507,7 +507,7 @@
 		<property name="config" value="content.Language,content.Language-ext" />
 	</bean>
 	<bean id="com.liferay.portal.language.LanguageResources" class="com.liferay.portal.language.LanguageResources">
-		<property name="config" value="content.Language,content.Language-ext" />
+		<property name="languageResourceManager" ref="com.liferay.portal.kernel.language.LanguageResourceManager" />
 	</bean>
 	<bean id="com.liferay.portal.lar.PortletDataContextIndexer" class="com.liferay.portal.lar.PortletDataContextIndexer" />
 	<bean id="com.liferay.portal.layoutconfiguration.util.JettyThreadLocalBinder" class="com.liferay.portal.layoutconfiguration.util.JettyThreadLocalBinder">
