@@ -506,6 +506,7 @@
 	<bean id="com.liferay.portal.kernel.language.LanguageResourceManager" class="com.liferay.portal.language.LanguageResourceManagerImpl">
 		<property name="config" value="content.Language,content.Language-ext" />
 	</bean>
+	<bean id="com.liferay.portal.kernel.language.LanguageResourceManagerFactory" class="com.liferay.portal.language.LanguageResourceManagerFactoryImpl" />
 	<bean id="com.liferay.portal.language.LanguageResources" class="com.liferay.portal.language.LanguageResources">
 		<property name="languageResourceManager" ref="com.liferay.portal.kernel.language.LanguageResourceManager" />
 	</bean>
