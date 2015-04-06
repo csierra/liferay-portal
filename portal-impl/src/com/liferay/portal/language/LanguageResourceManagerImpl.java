@@ -59,7 +59,7 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 		String value = languageMap.get(key);
 
 		if (value == null) {
-			return getMessage(getSuperLocale(locale), key);
+			return getMessage(_getSuperLocale(locale), key);
 		}
 		else {
 			return value;
@@ -71,8 +71,16 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 		return new LanguageResourcesBundle(locale);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public Locale getSuperLocale(Locale locale) {
+		return _getSuperLocale(locale);
+	}
+
+	private Locale _getSuperLocale(Locale locale) {
 		Locale superLocale = _superLocales.get(locale);
 
 		if (superLocale != null) {
@@ -83,7 +91,7 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 			return superLocale;
 		}
 
-		superLocale = _getSuperLocale(locale);
+		superLocale = _createSuperLocale(locale);
 
 		if (superLocale == null) {
 			_superLocales.put(locale, _nullLocale);
@@ -125,7 +133,7 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 			config.replace(CharPool.PERIOD, CharPool.SLASH));
 	}
 
-	private Locale _getSuperLocale(Locale locale) {
+	private Locale _createSuperLocale(Locale locale) {
 		String variant = locale.getVariant();
 
 		if (variant.length() > 0) {
@@ -281,7 +289,7 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 
 			_languageMap = languageMap;
 
-			Locale superLocale = getSuperLocale(locale);
+			Locale superLocale = _getSuperLocale(locale);
 
 			if (superLocale != null) {
 				setParent(new LanguageResourcesBundle(superLocale));

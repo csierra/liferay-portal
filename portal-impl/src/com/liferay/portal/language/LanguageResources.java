@@ -75,6 +75,10 @@ public class LanguageResources {
 		return _languageResourceManager.getResourceBundle(locale);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static Locale getSuperLocale(Locale locale) {
 		return _languageResourceManager.getSuperLocale(locale);
 	}
