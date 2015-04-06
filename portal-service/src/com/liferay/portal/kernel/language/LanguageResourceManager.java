@@ -27,6 +27,8 @@ public interface LanguageResourceManager {
 
 	public ResourceBundle getResourceBundle(Locale locale);
 
+	public Locale getSuperLocale(Locale locale);
+
 	public Map<String, String> putLanguageMap(
 		Locale locale, Map<String, String> languageMap);
 
