@@ -80,29 +80,6 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 		return _getSuperLocale(locale);
 	}
 
-	private Locale _getSuperLocale(Locale locale) {
-		Locale superLocale = _superLocales.get(locale);
-
-		if (superLocale != null) {
-			if (superLocale == _nullLocale) {
-				return null;
-			}
-
-			return superLocale;
-		}
-
-		superLocale = _createSuperLocale(locale);
-
-		if (superLocale == null) {
-			_superLocales.put(locale, _nullLocale);
-		}
-		else {
-			_superLocales.put(locale, superLocale);
-		}
-
-		return superLocale;
-	}
-
 	@Override
 	public Map<String, String> putLanguageMap(
 		Locale locale, Map<String, String> languageMap) {
@@ -161,6 +138,29 @@ public class LanguageResourceManagerImpl implements LanguageResourceManager {
 		}
 
 		return null;
+	}
+
+	private Locale _getSuperLocale(Locale locale) {
+		Locale superLocale = _superLocales.get(locale);
+
+		if (superLocale != null) {
+			if (superLocale == _nullLocale) {
+				return null;
+			}
+
+			return superLocale;
+		}
+
+		superLocale = _createSuperLocale(locale);
+
+		if (superLocale == null) {
+			_superLocales.put(locale, _nullLocale);
+		}
+		else {
+			_superLocales.put(locale, superLocale);
+		}
+
+		return superLocale;
 	}
 
 	private Map<String, String> _loadLocale(Locale locale) {
