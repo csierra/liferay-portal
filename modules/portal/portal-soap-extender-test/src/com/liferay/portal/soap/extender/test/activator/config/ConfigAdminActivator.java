@@ -38,7 +38,8 @@ public class ConfigAdminActivator implements BundleActivator {
 
 		try {
 			_cxfConfiguration = configurationAdmin.createFactoryConfiguration(
-				"com.liferay.portal.ws.WebServicePublisherConfiguration", null);
+				"com.liferay.portal.ws.configuration.WebServicePublisherConfiguration",
+				null);
 
 			Dictionary<String, Object> properties = new Hashtable<>();
 
@@ -47,7 +48,7 @@ public class ConfigAdminActivator implements BundleActivator {
 			_cxfConfiguration.update(properties);
 
 			_soapConfiguration = configurationAdmin.createFactoryConfiguration(
-				"com.liferay.portal.soap.extender.SoapExtenderConfiguration",
+				"com.liferay.portal.soap.extender.configuration.SoapExtenderConfiguration",
 				null);
 
 			properties = new Hashtable<>();
