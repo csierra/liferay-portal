@@ -12,32 +12,24 @@
  * details.
  */
 
-package com.liferay.portal.soap.extender.configuration;
+package com.liferay.portal.kernel.search;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * @author Carlos Sierra Andrés
+ * @author Michael C. Han
  */
-public class ExtensionManager {
+public class SimpleTokenizer implements Tokenizer {
 
-	public Map<Class<?>, Object> getExtensions() {
-		return _extensions;
+	@Override
+	public List<String> tokenize(
+		String fieldName, String input, String languageId) {
+
+		return Arrays.asList(StringUtil.split(input, StringPool.PERIOD));
 	}
-
-	protected void addExtension(
-		Map<String, Object> properties, Object extension) {
-
-		Class<?> extensionClass = (Class<?>)properties.get(
-			"soap.extension.class");
-
-		_extensions.put(extensionClass, extension);
-	}
-
-	protected void removeExtension(Object extension) {
-	}
-
-	private final Map<Class<?>, Object> _extensions = new HashMap<>();
 
 }

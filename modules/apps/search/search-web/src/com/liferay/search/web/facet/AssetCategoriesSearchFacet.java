@@ -91,8 +91,8 @@ public class AssetCategoriesSearchFacet extends BaseSearchFacet {
 	public JSONObject getJSONData(ActionRequest actionRequest) {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		String displayStyle = ParamUtil.getString(
-			actionRequest, getClassName() + "displayStyle", "list");
+		String displayStyleFacet = ParamUtil.getString(
+			actionRequest, getClassName() + "displayStyleFacet", "list");
 		int frequencyThreshold = ParamUtil.getInteger(
 			actionRequest, getClassName() + "frequencyThreshold", 1);
 		int maxTerms = ParamUtil.getInteger(
@@ -100,7 +100,7 @@ public class AssetCategoriesSearchFacet extends BaseSearchFacet {
 		boolean showAssetCount = ParamUtil.getBoolean(
 			actionRequest, getClassName() + "showAssetCount", true);
 
-		jsonObject.put("displayStyle", displayStyle);
+		jsonObject.put("displayStyle", displayStyleFacet);
 		jsonObject.put("frequencyThreshold", frequencyThreshold);
 		jsonObject.put("maxTerms", maxTerms);
 		jsonObject.put("showAssetCount", showAssetCount);
