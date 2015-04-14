@@ -91,6 +91,10 @@ public class PoshiRunnerContext {
 		return _filePaths.get(fileName);
 	}
 
+	public static String[] getFilePathsArray() {
+		return _filePathsArray;
+	}
+
 	public static Element getFunctionCommandElement(String classCommandName) {
 		return _commandElements.get("function#" + classCommandName);
 	}
@@ -123,6 +127,10 @@ public class PoshiRunnerContext {
 		return _pathLocators.get(pathLocatorKey);
 	}
 
+	public static Element getPathRootElement(String className) {
+		return _rootElements.get("path#" + className);
+	}
+
 	public static Map<String, Element> getRootElementsMap() {
 		return _rootElements;
 	}
@@ -137,6 +145,10 @@ public class PoshiRunnerContext {
 
 	public static Element getTestcaseRootElement(String className) {
 		return _rootElements.get("testcase#" + className);
+	}
+
+	public static boolean isCommandElement(String commandElementKey) {
+		return _commandElements.containsKey(commandElementKey);
 	}
 
 	public static void readFiles() throws Exception {
@@ -206,6 +218,8 @@ public class PoshiRunnerContext {
 
 		Element rootElement = PoshiRunnerGetterUtil.getRootElementFromFilePath(
 			filePath);
+
+		_rootElements.put("path#" + className, rootElement);
 
 		Element bodyElement = rootElement.element("body");
 
@@ -309,6 +323,12 @@ public class PoshiRunnerContext {
 				for (Element commandElement : commandElements) {
 					String classCommandName =
 						className + "#" + commandElement.attributeValue("name");
+
+					if (isCommandElement(classType + "#" + classCommandName)) {
+						throw new Exception(
+							"Duplicate command name\n" + filePath + ":" +
+								commandElement.attributeValue("line-number"));
+					}
 
 					_commandElements.put(
 						classType + "#" + classCommandName, commandElement);

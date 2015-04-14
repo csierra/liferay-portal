@@ -14,6 +14,8 @@
 
 package com.liferay.poshi.runner;
 
+import com.liferay.poshi.runner.util.OSDetector;
+import com.liferay.poshi.runner.util.PropsValues;
 import com.liferay.poshi.runner.util.Validator;
 
 import java.util.Arrays;
@@ -30,23 +32,45 @@ import org.dom4j.Element;
  */
 public class PoshiRunnerValidation {
 
-	public static void validate(Element element, String filePath)
-		throws PoshiRunnerException {
+	public static void validate() throws PoshiRunnerException {
+		String[] filePathsArray = PoshiRunnerContext.getFilePathsArray();
 
-		String classType = PoshiRunnerGetterUtil.getClassTypeFromFilePath(
-			filePath);
+		for (String filePath : filePathsArray) {
+			filePath = _BASE_DIR + "/" + filePath;
 
-		if (classType.equals("function")) {
-			_validateFunctionFile(element, filePath);
-		}
-		else if (classType.equals("macro")) {
-			_validateMacroFile(element, filePath);
-		}
-		else if (classType.equals("path")) {
-			_validatePathFile(element, filePath);
-		}
-		else if (classType.equals("testcase")) {
-			_validateTestcaseFile(element, filePath);
+			if (OSDetector.isWindows()) {
+				filePath = filePath.replace("/", "\\");
+			}
+
+			String className = PoshiRunnerGetterUtil.getClassNameFromFilePath(
+				filePath);
+			String classType = PoshiRunnerGetterUtil.getClassTypeFromFilePath(
+				filePath);
+
+			if (classType.equals("function")) {
+				Element element = PoshiRunnerContext.getFunctionRootElement(
+					className);
+
+				_validateFunctionFile(element, filePath);
+			}
+			else if (classType.equals("macro")) {
+				Element element = PoshiRunnerContext.getMacroRootElement(
+					className);
+
+				_validateMacroFile(element, filePath);
+			}
+			else if (classType.equals("path")) {
+				Element element = PoshiRunnerContext.getPathRootElement(
+					className);
+
+				_validatePathFile(element, filePath);
+			}
+			else if (classType.equals("testcase")) {
+				Element element = PoshiRunnerContext.getTestcaseRootElement(
+					className);
+
+				_validateTestcaseFile(element, filePath);
+			}
 		}
 	}
 
@@ -75,6 +99,12 @@ public class PoshiRunnerValidation {
 			}
 			else if (elementName.equals("execute")) {
 				_validateExecuteElement(childElement, filePath);
+			}
+			else if (elementName.equals("for")) {
+				_validateForElement(childElement, filePath);
+			}
+			else if (elementName.equals("take-screenshot")) {
+				_validateTakeScreenshotElement(childElement, filePath);
 			}
 		}
 	}
@@ -155,6 +185,8 @@ public class PoshiRunnerValidation {
 
 			_validatePossibleAttributeNames(
 				element, possibleAttributeNames, filePath);
+
+			_validateMacroContext(element, filePath);
 		}
 		else if (Validator.isNotNull(element.attributeValue("selenium"))) {
 			List<String> possibleAttributeNames = Arrays.asList(
@@ -204,6 +236,18 @@ public class PoshiRunnerValidation {
 		}
 	}
 
+	private static void _validateForElement(Element element, String filePath)
+		throws PoshiRunnerException {
+
+		List<String> possibleAttributeNames = Arrays.asList(
+			"line-number", "list", "param");
+
+		_validatePossibleAttributeNames(
+			element, possibleAttributeNames, filePath);
+
+		_parseElements(element, filePath);
+	}
+
 	private static void _validateFunctionFile(Element element, String filePath)
 		throws PoshiRunnerException {
 
@@ -229,6 +273,20 @@ public class PoshiRunnerValidation {
 			_validateCommandElement(childElement, filePath);
 
 			_parseElements(childElement, filePath);
+		}
+	}
+
+	private static void _validateMacroContext(Element element, String filePath)
+		throws PoshiRunnerException {
+
+		String classCommandName = element.attributeValue("macro");
+
+		String commandElementKey = "macro#" + classCommandName;
+
+		if (!PoshiRunnerContext.isCommandElement(commandElementKey)) {
+			throw new PoshiRunnerException(
+				"Invalid macro command " + classCommandName + "\n" + filePath +
+					":" + element.attributeValue("line-number"));
 		}
 	}
 
@@ -326,6 +384,24 @@ public class PoshiRunnerValidation {
 		}
 	}
 
+	private static void _validateTakeScreenshotElement(
+			Element element, String filePath)
+		throws PoshiRunnerException {
+
+		List<String> possibleAttributeNames = Arrays.asList("line-number");
+
+		_validatePossibleAttributeNames(
+			element, possibleAttributeNames, filePath);
+
+		List<Element> childElements = element.elements();
+
+		if (!childElements.isEmpty()) {
+			throw new PoshiRunnerException(
+				"Invalid child elements\n" + filePath + ":" +
+					element.attributeValue("line-number"));
+		}
+	}
+
 	private static void _validateTestcaseFile(Element element, String filePath)
 		throws PoshiRunnerException {
 
@@ -358,5 +434,8 @@ public class PoshiRunnerValidation {
 		_validatePossibleAttributeNames(
 			element, possibleAttributeNames, filePath);
 	}
+
+	private static final String _BASE_DIR =
+		PoshiRunnerGetterUtil.getCanonicalPath(PropsValues.TEST_BASE_DIR_NAME);
 
 }
