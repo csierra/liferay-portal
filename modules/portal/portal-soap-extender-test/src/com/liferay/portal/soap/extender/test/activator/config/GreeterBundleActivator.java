@@ -65,7 +65,7 @@ public class GreeterBundleActivator implements BundleActivator {
 
 		if (bus == null) {
 			throw new IllegalStateException(
-				"Bus has not been registered past 10 seconds");
+				"Bus was not registered within 10 seconds");
 		}
 
 		ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
@@ -84,7 +84,7 @@ public class GreeterBundleActivator implements BundleActivator {
 
 		if (servers.isEmpty()) {
 			throw new IllegalStateException(
-				"Endpoint has not been registered past 10 seconds");
+				"Endpoint was not registered within 10 seconds");
 		}
 	}
 
