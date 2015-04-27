@@ -63,9 +63,6 @@ public class SoapExtender {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		_soapExtenderConfiguration = Configurable.createConfigurable(
-			SoapExtenderConfiguration.class, properties);
-
 		_dependencyManager = new TCCLDependencyManager(bundleContext);
 
 		_component = _dependencyManager.createComponent();
@@ -86,6 +83,9 @@ public class SoapExtender {
 		_dependencyManager.add(_component);
 
 		_component.start();
+
+		_soapExtenderConfiguration = Configurable.createConfigurable(
+			SoapExtenderConfiguration.class, properties);
 	}
 
 	protected void addBusDependencies() {
