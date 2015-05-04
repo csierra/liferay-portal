@@ -17,6 +17,7 @@ package com.liferay.portal.rest.extender.internal;
 import aQute.bnd.annotation.metatype.Configurable;
 
 import com.liferay.portal.dependency.manager.tccl.TCCLDependencyManager;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.rest.extender.configuration.RestExtenderConfiguration;
 
 import java.util.Map;
@@ -79,7 +80,7 @@ public class RestExtender {
 
 		String[] contextPaths = restExtenderConfiguration.contextPaths();
 
-		if (contextPaths == null) {
+		if (ArrayUtil.isEmpty(contextPaths)) {
 			return;
 		}
 
@@ -99,7 +100,7 @@ public class RestExtender {
 		String[] jaxRsApplicationFilterStrings =
 			restExtenderConfiguration.jaxRsApplicationFilterStrings();
 
-		if (jaxRsApplicationFilterStrings == null) {
+		if (ArrayUtil.isEmpty(jaxRsApplicationFilterStrings)) {
 			return;
 		}
 
@@ -119,7 +120,7 @@ public class RestExtender {
 		String[] jaxRsProviderFilterStrings =
 			soapExtenderConfiguration.jaxRsProviderFilterStrings();
 
-		if (jaxRsProviderFilterStrings == null) {
+		if (ArrayUtil.isEmpty(jaxRsProviderFilterStrings)) {
 			return;
 		}
 
@@ -137,7 +138,7 @@ public class RestExtender {
 		String[] jaxRsServiceFilterStrings =
 			soapExtenderConfiguration.jaxRsServiceFilterStrings();
 
-		if (jaxRsServiceFilterStrings == null) {
+		if (ArrayUtil.isEmpty(jaxRsServiceFilterStrings)) {
 			return;
 		}
 

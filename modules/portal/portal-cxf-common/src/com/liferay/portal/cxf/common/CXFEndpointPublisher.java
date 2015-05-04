@@ -18,6 +18,7 @@ import aQute.bnd.annotation.metatype.Configurable;
 
 import com.liferay.portal.cxf.common.configuration.CXFEndpointPublisherConfiguration;
 import com.liferay.portal.kernel.security.access.control.AccessControlThreadLocal;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.servlet.filters.authverifier.AuthVerifierFilter;
 
 import java.io.IOException;
@@ -192,7 +193,8 @@ public class CXFEndpointPublisher {
 			Object authVerifierPropertiesObject = _properties.get(
 				"authVerifierProperties");
 
-			if (authVerifierPropertiesObject != null) {
+			if ((authVerifierPropertiesObject != null) &&
+				ArrayUtil.isNotEmpty((Object[]) authVerifierPropertiesObject)) {
 				String[] authVerifierPropertiesArray =
 					(String[])authVerifierPropertiesObject;
 

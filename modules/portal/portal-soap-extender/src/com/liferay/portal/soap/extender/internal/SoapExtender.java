@@ -17,6 +17,7 @@ package com.liferay.portal.soap.extender.internal;
 import aQute.bnd.annotation.metatype.Configurable;
 
 import com.liferay.portal.dependency.manager.tccl.TCCLDependencyManager;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.soap.extender.SoapDescriptorBuilder;
 import com.liferay.portal.soap.extender.configuration.SoapExtenderConfiguration;
 
@@ -85,7 +86,7 @@ public class SoapExtender {
 
 		String[] contextPaths = soapExtenderConfiguration.contextPaths();
 
-		if (contextPaths == null) {
+		if (ArrayUtil.isEmpty(contextPaths)) {
 			return;
 		}
 
@@ -105,7 +106,7 @@ public class SoapExtender {
 		String[] jaxWsHandlerFilterStrings =
 			soapExtenderConfiguration.jaxWsHandlerFilterStrings();
 
-		if (jaxWsHandlerFilterStrings == null) {
+		if (ArrayUtil.isEmpty(jaxWsHandlerFilterStrings)) {
 			return;
 		}
 
@@ -123,7 +124,7 @@ public class SoapExtender {
 		String[] jaxWsServiceFilterStrings =
 			soapExtenderConfiguration.jaxWsServiceFilterStrings();
 
-		if (jaxWsServiceFilterStrings == null) {
+		if (ArrayUtil.isEmpty(jaxWsServiceFilterStrings)) {
 			return;
 		}
 
