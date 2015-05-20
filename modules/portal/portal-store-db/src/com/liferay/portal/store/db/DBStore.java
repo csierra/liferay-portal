@@ -45,10 +45,17 @@ import java.sql.SQLException;
 
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Shuyang Zhou
  * @author Tina Tian
  */
+@Component(
+	immediate = true,
+	property = "store.type=com.liferay.portal.store.db.DBStore",
+	service = Store.class
+)
 public class DBStore extends BaseStore {
 
 	@Override
