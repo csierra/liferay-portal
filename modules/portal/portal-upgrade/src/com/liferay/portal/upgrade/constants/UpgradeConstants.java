@@ -14,27 +14,17 @@
  *
  */
 
-package com.liferay.bookmarks.upgrade;
-
-
-import com.liferay.portal.upgrade.ModuleUpgradeManager;
-import org.osgi.service.component.annotations.Component;
+package com.liferay.portal.upgrade.constants;
 
 /**
  * @author Miguel Pastor
  */
-@Component(property = "component.name=bookmarks")
-public class BookmarksUpgradeManager implements ModuleUpgradeManager {
+public interface UpgradeConstants {
 
-	@Override
-	public void execute(UpgradeContext upgradeContext) {
-		System.out.println(upgradeContext);
-	}
+	public String APPLICATION_NAME = "application.name";
 
-	@Override
-	public void register(UpgradeRegistry registry) {
-		registry.registerStep("0", "1.0");
-		registry.registerStep("1.0", "1.1");
-	}
+	public String FROM = "from";
+
+	public String TO = "to";
 
 }
