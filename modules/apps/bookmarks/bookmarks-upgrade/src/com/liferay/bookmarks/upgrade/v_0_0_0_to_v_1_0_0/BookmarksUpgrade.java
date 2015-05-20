@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.bookmarks.upgrade;
+package com.liferay.bookmarks.upgrade.v_0_0_0_to_v_1_0_0;
 
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeAdminPortlets;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeClassNames;
@@ -22,7 +22,6 @@ import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletSettings;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.whiteboard.UpgradeWhiteboardConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,16 +32,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Miguel Pastor
  */
-@Component(
-	immediate = true,
-	property = {
-		UpgradeWhiteboardConstants.UPGRADE_WHITEBOARD_RELEASE_NAME + "=com.liferay.bookmarks.service",
-		UpgradeWhiteboardConstants.UPGRADE_WHITEBOARD_RELEASE_PREVIOUS_VERSION + "=0",
-		UpgradeWhiteboardConstants.UPGRADE_WHITEBOARD_RELEASE_VERSION + "=" + BookmarksUpgrade_1_0_0.BUILD_NUMBER
-	},
-	service = UpgradeProcess.class
-)
-public class BookmarksUpgrade_1_0_0 extends UpgradeProcess {
+@Component(property = {"from=0.0.0", "to=1.0.0", "component.name=bookmarks"})
+public class BookmarksUpgrade extends UpgradeProcess {
 
 	public static final int BUILD_NUMBER = 1;
 
