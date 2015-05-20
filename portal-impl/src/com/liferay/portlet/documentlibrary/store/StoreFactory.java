@@ -132,7 +132,11 @@ public class StoreFactory {
 		Store store = (Store)InstanceFactory.newInstance(
 			classLoader, PropsValues.DL_STORE_IMPL);
 
-		if (!(store instanceof DBStore)) {
+		String className = store.getClass().getName();
+
+		if (!(className.equals(
+			"com.liferay.portlet.documentlibrary.store.DBStore"))) {
+
 			return store;
 		}
 
