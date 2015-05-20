@@ -14,21 +14,20 @@
 
 package com.liferay.portal.upgrade.internal;
 
-import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
+import com.liferay.osgi.service.tracker.map.*;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
 
 
-import com.liferay.portal.upgrade.ModuleUpgradeManager;
-
-import com.liferay.portal.upgrade.ModuleUpgradeManager.UpgradeRegistry;
+import com.liferay.portal.upgrade.constants.UpgradeConstants;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.*;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -37,11 +36,27 @@ import java.util.List;
 @Component(
 	immediate = true,
 	property = {
+		"osgi.command.function=execute",
 		"osgi.command.function=list",
 		"osgi.command.scope=upgrade"
 	},
 	service = Object.class)
 public class ReleaseManager {
+
+	public void execute(String componentName) throws PortalException {
+		List<UpgradeProcessInfo> upgradeProcesses = _serviceTrackerMap.getService(componentName);
+
+		for (UpgradeProcessInfo upgradeProcessInfo : upgradeProcesses) {
+
+			upgradeProcessInfo._UpgradeProcess.upgrade();
+
+			_releaseLocalService.updateRelease(
+				componentName,
+				Collections.<UpgradeProcess>emptyList(),
+				upgradeProcessInfo.to(), upgradeProcessInfo.from(), false);
+		}
+
+	}
 
 	public void list() {
 		for (String key : _serviceTrackerMap.keySet()) {
@@ -50,13 +65,12 @@ public class ReleaseManager {
 	}
 
 	public void list(String componentName) {
-		List<ModuleUpgradeManagerInfo> moduleUpgradeManagers =
-			_serviceTrackerMap.getService(componentName);
+		List<UpgradeProcessInfo> upgradeProcesses = _serviceTrackerMap.getService(componentName);
 
 		System.out.println("Registered upgrade commands for component " + componentName);
 
-		for (ModuleUpgradeManagerInfo moduleUpgradeManagerInfo : moduleUpgradeManagers) {
-			System.out.println(moduleUpgradeManagerInfo);
+		for (UpgradeProcessInfo upgradeProcess : upgradeProcesses) {
+			System.out.println(upgradeProcess);
 		}
 	}
 
@@ -64,41 +78,34 @@ public class ReleaseManager {
 	protected void activate(final BundleContext bundleContext)
 		throws InvalidSyntaxException {
 
-		_serviceTrackerMap = ServiceTrackerMapFactory.singleValueMap(
-			bundleContext, ModuleUpgradeManager.class, "component.name", new ServiceTrackerCustomizer<ModuleUpgradeManager, List<ModuleUpgradeManagerInfo>>() {
+		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
+			bundleContext, UpgradeProcess.class, "(" + UpgradeConstants.APPLICATION_NAME + "=*)",
+			new PropertyServiceReferenceMapper<String, UpgradeProcess>(UpgradeConstants.APPLICATION_NAME),
+			new ServiceTrackerCustomizer<UpgradeProcess, UpgradeProcessInfo>() {
+
 				@Override
-				public List<ModuleUpgradeManagerInfo> addingService(ServiceReference<ModuleUpgradeManager> serviceReference) {
-					final List<ModuleUpgradeManagerInfo> moduleUpgradeManagerInfos = new ArrayList<>();
+				public UpgradeProcessInfo addingService(ServiceReference<UpgradeProcess> serviceReference) {
+					String from = (String) serviceReference.getProperty(UpgradeConstants.FROM);
+					String to = (String) serviceReference.getProperty(UpgradeConstants.TO);
 
-					final ModuleUpgradeManager moduleUpgradeManager =
-						bundleContext.getService(serviceReference);
+					UpgradeProcess service = bundleContext.getService(serviceReference);
 
-					moduleUpgradeManager.register(new UpgradeRegistry() {
-						@Override
-						public void registerStep(String from, String to) {
-							moduleUpgradeManagerInfos.add(
-								new ModuleUpgradeManagerInfo(
-									from, to, moduleUpgradeManager));
-						}
-					});
-
-					return moduleUpgradeManagerInfos;
+					return new UpgradeProcessInfo(from, to, service);
 				}
 
 				@Override
-				public void modifiedService(
-					ServiceReference<ModuleUpgradeManager> serviceReference,
-					List<ModuleUpgradeManagerInfo> moduleUpgradeManagerInfos) {
+				public void modifiedService(ServiceReference<UpgradeProcess> serviceReference, UpgradeProcessInfo upgradeProcessInfo) {
+
 				}
 
 				@Override
-				public void removedService(
-					ServiceReference<ModuleUpgradeManager> serviceReference,
-					List<ModuleUpgradeManagerInfo> moduleUpgradeManagerInfos) {
-
+				public void removedService(ServiceReference<UpgradeProcess> serviceReference, UpgradeProcessInfo upgradeProcessInfo) {
 					bundleContext.ungetService(serviceReference);
 				}
-			});
+			},
+			Collections.reverseOrder(
+				new PropertyServiceReferenceComparator<UpgradeProcess>(
+					UpgradeConstants.FROM)));
 
 		_serviceTrackerMap.open();
 	}
@@ -115,20 +122,34 @@ public class ReleaseManager {
 		_releaseLocalService = releaseLocalService;
 	}
 
-	ServiceTrackerMap<String, List<ModuleUpgradeManagerInfo>> _serviceTrackerMap;
+	ServiceTrackerMap<String, List<UpgradeProcessInfo>> _serviceTrackerMap;
 
 	private ReleaseLocalService _releaseLocalService;
 
-	private static class ModuleUpgradeManagerInfo {
-		public ModuleUpgradeManagerInfo(String from, String to, ModuleUpgradeManager _moduleUpgradeManager) {
+	private static class UpgradeProcessInfo {
+		public UpgradeProcessInfo(
+			String from, String to, UpgradeProcess _UpgradeProcess) {
+
 			this.from = from;
 			this.to = to;
-			this._moduleUpgradeManager = _moduleUpgradeManager;
+			this._UpgradeProcess = _UpgradeProcess;
+		}
+
+		public int to() {
+			return transform(to);
+		}
+
+		public int from() {
+			return transform(from);
+		}
+
+		protected int transform(String s) {
+			return Integer.parseInt(s.replace(".", ""));
 		}
 
 		private String from;
 		private String to;
-		private ModuleUpgradeManager _moduleUpgradeManager;
+		private UpgradeProcess _UpgradeProcess;
 	}
 
 }
