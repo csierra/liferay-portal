@@ -12,20 +12,11 @@
  * details.
  */
 
-package com.liferay.portal.kernel.upgrade.whiteboard;
+package com.liferay.portal.upgrade.internal.bundle;
 
 /**
  * @author Miguel Pastor
  */
-public final class UpgradeWhiteboardConstants {
-
-	public static final String UPGRADE_WHITEBOARD_RELEASE_NAME =
-		"upgrade.whiteboard.release.name";
-
-	public static final String UPGRADE_WHITEBOARD_RELEASE_PREVIOUS_VERSION =
-		"upgrade.whiteboard.release.previous.version";
-
-	public static final String UPGRADE_WHITEBOARD_RELEASE_VERSION =
-		"upgrade.whiteboard.release.version";
+public final class SyntheticBundleBuilder {
 
 }
