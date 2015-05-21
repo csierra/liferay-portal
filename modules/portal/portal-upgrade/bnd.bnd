@@ -3,4 +3,8 @@ Bundle-SymbolicName: com.liferay.portal.upgrade
 Bundle-Version: 1.0.0
 Export-Package:\
 	com.liferay.portal.upgrade.constants
-Include-Resource: classes
+Include-Resource:\
+	@lib/shrinkwrap-api.jar,\
+	@lib/shrinkwrap-impl-base.jar,\
+	@lib/shrinkwrap-spi.jar,\
+	classes
