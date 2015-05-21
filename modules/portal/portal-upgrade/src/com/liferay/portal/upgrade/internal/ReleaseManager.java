@@ -17,6 +17,7 @@ package com.liferay.portal.upgrade.internal;
 import com.liferay.osgi.service.tracker.map.*;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
 
 
@@ -27,6 +28,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.*;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,9 +46,21 @@ import java.util.List;
 public class ReleaseManager {
 
 	public void execute(String componentName) throws PortalException {
-		List<UpgradeProcessInfo> upgradeProcesses = _serviceTrackerMap.getService(componentName);
+		List<UpgradeProcessInfo> upgradeProcessInfos =
+			_serviceTrackerMap.getService(componentName);
 
-		for (UpgradeProcessInfo upgradeProcessInfo : upgradeProcesses) {
+		Release release = _releaseLocalService.fetchRelease(componentName);
+
+		int buildNumber = 0;
+
+		if (release != null) {
+			buildNumber = release.getBuildNumber();
+		}
+
+		List<UpgradeProcessInfo> upgradePath = buildUpgradePath(
+			buildNumber, upgradeProcessInfos);
+
+		for (UpgradeProcessInfo upgradeProcessInfo : upgradePath) {
 
 			upgradeProcessInfo._UpgradeProcess.upgrade();
 
@@ -72,6 +86,31 @@ public class ReleaseManager {
 		for (UpgradeProcessInfo upgradeProcess : upgradeProcesses) {
 			System.out.println(upgradeProcess);
 		}
+	}
+
+	protected List<UpgradeProcessInfo> buildUpgradePath(
+		int buildNumber, List<UpgradeProcessInfo> upgradeProcessesInfo) {
+
+		List<UpgradeProcessInfo> result = new ArrayList<>();
+
+		for (UpgradeProcessInfo upgradeProcessInfo : upgradeProcessesInfo) {
+
+			if (upgradeProcessInfo.to() <= buildNumber) {
+				continue;
+			}
+
+			if (upgradeProcessInfo.from() > buildNumber) {
+				throw new IllegalStateException(
+					"A gap has been found in your upgrade path for " +
+						" the component");
+			}
+
+			result.add(upgradeProcessInfo);
+
+			buildNumber = upgradeProcessInfo.to();
+		}
+
+		return result;
 	}
 
 	@Activate
@@ -135,12 +174,20 @@ public class ReleaseManager {
 			this._UpgradeProcess = _UpgradeProcess;
 		}
 
+		public int from() {
+			return transform(from);
+		}
+
 		public int to() {
 			return transform(to);
 		}
 
-		public int from() {
-			return transform(from);
+		@Override
+		public String toString() {
+			return "UpgradeProcessInfo{" +
+				"from='" + from + '\'' +
+				", to='" + to + '\'' +
+				'}';
 		}
 
 		protected int transform(String s) {

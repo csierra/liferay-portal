@@ -20,8 +20,8 @@ import aQute.bnd.annotation.headers.RequireCapability;
  * @author Miguel Pastor
  */
 @RequireCapability(
-	filter = "(&(schema.name=com.liferay.bookmarks.service)(version=1))",
-	ns ="schema.name"
+	filter = "(&(schema.provider=bookmarks)(version=1.2.0))",
+	ns ="schema.provider"
 )
 public interface ReleaseRequirements {
 }
