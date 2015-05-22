@@ -14,7 +14,10 @@
 
 package com.liferay.portal.upgrade.internal;
 
-import com.liferay.osgi.service.tracker.map.*;
+import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceComparator;
+import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceMapper;
+import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.model.Release;
@@ -165,11 +168,24 @@ public class ReleaseManager {
 
 	private ReleaseLocalService _releaseLocalService;
 
-	private static class UpgradeProcessInfo {
+	protected static class UpgradeProcessInfo {
+		public String getFrom() {
+			return from;
+		}
+
+		public String getTo() {
+			return to;
+		}
+
+		public UpgradeProcess getUpgradeProcess() {
+			return _UpgradeProcess;
+		}
+
 		public UpgradeProcessInfo(
 			String from, String to, UpgradeProcess _UpgradeProcess) {
 
 			this.from = from;
+
 			this.to = to;
 			this._UpgradeProcess = _UpgradeProcess;
 		}
