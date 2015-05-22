@@ -4,6 +4,7 @@ Bundle-Version: 1.0.0
 Export-Package:\
 	com.liferay.portal.upgrade.constants
 Include-Resource:\
+	@lib/jgrapht-core.jar,\
 	@lib/shrinkwrap-api.jar,\
 	@lib/shrinkwrap-impl-base.jar,\
 	@lib/shrinkwrap-spi.jar,\
