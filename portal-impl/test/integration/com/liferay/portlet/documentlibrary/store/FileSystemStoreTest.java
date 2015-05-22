@@ -24,6 +24,7 @@ import org.junit.Rule;
 
 /**
  * @author Preston Crary
+ * @author Manuel de la Peña
  */
 public class FileSystemStoreTest extends BaseStoreTestCase {
 
@@ -34,8 +35,8 @@ public class FileSystemStoreTest extends BaseStoreTestCase {
 			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
 
 	@Override
-	protected Store getStore() {
-		return new FileSystemStore();
+	protected String getStoreType() {
+		return "filesystem";
 	}
 
 }
