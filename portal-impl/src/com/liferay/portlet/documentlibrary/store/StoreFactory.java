@@ -44,6 +44,10 @@ import org.aopalliance.intercept.MethodInterceptor;
  */
 public class StoreFactory {
 
+	public StoreFactory() {
+		_serviceTrackerMap.open();
+	}
+
 	public static void checkProperties() {
 		if (_warned) {
 			return;
@@ -59,9 +63,13 @@ public class StoreFactory {
 
 		boolean found = false;
 
-		for (String[] dlHookStoreParts : _DL_HOOK_STORES) {
-			if (dlHookImpl.equals(dlHookStoreParts[0])) {
-				PropsValues.DL_STORE_IMPL = dlHookStoreParts[1];
+		for (String key : _serviceTrackerMap.keySet()) {
+			Store storeEntry = _serviceTrackerMap.getService(key);
+
+			String className = storeEntry.getClass().getName();
+
+			if (dlHookImpl.equals(className)) {
+				PropsValues.DL_STORE_IMPL = className;
 
 				found = true;
 
@@ -174,17 +182,6 @@ public class StoreFactory {
 
 		return store;
 	}
-
-	private static final String[][] _DL_HOOK_STORES = new String[][] {
-		new String[] {
-			"com.liferay.documentlibrary.util.AdvancedFileSystemHook",
-			AdvancedFileSystemStore.class.getName()
-		},
-		new String[] {
-			"com.liferay.documentlibrary.util.FileSystemHook",
-			FileSystemStore.class.getName()
-		}
-	};
 
 	private static final Log _log = LogFactoryUtil.getLog(StoreFactory.class);
 
