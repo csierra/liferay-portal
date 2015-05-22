@@ -51,7 +51,7 @@ public abstract class BaseStoreTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		StoreFactory storeFactory = new StoreFactory();
+		StoreFactory storeFactory = StoreFactory.getInstance();
 
 		store = storeFactory.getStoreInstance(getStoreType());
 
