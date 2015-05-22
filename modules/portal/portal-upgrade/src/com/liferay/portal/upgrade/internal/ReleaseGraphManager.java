@@ -19,8 +19,10 @@ import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.upgrade.internal.ReleaseManager.UpgradeProcessInfo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.alg.DijkstraShortestPath;
@@ -69,6 +71,29 @@ public class ReleaseGraphManager {
 				upgradeProcessInfo.getFrom(), upgradeProcessInfo.getTo(),
 				new UpgradeProcessEdge(upgradeProcessInfo));
 		}
+	}
+
+	public List<UpgradeProcessInfo> getUpgradePath(String from) {
+		final List<String> endVertices = new ArrayList<>();
+
+		final Set<String> strings = _directedGraph.vertexSet();
+
+		for (String string : strings) {
+			if (_directedGraph.outgoingEdgesOf(string).isEmpty()) {
+				endVertices.add(string);
+			}
+		}
+
+		if ((endVertices.size() == 1)) {
+			return getUpgradePath(from, endVertices.get(0));
+		}
+
+		if ((endVertices.size() > 1)) {
+			throw new IllegalStateException(
+				"There are more that one possible end nodes " + endVertices);
+		}
+
+		throw new IllegalStateException("No end nodes!");
 	}
 
 	public List<UpgradeProcessInfo> getUpgradePath(String from, String to) {

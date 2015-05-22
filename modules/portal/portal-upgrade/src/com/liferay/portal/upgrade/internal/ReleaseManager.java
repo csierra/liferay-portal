@@ -28,10 +28,12 @@ import com.liferay.portal.upgrade.constants.UpgradeConstants;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,25 +50,31 @@ import java.util.List;
 	service = Object.class)
 public class ReleaseManager {
 
+	public void execute(String componentName) throws PortalException {
+		List<UpgradeProcessInfo> upgradeProcessInfos =
+			_serviceTrackerMap.getService(componentName);
+
+		String buildNumber = getBuildNumber(componentName);
+
+		List<UpgradeProcessInfo> upgradePath = new ReleaseGraphManager(upgradeProcessInfos).getUpgradePath(buildNumber);
+
+		executeUpgradePath(componentName, upgradePath);
+	}
+
 	public void execute(String componentName, String to) throws PortalException {
 		List<UpgradeProcessInfo> upgradeProcessInfos =
 			_serviceTrackerMap.getService(componentName);
 
-		Release release = _releaseLocalService.fetchRelease(componentName);
+		String buildNumber = getBuildNumber(componentName);
 
-		int buildNumber = 0;
+		List<UpgradeProcessInfo> upgradePath = new ReleaseGraphManager(upgradeProcessInfos).getUpgradePath(buildNumber, to);
 
-		if (release != null) {
-			buildNumber = release.getBuildNumber();
-		}
+		executeUpgradePath(componentName, upgradePath);
 
-		String from = Integer.toString(buildNumber);
-		to = to.replace(".", "");
+	}
 
-		List<UpgradeProcessInfo> upgradePath = buildUpgradePath(
-			upgradeProcessInfos, from, to);
-
-		for (UpgradeProcessInfo upgradeProcessInfo : upgradePath) {
+	protected void executeUpgradePath(String componentName, List<UpgradeProcessInfo> upgradeProcessInfos) throws PortalException {
+		for (UpgradeProcessInfo upgradeProcessInfo : upgradeProcessInfos) {
 
 			upgradeProcessInfo._UpgradeProcess.upgrade();
 
@@ -75,7 +83,18 @@ public class ReleaseManager {
 				Collections.<UpgradeProcess>emptyList(),
 				upgradeProcessInfo.to(), upgradeProcessInfo.from(), false);
 		}
+	}
 
+	protected String getBuildNumber(String componentName) {
+		Release release = _releaseLocalService.fetchRelease(componentName);
+
+		int buildNumber = 0;
+
+		if (release != null) {
+			buildNumber = release.getBuildNumber();
+		}
+
+		return Integer.toString(buildNumber);
 	}
 
 	public void list() {
