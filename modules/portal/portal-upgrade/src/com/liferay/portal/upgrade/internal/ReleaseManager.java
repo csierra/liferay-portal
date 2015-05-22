@@ -48,7 +48,7 @@ import java.util.List;
 	service = Object.class)
 public class ReleaseManager {
 
-	public void execute(String componentName) throws PortalException {
+	public void execute(String componentName, String to) throws PortalException {
 		List<UpgradeProcessInfo> upgradeProcessInfos =
 			_serviceTrackerMap.getService(componentName);
 
@@ -60,8 +60,11 @@ public class ReleaseManager {
 			buildNumber = release.getBuildNumber();
 		}
 
+		String from = Integer.toString(buildNumber);
+		to = to.replace(".", "");
+
 		List<UpgradeProcessInfo> upgradePath = buildUpgradePath(
-			buildNumber, upgradeProcessInfos);
+			upgradeProcessInfos, from, to);
 
 		for (UpgradeProcessInfo upgradeProcessInfo : upgradePath) {
 
@@ -92,28 +95,13 @@ public class ReleaseManager {
 	}
 
 	protected List<UpgradeProcessInfo> buildUpgradePath(
-		int buildNumber, List<UpgradeProcessInfo> upgradeProcessesInfo) {
+		List<UpgradeProcessInfo> upgradeProcessesInfo,
+		String from, String to) {
 
-		List<UpgradeProcessInfo> result = new ArrayList<>();
+		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
+			upgradeProcessesInfo);
 
-		for (UpgradeProcessInfo upgradeProcessInfo : upgradeProcessesInfo) {
-
-			if (upgradeProcessInfo.to() <= buildNumber) {
-				continue;
-			}
-
-			if (upgradeProcessInfo.from() > buildNumber) {
-				throw new IllegalStateException(
-					"A gap has been found in your upgrade path for " +
-						" the component");
-			}
-
-			result.add(upgradeProcessInfo);
-
-			buildNumber = upgradeProcessInfo.to();
-		}
-
-		return result;
+		return releaseGraphManager.getUpgradePath(from, to);
 	}
 
 	@Activate
@@ -184,9 +172,12 @@ public class ReleaseManager {
 		public UpgradeProcessInfo(
 			String from, String to, UpgradeProcess _UpgradeProcess) {
 
-			this.from = from;
+			this.from = Integer.toString(
+				Integer.parseInt(from.replace(".", "")));
 
-			this.to = to;
+			this.to = Integer.toString(
+				Integer.parseInt(to.replace(".", "")));
+
 			this._UpgradeProcess = _UpgradeProcess;
 		}
 

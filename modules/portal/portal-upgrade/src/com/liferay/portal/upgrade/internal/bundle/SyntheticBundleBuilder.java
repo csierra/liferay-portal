@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
+import javax.servlet.ServletContext;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +96,7 @@ public final class SyntheticBundleBuilder {
 		sb.append(" Schema Capabilities Provider");
 		sb.append(StringPool.NEW_LINE);
 		sb.append("Bundle-SymbolicName: ");
+		sb.append("synthetic.");
 		sb.append(release.getServletContextName());
 		sb.append(StringPool.NEW_LINE);
 		sb.append("Bundle-Version: ");
@@ -124,6 +126,10 @@ public final class SyntheticBundleBuilder {
 		ReleaseLocalService releaseLocalService) {
 
 		_releaseLocalService = releaseLocalService;
+	}
+
+	@Reference(target = "(original.bean=true)")
+	protected void setServletContext(ServletContext servletContext) {
 	}
 
 	private Map<String, Bundle> _syntheticBundles= new HashMap<>();

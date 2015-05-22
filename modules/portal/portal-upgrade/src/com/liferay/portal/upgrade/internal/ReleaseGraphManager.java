@@ -47,7 +47,7 @@ public class ReleaseGraphManager {
 					"0.0.0", "3.1.0", new UpgradeProcess() {})
 			));
 
-		final List<UpgradeProcess> upgradePath =
+		final List<UpgradeProcessInfo> upgradePath =
 			releaseGraphManager.getUpgradePath("0.0.0", "3.1.0");
 
 		System.out.println(upgradePath);
@@ -67,11 +67,11 @@ public class ReleaseGraphManager {
 
 			_directedGraph.addEdge(
 				upgradeProcessInfo.getFrom(), upgradeProcessInfo.getTo(),
-				new UpgradeProcessEdge(upgradeProcessInfo.getUpgradeProcess()));
+				new UpgradeProcessEdge(upgradeProcessInfo));
 		}
 	}
 
-	public List<UpgradeProcess> getUpgradePath(String from, String to) {
+	public List<UpgradeProcessInfo> getUpgradePath(String from, String to) {
 		if (!_directedGraph.containsVertex(from)) {
 			throw new IllegalArgumentException(
 				"There is not a UpgradeProcess starting in " + from);
@@ -95,13 +95,13 @@ public class ReleaseGraphManager {
 		}
 
 		return ListUtil.toList(
-			pathEdgeList, new Function<UpgradeProcessEdge, UpgradeProcess>() {
+			pathEdgeList, new Function<UpgradeProcessEdge, UpgradeProcessInfo>() {
 
-			@Override
-			public UpgradeProcess apply(UpgradeProcessEdge upgradeProcessEdge) {
-				return upgradeProcessEdge._upgradeProcess;
-			}
-		});
+				@Override
+				public UpgradeProcessInfo apply(UpgradeProcessEdge upgradeProcessEdge) {
+					return upgradeProcessEdge._upgradeProcessInfo;
+				}
+			});
 	}
 
 	private final DefaultDirectedGraph<String, UpgradeProcessEdge>
@@ -110,15 +110,15 @@ public class ReleaseGraphManager {
 
 	private static class UpgradeProcessEdge extends DefaultEdge {
 
-		public UpgradeProcessEdge(UpgradeProcess upgradeProcess) {
-			_upgradeProcess = upgradeProcess;
+		public UpgradeProcessEdge(UpgradeProcessInfo upgradeProcessInfo) {
+			_upgradeProcessInfo = upgradeProcessInfo;
 		}
 
-		public UpgradeProcess getUpgradeProcess() {
-			return _upgradeProcess;
+		public UpgradeProcessInfo getUpgradeProcessInfo() {
+			return _upgradeProcessInfo;
 		}
 
-		private final UpgradeProcess _upgradeProcess;
+		private final UpgradeProcessInfo _upgradeProcessInfo;
 
 	}
 
@@ -139,8 +139,7 @@ public class ReleaseGraphManager {
 				if (upgradeProcessInfo.getFrom().equals(sourceVertex) &&
 					upgradeProcessInfo.getTo().equals(targetVertex)) {
 
-					return new UpgradeProcessEdge(
-						upgradeProcessInfo.getUpgradeProcess());
+					return new UpgradeProcessEdge(upgradeProcessInfo);
 				}
 			}
 
