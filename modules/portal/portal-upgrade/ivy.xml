@@ -21,5 +21,6 @@
 		<dependency name="org.osgi.compendium" org="org.osgi" rev="5.0.0" />
 		<dependency name="org.osgi.core" org="org.osgi" rev="5.0.0" />
 		<dependency name="shrinkwrap-depchain" org="org.jboss.shrinkwrap" rev="1.2.2" />
+		<dependency conf="test->default" name="junit" org="junit" rev="4.11" />
 	</dependencies>
 </ivy-module>
