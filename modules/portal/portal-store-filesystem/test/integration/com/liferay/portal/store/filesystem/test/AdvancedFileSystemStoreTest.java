@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portlet.documentlibrary.store;
+package com.liferay.portal.store.filesystem.test;
 
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -23,20 +23,19 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 
 /**
- * @author Preston Crary
+ * @author Vilmos Papp
  * @author Manuel de la Peña
  */
-public class FileSystemStoreTest extends BaseStoreTestCase {
+public class AdvancedFileSystemStoreTest extends BaseStoreTestCase {
 
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new AggregateTestRule(new LiferayIntegrationTestRule());
 
 	@Override
 	protected String getStoreType() {
-		return "filesystem";
+		return "advanced-filesystem";
 	}
 
 }

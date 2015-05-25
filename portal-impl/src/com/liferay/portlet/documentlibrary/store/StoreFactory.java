@@ -140,12 +140,9 @@ public class StoreFactory {
 	public String[] getStoreTypes() {
 		Set<String> keySet = _serviceTrackerMap.keySet();
 
-		String[] storesTypes = new String[keySet.size() + 2];
+		String[] storesTypes = new String[keySet.size()];
 
 		int i = 0;
-
-		storesTypes[i++] = AdvancedFileSystemStore.class.getName();
-		storesTypes[i++] = FileSystemStore.class.getName();
 
 		for (String key : keySet) {
 			Store store = _serviceTrackerMap.getService(key);
