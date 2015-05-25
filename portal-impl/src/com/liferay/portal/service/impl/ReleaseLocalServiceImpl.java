@@ -50,7 +50,7 @@ import java.util.Properties;
 public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 
 	@Override
-	public Release addRelease(String servletContextName, int buildNumber) {
+	public Release addRelease(String servletContextName, String buildNumber) {
 		Release release = null;
 
 		if (servletContextName.equals(
@@ -130,7 +130,7 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 	}
 
 	@Override
-	public int getBuildNumberOrCreate() throws PortalException {
+	public String getBuildNumberOrCreate() throws PortalException {
 
 		// Get release build number
 
@@ -148,7 +148,7 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-				int buildNumber = rs.getInt("buildNumber");
+				String buildNumber = rs.getString("buildNumber");
 
 				if (_log.isDebugEnabled()) {
 					_log.debug("Build number " + buildNumber);
@@ -201,7 +201,7 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 
 	@Override
 	public Release updateRelease(
-			long releaseId, int buildNumber, Date buildDate, boolean verified)
+			long releaseId, String buildNumber, Date buildDate, boolean verified)
 		throws PortalException {
 
 		Release release = releasePersistence.findByPrimaryKey(releaseId);
@@ -218,40 +218,15 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 
 	@Override
 	public void updateRelease(
-			String servletContextName, List<UpgradeProcess> upgradeProcesses,
-			int buildNumber, int previousBuildNumber, boolean indexOnUpgrade)
+			String servletContextName,
+			String buildNumber, String previousBuildNumber)
 		throws PortalException {
-
-		if (buildNumber <= 0) {
-			_log.error(
-				"Skipping upgrade processes for " + servletContextName +
-					" because \"release.info.build.number\" is not specified");
-
-			return;
-		}
 
 		Release release = releaseLocalService.fetchRelease(servletContextName);
 
 		if (release == null) {
 			release = releaseLocalService.addRelease(
 				servletContextName, previousBuildNumber);
-		}
-
-		if (buildNumber == release.getBuildNumber()) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Skipping upgrade processes for " + servletContextName +
-						" because it is already up to date");
-			}
-		}
-		else if (buildNumber < release.getBuildNumber()) {
-			throw new OlderVersionException(
-				"Skipping upgrade processes for " + servletContextName +
-					" because you are trying to upgrade with an older version");
-		}
-		else {
-			UpgradeProcessUtil.upgradeProcess(
-				release.getBuildNumber(), upgradeProcesses, indexOnUpgrade);
 		}
 
 		releaseLocalService.updateRelease(
@@ -264,20 +239,15 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 			Properties unfilteredPortalProperties)
 		throws Exception {
 
-		int buildNumber = GetterUtil.getInteger(
+		String buildNumber = GetterUtil.getString(
 			unfilteredPortalProperties.getProperty(
 				PropsKeys.RELEASE_INFO_BUILD_NUMBER));
-		int previousBuildNumber = GetterUtil.getInteger(
+		String previousBuildNumber = GetterUtil.getString(
 			unfilteredPortalProperties.getProperty(
 				PropsKeys.RELEASE_INFO_PREVIOUS_BUILD_NUMBER),
 			buildNumber);
-		boolean indexOnUpgrade = GetterUtil.getBoolean(
-			unfilteredPortalProperties.getProperty(PropsKeys.INDEX_ON_UPGRADE),
-			PropsValues.INDEX_ON_UPGRADE);
 
-		updateRelease(
-			servletContextName, upgradeProcesses, buildNumber,
-			previousBuildNumber, indexOnUpgrade);
+		updateRelease(servletContextName, buildNumber, previousBuildNumber);
 	}
 
 	protected void testSupportsStringCaseSensitiveQuery() {
