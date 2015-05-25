@@ -91,6 +91,7 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 		upgrade(UpgradePortalPreferences.class);
 		upgrade(UpgradePortletDisplayTemplatePreferences.class);
 		upgrade(UpgradeRatings.class);
+		upgrade(UpgradeRelease.class);
 		upgrade(UpgradeRepositoryEntry.class);
 		upgrade(UpgradeShopping.class);
 		upgrade(UpgradeShoppingPreferences.class);
