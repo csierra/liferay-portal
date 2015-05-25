@@ -72,7 +72,7 @@ public class UpgradeRelease extends UpgradeProcess {
 	private String transformVersion(String buildNumber) {
 		String major = buildNumber.substring(0, 1);
 		String minor = buildNumber.substring(1, 2);
-		String micro = buildNumber.substring(2, 4);
+		String micro = buildNumber.substring(2);
 
 		return major + "." + minor + "." + micro;
 	}
