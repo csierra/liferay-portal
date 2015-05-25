@@ -74,26 +74,9 @@ public class ReleaseGraphManager {
 	}
 
 	public List<UpgradeProcessInfo> getUpgradePath(String from) {
-		final List<String> endVertices = new ArrayList<>();
+		String endNode = findEndNode();
 
-		final Set<String> strings = _directedGraph.vertexSet();
-
-		for (String string : strings) {
-			if (_directedGraph.outgoingEdgesOf(string).isEmpty()) {
-				endVertices.add(string);
-			}
-		}
-
-		if ((endVertices.size() == 1)) {
-			return getUpgradePath(from, endVertices.get(0));
-		}
-
-		if ((endVertices.size() > 1)) {
-			throw new IllegalStateException(
-				"There are more that one possible end nodes " + endVertices);
-		}
-
-		throw new IllegalStateException("No end nodes!");
+		return getUpgradePath(from, endNode);
 	}
 
 	public List<UpgradeProcessInfo> getUpgradePath(String from, String to) {
@@ -120,13 +103,38 @@ public class ReleaseGraphManager {
 		}
 
 		return ListUtil.toList(
-			pathEdgeList, new Function<UpgradeProcessEdge, UpgradeProcessInfo>() {
+			pathEdgeList,
+			new Function<UpgradeProcessEdge, UpgradeProcessInfo>() {
 
 				@Override
-				public UpgradeProcessInfo apply(UpgradeProcessEdge upgradeProcessEdge) {
+				public UpgradeProcessInfo apply(
+					UpgradeProcessEdge upgradeProcessEdge) {
 					return upgradeProcessEdge._upgradeProcessInfo;
 				}
 			});
+	}
+
+	protected String findEndNode() {
+		final List<String> endVertices = new ArrayList<>();
+
+		final Set<String> strings = _directedGraph.vertexSet();
+
+		for (String string : strings) {
+			if (_directedGraph.outgoingEdgesOf(string).isEmpty()) {
+				endVertices.add(string);
+			}
+		}
+
+		if ((endVertices.size() == 1)) {
+			return endVertices.get(0);
+		}
+
+		if ((endVertices.size() > 1)) {
+			throw new IllegalStateException(
+				"There are more that one possible end nodes " + endVertices);
+		}
+
+		throw new IllegalStateException("No end nodes!");
 	}
 
 	private final DefaultDirectedGraph<String, UpgradeProcessEdge>
