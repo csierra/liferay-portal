@@ -442,6 +442,29 @@ public class ListUtilTest {
 	}
 
 	@Test
+	public void testToListWithTransformation() {
+		List<String> list = new ArrayList<>();
+
+		list.add("1");
+		list.add("2");
+		list.add("3");
+
+		List<Integer> list2 = ListUtil.toList(
+			list, new Function<String, Integer>() {
+				@Override
+				public Integer apply(String s) {
+					return Integer.valueOf(s);
+				}
+			});
+
+		Assert.assertEquals(3, list2.size());
+
+		Assert.assertEquals(Integer.valueOf(1), list2.get(0));
+		Assert.assertEquals(Integer.valueOf(2), list2.get(1));
+		Assert.assertEquals(Integer.valueOf(3), list2.get(2));
+	}
+
+	@Test
 	public void testToLongArray() {
 		List<String> list = Arrays.asList("1", "2", "3", "4");
 
