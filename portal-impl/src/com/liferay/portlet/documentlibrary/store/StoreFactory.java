@@ -167,6 +167,10 @@ public class StoreFactory {
 	}
 
 	private Store _getStoreInstance() throws Exception {
+		if (_store == null) {
+			return _NULL_STORE;
+		}
+
 		String storeType = _store.getType();
 
 		if (!(storeType.endsWith("DBStore"))) {
@@ -201,6 +205,7 @@ public class StoreFactory {
 
 	private static final Log _log = LogFactoryUtil.getLog(StoreFactory.class);
 
+	private static final Store _NULL_STORE = null;
 	private static Store _store;
 	private static StoreFactory _instance;
 	private static boolean _warned;
