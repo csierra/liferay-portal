@@ -17,6 +17,8 @@ package com.liferay.portal.store.jcr.jackrabbit;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.store.jcr.JCRFactory;
@@ -112,7 +114,15 @@ public class JCRFactoryImpl implements JCRFactory {
 	@Override
 	public void prepare() throws RepositoryException {
 		try {
-			FileUtil.mkdirs(_configuration.jackrabbitRepositoryRoot());
+			String path = _configuration.jackrabbitRepositoryRoot();
+
+			File repositoryRoot = new File(path);
+
+			if (!repositoryRoot.isAbsolute()) {
+				path = PropsUtil.get(PropsKeys.LIFERAY_HOME) + "/" + path;
+			}
+
+			FileUtil.mkdirs(path);
 
 			File tempFile = new File(
 				SystemProperties.get(SystemProperties.TMP_DIR) +
