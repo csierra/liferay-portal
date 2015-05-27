@@ -168,7 +168,19 @@ public class StoreFactory {
 
 	private Store _getStoreInstance() throws Exception {
 		if (_store == null) {
-			return _NULL_STORE;
+			Set<String> keySet = _serviceTrackerMap.keySet();
+
+			for (String key : keySet) {
+				if (key.endsWith("FileSystemStore")) {
+					_store = getStoreInstance(key);
+
+					break;
+				}
+			}
+
+			if (_store == null) {
+				return _NULL_STORE;
+			}
 		}
 
 		String storeType = _store.getType();
