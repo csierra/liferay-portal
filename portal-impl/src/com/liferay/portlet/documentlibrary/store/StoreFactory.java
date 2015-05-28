@@ -28,12 +28,18 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.aop.MethodInterceptorInvocationHandler;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
+import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.aopalliance.intercept.MethodInterceptor;
 
@@ -68,7 +74,7 @@ public class StoreFactory {
 		boolean found = false;
 
 		for (String key : _serviceTrackerMap.keySet()) {
-			Store storeEntry = _serviceTrackerMap.getService(key);
+			Store storeEntry = getStoreInstance(key);
 
 			String className = storeEntry.getClass().getName();
 
@@ -108,6 +114,10 @@ public class StoreFactory {
 		_warned = true;
 	}
 
+	public void destroy() {
+		_serviceTrackerMap.close();
+	}
+
 	public Store getStoreInstance() {
 		if (_store == null) {
 			checkProperties();
@@ -140,22 +150,7 @@ public class StoreFactory {
 	public String[] getStoreTypes() {
 		Set<String> keySet = _serviceTrackerMap.keySet();
 
-		String[] storesTypes = new String[keySet.size() + 2];
-
-		int i = 0;
-
-		storesTypes[i++] = AdvancedFileSystemStore.class.getName();
-		storesTypes[i++] = FileSystemStore.class.getName();
-
-		for (String key : keySet) {
-			Store store = _serviceTrackerMap.getService(key);
-
-			storesTypes[i] = store.getType();
-
-			i++;
-		}
-
-		return storesTypes;
+		return keySet.toArray(new String[keySet.size()]);
 	}
 
 	public void setStoreInstance(Store store) {
@@ -164,6 +159,10 @@ public class StoreFactory {
 		}
 
 		_store = store;
+	}
+
+	private StoreFactory() {
+		_serviceTrackerMap.open();
 	}
 
 	private Store _getStoreInstance() throws Exception {
@@ -183,50 +182,116 @@ public class StoreFactory {
 			}
 		}
 
-		String storeType = _store.getType();
+		Class<? extends Store> clazz = _store.getClass();
 
-		if (!(storeType.endsWith("DBStore"))) {
+		String storeType = clazz.getName();
+
+		if (!storeType.endsWith("DBStore")) {
 			return _store;
 		}
 
+		_wrapDatabaseStore();
+
+		return _store;
+	}
+
+	private void _wrapDatabaseStore() {
 		DB db = DBFactoryUtil.getDB();
 
 		String dbType = db.getType();
 
-		if (dbType.equals(DB.TYPE_POSTGRESQL)) {
-			ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
-
-			MethodInterceptor transactionAdviceMethodInterceptor =
-				(MethodInterceptor)PortalBeanLocatorUtil.locate(
-					"transactionAdvice");
-
-			MethodInterceptor tempFileMethodInterceptor =
-				new TempFileMethodInterceptor();
-
-			List<MethodInterceptor> methodInterceptors = Arrays.asList(
-				transactionAdviceMethodInterceptor, tempFileMethodInterceptor);
-
-			_store = (Store)ProxyUtil.newProxyInstance(
-				classLoader, new Class<?>[] {Store.class},
-				new MethodInterceptorInvocationHandler(
-					_store, methodInterceptors));
+		if (!dbType.equals(DB.TYPE_POSTGRESQL)) {
+			return;
 		}
 
-		return _store;
+		ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
+
+		MethodInterceptor transactionAdviceMethodInterceptor =
+			(MethodInterceptor)PortalBeanLocatorUtil.locate(
+				"transactionAdvice");
+
+		MethodInterceptor tempFileMethodInterceptor =
+			new TempFileMethodInterceptor();
+
+		List<MethodInterceptor> methodInterceptors = Arrays.asList(
+			transactionAdviceMethodInterceptor, tempFileMethodInterceptor);
+
+		_store = (Store)ProxyUtil.newProxyInstance(
+			classLoader, new Class<?>[] {Store.class},
+			new MethodInterceptorInvocationHandler(_store, methodInterceptors));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(StoreFactory.class);
 
 	private static final Store _NULL_STORE = null;
 	private static Store _store;
+	private static Map<String, Store> _stores = new ConcurrentHashMap<>();
 	private static StoreFactory _instance;
 	private static boolean _warned;
 
-	private static final ServiceTrackerMap<String, Store> _serviceTrackerMap =
-		ServiceTrackerCollections.singleValueMap(Store.class, "store.type");
+	private final ServiceTrackerMap<String, Store> _serviceTrackerMap =
+		ServiceTrackerCollections.singleValueMap(
+			Store.class, "store.type", new StoreServiceTrackerCustomizer());
 
-	static {
-		_serviceTrackerMap.open();
+	private class StoreServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer<Store, Store> {
+
+		@Override
+		public Store addingService(ServiceReference<Store> serviceReference) {
+			Registry registry = RegistryUtil.getRegistry();
+
+			Store store = registry.getService(serviceReference);
+
+			if (store == null) {
+				return null;
+			}
+
+			Class<? extends Store> clazz = store.getClass();
+
+			String storeType = clazz.getName();
+
+			if ((_store == null) ||
+				storeType.equals(PropsValues.DL_STORE_IMPL)) {
+
+				_store = store;
+			}
+
+			return store;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<Store> serviceReference, Store store) {
+
+			Class<? extends Store> clazz = _store.getClass();
+
+			String currentType = clazz.getName();
+
+			String type = (String)serviceReference.getProperty("store.type");
+
+			if (currentType.equals(type)) {
+				_store = store;
+			}
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<Store> serviceReference, Store service) {
+
+			String type = (String)serviceReference.getProperty("store.type");
+
+			Class<? extends Store> clazz = _store.getClass();
+
+			String currentType = clazz.getName();
+
+			if ((_store != null) && currentType.equals(type)) {
+				_store = null;
+			}
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			registry.ungetService(serviceReference);
+		}
 	}
 
 }
