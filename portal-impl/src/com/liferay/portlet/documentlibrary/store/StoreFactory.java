@@ -28,12 +28,18 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.aop.MethodInterceptorInvocationHandler;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.collections.ServiceTrackerCollections;
-import com.liferay.registry.collections.ServiceTrackerMap;
+import com.liferay.registry.Filter;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
+import com.liferay.registry.ServiceTracker;
+import com.liferay.registry.ServiceTrackerCustomizer;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.aopalliance.intercept.MethodInterceptor;
 
@@ -67,8 +73,8 @@ public class StoreFactory {
 
 		boolean found = false;
 
-		for (String key : _serviceTrackerMap.keySet()) {
-			Store storeEntry = _serviceTrackerMap.getService(key);
+		for (String key : _stores.keySet()) {
+			Store storeEntry = getStoreInstance(key);
 
 			String className = storeEntry.getClass().getName();
 
@@ -134,18 +140,18 @@ public class StoreFactory {
 	}
 
 	public Store getStoreInstance(String key) {
-		return _serviceTrackerMap.getService(key);
+		return _stores.get(key);
 	}
 
 	public String[] getStoreTypes() {
-		Set<String> keySet = _serviceTrackerMap.keySet();
+		Set<String> keySet = _stores.keySet();
 
 		String[] storesTypes = new String[keySet.size()];
 
 		int i = 0;
 
 		for (String key : keySet) {
-			Store store = _serviceTrackerMap.getService(key);
+			Store store = getStoreInstance(key);
 
 			storesTypes[i] = store.getType();
 
@@ -163,9 +169,21 @@ public class StoreFactory {
 		_store = store;
 	}
 
+	private StoreFactory() {
+		Registry registry = RegistryUtil.getRegistry();
+
+		Filter filter = registry.getFilter(
+			"(&(store.type=*)(objectClass=" + Store.class.getName() + "))");
+
+		_serviceTracker = registry.trackServices(
+			filter, new StoreServiceTrackerCustomizer());
+
+		_serviceTracker.open();
+	}
+
 	private Store _getStoreInstance() throws Exception {
 		if (_store == null) {
-			Set<String> keySet = _serviceTrackerMap.keySet();
+			Set<String> keySet = _stores.keySet();
 
 			for (String key : keySet) {
 				if (key.endsWith("FileSystemStore")) {
@@ -216,14 +234,55 @@ public class StoreFactory {
 
 	private static final Store _NULL_STORE = null;
 	private static Store _store;
+	private static Map<String, Store> _stores = new ConcurrentHashMap<>();
 	private static StoreFactory _instance;
 	private static boolean _warned;
 
-	private static final ServiceTrackerMap<String, Store> _serviceTrackerMap =
-		ServiceTrackerCollections.singleValueMap(Store.class, "store.type");
+	private final ServiceTracker<Store, Store> _serviceTracker;
 
-	static {
-		_serviceTrackerMap.open();
+	private class StoreServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer<Store, Store> {
+
+		@Override
+		public Store addingService(ServiceReference<Store> serviceReference) {
+			Registry registry = RegistryUtil.getRegistry();
+
+			Store store = registry.getService(serviceReference);
+
+			if (store == null) {
+				return null;
+			}
+
+			String storeType = store.getType();
+
+			if (_store == null || storeType.equals(PropsValues.DL_STORE_IMPL)) {
+				_store = store;
+			}
+
+			_stores.put(storeType, store);
+
+			return store;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<Store> serviceReference, Store service) {
+
+			if (service.getType().equals(_store.getType())) {
+				_store = service;
+			}
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<Store> serviceReference, Store service) {
+
+			_stores.remove(service.getType());
+
+			if (_store != null && _store.getType().equals(service.getType())) {
+				_store = null;
+			}
+		}
 	}
 
 }
