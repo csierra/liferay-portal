@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.plugin.Version;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -101,35 +102,8 @@ public class DBUpgrader {
 
 		CacheRegistryUtil.setActive(false);
 
-		// Check release
+		ReleaseLocalServiceUtil.getBuildNumberOrCreate();
 
-		int buildNumber = ReleaseLocalServiceUtil.getBuildNumberOrCreate();
-
-		if (buildNumber > ReleaseInfo.getParentBuildNumber()) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append("Attempting to deploy an older Liferay Portal version. ");
-			sb.append("Current build version is ");
-			sb.append(buildNumber);
-			sb.append(" and attempting to deploy version ");
-			sb.append(ReleaseInfo.getParentBuildNumber());
-			sb.append(".");
-
-			throw new IllegalStateException(sb.toString());
-		}
-		else if (buildNumber < ReleaseInfo.RELEASE_5_2_3_BUILD_NUMBER) {
-			String msg = "You must first upgrade to Liferay Portal 5.2.3";
-
-			System.out.println(msg);
-
-			throw new RuntimeException(msg);
-		}
-
-		// Upgrade
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Update build " + buildNumber);
-		}
 
 		_checkPermissionAlgorithm();
 		_checkReleaseState(_getReleaseState());
@@ -139,7 +113,7 @@ public class DBUpgrader {
 		}
 
 		try {
-			StartupHelperUtil.upgradeProcess(buildNumber);
+			// StartupHelperUtil.upgradeProcess(0);
 		}
 		catch (Exception e) {
 			_updateReleaseState(ReleaseConstants.STATE_UPGRADE_FAILURE);
@@ -212,7 +186,7 @@ public class DBUpgrader {
 		if (release == null) {
 			release = ReleaseLocalServiceUtil.addRelease(
 				ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME,
-				ReleaseInfo.getParentBuildNumber());
+				"CHANGE ME");
 		}
 
 		_checkReleaseState(release.getState());
@@ -236,9 +210,6 @@ public class DBUpgrader {
 
 		boolean newBuildNumber = false;
 
-		if (ReleaseInfo.getBuildNumber() > release.getBuildNumber()) {
-			newBuildNumber = true;
-		}
 
 		try {
 			StartupHelperUtil.verifyProcess(
@@ -275,7 +246,7 @@ public class DBUpgrader {
 		}
 
 		release = ReleaseLocalServiceUtil.updateRelease(
-			release.getReleaseId(), ReleaseInfo.getParentBuildNumber(),
+			release.getReleaseId(), "CHANGE ME",
 			ReleaseInfo.getBuildDate(), verified);
 
 		// Enable database caching after verify
