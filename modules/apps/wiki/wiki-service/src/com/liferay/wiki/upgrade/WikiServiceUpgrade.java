@@ -17,8 +17,6 @@ package com.liferay.wiki.upgrade;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
-import com.liferay.wiki.service.configuration.configurator.WikiServiceConfigurator;
 import com.liferay.wiki.upgrade.v1_0_0.UpgradeClassNames;
 import com.liferay.wiki.upgrade.v1_0_0.UpgradePortletId;
 import com.liferay.wiki.upgrade.v1_0_0.UpgradePortletPreferences;
@@ -38,14 +36,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = WikiServiceUpgrade.class)
 public class WikiServiceUpgrade {
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
-	@Reference(unbind = "-")
 	protected void setSettingsFactory(SettingsFactory settingsFactory) {
 		_settingsFactory = settingsFactory;
 	}
@@ -67,11 +57,8 @@ public class WikiServiceUpgrade {
 		upgradeProcesses.add(new UpgradePortletSettings(_settingsFactory));
 		upgradeProcesses.add(new UpgradeWikiPageResource());
 
-		_releaseLocalService.updateRelease(
-			"com.liferay.wiki.service", upgradeProcesses, 1, 1, false);
 	}
 
-	private ReleaseLocalService _releaseLocalService;
 	private SettingsFactory _settingsFactory;
 
 }

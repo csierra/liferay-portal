@@ -18,7 +18,6 @@ import com.liferay.polls.service.configuration.configurator.PollsServiceConfigur
 import com.liferay.polls.upgrade.v1_0_0.UpgradeClassNames;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 
 import java.util.ArrayList;
@@ -26,25 +25,12 @@ import java.util.List;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Miguel Pastor
  */
 @Component(immediate = true, service = PollsServiceUpgrade.class)
 public class PollsServiceUpgrade {
-
-	@Reference(unbind = "-")
-	protected void setPollsServiceConfigurator(
-		PollsServiceConfigurator pollsServiceConfigurator) {
-	}
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
 
 	@Activate
 	protected void upgrade() throws PortalException {
@@ -53,11 +39,6 @@ public class PollsServiceUpgrade {
 		upgradeProcesses.add(new UpgradePortletId());
 
 		upgradeProcesses.add(new UpgradeClassNames());
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.polls.service", upgradeProcesses, 1, 1, false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

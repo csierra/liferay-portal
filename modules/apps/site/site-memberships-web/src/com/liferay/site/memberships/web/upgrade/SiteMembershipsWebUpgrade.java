@@ -15,35 +15,17 @@
 package com.liferay.site.memberships.web.upgrade;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 import com.liferay.site.memberships.web.constants.SiteMembershipsPortletKeys;
 
-import java.util.Collections;
-
-import javax.servlet.ServletContext;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
 @Component(immediate = true, service = SiteMembershipsWebUpgrade.class)
 public class SiteMembershipsWebUpgrade {
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
-	@Reference(target = "(original.bean=*)", unbind = "-")
-	protected void setServletContext(ServletContext servletContext) {
-	}
 
 	@Activate
 	protected void upgrade() throws PortalException {
@@ -59,13 +41,6 @@ public class SiteMembershipsWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.site.memberships.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }
