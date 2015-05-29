@@ -25,7 +25,6 @@ import java.util.Collections;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
@@ -36,13 +35,6 @@ public class AssetCategoriesAdminWebUpgrade {
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
 	protected void setModuleServiceLifecycle(
 		ModuleServiceLifecycle moduleServiceLifecycle) {
-	}
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
 	}
 
 	@Activate
@@ -60,13 +52,6 @@ public class AssetCategoriesAdminWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.asset.categories.admin.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

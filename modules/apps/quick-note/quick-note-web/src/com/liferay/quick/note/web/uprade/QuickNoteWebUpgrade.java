@@ -17,7 +17,6 @@ package com.liferay.quick.note.web.uprade;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 import com.liferay.quick.note.web.constants.QuickNotePortletKeys;
 
@@ -39,13 +38,6 @@ public class QuickNoteWebUpgrade {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		UpgradePortletId upgradePortletId = new UpgradePortletId() {
@@ -58,13 +50,6 @@ public class QuickNoteWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.quick.note.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

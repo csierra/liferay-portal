@@ -39,13 +39,6 @@ public class CurrencyConverterWebUpgrade {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		UpgradePortletId upgradePortletId = new UpgradePortletId() {
@@ -60,13 +53,6 @@ public class CurrencyConverterWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.currency.converter.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

@@ -38,13 +38,6 @@ public class AssetTagsNavigationWebUpgrade {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		UpgradePortletId upgradePortletId = new UpgradePortletId() {
@@ -63,13 +56,6 @@ public class AssetTagsNavigationWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.asset.tags.navigation.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

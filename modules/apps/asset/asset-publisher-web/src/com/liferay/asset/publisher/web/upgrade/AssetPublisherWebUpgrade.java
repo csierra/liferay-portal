@@ -38,13 +38,6 @@ public class AssetPublisherWebUpgrade {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		UpgradePortletId upgradePortletId = new UpgradePortletId() {
@@ -71,13 +64,6 @@ public class AssetPublisherWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.asset.publisher.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }
