@@ -144,21 +144,21 @@ public class ReleaseManager {
 			upgradeProcess.upgrade();
 
 			_releaseLocalService.updateRelease(
-				componentName, Collections.<UpgradeProcess>emptyList(),
-				upgradeProcessInfo.to(), upgradeProcessInfo.from(), false);
+				componentName,
+				upgradeProcessInfo.getTo(), upgradeProcessInfo.getFrom());
 		}
 	}
 
 	protected String getBuildNumber(String componentName) {
 		Release release = _releaseLocalService.fetchRelease(componentName);
 
-		int buildNumber = 0;
+		String buildNumber = "0.0.0";
 
 		if (release != null) {
 			buildNumber = release.getBuildNumber();
 		}
 
-		return Integer.toString(buildNumber);
+		return buildNumber;
 	}
 
 	@Reference
