@@ -15,35 +15,17 @@
 package com.liferay.web.proxy.web.upgrade;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 import com.liferay.web.proxy.web.constants.WebProxyPortletKeys;
 
-import java.util.Collections;
-
-import javax.servlet.ServletContext;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Raymond Augé
  */
 @Component(immediate = true, service = WebProxyWebUpgrade.class)
 public class WebProxyWebUpgrade {
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
-	@Reference(target = "(original.bean=true)", unbind = "-")
-	protected void setServletContext(ServletContext servletContext) {
-	}
 
 	@Activate
 	protected void upgrade() throws PortalException {
@@ -57,13 +39,6 @@ public class WebProxyWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.web.proxy.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

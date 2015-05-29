@@ -16,34 +16,16 @@ package com.liferay.dynamic.data.lists.display.web.upgrade;
 
 import com.liferay.dynamic.data.lists.display.web.constants.DDLDisplayPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
-
-import java.util.Collections;
-
-import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marcellus Tavares
  */
 @Component(immediate = true, service = DDLDisplayWebUpgrade.class)
 public class DDLDisplayWebUpgrade {
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
-	@Reference(target = "(original.bean=*)", unbind = "-")
-	protected void setServletContext(ServletContext servletContext) {
-	}
 
 	@Activate
 	protected void upgrade() throws PortalException {
@@ -59,13 +41,6 @@ public class DDLDisplayWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.dynamic.data.lists.display.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 0,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

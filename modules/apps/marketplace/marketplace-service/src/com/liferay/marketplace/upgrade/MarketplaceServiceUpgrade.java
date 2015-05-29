@@ -58,9 +58,6 @@ public class MarketplaceServiceUpgrade {
 
 		upgradeProcesses.add(new UpgradeExpando());
 		upgradeProcesses.add(new UpgradeModule());
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.marketplace.service", upgradeProcesses, 1, 1, false);
 	}
 
 	private ReleaseLocalService _releaseLocalService;

@@ -14,36 +14,17 @@
 
 package com.liferay.hello.velocity.web.upgrade;
 
-import com.liferay.hello.velocity.web.portlet.HelloVelocityPortlet;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
-
-import java.util.Collections;
-
-import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Peter Fellwock
  */
 @Component(immediate = true, service = HelloVelocityWebUpgrade.class)
 public class HelloVelocityWebUpgrade {
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
-	@Reference(target = "(original.bean=true)", unbind = "-")
-	protected void setServletContext(ServletContext servletContext) {
-	}
 
 	@Activate
 	protected void upgrade() throws PortalException {
@@ -61,13 +42,6 @@ public class HelloVelocityWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			HelloVelocityPortlet.class.getName(),
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }
