@@ -14,28 +14,33 @@
 
 package com.liferay.portal.store.filesystem.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.documentlibrary.store.test.BaseStoreTestCase;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.runner.RunWith;
 
 /**
  * @author Vilmos Papp
  * @author Manuel de la Peña
  */
+@RunWith(Arquillian.class)
 public class AdvancedFileSystemStoreTest extends BaseStoreTestCase {
 
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(new LiferayIntegrationTestRule());
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			SynchronousDestinationTestRule.INSTANCE);
 
 	@Override
 	protected String getStoreType() {
-		return "advanced-filesystem";
+		return "com.liferay.portal.store.filesystem.AdvancedFileSystemStore";
 	}
 
 }
