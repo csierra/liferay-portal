@@ -15,11 +15,10 @@
 package com.liferay.portal.store.jcr.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.documentlibrary.store.test.BaseStoreTestCase;
-
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -35,10 +34,12 @@ public class JCRStoreTest extends BaseStoreTestCase {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			SynchronousDestinationTestRule.INSTANCE);
 
 	protected String getStoreType() {
-		return "jcr";
+		return "com.liferay.portal.store.jcr.JCRStore";
 	}
 
 }
