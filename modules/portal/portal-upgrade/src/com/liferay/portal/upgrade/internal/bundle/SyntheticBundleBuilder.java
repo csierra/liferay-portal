@@ -36,6 +36,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -48,20 +49,29 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true)
 public final class SyntheticBundleBuilder {
 
+	private ClassLoader _bundleClassLoader;
+
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		Bundle bundle = bundleContext.getBundle();
+
+		BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+
+		_bundleClassLoader = bundleWiring.getClassLoader();
+
 		List<Release> releases = _releaseLocalService.getReleases(
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		for (Release release : releases) {
 			try {
-				Bundle bundle = bundleContext.installBundle(
+				Bundle synthetic = bundleContext.installBundle(
 					"SyntheticBundle" + release.getServletContextName(),
 					buildBundle(release));
 
-				bundle.start();
+				synthetic.start();
 
-				_syntheticBundles.put(release.getServletContextName(), bundle);
+				_syntheticBundles.put(
+					release.getServletContextName(), synthetic);
 			}
 			catch (BundleException be) {
 				throw new RuntimeException(
@@ -92,13 +102,25 @@ public final class SyntheticBundleBuilder {
 		sb.append(release.getBuildNumber());
 		sb.append("\"");
 
-		JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
+		Thread thread = Thread.currentThread();
 
-		javaArchive.add(new StringAsset(sb.toString()), "META-INF/MANIFEST.MF");
+		ClassLoader contextClassLoader = thread.getContextClassLoader();
 
-		ZipExporter zipExporter = javaArchive.as(ZipExporter.class);
+		thread.setContextClassLoader(_bundleClassLoader);
 
-		return zipExporter.exportAsInputStream();
+		try {
+			JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
+
+			javaArchive.add(
+				new StringAsset(sb.toString()), "META-INF/MANIFEST.MF");
+
+			ZipExporter zipExporter = javaArchive.as(ZipExporter.class);
+
+			return zipExporter.exportAsInputStream();
+		}
+		finally {
+			thread.setContextClassLoader(contextClassLoader);
+		}
 	}
 
 	@Deactivate
