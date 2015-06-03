@@ -15,29 +15,29 @@
 package com.liferay.portal.store.cmis.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.test.ServiceTestUtil;
+import com.liferay.portal.store.cmis.test.activator.configuration.ConfigurationAdminBundleActivator;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.documentlibrary.store.test.BaseStoreTestCase;
 
 import java.util.Calendar;
 
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
@@ -47,20 +47,12 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class CMISStoreTest extends BaseStoreTestCase {
 
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		Assume.assumeTrue(
-			"Property \"" + PropsKeys.SESSION_STORE_PASSWORD +
-				"\" is not set to true",
-			GetterUtil.getBoolean(
-				PropsUtil.get(PropsKeys.SESSION_STORE_PASSWORD))
-			);
-		Assume.assumeTrue(
-			"Property \"" + PropsKeys.COMPANY_SECURITY_AUTH_TYPE +
-				"\" is not set to \"" + CompanyConstants.AUTH_TYPE_SN + "\"",
-			GetterUtil.getString(PropsKeys.COMPANY_SECURITY_AUTH_TYPE).equals(
-				CompanyConstants.AUTH_TYPE_SN));
-	}
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			SynchronousDestinationTestRule.INSTANCE);
 
 	@Before
 	@Override
@@ -81,21 +73,23 @@ public class CMISStoreTest extends BaseStoreTestCase {
 	protected User getCMISAdminUser() throws Exception {
 		User user = UserLocalServiceUtil.fetchUserByScreenName(
 			TestPropsValues.getCompanyId(),
-			PropsValues.DL_STORE_CMIS_CREDENTIALS_USERNAME);
+			ConfigurationAdminBundleActivator.STORE_CMIS_CREDENTIALS_USERNAME);
 
 		if (user != null) {
 			return user;
 		}
 
-		String password = PropsValues.DL_STORE_CMIS_CREDENTIALS_PASSWORD;
+		String password =
+			ConfigurationAdminBundleActivator.STORE_CMIS_CREDENTIALS_PASSWORD;
 		String emailAddress =
-			PropsValues.DL_STORE_CMIS_CREDENTIALS_USERNAME + "@liferay.com";
+			ConfigurationAdminBundleActivator.STORE_CMIS_CREDENTIALS_USERNAME +
+				"@liferay.com";
 
 		user = UserLocalServiceUtil.addUser(
 			TestPropsValues.getUserId(), TestPropsValues.getCompanyId(), false,
 			password, password, false,
-			PropsValues.DL_STORE_CMIS_CREDENTIALS_USERNAME, emailAddress, 0,
-			StringPool.BLANK, LocaleUtil.getDefault(),
+			ConfigurationAdminBundleActivator.STORE_CMIS_CREDENTIALS_USERNAME,
+			emailAddress, 0, StringPool.BLANK, LocaleUtil.getDefault(),
 			RandomTestUtil.randomString(), StringPool.BLANK,
 			RandomTestUtil.randomString(), 0, 0, true, Calendar.JANUARY, 1,
 			1970, StringPool.BLANK, new long[] {repositoryId},
@@ -112,7 +106,7 @@ public class CMISStoreTest extends BaseStoreTestCase {
 
 	@Override
 	protected String getStoreType() {
-		return "cmis";
+		return "com.liferay.portal.store.cmis.CMISStore";
 	}
 
 }
