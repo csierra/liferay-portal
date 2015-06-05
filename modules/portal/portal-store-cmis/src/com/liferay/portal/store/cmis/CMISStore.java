@@ -488,6 +488,11 @@ public class CMISStore extends BaseStore {
 		return (Folder)SessionHolder.session.getObject(objectId);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_systemRootDir = null;
+	}
+
 	protected void doGetFileNames(
 		List<String> fileNames, String dirName, Folder folder) {
 
@@ -511,11 +516,6 @@ public class CMISStore extends BaseStore {
 		else if (!Validator.isNull(dirName)) {
 			fileNames.add(dirName);
 		}
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_systemRootDir = null;
 	}
 
 	protected Folder getCompanyFolder(long companyId) {
@@ -686,14 +686,12 @@ public class CMISStore extends BaseStore {
 		activate(properties);
 	}
 
-	private Folder _systemRootDir;
-
 	private static volatile CMISConfiguration _cmisConfiguration;
-
 	private static OperationContext _operationContext;
-
 	private static final SessionFactory _sessionFactory =
 		SessionFactoryImpl.newInstance();
+
+	private Folder _systemRootDir;
 
 	private static class SessionHolder {
 

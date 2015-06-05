@@ -90,9 +90,6 @@ public class ConfigurationAdminBundleActivator implements BundleActivator {
 		return configurationAdmin.getConfiguration(configurationPid, null);
 	}
 
-	private Configuration _advancedFileSystemConfiguration;
-	private Configuration _fileSystemConfiguration;
-
 	private static final String _ADVANCED_FILE_SYSTEM_CONFIGURATION_PID =
 		"com.liferay.portal.store.filesystem.configuration." +
 			"AdvancedFileSystemConfiguration";
@@ -106,5 +103,8 @@ public class ConfigurationAdminBundleActivator implements BundleActivator {
 
 	private static final String _ROOT_DIR =
 		PropsUtil.get(PropsKeys.LIFERAY_HOME) + "/filesystem";
+
+	private Configuration _advancedFileSystemConfiguration;
+	private Configuration _fileSystemConfiguration;
 
 }
