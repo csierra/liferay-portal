@@ -184,8 +184,7 @@ public class ConvertDocumentLibraryTest {
 
 		Store store = _storeFactory.getStoreInstance();
 
-		Assert.assertEquals(
-			_dbStoreClassName, store.getClass().getName());
+		Assert.assertEquals(_dbStoreClassName, store.getClass().getName());
 	}
 
 	protected FileEntry addFileEntry(
@@ -309,16 +308,15 @@ public class ConvertDocumentLibraryTest {
 			dlFileEntry.getName());
 	}
 
-	private ConvertProcess _convertProcess;
+	private static final StoreFactory _storeFactory =
+		StoreFactory.getInstance();
 
+	private ConvertProcess _convertProcess;
 	private String _dbStoreClassName;
 
 	@DeleteAfterTestRun
 	private Group _group;
 
 	private Store _sourceStore;
-
-	private static final StoreFactory _storeFactory =
-		StoreFactory.getInstance();
 
 }

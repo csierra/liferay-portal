@@ -200,7 +200,7 @@ public class StoreFactory {
 
 		String storeType = _store.getType();
 
-		if (!(storeType.endsWith("DBStore"))) {
+		if (!storeType.endsWith("DBStore")) {
 			return _store;
 		}
 
@@ -230,12 +230,14 @@ public class StoreFactory {
 		return _store;
 	}
 
+	private static final Store _NULL_STORE = null;
+
 	private static final Log _log = LogFactoryUtil.getLog(StoreFactory.class);
 
-	private static final Store _NULL_STORE = null;
-	private static Store _store;
-	private static Map<String, Store> _stores = new ConcurrentHashMap<>();
 	private static StoreFactory _instance;
+
+	private static Store _store;
+	private static final Map<String, Store> _stores = new ConcurrentHashMap<>();
 	private static boolean _warned;
 
 	private final ServiceTracker<Store, Store> _serviceTracker;
@@ -255,7 +257,9 @@ public class StoreFactory {
 
 			String storeType = store.getType();
 
-			if (_store == null || storeType.equals(PropsValues.DL_STORE_IMPL)) {
+			if ((_store == null) ||
+				storeType.equals(PropsValues.DL_STORE_IMPL)) {
+
 				_store = store;
 			}
 
@@ -279,10 +283,13 @@ public class StoreFactory {
 
 			_stores.remove(service.getType());
 
-			if (_store != null && _store.getType().equals(service.getType())) {
+			if ((_store != null) &&
+				_store.getType().equals(service.getType())) {
+
 				_store = null;
 			}
 		}
+
 	}
 
 }
