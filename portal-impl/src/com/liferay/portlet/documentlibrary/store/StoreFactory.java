@@ -28,18 +28,16 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.aop.MethodInterceptorInvocationHandler;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
-import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
+import com.liferay.registry.collections.ServiceTrackerCollections;
+import com.liferay.registry.collections.ServiceTrackerMap;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.aopalliance.intercept.MethodInterceptor;
 
@@ -73,7 +71,7 @@ public class StoreFactory {
 
 		boolean found = false;
 
-		for (String key : _stores.keySet()) {
+		for (String key : _serviceTrackerMap.keySet()) {
 			Store storeEntry = getStoreInstance(key);
 
 			String className = storeEntry.getClass().getName();
@@ -114,6 +112,10 @@ public class StoreFactory {
 		_warned = true;
 	}
 
+	public void destroy() {
+		_serviceTrackerMap.close();
+	}
+
 	public Store getStoreInstance() {
 		if (_store == null) {
 			checkProperties();
@@ -140,25 +142,13 @@ public class StoreFactory {
 	}
 
 	public Store getStoreInstance(String key) {
-		return _stores.get(key);
+		return _serviceTrackerMap.getService(key);
 	}
 
 	public String[] getStoreTypes() {
-		Set<String> keySet = _stores.keySet();
+		Set<String> keySet = _serviceTrackerMap.keySet();
 
-		String[] storesTypes = new String[keySet.size()];
-
-		int i = 0;
-
-		for (String key : keySet) {
-			Store store = getStoreInstance(key);
-
-			storesTypes[i] = store.getType();
-
-			i++;
-		}
-
-		return storesTypes;
+		return keySet.toArray(new String[keySet.size()]);
 	}
 
 	public void setStoreInstance(Store store) {
@@ -170,20 +160,12 @@ public class StoreFactory {
 	}
 
 	private StoreFactory() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		Filter filter = registry.getFilter(
-			"(&(store.type=*)(objectClass=" + Store.class.getName() + "))");
-
-		_serviceTracker = registry.trackServices(
-			filter, new StoreServiceTrackerCustomizer());
-
-		_serviceTracker.open();
+		_serviceTrackerMap.open();
 	}
 
 	private Store _getStoreInstance() throws Exception {
 		if (_store == null) {
-			Set<String> keySet = _stores.keySet();
+			Set<String> keySet = _serviceTrackerMap.keySet();
 
 			for (String key : keySet) {
 				if (key.endsWith("FileSystemStore")) {
@@ -198,36 +180,43 @@ public class StoreFactory {
 			}
 		}
 
-		String storeType = _store.getType();
+		Class<? extends Store> clazz = _store.getClass();
+
+		String storeType = clazz.getName();
 
 		if (!storeType.endsWith("DBStore")) {
 			return _store;
 		}
 
+		_wrapDatabaseStore();
+
+		return _store;
+	}
+
+	private void _wrapDatabaseStore() {
 		DB db = DBFactoryUtil.getDB();
 
 		String dbType = db.getType();
 
-		if (dbType.equals(DB.TYPE_POSTGRESQL)) {
-			ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
-
-			MethodInterceptor transactionAdviceMethodInterceptor =
-				(MethodInterceptor)PortalBeanLocatorUtil.locate(
-					"transactionAdvice");
-
-			MethodInterceptor tempFileMethodInterceptor =
-				new TempFileMethodInterceptor();
-
-			List<MethodInterceptor> methodInterceptors = Arrays.asList(
-				transactionAdviceMethodInterceptor, tempFileMethodInterceptor);
-
-			_store = (Store)ProxyUtil.newProxyInstance(
-				classLoader, new Class<?>[] {Store.class},
-				new MethodInterceptorInvocationHandler(
-					_store, methodInterceptors));
+		if (!dbType.equals(DB.TYPE_POSTGRESQL)) {
+			return;
 		}
 
-		return _store;
+		ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
+
+		MethodInterceptor transactionAdviceMethodInterceptor =
+			(MethodInterceptor)PortalBeanLocatorUtil.locate(
+				"transactionAdvice");
+
+		MethodInterceptor tempFileMethodInterceptor =
+			new TempFileMethodInterceptor();
+
+		List<MethodInterceptor> methodInterceptors = Arrays.asList(
+			transactionAdviceMethodInterceptor, tempFileMethodInterceptor);
+
+		_store = (Store)ProxyUtil.newProxyInstance(
+			classLoader, new Class<?>[] {Store.class},
+			new MethodInterceptorInvocationHandler(_store, methodInterceptors));
 	}
 
 	private static final Store _NULL_STORE = null;
@@ -237,10 +226,11 @@ public class StoreFactory {
 	private static StoreFactory _instance;
 
 	private static Store _store;
-	private static final Map<String, Store> _stores = new ConcurrentHashMap<>();
 	private static boolean _warned;
 
-	private final ServiceTracker<Store, Store> _serviceTracker;
+	private final ServiceTrackerMap<String, Store> _serviceTrackerMap =
+		ServiceTrackerCollections.singleValueMap(
+			Store.class, "store.type", new StoreServiceTrackerCustomizer());
 
 	private class StoreServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<Store, Store> {
@@ -255,7 +245,9 @@ public class StoreFactory {
 				return null;
 			}
 
-			String storeType = store.getType();
+			Class<? extends Store> clazz = store.getClass();
+
+			String storeType = clazz.getName();
 
 			if ((_store == null) ||
 				storeType.equals(PropsValues.DL_STORE_IMPL)) {
@@ -263,17 +255,21 @@ public class StoreFactory {
 				_store = store;
 			}
 
-			_stores.put(storeType, store);
-
 			return store;
 		}
 
 		@Override
 		public void modifiedService(
-			ServiceReference<Store> serviceReference, Store service) {
+			ServiceReference<Store> serviceReference, Store store) {
 
-			if (service.getType().equals(_store.getType())) {
-				_store = service;
+			Class<? extends Store> clazz = _store.getClass();
+
+			String currentType = clazz.getName();
+
+			String type = (String)serviceReference.getProperty("store.type");
+
+			if (currentType.equals(type)) {
+				_store = store;
 			}
 		}
 
@@ -281,13 +277,19 @@ public class StoreFactory {
 		public void removedService(
 			ServiceReference<Store> serviceReference, Store service) {
 
-			_stores.remove(service.getType());
+			String type = (String)serviceReference.getProperty("store.type");
 
-			if ((_store != null) &&
-				_store.getType().equals(service.getType())) {
+			Class<? extends Store> clazz = _store.getClass();
 
+			String currentType = clazz.getName();
+
+			if ((_store != null) && currentType.equals(type)) {
 				_store = null;
 			}
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			registry.ungetService(serviceReference);
 		}
 
 	}
