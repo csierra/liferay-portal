@@ -221,12 +221,14 @@ public class StoreFactory {
 			new MethodInterceptorInvocationHandler(_store, methodInterceptors));
 	}
 
+	private static final Store _NULL_STORE = null;
+
 	private static final Log _log = LogFactoryUtil.getLog(StoreFactory.class);
 
-	private static final Store _NULL_STORE = null;
-	private static Store _store;
-	private static Map<String, Store> _stores = new ConcurrentHashMap<>();
 	private static StoreFactory _instance;
+
+	private static Store _store;
+	private static final Map<String, Store> _stores = new ConcurrentHashMap<>();
 	private static boolean _warned;
 
 	private final ServiceTrackerMap<String, Store> _serviceTrackerMap =
@@ -292,6 +294,7 @@ public class StoreFactory {
 
 			registry.ungetService(serviceReference);
 		}
+
 	}
 
 }
