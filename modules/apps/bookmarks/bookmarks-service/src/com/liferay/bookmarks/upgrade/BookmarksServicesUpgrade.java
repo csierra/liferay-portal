@@ -17,14 +17,12 @@ package com.liferay.bookmarks.upgrade;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeClassNames;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletId;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletSettings;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -32,15 +30,15 @@ import org.osgi.service.component.annotations.Reference;
  * @author Miguel Pastor
  */
 @Component(immediate = true, service = BookmarksServicesUpgrade.class)
-public class BookmarksServicesUpgrade {
+public class BookmarksServicesUpgrade extends UpgradeProcess {
 
 	@Reference(unbind = "-")
 	protected void setSettingsFactory(SettingsFactory settingsFactory) {
 		_settingsFactory = settingsFactory;
 	}
 
-	@Activate
-	protected void upgrade() throws PortalException {
+	@Override
+	public void upgrade() {
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
 
 		upgradeProcesses.add(new UpgradePortletId());

@@ -9,4 +9,5 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd"
 >
 	<osgi:reference id="liferayDataSource" availability="mandatory" interface="javax.sql.DataSource" filter="(&amp;(bean.id=liferayDataSource)(original.bean=true))" />
+	<osgi:reference id="serviceConfigurator" availability="mandatory" interface="com.liferay.portal.service.configuration.configurator.ServiceConfigurator" filter="" />
 </beans>

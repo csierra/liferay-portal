@@ -16,8 +16,8 @@ package com.liferay.bookmarks.verify;
 
 import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksFolder;
-import com.liferay.bookmarks.service.BookmarksEntryLocalServiceUtil;
-import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
+import com.liferay.bookmarks.service.BookmarksEntryLocalService;
+import com.liferay.bookmarks.service.BookmarksFolderLocalService;
 import com.liferay.bookmarks.upgrade.BookmarksServicesUpgrade;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -37,6 +37,9 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = BookmarksServiceVerifyProcess.class)
 public class BookmarksServiceVerifyProcess extends VerifyProcess {
 
+	private BookmarksFolderLocalService _bookmarksFolderLocalService;
+	private BookmarksEntryLocalService _bookmarksEntryLocalService;
+
 	@Activate
 	@Override
 	protected void doVerify() throws Exception {
@@ -52,7 +55,7 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 
 	protected void updateEntryAssets() throws Exception {
 		List<BookmarksEntry> entries =
-			BookmarksEntryLocalServiceUtil.getNoAssetEntries();
+			_bookmarksEntryLocalService.getNoAssetEntries();
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -61,7 +64,7 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 
 		for (BookmarksEntry entry : entries) {
 			try {
-				BookmarksEntryLocalServiceUtil.updateAsset(
+				_bookmarksEntryLocalService.updateAsset(
 					entry.getUserId(), entry, null, null, null);
 			}
 			catch (Exception e) {
@@ -80,7 +83,7 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 
 	protected void updateFolderAssets() throws Exception {
 		List<BookmarksFolder> folders =
-			BookmarksFolderLocalServiceUtil.getNoAssetFolders();
+			_bookmarksFolderLocalService.getNoAssetFolders();
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -89,7 +92,7 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 
 		for (BookmarksFolder folder : folders) {
 			try {
-				BookmarksFolderLocalServiceUtil.updateAsset(
+				_bookmarksFolderLocalService.updateAsset(
 					folder.getUserId(), folder, null, null, null);
 			}
 			catch (Exception e) {
@@ -110,8 +113,22 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 		long[] companyIds = PortalInstances.getCompanyIdsBySQL();
 
 		for (long companyId : companyIds) {
-			BookmarksFolderLocalServiceUtil.rebuildTree(companyId);
+			_bookmarksFolderLocalService.rebuildTree(companyId);
 		}
+	}
+
+	@Reference(unbind = "-")
+	public void setBookmarksEntryLocalService(
+		BookmarksEntryLocalService bookmarksEntryLocalService) {
+
+		_bookmarksEntryLocalService = bookmarksEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setBookmarksFolderLocalService(
+		BookmarksFolderLocalService bookmarksFolderLocalService) {
+
+		_bookmarksFolderLocalService = bookmarksFolderLocalService;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
