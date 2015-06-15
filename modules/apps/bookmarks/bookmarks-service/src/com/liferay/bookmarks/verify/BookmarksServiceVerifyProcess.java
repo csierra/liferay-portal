@@ -37,6 +37,9 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = BookmarksServiceVerifyProcess.class)
 public class BookmarksServiceVerifyProcess extends VerifyProcess {
 
+	private BookmarksFolderLocalService _bookmarksFolderLocalService;
+	private BookmarksEntryLocalService _bookmarksEntryLocalService;
+
 	@Activate
 	@Override
 	protected void doVerify() throws Exception {
@@ -126,6 +129,20 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 		for (long companyId : companyIds) {
 			_bookmarksFolderLocalService.rebuildTree(companyId);
 		}
+	}
+
+	@Reference(unbind = "-")
+	public void setBookmarksEntryLocalService(
+		BookmarksEntryLocalService bookmarksEntryLocalService) {
+
+		_bookmarksEntryLocalService = bookmarksEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setBookmarksFolderLocalService(
+		BookmarksFolderLocalService bookmarksFolderLocalService) {
+
+		_bookmarksFolderLocalService = bookmarksFolderLocalService;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

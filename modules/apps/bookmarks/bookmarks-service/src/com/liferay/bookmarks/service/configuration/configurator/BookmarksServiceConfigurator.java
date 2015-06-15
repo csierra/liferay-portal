@@ -56,7 +56,9 @@ public class BookmarksServiceConfigurator {
 		return new ModuleResourceLoader(bundle);
 	}
 
-	@Reference(unbind = "-")
+	@Reference(
+		target="(&(component.name=com.liferay.bookmarks)(release.build.number=1.0.0))",
+		unbind = "-")
 	protected void setServiceConfigurator(
 		ServiceConfigurator serviceConfigurator) {
 

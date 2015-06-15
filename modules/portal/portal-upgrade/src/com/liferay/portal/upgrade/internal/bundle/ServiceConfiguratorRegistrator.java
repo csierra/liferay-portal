@@ -22,12 +22,15 @@ import com.liferay.portal.service.ReleaseLocalService;
 
 import java.io.InputStream;
 
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -35,7 +38,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -47,9 +50,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Sierra Andrés
  */
 @Component(immediate = true)
-public final class SyntheticBundleBuilder {
+public final class ServiceConfiguratorRegistrator {
 
 	private ClassLoader _bundleClassLoader;
+	private ServiceConfigurator _serviceConfigurator;
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
@@ -63,21 +67,25 @@ public final class SyntheticBundleBuilder {
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		for (Release release : releases) {
-			try {
-				Bundle synthetic = bundleContext.installBundle(
-					"SyntheticBundle" + release.getServletContextName(),
-					buildBundle(release));
-
-				synthetic.start();
-
-				_syntheticBundles.put(
-					release.getServletContextName(), synthetic);
-			}
-			catch (BundleException be) {
-				throw new RuntimeException(
-					"Unable to activate the schema provider", be);
-			}
+			signalRelease(bundleContext, release);
 		}
+	}
+
+	private void signalRelease(BundleContext bundleContext, Release release) {
+		Dictionary<String, Object> properties = new Hashtable<>();
+
+		String servletContextName = release.getServletContextName();
+
+		properties.put("component.name", servletContextName);
+		properties.put("release.build.number", release.getBuildNumber());
+
+		ServiceRegistration<ServiceConfigurator> serviceRegistration =
+			bundleContext.registerService(
+				ServiceConfigurator.class,
+				_serviceConfigurator, properties);
+
+		_serviceConfiguratorRegistrations.put(
+			servletContextName, serviceRegistration);
 	}
 
 	protected InputStream buildBundle(Release release) {
@@ -125,14 +133,10 @@ public final class SyntheticBundleBuilder {
 
 	@Deactivate
 	protected void deactivate() {
-		for (Bundle bundle : _syntheticBundles.values()) {
-			try {
-				bundle.uninstall();
-			}
-			catch (BundleException be) {
-				throw new RuntimeException(
-					"Unable to deactivate the schema provider", be);
-			}
+		for (ServiceRegistration<ServiceConfigurator> serviceRegistration :
+			_serviceConfiguratorRegistrations.values()) {
+
+			serviceRegistration.unregister();
 		}
 	}
 
@@ -147,7 +151,16 @@ public final class SyntheticBundleBuilder {
 	protected void setServletContext(ServletContext servletContext) {
 	}
 
+	@Reference
+	protected void setServiceConfigurator(
+		ServiceConfigurator serviceConfigurator) {
+
+		_serviceConfigurator = serviceConfigurator;
+	}
+
 	private ReleaseLocalService _releaseLocalService;
-	private final Map<String, Bundle> _syntheticBundles = new HashMap<>();
+
+	private final Map<String, ServiceRegistration<ServiceConfigurator>>
+		_serviceConfiguratorRegistrations = new HashMap<>();
 
 }
