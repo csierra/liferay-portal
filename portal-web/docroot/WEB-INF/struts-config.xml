@@ -115,6 +115,8 @@
 			<forward name="portal.update_password" path="portal.update_password" />
 		</action>
 
+		<action path="/portal/update_portlet_title" type="com.liferay.portal.action.UpdatePortletTitleAction" />
+
 		<action path="/portal/update_reminder_query" type="com.liferay.portal.action.UpdateReminderQueryAction">
 			<forward name="portal.update_reminder_query" path="portal.update_reminder_query" />
 		</action>
@@ -160,11 +162,6 @@
 		<action path="/admin_server/edit_document_library_extra_settings" type="com.liferay.portal.convert.action.EditDocumentLibraryExtraSettingsAction">
 			<forward name="portlet.admin.edit_document_library_extra_settings" path="portlet.admin.edit_document_library_extra_settings" />
 			<forward name="portlet.admin.error" path="portlet.admin.error" />
-		</action>
-
-		<action path="/admin_server/edit_role_permissions" type="com.liferay.portlet.rolesadmin.action.EditRolePermissionsAction">
-			<forward name="portlet.roles_admin.edit_role_permissions" path="portlet.roles_admin.edit_role_permissions" />
-			<forward name="portlet.roles_admin.error" path="portlet.roles_admin.error" />
 		</action>
 
 		<action path="/admin_server/edit_server" type="com.liferay.portlet.admin.action.EditServerAction">
@@ -238,6 +235,7 @@
 		<action path="/blogs/view_entry" type="com.liferay.portlet.blogs.action.EditEntryAction">
 			<forward name="portlet.blogs.edit_entry" path="portlet.blogs.view_entry" />
 			<forward name="portlet.blogs.error" path="portlet.blogs.error" />
+			<forward name="portlet.blogs.view" path="portlet.blogs.view" />
 		</action>
 
 		<!-- Blogs Admin -->
@@ -264,6 +262,7 @@
 		<action path="/blogs_admin/view_entry" type="com.liferay.portlet.blogs.action.EditEntryAction">
 			<forward name="portlet.blogs.edit_entry" path="portlet.blogs.view_entry" />
 			<forward name="portlet.blogs.error" path="portlet.blogs.error" />
+			<forward name="portlet.blogs.view" path="portlet.blogs.view" />
 		</action>
 
 		<!-- Blogs Aggregator -->
@@ -782,6 +781,13 @@
 		<action path="/monitoring/view" forward="portlet.monitoring.view" />
 
 		<!-- My Account -->
+
+		<action path="/my_account/edit_user" type="com.liferay.portlet.myaccount.action.EditUserAction">
+			<forward name="portlet.users_admin.edit_user" path="portlet.users_admin.edit_user" />
+			<forward name="portlet.users_admin.error" path="portlet.users_admin.error" />
+		</action>
+
+		<action path="/my_account/edit_user_details" forward="portlet.users_admin.edit_user_details" />
 
 		<action path="/my_account/view" type="com.liferay.portlet.myaccount.action.ViewAction">
 			<forward name="portlet.my_account.edit_user" path="portlet.users_admin.edit_user" />
