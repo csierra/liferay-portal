@@ -16,9 +16,15 @@ package com.liferay.portal.store.s3.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.documentlibrary.store.test.BaseStoreTestCase;
 
+import org.junit.Assume;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -33,11 +39,25 @@ public class S3StoreTest extends BaseStoreTestCase {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			SynchronousDestinationTestRule.INSTANCE,
+			TransactionalTestRule.INSTANCE);
+
+	@BeforeClass
+	public static void setUpClass() {
+		String dlStoreImpl = PropsUtil.get(PropsKeys.DL_STORE_IMPL);
+
+		String s3StoreClassName = "com.liferay.portal.store.cmis.S3Store";
+
+		Assume.assumeTrue(
+			"Property '" + PropsKeys.DL_STORE_IMPL + "' must be equals to '" +
+				s3StoreClassName + "'", dlStoreImpl.equals(s3StoreClassName));
+	}
 
 	@Override
 	protected String getStoreType() {
-		return "s3";
+		return "com.liferay.portal.store.s3.S3Store";
 	}
 
 }
