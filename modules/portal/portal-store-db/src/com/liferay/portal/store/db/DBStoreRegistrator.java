@@ -64,6 +64,8 @@ public class DBStoreRegistrator {
 			return store;
 		}
 
+		DBStore dbStore = (DBStore)store;
+
 		ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
 
 		MethodInterceptor transactionAdviceMethodInterceptor =
@@ -76,9 +78,13 @@ public class DBStoreRegistrator {
 		List<MethodInterceptor> methodInterceptors = Arrays.asList(
 			transactionAdviceMethodInterceptor, tempFileMethodInterceptor);
 
-		return (Store) ProxyUtil.newProxyInstance(
+		store = (Store)ProxyUtil.newProxyInstance(
 			classLoader, new Class<?>[]{Store.class},
 			new MethodInterceptorInvocationHandler(store, methodInterceptors));
+
+		dbStore.setStoreProxy(store);
+
+		return dbStore;
 	}
 
 	@Deactivate
