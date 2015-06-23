@@ -22,11 +22,13 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
 
 import java.util.Set;
-
 
 /**
  * @author Brian Wing Shun Chan
@@ -129,11 +131,19 @@ public class StoreFactory {
 			_log.debug("Set " + ClassUtil.getClassName(store));
 		}
 
-		_store = store;
+		StoreWrapper storeWrapper = _serviceTracker.getService();
+
+		_store = storeWrapper.wrap(store);
 	}
 
 	private StoreFactory() {
 		_serviceTrackerMap.open();
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		_serviceTracker = registry.trackServices(StoreWrapper.class);
+
+		_serviceTracker.open();
 	}
 
 	private volatile Store _store = null;
@@ -143,6 +153,8 @@ public class StoreFactory {
 	private static StoreFactory _instance;
 
 	private static boolean _warned;
+
+	private ServiceTracker<StoreWrapper, StoreWrapper> _serviceTracker;
 
 	private final ServiceTrackerMap<String, Store> _serviceTrackerMap =
 		ServiceTrackerCollections.singleValueMap(Store.class, "store.type");
