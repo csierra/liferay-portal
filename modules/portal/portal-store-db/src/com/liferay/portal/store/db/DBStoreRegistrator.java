@@ -22,7 +22,13 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.spring.aop.MethodInterceptorInvocationHandler;
 import com.liferay.portlet.documentlibrary.store.Store;
 import com.liferay.portlet.documentlibrary.store.TempFileMethodInterceptor;
+
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
+
 import org.aopalliance.intercept.MethodInterceptor;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -30,18 +36,16 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-
 /**
  * @author Carlos Sierra Andrés
  */
 @Component(immediate = true)
 public class DBStoreRegistrator {
 
-	private ServiceRegistration<Store> _storeServiceRegistration;
-	private Store _dbStore;
+	@Reference
+	public void setDBStore(DBStore dbStore) {
+		_dbStore = dbStore;
+	}
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
@@ -53,6 +57,11 @@ public class DBStoreRegistrator {
 
 		_storeServiceRegistration = bundleContext.registerService(
 			Store.class, _dbStore, properties);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_storeServiceRegistration.unregister();
 	}
 
 	private Store _wrapDatabaseStore(Store store) {
@@ -69,7 +78,7 @@ public class DBStoreRegistrator {
 		ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
 
 		MethodInterceptor transactionAdviceMethodInterceptor =
-			(MethodInterceptor) PortalBeanLocatorUtil.locate(
+			(MethodInterceptor)PortalBeanLocatorUtil.locate(
 				"transactionAdvice");
 
 		MethodInterceptor tempFileMethodInterceptor =
@@ -79,7 +88,7 @@ public class DBStoreRegistrator {
 			transactionAdviceMethodInterceptor, tempFileMethodInterceptor);
 
 		store = (Store)ProxyUtil.newProxyInstance(
-			classLoader, new Class<?>[]{Store.class},
+			classLoader, new Class<?>[] {Store.class},
 			new MethodInterceptorInvocationHandler(store, methodInterceptors));
 
 		dbStore.setStoreProxy(store);
@@ -87,13 +96,7 @@ public class DBStoreRegistrator {
 		return dbStore;
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_storeServiceRegistration.unregister();
-	}
+	private Store _dbStore;
+	private ServiceRegistration<Store> _storeServiceRegistration;
 
-	@Reference
-	public void setDBStore(DBStore dbStore) {
-		_dbStore = dbStore;
-	}
 }
