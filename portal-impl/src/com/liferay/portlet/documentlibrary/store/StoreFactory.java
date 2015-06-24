@@ -133,7 +133,13 @@ public class StoreFactory {
 
 		StoreWrapper storeWrapper = _serviceTracker.getService();
 
-		_store = storeWrapper.wrap(store);
+		if (storeWrapper != null) {
+			_store = storeWrapper.wrap(store);
+
+			return;
+		}
+
+		_store = store;
 	}
 
 	private StoreFactory() {
