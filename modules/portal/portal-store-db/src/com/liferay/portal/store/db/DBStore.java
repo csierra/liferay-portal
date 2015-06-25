@@ -51,7 +51,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Shuyang Zhou
  * @author Tina Tian
  */
-@Component
+@Component(service = DBStore.class)
 public class DBStore extends BaseStore {
 
 	@Override
