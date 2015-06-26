@@ -16,7 +16,7 @@ package com.liferay.portal.upgrade.internal.graph;
 
 import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.upgrade.internal.UpgradeProcessInfo;
+import com.liferay.portal.upgrade.internal.UpgradeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,28 +34,28 @@ import org.jgrapht.graph.DefaultEdge;
 public class ReleaseGraphManager {
 
 	public ReleaseGraphManager(
-		final List<UpgradeProcessInfo> upgradeProcessInfos) {
+		final List<UpgradeInfo> upgradeInfos) {
 
 		_directedGraph = new DefaultDirectedGraph<>(
-			new UpgradeProcessEdgeFactory(upgradeProcessInfos));
+			new UpgradeProcessEdgeFactory(upgradeInfos));
 
-		for (UpgradeProcessInfo upgradeProcessInfo : upgradeProcessInfos) {
-			_directedGraph.addVertex(upgradeProcessInfo.getFrom());
-			_directedGraph.addVertex(upgradeProcessInfo.getTo());
+		for (UpgradeInfo upgradeInfo : upgradeInfos) {
+			_directedGraph.addVertex(upgradeInfo.getFrom());
+			_directedGraph.addVertex(upgradeInfo.getTo());
 
 			_directedGraph.addEdge(
-				upgradeProcessInfo.getFrom(), upgradeProcessInfo.getTo(),
-				new UpgradeProcessEdge(upgradeProcessInfo));
+				upgradeInfo.getFrom(), upgradeInfo.getTo(),
+				new UpgradeProcessEdge(upgradeInfo));
 		}
 	}
 
-	public List<UpgradeProcessInfo> getUpgradePath(String from) {
+	public List<UpgradeInfo> getUpgradePath(String from) {
 		String endNode = findEndNode();
 
 		return getUpgradePath(from, endNode);
 	}
 
-	public List<UpgradeProcessInfo> getUpgradePath(String from, String to) {
+	public List<UpgradeInfo> getUpgradePath(String from, String to) {
 		if (!_directedGraph.containsVertex(from)) {
 			throw new IllegalArgumentException(
 				"There is not an UpgradeProcess starting in " + from);
@@ -80,13 +80,13 @@ public class ReleaseGraphManager {
 
 		return ListUtil.toList(
 			pathEdgeList,
-			new Function<UpgradeProcessEdge, UpgradeProcessInfo>() {
+			new Function<UpgradeProcessEdge, UpgradeInfo>() {
 
 				@Override
-				public UpgradeProcessInfo apply(
+				public UpgradeInfo apply(
 					UpgradeProcessEdge upgradeProcessEdge) {
 
-					return upgradeProcessEdge._upgradeProcessInfo;
+					return upgradeProcessEdge._upgradeInfo;
 				}
 			});
 	}
@@ -122,15 +122,15 @@ public class ReleaseGraphManager {
 
 	private static class UpgradeProcessEdge extends DefaultEdge {
 
-		public UpgradeProcessEdge(UpgradeProcessInfo upgradeProcessInfo) {
-			_upgradeProcessInfo = upgradeProcessInfo;
+		public UpgradeProcessEdge(UpgradeInfo upgradeInfo) {
+			_upgradeInfo = upgradeInfo;
 		}
 
-		public UpgradeProcessInfo getUpgradeProcessInfo() {
-			return _upgradeProcessInfo;
+		public UpgradeInfo getUpgradeInfo() {
+			return _upgradeInfo;
 		}
 
-		private final UpgradeProcessInfo _upgradeProcessInfo;
+		private final UpgradeInfo _upgradeInfo;
 
 	}
 
@@ -138,28 +138,28 @@ public class ReleaseGraphManager {
 		implements EdgeFactory<String, UpgradeProcessEdge> {
 
 		public UpgradeProcessEdgeFactory(
-			List<UpgradeProcessInfo> upgradeProcessInfos) {
+			List<UpgradeInfo> upgradeInfos) {
 
-			_upgradeProcessInfos = upgradeProcessInfos;
+			_upgradeInfos = upgradeInfos;
 		}
 
 		@Override
 		public UpgradeProcessEdge createEdge(
 			String sourceVertex, String targetVertex) {
 
-			for (UpgradeProcessInfo upgradeProcessInfo : _upgradeProcessInfos) {
-				String from = upgradeProcessInfo.getFrom();
-				String to = upgradeProcessInfo.getTo();
+			for (UpgradeInfo upgradeInfo : _upgradeInfos) {
+				String from = upgradeInfo.getFrom();
+				String to = upgradeInfo.getTo();
 
 				if (from.equals(sourceVertex) && to.equals(targetVertex)) {
-					return new UpgradeProcessEdge(upgradeProcessInfo);
+					return new UpgradeProcessEdge(upgradeInfo);
 				}
 			}
 
 			return null;
 		}
 
-		private final List<UpgradeProcessInfo> _upgradeProcessInfos;
+		private final List<UpgradeInfo> _upgradeInfos;
 
 	}
 

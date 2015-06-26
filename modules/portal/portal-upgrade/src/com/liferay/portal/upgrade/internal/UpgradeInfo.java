@@ -14,22 +14,20 @@
 
 package com.liferay.portal.upgrade.internal;
 
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.upgrade.api.Upgrade;
 
 /**
  * @author Miguel Pastor
  * @author Carlos Sierra Andrés
  */
-public class UpgradeProcessInfo {
+public class UpgradeInfo {
 
-	public UpgradeProcessInfo(
-		String from, String to, UpgradeProcess upgradeProcess) {
-
-		_from = Integer.toString(transform(from));
-		_to = Integer.toString(transform(to));
-		_upgradeProcess = upgradeProcess;
+	public UpgradeInfo(String from, String to, Upgrade upgrade) {
+		_from = from;
+		_to = to;
+		_upgrade = upgrade;
 	}
 
 	public int from() {
@@ -44,8 +42,8 @@ public class UpgradeProcessInfo {
 		return _to;
 	}
 
-	public UpgradeProcess getUpgradeProcess() {
-		return _upgradeProcess;
+	public Upgrade getUpgrade() {
+		return _upgrade;
 	}
 
 	public int to() {
@@ -71,6 +69,6 @@ public class UpgradeProcessInfo {
 
 	private final String _from;
 	private final String _to;
-	private final UpgradeProcess _upgradeProcess;
+	private final Upgrade _upgrade;
 
 }
