@@ -14,9 +14,9 @@
 
 package com.liferay.portal.upgrade.internal;
 
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.upgrade.api.Upgrade;
 
 /**
  * @author Miguel Pastor
@@ -24,56 +24,51 @@ import com.liferay.portal.kernel.util.StringPool;
  */
 public class UpgradeInfo {
 
-	public UpgradeInfo(
-		String fromVersionString, String toVersionString,
-		UpgradeProcess upgradeProcess) {
-
-		_fromVersionString = fromVersionString;
-		_toVersionString = toVersionString;
-		_upgradeProcess = upgradeProcess;
+	public UpgradeInfo(String from, String to, Upgrade upgrade) {
+		_from = from;
+		_to = to;
+		_upgrade = upgrade;
 	}
 
-	public int getFromVersionInt() {
-		return toInt(_fromVersionString);
+	public int from() {
+		return transform(_from);
 	}
 
-	public String getFromVersionString() {
-		return _fromVersionString;
+	public String getFrom() {
+		return _from;
 	}
 
-	public int getToVersionInt() {
-		return toInt(_toVersionString);
+	public String getTo() {
+		return _to;
 	}
 
-	public String getToVersionString() {
-		return _toVersionString;
+	public Upgrade getUpgrade() {
+		return _upgrade;
 	}
 
-	public UpgradeProcess getUpgradeProcess() {
-		return _upgradeProcess;
+	public int to() {
+		return transform(_to);
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(7);
+		StringBundler sb = new StringBundler(5);
 
-		sb.append("{fromVersionString=");
-		sb.append(_fromVersionString);
-		sb.append(", toVersionString=");
-		sb.append(_toVersionString);
-		sb.append(", upgradeProcess=");
-		sb.append(_upgradeProcess);
-		sb.append("}");
+		sb.append("UpgradeProcessInfo { _from='");
+		sb.append(_from);
+		sb.append("', _to='");
+		sb.append(_to);
+		sb.append("'}");
 
 		return sb.toString();
 	}
 
-	protected int toInt(String s) {
+	protected int transform(String s) {
 		return Integer.parseInt(s.replace(StringPool.PERIOD, StringPool.BLANK));
 	}
 
-	private final String _fromVersionString;
-	private final String _toVersionString;
-	private final UpgradeProcess _upgradeProcess;
+	private final String _from;
+	private final String _to;
+	private final Upgrade _upgrade;
 
 }

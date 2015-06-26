@@ -22,8 +22,9 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
+import com.liferay.portal.upgrade.api.Upgrade;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
-import com.liferay.portal.upgrade.internal.UpgradeProcessInfo;
+import com.liferay.portal.upgrade.internal.UpgradeInfo;
 import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
 
 import java.util.Collections;
@@ -53,32 +54,34 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class ReleaseManager {
 
 	public void execute(String componentName) throws PortalException {
-		List<UpgradeProcessInfo> upgradeProcessInfos =
+		List<UpgradeInfo> upgradeInfos =
 			_serviceTrackerMap.getService(componentName);
 
 		String buildNumber = getBuildNumber(componentName);
 
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
-			upgradeProcessInfos);
+			upgradeInfos);
 
-		List<UpgradeProcessInfo> upgradePath =
+		List<UpgradeInfo> upgradePath =
 			releaseGraphManager.getUpgradePath(buildNumber);
 
 		executeUpgradePath(componentName, upgradePath);
+
+		UpgradeInfo upgradeInfo = upgradePath.get(upgradePath.size() - 1);
 	}
 
 	public void execute(String componentName, String to)
 		throws PortalException {
 
-		List<UpgradeProcessInfo> upgradeProcessInfos =
+		List<UpgradeInfo> upgradeInfos =
 			_serviceTrackerMap.getService(componentName);
 
 		String buildNumber = getBuildNumber(componentName);
 
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
-			upgradeProcessInfos);
+			upgradeInfos);
 
-		List<UpgradeProcessInfo> upgradePath =
+		List<UpgradeInfo> upgradePath =
 			releaseGraphManager.getUpgradePath(buildNumber, to);
 
 		executeUpgradePath(componentName, upgradePath);
@@ -91,13 +94,13 @@ public class ReleaseManager {
 	}
 
 	public void list(String componentName) {
-		List<UpgradeProcessInfo> upgradeProcesses =
+		List<UpgradeInfo> upgradeProcesses =
 			_serviceTrackerMap.getService(componentName);
 
 		System.out.println(
 			"Registered upgrade commands for component " + componentName);
 
-		for (UpgradeProcessInfo upgradeProcess : upgradeProcesses) {
+		for (UpgradeInfo upgradeProcess : upgradeProcesses) {
 			System.out.println(upgradeProcess);
 		}
 	}
@@ -107,20 +110,20 @@ public class ReleaseManager {
 		throws InvalidSyntaxException {
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
-			bundleContext, UpgradeProcess.class,
+			bundleContext, Upgrade.class,
 			"(" + UpgradeWhiteboardConstants.APPLICATION_NAME + "=*)",
-			new PropertyServiceReferenceMapper<String, UpgradeProcess>(
+			new PropertyServiceReferenceMapper<String, Upgrade>(
 				UpgradeWhiteboardConstants.APPLICATION_NAME),
-			new UpgradeProcessCustomizer(bundleContext),
+			new UpgradeCustomizer(bundleContext),
 			Collections.reverseOrder(
-				new PropertyServiceReferenceComparator<UpgradeProcess>(
+				new PropertyServiceReferenceComparator<Upgrade>(
 					UpgradeWhiteboardConstants.FROM)));
 
 		_serviceTrackerMap.open();
 	}
 
-	protected List<UpgradeProcessInfo> buildUpgradePath(
-		List<UpgradeProcessInfo> upgradeProcessesInfo, String from, String to) {
+	protected List<UpgradeInfo> buildUpgradePath(
+		List<UpgradeInfo> upgradeProcessesInfo, String from, String to) {
 
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			upgradeProcessesInfo);
@@ -134,18 +137,17 @@ public class ReleaseManager {
 	}
 
 	protected void executeUpgradePath(
-			String componentName, List<UpgradeProcessInfo> upgradeProcessInfos)
+			String componentName, List<UpgradeInfo> upgradeInfos)
 		throws PortalException {
 
-		for (UpgradeProcessInfo upgradeProcessInfo : upgradeProcessInfos) {
-			UpgradeProcess upgradeProcess =
-				upgradeProcessInfo.getUpgradeProcess();
+		for (UpgradeInfo upgradeInfo : upgradeInfos) {
+			Upgrade upgrade = upgradeInfo.getUpgrade();
 
-			upgradeProcess.upgrade();
+			upgrade.upgrade(new Upgrade.UpgradeContext());
 
 			_releaseLocalService.updateRelease(
 				componentName,
-				upgradeProcessInfo.getTo(), upgradeProcessInfo.getFrom());
+				upgradeInfo.getTo(), upgradeInfo.getFrom());
 		}
 	}
 
@@ -169,42 +171,41 @@ public class ReleaseManager {
 	}
 
 	private ReleaseLocalService _releaseLocalService;
-	private ServiceTrackerMap<String, List<UpgradeProcessInfo>>
+	private ServiceTrackerMap<String, List<UpgradeInfo>>
 		_serviceTrackerMap;
 
-	private static class UpgradeProcessCustomizer
-		implements
-			ServiceTrackerCustomizer<UpgradeProcess, UpgradeProcessInfo> {
+	private static class UpgradeCustomizer implements
+			ServiceTrackerCustomizer<Upgrade, UpgradeInfo> {
 
-		public UpgradeProcessCustomizer(BundleContext bundleContext) {
+		public UpgradeCustomizer(BundleContext bundleContext) {
 			_bundleContext = bundleContext;
 		}
 
 		@Override
-		public UpgradeProcessInfo addingService(
-			ServiceReference<UpgradeProcess> serviceReference) {
+		public UpgradeInfo addingService(
+			ServiceReference<Upgrade> serviceReference) {
 
 			String from = (String)serviceReference.getProperty(
 				UpgradeWhiteboardConstants.FROM);
 			String to = (String)serviceReference.getProperty(
 				UpgradeWhiteboardConstants.TO);
 
-			UpgradeProcess upgradeProcess = _bundleContext.getService(
+			Upgrade upgradeProcess = _bundleContext.getService(
 				serviceReference);
 
-			return new UpgradeProcessInfo(from, to, upgradeProcess);
+			return new UpgradeInfo(from, to, upgradeProcess);
 		}
 
 		@Override
 		public void modifiedService(
-			ServiceReference<UpgradeProcess> serviceReference,
-			UpgradeProcessInfo upgradeProcessInfo) {
+			ServiceReference<Upgrade> serviceReference,
+			UpgradeInfo upgradeInfo) {
 		}
 
 		@Override
 		public void removedService(
-			ServiceReference<UpgradeProcess> serviceReference,
-			UpgradeProcessInfo upgradeProcessInfo) {
+			ServiceReference<Upgrade> serviceReference,
+			UpgradeInfo upgradeInfo) {
 
 			_bundleContext.ungetService(serviceReference);
 		}

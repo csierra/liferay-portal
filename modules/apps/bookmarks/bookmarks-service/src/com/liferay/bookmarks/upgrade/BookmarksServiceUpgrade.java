@@ -19,23 +19,32 @@ import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeClassNames;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeLastPublishDate;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletId;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletSettings;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Activate;
+import com.liferay.portal.upgrade.api.Upgrade;
+import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
+ * @author Carlos Sierra Andrés
  * @author Miguel Pastor
  */
-@Component(immediate = true, service = BookmarksServiceUpgrade.class)
-public class BookmarksServiceUpgrade {
+@Component(
+	immediate = true,
+	property = {
+		UpgradeWhiteboardConstants.APPLICATION_NAME + "=bookmarks",
+		UpgradeWhiteboardConstants.FROM + "=0.0.1",
+		UpgradeWhiteboardConstants.TO + "=1.0.0",
+	},
+	service = Upgrade.class)
+public class BookmarksServicesUpgrade implements Upgrade {
 
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
 	protected void setModuleServiceLifecycle(
@@ -47,8 +56,8 @@ public class BookmarksServiceUpgrade {
 		_settingsFactory = settingsFactory;
 	}
 
-	@Activate
-	protected void upgrade() throws PortalException {
+	@Override
+	public void upgrade(UpgradeContext upgradeContext) throws UpgradeException {
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
 
 		upgradeProcesses.add(new UpgradePortletId());
@@ -56,8 +65,11 @@ public class BookmarksServiceUpgrade {
 		upgradeProcesses.add(new UpgradeClassNames());
 		upgradeProcesses.add(new UpgradeLastPublishDate());
 		upgradeProcesses.add(new UpgradePortletSettings(_settingsFactory));
+
+		for (UpgradeProcess upgradeProcess : upgradeProcesses) {
+			upgradeProcess.upgrade();
+		}
 	}
 
 	private SettingsFactory _settingsFactory;
-
 }
