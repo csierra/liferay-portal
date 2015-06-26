@@ -4,7 +4,7 @@
 	<osgi:reference id="com.liferay.portal.kernel.settings.SettingsFactory" availability="mandatory" interface="com.liferay.portal.kernel.settings.SettingsFactory" />
 	<osgi:reference
 		availability="mandatory"
-		filter="(&amp;(component.name=com.liferay.bookmarks)(release.build.number=1.0.0))"
+		filter="(&amp;(component.name=bookmarks)(release.build.number=1.0.0))"
 		id="serviceConfigurator"
 		interface="com.liferay.portal.service.configuration.configurator.ServiceConfigurator" timeout="0"/>
 </beans>
