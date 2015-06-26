@@ -18,19 +18,30 @@ import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeClassNames;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletId;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletSettings;
 import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.liferay.portal.upgrade.api.Upgrade;
+import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
+ * @author Carxlos Sierra Andrés
  * @author Miguel Pastor
  */
-@Component(immediate = true, service = BookmarksServicesUpgrade.class)
-public class BookmarksServicesUpgrade extends UpgradeProcess {
+@Component(
+	immediate = true,
+	property = {
+		UpgradeWhiteboardConstants.APPLICATION_NAME + "=bookmarks",
+		UpgradeWhiteboardConstants.FROM + "=0.0.1",
+		UpgradeWhiteboardConstants.TO + "=1.0.0",
+	},
+	service = Upgrade.class)
+public class BookmarksServicesUpgrade implements Upgrade {
 
 	@Reference(unbind = "-")
 	protected void setSettingsFactory(SettingsFactory settingsFactory) {
@@ -38,15 +49,18 @@ public class BookmarksServicesUpgrade extends UpgradeProcess {
 	}
 
 	@Override
-	public void upgrade() {
+	public void upgrade(UpgradeContext upgradeContext) throws UpgradeException {
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
 
 		upgradeProcesses.add(new UpgradePortletId());
 
 		upgradeProcesses.add(new UpgradeClassNames());
 		upgradeProcesses.add(new UpgradePortletSettings(_settingsFactory));
+
+		for (UpgradeProcess upgradeProcess : upgradeProcesses) {
+			upgradeProcess.upgrade();
+		}
 	}
 
 	private SettingsFactory _settingsFactory;
-
 }
