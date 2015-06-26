@@ -49,14 +49,16 @@ import org.osgi.service.component.annotations.Reference;
  * @author Miguel Pastor
  * @author Carlos Sierra Andrés
  */
-@Component(immediate = true)
+@Component(immediate = true, service = ServiceConfiguratorRegistrator.class)
 public final class ServiceConfiguratorRegistrator {
 
 	private ClassLoader _bundleClassLoader;
 	private ServiceConfigurator _serviceConfigurator;
+	private BundleContext _bundleContext;
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
 		Bundle bundle = bundleContext.getBundle();
 
 		BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
@@ -67,20 +69,27 @@ public final class ServiceConfiguratorRegistrator {
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		for (Release release : releases) {
-			signalRelease(bundleContext, release);
+			signalRelease(release);
 		}
 	}
 
-	private void signalRelease(BundleContext bundleContext, Release release) {
+	public void signalRelease(Release release) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 
 		String servletContextName = release.getServletContextName();
+
+		ServiceRegistration<ServiceConfigurator> oldServiceRegistration =
+			_serviceConfiguratorRegistrations.get(servletContextName);
+
+		if (oldServiceRegistration != null) {
+			oldServiceRegistration.unregister();
+		}
 
 		properties.put("component.name", servletContextName);
 		properties.put("release.build.number", release.getBuildNumber());
 
 		ServiceRegistration<ServiceConfigurator> serviceRegistration =
-			bundleContext.registerService(
+			_bundleContext.registerService(
 				ServiceConfigurator.class,
 				_serviceConfigurator, properties);
 
