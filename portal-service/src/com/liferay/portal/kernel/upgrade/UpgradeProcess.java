@@ -197,7 +197,6 @@ public abstract class UpgradeProcess extends BaseDBProcess {
 
 	protected boolean doHasTable(String tableName) throws Exception {
 		Connection con = null;
-		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
@@ -212,7 +211,7 @@ public abstract class UpgradeProcess extends BaseDBProcess {
 			}
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(con, null, rs);
 		}
 
 		return false;
