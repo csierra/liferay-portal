@@ -27,6 +27,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 /**
  * @author Miguel Pastor
  */
@@ -53,7 +56,17 @@ public class BookmarksServiceConfigurator {
 	protected ServiceComponentConfiguration getConfiguration() {
 		Bundle bundle = FrameworkUtil.getBundle(getClass());
 
-		return new ModuleResourceLoader(bundle);
+		return new ModuleResourceLoader(bundle) {
+			@Override
+			public InputStream getSQLIndexesInputStream() {
+				return new ByteArrayInputStream(new byte[0]);
+			}
+
+			@Override
+			public InputStream getSQLTablesInputStream() {
+				return new ByteArrayInputStream(new byte[0]);
+			}
+		};
 	}
 
 	@Reference(
