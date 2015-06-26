@@ -25,6 +25,7 @@ import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.api.Upgrade;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 import com.liferay.portal.upgrade.internal.UpgradeInfo;
+import com.liferay.portal.upgrade.internal.bundle.ServiceConfiguratorRegistrator;
 import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
 
 import java.util.Collections;
@@ -52,6 +53,8 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 	service = Object.class
 )
 public class ReleaseManager {
+
+	private ServiceConfiguratorRegistrator _serviceConfiguratorRegistrator;
 
 	public void execute(String componentName) throws PortalException {
 		List<UpgradeInfo> upgradeInfos =
@@ -149,6 +152,12 @@ public class ReleaseManager {
 				componentName,
 				upgradeInfo.getTo(), upgradeInfo.getFrom());
 		}
+
+		Release release = _releaseLocalService.fetchRelease(componentName);
+
+		if (release != null) {
+			_serviceConfiguratorRegistrator.signalRelease(release);
+		}
 	}
 
 	protected String getBuildNumber(String componentName) {
@@ -214,4 +223,11 @@ public class ReleaseManager {
 
 	}
 
+
+	@Reference
+	public void setServiceConfiguratorRegistrator(
+		ServiceConfiguratorRegistrator serviceConfiguratorRegistrator) {
+
+		_serviceConfiguratorRegistrator = serviceConfiguratorRegistrator;
+	}
 }
