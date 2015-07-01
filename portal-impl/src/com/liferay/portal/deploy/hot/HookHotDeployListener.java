@@ -1709,12 +1709,9 @@ public class HookHotDeployListener
 			String storeClassName = portalProperties.getProperty(
 				PropsKeys.DL_STORE_IMPL);
 
-			Store store = (Store)newInstance(
-				portletClassLoader, Store.class, storeClassName);
-
 			StoreFactory storeFactory = StoreFactory.getInstance();
 
-			storeFactory.setStoreInstance(store);
+			storeFactory.setStoreInstance(storeClassName);
 		}
 
 		if (portalProperties.containsKey(
