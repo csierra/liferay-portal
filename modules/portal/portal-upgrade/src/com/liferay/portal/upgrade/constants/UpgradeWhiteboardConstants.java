@@ -22,6 +22,8 @@ public interface UpgradeWhiteboardConstants {
 
 	public String APPLICATION_NAME = "application.name";
 
+	public String DATABASE = "database";
+
 	public String FROM = "from";
 
 	public String TO = "to";
