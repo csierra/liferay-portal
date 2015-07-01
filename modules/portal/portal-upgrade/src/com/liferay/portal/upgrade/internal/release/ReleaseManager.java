@@ -18,6 +18,7 @@ import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceComparator;
 import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
+import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.model.Release;
@@ -114,7 +115,10 @@ public class ReleaseManager {
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
 			bundleContext, Upgrade.class,
-			"(" + UpgradeWhiteboardConstants.APPLICATION_NAME + "=*)",
+			"(|(&(" + UpgradeWhiteboardConstants.APPLICATION_NAME + "=*)(!(" + UpgradeWhiteboardConstants.DATABASE + "=*)))" +
+				"(&(" + UpgradeWhiteboardConstants.DATABASE + "=" +
+					DBFactoryUtil.getDB().getType()+ ")("
+					+ UpgradeWhiteboardConstants.APPLICATION_NAME + "=*)))",
 			new PropertyServiceReferenceMapper<String, Upgrade>(
 				UpgradeWhiteboardConstants.APPLICATION_NAME),
 			new UpgradeCustomizer(bundleContext),
