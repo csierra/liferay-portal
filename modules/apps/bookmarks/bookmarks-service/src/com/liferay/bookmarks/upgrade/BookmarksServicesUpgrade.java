@@ -30,15 +30,16 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Carxlos Sierra Andrés
+ * @author Carlos Sierra Andrés
  * @author Miguel Pastor
  */
 @Component(
 	immediate = true,
 	property = {
+		UpgradeWhiteboardConstants.ALL_DATABASES_PROPERTY,
 		UpgradeWhiteboardConstants.APPLICATION_NAME + "=bookmarks",
 		UpgradeWhiteboardConstants.FROM + "=0.0.1",
-		UpgradeWhiteboardConstants.TO + "=1.0.0",
+		UpgradeWhiteboardConstants.TO + "=1.0.0"
 	},
 	service = Upgrade.class)
 public class BookmarksServicesUpgrade implements Upgrade {
