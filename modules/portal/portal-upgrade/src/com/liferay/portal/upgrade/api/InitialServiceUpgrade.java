@@ -65,6 +65,9 @@ public class InitialServiceUpgrade implements Upgrade {
 
 		properties.put(
 			UpgradeWhiteboardConstants.APPLICATION_NAME, applicationName);
+		properties.put(
+			UpgradeWhiteboardConstants.DATABASE,
+			UpgradeWhiteboardConstants.ALL_DATABASES);
 		properties.put(UpgradeWhiteboardConstants.FROM, "0.0.0");
 		properties.put(UpgradeWhiteboardConstants.TO, to);
 
