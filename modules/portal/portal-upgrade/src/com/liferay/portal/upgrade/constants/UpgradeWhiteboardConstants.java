@@ -22,7 +22,11 @@ public interface UpgradeWhiteboardConstants {
 
 	public String APPLICATION_NAME = "application.name";
 
+	public String ALL_DATABASES = "ALL";
+
 	public String DATABASE = "database";
+
+	public String ALL_DATABASES_PROPERTY = DATABASE + "=" + ALL_DATABASES;
 
 	public String FROM = "from";
 

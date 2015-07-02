@@ -37,9 +37,10 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
+		UpgradeWhiteboardConstants.ALL_DATABASES_PROPERTY,
 		UpgradeWhiteboardConstants.APPLICATION_NAME + "=bookmarks",
 		UpgradeWhiteboardConstants.FROM + "=0.0.1",
-		UpgradeWhiteboardConstants.TO + "=1.0.0",
+		UpgradeWhiteboardConstants.TO + "=1.0.0"
 	},
 	service = Upgrade.class)
 public class BookmarksServicesUpgrade implements Upgrade {

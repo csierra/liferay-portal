@@ -115,10 +115,11 @@ public class ReleaseManager {
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
 			bundleContext, Upgrade.class,
-			"(|(&(" + UpgradeWhiteboardConstants.APPLICATION_NAME + "=*)(!(" + UpgradeWhiteboardConstants.DATABASE + "=*)))" +
-				"(&(" + UpgradeWhiteboardConstants.DATABASE + "=" +
-					DBFactoryUtil.getDB().getType()+ ")("
-					+ UpgradeWhiteboardConstants.APPLICATION_NAME + "=*)))",
+				"(&(" + UpgradeWhiteboardConstants.APPLICATION_NAME +
+					"=*)(|(database=" +
+						UpgradeWhiteboardConstants.ALL_DATABASES +
+							")(database=" + DBFactoryUtil.getDB().getType() +
+								")))",
 			new PropertyServiceReferenceMapper<String, Upgrade>(
 				UpgradeWhiteboardConstants.APPLICATION_NAME),
 			new UpgradeCustomizer(bundleContext),
