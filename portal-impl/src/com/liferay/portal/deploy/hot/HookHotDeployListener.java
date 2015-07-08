@@ -126,13 +126,13 @@ import com.liferay.portlet.ControlPanelEntry;
 import com.liferay.portlet.documentlibrary.antivirus.AntivirusScanner;
 import com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerUtil;
 import com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerWrapper;
-import com.liferay.portlet.documentlibrary.store.Store;
 import com.liferay.portlet.documentlibrary.store.StoreFactory;
 import com.liferay.portlet.documentlibrary.util.DLProcessor;
 import com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
+import com.liferay.taglib.FileAvailabilityUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -476,7 +476,9 @@ public class HookHotDeployListener
 		}
 
 		if (portalProperties.containsKey(PropsKeys.DL_STORE_IMPL)) {
-			StoreFactory.setInstance(null);
+			StoreFactory storeFactory = StoreFactory.getInstance();
+
+			storeFactory.setStoreInstance(null);
 		}
 
 		Set<String> liferayFilterClassNames =
@@ -593,6 +595,7 @@ public class HookHotDeployListener
 		registerClpMessageListeners(servletContext, portletClassLoader);
 
 		DirectServletRegistryUtil.clearServlets();
+		FileAvailabilityUtil.clearAvailabilities();
 
 		if (_log.isInfoEnabled()) {
 			_log.info(
@@ -1707,10 +1710,9 @@ public class HookHotDeployListener
 			String storeClassName = portalProperties.getProperty(
 				PropsKeys.DL_STORE_IMPL);
 
-			Store store = (Store)newInstance(
-				portletClassLoader, Store.class, storeClassName);
+			StoreFactory storeFactory = StoreFactory.getInstance();
 
-			StoreFactory.setInstance(store);
+			storeFactory.setStoreInstance(storeClassName);
 		}
 
 		if (portalProperties.containsKey(

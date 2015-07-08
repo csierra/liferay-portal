@@ -48,7 +48,7 @@
 		<dirset dir="apps/site-navigation" includes="*" />
 		<dirset dir="apps/social" excludes="social-networking-*" includes="*" />
 		<dirset dir="apps/social-office" includes="*" />
-		<dirset dir="apps/staging-bar" includes="*" />
+		<dirset dir="apps/staging" includes="*" />
 		<dirset dir="apps/translator" includes="*" />
 		<dirset dir="apps/trash" includes="*" />
 		<dirset dir="apps/unit-converter" includes="*" />
@@ -59,7 +59,7 @@
 		<dirset dir="apps/xsl-content" includes="*" />
 		<dirset dir="core" includes="*" />
 		<dirset dir="frontend" includes="*" />
-		<dirset dir="portal" excludes="portal-search-solr,portal-taglib-aui-form-extension-sample" includes="*" />
+		<dirset dir="portal" excludes="portal-cache-memory,portal-search-solr,portal-taglib-aui-form-extension-sample" includes="*" />
 		<dirset dir="portal-security" includes="*" />
 		<dirset dir="util" includes="pmd,portal-tools-sample-sql-builder,sass-compiler-jni" />
 	</path>

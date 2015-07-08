@@ -21,6 +21,7 @@ import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.service.DDLRecordService;
 import com.liferay.dynamic.data.lists.service.DDLRecordSetService;
 import com.liferay.dynamic.data.lists.web.constants.DDLPortletKeys;
+import com.liferay.portal.PortletPreferencesException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -116,6 +117,9 @@ public class DDLDisplayPortlet extends MVCPortlet {
 		if (SessionErrors.contains(
 				renderRequest, NoSuchRecordSetException.class.getName()) ||
 			SessionErrors.contains(
+				renderRequest,
+				PortletPreferencesException.MustBeStrict.class.getName()) ||
+			SessionErrors.contains(
 				renderRequest, PrincipalException.getNestedClasses())) {
 
 			include(templatePath + "error.jsp", renderRequest, renderResponse);
@@ -128,6 +132,7 @@ public class DDLDisplayPortlet extends MVCPortlet {
 	@Override
 	protected boolean isSessionErrorException(Throwable cause) {
 		if (cause instanceof NoSuchRecordSetException ||
+			cause instanceof PortletPreferencesException ||
 			cause instanceof PrincipalException) {
 
 			return true;

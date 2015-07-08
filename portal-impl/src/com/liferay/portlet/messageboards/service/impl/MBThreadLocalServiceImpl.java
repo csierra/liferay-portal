@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.social.SocialActivityManagerUtil;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -224,8 +225,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				MBCategory category = mbCategoryPersistence.findByPrimaryKey(
 					thread.getCategoryId());
 
-				MBUtil.updateCategoryStatistics(
-					category.getCompanyId(), category.getCategoryId());
+				MBUtil.updateCategoryStatistics(category.getCategoryId());
 			}
 			catch (NoSuchCategoryException nsce) {
 				if (!thread.isInTrash()) {
@@ -772,13 +772,11 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		// Category
 
 		if ((oldCategory != null) && (categoryId != oldCategoryId)) {
-			MBUtil.updateCategoryStatistics(
-				oldCategory.getCompanyId(), oldCategory.getCategoryId());
+			MBUtil.updateCategoryStatistics(oldCategory.getCategoryId());
 		}
 
 		if ((category != null) && (categoryId != oldCategoryId)) {
-			MBUtil.updateCategoryStatistics(
-				category.getCompanyId(), category.getCategoryId());
+			MBUtil.updateCategoryStatistics(category.getCategoryId());
 		}
 
 		// Indexer
@@ -895,9 +893,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		extraDataJSONObject.put("rootMessageId", thread.getRootMessageId());
 		extraDataJSONObject.put("title", message.getSubject());
 
-		socialActivityLocalService.addActivity(
-			userId, thread.getGroupId(), MBThread.class.getName(),
-			thread.getThreadId(), SocialActivityConstants.TYPE_MOVE_TO_TRASH,
+		SocialActivityManagerUtil.addActivity(
+			userId, thread, SocialActivityConstants.TYPE_MOVE_TO_TRASH,
 			extraDataJSONObject.toString(), 0);
 
 		return thread;
@@ -1013,10 +1010,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		extraDataJSONObject.put("rootMessageId", thread.getRootMessageId());
 		extraDataJSONObject.put("title", message.getSubject());
 
-		socialActivityLocalService.addActivity(
-			userId, thread.getGroupId(), MBThread.class.getName(),
-			thread.getThreadId(),
-			SocialActivityConstants.TYPE_RESTORE_FROM_TRASH,
+		SocialActivityManagerUtil.addActivity(
+			userId, thread, SocialActivityConstants.TYPE_RESTORE_FROM_TRASH,
 			extraDataJSONObject.toString(), 0);
 	}
 
@@ -1155,13 +1150,11 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		// Update new thread
 
-		MBUtil.updateThreadMessageCount(
-			thread.getCompanyId(), thread.getThreadId());
+		MBUtil.updateThreadMessageCount(thread.getThreadId());
 
 		// Update old thread
 
-		MBUtil.updateThreadMessageCount(
-			oldThread.getCompanyId(), oldThread.getThreadId());
+		MBUtil.updateThreadMessageCount(oldThread.getThreadId());
 
 		// Category
 
@@ -1170,8 +1163,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			(message.getCategoryId() !=
 				MBCategoryConstants.DISCUSSION_CATEGORY_ID)) {
 
-			MBUtil.updateCategoryThreadCount(
-				category.getCompanyId(), category.getCategoryId());
+			MBUtil.updateCategoryThreadCount(category.getCategoryId());
 		}
 
 		// Indexer
@@ -1184,6 +1176,22 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		indexer.reindex(message.getThread());
 
 		return thread;
+	}
+
+	@Override
+	public MBThread updateMessageCount(long threadId) {
+		MBThread mbThread = mbThreadPersistence.fetchByPrimaryKey(threadId);
+
+		if (mbThread == null) {
+			return null;
+		}
+
+		int messageCount = mbMessageLocalService.getThreadMessagesCount(
+			threadId, WorkflowConstants.STATUS_APPROVED);
+
+		mbThread.setMessageCount(messageCount);
+
+		return mbThreadPersistence.update(mbThread);
 	}
 
 	@Override
@@ -1236,8 +1244,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				thread.getCategoryId());
 
 			if (category != null) {
-				MBUtil.updateCategoryStatistics(
-					category.getCompanyId(), category.getCategoryId());
+				MBUtil.updateCategoryStatistics(category.getCategoryId());
 			}
 		}
 
