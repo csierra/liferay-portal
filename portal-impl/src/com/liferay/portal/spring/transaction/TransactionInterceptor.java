@@ -48,6 +48,17 @@ public class TransactionInterceptor implements MethodInterceptor {
 			transactionAttributeSource.getTransactionAttribute(
 				method, targetClass);
 
+		if (transactionModeProvider.isReadOnly()) {
+			transactionAttribute = new TransactionAttributeWrapper(
+				transactionAttribute) {
+
+				@Override
+				public boolean isReadOnly() {
+					return true;
+				}
+			};
+		}
+
 		if (transactionAttribute == null) {
 			return methodInvocation.proceed();
 		}
@@ -85,8 +96,56 @@ public class TransactionInterceptor implements MethodInterceptor {
 		setPlatformTransactionManager(platformTransactionManager);
 	}
 
+	public void setTransactionModeProvider(
+		TransactionModeProvider transactionModeProvider) {
+
+		this.transactionModeProvider = transactionModeProvider;
+	}
+
 	protected PlatformTransactionManager platformTransactionManager;
 	protected TransactionAttributeSource transactionAttributeSource;
 	protected TransactionExecutor transactionExecutor;
+
+	protected TransactionModeProvider transactionModeProvider;
+
+	private class TransactionAttributeWrapper implements TransactionAttribute {
+
+		public TransactionAttributeWrapper(
+			TransactionAttribute transactionAttribute) {
+
+			_transactionAttribute = transactionAttribute;
+		}
+
+		public int getIsolationLevel() {
+			return _transactionAttribute.getIsolationLevel();
+		}
+
+		public String getName() {
+			return _transactionAttribute.getName();
+		}
+
+		public int getPropagationBehavior() {
+			return _transactionAttribute.getPropagationBehavior();
+		}
+
+		public String getQualifier() {
+			return _transactionAttribute.getQualifier();
+		}
+
+		public int getTimeout() {
+			return _transactionAttribute.getTimeout();
+		}
+
+		public boolean isReadOnly() {
+			return _transactionAttribute.isReadOnly();
+		}
+
+		public boolean rollbackOn(Throwable ex) {
+			return _transactionAttribute.rollbackOn(ex);
+		}
+
+		private final TransactionAttribute _transactionAttribute;
+
+	}
 
 }
