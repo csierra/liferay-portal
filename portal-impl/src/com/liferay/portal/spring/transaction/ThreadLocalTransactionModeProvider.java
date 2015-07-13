@@ -32,9 +32,14 @@ public class ThreadLocalTransactionModeProvider
 	private static final ThreadLocal<Boolean> _readOnlyTransaction;
 
 	static {
-		_readOnlyTransaction = new ThreadLocal<>();
+		_readOnlyTransaction = new ThreadLocal<Boolean>() {
 
-		_readOnlyTransaction.set(false);
+			@Override
+			protected Boolean initialValue() {
+				return Boolean.FALSE;
+			}
+			
+		};
 	}
 
 }
