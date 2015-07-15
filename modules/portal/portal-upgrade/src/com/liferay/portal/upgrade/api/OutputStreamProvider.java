@@ -14,15 +14,21 @@
 
 package com.liferay.portal.upgrade.api;
 
-import com.liferay.portal.DatabaseProcessContext;
-import com.liferay.portal.kernel.upgrade.UpgradeException;
+import java.io.OutputStream;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface Upgrade {
+public interface OutputStreamProvider {
 
-	public void upgrade(DatabaseProcessContext databaseContext)
-		throws UpgradeException;
+	public OutputStreamInformation create(String hint);
+
+	public interface OutputStreamInformation {
+
+		public String getDescription();
+
+		public OutputStream getOutputStream();
+
+	}
 
 }

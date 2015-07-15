@@ -14,10 +14,13 @@
 
 package com.liferay.bookmarks.upgrade;
 
+import com.liferay.portal.DatabaseContext;
+import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.upgrade.api.Upgrade;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -33,18 +36,22 @@ import org.osgi.service.component.annotations.Reference;
 		UpgradeWhiteboardConstants.TO + "=1.0.0.Mysql",
 		UpgradeWhiteboardConstants.DATABASE + "=mysql"
 	},
-	service = Upgrade.class)
+	service = Upgrade.class
+)
 public class BookmarksServicesUpgrade100MySql implements Upgrade {
+
+	@Override
+	public void upgrade(DatabaseProcessContext databaseContext)
+		throws UpgradeException {
+
+		System.out.println("Upgrading to some thing regarding mysql only");
+	}
 
 	@Reference(unbind = "-")
 	protected void setSettingsFactory(SettingsFactory settingsFactory) {
 		_settingsFactory = settingsFactory;
 	}
 
-	@Override
-	public void upgrade(UpgradeContext upgradeContext) throws UpgradeException {
-		System.out.println("Upgrading to some thing regarding mysql only");
-	}
-
 	private SettingsFactory _settingsFactory;
+
 }

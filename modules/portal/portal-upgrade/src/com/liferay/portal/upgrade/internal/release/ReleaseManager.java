@@ -18,17 +18,23 @@ import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceComparator;
 import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
+import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
+import com.liferay.portal.DatabaseContext;
+import com.liferay.portal.upgrade.api.OutputStreamProvider;
+import com.liferay.portal.upgrade.api.OutputStreamProviderTracker;
 import com.liferay.portal.upgrade.api.Upgrade;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 import com.liferay.portal.upgrade.internal.UpgradeInfo;
 import com.liferay.portal.upgrade.internal.bundle.ServiceConfiguratorRegistrator;
 import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,19 +61,19 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 )
 public class ReleaseManager {
 
-	private ServiceConfiguratorRegistrator _serviceConfiguratorRegistrator;
+	private OutputStreamProviderTracker _outputStreamProviderTracker;
 
 	public void execute(String componentName) throws PortalException {
-		List<UpgradeInfo> upgradeInfos =
-			_serviceTrackerMap.getService(componentName);
+		List<UpgradeInfo> upgradeInfos = _serviceTrackerMap.getService(
+			componentName);
 
 		String buildNumber = getBuildNumber(componentName);
 
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			upgradeInfos);
 
-		List<UpgradeInfo> upgradePath =
-			releaseGraphManager.getUpgradePath(buildNumber);
+		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradePath(
+			buildNumber);
 
 		executeUpgradePath(componentName, upgradePath);
 
@@ -77,16 +83,16 @@ public class ReleaseManager {
 	public void execute(String componentName, String to)
 		throws PortalException {
 
-		List<UpgradeInfo> upgradeInfos =
-			_serviceTrackerMap.getService(componentName);
+		List<UpgradeInfo> upgradeInfos = _serviceTrackerMap.getService(
+			componentName);
 
 		String buildNumber = getBuildNumber(componentName);
 
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			upgradeInfos);
 
-		List<UpgradeInfo> upgradePath =
-			releaseGraphManager.getUpgradePath(buildNumber, to);
+		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradePath(
+			buildNumber, to);
 
 		executeUpgradePath(componentName, upgradePath);
 	}
@@ -98,8 +104,8 @@ public class ReleaseManager {
 	}
 
 	public void list(String componentName) {
-		List<UpgradeInfo> upgradeProcesses =
-			_serviceTrackerMap.getService(componentName);
+		List<UpgradeInfo> upgradeProcesses = _serviceTrackerMap.getService(
+			componentName);
 
 		System.out.println(
 			"Registered upgrade commands for component " + componentName);
@@ -107,6 +113,13 @@ public class ReleaseManager {
 		for (UpgradeInfo upgradeProcess : upgradeProcesses) {
 			System.out.println(upgradeProcess);
 		}
+	}
+
+	@Reference
+	public void setServiceConfiguratorRegistrator(
+		ServiceConfiguratorRegistrator serviceConfiguratorRegistrator) {
+
+		_serviceConfiguratorRegistrator = serviceConfiguratorRegistrator;
 	}
 
 	@Activate
@@ -145,17 +158,52 @@ public class ReleaseManager {
 	}
 
 	protected void executeUpgradePath(
-			String componentName, List<UpgradeInfo> upgradeInfos)
-		throws PortalException {
+			final String componentName, final List<UpgradeInfo> upgradeInfos) {
 
-		for (UpgradeInfo upgradeInfo : upgradeInfos) {
-			Upgrade upgrade = upgradeInfo.getUpgrade();
+		OutputStreamProvider outputStreamProvider =
+			_outputStreamProviderTracker.getDefaultOutputStreamProvider();
 
-			upgrade.upgrade(new Upgrade.UpgradeContext());
+		OutputStreamProvider.OutputStreamInformation outputStreamInformation =
+			outputStreamProvider.create("upgrade-" + componentName);
 
-			_releaseLocalService.updateRelease(
-				componentName,
-				upgradeInfo.getTo(), upgradeInfo.getFrom());
+		final OutputStream outputStream =
+			outputStreamInformation.getOutputStream();
+
+		StreamUtil.withStdOut(outputStream, new Runnable() {
+			@Override
+			public void run() {
+				for (UpgradeInfo upgradeInfo : upgradeInfos) {
+					Upgrade upgrade = upgradeInfo.getUpgrade();
+
+					try {
+						upgrade.upgrade(new DatabaseProcessContext() {
+
+							@Override
+							public DatabaseContext getDatabaseContext() {
+								return new DatabaseContext();
+							}
+
+							@Override
+							public OutputStream getOutputStream() {
+								return outputStream;
+							}
+						});
+
+						_releaseLocalService.updateRelease(
+							componentName, upgradeInfo.getTo(), upgradeInfo.getFrom());
+					}
+					catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		});
+
+		try {
+			outputStream.close();
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 
 		Release release = _releaseLocalService.fetchRelease(componentName);
@@ -178,6 +226,13 @@ public class ReleaseManager {
 	}
 
 	@Reference
+	public void setOutputStreamTracker(
+		OutputStreamProviderTracker outputStreamProviderTracker) {
+
+		_outputStreamProviderTracker = outputStreamProviderTracker;
+	}
+
+	@Reference
 	protected void setReleaseLocalService(
 		ReleaseLocalService releaseLocalService) {
 
@@ -185,11 +240,11 @@ public class ReleaseManager {
 	}
 
 	private ReleaseLocalService _releaseLocalService;
-	private ServiceTrackerMap<String, List<UpgradeInfo>>
-		_serviceTrackerMap;
+	private ServiceConfiguratorRegistrator _serviceConfiguratorRegistrator;
+	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
 
-	private static class UpgradeCustomizer implements
-			ServiceTrackerCustomizer<Upgrade, UpgradeInfo> {
+	private static class UpgradeCustomizer
+			implements ServiceTrackerCustomizer<Upgrade, UpgradeInfo> {
 
 		public UpgradeCustomizer(BundleContext bundleContext) {
 			_bundleContext = bundleContext;
@@ -228,11 +283,4 @@ public class ReleaseManager {
 
 	}
 
-
-	@Reference
-	public void setServiceConfiguratorRegistrator(
-		ServiceConfiguratorRegistrator serviceConfiguratorRegistrator) {
-
-		_serviceConfiguratorRegistrator = serviceConfiguratorRegistrator;
-	}
 }

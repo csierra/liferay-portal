@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -12,17 +12,15 @@
  * details.
  */
 
-package com.liferay.portal.upgrade.api;
+package com.liferay.portal;
 
-import com.liferay.portal.DatabaseProcessContext;
-import com.liferay.portal.kernel.upgrade.UpgradeException;
+import java.io.OutputStream;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface Upgrade {
+public interface DatabaseProcessContext {
+	public DatabaseContext getDatabaseContext();
 
-	public void upgrade(DatabaseProcessContext databaseContext)
-		throws UpgradeException;
-
+	public OutputStream getOutputStream();
 }
