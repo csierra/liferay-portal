@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.io.PrintStream;
 import java.nio.channels.FileChannel;
 
 /**
@@ -105,6 +106,22 @@ public class StreamUtil {
 		throws IOException {
 
 		transfer(inputStream, outputStream, bufferSize, cleanUp, 0);
+	}
+
+
+	public static void withStdOut(
+		OutputStream outputStream, Runnable runnable) {
+
+		PrintStream out = System.out;
+
+		System.setOut(new PrintStream(outputStream));
+
+		try {
+			runnable.run();
+		}
+		finally {
+			System.setOut(out);
+		}
 	}
 
 	public static void transfer(

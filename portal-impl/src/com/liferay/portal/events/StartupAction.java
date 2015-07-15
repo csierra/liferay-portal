@@ -178,14 +178,6 @@ public class StartupAction extends SimpleAction {
 			new Class[] {SchedulerEngineHelper.class},
 			new Filter[] {filter});
 
-		// Verify
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Verify database");
-		}
-
-		DBUpgrader.verify();
-
 		// Cluster master token listener
 
 		ServiceDependencyManager clusterMasterExecutorServiceDependencyManager =

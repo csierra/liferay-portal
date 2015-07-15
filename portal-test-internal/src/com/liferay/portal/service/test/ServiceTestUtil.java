@@ -189,14 +189,6 @@ public class ServiceTestUtil {
 			new Class[] {SchedulerEngineHelper.class},
 			new Filter[] {filter});
 
-		// Verify
-
-		try {
-			DBUpgrader.verify();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
 	}
 
 	private static Filter _registerDestinationFilter(String destinationName) {

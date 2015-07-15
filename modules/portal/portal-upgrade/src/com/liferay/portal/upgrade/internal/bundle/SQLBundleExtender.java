@@ -14,11 +14,21 @@
 
 package com.liferay.portal.upgrade.internal.bundle;
 
+import com.liferay.portal.DatabaseContext;
+import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.db.DBFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.upgrade.api.Upgrade;
+
+import java.net.URL;
+
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -28,18 +38,11 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 
-import java.net.URL;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 /**
  * @author Carlos Sierra Andrés
  */
 @Component
 public class SQLBundleExtender {
-
-	private BundleTracker<Bundle> _bundleTracker;
 
 	@Activate
 	public void activate(final BundleContext bundleContext) {
@@ -60,9 +63,8 @@ public class SQLBundleExtender {
 						while (entries.hasMoreElements()) {
 							final URL url = entries.nextElement();
 
-							String entryPath =
-								url.getPath().substring(
-									SqlUpgrades.length() + 1);
+							String entryPath = url.getPath().substring(
+								SqlUpgrades.length() + 1);
 
 							String[] tokens = entryPath.split(StringPool.SLASH);
 
@@ -87,23 +89,30 @@ public class SQLBundleExtender {
 								Upgrade.class, new Upgrade() {
 									@Override
 									public void upgrade(
-											UpgradeContext upgradeContext) 
+											DatabaseProcessContext
+												databaseProcessContext)
 										throws UpgradeException {
 
 										try {
 											String sql = StringUtil.read(
 												url.openStream());
 
-											DB db = upgradeContext.getDBFactory().getDB();
+											DatabaseContext databaseContext =
+												databaseProcessContext.
+													getDatabaseContext();
+											DBFactory dbFactory =
+												databaseContext.getDBFactory();
 
-											db.runSQLTemplateString(sql, true, true);
+											DB db = dbFactory.getDB();
+
+											db.runSQLTemplateString(
+												sql, true, true);
 										}
 										catch (Exception e) {
 											throw new UpgradeException(e);
 										}
 									}
 								}, properties);
-
 						}
 					}
 
@@ -113,13 +122,11 @@ public class SQLBundleExtender {
 				@Override
 				public void modifiedBundle(
 					Bundle bundle, BundleEvent event, Bundle object) {
-
 				}
 
 				@Override
 				public void removedBundle(
 					Bundle bundle, BundleEvent event, Bundle object) {
-
 				}
 			});
 
@@ -130,4 +137,7 @@ public class SQLBundleExtender {
 	public void deactivate() {
 		_bundleTracker.close();
 	}
+
+	private BundleTracker<Bundle> _bundleTracker;
+
 }

@@ -33,9 +33,7 @@ import org.jgrapht.graph.DefaultEdge;
  */
 public class ReleaseGraphManager {
 
-	public ReleaseGraphManager(
-		final List<UpgradeInfo> upgradeInfos) {
-
+	public ReleaseGraphManager(final List<UpgradeInfo> upgradeInfos) {
 		_directedGraph = new DefaultDirectedGraph<>(
 			new UpgradeProcessEdgeFactory(upgradeInfos));
 
@@ -137,9 +135,7 @@ public class ReleaseGraphManager {
 	private static class UpgradeProcessEdgeFactory
 		implements EdgeFactory<String, UpgradeProcessEdge> {
 
-		public UpgradeProcessEdgeFactory(
-			List<UpgradeInfo> upgradeInfos) {
-
+		public UpgradeProcessEdgeFactory(List<UpgradeInfo> upgradeInfos) {
 			_upgradeInfos = upgradeInfos;
 		}
 

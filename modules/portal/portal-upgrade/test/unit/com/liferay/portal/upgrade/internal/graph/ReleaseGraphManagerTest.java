@@ -68,8 +68,8 @@ public class ReleaseGraphManagerTest {
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			Arrays.asList(upi1, upi2, upi3, upi4));
 
-		List<UpgradeInfo> upgradePath =
-			releaseGraphManager.getUpgradePath("0", "200");
+		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradePath(
+			"0", "200");
 
 		Assert.assertEquals(Arrays.asList(upi1, upi2, upi3, upi4), upgradePath);
 	}
@@ -84,8 +84,8 @@ public class ReleaseGraphManagerTest {
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			Arrays.asList(upi4, upi2, upi1, upi3));
 
-		List<UpgradeInfo> upgradePath =
-			releaseGraphManager.getUpgradePath("0", "200");
+		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradePath(
+			"0", "200");
 
 		Assert.assertEquals(Arrays.asList(upi1, upi2, upi3, upi4), upgradePath);
 	}
@@ -101,8 +101,8 @@ public class ReleaseGraphManagerTest {
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			Arrays.asList(upi1, upi2, upi3, upi4, upi5));
 
-		List<UpgradeInfo> upgradePath =
-			releaseGraphManager.getUpgradePath("0", "200");
+		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradePath(
+			"0", "200");
 
 		Assert.assertEquals(Arrays.asList(upi5), upgradePath);
 	}
@@ -118,8 +118,8 @@ public class ReleaseGraphManagerTest {
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			Arrays.asList(upi1, upi2, upi3, upi4, upi5));
 
-		List<UpgradeInfo> upgradePath =
-			releaseGraphManager.getUpgradePath("10", "200");
+		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradePath(
+			"10", "200");
 
 		Assert.assertEquals(Arrays.asList(upi2, upi3, upi4), upgradePath);
 	}
@@ -137,9 +137,7 @@ public class ReleaseGraphManagerTest {
 		releaseGraphManager.getUpgradePath("0", "201");
 	}
 
-	protected UpgradeInfo createUpgradeProcessInfo(
-		String from, String to) {
-
+	protected UpgradeInfo createUpgradeProcessInfo(String from, String to) {
 		return new UpgradeInfo(
 			from, to, new TestUpgradeProcess(from + " -> " + to));
 	}
