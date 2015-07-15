@@ -18,7 +18,6 @@ import com.liferay.exportimport.web.upgrade.v1_0_0.UpgradePortletId;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,23 +37,11 @@ public class ExportImportWebUpgrade {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
 
-		upgradeProcesses.add(new UpgradePortletId());
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.exportimport.web", upgradeProcesses, 1, 1, false);
+		upgradeProcesses.add(new UpgradeExportImportPortletId());
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

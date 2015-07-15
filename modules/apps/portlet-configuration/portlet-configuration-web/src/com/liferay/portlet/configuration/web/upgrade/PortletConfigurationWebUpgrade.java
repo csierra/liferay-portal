@@ -17,7 +17,6 @@ package com.liferay.portlet.configuration.web.upgrade;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 import com.liferay.portlet.configuration.web.constants.PortletConfigurationPortletKeys;
 
@@ -38,13 +37,6 @@ public class PortletConfigurationWebUpgrade {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		UpgradePortletId upgradePortletId = new UpgradePortletId() {
@@ -61,12 +53,6 @@ public class PortletConfigurationWebUpgrade {
 
 		};
 
-		_releaseLocalService.updateRelease(
-			"com.liferay.portlet.configuration.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }
