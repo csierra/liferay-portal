@@ -814,7 +814,9 @@ public class MainServlet extends ActionServlet {
 
 		Registry registry = RegistryUtil.getRegistry();
 
-		Filter filter = registry.getFilter("(search.engine.id=SYSTEM_ENGINE)");
+		Filter filter = registry.getFilter(
+			"(&(objectClass=com.liferay.portal.kernel.search.SearchEngine)" +
+				"(search.engine.id=SYSTEM_ENGINE))");
 
 		serviceDependencyManager.registerDependencies(filter);
 	}
