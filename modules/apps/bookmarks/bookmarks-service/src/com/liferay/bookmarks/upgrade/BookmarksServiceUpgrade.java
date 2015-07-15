@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = Upgrade.class
 )
-public class BookmarksServicesUpgrade implements Upgrade {
+public class BookmarksServiceUpgrade implements Upgrade {
 
 	@Override
 	public void upgrade(DatabaseProcessContext databaseProcessContext)

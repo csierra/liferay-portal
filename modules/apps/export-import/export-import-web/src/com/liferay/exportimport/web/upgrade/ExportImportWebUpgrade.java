@@ -17,7 +17,6 @@ package com.liferay.exportimport.web.upgrade;
 import com.liferay.exportimport.web.upgrade.v1_0_0.UpgradeExportImportPortletId;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +33,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = ExportImportWebUpgrade.class)
 public class ExportImportWebUpgrade {
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Reference(target = "(original.bean=*)", unbind = "-")
 	protected void setServletContext(ServletContext servletContext) {
 	}
@@ -50,11 +42,6 @@ public class ExportImportWebUpgrade {
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
 
 		upgradeProcesses.add(new UpgradeExportImportPortletId());
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.exportimport.web", upgradeProcesses, 1, 1, false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

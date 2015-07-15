@@ -17,7 +17,6 @@ package com.liferay.layout.admin.web.upgrade;
 import com.liferay.layout.admin.web.constants.LayoutAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 
 import java.util.Collections;
@@ -33,13 +32,6 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = LayoutAdminWebUpgrade.class)
 public class LayoutAdminWebUpgrade {
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
 
 	@Reference(target = "(original.bean=*)", unbind = "-")
 	protected void setServletContext(ServletContext servletContext) {
@@ -62,12 +54,6 @@ public class LayoutAdminWebUpgrade {
 
 		};
 
-		_releaseLocalService.updateRelease(
-			"com.liferay.layout.admin.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

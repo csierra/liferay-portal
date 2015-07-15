@@ -41,13 +41,6 @@ import org.osgi.service.component.annotations.Reference;
 public class BookmarksServiceVerifyProcess implements Verifier {
 
 	@Reference(unbind = "-")
-	public void setBookmarksEntryLocalService(
-		BookmarksEntryLocalService bookmarksEntryLocalService) {
-
-		_bookmarksEntryLocalService = bookmarksEntryLocalService;
-	}
-
-	@Reference(unbind = "-")
 	protected void setBookmarksEntryLocalService(
 		BookmarksEntryLocalService bookmarksEntryLocalService) {
 

@@ -17,7 +17,6 @@ package com.liferay.comments.page.comments.web.upgrade;
 import com.liferay.comments.page.comments.web.constants.PageCommentsPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 
 import java.util.Collections;
@@ -33,13 +32,6 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = PageCommentsWebUpgrade.class)
 public class PageCommentsWebUpgrade {
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
 
 	@Reference(target = "(original.bean=*)", unbind = "-")
 	protected void setServletContext(ServletContext servletContext) {
@@ -58,12 +50,6 @@ public class PageCommentsWebUpgrade {
 
 		};
 
-		_releaseLocalService.updateRelease(
-			"com.liferay.comments.page.comments.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

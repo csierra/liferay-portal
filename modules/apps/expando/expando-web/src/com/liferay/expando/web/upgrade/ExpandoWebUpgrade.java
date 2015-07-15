@@ -17,7 +17,6 @@ package com.liferay.expando.web.upgrade;
 import com.liferay.expando.web.constants.ExpandoPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 
 import java.util.Collections;
@@ -34,13 +33,6 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = ExpandoWebUpgrade.class)
 public class ExpandoWebUpgrade {
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
 
 	@Reference(target = "(original.bean=*)", unbind = "-")
 	protected void setServletContext(ServletContext servletContext) {
@@ -61,12 +53,6 @@ public class ExpandoWebUpgrade {
 
 		};
 
-		_releaseLocalService.updateRelease(
-			"com.liferay.expando.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

@@ -18,7 +18,6 @@ import com.liferay.calendar.web.upgrade.v1_0_0.UpgradeCalendarPortletId;
 import com.liferay.calendar.web.upgrade.v1_0_0.UpgradePortletPreferences;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,13 +34,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = CalendarWebUpgrade.class)
 public class CalendarWebUpgrade {
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Reference(target = "(original.bean=*)", unbind = "-")
 	protected void setServletContext(ServletContext servletContext) {
 	}
@@ -52,11 +44,6 @@ public class CalendarWebUpgrade {
 
 		upgradeProcesses.add(new UpgradeCalendarPortletId());
 		upgradeProcesses.add(new UpgradePortletPreferences());
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.calendar.web", upgradeProcesses, 1, 1, false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

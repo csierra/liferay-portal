@@ -40,11 +40,6 @@ public class WikiServiceUpgrade {
 		_settingsFactory = settingsFactory;
 	}
 
-	@Reference(unbind = "-")
-	protected void setWikiServiceConfigurator(
-		WikiServiceConfigurator wikiServiceConfigurator) {
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();

@@ -18,7 +18,6 @@ import com.liferay.dynamic.data.lists.service.configuration.configurator.DDLServ
 import com.liferay.dynamic.data.lists.upgrade.v1_0_0.DDLClassNamesUpgradeProcess;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 
 import java.util.Collections;
 
@@ -37,23 +36,10 @@ public class DDLServiceUpgrade {
 		DDLServiceConfigurator ddlServiceConfigurator) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		UpgradeProcess upgradeProcess = new DDLClassNamesUpgradeProcess();
 
-		_releaseLocalService.updateRelease(
-			"com.liferay.dynamic.data.lists.service",
-			Collections.<UpgradeProcess>singletonList(upgradeProcess), 1, 0,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }
