@@ -6,5 +6,5 @@
 		availability="mandatory"
 		filter="(&amp;(component.name=bookmarks)(release.build.number=1.0.0))"
 		id="serviceConfigurator"
-		interface="com.liferay.portal.service.configuration.configurator.ServiceConfigurator" timeout="0"/>
+		interface="com.liferay.portal.service.configuration.configurator.ServiceConfigurator" timeout="0" />
 </beans>

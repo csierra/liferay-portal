@@ -12,35 +12,33 @@
  * details.
  */
 
-package com.liferay.portal.spring.transaction;
+package com.liferay.portal.verify.extender.internal;
+
+import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.upgrade.api.OutputStreamProvider;
+
+import java.io.OutputStream;
+
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class ThreadLocalTransactionModeProvider
-	implements TransactionModeProvider {
-
-	public static void setReadOnlyTransaction(boolean readOnly) {
-		ThreadLocalTransactionModeProvider._readOnlyTransaction.set(readOnly);
-	}
-
-	public static boolean getReadOnlyTransaction() {
-		return ThreadLocalTransactionModeProvider._readOnlyTransaction.get();
-	}
+@Component(immediate = true, property = {"name=console"})
+public class SystemOutputStreamProvider implements OutputStreamProvider {
 
 	@Override
-	public boolean isReadOnly() {
-		return getReadOnlyTransaction();
-	}
-
-	private static final ThreadLocal<Boolean> _readOnlyTransaction;
-
-	static {
-		_readOnlyTransaction = new ThreadLocal<Boolean>() {
+	public OutputStreamInformation create(String hint) {
+		return new OutputStreamInformation() {
 
 			@Override
-			protected Boolean initialValue() {
-				return Boolean.FALSE;
+			public String getDescription() {
+				return "the console";
+			}
+
+			@Override
+			public OutputStream getOutputStream() {
+				return StreamUtil.uncloseable(System.out);
 			}
 
 		};

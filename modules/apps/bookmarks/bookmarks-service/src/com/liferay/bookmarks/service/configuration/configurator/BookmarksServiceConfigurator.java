@@ -18,15 +18,15 @@ import com.liferay.portal.service.configuration.ServiceComponentConfiguration;
 import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
 import com.liferay.portal.spring.extender.loader.ModuleResourceLoader;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 /**
  * @author Miguel Pastor
@@ -68,8 +68,9 @@ public class BookmarksServiceConfigurator {
 	}
 
 	@Reference(
-		target="(&(component.name=com.liferay.bookmarks)(release.build.number=1.0.0))",
-		unbind = "-")
+		target ="(&(component.name=com.liferay.bookmarks)(release.build.number=1.0.0))",
+		unbind = "-"
+	)
 	protected void setServiceConfigurator(
 		ServiceConfigurator serviceConfigurator) {
 

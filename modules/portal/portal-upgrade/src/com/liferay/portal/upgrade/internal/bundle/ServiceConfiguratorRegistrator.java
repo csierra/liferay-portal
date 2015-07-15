@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
+import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
 
 import java.io.InputStream;
 
@@ -30,7 +31,6 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -52,27 +52,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = ServiceConfiguratorRegistrator.class)
 public final class ServiceConfiguratorRegistrator {
 
-	private ClassLoader _bundleClassLoader;
-	private ServiceConfigurator _serviceConfigurator;
-	private BundleContext _bundleContext;
-
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-		Bundle bundle = bundleContext.getBundle();
-
-		BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
-
-		_bundleClassLoader = bundleWiring.getClassLoader();
-
-		List<Release> releases = _releaseLocalService.getReleases(
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-		for (Release release : releases) {
-			signalRelease(release);
-		}
-	}
-
 	public void signalRelease(Release release) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 
@@ -90,11 +69,27 @@ public final class ServiceConfiguratorRegistrator {
 
 		ServiceRegistration<ServiceConfigurator> serviceRegistration =
 			_bundleContext.registerService(
-				ServiceConfigurator.class,
-				_serviceConfigurator, properties);
+				ServiceConfigurator.class, _serviceConfigurator, properties);
 
 		_serviceConfiguratorRegistrations.put(
 			servletContextName, serviceRegistration);
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
+		Bundle bundle = bundleContext.getBundle();
+
+		BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+
+		_bundleClassLoader = bundleWiring.getClassLoader();
+
+		List<Release> releases = _releaseLocalService.getReleases(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		for (Release release : releases) {
+			signalRelease(release);
+		}
 	}
 
 	protected InputStream buildBundle(Release release) {
@@ -156,10 +151,6 @@ public final class ServiceConfiguratorRegistrator {
 		_releaseLocalService = releaseLocalService;
 	}
 
-	@Reference(target = "(original.bean=true)")
-	protected void setServletContext(ServletContext servletContext) {
-	}
-
 	@Reference
 	protected void setServiceConfigurator(
 		ServiceConfigurator serviceConfigurator) {
@@ -167,8 +158,14 @@ public final class ServiceConfiguratorRegistrator {
 		_serviceConfigurator = serviceConfigurator;
 	}
 
-	private ReleaseLocalService _releaseLocalService;
+	@Reference(target = "(original.bean=true)")
+	protected void setServletContext(ServletContext servletContext) {
+	}
 
+	private ClassLoader _bundleClassLoader;
+	private BundleContext _bundleContext;
+	private ReleaseLocalService _releaseLocalService;
+	private ServiceConfigurator _serviceConfigurator;
 	private final Map<String, ServiceRegistration<ServiceConfigurator>>
 		_serviceConfiguratorRegistrations = new HashMap<>();
 

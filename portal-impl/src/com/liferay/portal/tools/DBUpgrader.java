@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.plugin.Version;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -77,7 +76,6 @@ public class DBUpgrader {
 			InitUtil.initWithSpring(true);
 
 			upgrade();
-			verify();
 
 			System.out.println(
 				"\nCompleted upgrade and verify processes in " +
@@ -104,7 +102,6 @@ public class DBUpgrader {
 
 		ReleaseLocalServiceUtil.getBuildNumberOrCreate();
 
-
 		_checkPermissionAlgorithm();
 		_checkReleaseState(_getReleaseState());
 
@@ -113,7 +110,9 @@ public class DBUpgrader {
 		}
 
 		try {
+
 			// StartupHelperUtil.upgradeProcess(0);
+
 		}
 		catch (Exception e) {
 			_updateReleaseState(ReleaseConstants.STATE_UPGRADE_FAILURE);
@@ -174,99 +173,6 @@ public class DBUpgrader {
 		if (StartupHelperUtil.isUpgraded()) {
 			MultiVMPoolUtil.clear();
 		}
-	}
-
-	public static void verify() throws Exception {
-
-		// Check release
-
-		Release release = ReleaseLocalServiceUtil.fetchRelease(
-			ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME);
-
-		if (release == null) {
-			release = ReleaseLocalServiceUtil.addRelease(
-				ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME,
-				"CHANGE ME");
-		}
-
-		_checkReleaseState(release.getState());
-
-		// Update indexes
-
-		if (PropsValues.DATABASE_INDEXES_UPDATE_ON_STARTUP) {
-			StartupHelperUtil.setDropIndexes(true);
-
-			StartupHelperUtil.updateIndexes();
-		}
-		else if (StartupHelperUtil.isUpgraded()) {
-			StartupHelperUtil.updateIndexes();
-		}
-
-		// Verify
-
-		if (PropsValues.VERIFY_DATABASE_TRANSACTIONS_DISABLED) {
-			_disableTransactions();
-		}
-
-		boolean newBuildNumber = false;
-
-
-		try {
-			StartupHelperUtil.verifyProcess(
-				newBuildNumber, release.isVerified());
-		}
-		catch (Exception e) {
-			_updateReleaseState(ReleaseConstants.STATE_VERIFY_FAILURE);
-
-			_log.error(
-				"Unable to execute verify process: " + e.getMessage(), e);
-
-			throw e;
-		}
-		finally {
-			if (PropsValues.VERIFY_DATABASE_TRANSACTIONS_DISABLED) {
-				_enableTransactions();
-			}
-		}
-
-		// Update indexes
-
-		if (PropsValues.DATABASE_INDEXES_UPDATE_ON_STARTUP ||
-			StartupHelperUtil.isUpgraded()) {
-
-			StartupHelperUtil.updateIndexes(false);
-		}
-
-		// Update release
-
-		boolean verified = StartupHelperUtil.isVerified();
-
-		if (release.isVerified()) {
-			verified = true;
-		}
-
-		release = ReleaseLocalServiceUtil.updateRelease(
-			release.getReleaseId(), "7.0.0",
-			ReleaseInfo.getBuildDate(), verified);
-
-		// Enable database caching after verify
-
-		CacheRegistryUtil.setActive(true);
-
-		// Register release service
-
-		Registry registry = RegistryUtil.getRegistry();
-
-		ServiceRegistrar<Release> serviceRegistrar =
-			registry.getServiceRegistrar(Release.class);
-
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put("build.date", release.getBuildDate());
-		properties.put("build.number", release.getBuildNumber());
-		properties.put("servlet.context.name", release.getServletContextName());
-
-		serviceRegistrar.registerService(Release.class, release, properties);
 	}
 
 	private static void _checkPermissionAlgorithm() throws Exception {

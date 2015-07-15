@@ -30,7 +30,7 @@ import com.liferay.portal.util.PropsValues;
  * @author Alexander Chow
  * @author Raymond Augé
  */
-public class VerifyProcessUtil {
+public class VerifyProcessUtilOrig {
 
 	public static boolean verifyProcess(
 			boolean ranUpgradeProcess, boolean newBuildNumber, boolean verified)
@@ -130,6 +130,6 @@ public class VerifyProcessUtil {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		VerifyProcessUtil.class);
+		VerifyProcessUtilOrig.class);
 
 }

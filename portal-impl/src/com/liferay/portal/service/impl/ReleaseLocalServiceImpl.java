@@ -23,9 +23,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.upgrade.OlderVersionException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -34,7 +32,6 @@ import com.liferay.portal.model.Release;
 import com.liferay.portal.model.ReleaseConstants;
 import com.liferay.portal.service.base.ReleaseLocalServiceBaseImpl;
 import com.liferay.portal.util.PropsUtil;
-import com.liferay.portal.util.PropsValues;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -201,7 +198,8 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 
 	@Override
 	public Release updateRelease(
-			long releaseId, String buildNumber, Date buildDate, boolean verified)
+			long releaseId, String buildNumber, Date buildDate,
+			boolean verified)
 		throws PortalException {
 
 		Release release = releasePersistence.findByPrimaryKey(releaseId);
@@ -214,23 +212,6 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 		releasePersistence.update(release);
 
 		return release;
-	}
-
-	@Override
-	public void updateRelease(
-			String servletContextName,
-			String buildNumber, String previousBuildNumber)
-		throws PortalException {
-
-		Release release = releaseLocalService.fetchRelease(servletContextName);
-
-		if (release == null) {
-			release = releaseLocalService.addRelease(
-				servletContextName, previousBuildNumber);
-		}
-
-		releaseLocalService.updateRelease(
-			release.getReleaseId(), buildNumber, null, true);
 	}
 
 	@Override
@@ -248,6 +229,23 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 			buildNumber);
 
 		updateRelease(servletContextName, buildNumber, previousBuildNumber);
+	}
+
+	@Override
+	public void updateRelease(
+			String servletContextName, String buildNumber,
+			String previousBuildNumber)
+		throws PortalException {
+
+		Release release = releaseLocalService.fetchRelease(servletContextName);
+
+		if (release == null) {
+			release = releaseLocalService.addRelease(
+				servletContextName, previousBuildNumber);
+		}
+
+		releaseLocalService.updateRelease(
+			release.getReleaseId(), buildNumber, null, true);
 	}
 
 	protected void testSupportsStringCaseSensitiveQuery() {

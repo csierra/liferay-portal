@@ -14,49 +14,25 @@
 
 package com.liferay.portal.upgrade.api;
 
+import com.liferay.portal.DatabaseContext;
+import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.loader.ModuleResourceLoader;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Carlos Sierra Andrés
  */
 public class InitialServiceUpgrade implements Upgrade {
-
-	public InitialServiceUpgrade(ModuleResourceLoader loader) {
-		_loader = loader;
-	}
-
-	@Override
-	public void upgrade(UpgradeContext upgradeContext) throws UpgradeException {
-		try {
-			String indexes = StringUtil.read(
-				_loader.getSQLIndexesInputStream());
-			String sequences = StringUtil.read(
-				_loader.getSQLSequencesInputStream());
-			String tables = StringUtil.read(_loader.getSQLTablesInputStream());
-
-			DBFactory dbFactory = upgradeContext.getDBFactory();
-
-			DB db = dbFactory.getDB();
-
-			db.runSQLTemplateString(tables, true, true);
-
-			db.runSQLTemplateString(indexes, true, true);
-			db.runSQLTemplateString(sequences, true, true);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	public static ServiceRegistration<Upgrade> registerForApplication(
 		BundleContext bundleContext, String applicationName, String to) {
@@ -78,6 +54,38 @@ public class InitialServiceUpgrade implements Upgrade {
 			Upgrade.class, new InitialServiceUpgrade(loader), properties);
 	}
 
-	private ModuleResourceLoader _loader;
+	public InitialServiceUpgrade(ModuleResourceLoader loader) {
+		_loader = loader;
+	}
+
+	@Override
+	public void upgrade(DatabaseProcessContext databaseProcessContext)
+		throws UpgradeException {
+
+		try {
+			String indexes = StringUtil.read(
+				_loader.getSQLIndexesInputStream());
+			String sequences = StringUtil.read(
+				_loader.getSQLSequencesInputStream());
+			String tables = StringUtil.read(_loader.getSQLTablesInputStream());
+
+			DatabaseContext databaseContext =
+				databaseProcessContext.getDatabaseContext();
+
+			DBFactory dbFactory = databaseContext.getDBFactory();
+
+			DB db = dbFactory.getDB();
+
+			db.runSQLTemplateString(tables, true, true);
+
+			db.runSQLTemplateString(indexes, true, true);
+			db.runSQLTemplateString(sequences, true, true);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private final ModuleResourceLoader _loader;
 
 }
