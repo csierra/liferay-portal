@@ -21,6 +21,8 @@ import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
 import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
@@ -239,8 +241,11 @@ public class ReleaseManager {
 		_releaseLocalService = releaseLocalService;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(ReleaseManager.class);
+
 	private ReleaseLocalService _releaseLocalService;
 	private ServiceConfiguratorRegistrator _serviceConfiguratorRegistrator;
+
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
 
 	private static class UpgradeCustomizer
@@ -261,6 +266,15 @@ public class ReleaseManager {
 
 			Upgrade upgradeProcess = _bundleContext.getService(
 				serviceReference);
+
+			if (upgradeProcess == null) {
+				_log.warn(
+					"Service " + serviceReference + " is registered as an " +
+						"upgrade but it is not implementing Upgrade " +
+							"interface. Not tracking.");
+
+				return null;
+			}
 
 			return new UpgradeInfo(from, to, upgradeProcess);
 		}
