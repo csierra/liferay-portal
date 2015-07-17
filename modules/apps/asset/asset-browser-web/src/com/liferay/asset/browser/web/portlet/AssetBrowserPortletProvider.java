@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.portlet.BrowsePortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
@@ -37,4 +38,8 @@ public class AssetBrowserPortletProvider
 		return AssetBrowserPortletKeys.ASSET_BROWSER;
 	}
 
+	@Reference(unbind="-")
+	protected void setAssetBrowserPortlet(AssetBrowserPortlet portlet) {
+
+	}
 }

@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 
 import javax.portlet.Portlet;
 
+import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -45,9 +46,14 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class AssetBrowserPortlet extends MVCPortlet {
 
-	@Reference(unbind = "-")
-	protected void setAssetBrowserWebUpgrade(
-		AssetBrowserWebUpgrade assetBrowserWebUpgrade) {
+	@Reference(
+		target="(&" +
+			"(component.name=asset-browser-web)" +
+			"(release.build.number=1.0.0)" +
+			")",
+		unbind = "-")
+	protected void setServiceConfigurator(
+		ServiceConfigurator serviceConfigurator) {
 	}
 
 }

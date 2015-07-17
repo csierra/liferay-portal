@@ -15,8 +15,14 @@
 package com.liferay.asset.browser.web.upgrade;
 
 import com.liferay.asset.browser.web.constants.AssetBrowserPortletKeys;
+
+import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.upgrade.UpgradeException;
+import com.liferay.portal.upgrade.api.Upgrade;
+import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
+
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -24,11 +30,20 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Eudaldo Alonso
  */
-@Component(immediate = true, service = AssetBrowserWebUpgrade.class)
-public class AssetBrowserWebUpgrade {
+@Component(
+	immediate = true,
+	property = {
+		UpgradeWhiteboardConstants.DATABASES_ALL_PROPERTY,
+		UpgradeWhiteboardConstants.APPLICATION_NAME + "=asset-browser-web",
+		UpgradeWhiteboardConstants.FROM + "=0.0.0",
+		UpgradeWhiteboardConstants.TO + "=1.0.0"
+	},
+	service = Upgrade.class)
+public class AssetBrowserWebUpgrade implements Upgrade {
 
-	@Activate
-	protected void upgrade() throws PortalException {
+	public void upgrade(DatabaseProcessContext databaseProcessContext)
+		throws UpgradeException {
+
 		UpgradePortletId upgradePortletId = new UpgradePortletId() {
 
 			@Override
@@ -41,6 +56,8 @@ public class AssetBrowserWebUpgrade {
 			}
 
 		};
+
+		upgradePortletId.upgrade();
 	}
 
 }
