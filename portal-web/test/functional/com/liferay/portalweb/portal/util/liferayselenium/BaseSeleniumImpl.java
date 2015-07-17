@@ -103,6 +103,11 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
+	public void assertEditable(String locator) throws Exception {
+		LiferaySeleniumHelper.assertEditable(this, locator);
+	}
+
+	@Override
 	public void assertElementNotPresent(String locator) throws Exception {
 		LiferaySeleniumHelper.assertElementNotPresent(this, locator);
 	}
@@ -171,6 +176,11 @@ public abstract class BaseSeleniumImpl
 	@Override
 	public void assertNotChecked(String locator) throws Exception {
 		LiferaySeleniumHelper.assertNotChecked(this, locator);
+	}
+
+	@Override
+	public void assertNotEditable(String locator) throws Exception {
+		LiferaySeleniumHelper.assertNotEditable(this, locator);
 	}
 
 	@Override
@@ -405,6 +415,11 @@ public abstract class BaseSeleniumImpl
 	@Override
 	public boolean isNotChecked(String locator) {
 		return LiferaySeleniumHelper.isNotChecked(this, locator);
+	}
+
+	@Override
+	public boolean isNotEditable(String locator) {
+		return !isEditable(locator);
 	}
 
 	@Override
@@ -667,6 +682,13 @@ public abstract class BaseSeleniumImpl
 	@Override
 	public void sikuliClick(String image) throws Exception {
 		LiferaySeleniumHelper.sikuliClick(this, image);
+	}
+
+	@Override
+	public void sikuliClickByIndex(String image, String index)
+		throws Exception {
+
+		LiferaySeleniumHelper.sikuliClickByIndex(this, image, index);
 	}
 
 	@Override
