@@ -15,6 +15,8 @@
 package com.liferay.asset.browser.web.upgrade;
 
 import com.liferay.asset.browser.web.constants.AssetBrowserPortletKeys;
+
+import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
@@ -31,11 +33,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = AssetBrowserWebUpgrade.class)
 public class AssetBrowserWebUpgrade {
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		UpgradePortletId upgradePortletId = new UpgradePortletId() {
@@ -50,6 +47,8 @@ public class AssetBrowserWebUpgrade {
 			}
 
 		};
+
+		upgradePortletId.upgrade();
 	}
 
 }
