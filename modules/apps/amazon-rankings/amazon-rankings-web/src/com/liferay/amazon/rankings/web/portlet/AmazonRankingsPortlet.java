@@ -35,6 +35,8 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
+import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
+
 /**
  * @author Raymond Augé
  * @author Peter Fellwock
@@ -81,9 +83,14 @@ public class AmazonRankingsPortlet extends MVCPortlet {
 			AmazonRankingsConfiguration.class, properties);
 	}
 
-	@Reference(unbind = "-")
-	protected void setAmazonRankingsWebUpgrade(
-		AmazonRankingsWebUpgrade amazonRankingsWebUpgrade) {
+	@Reference(
+		target="(&" +
+					"(component.name=amazon-rankings-web)" +
+					"(release.build.number=1.0.0)" +
+				")",
+		unbind = "-")
+	protected void setServiceConfigurator(
+		ServiceConfigurator serviceConfigurator) {
 	}
 
 	private volatile AmazonRankingsConfiguration _amazonRankingsConfiguration;
