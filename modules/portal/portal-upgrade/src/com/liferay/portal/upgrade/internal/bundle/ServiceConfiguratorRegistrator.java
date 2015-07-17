@@ -137,7 +137,8 @@ public final class ServiceConfiguratorRegistrator {
 
 	@Deactivate
 	protected void deactivate() {
-		for (ServiceRegistration<ServiceConfigurator> serviceRegistration :
+		for (
+			ServiceRegistration<ServiceConfigurator> serviceRegistration :
 			_serviceConfiguratorRegistrations.values()) {
 
 			serviceRegistration.unregister();

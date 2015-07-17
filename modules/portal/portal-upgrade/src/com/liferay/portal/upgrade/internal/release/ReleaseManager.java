@@ -18,6 +18,7 @@ import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceComparator;
 import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
+import com.liferay.portal.DatabaseContext;
 import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
-import com.liferay.portal.DatabaseContext;
 import com.liferay.portal.upgrade.api.OutputStreamProvider;
 import com.liferay.portal.upgrade.api.OutputStreamProviderTracker;
 import com.liferay.portal.upgrade.api.Upgrade;
@@ -37,6 +37,7 @@ import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -62,8 +63,6 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 	service = Object.class
 )
 public class ReleaseManager {
-
-	private OutputStreamProviderTracker _outputStreamProviderTracker;
 
 	public void execute(String componentName) throws PortalException {
 		List<UpgradeInfo> upgradeInfos = _serviceTrackerMap.getService(
@@ -118,6 +117,13 @@ public class ReleaseManager {
 	}
 
 	@Reference
+	public void setOutputStreamTracker(
+		OutputStreamProviderTracker outputStreamProviderTracker) {
+
+		_outputStreamProviderTracker = outputStreamProviderTracker;
+	}
+
+	@Reference
 	public void setServiceConfiguratorRegistrator(
 		ServiceConfiguratorRegistrator serviceConfiguratorRegistrator) {
 
@@ -160,7 +166,7 @@ public class ReleaseManager {
 	}
 
 	protected void executeUpgradePath(
-			final String componentName, final List<UpgradeInfo> upgradeInfos) {
+		final String componentName, final List<UpgradeInfo> upgradeInfos) {
 
 		OutputStreamProvider outputStreamProvider =
 			_outputStreamProviderTracker.getDefaultOutputStreamProvider();
@@ -192,7 +198,8 @@ public class ReleaseManager {
 						});
 
 						_releaseLocalService.updateRelease(
-							componentName, upgradeInfo.getTo(), upgradeInfo.getFrom());
+							componentName, upgradeInfo.getTo(),
+							upgradeInfo.getFrom());
 					}
 					catch (Exception e) {
 						throw new RuntimeException(e);
@@ -228,13 +235,6 @@ public class ReleaseManager {
 	}
 
 	@Reference
-	public void setOutputStreamTracker(
-		OutputStreamProviderTracker outputStreamProviderTracker) {
-
-		_outputStreamProviderTracker = outputStreamProviderTracker;
-	}
-
-	@Reference
 	protected void setReleaseLocalService(
 		ReleaseLocalService releaseLocalService) {
 
@@ -243,9 +243,9 @@ public class ReleaseManager {
 
 	private static final Log _log = LogFactoryUtil.getLog(ReleaseManager.class);
 
+	private OutputStreamProviderTracker _outputStreamProviderTracker;
 	private ReleaseLocalService _releaseLocalService;
 	private ServiceConfiguratorRegistrator _serviceConfiguratorRegistrator;
-
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
 
 	private static class UpgradeCustomizer
@@ -268,10 +268,12 @@ public class ReleaseManager {
 				serviceReference);
 
 			if (upgradeProcess == null) {
-				_log.warn(
-					"Service " + serviceReference + " is registered as an " +
-						"upgrade but it is not implementing Upgrade " +
-							"interface. Not tracking.");
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Service " + serviceReference + " is registered as " +
+							"an upgrade but it is not implementing Upgrade " +
+								"interface. Not tracking.");
+				}
 
 				return null;
 			}

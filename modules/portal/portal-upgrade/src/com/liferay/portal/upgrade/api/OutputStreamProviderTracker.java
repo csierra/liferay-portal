@@ -16,6 +16,9 @@ package com.liferay.portal.upgrade.api;
 
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
+
+import java.util.Set;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.component.annotations.Activate;
@@ -23,48 +26,14 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.Set;
-
 /**
  * @author Carlos Sierra Andrés
  */
 @Component(immediate = true, service = OutputStreamProviderTracker.class)
 public class OutputStreamProviderTracker {
 
-	private OutputStreamProvider _outputStreamProvider;
-
 	public OutputStreamProvider getDefaultOutputStreamProvider() {
 		return _outputStreamProvider;
-	}
-
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-
-		try {
-			_outputStreamProviders = ServiceTrackerMapFactory.singleValueMap(
-				bundleContext, OutputStreamProvider.class, "name");
-		}
-		catch (InvalidSyntaxException e) {
-			throw new IllegalStateException(e);
-		}
-
-		_outputStreamProviders.open();
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_outputStreamProviders.close();
-	}
-
-	public Set<String> getOutputStreamProviderNames() {
-		return _outputStreamProviders.keySet();
-	}
-
-	@Reference
-	public void setOutputStreamProvider(
-		OutputStreamProvider outputStreamProvider) {
-
-		_outputStreamProvider = outputStreamProvider;
 	}
 
 	public OutputStreamProvider getOutputStreamProvider(
@@ -82,7 +51,38 @@ public class OutputStreamProviderTracker {
 		return outputStreamProvider;
 	}
 
+	public Set<String> getOutputStreamProviderNames() {
+		return _outputStreamProviders.keySet();
+	}
+
+	@Reference
+	public void setOutputStreamProvider(
+		OutputStreamProvider outputStreamProvider) {
+
+		_outputStreamProvider = outputStreamProvider;
+	}
+
 	public ServiceTrackerMap<String, OutputStreamProvider>
 		_outputStreamProviders;
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		try {
+			_outputStreamProviders = ServiceTrackerMapFactory.singleValueMap(
+				bundleContext, OutputStreamProvider.class, "name");
+		}
+		catch (InvalidSyntaxException e) {
+			throw new IllegalStateException(e);
+		}
+
+		_outputStreamProviders.open();
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_outputStreamProviders.close();
+	}
+
+	private OutputStreamProvider _outputStreamProvider;
 
 }
