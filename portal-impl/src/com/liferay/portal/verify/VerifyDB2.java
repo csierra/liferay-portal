@@ -14,22 +14,30 @@
 
 package com.liferay.portal.verify;
 
+import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.util.Consumer;
 import com.liferay.portal.kernel.util.StringBundler;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @author Igor Beslic
  */
-public class VerifyDB2 extends VerifyProcess {
+@OSGiBeanProperties(property = {"verifier.name=DB2"}, service = Verifier.class)
+public class VerifyDB2 extends VerifyProcess implements Verifier {
 
-	@Override
-	protected void doVerify() throws Exception {
+	protected void doWithResultSet(Consumer<ResultSet> consumer)
+		throws SQLException {
+
 		DB db = DBFactoryUtil.getDB();
 
 		String dbType = db.getType();
@@ -56,23 +64,79 @@ public class VerifyDB2 extends VerifyProcess {
 
 			rs = ps.executeQuery();
 
-			while (rs.next()) {
-				String tableName = rs.getString(1);
-
-				if (!isPortalTableName(tableName)) {
-					continue;
-				}
-
-				String columnName = rs.getString(2);
-
-				runSQL(
-					"alter table " + tableName + " alter column " + columnName +
-						" set data type varchar(600)");
-			}
+			consumer.accept(rs);
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
 
+	@Override
+	protected void doVerify() throws Exception {
+		doWithResultSet(new Consumer<ResultSet>() {
+
+			@Override
+			public void accept(ResultSet rs) {
+				try {
+					while (rs.next()) {
+						String tableName = rs.getString(1);
+
+						if (!isPortalTableName(tableName)) {
+							continue;
+						}
+
+						String columnName = rs.getString(2);
+
+						runSQL(
+							"alter table " + tableName + " alter column " +
+								columnName + " set data type varchar(600)");
+					}
+				}
+				catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+		});
+	}
+
+	@Override
+	public void verify(DatabaseProcessContext verifyContext) {
+		OutputStream outputStream = verifyContext.getOutputStream();
+
+		final PrintStream out = new PrintStream(outputStream);
+
+		try {
+			doWithResultSet(new Consumer<ResultSet>() {
+
+				@Override
+				public void accept(ResultSet rs) {
+					out.println("Columns to alter:");
+
+					try {
+						while (rs.next()) {
+							String tableName = rs.getString(1);
+
+							if (!isPortalTableName(tableName)) {
+								continue;
+							}
+
+							String columnName = rs.getString(2);
+
+							out.println(
+								"Column: " + columnName + "; Table: " +
+									tableName);
+						}
+					}
+					catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+
+			});
+		}
+		catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
