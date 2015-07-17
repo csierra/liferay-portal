@@ -14,7 +14,6 @@
 
 package com.liferay.bookmarks.upgrade;
 
-import com.liferay.bookmarks.service.configuration.configurator.BookmarksServiceConfigurator;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeClassNames;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeLastPublishDate;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletId;
