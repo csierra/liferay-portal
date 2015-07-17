@@ -48,9 +48,22 @@ public class ReleaseGraphManager {
 	}
 
 	public List<UpgradeInfo> getUpgradePath(String from) {
-		String endNode = findEndNode();
+		List<String> sinkNodes = getSinkNodes();
 
-		return getUpgradePath(from, endNode);
+		sinkNodes.remove(from);
+
+		//Only one sink node other than the current one
+
+		if (sinkNodes.size() == 1) {
+			return getUpgradePath(from, sinkNodes.get(0));
+		}
+
+		if (sinkNodes.size() > 1) {
+			throw new IllegalStateException(
+				"There are more that one possible end nodes " + sinkNodes);
+		}
+
+		throw new IllegalStateException("No end nodes!");
 	}
 
 	public List<UpgradeInfo> getUpgradePath(String from, String to) {
@@ -89,7 +102,7 @@ public class ReleaseGraphManager {
 			});
 	}
 
-	protected String findEndNode() {
+	protected List<String> getSinkNodes() {
 		final List<String> endVertices = new ArrayList<>();
 
 		final Set<String> vertices = _directedGraph.vertexSet();
@@ -103,16 +116,7 @@ public class ReleaseGraphManager {
 			}
 		}
 
-		if (endVertices.size() == 1) {
-			return endVertices.get(0);
-		}
-
-		if (endVertices.size() > 1) {
-			throw new IllegalStateException(
-				"There are more that one possible end nodes " + endVertices);
-		}
-
-		throw new IllegalStateException("No end nodes!");
+		return endVertices;
 	}
 
 	private final DefaultDirectedGraph<String, UpgradeProcessEdge>
