@@ -31,4 +31,10 @@ public interface CXFEndpointPublisherConfiguration {
 	@Meta.AD(name = "required.extensions", required = false)
 	public String[] extensions();
 
+	@Meta.AD(
+		deflt = "true", name = "init.portal.authorization.context",
+		required = false
+	)
+	public boolean initPortalAuthorizationContext();
+
 }
