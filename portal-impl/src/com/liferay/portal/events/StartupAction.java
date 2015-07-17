@@ -175,8 +175,17 @@ public class StartupAction extends SimpleAction {
 				"QuartzSchemaManager)");
 
 		schedulerServiceDependencyManager.registerDependencies(
-			new Class[] {SchedulerEngineHelper.class},
-			new Filter[] {filter});
+			new Class[]{SchedulerEngineHelper.class},
+			new Filter[]{filter});
+
+		// Verify
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Verify database");
+		}
+
+		DBUpgrader.verify();
+
 
 		// Cluster master token listener
 

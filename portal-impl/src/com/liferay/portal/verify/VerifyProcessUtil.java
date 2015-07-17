@@ -30,7 +30,7 @@ import com.liferay.portlet.exportimport.staging.StagingAdvicesThreadLocal;
  * @author Alexander Chow
  * @author Raymond Augé
  */
-public class VerifyProcessUtilOrig {
+public class VerifyProcessUtil {
 
 	public static boolean verifyProcess(
 			boolean ranUpgradeProcess, boolean newBuildNumber, boolean verified)
@@ -130,6 +130,6 @@ public class VerifyProcessUtilOrig {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		VerifyProcessUtilOrig.class);
+		VerifyProcessUtil.class);
 
 }

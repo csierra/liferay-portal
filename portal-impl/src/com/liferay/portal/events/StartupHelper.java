@@ -29,6 +29,8 @@ import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.verify.VerifyException;
+import com.liferay.portal.verify.VerifyProcessUtil;
 
 import java.sql.Connection;
 
@@ -165,6 +167,13 @@ public class StartupHelper {
 		finally {
 			_upgrading = false;
 		}
+	}
+
+	public void verifyProcess(boolean newBuildNumber, boolean verified)
+		throws VerifyException {
+
+		_verified = VerifyProcessUtil.verifyProcess(
+			_upgraded, newBuildNumber, verified);
 	}
 
 	protected String[] getUpgradeProcessClassNames(String key) {
