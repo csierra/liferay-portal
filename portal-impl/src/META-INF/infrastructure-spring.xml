@@ -28,4 +28,5 @@
 	<bean id="com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil" class="com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil">
 		<property name="persistedModelLocalServiceRegistry" ref="com.liferay.portal.service.PersistedModelLocalServiceRegistry" />
 	</bean>
+	<bean id="com.liferay.portal.verify.VerifyDB2" class="com.liferay.portal.verify.VerifyDB2" />
 </beans>
