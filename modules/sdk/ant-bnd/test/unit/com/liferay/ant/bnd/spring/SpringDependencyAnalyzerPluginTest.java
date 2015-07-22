@@ -51,7 +51,9 @@ public class SpringDependencyAnalyzerPluginTest {
 
 		String value = IO.collect(resource.openInputStream());
 
-		Assert.assertEquals("bar.foo.Dependency\njava.lang.String\n", value);
+		Assert.assertEquals(
+			"bar.foo.Dependency\n" + _RELEASE_INFO + "java.lang.String\n",
+			value);
 	}
 
 	@Test
@@ -63,7 +65,7 @@ public class SpringDependencyAnalyzerPluginTest {
 
 		String value = IO.collect(resource.openInputStream());
 
-		Assert.assertEquals("java.lang.String\n", value);
+		Assert.assertEquals(_RELEASE_INFO + "java.lang.String\n", value);
 	}
 
 	@Test
@@ -79,7 +81,7 @@ public class SpringDependencyAnalyzerPluginTest {
 
 		String value = IO.collect(resource.openInputStream());
 
-		Assert.assertEquals("bar.foo.Dependency\n", value);
+		Assert.assertEquals("bar.foo.Dependency\n" + _RELEASE_INFO, value);
 	}
 
 	@Test
@@ -95,7 +97,7 @@ public class SpringDependencyAnalyzerPluginTest {
 
 		String value = IO.collect(resource.openInputStream());
 
-		Assert.assertEquals("", value);
+		Assert.assertEquals(_RELEASE_INFO, value);
 	}
 
 	protected Jar analyze(List<String> packages, JarResource... jarResources)
@@ -114,8 +116,11 @@ public class SpringDependencyAnalyzerPluginTest {
 
 		Analyzer analyzer = new Analyzer();
 
+		analyzer.setBundleSymbolicName("test.bundle");
+		analyzer.setBundleVersion("1.0.0");
 		analyzer.setProperty(
 			"-spring-dependency", ServiceReference.class.getName());
+		analyzer.setProperty("-release-info", "");
 
 		ZipExporter zipExporter = javaArchive.as(ZipExporter.class);
 
@@ -136,6 +141,10 @@ public class SpringDependencyAnalyzerPluginTest {
 	}
 
 	private static final String _PACKAGE_NAME = "com.liferay.ant.bnd.spring";
+
+	private static final String _RELEASE_INFO =
+		"java.lang.Object (&(release.build.number=1.0.0)" +
+			"(component.name=test.bundle))\n";
 
 	private static final class JarResource {
 
