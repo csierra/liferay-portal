@@ -14,18 +14,26 @@
 
 package com.liferay.dynamic.data.mapping.expression.evaluator;
 
-import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
-import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
-
-import java.util.Locale;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * @author Pablo Carvalho
+ * @author Marcellus Tavares
  */
-public interface DDMExpressionEvaluator {
+public class DDMExpressionEvaluatorException extends PortalException {
 
-	public DDMFormExpressionEvaluatorResult evaluate(
-			DDMForm ddmForm, DDMFormValues ddmFormValues, Locale locale)
-		throws DDMExpressionEvaluatorException;
+	public DDMExpressionEvaluatorException() {
+	}
+
+	public DDMExpressionEvaluatorException(String msg) {
+		super(msg);
+	}
+
+	public DDMExpressionEvaluatorException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
+
+	public DDMExpressionEvaluatorException(Throwable cause) {
+		super(cause);
+	}
 
 }

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.dynamic.data.mapping.expression.evaluator;
+package com.liferay.dynamic.data.mapping.expression.evaluator.internal;
 
 import java.io.IOException;
 

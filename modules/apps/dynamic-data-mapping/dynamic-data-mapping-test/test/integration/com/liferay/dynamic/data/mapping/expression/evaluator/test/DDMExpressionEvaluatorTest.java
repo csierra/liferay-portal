@@ -16,18 +16,25 @@ package com.liferay.dynamic.data.mapping.expression.evaluator.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dynamic.data.mapping.expression.evaluator.DDMExpressionEvaluator;
+import com.liferay.dynamic.data.mapping.expression.evaluator.DDMFormExpressionEvaluatorResult;
 import com.liferay.dynamic.data.mapping.service.test.BaseDDMServiceTestCase;
-import com.liferay.portal.expression.ExpressionFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 
-import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * @author Pablo Carvalho
@@ -42,31 +49,37 @@ public class DDMExpressionEvaluatorTest extends BaseDDMServiceTestCase {
 
 	@Test
 	public void testValidFields() throws Exception {
-		String serializedDDMFormValues = read(
-			"ddm-expression-evaluator-form-values-test-data.json");
-
 		String serializedDDMForm = read(
 			"ddm-expression-evaluator-form-test-data.json");
 
-		String languageId = LocaleUtil.toLanguageId(LocaleUtil.US);
+		DDMForm ddmForm = DDMFormJSONDeserializerUtil.deserialize(
+			serializedDDMForm);
 
-		DDMExpressionEvaluator ddmExpressionEvaluator =
-			new DDMExpressionEvaluator(
-				serializedDDMFormValues, serializedDDMForm, languageId);
+		String serializedDDMFormValues = read(
+			"ddm-expression-evaluator-form-values-test-data.json");
+
+		DDMFormValues ddmFormValues =
+			DDMFormValuesJSONDeserializerUtil.deserialize(
+				ddmForm, serializedDDMFormValues);
 
 		Registry registry = RegistryUtil.getRegistry();
 
-		ExpressionFactory expressionFactory = registry.getService(
-			ExpressionFactory.class);
+		DDMExpressionEvaluator ddmExpressionEvaluator = registry.getService(
+			DDMExpressionEvaluator.class);
 
-		ddmExpressionEvaluator.setExpressionFactory(expressionFactory);
+		DDMFormExpressionEvaluatorResult ddmFormExpressionEvaluatorResult =
+			ddmExpressionEvaluator.evaluate(
+				ddmForm, ddmFormValues, LocaleUtil.US);
 
-		String actualResult = ddmExpressionEvaluator.evaluate();
+		JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
 
 		String expectedResult = read(
 			"ddm-expression-evaluator-result-data.json");
 
-		Assert.assertEquals(expectedResult, actualResult);
+		String actualResult = jsonSerializer.serializeDeep(
+			ddmFormExpressionEvaluatorResult);
+
+		JSONAssert.assertEquals(expectedResult, actualResult, false);
 	}
 
 }
