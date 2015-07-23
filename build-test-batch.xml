@@ -30,9 +30,17 @@
 
 			<property name="database.type" value="@{database.type}" />
 
-			<local name="database.service.name" />
+			<local name="database.service.executable" />
 
-			<get-database-property property.name="database.service.name" />
+			<get-database-property property.name="database.service.executable" />
+
+			<local name="database.service.cmd.start" />
+
+			<get-database-property property.name="database.service.cmd.start" />
+
+			<local name="database.service.cmd.stop" />
+
+			<get-database-property property.name="database.service.cmd.stop" />
 
 			<action />
 		</sequential>
@@ -45,9 +53,19 @@
 		<sequential>
 			<database-test-action database.type="@{database.type}">
 				<action>
-					<exec executable="service" failonerror="true">
-						<arg line="${database.service.name} stop" />
-					</exec>
+					<if>
+						<equals arg1="@{database.type}" arg2="db2" />
+						<then>
+							<exec dir="/opt/ibm/db2/V10.5/bin" executable="${database.service.executable}" failonerror="true">
+								<arg line="${database.service.cmd.stop}" />
+							</exec>
+						</then>
+						<else>
+							<exec executable="${database.service.executable}" failonerror="true">
+								<arg line="${database.service.cmd.stop}" />
+							</exec>
+						</else>
+					</if>
 				</action>
 			</database-test-action>
 
@@ -59,24 +77,49 @@
 
 					<set-portal-impl-system-ext-properties />
 
-					<exec executable="service" failonerror="true">
-						<arg line="${database.service.name} start" />
-					</exec>
+					<if>
+						<equals arg1="@{database.type}" arg2="db2" />
+						<then>
+							<exec dir="/opt/ibm/db2/V10.5/bin" executable="${database.service.executable}" failonerror="true">
+								<arg line="${database.service.cmd.start}" />
+							</exec>
+						</then>
+						<else>
+							<exec executable="${database.service.executable}" failonerror="true">
+								<arg line="${database.service.cmd.start}" />
+							</exec>
+						</else>
+					</if>
 
 					<antcall target="copy-optional-jars" inheritall="false" >
-						<param name="database.type" value="${database.type}" />
+						<param name="database.type" value="@{database.type}" />
 						<param name="todir" value="lib/development" />
 					</antcall>
 
+					<antcall target="copy-optional-jars" inheritall="false" >
+						<param name="database.type" value="@{database.type}" />
+						<param name="todir" value="${app.server.lib.global.dir}" />
+					</antcall>
+
 					<antcall target="rebuild-database" inheritall="false" >
-						<param name="database.type" value="${database.type}" />
+						<param name="database.type" value="@{database.type}" />
 					</antcall>
 
 					<test-action />
 
-					<exec executable="service" failonerror="true">
-						<arg line="${database.service.name} stop" />
-					</exec>
+					<if>
+						<equals arg1="@{database.type}" arg2="db2" />
+						<then>
+							<exec dir="/opt/ibm/db2/V10.5/bin" executable="${database.service.executable}" failonerror="true">
+								<arg line="${database.service.cmd.stop}" />
+							</exec>
+						</then>
+						<else>
+							<exec executable="${database.service.executable}" failonerror="true">
+								<arg line="${database.service.cmd.stop}" />
+							</exec>
+						</else>
+					</if>
 				</action>
 			</database-test-action>
 		</sequential>
@@ -137,6 +180,25 @@
 		</sequential>
 	</macrodef>
 
+	<macrodef name="run-functional-test">
+		<attribute name="database.type" />
+		<sequential>
+			<property name="test.class" value="${axis.variable}" />
+
+			<run-batch-test test.class.group.index="${jenkins.axis.variable}">
+				<test-action>
+					<database-test-run-test database.type="@{database.type}">
+						<test-action>
+							<ant antfile="build-test-tomcat.xml" inheritAll="false" target="run-selenium-tomcat">
+								<property name="test.class" value="${axis.variable}" />
+							</ant>
+						</test-action>
+					</database-test-run-test>
+				</test-action>
+			</run-batch-test>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="run-integration-test">
 		<attribute name="database.type" />
 		<sequential>
@@ -148,6 +210,34 @@
 								<property name="database.type" value="@{database.type}" />
 								<property name="test.class.group.index" value="@{test.class.group.index}" />
 								<property name="test.type" value="integration" />
+							</ant>
+						</test-action>
+					</database-test-run-test>
+				</test-action>
+			</run-batch-test>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="run-modules-integration-test">
+		<attribute name="database.type" />
+		<sequential>
+			<run-batch-test test.class.group.index="${jenkins.axis.variable}">
+				<test-action>
+					<database-test-run-test database.type="@{database.type}">
+						<test-action>
+							<antcall target="prepare-portal-ext-properties" inheritAll="false">
+								<param name="database.type" value="@{database.type}" />
+							</antcall>
+
+							<antcall target="prepare-system-ext-properties" inheritAll="false" />
+
+							<ant dir="modules" target="test-class-group" inheritAll="false">
+								<property name="test.class.group.index" value="@{test.class.group.index}" />
+								<property name="test.type" value="integration" />
+							</ant>
+
+							<ant dir="portal-service" target="test-class" inheritAll="false">
+								<property name="test.class" value="PortalLogAssertorTest" />
 							</ant>
 						</test-action>
 					</database-test-run-test>
@@ -170,6 +260,14 @@
 		</sequential>
 	</macrodef>
 
+	<target name="functional-tomcat-mysql">
+		<run-functional-test database.type="mysql" />
+	</target>
+
+	<target name="integration-db2">
+		<run-integration-test database.type="db2" />
+	</target>
+
 	<target name="integration-mysql">
 		<run-integration-test database.type="mysql" />
 	</target>
@@ -182,23 +280,28 @@
 		<run-integration-test database.type="postgresql" />
 	</target>
 
-	<target name="modules">
+	<target name="modules-integration-db2">
+		<run-modules-integration-test database.type="db2" />
+	</target>
+
+	<target name="modules-integration-mysql">
+		<run-modules-integration-test database.type="mysql" />
+	</target>
+
+	<target name="modules-integration-oracle">
+		<run-modules-integration-test database.type="oracle" />
+	</target>
+
+	<target name="modules-integration-postgresql">
+		<run-modules-integration-test database.type="postgresql" />
+	</target>
+
+	<target name="modules-unit">
 		<run-batch-test test.class.group.index="${jenkins.axis.variable}">
 			<test-action>
-				<exec executable="service" failonerror="true">
-					<arg line="${database.mysql.service.name} start" />
-				</exec>
-
-				<antcall target="rebuild-database" inheritAll="false" />
-
-				<antcall target="delete-liferay-home" />
-
 				<ant dir="modules" target="test-class-group" inheritAll="false">
 					<property name="test.class.group.index" value="@{test.class.group.index}" />
-				</ant>
-
-				<ant dir="portal-service" target="test-class" inheritAll="false">
-					<property name="test.class" value="PortalLogAssertorTest" />
+					<property name="test.type" value="unit" />
 				</ant>
 			</test-action>
 		</run-batch-test>
@@ -217,9 +320,18 @@
 	<target name="portal-web">
 		<run-batch-test test.class.group.index="${jenkins.axis.variable}">
 			<test-action>
-				<run-build-selenium />
+				<database-test-run-test database.type="mysql">
+					<test-action>
+						<run-build-selenium />
 
-				<run-source-formatter />
+						<if>
+							<equals arg1="${TEST_PORTAL_WEB}" arg2="true" />
+							<then>
+								<run-source-formatter />
+							</then>
+						</if>
+					</test-action>
+				</database-test-run-test>
 			</test-action>
 		</run-batch-test>
 	</target>
@@ -239,8 +351,8 @@
 	<target name="tck">
 		<run-batch-test test.class.group.index="${jenkins.axis.variable}">
 			<test-action>
-				<exec executable="service" failonerror="true">
-					<arg line="${database.mysql.service.name} start" />
+				<exec executable="${database.mysql.service.executable}" failonerror="true">
+					<arg line="${database.mysql.service.cmd.start}" />
 				</exec>
 
 				<antcall target="rebuild-database" inheritAll="false" />

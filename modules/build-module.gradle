@@ -87,14 +87,47 @@ sourceSets {
 	}
 
 	test {
-		compileClasspath += configurations.portal + configurations.portalTest
-		runtimeClasspath += configurations.portal + configurations.portalTest
+		compileClasspath = configurations.portal + compileClasspath + configurations.portalTest
+		runtimeClasspath = configurations.portal + runtimeClasspath + configurations.portalTest
 	}
 
 	testIntegration {
-		compileClasspath += configurations.portal + configurations.portalTest
-		runtimeClasspath += configurations.portal + configurations.portalTest
+		compileClasspath = configurations.portal + compileClasspath + configurations.portalTest
+		runtimeClasspath = configurations.portal + runtimeClasspath + configurations.portalTest
 	}
+}
+
+test {
+	jvmArgs "-XX:MaxNewSize=32m"
+	jvmArgs "-XX:MaxPermSize=64m"
+	jvmArgs "-XX:MaxTenuringThreshold=0"
+	jvmArgs "-XX:NewSize=32m"
+	jvmArgs "-XX:ParallelGCThreads=2"
+	jvmArgs "-XX:PermSize=64m"
+	jvmArgs "-XX:SurvivorRatio=65536"
+	jvmArgs "-XX:TargetSurvivorRatio=0"
+	jvmArgs "-XX:-UseAdaptiveSizePolicy"
+	jvmArgs "-XX:+UseParallelOldGC"
+	jvmArgs "-XX:-UseSplitVerifier"
+
+	maxHeapSize = "256m"
+	minHeapSize = "256m"
+}
+
+testIntegration {
+	jvmArgs "-XX:MaxNewSize=32m"
+	jvmArgs "-XX:MaxPermSize=200m"
+	jvmArgs "-XX:MaxTenuringThreshold=0"
+	jvmArgs "-XX:NewSize=32m"
+	jvmArgs "-XX:ParallelGCThreads=2"
+	jvmArgs "-XX:PermSize=200m"
+	jvmArgs "-XX:SurvivorRatio=65536"
+	jvmArgs "-XX:TargetSurvivorRatio=0"
+	jvmArgs "-XX:-UseAdaptiveSizePolicy"
+	jvmArgs "-XX:+UseParallelOldGC"
+
+	maxHeapSize = "512m"
+	minHeapSize = "512m"
 }
 
 pluginManager.withPlugin("com.liferay.maven.plugin.builder") {
@@ -144,4 +177,24 @@ pluginManager.withPlugin("com.moowork.node") {
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
 	options.warnings = false
+}
+
+if (project.hasProperty("testClassGroupIndex")) {
+	Properties properties = new Properties()
+
+	File file = new File(rootDir, "../test.class.file.names.properties")
+
+	properties.load(new StringReader(file.text.replace("\\", "/")))
+
+	String testClassGroup = properties["TEST_CLASS_GROUP_" + testClassGroupIndex]
+	String testClassGroups = properties["TEST_CLASS_GROUPS"]
+
+	List<String> testClasses = testClassGroup.tokenize(",")
+
+	configure([test, testIntegration]) {
+		include testClasses
+
+		jvmArgs "-Dtest.class.group.index=" + testClassGroupIndex
+		jvmArgs "-Dtest.class.groups=" + testClassGroups
+	}
 }

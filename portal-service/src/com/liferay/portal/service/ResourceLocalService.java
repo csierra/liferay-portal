@@ -53,9 +53,9 @@ public interface ResourceLocalService extends BaseLocalService {
 	* <li>
 	* If the service context specifies that default group or default guest
 	* permissions are to be added, then only default permissions are added. See
-	* {@link com.liferay.portal.service.ServiceContext#setAddGroupPermissions(
+	* {@link ServiceContext#setAddGroupPermissions(
 	* boolean)} and {@link
-	* com.liferay.portal.service.ServiceContext#setAddGuestPermissions(
+	* ServiceContext#setAddGuestPermissions(
 	* boolean)}.
 	* </li>
 	* <li>
@@ -65,15 +65,15 @@ public interface ResourceLocalService extends BaseLocalService {
 	* If the service context specifies to derive default permissions, then
 	* default group and guest permissions are derived from the model and
 	* added. See {@link
-	* com.liferay.portal.service.ServiceContext#setDeriveDefaultPermissions(
+	* ServiceContext#setDeriveDefaultPermissions(
 	* boolean)}.
 	* </li>
 	* <li>
 	* Lastly group and guest permissions from the service
 	* context are applied. See {@link
-	* com.liferay.portal.service.ServiceContext#setGroupPermissions(String[])}
+	* ServiceContext#setGroupPermissions(String[])}
 	* and {@link
-	* com.liferay.portal.service.ServiceContext#setGuestPermissions(String[])}.
+	* ServiceContext#setGuestPermissions(String[])}.
 	* </li>
 	* </ol>
 	*
@@ -91,7 +91,7 @@ public interface ResourceLocalService extends BaseLocalService {
 	public void addModelResources(
 		com.liferay.portal.model.AuditedModel auditedModel,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws PortalException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Adds resources for the model with the name and primary key, always
@@ -113,7 +113,7 @@ public interface ResourceLocalService extends BaseLocalService {
 	public void addModelResources(long companyId, long groupId, long userId,
 		java.lang.String name, long primKey,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws PortalException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Adds resources for the model with the name and primary key string, always
@@ -135,7 +135,17 @@ public interface ResourceLocalService extends BaseLocalService {
 	public void addModelResources(long companyId, long groupId, long userId,
 		java.lang.String name, java.lang.String primKey,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws PortalException;
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void addModelResources(long companyId, long groupId, long userId,
+		java.lang.String name, long primKey,
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void addModelResources(long companyId, long groupId, long userId,
+		java.lang.String name, java.lang.String primKey,
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Adds resources for the entity with the name. Use this method if the user
@@ -152,7 +162,7 @@ public interface ResourceLocalService extends BaseLocalService {
 	*/
 	public void addResources(long companyId, long groupId,
 		java.lang.String name, boolean portletActions)
-		throws PortalException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Adds resources for the entity with the name and primary key string,
@@ -177,7 +187,8 @@ public interface ResourceLocalService extends BaseLocalService {
 	public void addResources(long companyId, long groupId, long userId,
 		java.lang.String name, java.lang.String primKey,
 		boolean portletActions, boolean addGroupPermissions,
-		boolean addGuestPermissions) throws PortalException;
+		boolean addGuestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Adds resources for the entity with the name and primary key, always
@@ -202,19 +213,19 @@ public interface ResourceLocalService extends BaseLocalService {
 	public void addResources(long companyId, long groupId, long userId,
 		java.lang.String name, long primKey, boolean portletActions,
 		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws PortalException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes the resource associated with the model at the scope.
 	*
 	* @param auditedModel the model associated with the resource
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
+	ResourceConstants}.
 	* @throws PortalException if a portal exception occurred
 	*/
 	public void deleteResource(
 		com.liferay.portal.model.AuditedModel auditedModel, int scope)
-		throws PortalException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes the resource matching the primary key at the scope.
@@ -223,12 +234,13 @@ public interface ResourceLocalService extends BaseLocalService {
 	* @param name the resource's name, which should be a portlet ID if the
 	resource is a portlet or the resource's class name otherwise
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
+	ResourceConstants}.
 	* @param primKey the primary key of the resource instance
 	* @throws PortalException if a portal exception occurred
 	*/
 	public void deleteResource(long companyId, java.lang.String name,
-		int scope, long primKey) throws PortalException;
+		int scope, long primKey)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes the resource matching the primary key at the scope.
@@ -237,12 +249,13 @@ public interface ResourceLocalService extends BaseLocalService {
 	* @param name the resource's name, which should be a portlet ID if the
 	resource is a portlet or the resource's class name otherwise
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
+	ResourceConstants}.
 	* @param primKey the primary key string of the resource instance
 	* @throws PortalException if a portal exception occurred
 	*/
 	public void deleteResource(long companyId, java.lang.String name,
-		int scope, java.lang.String primKey) throws PortalException;
+		int scope, java.lang.String primKey)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -258,7 +271,7 @@ public interface ResourceLocalService extends BaseLocalService {
 	* @param name a name for the resource, which should be a portlet ID if the
 	resource is a portlet or the resource's class name otherwise
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
+	ResourceConstants}.
 	* @param primKey the primary key string of the resource
 	* @return the new resource
 	*/
@@ -288,7 +301,8 @@ public interface ResourceLocalService extends BaseLocalService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasUserPermissions(long userId, long resourceId,
 		java.util.List<com.liferay.portal.model.Resource> resources,
-		java.lang.String actionId, long[] roleIds) throws PortalException;
+		java.lang.String actionId, long[] roleIds)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Sets the Spring bean ID for this bean.
@@ -309,7 +323,7 @@ public interface ResourceLocalService extends BaseLocalService {
 	public void updateModelResources(
 		com.liferay.portal.model.AuditedModel auditedModel,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws PortalException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Updates resources matching the group, name, and primary key string at the
@@ -327,7 +341,7 @@ public interface ResourceLocalService extends BaseLocalService {
 	public void updateResources(long companyId, long groupId,
 		java.lang.String name, java.lang.String primKey,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws PortalException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Updates resources matching the group, name, and primary key at the
@@ -345,7 +359,7 @@ public interface ResourceLocalService extends BaseLocalService {
 	public void updateResources(long companyId, long groupId,
 		java.lang.String name, long primKey,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws PortalException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Updates resources matching the name, primary key string and scope,
@@ -356,7 +370,7 @@ public interface ResourceLocalService extends BaseLocalService {
 	* @param name the resource's name, which should be a portlet ID if the
 	resource is a portlet or the resource's class name otherwise
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
+	ResourceConstants}.
 	* @param primKey the primary key string of the resource instance
 	* @param newPrimKey the new primary key string of the resource
 	*/
