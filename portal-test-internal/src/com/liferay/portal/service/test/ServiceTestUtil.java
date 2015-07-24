@@ -122,7 +122,7 @@ public class ServiceTestUtil {
 		// Upgrade
 
 		try {
-			DBUpgrader.upgrade();
+			// DBUpgrader.upgrade();
 		}
 		catch (Throwable t) {
 			_log.error(t, t);

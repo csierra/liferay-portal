@@ -92,49 +92,6 @@ public final class ServiceConfiguratorRegistrator {
 		}
 	}
 
-	protected InputStream buildBundle(Release release) {
-		StringBundler sb = new StringBundler(18);
-
-		sb.append("Bundle-Name: ");
-		sb.append(release.getServletContextName());
-		sb.append(" Schema Capabilities Provider");
-		sb.append(StringPool.NEW_LINE);
-		sb.append("Bundle-SymbolicName: ");
-		sb.append("synthetic.");
-		sb.append(release.getServletContextName());
-		sb.append(StringPool.NEW_LINE);
-		sb.append("Bundle-Version: ");
-		sb.append(release.getBuildNumber());
-		sb.append(StringPool.NEW_LINE);
-		sb.append("Provide-Capability: schema.provider;");
-		sb.append("schema.provider=\"");
-		sb.append(release.getServletContextName());
-		sb.append("\";");
-		sb.append("version:Version=\"");
-		sb.append(release.getBuildNumber());
-		sb.append("\"");
-
-		Thread thread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = thread.getContextClassLoader();
-
-		thread.setContextClassLoader(_bundleClassLoader);
-
-		try {
-			JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class);
-
-			javaArchive.add(
-				new StringAsset(sb.toString()), "META-INF/MANIFEST.MF");
-
-			ZipExporter zipExporter = javaArchive.as(ZipExporter.class);
-
-			return zipExporter.exportAsInputStream();
-		}
-		finally {
-			thread.setContextClassLoader(contextClassLoader);
-		}
-	}
-
 	@Deactivate
 	protected void deactivate() {
 		for (

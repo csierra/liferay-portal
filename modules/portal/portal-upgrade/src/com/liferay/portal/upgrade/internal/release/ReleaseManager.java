@@ -29,7 +29,7 @@ import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.api.OutputStreamProvider;
 import com.liferay.portal.upgrade.api.OutputStreamProviderTracker;
-import com.liferay.portal.upgrade.api.Upgrade;
+import com.liferay.portal.Upgrade;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 import com.liferay.portal.upgrade.internal.UpgradeInfo;
 import com.liferay.portal.upgrade.internal.bundle.ServiceConfiguratorRegistrator;
@@ -121,13 +121,6 @@ public class ReleaseManager {
 		OutputStreamProviderTracker outputStreamProviderTracker) {
 
 		_outputStreamProviderTracker = outputStreamProviderTracker;
-	}
-
-	@Reference
-	public void setServiceConfiguratorRegistrator(
-		ServiceConfiguratorRegistrator serviceConfiguratorRegistrator) {
-
-		_serviceConfiguratorRegistrator = serviceConfiguratorRegistrator;
 	}
 
 	@Activate

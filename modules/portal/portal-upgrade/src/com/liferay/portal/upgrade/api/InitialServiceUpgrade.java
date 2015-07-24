@@ -16,6 +16,7 @@ package com.liferay.portal.upgrade.api;
 
 import com.liferay.portal.DatabaseContext;
 import com.liferay.portal.DatabaseProcessContext;
+import com.liferay.portal.Upgrade;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeException;

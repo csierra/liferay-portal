@@ -12,17 +12,13 @@
  * details.
  */
 
-package com.liferay.portal.upgrade.api;
-
-import com.liferay.portal.DatabaseProcessContext;
-import com.liferay.portal.kernel.upgrade.UpgradeException;
+package com.liferay.portal.kernel.sql;
 
 /**
- * @author Carlos Sierra Andrés
+ * @author Miguel Pastor
  */
-public interface Upgrade {
+public interface SQLTransformer {
 
-	public void upgrade(DatabaseProcessContext databaseContext)
-		throws UpgradeException;
+	public String transform(String sql);
 
 }

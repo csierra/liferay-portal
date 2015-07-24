@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.dao.db.DBFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.upgrade.api.Upgrade;
+import com.liferay.portal.Upgrade;
 
 import java.net.URL;
 

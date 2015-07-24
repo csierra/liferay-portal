@@ -68,6 +68,7 @@ import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbUtil;
+import com.liferay.portal.kernel.sql.SQLTransformerUtil;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadServletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -7065,7 +7066,7 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String transformSQL(String sql) {
-		return SQLTransformer.transform(sql);
+		return SQLTransformerUtil.transform(sql);
 	}
 
 	@Override

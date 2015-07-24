@@ -72,7 +72,7 @@ public class PersistenceTestCallback extends BaseTestCallback<Object, Object> {
 		}
 
 		try {
-			DBUpgrader.upgrade();
+			// DBUpgrader.upgrade();
 		}
 		catch (Throwable t) {
 			throw new ExceptionInInitializerError(t);

@@ -16,7 +16,7 @@ package com.liferay.portal.upgrade.internal;
 
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.upgrade.api.Upgrade;
+import com.liferay.portal.Upgrade;
 
 /**
  * @author Miguel Pastor
