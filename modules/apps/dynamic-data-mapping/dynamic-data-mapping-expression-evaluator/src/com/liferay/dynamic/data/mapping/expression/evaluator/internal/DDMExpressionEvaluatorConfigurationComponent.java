@@ -55,10 +55,12 @@ public class DDMExpressionEvaluatorConfigurationComponent {
 		properties.put("contextPaths", new String[] {"/ddm-eval"});
 		properties.put(
 			"jaxRsApplicationFilterStrings",
-			new String[] {"(jaxrs.application=true)"});
+			new String[] {"(ddm.expression.evaluator=true)"});
 		properties.put(
 			"jaxRsProviderFilterStrings",
-			new String[] {"(jaxrs.provider=true)"});
+			new String[] {"(&(ddm.expression.evaluator=true)" +
+				"(jaxrs.provider=true))"
+			});
 
 		_restConfiguration.update(properties);
 	}

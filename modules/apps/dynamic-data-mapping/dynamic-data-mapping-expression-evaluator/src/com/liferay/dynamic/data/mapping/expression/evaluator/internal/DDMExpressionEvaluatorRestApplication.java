@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Pablo Carvalho
  */
 @Component(
-	immediate = true, property = "jaxrs.application=true",
+	immediate = true, property = {"ddm.expression.evaluator=true"},
 	service = Application.class
 )
 public class DDMExpressionEvaluatorRestApplication extends Application {
