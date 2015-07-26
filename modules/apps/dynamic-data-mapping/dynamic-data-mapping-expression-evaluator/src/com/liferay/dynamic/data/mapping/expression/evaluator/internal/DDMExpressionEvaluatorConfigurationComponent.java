@@ -67,8 +67,13 @@ public class DDMExpressionEvaluatorConfigurationComponent {
 
 	@Deactivate
 	public void deactivate() throws IOException {
-		_restConfiguration.delete();
-		_cxfConfiguration.delete();
+		if (_restConfiguration != null) {
+			_restConfiguration.delete();
+		}
+
+		if (_cxfConfiguration != null) {
+			_cxfConfiguration.delete();
+		}
 	}
 
 	@Reference
