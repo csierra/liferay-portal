@@ -45,18 +45,6 @@ public class DDMExpressionEvaluatorConfigurationComponent {
 
 		_cxfConfiguration.update(properties);
 
-		_jaxWsApiConfiguration = _configurationAdmin.getConfiguration(
-			"com.liferay.portal.soap.extender.configuration." +
-				"JaxWsApiConfiguration",
-			null);
-
-		properties = new Hashtable<>();
-
-		properties.put("contextPath", "/ddm-eval");
-		properties.put("timeout", 10000);
-
-		_jaxWsApiConfiguration.update(properties);
-
 		_restConfiguration = _configurationAdmin.createFactoryConfiguration(
 			"com.liferay.portal.rest.extender.configuration." +
 				"RestExtenderConfiguration",
@@ -78,7 +66,6 @@ public class DDMExpressionEvaluatorConfigurationComponent {
 	@Deactivate
 	public void deactivate() throws IOException {
 		_restConfiguration.delete();
-		_jaxWsApiConfiguration.delete();
 		_cxfConfiguration.delete();
 	}
 
@@ -89,7 +76,6 @@ public class DDMExpressionEvaluatorConfigurationComponent {
 
 	private ConfigurationAdmin _configurationAdmin;
 	private Configuration _cxfConfiguration;
-	private Configuration _jaxWsApiConfiguration;
 	private Configuration _restConfiguration;
 
 }
