@@ -14,15 +14,17 @@
 
 package com.liferay.portal.upgrade.internal.bundle;
 
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
 
 import java.io.InputStream;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -31,15 +33,10 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.apache.felix.utils.log.Logger;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -78,14 +75,10 @@ public final class ServiceConfiguratorRegistrator {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
-		Bundle bundle = bundleContext.getBundle();
 
-		BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+		_log = new Logger(bundleContext);
 
-		_bundleClassLoader = bundleWiring.getClassLoader();
-
-		List<Release> releases = _releaseLocalService.getReleases(
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		List<Release> releases = _getReleases();
 
 		for (Release release : releases) {
 			signalRelease(release);
@@ -120,8 +113,45 @@ public final class ServiceConfiguratorRegistrator {
 	protected void setServletContext(ServletContext servletContext) {
 	}
 
-	private ClassLoader _bundleClassLoader;
+	private List<Release> _getReleases() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<Release> releases = new ArrayList<>();
+
+		try {
+			con = DataAccess.getConnection();
+
+			ps = con.prepareStatement(
+				"select servletContextName, buildNumber from Release_");
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				String serveltContextName = rs.getString("servletContextName");
+				String buildNumber = rs.getString("buildNumber");
+
+				Release release = _releaseLocalService.createRelease(-1);
+
+				release.setServletContextName(serveltContextName);
+				release.setBuildNumber(buildNumber);
+			}
+		}
+		catch (Exception e) {
+			_log.log(
+				Logger.LOG_ERROR,
+				"Unexpected error retrieving the current list of releases", e);
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+
+		return releases;
+	}
+
 	private BundleContext _bundleContext;
+	private Logger _log;
 	private ReleaseLocalService _releaseLocalService;
 	private ServiceConfigurator _serviceConfigurator;
 	private final Map<String, ServiceRegistration<ServiceConfigurator>>

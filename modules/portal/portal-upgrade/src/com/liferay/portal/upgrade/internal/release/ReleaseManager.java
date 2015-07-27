@@ -21,9 +21,8 @@ import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
 import com.liferay.portal.DatabaseContext;
 import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
@@ -38,9 +37,14 @@ import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.felix.utils.log.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -68,7 +72,7 @@ public class ReleaseManager {
 		List<UpgradeInfo> upgradeInfos = _serviceTrackerMap.getService(
 			componentName);
 
-		String buildNumber = getBuildNumber(componentName);
+		String buildNumber = _getBuildNumber(componentName);
 
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			upgradeInfos);
@@ -87,7 +91,7 @@ public class ReleaseManager {
 		List<UpgradeInfo> upgradeInfos = _serviceTrackerMap.getService(
 			componentName);
 
-		String buildNumber = getBuildNumber(componentName);
+		String buildNumber = _getBuildNumber(componentName);
 
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			upgradeInfos);
@@ -126,6 +130,8 @@ public class ReleaseManager {
 	@Activate
 	protected void activate(final BundleContext bundleContext)
 		throws InvalidSyntaxException {
+
+		_log = new Logger(bundleContext);
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
 			bundleContext, Upgrade.class,
@@ -215,18 +221,6 @@ public class ReleaseManager {
 		}
 	}
 
-	protected String getBuildNumber(String componentName) {
-		Release release = _releaseLocalService.fetchRelease(componentName);
-
-		String buildNumber = "0.0.0";
-
-		if (release != null) {
-			buildNumber = release.getBuildNumber();
-		}
-
-		return buildNumber;
-	}
-
 	@Reference
 	protected void setReleaseLocalService(
 		ReleaseLocalService releaseLocalService) {
@@ -234,7 +228,40 @@ public class ReleaseManager {
 		_releaseLocalService = releaseLocalService;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(ReleaseManager.class);
+	private String _getBuildNumber(String servletContextName) {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getConnection();
+
+			ps = con.prepareStatement(
+				"select buildNumber from Release_ where " +
+					"servletContextName = ?");
+
+			ps.setString(1,servletContextName);
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return rs.getString("buildNumber");
+			}
+
+		} catch (Exception e) {
+			_log.log(
+				Logger.LOG_ERROR,
+				"Unexpected error retrieving the current build number of " +
+					servletContextName, e);
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+
+		return "";
+	}
+
+	private static Logger _log;
 
 	private OutputStreamProviderTracker _outputStreamProviderTracker;
 	private ReleaseLocalService _releaseLocalService;
@@ -252,21 +279,19 @@ public class ReleaseManager {
 		public UpgradeInfo addingService(
 			ServiceReference<Upgrade> serviceReference) {
 
-			String from = (String)serviceReference.getProperty(
+			String from = (String) serviceReference.getProperty(
 				UpgradeWhiteboardConstants.FROM);
-			String to = (String)serviceReference.getProperty(
+			String to = (String) serviceReference.getProperty(
 				UpgradeWhiteboardConstants.TO);
 
 			Upgrade upgradeProcess = _bundleContext.getService(
 				serviceReference);
 
 			if (upgradeProcess == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Service " + serviceReference + " is registered as " +
-							"an upgrade but it is not implementing Upgrade " +
-								"interface. Not tracking.");
-				}
+				_log.log(Logger.LOG_WARNING,
+					"Service " + serviceReference + " is registered as " +
+						"an upgrade but it is not implementing Upgrade " +
+						"interface. Not tracking.");
 
 				return null;
 			}

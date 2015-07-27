@@ -16,35 +16,52 @@ package com.liferay.portal.tools;
 
 import com.liferay.portal.cache.key.HashCodeCacheKeyGenerator;
 import com.liferay.portal.cache.key.SimpleCacheKeyGenerator;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
+import com.liferay.portal.dao.db.DBFactoryImpl;
+import com.liferay.portal.dao.jdbc.DataSourceFactoryImpl;
+import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.kernel.cache.key.CacheKeyGenerator;
 import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
+import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.sql.SQLTransformerUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
 ;
-import com.liferay.portal.kernel.util.*;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ReleaseInfo;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.ReleaseConstants;
+import com.liferay.portal.security.lang.DoPrivilegedUtil;
+import com.liferay.portal.spring.context.ArrayApplicationContext;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PropsImpl;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
+import java.io.Console;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractRefreshableApplicationContext;
 
 /**
  * @author Michael C. Han
@@ -56,29 +73,9 @@ public class DBUpgrader {
 		DBUpgrader dbUpgrader = new DBUpgrader();
 
 		try {
+			upgradeCorePortal();
+
 			_startFramework();
-
-			/*
-			Thread thread = new Thread(
-				new Runnable() {
-
-					@Override
-					public void run() {
-						_startFramework();
-					}
-
-				}, "Upgrade Console Thread");
-
-			thread.start();
-
-			// Wait for the tread to finish: this should lock forever since
-			// we are starting the Gogo Shell
-
-			thread.join();
-
-			// dbUpgrader.upgrade();
-
-			// System.exit(0);*/
 
 		} catch (Exception e) {
 			Thread.currentThread().interrupt();
@@ -86,15 +83,6 @@ public class DBUpgrader {
 	}
 
 	public void upgrade(){
-
-		// Disable database caching before upgrade
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Disable cache registry");
-		}
-
-		CacheRegistryUtil.setActive(false);
-
 		// Check release
 
 		int buildNumber = _getBuildNumber();
@@ -154,6 +142,59 @@ public class DBUpgrader {
 		}
 	}
 
+	protected static void upgradeCorePortal() {
+		Console console = System.console();
+
+		if (console == null) {
+			System.err.println("No console is available.");
+
+			System.exit(1);
+		}
+
+		console.format("*****************************************\n");
+		console.format("Portal is about to start in Upgrade mode.\n");
+		console.format("*****************************************\n");
+
+		String upgrade = null;
+
+		do {
+			upgrade = console.readLine(
+				"Do you want to upgrade Liferay's Portal Core? (yes/no):");
+		} while (!upgrade.equals("yes") && !upgrade.equals("no"));
+
+		if (upgrade.equals("no")) {
+			console.format(
+				"Upgrade the core portal is mandatory in order to be able " +
+					"to upgrade all the modules");
+
+			System.exit(1);
+		}
+
+		DataSourceFactoryUtil.setDataSourceFactory(
+			DoPrivilegedUtil.wrap(new DataSourceFactoryImpl()));
+
+		DBFactoryUtil.setDBFactory(DoPrivilegedUtil.wrap(new DBFactoryImpl()));
+
+		PortalClassLoaderUtil.setClassLoader(
+			ClassLoaderUtil.getContextClassLoader());
+
+		ApplicationContext applicationContext = new ArrayApplicationContext(
+			PropsValues.SPRING_INFRASTRUCTURE_CONFIGS);
+
+		new SQLTransformerUtil(new SQLTransformer());
+
+		com.liferay.portal.kernel.util.PropsUtil.setProps(new PropsImpl());
+
+		PropsUtil.reload();
+
+		DBUpgrader dbUpgrader = new DBUpgrader();
+
+		dbUpgrader.upgrade();
+
+		((AbstractRefreshableApplicationContext)applicationContext).close();
+
+		return;
+	}
 	protected static String[] getUpgradeProcessClassNames(String key) {
 
 		// We would normally call PropsUtil#getArray(String) to return a String

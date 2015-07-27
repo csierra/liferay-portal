@@ -140,11 +140,11 @@ public class UpgradeProcessUtil {
 
 		boolean ranUpgradeProcess = false;
 
-		boolean tempIndexReadOnly = SearchEngineUtil.isIndexReadOnly();
+		//boolean tempIndexReadOnly = SearchEngineUtil.isIndexReadOnly();
 
-		if (indexOnUpgrade) {
-			SearchEngineUtil.setIndexReadOnly(true);
-		}
+		//if (indexOnUpgrade) {
+		//	SearchEngineUtil.setIndexReadOnly(true);
+		//}
 
 		try {
 			for (UpgradeProcess upgradeProcess : upgradeProcesses) {
@@ -157,7 +157,7 @@ public class UpgradeProcessUtil {
 			}
 		}
 		finally {
-			SearchEngineUtil.setIndexReadOnly(tempIndexReadOnly);
+			//SearchEngineUtil.setIndexReadOnly(tempIndexReadOnly);
 		}
 
 		return ranUpgradeProcess;
