@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
@@ -33,7 +32,6 @@ import com.liferay.portal.upgrade.api.OutputStreamProviderTracker;
 import com.liferay.portal.Upgrade;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 import com.liferay.portal.upgrade.internal.UpgradeInfo;
-import com.liferay.portal.upgrade.internal.bundle.ServiceConfiguratorRegistrator;
 import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
 
 import java.io.IOException;
@@ -45,8 +43,6 @@ import java.sql.ResultSet;
 
 import java.util.Collections;
 import java.util.List;
-
-import com.liferay.portal.upgrade.internal.upgrade.UpgradeRelease;
 
 import org.apache.felix.utils.log.Logger;
 
@@ -136,9 +132,6 @@ public class ReleaseManager {
 
 		_log = new Logger(bundleContext);
 
-		UpgradeProcess upgradeProcess = new UpgradeRelease();
-
-		upgradeProcess.upgrade();
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
 			bundleContext, Upgrade.class,
@@ -224,7 +217,7 @@ public class ReleaseManager {
 		Release release = _releaseLocalService.fetchRelease(componentName);
 
 		if (release != null) {
-			_serviceConfiguratorRegistrator.signalRelease(release);
+			_releasePublisher.publish(release);
 		}
 	}
 
@@ -233,6 +226,11 @@ public class ReleaseManager {
 		ReleaseLocalService releaseLocalService) {
 
 		_releaseLocalService = releaseLocalService;
+	}
+
+	@Reference
+	protected void setReleasePublisher(ReleasePublisher releasePublisher) {
+		_releasePublisher = releasePublisher;
 	}
 
 	private String _getBuildNumber(String servletContextName) {
@@ -272,7 +270,7 @@ public class ReleaseManager {
 
 	private OutputStreamProviderTracker _outputStreamProviderTracker;
 	private ReleaseLocalService _releaseLocalService;
-	private ServiceConfiguratorRegistrator _serviceConfiguratorRegistrator;
+	private ReleasePublisher _releasePublisher;
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
 
 	private static class UpgradeCustomizer

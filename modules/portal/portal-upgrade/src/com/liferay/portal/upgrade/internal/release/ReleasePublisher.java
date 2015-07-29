@@ -12,19 +12,15 @@
  * details.
  */
 
-package com.liferay.portal.upgrade.internal.bundle;
+package com.liferay.portal.upgrade.internal.release;
 
-import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.upgrade.UpgradeException;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
 
-import java.io.InputStream;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -33,6 +29,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import com.liferay.portal.upgrade.internal.upgrade.UpgradeRelease;
 import org.apache.felix.utils.log.Logger;
 
 import org.osgi.framework.BundleContext;
@@ -46,10 +43,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Miguel Pastor
  * @author Carlos Sierra Andrés
  */
-@Component(immediate = true, service = ServiceConfiguratorRegistrator.class)
-public final class ServiceConfiguratorRegistrator {
+@Component(immediate = true, service = ReleasePublisher.class)
+public final class ReleasePublisher {
 
-	public void signalRelease(Release release) {
+	public void publish(Release release) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 
 		String servletContextName = release.getServletContextName();
@@ -73,15 +70,20 @@ public final class ServiceConfiguratorRegistrator {
 	}
 
 	@Activate
-	protected void activate(BundleContext bundleContext) {
+	protected void activate(BundleContext bundleContext)
+		throws UpgradeException {
+
 		_bundleContext = bundleContext;
 
 		_log = new Logger(bundleContext);
 
-		List<Release> releases = _getReleases();
+		_upgradeRelease();
+
+		List<Release> releases = _releaseLocalService.getReleases(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		for (Release release : releases) {
-			signalRelease(release);
+			publish(release);
 		}
 	}
 
@@ -109,45 +111,10 @@ public final class ServiceConfiguratorRegistrator {
 		_serviceConfigurator = serviceConfigurator;
 	}
 
-	@Reference(target = "(original.bean=true)")
-	protected void setServletContext(ServletContext servletContext) {
-	}
+	private void _upgradeRelease() throws UpgradeException {
+		UpgradeProcess upgradeProcess = new UpgradeRelease();
 
-	private List<Release> _getReleases() {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		List<Release> releases = new ArrayList<>();
-
-		try {
-			con = DataAccess.getConnection();
-
-			ps = con.prepareStatement(
-				"select servletContextName, buildNumber from Release_");
-
-			rs = ps.executeQuery();
-
-			while (rs.next()) {
-				String serveltContextName = rs.getString("servletContextName");
-				String buildNumber = rs.getString("buildNumber");
-
-				Release release = _releaseLocalService.createRelease(-1);
-
-				release.setServletContextName(serveltContextName);
-				release.setBuildNumber(buildNumber);
-			}
-		}
-		catch (Exception e) {
-			_log.log(
-				Logger.LOG_ERROR,
-				"Unexpected error retrieving the current list of releases", e);
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
-		}
-
-		return releases;
+		upgradeProcess.upgrade();
 	}
 
 	private BundleContext _bundleContext;
