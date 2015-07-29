@@ -39,7 +39,7 @@ import java.util.Enumeration;
 public abstract class UpgradePortletSettings extends UpgradeProcess {
 
 	public UpgradePortletSettings() {
-		_settingsFactory = SettingsFactoryUtil.getSettingsFactory();
+		this(SettingsFactoryUtil.getSettingsFactory());
 	}
 
 	public UpgradePortletSettings(SettingsFactory settingsFactory) {

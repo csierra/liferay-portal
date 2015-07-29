@@ -23,6 +23,8 @@ import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.upgrade.UpgradeException;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
@@ -44,7 +46,10 @@ import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.List;
 
+import com.liferay.portal.upgrade.internal.upgrade.UpgradeRelease;
+
 import org.apache.felix.utils.log.Logger;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -81,8 +86,6 @@ public class ReleaseManager {
 			buildNumber);
 
 		executeUpgradePath(componentName, upgradePath);
-
-		UpgradeInfo upgradeInfo = upgradePath.get(upgradePath.size() - 1);
 	}
 
 	public void execute(String componentName, String to)
@@ -116,7 +119,7 @@ public class ReleaseManager {
 			"Registered upgrade commands for component " + componentName);
 
 		for (UpgradeInfo upgradeProcess : upgradeProcesses) {
-			System.out.println(upgradeProcess);
+			System.out.println("\t" + upgradeProcess);
 		}
 	}
 
@@ -129,9 +132,13 @@ public class ReleaseManager {
 
 	@Activate
 	protected void activate(final BundleContext bundleContext)
-		throws InvalidSyntaxException {
+		throws InvalidSyntaxException, UpgradeException {
 
 		_log = new Logger(bundleContext);
+
+		UpgradeProcess upgradeProcess = new UpgradeRelease();
+
+		upgradeProcess.upgrade();
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
 			bundleContext, Upgrade.class,

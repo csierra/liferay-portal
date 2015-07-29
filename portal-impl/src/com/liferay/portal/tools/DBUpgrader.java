@@ -14,11 +14,14 @@
 
 package com.liferay.portal.tools;
 
+import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.cache.key.HashCodeCacheKeyGenerator;
 import com.liferay.portal.cache.key.SimpleCacheKeyGenerator;
 import com.liferay.portal.dao.db.DBFactoryImpl;
 import com.liferay.portal.dao.jdbc.DataSourceFactoryImpl;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
+import com.liferay.portal.kernel.bean.BeanLocator;
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.cache.key.CacheKeyGenerator;
 import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
@@ -33,19 +36,20 @@ import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
 ;
 import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.model.ReleaseConstants;
 import com.liferay.portal.security.lang.DoPrivilegedUtil;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.spring.context.ArrayApplicationContext;
 import com.liferay.portal.util.InitUtil;
-import com.liferay.portal.util.PortalImpl;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsImpl;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -56,10 +60,15 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import com.liferay.portal.xml.SAXReaderImpl;
+import com.liferay.portlet.documentlibrary.util.DLImpl;
+import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.util.log4j.Log4JUtil;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 
@@ -73,9 +82,9 @@ public class DBUpgrader {
 		DBUpgrader dbUpgrader = new DBUpgrader();
 
 		try {
-			upgradeCorePortal();
+			// upgradeCorePortal();
 
-			_startFramework();
+			_startMinimalServices();
 
 		} catch (Exception e) {
 			Thread.currentThread().interrupt();
@@ -181,11 +190,26 @@ public class DBUpgrader {
 		ApplicationContext applicationContext = new ArrayApplicationContext(
 			PropsValues.SPRING_INFRASTRUCTURE_CONFIGS);
 
+		BeanLocator beanLocator = new BeanLocatorImpl(
+			ClassLoaderUtil.getPortalClassLoader(), applicationContext);
+
+		PortalBeanLocatorUtil.setBeanLocator(beanLocator);
+
 		new SQLTransformerUtil(new SQLTransformer());
 
 		com.liferay.portal.kernel.util.PropsUtil.setProps(new PropsImpl());
 
 		PropsUtil.reload();
+
+		SAXReaderImpl saxReader = new SAXReaderImpl();
+
+		saxReader.setSecure(true);
+		saxReader.setSecureXMLFactoryProvider(
+			new SecureXMLFactoryProviderImpl());
+
+		new UnsecureSAXReaderUtil().setSAXReader(saxReader);
+
+		Log4JUtil.configureLog4J(ClassLoaderUtil.getPortalClassLoader());
 
 		DBUpgrader dbUpgrader = new DBUpgrader();
 
@@ -344,12 +368,15 @@ public class DBUpgrader {
 		}
 	}
 
-	private static List<String> _getSpringConfigs() {
-		List<String> configLocations = ListUtil.fromArray(
-			PropsUtil.getArray(
-				com.liferay.portal.kernel.util.PropsKeys.SPRING_CONFIGS));
+	private static List<String> _getMinimalSpringConfigs() {
+		List<String> configLocations = new ArrayList<>();
 
+		configLocations.add("META-INF/base-spring.xml");
+		configLocations.add("META-INF/counter-spring.xml");
+		configLocations.add("META-INF/minimal-upgrade-services-spring.xml");
+		configLocations.add("META-INF/portlet-container-spring.xml");
 		configLocations.add("META-INF/upgrade-spring.xml");
+		configLocations.add("META-INF/util-spring.xml");
 
 		return configLocations;
 	}
@@ -436,12 +463,41 @@ public class DBUpgrader {
 			new SimpleCacheKeyGenerator());
 	}
 
-	private static void _startFramework() {
+	public static void _wireDLUtils() {
+		new DLUtil().setDL(new DLImpl());
+	}
+
+	private static void _wireSaxReaders() {
+		SAXReaderImpl saxReader = new SAXReaderImpl();
+
+		saxReader.setSecure(true);
+		saxReader.setSecureXMLFactoryProvider(
+			new SecureXMLFactoryProviderImpl());
+
+		UnsecureSAXReaderUtil unsecureSAXReaderUtil =
+			new UnsecureSAXReaderUtil();
+
+		unsecureSAXReaderUtil.setSAXReader(saxReader);
+
+		SecureXMLFactoryProviderUtil secureXMLFactoryProviderUtil =
+			new SecureXMLFactoryProviderUtil();
+
+		secureXMLFactoryProviderUtil.setSecureXMLFactoryProvider(
+			new SecureXMLFactoryProviderImpl());
+
+		SAXReaderUtil saxReaderUtil = new SAXReaderUtil();
+
+		saxReaderUtil.setSAXReader(saxReader);
+	}
+
+	private static void _startMinimalServices() {
 		_wireCacheKeyGenerators();
 
-		new PortalUtil().setPortal(new PortalImpl());
+		InitUtil.initWithSpring(_getMinimalSpringConfigs(), true);
 
-		InitUtil.initWithSpring(_getSpringConfigs(), true);
+		_wireDLUtils();
+
+		_wireSaxReaders();
 
 		// InitUtil.initWithSpring(true);
 

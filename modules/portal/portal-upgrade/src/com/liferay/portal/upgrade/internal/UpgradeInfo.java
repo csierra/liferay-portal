@@ -54,11 +54,11 @@ public class UpgradeInfo {
 	public String toString() {
 		StringBundler sb = new StringBundler(5);
 
-		sb.append("UpgradeProcessInfo { _from='");
+		sb.append("UpgradeProcess from version '");
 		sb.append(_from);
-		sb.append("', _to='");
+		sb.append("' to version '");
 		sb.append(_to);
-		sb.append("'}");
+		sb.append("'");
 
 		return sb.toString();
 	}

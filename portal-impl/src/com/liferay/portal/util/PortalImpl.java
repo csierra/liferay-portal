@@ -1516,37 +1516,7 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public long getClassNameId(String value) {
-		if (!StartupHelperUtil.isUpgrading()) {
-			return ClassNameLocalServiceUtil.getClassNameId(value);
-		}
-
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
-				"select classNameId from ClassName_ where value = ?");
-
-			ps.setString(1, value);
-
-			rs = ps.executeQuery();
-
-			if (rs.next()) {
-				return rs.getLong("classNameId");
-			}
-		}
-		catch (Exception e) {
-			throw new RuntimeException(
-				"Unable to get class name ID from value " + value, e);
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
-		}
-
-		return 0;
+		return ClassNameLocalServiceUtil.getClassNameId(value);
 	}
 
 	@Override
