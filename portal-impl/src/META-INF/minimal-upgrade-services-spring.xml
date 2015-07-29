@@ -23,11 +23,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
-	<bean id="com.liferay.portal.kernel.sql.SQLTransformerUtil" class="com.liferay.portal.kernel.sql.SQLTransformerUtil">
-		<constructor-arg>
-			<bean class="com.liferay.portal.dao.orm.common.SQLTransformer" />
-		</constructor-arg>
-	</bean>
-	<bean id="com.liferay.portal.service.persistence.ReleasePersistence" class="com.liferay.portal.service.persistence.impl.ReleasePersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.portal.service.ReleaseLocalService" class="com.liferay.portal.service.impl.ReleaseLocalServiceImpl" />
+	<bean id="com.liferay.portal.service.persistence.ReleasePersistence" class="com.liferay.portal.service.persistence.impl.ReleasePersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.portal.service.ClassNameLocalService" class="com.liferay.portal.service.impl.ClassNameLocalServiceImpl" />
+	<bean id="com.liferay.portal.service.ClassNameService" class="com.liferay.portal.service.impl.ClassNameServiceImpl" />
+	<bean id="com.liferay.portal.service.persistence.ClassNamePersistence" class="com.liferay.portal.service.persistence.impl.ClassNamePersistenceImpl" parent="basePersistence" />
 </beans>

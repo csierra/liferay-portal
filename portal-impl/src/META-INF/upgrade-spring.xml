@@ -8,5 +8,5 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
 
-	<bean class="com.liferay.portal.upgrade.v7_0_0.UpgradeSchema" />
+	<bean class="com.liferay.portal.upgrade.UpgradeProcess_7_0_0" />
 </beans>

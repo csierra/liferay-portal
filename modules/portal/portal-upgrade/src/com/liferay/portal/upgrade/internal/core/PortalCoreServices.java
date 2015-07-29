@@ -16,17 +16,31 @@
 
 package com.liferay.portal.upgrade.internal.core;
 
+import com.liferay.portal.bean.BeanLocatorImpl;
+import com.liferay.portal.kernel.bean.BeanLocator;
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.model.Release;
 
+import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
+import com.liferay.portal.spring.context.ArrayApplicationContext;
+import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.List;
 
 /**
  * @author Migue Pastor
  */
-@Component(service = PortalCoreServices.class)
+@Component(immediate = true, service = PortalCoreServices.class)
 public class PortalCoreServices {
 
 	@Activate
@@ -43,8 +57,27 @@ public class PortalCoreServices {
 		System.out.println("-------------------");
 	}
 
-	@Reference(target = "(&(application.name=portal)(release.build.number=1.0.0))")
+	@Reference(target = "(&(component.name=portal)(release.build.number=7.0.0.0))")
 	protected void setRelease(Release release) {
 	}
 
+	public synchronized void startPortalServices() {
+		List<String> configLocations = ListUtil.fromArray(
+			PropsUtil.getArray(
+				com.liferay.portal.kernel.util.PropsKeys.SPRING_CONFIGS));
+
+		ApplicationContext applicationContext = new ArrayApplicationContext(
+			PropsValues.SPRING_INFRASTRUCTURE_CONFIGS);
+
+		applicationContext = new ClassPathXmlApplicationContext(
+			configLocations.toArray(new String[configLocations.size()]),
+			applicationContext);
+
+		BeanLocator beanLocator = new BeanLocatorImpl(
+			ClassLoaderUtil.getPortalClassLoader(), applicationContext);
+
+		PortalBeanLocatorUtil.setBeanLocator(beanLocator);
+
+		ModuleFrameworkUtilAdapter.registerContext(applicationContext);
+	}
 }

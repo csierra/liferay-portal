@@ -51,7 +51,7 @@ public final class ReleasePublisher {
 
 		String servletContextName = release.getServletContextName();
 
-		ServiceRegistration<ServiceConfigurator> oldServiceRegistration =
+		ServiceRegistration<Release> oldServiceRegistration =
 			_serviceConfiguratorRegistrations.get(servletContextName);
 
 		if (oldServiceRegistration != null) {
@@ -61,9 +61,9 @@ public final class ReleasePublisher {
 		properties.put("component.name", servletContextName);
 		properties.put("release.build.number", release.getBuildNumber());
 
-		ServiceRegistration<ServiceConfigurator> serviceRegistration =
+		ServiceRegistration<Release> serviceRegistration =
 			_bundleContext.registerService(
-				ServiceConfigurator.class, _serviceConfigurator, properties);
+				Release.class, release, properties);
 
 		_serviceConfiguratorRegistrations.put(
 			servletContextName, serviceRegistration);
@@ -90,8 +90,8 @@ public final class ReleasePublisher {
 	@Deactivate
 	protected void deactivate() {
 		for (
-			ServiceRegistration<ServiceConfigurator> serviceRegistration :
-			_serviceConfiguratorRegistrations.values()) {
+			ServiceRegistration<Release> serviceRegistration :
+				_serviceConfiguratorRegistrations.values()) {
 
 			serviceRegistration.unregister();
 		}
@@ -104,13 +104,6 @@ public final class ReleasePublisher {
 		_releaseLocalService = releaseLocalService;
 	}
 
-	@Reference
-	protected void setServiceConfigurator(
-		ServiceConfigurator serviceConfigurator) {
-
-		_serviceConfigurator = serviceConfigurator;
-	}
-
 	private void _upgradeRelease() throws UpgradeException {
 		UpgradeProcess upgradeProcess = new UpgradeRelease();
 
@@ -120,8 +113,7 @@ public final class ReleasePublisher {
 	private BundleContext _bundleContext;
 	private Logger _log;
 	private ReleaseLocalService _releaseLocalService;
-	private ServiceConfigurator _serviceConfigurator;
-	private final Map<String, ServiceRegistration<ServiceConfigurator>>
+	private final Map<String, ServiceRegistration<Release>>
 		_serviceConfiguratorRegistrations = new HashMap<>();
 
 }
