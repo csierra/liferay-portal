@@ -41,7 +41,7 @@ public class ExportImportWebUpgrade {
 	protected void upgrade() throws PortalException {
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
 
-		upgradeProcesses.add(new UpgradeExportImportPortletId());
+		// upgradeProcesses.add(new UpgradeExportImportPortletId());
 	}
 
 }

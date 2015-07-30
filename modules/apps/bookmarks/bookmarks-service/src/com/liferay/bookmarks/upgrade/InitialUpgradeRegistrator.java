@@ -15,7 +15,7 @@
 package com.liferay.bookmarks.upgrade;
 
 import com.liferay.portal.upgrade.api.InitialServiceUpgrade;
-import com.liferay.portal.upgrade.api.Upgrade;
+import com.liferay.portal.Upgrade;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;

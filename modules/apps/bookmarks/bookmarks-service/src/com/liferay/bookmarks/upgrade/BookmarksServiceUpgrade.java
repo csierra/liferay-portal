@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.upgrade.api.Upgrade;
+import com.liferay.portal.Upgrade;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 
 import java.util.ArrayList;
@@ -40,8 +40,8 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		UpgradeWhiteboardConstants.DATABASES_ALL_PROPERTY,
-		UpgradeWhiteboardConstants.APPLICATION_NAME + "=bookmarks",
-		UpgradeWhiteboardConstants.FROM + "=0.0.1",
+		UpgradeWhiteboardConstants.APPLICATION_NAME + "=com.liferay.bookmarks.service",
+		UpgradeWhiteboardConstants.FROM + "=0.0.0",
 		UpgradeWhiteboardConstants.TO + "=1.0.0"
 	},
 	service = Upgrade.class

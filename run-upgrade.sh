@@ -11,7 +11,7 @@ for lib in $LIBS;set CLASSPATH "$CLASSPATH:lib/global/$lib"; end
 set LIBS (ls lib/development)
 for lib in $LIBS;set CLASSPATH "$CLASSPATH:lib/development/$lib"; end
 
-set DEBUG_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9000"
+set DEBUG_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9000"
 
 mysql -uliferay -pliferay lportal_6_2 < /tmp/portal-upgrade/liferay-6.2.sql
 

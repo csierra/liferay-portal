@@ -210,8 +210,8 @@ public class ReleaseManager {
 		try {
 			outputStream.close();
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
 		}
 
 		Release release = _releaseLocalService.fetchRelease(componentName);
