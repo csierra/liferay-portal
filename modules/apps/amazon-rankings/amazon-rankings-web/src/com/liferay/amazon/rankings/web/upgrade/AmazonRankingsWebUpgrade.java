@@ -19,8 +19,6 @@ import com.liferay.amazon.rankings.web.constants.AmazonRankingsPortletKeys;
 import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
-import com.liferay.portal.upgrade.api.Upgrade;
-import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.Upgrade;
 import com.liferay.portal.upgrade.util.UpgradePortletId;

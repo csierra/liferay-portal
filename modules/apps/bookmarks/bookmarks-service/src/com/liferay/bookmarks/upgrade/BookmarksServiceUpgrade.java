@@ -65,7 +65,7 @@ public class BookmarksServiceUpgrade implements Upgrade {
 		}
 	}
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	@Reference(target = ModuleServiceLifecycle.SPRING_INITIALIZED, unbind = "-")
 	protected void setModuleServiceLifecycle(
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}

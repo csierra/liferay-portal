@@ -17,6 +17,7 @@ package com.liferay.portal.upgrade.internal.core;
 import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.kernel.bean.BeanLocator;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.model.Release;
@@ -38,8 +39,10 @@ import java.util.List;
 /**
  * @author Migue Pastor
  */
-@Component(immediate = true, service = PortalCoreServices.class)
-public class PortalCoreServices {
+@Component(
+	immediate = true, property = "module.service.lifecycle=spring.initialized"
+)
+public class PortalCoreServices implements ModuleServiceLifecycle {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
@@ -49,15 +52,7 @@ public class PortalCoreServices {
 			new ApplicationContextServicePublisher(
 				_configurableApplicationContext, bundleContext);
 
-		try {
-			_applicationContextServicePublisher.register();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		System.out.println("------------------------------------------------------------------------------");
-		System.out.println("We need to publish the servlet context to signal the rest of the people that the portal is ready!!");
-		System.out.println("------------------------------------------------------------------------------");
+		_applicationContextServicePublisher.register();
 	}
 
 	@Deactivate
