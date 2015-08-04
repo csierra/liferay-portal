@@ -18,18 +18,16 @@ import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceComparator;
 import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
-import com.liferay.portal.DatabaseContext;
-import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.api.OutputStreamProvider;
 import com.liferay.portal.upgrade.api.OutputStreamProviderTracker;
-import com.liferay.portal.Upgrade;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 import com.liferay.portal.upgrade.internal.UpgradeInfo;
 import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
@@ -132,19 +130,18 @@ public class ReleaseManager {
 
 		_log = new Logger(bundleContext);
 
-
 		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
-			bundleContext, Upgrade.class,
+			bundleContext, UpgradeProcess.class,
 				"(&(" + UpgradeWhiteboardConstants.APPLICATION_NAME +
 					"=*)(|(database=" +
 						UpgradeWhiteboardConstants.ALL_DATABASES +
 							")(database=" + DBFactoryUtil.getDB().getType() +
 								")))",
-			new PropertyServiceReferenceMapper<String, Upgrade>(
+			new PropertyServiceReferenceMapper<String, UpgradeProcess>(
 				UpgradeWhiteboardConstants.APPLICATION_NAME),
 			new UpgradeCustomizer(bundleContext),
 			Collections.reverseOrder(
-				new PropertyServiceReferenceComparator<Upgrade>(
+				new PropertyServiceReferenceComparator<UpgradeProcess>(
 					UpgradeWhiteboardConstants.FROM)));
 
 		_serviceTrackerMap.open();
@@ -180,21 +177,11 @@ public class ReleaseManager {
 			@Override
 			public void run() {
 				for (UpgradeInfo upgradeInfo : upgradeInfos) {
-					Upgrade upgrade = upgradeInfo.getUpgrade();
+					UpgradeProcess upgradeProcess =
+						upgradeInfo.getUpgradeProcess();
 
 					try {
-						upgrade.upgrade(new DatabaseProcessContext() {
-
-							@Override
-							public DatabaseContext getDatabaseContext() {
-								return new DatabaseContext();
-							}
-
-							@Override
-							public OutputStream getOutputStream() {
-								return outputStream;
-							}
-						});
+						upgradeProcess.upgrade();
 
 						_releaseLocalService.updateRelease(
 							componentName, upgradeInfo.getTo(),
@@ -239,25 +226,26 @@ public class ReleaseManager {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select buildNumber from Release_ where " +
 					"servletContextName = ?");
 
-			ps.setString(1,servletContextName);
+			ps.setString(1, servletContextName);
 
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
 				return rs.getString("buildNumber");
 			}
-
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			_log.log(
 				Logger.LOG_ERROR,
 				"Unexpected error retrieving the current build number of " +
-					servletContextName, e);
+					servletContextName,
+				e);
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
@@ -274,7 +262,7 @@ public class ReleaseManager {
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
 
 	private static class UpgradeCustomizer
-			implements ServiceTrackerCustomizer<Upgrade, UpgradeInfo> {
+			implements ServiceTrackerCustomizer<UpgradeProcess, UpgradeInfo> {
 
 		public UpgradeCustomizer(BundleContext bundleContext) {
 			_bundleContext = bundleContext;
@@ -282,21 +270,22 @@ public class ReleaseManager {
 
 		@Override
 		public UpgradeInfo addingService(
-			ServiceReference<Upgrade> serviceReference) {
+			ServiceReference<UpgradeProcess> serviceReference) {
 
-			String from = (String) serviceReference.getProperty(
+			String from = (String)serviceReference.getProperty(
 				UpgradeWhiteboardConstants.FROM);
-			String to = (String) serviceReference.getProperty(
+			String to = (String)serviceReference.getProperty(
 				UpgradeWhiteboardConstants.TO);
 
-			Upgrade upgradeProcess = _bundleContext.getService(
+			UpgradeProcess upgradeProcess = _bundleContext.getService(
 				serviceReference);
 
 			if (upgradeProcess == null) {
-				_log.log(Logger.LOG_WARNING,
+				_log.log(
+					Logger.LOG_WARNING,
 					"Service " + serviceReference + " is registered as " +
 						"an upgrade but it is not implementing Upgrade " +
-						"interface. Not tracking.");
+							"interface. Not tracking.");
 
 				return null;
 			}
@@ -306,13 +295,13 @@ public class ReleaseManager {
 
 		@Override
 		public void modifiedService(
-			ServiceReference<Upgrade> serviceReference,
+			ServiceReference<UpgradeProcess> serviceReference,
 			UpgradeInfo upgradeInfo) {
 		}
 
 		@Override
 		public void removedService(
-			ServiceReference<Upgrade> serviceReference,
+			ServiceReference<UpgradeProcess> serviceReference,
 			UpgradeInfo upgradeInfo) {
 
 			_bundleContext.ungetService(serviceReference);

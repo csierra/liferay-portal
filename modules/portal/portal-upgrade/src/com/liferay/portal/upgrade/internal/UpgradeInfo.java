@@ -14,9 +14,9 @@
 
 package com.liferay.portal.upgrade.internal;
 
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.Upgrade;
 
 /**
  * @author Miguel Pastor
@@ -24,10 +24,10 @@ import com.liferay.portal.Upgrade;
  */
 public class UpgradeInfo {
 
-	public UpgradeInfo(String from, String to, Upgrade upgrade) {
+	public UpgradeInfo(String from, String to, UpgradeProcess upgradeProcess) {
 		_from = from;
 		_to = to;
-		_upgrade = upgrade;
+		_upgradeProcess = upgradeProcess;
 	}
 
 	public int from() {
@@ -42,8 +42,8 @@ public class UpgradeInfo {
 		return _to;
 	}
 
-	public Upgrade getUpgrade() {
-		return _upgrade;
+	public UpgradeProcess getUpgradeProcess() {
+		return _upgradeProcess;
 	}
 
 	public int to() {
@@ -69,6 +69,6 @@ public class UpgradeInfo {
 
 	private final String _from;
 	private final String _to;
-	private final Upgrade _upgrade;
+	private final UpgradeProcess _upgradeProcess;
 
 }

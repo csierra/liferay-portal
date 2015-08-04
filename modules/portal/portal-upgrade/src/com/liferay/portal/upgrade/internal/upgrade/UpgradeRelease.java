@@ -1,17 +1,15 @@
-/*
- * *
- *  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- *  *
- *  * This library is free software; you can redistribute it and/or modify it under
- *  * the terms of the GNU Lesser General Public License as published by the Free
- *  * Software Foundation; either version 2.1 of the License, or (at your option)
- *  * any later version.
- *  *
- *  * This library is distributed in the hope that it will be useful, but WITHOUT
- *  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- *  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- *  * details.
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 
 package com.liferay.portal.upgrade.internal.upgrade;
@@ -22,7 +20,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.upgrade.UpgradeMVCC;
 import com.liferay.portal.upgrade.v7_0_0.util.ReleaseTable;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -30,16 +27,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author Miguel Pastor
  */
 public class UpgradeRelease extends UpgradeProcess {
-
-	@Override
-	protected void doUpgrade() throws Exception {
-		addVersionColumn();
-
-		transformBuildNumber();
-	}
 
 	protected void addVersionColumn() throws Exception {
 		Connection connection = DataAccess.getUpgradeOptimizedConnection();
@@ -49,6 +39,13 @@ public class UpgradeRelease extends UpgradeProcess {
 		UpgradeMVCC upgradeMVCC = new UpgradeMVCC();
 
 		upgradeMVCC.upgradeMVCC(databaseMetaData, "Release_");
+	}
+
+	@Override
+	protected void doUpgrade() throws Exception {
+		addVersionColumn();
+
+		transformBuildNumber();
 	}
 
 	protected void transformBuildNumber() throws Exception {
@@ -102,7 +99,7 @@ public class UpgradeRelease extends UpgradeProcess {
 
 			int i = 0;
 
-			for (;i < chars.length - 1; i++) {
+			for (; i < chars.length - 1; i++) {
 				sb.append(chars[i]);
 				sb.append(".");
 			}
