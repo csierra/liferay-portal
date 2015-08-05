@@ -18,15 +18,13 @@ import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksEntryLocalService;
 import com.liferay.bookmarks.service.BookmarksFolderLocalService;
-import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.util.PortalInstances;
-import com.liferay.portal.verify.Verifier;
 
-import java.io.PrintWriter;
 import java.util.List;
 
+import com.liferay.portal.verify.VerifyProcess;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -36,9 +34,9 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true, property = {"verifier.name=bookmarks"},
-	service = Verifier.class
+	service = VerifyProcess.class
 )
-public class BookmarksServiceVerifyProcess implements Verifier {
+public class BookmarksServiceVerifyProcess extends VerifyProcess {
 
 	@Reference(unbind = "-")
 	protected void setBookmarksEntryLocalService(
@@ -55,18 +53,11 @@ public class BookmarksServiceVerifyProcess implements Verifier {
 	}
 
 	@Override
-	public void verify(DatabaseProcessContext databaseProcessContext) {
+	public void doVerify() {
 		try {
 			updateEntryAssets();
 			updateFolderAssets();
 			verifyTree();
-
-			PrintWriter printWriter = new PrintWriter(
-				databaseProcessContext.getOutputStream());
-
-			printWriter.println("Executed successfully");
-
-			printWriter.flush();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

@@ -16,7 +16,6 @@ package com.liferay.asset.browser.web.upgrade;
 
 import com.liferay.asset.browser.web.constants.AssetBrowserPortletKeys;
 
-import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.upgrade.util.UpgradePortletId;

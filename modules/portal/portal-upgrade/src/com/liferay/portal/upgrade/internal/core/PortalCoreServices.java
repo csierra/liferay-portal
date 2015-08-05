@@ -46,13 +46,19 @@ public class PortalCoreServices implements ModuleServiceLifecycle {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		System.out.println("Starting Portal core services ....");
+
 		_configurableApplicationContext = wirePortalServices();
 
 		_applicationContextServicePublisher =
 			new ApplicationContextServicePublisher(
 				_configurableApplicationContext, bundleContext);
 
+		System.out.println("Registering Portal's beans as OSGi services ....");
+
 		_applicationContextServicePublisher.register();
+
+		System.out.println("Finished!");
 	}
 
 	@Deactivate

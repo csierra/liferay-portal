@@ -18,12 +18,10 @@ import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeClassNames;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradeLastPublishDate;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletId;
 import com.liferay.bookmarks.upgrade.v1_0_0.UpgradePortletSettings;
-import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.Upgrade;
 import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 
 import java.util.ArrayList;
@@ -41,16 +39,15 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		UpgradeWhiteboardConstants.DATABASES_ALL_PROPERTY,
 		UpgradeWhiteboardConstants.APPLICATION_NAME + "=com.liferay.bookmarks.service",
-		UpgradeWhiteboardConstants.FROM + "=0.0.0",
-		UpgradeWhiteboardConstants.TO + "=1.0.0"
+		UpgradeWhiteboardConstants.FROM + "=-1.-1.-1.-1",
+		UpgradeWhiteboardConstants.TO + "=1.0.0.0"
 	},
-	service = Upgrade.class
+	service = UpgradeProcess.class
 )
-public class BookmarksServiceUpgrade implements Upgrade {
+public class BookmarksServiceUpgrade extends UpgradeProcess {
 
 	@Override
-	public void upgrade(DatabaseProcessContext databaseProcessContext)
-		throws UpgradeException {
+	public void doUpgrade() throws UpgradeException {
 
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
 

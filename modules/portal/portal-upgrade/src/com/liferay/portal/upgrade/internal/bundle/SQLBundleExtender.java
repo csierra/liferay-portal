@@ -14,14 +14,7 @@
 
 package com.liferay.portal.upgrade.internal.bundle;
 
-import com.liferay.portal.DatabaseContext;
-import com.liferay.portal.DatabaseProcessContext;
-import com.liferay.portal.Upgrade;
-import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import java.net.URL;
 
@@ -85,6 +78,7 @@ public class SQLBundleExtender {
 							properties.put("to", to);
 							properties.put("application.name", "bookmarks");
 
+							/**
 							bundle.getBundleContext().registerService(
 								Upgrade.class, new Upgrade() {
 									@Override
@@ -113,6 +107,7 @@ public class SQLBundleExtender {
 										}
 									}
 								}, properties);
+							 */
 						}
 					}
 

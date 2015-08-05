@@ -16,8 +16,6 @@ package com.liferay.portal.verify.extender.internal;
 
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
-import com.liferay.portal.DatabaseContext;
-import com.liferay.portal.DatabaseProcessContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
@@ -25,7 +23,6 @@ import com.liferay.portal.spring.transaction.ThreadLocalTransactionModeProvider;
 import com.liferay.portal.upgrade.api.OutputStreamProvider;
 import com.liferay.portal.upgrade.api.OutputStreamProvider.OutputStreamInformation;
 import com.liferay.portal.upgrade.api.OutputStreamProviderTracker;
-import com.liferay.portal.verify.Verifier;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,6 +30,8 @@ import java.io.PrintWriter;
 
 import java.util.Set;
 
+import com.liferay.portal.verify.VerifyException;
+import com.liferay.portal.verify.VerifyProcess;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.component.annotations.Activate;
@@ -41,6 +40,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
+ * @author Miguel Pastor
  * @author Carlos Sierra Andrés
  */
 @Component(
@@ -87,26 +87,19 @@ public class VerifyProcessTracker {
 		_safeCloseOutputStream(outputStream);
 	}
 
-	public void execute(Verifier verifier, final OutputStream outputStream) {
+	public void execute(
+		VerifyProcess verifyProcess, final OutputStream outputStream) {
+
 		boolean readOnlyTransaction =
 			ThreadLocalTransactionModeProvider.getReadOnlyTransaction();
 
 		ThreadLocalTransactionModeProvider.setReadOnlyTransaction(true);
 
 		try {
-			verifier.verify(new DatabaseProcessContext() {
-
-				@Override
-				public DatabaseContext getDatabaseContext() {
-					return new DatabaseContext();
-				}
-
-				@Override
-				public OutputStream getOutputStream() {
-					return StreamUtil.uncloseable(outputStream);
-				}
-
-			});
+			verifyProcess.verify();
+		}
+		catch (VerifyException ve) {
+			ve.printStackTrace();
 		}
 		finally {
 			ThreadLocalTransactionModeProvider.setReadOnlyTransaction(
@@ -146,15 +139,15 @@ public class VerifyProcessTracker {
 		_safeCloseOutputStream(outputStream);
 	}
 
-	public Verifier getVerifier(String verifierName) {
-		Verifier verifier = _verifiers.getService(verifierName);
+	public VerifyProcess getVerifyProcess(String verifierName) {
+		VerifyProcess verifyProcess = _verifiers.getService(verifierName);
 
-		if (verifier == null) {
+		if (verifyProcess == null) {
 			throw new IllegalArgumentException(
 				"Verifier with name " + verifierName + " is not registered");
 		}
 
-		return verifier;
+		return verifyProcess;
 	}
 
 	public void list() {
@@ -164,9 +157,9 @@ public class VerifyProcessTracker {
 	}
 
 	public void list(String verifierName) {
-		Verifier verifier = _verifiers.getService(verifierName);
+		VerifyProcess verifyProcess = _verifiers.getService(verifierName);
 
-		if (verifier != null) {
+		if (verifyProcess != null) {
 			System.out.println("Registered verifier: " + verifierName);
 		}
 		else {
@@ -185,13 +178,13 @@ public class VerifyProcessTracker {
 	}
 
 
-	public ServiceTrackerMap<String, Verifier> _verifiers;
+	public ServiceTrackerMap<String, VerifyProcess> _verifiers;
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		try {
 			_verifiers = ServiceTrackerMapFactory.singleValueMap(
-				bundleContext, Verifier.class, "verifier.name");
+				bundleContext, VerifyProcess.class, "verifier.name");
 
 			_verifiers.open();
 		}
@@ -234,9 +227,9 @@ public class VerifyProcessTracker {
 
 		printWriter.flush();
 
-		Verifier verifier = getVerifier(verifierName);
+		VerifyProcess verifyProcess = getVerifyProcess(verifierName);
 
-		execute(verifier, outputStream);
+		execute(verifyProcess, outputStream);
 	}
 
 	@Reference

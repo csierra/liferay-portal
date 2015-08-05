@@ -15,7 +15,6 @@
 package com.liferay.bookmarks.upgrade;
 
 import com.liferay.portal.upgrade.api.InitialServiceUpgrade;
-import com.liferay.portal.Upgrade;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -29,6 +28,7 @@ import org.osgi.service.component.annotations.Deactivate;
 @Component(immediate = true)
 public class InitialUpgradeRegistrator {
 
+	/**
 	@Activate
 	public void activate(BundleContext bundleContext) {
 		_initialUpgradeServiceRegistration =
@@ -40,7 +40,7 @@ public class InitialUpgradeRegistrator {
 	public void deactivate() {
 		_initialUpgradeServiceRegistration.unregister();
 	}
-
-	private ServiceRegistration<Upgrade> _initialUpgradeServiceRegistration;
+*/
+	// private ServiceRegistration<Upgrade> _initialUpgradeServiceRegistration;
 
 }

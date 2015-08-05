@@ -76,7 +76,7 @@ public class ReleaseManager {
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			upgradeInfos);
 
-		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradePath(
+		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradeInfos(
 			buildNumber);
 
 		executeUpgradePath(componentName, upgradePath);
@@ -93,7 +93,7 @@ public class ReleaseManager {
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			upgradeInfos);
 
-		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradePath(
+		List<UpgradeInfo> upgradePath = releaseGraphManager.getUpgradeInfos(
 			buildNumber, to);
 
 		executeUpgradePath(componentName, upgradePath);
@@ -153,7 +153,7 @@ public class ReleaseManager {
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			upgradeProcessesInfo);
 
-		return releaseGraphManager.getUpgradePath(from, to);
+		return releaseGraphManager.getUpgradeInfos(from, to);
 	}
 
 	@Deactivate
@@ -184,8 +184,8 @@ public class ReleaseManager {
 						upgradeProcess.upgrade();
 
 						_releaseLocalService.updateRelease(
-							componentName, upgradeInfo.getTo(),
-							upgradeInfo.getFrom());
+							componentName, upgradeInfo.getToVersionString(),
+							upgradeInfo.getFromVersionString());
 					}
 					catch (Exception e) {
 						throw new RuntimeException(e);
