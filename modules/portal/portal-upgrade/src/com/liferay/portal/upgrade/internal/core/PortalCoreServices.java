@@ -21,20 +21,20 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.model.Release;
+
 import com.liferay.portal.spring.context.ArrayApplicationContext;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-
-import java.util.List;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.List;
 
 /**
  * @author Migue Pastor
@@ -68,9 +68,7 @@ public class PortalCoreServices implements ModuleServiceLifecycle {
 		_configurableApplicationContext.close();
 	}
 
-	@Reference(
-		target = "(&(component.name=portal)(release.build.number=7.0.0.0))"
-	)
+	@Reference(target = "(&(component.name=portal)(release.build.number=7.0.0.0))")
 	protected void setRelease(Release release) {
 	}
 
@@ -96,8 +94,8 @@ public class PortalCoreServices implements ModuleServiceLifecycle {
 		return configurableApplicationContext;
 	}
 
+	private ConfigurableApplicationContext _configurableApplicationContext;
 	private ApplicationContextServicePublisher
 		_applicationContextServicePublisher;
-	private ConfigurableApplicationContext _configurableApplicationContext;
 
 }

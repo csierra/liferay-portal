@@ -19,6 +19,15 @@ import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.spring.aop.ServiceBeanAopProxy;
+import org.apache.felix.utils.log.Logger;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.springframework.aop.TargetSource;
+import org.springframework.aop.framework.AdvisedSupport;
+import org.springframework.beans.factory.BeanIsAbstractException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,17 +35,6 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.felix.utils.log.Logger;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-
-import org.springframework.aop.TargetSource;
-import org.springframework.aop.framework.AdvisedSupport;
-import org.springframework.beans.factory.BeanIsAbstractException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.annotation.AnnotationUtils;
 
 /**
  * @author Miguel Pastor

@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.service.ReleaseLocalService;
-import com.liferay.portal.upgrade.internal.upgrade.UpgradeRelease;
+import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -27,6 +27,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
+import com.liferay.portal.upgrade.internal.upgrade.UpgradeRelease;
 import org.apache.felix.utils.log.Logger;
 
 import org.osgi.framework.BundleContext;
@@ -59,7 +62,8 @@ public final class ReleasePublisher {
 		properties.put("release.build.number", release.getBuildNumber());
 
 		ServiceRegistration<Release> serviceRegistration =
-			_bundleContext.registerService(Release.class, release, properties);
+			_bundleContext.registerService(
+				Release.class, release, properties);
 
 		_serviceConfiguratorRegistrations.put(
 			servletContextName, serviceRegistration);
