@@ -61,6 +61,10 @@ public class SQLBundleExtender {
 						Enumeration<URL> entries = bundle.findEntries(
 							SqlUpgrades, "*.sql", true);
 
+						if (entries == null) {
+							return bundle;
+						}
+
 						while (entries.hasMoreElements()) {
 							final URL url = entries.nextElement();
 

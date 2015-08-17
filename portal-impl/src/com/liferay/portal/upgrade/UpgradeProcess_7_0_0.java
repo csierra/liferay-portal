@@ -14,7 +14,10 @@
 
 package com.liferay.portal.upgrade;
 
+import com.liferay.portal.DatabaseProcessContext;
+import com.liferay.portal.Upgrade;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeAddress;
@@ -52,9 +55,9 @@ import com.liferay.portal.upgrade.v7_0_0.UpgradeWebsite;
 	property = {
 		"application.name=portal", "database=ALL", "from=6.2.0.0", "to=7.0.0.0"
 	} ,
-	service = UpgradeProcess.class
+	service = Upgrade.class
 )
-public class UpgradeProcess_7_0_0 extends UpgradeProcess {
+public class UpgradeProcess_7_0_0 extends UpgradeProcess implements Upgrade {
 
 	@Override
 	public int getThreshold() {
@@ -93,4 +96,15 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 		upgrade(UpgradeWebsite.class);
 	}
 
+	@Override
+	public void upgrade(DatabaseProcessContext databaseContext)
+		throws UpgradeException {
+
+		try {
+			doUpgrade();
+		}
+		catch (Exception e) {
+			throw new UpgradeException(e);
+		}
+	}
 }

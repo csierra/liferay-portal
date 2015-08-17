@@ -55,12 +55,6 @@
 
 	<!-- Utils -->
 
-	<bean id="com.liferay.portal.kernel.search.SearchResultManagerUtil" class="com.liferay.portal.kernel.search.SearchResultManagerUtil">
-		<property name="searchResultManager">
-			<bean class="com.liferay.portal.search.SearchResultManagerImpl" />
-		</property>
-	</bean>
-
 	<!-- Generic search engine -->
 
 	<bean id="com.liferay.portal.search.generic.GenericSearchEngineImpl" class="com.liferay.portal.kernel.search.BaseSearchEngine">
