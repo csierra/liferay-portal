@@ -50,4 +50,10 @@ public class AssetBrowserWebUpgrade {
 		upgradePortletId.upgrade();
 	}
 
+	@Reference(target = ModuleServiceLifecycle.SPRING_INITIALIZED)
+	public void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+
+	}
+
 }
