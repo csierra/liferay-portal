@@ -17,7 +17,6 @@ package com.liferay.shopping.upgrade;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.shopping.upgrade.v1_0_0.UpgradeClassNames;
 import com.liferay.shopping.upgrade.v1_0_0.UpgradePortletId;
 import com.liferay.shopping.upgrade.v1_0_0.UpgradeShopping;
@@ -41,13 +40,6 @@ public class ShoppingServiceUpgrade {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
@@ -57,11 +49,6 @@ public class ShoppingServiceUpgrade {
 		upgradeProcesses.add(new UpgradeClassNames());
 		upgradeProcesses.add(new UpgradeShopping());
 		upgradeProcesses.add(new UpgradeShoppingPreferences());
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.shopping.service", upgradeProcesses, 1, 1, false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }
