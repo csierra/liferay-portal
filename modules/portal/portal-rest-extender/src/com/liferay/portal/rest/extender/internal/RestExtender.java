@@ -39,8 +39,7 @@ import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
  */
 @Component(
 	configurationPid = "com.liferay.portal.rest.extender.configuration.RestExtenderConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE,
-	immediate = true
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true
 )
 public class RestExtender {
 
