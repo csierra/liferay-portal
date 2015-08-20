@@ -15,11 +15,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-drop database if exists lportal_6_2;
+drop database if exists lportal;
 
-create database lportal_6_2 character set utf8;
+create database lportal character set utf8;
 
-use lportal_6_2;
+use lportal;
 
 --
 -- Table structure for table `account_`
