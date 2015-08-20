@@ -82,7 +82,7 @@ public class DBUpgrader {
 		DBUpgrader dbUpgrader = new DBUpgrader();
 
 		try {
-			// upgradeCorePortal();
+			upgradeCorePortal();
 
 			_startMinimalServices();
 
