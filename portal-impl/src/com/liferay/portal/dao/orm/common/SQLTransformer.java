@@ -32,14 +32,11 @@ import java.util.regex.Pattern;
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
  */
-public class SQLTransformer {
+public class SQLTransformer
+	implements com.liferay.portal.kernel.sql.SQLTransformer {
 
 	public static void reloadSQLTransformer() {
 		_instance._reloadSQLTransformer();
-	}
-
-	public static String transform(String sql) {
-		return _instance._transform(sql);
 	}
 
 	public static String transformFromHqlToJpql(String sql) {
@@ -50,8 +47,12 @@ public class SQLTransformer {
 		return _instance._transformFromJpqlToHql(sql);
 	}
 
-	private SQLTransformer() {
+	public SQLTransformer() {
 		_reloadSQLTransformer();
+	}
+
+	public String transform(String sql) {
+		return _instance._transform(sql);
 	}
 
 	private void _reloadSQLTransformer() {

@@ -14,52 +14,63 @@
 
 package com.liferay.portal.tools;
 
+import com.liferay.portal.bean.BeanLocatorImpl;
+import com.liferay.portal.cache.key.HashCodeCacheKeyGenerator;
+import com.liferay.portal.cache.key.SimpleCacheKeyGenerator;
+import com.liferay.portal.dao.db.DBFactoryImpl;
+import com.liferay.portal.dao.jdbc.DataSourceFactoryImpl;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
-import com.liferay.portal.events.StartupHelperUtil;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
-import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
-import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.bean.BeanLocator;
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.cache.key.CacheKeyGenerator;
+import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.spring.aop.Skip;
+import com.liferay.portal.kernel.sql.SQLTransformerUtil;
+import com.liferay.portal.kernel.upgrade.UpgradeException;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
+;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.model.Release;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.model.ReleaseConstants;
-import com.liferay.portal.service.ClassNameLocalServiceUtil;
-import com.liferay.portal.service.ReleaseLocalServiceUtil;
-import com.liferay.portal.service.ResourceActionLocalServiceUtil;
-import com.liferay.portal.spring.aop.ServiceBeanAopCacheManager;
-import com.liferay.portal.spring.aop.ServiceBeanAopCacheManagerUtil;
+import com.liferay.portal.security.lang.DoPrivilegedUtil;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil;
+import com.liferay.portal.spring.context.ArrayApplicationContext;
 import com.liferay.portal.util.InitUtil;
+import com.liferay.portal.util.PropsImpl;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceRegistrar;
-import com.liferay.util.dao.orm.CustomSQLUtil;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-
+import java.io.Console;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
-import org.aopalliance.intercept.MethodInvocation;
-
-import org.apache.commons.lang.time.StopWatch;
+import com.liferay.portal.xml.SAXReaderImpl;
+import com.liferay.portlet.documentlibrary.util.DLImpl;
+import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.util.log4j.Log4JUtil;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractRefreshableApplicationContext;
 
 /**
  * @author Michael C. Han
@@ -68,42 +79,22 @@ import org.apache.commons.lang.time.StopWatch;
 public class DBUpgrader {
 
 	public static void main(String[] args) {
+		DBUpgrader dbUpgrader = new DBUpgrader();
+
 		try {
-			StopWatch stopWatch = new StopWatch();
+			upgradeCorePortal();
 
-			stopWatch.start();
+			_startMinimalServices();
 
-			InitUtil.initWithSpring(true);
-
-			upgrade();
-			verify();
-
-			System.out.println(
-				"\nCompleted upgrade and verify processes in " +
-					(stopWatch.getTime() / Time.SECOND) + " seconds");
-
-			System.exit(0);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-
-			System.exit(1);
+		} catch (Exception e) {
+			Thread.currentThread().interrupt();
 		}
 	}
 
-	public static void upgrade() throws Exception {
-
-		// Disable database caching before upgrade
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Disable cache registry");
-		}
-
-		CacheRegistryUtil.setActive(false);
-
+	public void upgrade(){
 		// Check release
 
-		int buildNumber = ReleaseLocalServiceUtil.getBuildNumberOrCreate();
+		int buildNumber = _getBuildNumber();
 
 		if (buildNumber > ReleaseInfo.getParentBuildNumber()) {
 			StringBundler sb = new StringBundler(6);
@@ -134,163 +125,115 @@ public class DBUpgrader {
 		_checkPermissionAlgorithm();
 		_checkReleaseState(_getReleaseState());
 
-		if (PropsValues.UPGRADE_DATABASE_TRANSACTIONS_DISABLED) {
-			_disableTransactions();
-		}
-
 		try {
-			StartupHelperUtil.upgradeProcess(buildNumber);
+			_upgradeProcess(buildNumber);
 		}
 		catch (Exception e) {
 			_updateReleaseState(ReleaseConstants.STATE_UPGRADE_FAILURE);
 
-			throw e;
-		}
-		finally {
-			if (PropsValues.UPGRADE_DATABASE_TRANSACTIONS_DISABLED) {
-				_enableTransactions();
-			}
+			throw new RuntimeException(e);
 		}
 
-		// Reload SQL
-
-		CustomSQLUtil.reloadCustomSQL();
-		SQLTransformer.reloadSQLTransformer();
-
-		// Update company key
-
-		if (StartupHelperUtil.isUpgraded()) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Update company key");
-			}
-
-			_updateCompanyKey();
-		}
-
-		// Check class names
+		// Delete temporary images
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Check class names");
+			_log.debug("Delete temporary images");
 		}
 
-		ClassNameLocalServiceUtil.checkClassNames();
+		// Temporarily disabled due to LPS-56383
 
-		// Check resource actions
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Check resource actions");
-		}
-
-		ResourceActionLocalServiceUtil.checkResourceActions();
+		// _deleteTempImages();
 
 		// Clear the caches only if the upgrade process was run
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Clear cache if upgrade process was run");
 		}
-
-		if (StartupHelperUtil.isUpgraded()) {
-			MultiVMPoolUtil.clear();
-		}
 	}
 
-	public static void verify() throws Exception {
+	protected static void upgradeCorePortal() {
+		Console console = System.console();
 
-		// Check release
+		if (console == null) {
+			System.err.println("No console is available.");
 
-		Release release = ReleaseLocalServiceUtil.fetchRelease(
-			ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME);
-
-		if (release == null) {
-			release = ReleaseLocalServiceUtil.addRelease(
-				ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME,
-				ReleaseInfo.getParentBuildNumber());
+			System.exit(1);
 		}
 
-		_checkReleaseState(release.getState());
+		console.format("*****************************************\n");
+		console.format("Portal is about to start in Upgrade mode.\n");
+		console.format("*****************************************\n");
 
-		// Update indexes
+		String upgrade = null;
 
-		if (PropsValues.DATABASE_INDEXES_UPDATE_ON_STARTUP) {
-			StartupHelperUtil.setDropIndexes(true);
+		do {
+			upgrade = console.readLine(
+				"Do you want to upgrade Liferay's Portal Core? (yes/no):");
+		} while (!upgrade.equals("yes") && !upgrade.equals("no"));
 
-			StartupHelperUtil.updateIndexes();
-		}
-		else if (StartupHelperUtil.isUpgraded()) {
-			StartupHelperUtil.updateIndexes();
-		}
+		if (upgrade.equals("no")) {
+			console.format(
+				"Upgrade the core portal is mandatory in order to be able " +
+					"to upgrade all the modules");
 
-		// Verify
-
-		if (PropsValues.VERIFY_DATABASE_TRANSACTIONS_DISABLED) {
-			_disableTransactions();
-		}
-
-		boolean newBuildNumber = false;
-
-		if (ReleaseInfo.getBuildNumber() > release.getBuildNumber()) {
-			newBuildNumber = true;
+			System.exit(1);
 		}
 
-		try {
-			StartupHelperUtil.verifyProcess(
-				newBuildNumber, release.isVerified());
-		}
-		catch (Exception e) {
-			_updateReleaseState(ReleaseConstants.STATE_VERIFY_FAILURE);
+		DataSourceFactoryUtil.setDataSourceFactory(
+			DoPrivilegedUtil.wrap(new DataSourceFactoryImpl()));
 
-			_log.error(
-				"Unable to execute verify process: " + e.getMessage(), e);
+		DBFactoryUtil.setDBFactory(DoPrivilegedUtil.wrap(new DBFactoryImpl()));
 
-			throw e;
-		}
-		finally {
-			if (PropsValues.VERIFY_DATABASE_TRANSACTIONS_DISABLED) {
-				_enableTransactions();
-			}
-		}
+		PortalClassLoaderUtil.setClassLoader(
+			ClassLoaderUtil.getContextClassLoader());
 
-		// Update indexes
+		ApplicationContext applicationContext = new ArrayApplicationContext(
+			PropsValues.SPRING_INFRASTRUCTURE_CONFIGS);
 
-		if (PropsValues.DATABASE_INDEXES_UPDATE_ON_STARTUP ||
-			StartupHelperUtil.isUpgraded()) {
+		BeanLocator beanLocator = new BeanLocatorImpl(
+			ClassLoaderUtil.getPortalClassLoader(), applicationContext);
 
-			StartupHelperUtil.updateIndexes(false);
-		}
+		PortalBeanLocatorUtil.setBeanLocator(beanLocator);
 
-		// Update release
+		new SQLTransformerUtil(new SQLTransformer());
 
-		boolean verified = StartupHelperUtil.isVerified();
+		com.liferay.portal.kernel.util.PropsUtil.setProps(new PropsImpl());
 
-		if (release.isVerified()) {
-			verified = true;
-		}
+		PropsUtil.reload();
 
-		release = ReleaseLocalServiceUtil.updateRelease(
-			release.getReleaseId(), ReleaseInfo.getParentBuildNumber(),
-			ReleaseInfo.getBuildDate(), verified);
+		SAXReaderImpl saxReader = new SAXReaderImpl();
 
-		// Enable database caching after verify
+		saxReader.setSecure(true);
+		saxReader.setSecureXMLFactoryProvider(
+			new SecureXMLFactoryProviderImpl());
 
-		CacheRegistryUtil.setActive(true);
+		new UnsecureSAXReaderUtil().setSAXReader(saxReader);
 
-		// Register release service
+		Log4JUtil.configureLog4J(ClassLoaderUtil.getPortalClassLoader());
 
-		Registry registry = RegistryUtil.getRegistry();
+		DBUpgrader dbUpgrader = new DBUpgrader();
 
-		ServiceRegistrar<Release> serviceRegistrar =
-			registry.getServiceRegistrar(Release.class);
+		dbUpgrader.upgrade();
 
-		Map<String, Object> properties = new HashMap<>();
+		((AbstractRefreshableApplicationContext)applicationContext).close();
 
-		properties.put("build.date", release.getBuildDate());
-		properties.put("build.number", release.getBuildNumber());
-		properties.put("servlet.context.name", release.getServletContextName());
+		return;
+	}
+	protected static String[] getUpgradeProcessClassNames(String key) {
 
-		serviceRegistrar.registerService(Release.class, release, properties);
+		// We would normally call PropsUtil#getArray(String) to return a String
+		// array based on a comma delimited value. However, there is a bug with
+		// Apache Commons Configuration where multi-line comma delimited values
+		// do not interpolate properly (i.e. cannot be referenced by other
+		// properties). The workaround to the bug is to escape commas with a
+		// back slash. To get the configured String array, we have to call
+		// PropsUtil#get(String) and manually split the value into a String
+		// array instead of simply calling PropsUtil#getArray(String).
+
+		return StringUtil.split(GetterUtil.getString(PropsUtil.get(key)));
 	}
 
-	private static void _checkPermissionAlgorithm() throws Exception {
+	private static void _checkPermissionAlgorithm() {
 		long count = _getResourceCodesCount();
 
 		if (count == 0) {
@@ -311,7 +254,7 @@ public class DBUpgrader {
 		throw new IllegalStateException(sb.toString());
 	}
 
-	private static void _checkReleaseState(int state) throws Exception {
+	private static void _checkReleaseState(int state) {
 		if (state == ReleaseConstants.STATE_GOOD) {
 			return;
 		}
@@ -328,64 +271,50 @@ public class DBUpgrader {
 		throw new IllegalStateException(sb.toString());
 	}
 
-	private static void _disableTransactions() throws Exception {
-		if (_log.isDebugEnabled()) {
-			_log.debug("Disable transactions");
-		}
-
-		PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED = false;
-
-		Field field = ReflectionUtil.getDeclaredField(
-			ServiceBeanAopCacheManager.class, "_annotations");
-
-		field.set(
-			null,
-			new HashMap<MethodInvocation, Annotation[]>() {
-
-				@Override
-				public Annotation[] get(Object key) {
-					return _annotations;
-				}
-
-				private Annotation[] _annotations = new Annotation[] {
-					new Skip() {
-
-						@Override
-						public Class<? extends Annotation> annotationType() {
-							return Skip.class;
-						}
-
-					}
-				};
-
-			}
-		);
-	}
-
-	private static void _enableTransactions() throws Exception {
-		if (_log.isDebugEnabled()) {
-			_log.debug("Enable transactions");
-		}
-
-		PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED = GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.SPRING_HIBERNATE_SESSION_DELEGATED));
-
-		Field field = ReflectionUtil.getDeclaredField(
-			ServiceBeanAopCacheManager.class, "_annotations");
-
-		field.set(
-			null, new ConcurrentHashMap<MethodInvocation, Annotation[]>());
-
-		ServiceBeanAopCacheManagerUtil.reset();
-	}
-
-	private static int _getReleaseState() throws Exception {
+	private static int _getBuildNumber() {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select buildNumber from Release_ where releaseId = ?");
+
+			ps.setLong(1, ReleaseConstants.DEFAULT_ID);
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				int buildNumber = rs.getInt("buildNumber");
+
+				if (_log.isDebugEnabled()) {
+					_log.debug("Build number " + buildNumber);
+				}
+
+				return buildNumber;
+			}
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e.getMessage());
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+
+		throw new RuntimeException("Unable to retrieve the build number");
+	}
+
+	private static int _getReleaseState() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select state_ from Release_ where releaseId = ?");
@@ -402,18 +331,22 @@ public class DBUpgrader {
 				"No Release exists with the primary key " +
 					ReleaseConstants.DEFAULT_ID);
 		}
-		finally {
+		catch (SQLException sqle) {
+			_log.error(sqle, sqle);
+
+			throw new RuntimeException(sqle);
+		} finally {
 			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
 
-	private static long _getResourceCodesCount() throws Exception {
+	private static long _getResourceCodesCount() {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement("select count(*) from ResourceCode");
 
@@ -435,18 +368,25 @@ public class DBUpgrader {
 		}
 	}
 
-	private static void _updateCompanyKey() throws Exception {
-		DB db = DBFactoryUtil.getDB();
+	private static List<String> _getMinimalSpringConfigs() {
+		List<String> configLocations = new ArrayList<>();
 
-		db.runSQL("update Company set key_ = null");
+		configLocations.add("META-INF/base-spring.xml");
+		configLocations.add("META-INF/counter-spring.xml");
+		configLocations.add("META-INF/minimal-upgrade-services-spring.xml");
+		configLocations.add("META-INF/portlet-container-spring.xml");
+		configLocations.add("META-INF/upgrade-spring.xml");
+		configLocations.add("META-INF/util-spring.xml");
+
+		return configLocations;
 	}
 
-	private static void _updateReleaseState(int state) throws Exception {
+	private static void _updateReleaseState(int state) {
 		Connection con = null;
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"update Release_ set modifiedDate = ?, state_ = ? where " +
@@ -458,9 +398,110 @@ public class DBUpgrader {
 
 			ps.executeUpdate();
 		}
-		finally {
+		catch (SQLException sqle) {
+			_log.error(sqle, sqle);
+
+			throw  new RuntimeException(sqle);
+		} finally {
 			DataAccess.cleanUp(con, ps);
 		}
+	}
+
+	private static void _upgradeProcess(int buildNumber)
+		throws UpgradeException {
+
+		if (buildNumber == ReleaseInfo.getParentBuildNumber()) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Skipping upgrade process from " + buildNumber +
+						" to " + ReleaseInfo.getParentBuildNumber());
+			}
+
+			return;
+		}
+
+		String[] upgradeProcessClassNames = getUpgradeProcessClassNames(
+			PropsKeys.UPGRADE_PROCESSES);
+
+		if (upgradeProcessClassNames.length == 0) {
+			upgradeProcessClassNames = getUpgradeProcessClassNames(
+				PropsKeys.UPGRADE_PROCESSES + StringPool.PERIOD + buildNumber);
+
+			if (upgradeProcessClassNames.length == 0) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Upgrading from " + buildNumber + " to " +
+							ReleaseInfo.getParentBuildNumber() +
+							" is not supported");
+				}
+
+				System.exit(0);
+			}
+		}
+
+		List<UpgradeProcess> upgradeProcesses =
+			UpgradeProcessUtil.initUpgradeProcesses(
+				ClassLoaderUtil.getPortalClassLoader(),
+				upgradeProcessClassNames);
+
+		UpgradeProcessUtil.upgradeProcess(buildNumber, upgradeProcesses);
+	}
+
+	private static void _wireCacheKeyGenerators() {
+		CacheKeyGeneratorUtil cacheKeyGeneratorUtil =
+			new CacheKeyGeneratorUtil();
+
+		Map<String, CacheKeyGenerator> cacheKeyGenerators = new HashMap<>();
+
+		cacheKeyGenerators.put(
+			"com.liferay.portal.kernel.dao.orm.FinderCache#BaseModel",
+			new HashCodeCacheKeyGenerator());
+
+		cacheKeyGeneratorUtil.setCacheKeyGenerators(cacheKeyGenerators);
+
+		cacheKeyGeneratorUtil.setDefaultCacheKeyGenerator(
+			new SimpleCacheKeyGenerator());
+	}
+
+	public static void _wireDLUtils() {
+		new DLUtil().setDL(new DLImpl());
+	}
+
+	private static void _wireSaxReaders() {
+		SAXReaderImpl saxReader = new SAXReaderImpl();
+
+		saxReader.setSecure(true);
+		saxReader.setSecureXMLFactoryProvider(
+			new SecureXMLFactoryProviderImpl());
+
+		UnsecureSAXReaderUtil unsecureSAXReaderUtil =
+			new UnsecureSAXReaderUtil();
+
+		unsecureSAXReaderUtil.setSAXReader(saxReader);
+
+		SecureXMLFactoryProviderUtil secureXMLFactoryProviderUtil =
+			new SecureXMLFactoryProviderUtil();
+
+		secureXMLFactoryProviderUtil.setSecureXMLFactoryProvider(
+			new SecureXMLFactoryProviderImpl());
+
+		SAXReaderUtil saxReaderUtil = new SAXReaderUtil();
+
+		saxReaderUtil.setSAXReader(saxReader);
+	}
+
+	private static void _startMinimalServices() {
+		_wireCacheKeyGenerators();
+
+		InitUtil.initWithSpring(_getMinimalSpringConfigs(), true);
+
+		_wireDLUtils();
+
+		_wireSaxReaders();
+
+		// InitUtil.initWithSpring(true);
+
+		PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED = false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(DBUpgrader.class);

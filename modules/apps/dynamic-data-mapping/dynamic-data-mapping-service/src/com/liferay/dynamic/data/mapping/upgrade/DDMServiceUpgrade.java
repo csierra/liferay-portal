@@ -41,13 +41,6 @@ public class DDMServiceUpgrade {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
@@ -57,12 +50,6 @@ public class DDMServiceUpgrade {
 		upgradeProcesses.add(new UpgradeClassNames());
 		upgradeProcesses.add(new UpgradeDynamicDataMapping());
 		upgradeProcesses.add(new UpgradeLastPublishDate());
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.dynamic.data.mapping.service", upgradeProcesses, 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

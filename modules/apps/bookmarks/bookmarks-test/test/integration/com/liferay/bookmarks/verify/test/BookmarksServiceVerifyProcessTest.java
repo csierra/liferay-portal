@@ -164,7 +164,7 @@ public class BookmarksServiceVerifyProcessTest
 	protected VerifyProcess getVerifyProcess() {
 		Registry registry = RegistryUtil.getRegistry();
 
-		return registry.getService(BookmarksServiceVerifyProcess.class);
+		return null;
 	}
 
 	@DeleteAfterTestRun

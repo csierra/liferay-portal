@@ -17,19 +17,26 @@ package com.liferay.portal.verify;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.util.Consumer;
 import com.liferay.portal.kernel.util.StringBundler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @author Igor Beslic
  */
+@OSGiBeanProperties(
+	property = {"verifier.name=DB2"}, service = VerifyProcess.class
+)
 public class VerifyDB2 extends VerifyProcess {
 
-	@Override
-	protected void doVerify() throws Exception {
+	protected void doWithResultSet(Consumer<ResultSet> consumer)
+		throws SQLException {
+
 		DB db = DBFactoryUtil.getDB();
 
 		String dbType = db.getType();
@@ -56,23 +63,39 @@ public class VerifyDB2 extends VerifyProcess {
 
 			rs = ps.executeQuery();
 
-			while (rs.next()) {
-				String tableName = rs.getString(1);
-
-				if (!isPortalTableName(tableName)) {
-					continue;
-				}
-
-				String columnName = rs.getString(2);
-
-				runSQL(
-					"alter table " + tableName + " alter column " + columnName +
-						" set data type varchar(600)");
-			}
+			consumer.accept(rs);
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
 
+	@Override
+	protected void doVerify() throws Exception {
+		doWithResultSet(new Consumer<ResultSet>() {
+
+			@Override
+			public void accept(ResultSet rs) {
+				try {
+					while (rs.next()) {
+						String tableName = rs.getString(1);
+
+						if (!isPortalTableName(tableName)) {
+							continue;
+						}
+
+						String columnName = rs.getString(2);
+
+						runSQL(
+							"alter table " + tableName + " alter column " +
+								columnName + " set data type varchar(600)");
+					}
+				}
+				catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+		});
+	}
 }

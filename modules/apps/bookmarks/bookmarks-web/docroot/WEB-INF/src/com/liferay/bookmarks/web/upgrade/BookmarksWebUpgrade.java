@@ -19,44 +19,41 @@ import com.liferay.bookmarks.web.upgrade.v1_0_0.UpgradePortletPreferences;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.liferay.portal.upgrade.constants.UpgradeWhiteboardConstants;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Miguel Pastor
  */
-@Component(immediate = true, service = BookmarksWebUpgrade.class)
-public class BookmarksWebUpgrade {
+@Component(
+	immediate = true,
+	property = {
+		UpgradeWhiteboardConstants.DATABASES_ALL_PROPERTY,
+		UpgradeWhiteboardConstants.APPLICATION_NAME + "=com.liferay.bookmarks.web",
+		UpgradeWhiteboardConstants.FROM + "=-1.-1.-1.-1",
+		UpgradeWhiteboardConstants.TO + "=1.0.0.0"
+	},
+	service = UpgradeProcess.class
+)
+public class BookmarksWebUpgrade extends UpgradeProcess {
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	@Reference(target = ModuleServiceLifecycle.SPRING_INITIALIZED, unbind = "-")
 	protected void setModuleServiceLifecycle(
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
+	@Override
+	protected void doUpgrade() throws PortalException {
+		UpgradeProcess upgradeProcess = new UpgradeAdminPortlets();
 
-		_releaseLocalService = releaseLocalService;
+		upgradeProcess.upgrade();
+
+		upgradeProcess = new UpgradePortletPreferences();
+
+		upgradeProcess.upgrade();
 	}
-
-	@Activate
-	protected void upgrade() throws PortalException {
-		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
-
-		upgradeProcesses.add(new UpgradeAdminPortlets());
-		upgradeProcesses.add(new UpgradePortletPreferences());
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.bookmarks.web", upgradeProcesses, 1, 1, false);
-	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

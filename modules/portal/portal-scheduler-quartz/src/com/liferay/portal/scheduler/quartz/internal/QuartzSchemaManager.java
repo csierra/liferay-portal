@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -79,6 +80,12 @@ public class QuartzSchemaManager {
 		}
 	}
 
+	@Reference(target = ModuleServiceLifecycle.SPRING_INITIALIZED)
+	public void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+
+	}
+	
 	@Reference
 	protected void setInfrastructureUtil(
 		InfrastructureUtil infrastructureUtil) {

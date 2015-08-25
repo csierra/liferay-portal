@@ -57,7 +57,7 @@ public interface ReleaseLocalService extends BaseLocalService,
 		com.liferay.portal.model.Release release);
 
 	public com.liferay.portal.model.Release addRelease(
-		java.lang.String servletContextName, int buildNumber);
+		java.lang.String servletContextName, java.lang.String buildNumber);
 
 	/**
 	* Creates a new release with the primary key. Does not add the release to the database.
@@ -181,7 +181,8 @@ public interface ReleaseLocalService extends BaseLocalService,
 	public java.lang.String getBeanIdentifier();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getBuildNumberOrCreate() throws PortalException;
+	public java.lang.String getBuildNumberOrCreate()
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -240,13 +241,12 @@ public interface ReleaseLocalService extends BaseLocalService,
 		com.liferay.portal.model.Release release);
 
 	public com.liferay.portal.model.Release updateRelease(long releaseId,
-		int buildNumber, java.util.Date buildDate, boolean verified)
-		throws PortalException;
+		java.lang.String buildNumber, java.util.Date buildDate, boolean verified)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public void updateRelease(java.lang.String servletContextName,
-		java.util.List<com.liferay.portal.kernel.upgrade.UpgradeProcess> upgradeProcesses,
-		int buildNumber, int previousBuildNumber, boolean indexOnUpgrade)
-		throws PortalException;
+		java.lang.String buildNumber, java.lang.String previousBuildNumber)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public void updateRelease(java.lang.String servletContextName,
 		java.util.List<com.liferay.portal.kernel.upgrade.UpgradeProcess> upgradeProcesses,

@@ -14,9 +14,9 @@
 
 package com.liferay.portal.upgrade.internal;
 
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.Upgrade;
 
 /**
  * @author Miguel Pastor
@@ -26,11 +26,11 @@ public class UpgradeInfo {
 
 	public UpgradeInfo(
 		String fromVersionString, String toVersionString,
-		UpgradeProcess upgradeProcess) {
+		Upgrade upgrade) {
 
 		_fromVersionString = fromVersionString;
 		_toVersionString = toVersionString;
-		_upgradeProcess = upgradeProcess;
+		_upgrade = upgrade;
 	}
 
 	public int getFromVersionInt() {
@@ -49,9 +49,10 @@ public class UpgradeInfo {
 		return _toVersionString;
 	}
 
-	public UpgradeProcess getUpgradeProcess() {
-		return _upgradeProcess;
+	public Upgrade getUpgrade() {
+		return _upgrade;
 	}
+
 
 	@Override
 	public String toString() {
@@ -61,8 +62,8 @@ public class UpgradeInfo {
 		sb.append(_fromVersionString);
 		sb.append(", toVersionString=");
 		sb.append(_toVersionString);
-		sb.append(", upgradeProcess=");
-		sb.append(_upgradeProcess);
+		sb.append(", upgrade=");
+		sb.append(_upgrade);
 		sb.append("}");
 
 		return sb.toString();
@@ -74,6 +75,6 @@ public class UpgradeInfo {
 
 	private final String _fromVersionString;
 	private final String _toVersionString;
-	private final UpgradeProcess _upgradeProcess;
+	private final Upgrade _upgrade;
 
 }

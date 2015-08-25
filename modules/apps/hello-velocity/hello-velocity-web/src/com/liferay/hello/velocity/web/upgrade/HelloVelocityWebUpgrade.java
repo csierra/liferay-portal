@@ -14,7 +14,6 @@
 
 package com.liferay.hello.velocity.web.upgrade;
 
-import com.liferay.hello.velocity.web.portlet.HelloVelocityPortlet;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
@@ -38,13 +37,6 @@ public class HelloVelocityWebUpgrade {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
 	protected void upgrade() throws PortalException {
 		UpgradePortletId upgradePortletId = new UpgradePortletId() {
@@ -61,13 +53,6 @@ public class HelloVelocityWebUpgrade {
 			}
 
 		};
-
-		_releaseLocalService.updateRelease(
-			HelloVelocityPortlet.class.getName(),
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
 	}
-
-	private ReleaseLocalService _releaseLocalService;
 
 }

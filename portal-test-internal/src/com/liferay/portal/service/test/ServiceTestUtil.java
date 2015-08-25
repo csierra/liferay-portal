@@ -122,7 +122,7 @@ public class ServiceTestUtil {
 		// Upgrade
 
 		try {
-			DBUpgrader.upgrade();
+			// DBUpgrader.upgrade();
 		}
 		catch (Throwable t) {
 			_log.error(t, t);
@@ -169,14 +169,6 @@ public class ServiceTestUtil {
 			new Class[] {SchedulerEngineHelper.class},
 			new Filter[] {filter});
 
-		// Verify
-
-		try {
-			DBUpgrader.verify();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
 	}
 
 	public static void initPermissions() {

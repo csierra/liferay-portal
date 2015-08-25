@@ -53,6 +53,8 @@
 	<bean id="com.liferay.portal.kernel.search.facet.ScopeFacetFactory" class="com.liferay.portal.kernel.search.facet.ScopeFacetFactory" />
 	<bean id="com.liferay.portal.kernel.search.facet.SimpleFacetFactory" class="com.liferay.portal.kernel.search.facet.SimpleFacetFactory" />
 
+	<!-- Utils -->
+
 	<!-- Generic search engine -->
 
 	<bean id="com.liferay.portal.search.generic.GenericSearchEngineImpl" class="com.liferay.portal.kernel.search.BaseSearchEngine">

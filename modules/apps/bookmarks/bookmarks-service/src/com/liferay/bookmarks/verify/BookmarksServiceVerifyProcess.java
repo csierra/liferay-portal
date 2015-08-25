@@ -21,11 +21,10 @@ import com.liferay.bookmarks.service.BookmarksFolderLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.util.PortalInstances;
-import com.liferay.portal.verify.VerifyProcess;
 
 import java.util.List;
 
-import org.osgi.service.component.annotations.Activate;
+import com.liferay.portal.verify.VerifyProcess;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -33,16 +32,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  * @author Alexander Chow
  */
-@Component(immediate = true, service = BookmarksServiceVerifyProcess.class)
+@Component(
+	immediate = true, property = {"verifier.name=bookmarks"},
+	service = VerifyProcess.class
+)
 public class BookmarksServiceVerifyProcess extends VerifyProcess {
-
-	@Activate
-	@Override
-	protected void doVerify() throws Exception {
-		updateEntryAssets();
-		updateFolderAssets();
-		verifyTree();
-	}
 
 	@Reference(unbind = "-")
 	protected void setBookmarksEntryLocalService(
@@ -56,6 +50,18 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 		BookmarksFolderLocalService bookmarksFolderLocalService) {
 
 		_bookmarksFolderLocalService = bookmarksFolderLocalService;
+	}
+
+	@Override
+	public void doVerify() {
+		try {
+			updateEntryAssets();
+			updateFolderAssets();
+			verifyTree();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected void updateEntryAssets() throws Exception {

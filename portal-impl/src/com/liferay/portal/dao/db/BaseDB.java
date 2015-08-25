@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.sql.SQLTransformerUtil;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -249,7 +250,7 @@ public abstract class BaseDB implements DB {
 			for (int i = 0; i < sqls.length; i++) {
 				String sql = buildSQL(sqls[i]);
 
-				sql = SQLTransformer.transform(sql.trim());
+				sql = SQLTransformerUtil.transform(sql.trim());
 
 				if (sql.endsWith(";")) {
 					sql = sql.substring(0, sql.length() - 1);

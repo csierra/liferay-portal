@@ -15,10 +15,9 @@
 package com.liferay.asset.browser.web.upgrade;
 
 import com.liferay.asset.browser.web.constants.AssetBrowserPortletKeys;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 
 import java.util.Collections;
@@ -32,18 +31,6 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = AssetBrowserWebUpgrade.class)
 public class AssetBrowserWebUpgrade {
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
-	}
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
 
 	@Activate
 	protected void upgrade() throws PortalException {
@@ -60,12 +47,13 @@ public class AssetBrowserWebUpgrade {
 
 		};
 
-		_releaseLocalService.updateRelease(
-			"com.liferay.asset.browser.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
-			false);
+		upgradePortletId.upgrade();
 	}
 
-	private ReleaseLocalService _releaseLocalService;
+	@Reference(target = ModuleServiceLifecycle.SPRING_INITIALIZED)
+	public void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+
+	}
 
 }
