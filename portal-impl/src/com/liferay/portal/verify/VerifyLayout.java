@@ -143,7 +143,7 @@ public class VerifyLayout extends VerifyProcess {
 			}
 
 			try {
-				LayoutLocalServiceUtil.updateFriendlyURL(
+				layout = LayoutLocalServiceUtil.updateFriendlyURL(
 					layout.getUserId(), layout.getPlid(), newFriendlyURL,
 					layoutFriendlyURL.getLanguageId());
 			}
