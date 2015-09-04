@@ -19,48 +19,43 @@ import com.liferay.dynamic.data.mapping.upgrade.v1_0_0.UpgradeDynamicDataMapping
 import com.liferay.dynamic.data.mapping.upgrade.v1_0_0.UpgradeLastPublishDate;
 import com.liferay.dynamic.data.mapping.upgrade.v1_0_0.UpgradeSchema;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
-import com.liferay.portal.upgrade.tools.UpgradeUtil;
+import com.liferay.portal.upgrade.tools.UpgradeStepRegistrator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 
 /**
  * @author Marcellus Tavares
  */
-@Component(immediate = true, service = DDMServiceUpgrade.class)
-public class DDMServiceUpgrade {
+@Component(immediate = true)
+public class DDMServiceUpgrade implements UpgradeStepRegistrator {
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
+	@Override
+	public String getBundleSymbolicName() {
+		return "com.liferay.dynamic.data.mapping.service";
+	}
+
+	@Override
+	public String getFromVersion() {
+		return "0.0.1";
+	}
+
+	@Override
+	public String getToVersion() {
+		return "1.0.0";
+	}
+
+	@Override
+	public Collection<UpgradeStep> getUpgradeSteps() {
 		Collection<UpgradeStep> upgradeSteps = new ArrayList<>();
 
 		upgradeSteps.add(new UpgradeSchema());
-
 		upgradeSteps.add(new UpgradeClassNames());
 		upgradeSteps.add(new UpgradeDynamicDataMapping());
 		upgradeSteps.add(new UpgradeLastPublishDate());
 
-		_serviceRegistrations = UpgradeUtil.register(
-			bundleContext, "com.liferay.dynamic.data.mapping.service", "0.0.1",
-			"1.0.0", upgradeSteps);
+		return upgradeSteps;
 	}
-
-	@Deactivate
-	protected void deactivate() {
-		for (ServiceRegistration<UpgradeStep> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
-	}
-
-	private List<ServiceRegistration<UpgradeStep>> _serviceRegistrations;
-
 }

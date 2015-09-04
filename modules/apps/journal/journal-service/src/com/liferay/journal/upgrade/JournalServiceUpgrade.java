@@ -27,28 +27,37 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
-import com.liferay.portal.upgrade.tools.UpgradeUtil;
+import com.liferay.portal.upgrade.tools.UpgradeStepRegistrator;
 
 import java.io.PrintWriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 
 /**
  * @author Eduardo Garcia
  */
 @Component(immediate = true)
-public class JournalServiceUpgrade {
+public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 
-	@Activate
-	protected void activate(BundleContext bundleContext) throws Exception {
+	@Override
+	public String getBundleSymbolicName() {
+		return "com.liferay.journal.service";
+	}
+
+	@Override
+	public String getFromVersion() {
+		return "0.0.1";
+	}
+
+	@Override
+	public String getToVersion() {
+		return "1.0.0";
+	}
+
+	public Collection<UpgradeStep> getUpgradeSteps() {
 		Collection<UpgradeStep> upgradeSteps = new ArrayList<>();
 
 		upgradeSteps.add(new UpgradeSchema());
@@ -74,18 +83,7 @@ public class JournalServiceUpgrade {
 			}
 		});
 
-		_serviceRegistrations = UpgradeUtil.register(
-			bundleContext, "com.liferay.journal.service", "0.0.1", "1.0.0",
-			upgradeSteps);
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		for (ServiceRegistration<UpgradeStep> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
+		return upgradeSteps;
 	}
 
 	protected void deleteTempImages() throws Exception {
@@ -104,7 +102,5 @@ public class JournalServiceUpgrade {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalServiceUpgrade.class);
-
-	private List<ServiceRegistration<UpgradeStep>> _serviceRegistrations;
 
 }

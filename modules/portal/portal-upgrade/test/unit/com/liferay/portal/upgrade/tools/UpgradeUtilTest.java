@@ -34,7 +34,7 @@ public class UpgradeUtilTest {
 	public void testBuildUpgradeInfos() {
 		TestUpgradeStep testUpgradeStep = new TestUpgradeStep();
 
-		List<UpgradeInfo> upgradeInfos = UpgradeUtil.buildUpgradeInfos(
+		List<UpgradeInfo> upgradeInfos = new UpgradeStepRegistratorTracker().buildUpgradeInfos(
 			"0.0.0", "1.0.0", testUpgradeStep, testUpgradeStep, testUpgradeStep,
 			testUpgradeStep);
 
@@ -53,7 +53,7 @@ public class UpgradeUtilTest {
 
 	@Test
 	public void testBuildUpgradeInfosWhenStepsAreEmpty() {
-		List<UpgradeInfo> upgradeInfos = UpgradeUtil.buildUpgradeInfos(
+		List<UpgradeInfo> upgradeInfos = new UpgradeStepRegistratorTracker().buildUpgradeInfos(
 			"0.0.0", "1.0.0");
 
 		Assert.assertTrue(upgradeInfos.isEmpty());
@@ -63,7 +63,7 @@ public class UpgradeUtilTest {
 	public void testBuildUpgradeInfosWithOneStep() {
 		TestUpgradeStep testUpgradeStep = new TestUpgradeStep();
 
-		List<UpgradeInfo> upgradeInfos = UpgradeUtil.buildUpgradeInfos(
+		List<UpgradeInfo> upgradeInfos = new UpgradeStepRegistratorTracker().buildUpgradeInfos(
 			"0.0.0", "1.0.0", testUpgradeStep);
 
 		Assert.assertEquals(1, upgradeInfos.size());

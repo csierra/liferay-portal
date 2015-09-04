@@ -26,14 +26,43 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class UpgradeUtil {
+@Component(immediate = true)
+public class UpgradeStepRegistratorTracker {
 
-	public static List<ServiceRegistration<UpgradeStep>> register(
+	private ServiceTracker<
+		UpgradeStepRegistrator, Collection<ServiceRegistration<UpgradeStep>>>
+		_serviceTracker;
+
+	private BundleContext _bundleContext;
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
+
+		_serviceTracker = new ServiceTracker<>(
+			bundleContext, UpgradeStepRegistrator.class,
+			new UpgradeStepRegistratorServiceTrackerCustomizer());
+
+		_serviceTracker.open();
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTracker.close();
+	}
+
+	public List<ServiceRegistration<UpgradeStep>> register(
 		BundleContext bundleContext, String upgradeBundleSymbolicName,
 		String upgradeFromSchemaVersion, String upgradeToSchemaVersion,
 		Collection<UpgradeStep> upgradeSteps) {
@@ -45,7 +74,7 @@ public class UpgradeUtil {
 			upgradeToSchemaVersion, upgradeSteps.toArray(upgradeStepsArray));
 	}
 
-	public static List<ServiceRegistration<UpgradeStep>> register(
+	public List<ServiceRegistration<UpgradeStep>> register(
 		BundleContext bundleContext, String upgradeBundleSymbolicName,
 		String upgradeFromSchemaVersion, String upgradeToSchemaVersion,
 		UpgradeStep ... upgradeSteps) {
@@ -66,7 +95,7 @@ public class UpgradeUtil {
 		return serviceRegistrations;
 	}
 
-	protected static List<UpgradeInfo> buildUpgradeInfos(
+	protected List<UpgradeInfo> buildUpgradeInfos(
 		String upgradeFromVersion, String upgradeToVersion,
 		UpgradeStep... upgradeSteps) {
 
@@ -99,12 +128,11 @@ public class UpgradeUtil {
 		return upgradeInfos;
 	}
 
-	private static ServiceRegistration<UpgradeStep> _registerUpgradeStep(
+	private ServiceRegistration<UpgradeStep> _registerUpgradeStep(
 		BundleContext bundleContext, String upgradeBundleSymbolicName,
 		UpgradeInfo upgradeInfo) {
 
-		Dictionary<String, Object> properties;
-		properties = new Hashtable<>();
+		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put("upgrade.db.type", "any");
 		properties.put(
@@ -118,4 +146,56 @@ public class UpgradeUtil {
 			UpgradeStep.class, upgradeInfo.getUpgradeStep(), properties);
 	}
 
+	private class UpgradeStepRegistratorServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer<
+						UpgradeStepRegistrator,
+						Collection<ServiceRegistration<UpgradeStep>>> {
+
+		@Override
+		public Collection<ServiceRegistration<UpgradeStep>> addingService(
+			ServiceReference<UpgradeStepRegistrator> serviceReference) {
+
+			UpgradeStepRegistrator upgradeStepRegistrator =
+				_bundleContext.getService(serviceReference);
+
+			if (upgradeStepRegistrator == null) {
+				return null;
+			}
+
+			String bundleSymbolicName =
+				upgradeStepRegistrator.getBundleSymbolicName();
+
+			String fromVersion = upgradeStepRegistrator.getFromVersion();
+			String toVersion = upgradeStepRegistrator.getToVersion();
+
+			Collection<UpgradeStep> upgradeSteps =
+				upgradeStepRegistrator.getUpgradeSteps();
+
+			return register(
+				_bundleContext, bundleSymbolicName, fromVersion, toVersion,
+				upgradeSteps);
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<UpgradeStepRegistrator> serviceReference,
+			Collection<ServiceRegistration<UpgradeStep>> serviceRegistrations) {
+
+			removedService(serviceReference, serviceRegistrations);
+
+			addingService(serviceReference);
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<UpgradeStepRegistrator> serviceReference,
+			Collection<ServiceRegistration<UpgradeStep>> serviceRegistrations) {
+
+			for (ServiceRegistration<UpgradeStep> serviceRegistration :
+					serviceRegistrations) {
+
+				serviceRegistration.unregister();
+			}
+		}
+	}
 }

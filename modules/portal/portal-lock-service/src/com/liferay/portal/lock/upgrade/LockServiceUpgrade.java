@@ -14,43 +14,39 @@
 
 package com.liferay.portal.lock.upgrade;
 
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.lock.upgrade.v1_0_0.UpgradeLock;
-import com.liferay.portal.upgrade.tools.UpgradeUtil;
+import com.liferay.portal.upgrade.tools.UpgradeStepRegistrator;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 
 /**
  * @author Miguel Pastor
  */
 @Component(immediate = true)
-public class LockServiceUpgrade {
+public class LockServiceUpgrade implements UpgradeStepRegistrator {
 
-	@Activate
-	protected void activate(BundleContext bundleContext)
-		throws PortalException {
-
-		_serviceRegistrations = UpgradeUtil.register(
-			bundleContext, "com.liferay.portal.lock.service", "0.0.1", "1.0.0",
-			new UpgradeLock());
+	@Override
+	public String getBundleSymbolicName() {
+		return "com.liferay.portal.lock.service";
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		for (ServiceRegistration<UpgradeStep> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
+	@Override
+	public String getFromVersion() {
+		return "0.0.1";
 	}
 
-	private List<ServiceRegistration<UpgradeStep>> _serviceRegistrations;
+	@Override
+	public String getToVersion() {
+		return "1.0.0";
+	}
+
+	@Override
+	public Collection<UpgradeStep> getUpgradeSteps() {
+		return Collections.<UpgradeStep>singleton(new UpgradeLock());
+	}
 
 }
