@@ -15,46 +15,42 @@
 package com.liferay.portal.lock.upgrade;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.lock.upgrade.v1_0_0.UpgradeLock;
-import com.liferay.portal.service.ReleaseLocalService;
+import com.liferay.portal.upgrade.tools.UpgradeUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.Deactivate;
 
 /**
  * @author Miguel Pastor
  */
-@Component(immediate = true, service = LockServiceUpgrade.class)
+@Component(immediate = true)
 public class LockServiceUpgrade {
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
-	}
-
-	@Reference(unbind = "-")
-	protected void setReleaseLocalService(
-		ReleaseLocalService releaseLocalService) {
-
-		_releaseLocalService = releaseLocalService;
-	}
-
 	@Activate
-	protected void upgrade() throws PortalException {
-		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
+	protected void activate(BundleContext bundleContext)
+		throws PortalException {
 
-		upgradeProcesses.add(new UpgradeLock());
-
-		_releaseLocalService.updateRelease(
-			"com.liferay.portal.lock.service", upgradeProcesses, 1, 1, false);
+		_serviceRegistrations = UpgradeUtil.register(
+			bundleContext, "com.liferay.portal.lock.service", "0.0.1", "1.0.0",
+			new UpgradeLock());
 	}
 
-	private ReleaseLocalService _releaseLocalService;
+	@Deactivate
+	protected void deactivate() {
+		for (ServiceRegistration<UpgradeStep> serviceRegistration :
+				_serviceRegistrations) {
+
+			serviceRegistration.unregister();
+		}
+	}
+
+	private List<ServiceRegistration<UpgradeStep>> _serviceRegistrations;
 
 }

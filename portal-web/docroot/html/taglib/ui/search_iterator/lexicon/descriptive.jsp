@@ -32,7 +32,7 @@ RowChecker rowChecker = searchContainer.getRowChecker();
 
 if (rowChecker != null) {
 	if (headerNames != null) {
-		headerNames.add(0, rowChecker.getAllRowsCheckBox(request));
+		headerNames.add(0, StringPool.BLANK);
 
 		normalizedHeaderNames.add(0, "rowChecker");
 	}
@@ -51,7 +51,7 @@ JSONArray primaryKeysJSONArray = JSONFactoryUtil.createJSONArray();
 	</div>
 </c:if>
 
-<ul class="<%= searchContainer.getCssClass() %> tabular-list-group <%= resultRows.isEmpty() ? "hide" : StringPool.BLANK %>" id="<%= namespace + id %>SearchContainer">
+<ul class="<%= searchContainer.getCssClass() %> <%= resultRows.isEmpty() ? "hide" : StringPool.BLANK %> tabular-list-group" id="<%= namespace + id %>SearchContainer">
 	<c:if test="<%= (headerNames != null) && Validator.isNotNull(headerNames.get(0)) %>">
 		<li class="list-group-heading"><liferay-ui:message key="<%= headerNames.get(0) %>" /></li>
 	</c:if>
@@ -85,7 +85,7 @@ JSONArray primaryKeysJSONArray = JSONFactoryUtil.createJSONArray();
 
 		<li class="list-group-item <%= GetterUtil.getString(row.getClassName()) %> <%= row.getCssClass() %> <%= rowIsChecked ? "active" : StringPool.BLANK %> <%= Validator.isNotNull(row.getState()) ? "list-group-item-" + row.getState() : StringPool.BLANK %>"  <%= AUIUtil.buildData(data) %>>
 			<c:if test="<%= rowChecker != null %>">
-				<div class="hidden-sm hidden-x list-group-item-field">
+				<div class="checkbox-default hidden-sm hidden-x list-group-item-field">
 					<%= rowChecker.getRowCheckBox(request, rowIsChecked, rowChecker.isDisabled(row.getObject()), row.getPrimaryKey()) %>
 				</div>
 			</c:if>
@@ -125,7 +125,7 @@ JSONArray primaryKeysJSONArray = JSONFactoryUtil.createJSONArray();
 </ul>
 
 <c:if test="<%= PropsValues.SEARCH_CONTAINER_SHOW_PAGINATION_BOTTOM && paginate %>">
-	<div class="taglib-search-iterator-page-iterator-bottom">
+	<div class="<%= resultRows.isEmpty() ? "hide" : StringPool.BLANK %> taglib-search-iterator-page-iterator-bottom">
 		<liferay-ui:search-paginator id='<%= id + "PageIteratorBottom" %>' searchContainer="<%= searchContainer %>" type="<%= type %>" />
 	</div>
 </c:if>

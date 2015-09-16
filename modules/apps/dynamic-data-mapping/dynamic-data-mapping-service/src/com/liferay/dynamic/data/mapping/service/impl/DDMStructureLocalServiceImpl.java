@@ -32,10 +32,13 @@ import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateConstants;
 import com.liferay.dynamic.data.mapping.service.base.DDMStructureLocalServiceBaseImpl;
+import com.liferay.dynamic.data.mapping.service.permission.DDMStructurePermission;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
 import com.liferay.dynamic.data.mapping.util.DDMXMLUtil;
 import com.liferay.dynamic.data.mapping.util.impl.DDMFormTemplateSynchonizer;
+import com.liferay.dynamic.data.mapping.validator.DDMFormValidationException;
+import com.liferay.dynamic.data.mapping.validator.DDMFormValidator;
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -60,6 +63,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.permission.ModelPermissions;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.util.PortalUtil;
 
 import java.util.ArrayList;
@@ -370,11 +374,14 @@ public class DDMStructureLocalServiceImpl
 			boolean addGuestPermissions)
 		throws PortalException {
 
+		String resourceName =
+			DDMStructurePermission.getStructureModelResourceName(
+				structure.getClassNameId());
+
 		resourceLocalService.addResources(
 			structure.getCompanyId(), structure.getGroupId(),
-			structure.getUserId(), DDMStructure.class.getName(),
-			structure.getStructureId(), false, addGroupPermissions,
-			addGuestPermissions);
+			structure.getUserId(), resourceName, structure.getStructureId(),
+			false, addGroupPermissions, addGuestPermissions);
 	}
 
 	/**
@@ -389,10 +396,14 @@ public class DDMStructureLocalServiceImpl
 			DDMStructure structure, ModelPermissions modelPermissions)
 		throws PortalException {
 
+		String resourceName =
+			DDMStructurePermission.getStructureModelResourceName(
+				structure.getClassNameId());
+
 		resourceLocalService.addModelResources(
 			structure.getCompanyId(), structure.getGroupId(),
-			structure.getUserId(), DDMStructure.class.getName(),
-			structure.getStructureId(), modelPermissions);
+			structure.getUserId(), resourceName, structure.getStructureId(),
+			modelPermissions);
 	}
 
 	/**
@@ -1656,6 +1667,10 @@ public class DDMStructureLocalServiceImpl
 			});
 	}
 
+	protected void validate(DDMForm ddmForm) throws PortalException {
+		ddmFormValidator.validate(ddmForm);
+	}
+
 	protected void validate(DDMForm parentDDMForm, DDMForm ddmForm)
 		throws PortalException {
 
@@ -1699,9 +1714,14 @@ public class DDMStructureLocalServiceImpl
 		try {
 			validate(nameMap, ddmForm.getDefaultLocale());
 
+			validate(ddmForm);
+
 			if (parentDDMForm != null) {
 				validate(parentDDMForm, ddmForm);
 			}
+		}
+		catch (DDMFormValidationException ddmfve) {
+			throw ddmfve;
 		}
 		catch (LocaleException le) {
 			throw le;
@@ -1745,5 +1765,8 @@ public class DDMStructureLocalServiceImpl
 			throw le;
 		}
 	}
+
+	@ServiceReference(type = DDMFormValidator.class)
+	protected DDMFormValidator ddmFormValidator;
 
 }

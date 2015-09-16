@@ -28,6 +28,8 @@ public class UpgradeLock extends UpgradeProcess {
 	protected void doUpgrade() throws Exception {
 		try {
 			runSQL("alter_column_type Lock_ owner VARCHAR(1024) null");
+
+			runSQL("alter table add mvccVersion LONG");
 		}
 		catch (SQLException sqle) {
 			upgradeTable(
