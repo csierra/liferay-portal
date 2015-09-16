@@ -53,8 +53,10 @@ public class UpgradeUtilTest {
 
 	@Test
 	public void testBuildUpgradeInfosWhenStepsAreEmpty() {
-		Assert.assertTrue(
-			UpgradeUtil.buildUpgradeInfos("0.0.0", "1.0.0").isEmpty());
+		List<UpgradeInfo> upgradeInfos = UpgradeUtil.buildUpgradeInfos(
+			"0.0.0", "1.0.0");
+
+		Assert.assertTrue(upgradeInfos.isEmpty());
 	}
 
 	@Test
