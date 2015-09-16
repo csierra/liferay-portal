@@ -22,13 +22,18 @@ import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.language.AggregateResourceBundle;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletApp;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portlet.PortletConfigFactoryUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -46,6 +51,11 @@ import javax.servlet.http.HttpServletResponse;
  * @author Shuyang Zhou
  */
 public class LanguageFilter extends BasePortalFilter {
+
+	@Override
+	public void destroy() {
+		super.destroy();
+	}
 
 	@Override
 	public void init(FilterConfig filterConfig) {
@@ -68,6 +78,36 @@ public class LanguageFilter extends BasePortalFilter {
 
 		_portletConfig = PortletConfigFactoryUtil.create(
 			portlets.get(0), filterConfig.getServletContext());
+	}
+
+	protected ResourceBundle getResourceBundle(
+			String portletId, String languageId)
+		throws Exception {
+
+		ResourceBundle defaultResourceBundle =
+			LanguageResources.getResourceBundle(
+				LocaleUtil.fromLanguageId(languageId));
+
+		if (Validator.isNull(portletId)) {
+			return defaultResourceBundle;
+		}
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		String filterString =
+			"(&(javax.portlet.name="+ portletId +")" +
+				"(language.id="+ languageId +"))";
+
+		Collection<ResourceBundle> resourceBundles = registry.getServices(
+			ResourceBundle.class, filterString);
+
+		if (resourceBundles.isEmpty()) {
+			return defaultResourceBundle;
+		}
+
+		Iterator<ResourceBundle> itr = resourceBundles.iterator();
+
+		return new AggregateResourceBundle(itr.next(), defaultResourceBundle);
 	}
 
 	@Override
@@ -97,13 +137,16 @@ public class LanguageFilter extends BasePortalFilter {
 	}
 
 	protected String translateResponse(
-		HttpServletRequest request, String content) {
+			HttpServletRequest request, String content)
+		throws Exception {
+
+		String portletId = (String)request.getAttribute("portletId");
 
 		String languageId = LanguageUtil.getLanguageId(request);
 		Locale locale = LocaleUtil.fromLanguageId(languageId);
 
-		ResourceBundle resourceBundle = LanguageResources.getResourceBundle(
-			locale);
+		ResourceBundle resourceBundle = getResourceBundle(
+			portletId, languageId);
 
 		if (_portletConfig != null) {
 			resourceBundle = new AggregateResourceBundle(

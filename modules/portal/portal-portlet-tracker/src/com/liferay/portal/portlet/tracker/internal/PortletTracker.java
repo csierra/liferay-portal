@@ -317,7 +317,7 @@ public class PortletTracker
 
 			checkWebResources(
 				bundle.getBundleContext(),
-				bundlePortletApp.getServletContextName(),
+				bundlePortletApp.getServletContextName(), portletModel,
 				bundleWiring.getClassLoader(), serviceRegistrations);
 
 			checkResourceBundles(
@@ -428,7 +428,8 @@ public class PortletTracker
 
 	protected void checkWebResources(
 		BundleContext bundleContext, String contextName,
-		ClassLoader classLoader, ServiceRegistrations serviceRegistrations) {
+		com.liferay.portal.model.Portlet portletModel, ClassLoader classLoader,
+		ServiceRegistrations serviceRegistrations) {
 
 		serviceRegistrations.addServiceRegistration(
 			createDefaultServlet(bundleContext, contextName));
@@ -439,6 +440,26 @@ public class PortletTracker
 		serviceRegistrations.addServiceRegistration(
 			createRestrictPortletServletRequestFilter(
 				bundleContext, contextName, classLoader));
+
+		if (Validator.isNull(portletModel.getResourceBundle())) {
+			return;
+		}
+
+		serviceRegistrations.addServiceRegistration(
+			createPortletIdAttributeServletRequestFilter(
+				bundleContext, contextName, portletModel.getPortletId(),
+				classLoader));
+
+		String webContextPath = getWebContextPath(bundleContext);
+
+		if (Validator.isNull(webContextPath)) {
+			return;
+		}
+
+		serviceRegistrations.addServiceRegistration(
+			createPortletIdAttributeServletRequestFilter(
+				bundleContext, webContextPath.substring(1),
+				portletModel.getPortletId(), classLoader));
 	}
 
 	protected void collectCacheScope(
@@ -1131,6 +1152,35 @@ public class PortletTracker
 			Servlet.class, servlet, properties);
 	}
 
+	protected ServiceRegistration<?>
+		createPortletIdAttributeServletRequestFilter(
+			BundleContext bundleContext, String contextName, String portletId,
+			ClassLoader classLoader) {
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+			contextName);
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_ASYNC_SUPPORTED,
+			Boolean.TRUE);
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_DISPATCHER,
+			new String[] {
+				DispatcherType.ASYNC.toString(),
+				DispatcherType.FORWARD.toString(),
+				DispatcherType.INCLUDE.toString(),
+				DispatcherType.REQUEST.toString()
+			});
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_PATTERN, "/*");
+
+		return bundleContext.registerService(
+			Filter.class, new PortletIdAttibuteServletRequestFilter(portletId),
+			properties);
+	}
+
 	protected ServiceRegistration<Servlet> createPortletServlet(
 		BundleContext bundleContext, String contextName,
 		ClassLoader classLoader) {
@@ -1248,6 +1298,14 @@ public class PortletTracker
 		}
 
 		return serviceRegistrations;
+	}
+
+	protected String getWebContextPath(BundleContext bundleContext) {
+		Bundle bundle = bundleContext.getBundle();
+
+		Dictionary<String, String> headers = bundle.getHeaders();
+
+		return headers.get("Web-ContextPath");
 	}
 
 	protected void initLogger(ClassLoader classLoader) {
@@ -1385,6 +1443,35 @@ public class PortletTracker
 		_serviceRegistrations = new ConcurrentHashMap<>();
 	private ServiceTracker<Portlet, com.liferay.portal.model.Portlet>
 		_serviceTracker;
+
+	private class PortletIdAttibuteServletRequestFilter implements Filter {
+
+		public PortletIdAttibuteServletRequestFilter(String portletId) {
+			_portletId = portletId;
+		}
+
+		@Override
+		public void destroy() {
+		}
+
+		@Override
+		public void doFilter(
+				ServletRequest servletRequest, ServletResponse servletResponse,
+				FilterChain filterChain)
+			throws IOException, ServletException {
+
+			servletRequest.setAttribute("portletId", _portletId);
+
+			filterChain.doFilter(servletRequest, servletResponse);
+		}
+
+		@Override
+		public void init(FilterConfig filterConfig) throws ServletException {
+		}
+
+		private final String _portletId;
+
+	}
 
 	private class PortletServletWrapper extends HttpServlet {
 
