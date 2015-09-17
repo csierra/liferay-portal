@@ -49,6 +49,10 @@ public class SpringDependencyAnalyzerPlugin implements AnalyzerPlugin {
 
 		Parameters parameters = analyzer.parseHeader(property);
 
+		if (parameters.isEmpty()) {
+			return false;
+		}
+
 		Jar jar = analyzer.getJar();
 
 		Collection<Clazz> classes = analyzer.getClasses();
@@ -67,7 +71,11 @@ public class SpringDependencyAnalyzerPlugin implements AnalyzerPlugin {
 				serviceReferenceCollector.getServiceReferences());
 		}
 
-		serviceReferences.add(getReleaseInfo(analyzer));
+		String releaseInfo = getReleaseInfo(analyzer);
+
+		if (!releaseInfo.equals("")) {
+			serviceReferences.add(releaseInfo);
+		}
 
 		jar.putResource(
 			"OSGI-INF/context/context.dependencies",
@@ -85,8 +93,8 @@ public class SpringDependencyAnalyzerPlugin implements AnalyzerPlugin {
 
 		StringBuffer sb = new StringBuffer(6);
 
-		sb.append(Object.class.getName());
-		sb.append(" (&(release.bundle.symbolic.name=");
+		sb.append("com.liferay.portal.model.Release ");
+		sb.append("(&(release.bundle.symbolic.name=");
 
 		Map.Entry<String, Attrs> entry = analyzer.getBundleSymbolicName();
 
