@@ -23,12 +23,11 @@ import java.util.Collection;
  */
 public interface UpgradeStepRegistrator {
 
-	public String getBundleSymbolicName();
+	public void register(Registry registry);
 
-	public String getFromVersion();
-
-	public String getToVersion();
-
-	public Collection<UpgradeStep> getUpgradeSteps();
-
+	public static interface Registry {
+		public void register(
+			String bundleSymbolicName, String from, String to,
+			Collection<UpgradeStep> upgradeSteps);
+	}
 }

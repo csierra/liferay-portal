@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.lock.upgrade.v1_0_0.UpgradeLock;
 import com.liferay.portal.upgrade.tools.UpgradeStepRegistrator;
 
-import java.util.Collection;
 import java.util.Collections;
 
 import org.osgi.service.component.annotations.Component;
@@ -30,23 +29,10 @@ import org.osgi.service.component.annotations.Component;
 public class LockServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
-	public String getBundleSymbolicName() {
-		return "com.liferay.portal.lock.service";
-	}
-
-	@Override
-	public String getFromVersion() {
-		return "0.0.1";
-	}
-
-	@Override
-	public String getToVersion() {
-		return "1.0.0";
-	}
-
-	@Override
-	public Collection<UpgradeStep> getUpgradeSteps() {
-		return Collections.<UpgradeStep>singleton(new UpgradeLock());
+	public void register(Registry registry) {
+		registry.register(
+			"com.liferay.portal.lock.service", "0.0.1", "1.0.0",
+			Collections.<UpgradeStep>singleton(new UpgradeLock()));
 	}
 
 }

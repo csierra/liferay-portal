@@ -16,6 +16,8 @@ package com.liferay.portal.upgrade.tools;
 
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Function;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.upgrade.internal.UpgradeInfo;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import com.liferay.portal.upgrade.tools.UpgradeStepRegistrator.Registry;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -97,6 +100,15 @@ public class UpgradeStepRegistratorTracker {
 
 	protected List<UpgradeInfo> buildUpgradeInfos(
 		String upgradeFromVersion, String upgradeToVersion,
+		Collection<UpgradeStep> upgradeSteps) {
+
+		return buildUpgradeInfos(
+			upgradeFromVersion, upgradeToVersion,
+			upgradeSteps.toArray(new UpgradeStep[upgradeSteps.size()]));
+	}
+
+	protected List<UpgradeInfo> buildUpgradeInfos(
+		String upgradeFromVersion, String upgradeToVersion,
 		UpgradeStep... upgradeSteps) {
 
 		if (ArrayUtil.isEmpty(upgradeSteps)) {
@@ -162,18 +174,39 @@ public class UpgradeStepRegistratorTracker {
 				return null;
 			}
 
-			String bundleSymbolicName =
-				upgradeStepRegistrator.getBundleSymbolicName();
+			final Collection<
+				ServiceRegistration<UpgradeStep>> serviceRegistrations =
+					new ArrayList<>();
 
-			String fromVersion = upgradeStepRegistrator.getFromVersion();
-			String toVersion = upgradeStepRegistrator.getToVersion();
+			upgradeStepRegistrator.register(new Registry() {
+				@Override
+				public void register(
+					final String bundleSymbolicName, String from, String to,
+					Collection<UpgradeStep> upgradeSteps) {
 
-			Collection<UpgradeStep> upgradeSteps =
-				upgradeStepRegistrator.getUpgradeSteps();
+					List<UpgradeInfo> upgradeInfos = buildUpgradeInfos(
+						from, to, upgradeSteps);
 
-			return register(
-				_bundleContext, bundleSymbolicName, fromVersion, toVersion,
-				upgradeSteps);
+					List<ServiceRegistration<UpgradeStep>> partialSr =
+						ListUtil.toList(
+							upgradeInfos, new Function<
+								UpgradeInfo,
+								ServiceRegistration<UpgradeStep>>() {
+
+								@Override
+								public ServiceRegistration<UpgradeStep> apply(
+									UpgradeInfo upgradeInfo) {
+
+									return _registerUpgradeStep(
+										_bundleContext, bundleSymbolicName,
+										upgradeInfo);
+								}
+							});
+					serviceRegistrations.addAll(partialSr);
+				}
+			});
+
+			return serviceRegistrations;
 		}
 
 		@Override

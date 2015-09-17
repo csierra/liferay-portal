@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.upgrade.tools.UpgradeStepRegistrator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.osgi.service.component.annotations.Component;
@@ -33,29 +34,14 @@ import org.osgi.service.component.annotations.Component;
 public class DDMServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
-	public String getBundleSymbolicName() {
-		return "com.liferay.dynamic.data.mapping.service";
-	}
-
-	@Override
-	public String getFromVersion() {
-		return "0.0.1";
-	}
-
-	@Override
-	public String getToVersion() {
-		return "1.0.0";
-	}
-
-	@Override
-	public Collection<UpgradeStep> getUpgradeSteps() {
-		Collection<UpgradeStep> upgradeSteps = new ArrayList<>();
-
-		upgradeSteps.add(new UpgradeSchema());
-		upgradeSteps.add(new UpgradeClassNames());
-		upgradeSteps.add(new UpgradeDynamicDataMapping());
-		upgradeSteps.add(new UpgradeLastPublishDate());
-
-		return upgradeSteps;
+	public void register(Registry registry) {
+		registry.register(
+			"com.liferay.dynamic.data.mapping.service", "0.0.1", "1.0.0",
+			Arrays.<UpgradeStep>asList(
+				new UpgradeSchema(),
+				new UpgradeClassNames(),
+				new UpgradeDynamicDataMapping(),
+				new UpgradeLastPublishDate()
+			));
 	}
 }

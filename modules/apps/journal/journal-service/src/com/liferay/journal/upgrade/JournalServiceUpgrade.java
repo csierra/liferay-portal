@@ -31,8 +31,7 @@ import com.liferay.portal.upgrade.tools.UpgradeStepRegistrator;
 
 import java.io.PrintWriter;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -43,47 +42,31 @@ import org.osgi.service.component.annotations.Component;
 public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
-	public String getBundleSymbolicName() {
-		return "com.liferay.journal.service";
-	}
+	public void register(Registry registry) {
+		registry.register(
+			"com.liferay.journal.service", "0.0.1", "1.0.0", Arrays.asList(
+				new UpgradeSchema(),
+				new UpgradeClassNames(),
+				new UpgradeJournal(),
+				new UpgradeJournalArticleType(),
+				new UpgradeJournalDisplayPreferences(),
+				new UpgradeLastPublishDate(),
+				new UpgradeStep() {
+					@Override
+					public void upgrade(DBProcessContext dbProcessContext)
+						throws UpgradeException {
 
-	@Override
-	public String getFromVersion() {
-		return "0.0.1";
-	}
-
-	@Override
-	public String getToVersion() {
-		return "1.0.0";
-	}
-
-	public Collection<UpgradeStep> getUpgradeSteps() {
-		Collection<UpgradeStep> upgradeSteps = new ArrayList<>();
-
-		upgradeSteps.add(new UpgradeSchema());
-
-		upgradeSteps.add(new UpgradeClassNames());
-		upgradeSteps.add(new UpgradeJournal());
-		upgradeSteps.add(new UpgradeJournalArticleType());
-		upgradeSteps.add(new UpgradeJournalDisplayPreferences());
-		upgradeSteps.add(new UpgradeLastPublishDate());
-		upgradeSteps.add(new UpgradeStep() {
-			@Override
-			public void upgrade(DBProcessContext dbProcessContext)
-				throws UpgradeException {
-
-				try {
-					deleteTempImages();
+						try {
+							deleteTempImages();
+						}
+						catch (Exception e) {
+							e.printStackTrace(
+								new PrintWriter(
+									dbProcessContext.getOutputStream(), true));
+						}
+					}
 				}
-				catch (Exception e) {
-					e.printStackTrace(
-						new PrintWriter(
-							dbProcessContext.getOutputStream(), true));
-				}
-			}
-		});
-
-		return upgradeSteps;
+			));
 	}
 
 	protected void deleteTempImages() throws Exception {
