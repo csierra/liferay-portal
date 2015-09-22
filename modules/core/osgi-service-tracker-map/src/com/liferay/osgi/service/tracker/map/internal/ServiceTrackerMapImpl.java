@@ -19,6 +19,7 @@ import com.liferay.osgi.service.tracker.map.ServiceReferenceServiceTuple;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerBucket;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerBucketFactory;
 import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.map.ServiceTrackerMapListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +36,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Carlos Sierra Andrés
  */
@@ -46,12 +50,14 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 			ServiceReferenceMapper<K, ? super SR> serviceReferenceMapper,
 			ServiceTrackerCustomizer<SR, TS> serviceTrackerCustomizer,
 			ServiceTrackerBucketFactory<SR, TS, R>
-				serviceTrackerMapBucketFactory)
+				serviceTrackerMapBucketFactory,
+			ServiceTrackerMapListener<K, TS, R> listener)
 		throws InvalidSyntaxException {
 
 		_serviceReferenceMapper = serviceReferenceMapper;
 		_serviceTrackerCustomizer = serviceTrackerCustomizer;
 		_serviceTrackerMapBucketFactory = serviceTrackerMapBucketFactory;
+		_listener = listener;
 
 		if (filterString != null) {
 			Filter filter = bundleContext.createFilter(
@@ -164,6 +170,10 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 		serviceReferenceServiceTuple.addEmittedKey(key);
 	}
 
+	private static final Logger _logger = LoggerFactory.getLogger(
+		ServiceTrackerMapImpl.class);
+
+	private final ServiceTrackerMapListener<K, TS, R> _listener;
 	private final ServiceReferenceMapper<K, ? super SR> _serviceReferenceMapper;
 	private final ServiceTracker<SR, ServiceReferenceServiceTuple<SR, TS, K>>
 		_serviceTracker;
@@ -199,6 +209,21 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 			}
 
 			storeKey(key, _serviceReferenceServiceTuple);
+
+			if (_listener != null) {
+				try {
+					_listener.update(
+						ServiceTrackerMapImpl.this, key,
+						_serviceReferenceServiceTuple.getService(),
+						_serviceTrackerBuckets.get(key).getContent());
+				}
+				catch (Throwable t) {
+					if (_logger.isErrorEnabled()) {
+						_logger.error(
+							"Invocation to listener threw Exception: ", t);
+					}
+				}
+			}
 		}
 
 		public ServiceReferenceServiceTuple<SR, TS, K>
