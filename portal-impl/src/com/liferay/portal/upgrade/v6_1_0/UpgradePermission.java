@@ -127,8 +127,8 @@ public class UpgradePermission extends UpgradeProcess {
 			else if (scope == ResourceConstants.SCOPE_GROUP) {
 				ResourceBlockLocalServiceUtil.setGroupScopePermissions(
 					resourcePermission.getCompanyId(),
-					GetterUtil.getLong(resourcePermission.getPrimaryKey()),
-					name, resourcePermission.getRoleId(),
+					GetterUtil.getLong(resourcePermission.getPrimKey()), name,
+					resourcePermission.getRoleId(),
 					resourcePermission.getActionIds());
 			}
 		}
@@ -136,6 +136,9 @@ public class UpgradePermission extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		runSQL("alter table ResourcePermission add primKeyId LONG");
+
+		runSQL("alter table ResourcePermission add viewActionId BOOLEAN");
 
 		// LPS-46141
 

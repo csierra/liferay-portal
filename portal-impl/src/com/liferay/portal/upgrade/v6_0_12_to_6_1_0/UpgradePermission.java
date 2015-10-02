@@ -23,6 +23,10 @@ public class UpgradePermission
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		runSQL("alter table ResourcePermission add primKeyId LONG");
+
+		runSQL("alter table ResourcePermission add viewActionId BOOLEAN");
+
 		convertResourcePermissions(
 			"com.liferay.portlet.bookmarks.model.BookmarksEntry",
 			"BookmarksEntry", "entryId");
