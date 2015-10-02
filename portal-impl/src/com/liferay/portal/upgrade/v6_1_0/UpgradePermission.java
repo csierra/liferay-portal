@@ -136,6 +136,9 @@ public class UpgradePermission extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		runSQL("alter table ResourcePermission add primKeyId LONG");
+
+		runSQL("alter table ResourcePermission add viewActionId BOOLEAN");
 
 		// LPS-46141
 
