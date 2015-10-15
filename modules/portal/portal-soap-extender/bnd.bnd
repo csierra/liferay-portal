@@ -4,10 +4,10 @@ Bundle-ClassPath:\
 	lib/cxf-rt-frontend-jaxws.jar,\
 	lib/cxf-rt-frontend-simple.jar,\
 	lib/cxf-rt-ws-policy.jar
-Bundle-ConfigurationPath: /configs
 Bundle-Name: Liferay Portal SOAP Extender
 Bundle-SymbolicName: com.liferay.portal.soap.extender
 Bundle-Version: 1.0.0
+ConfigurationPath: /configs
 Export-Package:\
 	com.liferay.portal.soap.extender,
 	com.liferay.portal.soap.extender.configuration

@@ -1,7 +1,7 @@
-Bundle-ConfigurationPath: /configs
 Bundle-Name: Liferay Portal REST Extender
 Bundle-SymbolicName: com.liferay.portal.rest.extender
 Bundle-Version: 1.0.0
+ConfigurationPath: /configs
 Include-Resource:\
 	configs=configs,\
 	classes

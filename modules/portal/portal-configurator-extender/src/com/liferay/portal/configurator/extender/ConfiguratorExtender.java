@@ -68,7 +68,7 @@ public class ConfiguratorExtender extends AbstractExtender {
 	protected Extension doCreateExtension(Bundle bundle) throws Exception {
 		Dictionary<String, String> headers = bundle.getHeaders();
 
-		if (headers.get("Bundle-ConfigurationPath") == null) {
+		if (headers.get("ConfigurationPath") == null) {
 			return null;
 		}
 
@@ -109,7 +109,7 @@ public class ConfiguratorExtender extends AbstractExtender {
 		public void start() throws Exception {
 			Dictionary<String, String> headers = _bundle.getHeaders();
 
-			String configurationPath = headers.get("Bundle-ConfigurationPath");
+			String configurationPath = headers.get("ConfigurationPath");
 
 			Enumeration<URL> configurationUrls = _bundle.findEntries(
 				configurationPath, "*", true);

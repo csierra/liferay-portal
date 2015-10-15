@@ -1,7 +1,7 @@
-Bundle-ConfigurationPath: /configs
 Bundle-Name: Liferay Portal Security Auth Verifier
 Bundle-SymbolicName: com.liferay.portal.security.auth.verifier
 Bundle-Version: 1.0.0
+ConfigurationPath: /configs
 Export-Package:\
 	com.liferay.portal.security.auth.verifier.basic.auth.header,\
 	com.liferay.portal.security.auth.verifier.digest.authentication,\
