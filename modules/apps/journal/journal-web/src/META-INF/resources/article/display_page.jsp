@@ -49,13 +49,13 @@ boolean changeStructure = GetterUtil.getBoolean(request.getAttribute("edit_artic
 			selLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(layoutUuid, themeDisplay.getSiteGroupId(), false);
 
 			if (selLayout != null) {
-				layoutBreadcrumb = _getLayoutBreadcrumb(selLayout, locale);
+				layoutBreadcrumb = _getLayoutBreadcrumb(request, selLayout, locale);
 			}
 			else {
 				selLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(layoutUuid, themeDisplay.getSiteGroupId(), true);
 
 				if (selLayout != null) {
-					layoutBreadcrumb = _getLayoutBreadcrumb(selLayout, locale);
+					layoutBreadcrumb = _getLayoutBreadcrumb(request, selLayout, locale);
 				}
 			}
 		}
@@ -65,7 +65,7 @@ boolean changeStructure = GetterUtil.getBoolean(request.getAttribute("edit_artic
 
 		<liferay-ui:error-marker key="errorSection" value="display-page" />
 
-		<h3><liferay-ui:message key="display-page" /><liferay-ui:icon-help message="default-display-page-help" /></h3>
+		<h3><liferay-ui:message key="display-page" /> <liferay-ui:icon-help message="default-display-page-help" /></h3>
 
 		<div id="<portlet:namespace />pagesContainer">
 			<aui:input id="pagesContainerInput" ignoreRequestValue="<%= true %>" name="layoutUuid" type="hidden" value="<%= layoutUuid %>" />
@@ -168,16 +168,16 @@ boolean changeStructure = GetterUtil.getBoolean(request.getAttribute("edit_artic
 </c:choose>
 
 <%!
-private String _getLayoutBreadcrumb(Layout layout, Locale locale) throws Exception {
+private String _getLayoutBreadcrumb(HttpServletRequest request, Layout layout, Locale locale) throws Exception {
 	List<Layout> ancestors = layout.getAncestors();
 
 	StringBundler sb = new StringBundler(4 * ancestors.size() + 5);
 
 	if (layout.isPrivateLayout()) {
-		sb.append(LanguageUtil.get(locale, "private-pages"));
+		sb.append(LanguageUtil.get(request, "private-pages"));
 	}
 	else {
-		sb.append(LanguageUtil.get(locale, "public-pages"));
+		sb.append(LanguageUtil.get(request, "public-pages"));
 	}
 
 	sb.append(StringPool.SPACE);

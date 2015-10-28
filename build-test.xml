@@ -432,12 +432,17 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 		<sequential>
 			<var name="poshi.dir.name" unset="true" />
 
-			<get-poshi-test-name />
+			<if>
+				<isset property="test.class" />
+				<then>
+					<get-poshi-test-name />
 
-			<antelope:stringutil property="poshi.dir.name" string="${poshi.test.name}">
-				<antelope:replace regex="," replacement="_" />
-				<antelope:replace regex="#" replacement="_" />
-			</antelope:stringutil>
+					<antelope:stringutil property="poshi.dir.name" string="${poshi.test.name}">
+						<antelope:replace regex="," replacement="_" />
+						<antelope:replace regex="#" replacement="_" />
+					</antelope:stringutil>
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 
@@ -588,8 +593,6 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 
 	<macrodef name="get-test-url">
 		<sequential>
-			<get-testcase-property property.name="browser.type" />
-
 			<get-testcase-property property.name="testcase.url" />
 
 			<if>
@@ -643,6 +646,15 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 		<attribute name="property.name" />
 
 		<sequential>
+			<var name="property.value.default" unset="true" />
+
+			<if>
+				<isset property="@{property.name}" />
+				<then>
+					<propertycopy from="@{property.name}" name="property.value.default" />
+				</then>
+			</if>
+
 			<var name="@{property.name}" unset="true" />
 
 			<if>
@@ -658,6 +670,7 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 					<beanshell>
 						<![CDATA[
 							String propertyName = project.getProperty("property.name");
+							String propertyValueDefault = project.getProperty("property.value.default");
 							String testMethodName = project.getProperty("test.method.name");
 							String testSimpleClassName = project.getProperty("test.simple.class.name");
 
@@ -681,6 +694,10 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 								sb.append(propertyName);
 
 								propertyValue = project.getProperty(sb.toString());
+
+								if (propertyValue == null) {
+									propertyValue = propertyValueDefault;
+								}
 							}
 
 							project.setProperty(propertyName, propertyValue);
@@ -2833,6 +2850,7 @@ go]]></replacevalue>
 		<get-env-java-jdk />
 		<get-env-liferay-portal />
 		<get-env-operating-system />
+		<get-poshi-dir-name />
 		<get-testray-case-defect />
 		<get-testray-components />
 		<get-testray-logs />
@@ -2874,7 +2892,7 @@ go]]></replacevalue>
 		</if>
 
 		<if>
-			<available file="portal-web/test-results/functional/report.html" />
+			<available file="portal-web/test-results/${poshi.dir.name}/index.html" />
 			<then>
 				<property name="test.case.attachments">
 					<![CDATA[
@@ -4627,6 +4645,15 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		</if>
 
 		<if>
+			<equals arg1="${hot.deploy.dependency.management.enabled}" arg2="false" />
+			<then>
+				<echo file="portal-impl/src/portal-ext.properties" append="true">
+
+hot.deploy.dependency.management.enabled=false</echo>
+			</then>
+		</if>
+
+		<if>
 			<isset property="set.permission.algorithm.5" />
 			<then>
 				<replace file="portal-impl/src/portal-ext.properties" token="#permissions.user.check.algorithm=5" value="permissions.user.check.algorithm=5" />
@@ -4654,10 +4681,6 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 include-and-override=${liferay.home}/portal-setup-wizard.properties</echo>
 			</then>
 		</if>
-
-		<echo file="portal-impl/src/portal-ext.properties" append="true">
-
-hot.deploy.dependency.management.enabled=false</echo>
 
 		<if>
 			<isset property="test.set.default.portal.properties" />
@@ -4842,10 +4865,21 @@ module.framework.properties.osgi.console=11312</echo>
 				</echo>
 			</then>
 		</if>
+
+		<if>
+			<isset property="test.portal.instance" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					test.portal.instance=${test.portal.instance}
+				</echo>
+			</then>
+		</if>
 	</target>
 
 	<target name="prepare-selenium">
 		<delete file="${test.ext.properties.file}" />
+
+		<get-testcase-property property.name="browser.type" />
 
 		<if>
 			<equals arg1="${test.poshi.runner.enabled}" arg2="true" />
@@ -5621,21 +5655,6 @@ module.framework.properties.osgi.console=11312</echo>
 	</target>
 
 	<target name="prepare-selenium-testcase-properties">
-		<get-testcase-property property.name="browser.type" />
-
-		<if>
-			<or>
-				<equals arg1="${browser.type}" arg2="android" />
-				<equals arg1="${browser.type}" arg2="androidchrome" />
-				<equals arg1="${browser.type}" arg2="iossafari" />
-			</or>
-			<then>
-				<echo append="true" file="${test.ext.properties.file}">
-					mobile.browser=true
-				</echo>
-			</then>
-		</if>
-
 		<get-testcase-property property.name="cmis.repository.type" />
 
 		<if>
@@ -6632,41 +6651,11 @@ jdbc.default.password=${database.mysql.password}</echo>
 					<then>
 						<copy
 							file="portal-web/test-results/${poshi.runner.results.dir}/index.html"
-							tofile="portal-web/test-results/functional/report.html"
-						/>
-					</then>
-				</if>
-
-				<if>
-					<available file="portal-web/test-results/${poshi.runner.results.dir}/screenshots" />
-					<then>
-						<copy todir="portal-web/test-results/functional/screenshots">
-							<fileset dir="portal-web/test-results/${poshi.runner.results.dir}/screenshots" erroronmissingdir="false" />
-						</copy>
-					</then>
-				</if>
-
-				<if>
-					<and>
-						<available file="portal-web/test-results/functional/report.html" />
-						<equals arg1="${test.selenium.logger.enabled}" arg2="true" />
-					</and>
-					<then>
-						<copy
-							file="portal-web/test-results/functional/report.html"
 							tofile="${jenkins.shared.results.dir}/${job.name}/builds/${env.BUILD_NUMBER}/report.html"
 						/>
-					</then>
-				</if>
 
-				<if>
-					<and>
-						<available file="portal-web/test-results/functional/screenshots" />
-						<equals arg1="${test.save.screenshot}" arg2="true" />
-					</and>
-					<then>
 						<copy todir="${jenkins.shared.results.dir}/${job.name}/builds/${env.BUILD_NUMBER}/screenshots">
-							<fileset dir="portal-web/test-results/functional/screenshots" erroronmissingdir="false" />
+							<fileset dir="portal-web/test-results/${poshi.runner.results.dir}/screenshots" erroronmissingdir="false" />
 						</copy>
 					</then>
 				</if>

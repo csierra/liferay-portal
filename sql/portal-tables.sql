@@ -329,14 +329,10 @@ create table Contact_ (
 	male BOOLEAN,
 	birthday DATE null,
 	smsSn VARCHAR(75) null,
-	aimSn VARCHAR(75) null,
 	facebookSn VARCHAR(75) null,
-	icqSn VARCHAR(75) null,
 	jabberSn VARCHAR(75) null,
-	mySpaceSn VARCHAR(75) null,
 	skypeSn VARCHAR(75) null,
 	twitterSn VARCHAR(75) null,
-	ymSn VARCHAR(75) null,
 	employeeStatusId VARCHAR(75) null,
 	employeeNumber VARCHAR(75) null,
 	jobTitle VARCHAR(100) null,
@@ -359,16 +355,6 @@ create table Country (
 	idd_ VARCHAR(75) null,
 	zipRequired BOOLEAN,
 	active_ BOOLEAN
-);
-
-create table CyrusUser (
-	userId VARCHAR(75) not null primary key,
-	password_ VARCHAR(75) not null
-);
-
-create table CyrusVirtual (
-	emailAddress VARCHAR(75) not null primary key,
-	userId VARCHAR(75) not null
 );
 
 create table DLContent (
