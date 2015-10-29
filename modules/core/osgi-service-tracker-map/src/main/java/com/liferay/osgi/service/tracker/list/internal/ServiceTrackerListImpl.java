@@ -67,7 +67,12 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 
 	@Override
 	public Iterator<T> iterator() {
-		throw new UnsupportedOperationException();
+		return new ServiceTrackerListIterator<>(_services.iterator());
+	}
+
+	@Override
+	public int size() {
+		return _services.size();
 	}
 
 	private final BundleContext _bundleContext;
@@ -110,6 +115,33 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 
 			return serviceReference1.compareTo(serviceReference2);
 		}
+
+	}
+
+	private static class ServiceTrackerListIterator<T> implements Iterator<T> {
+
+		public ServiceTrackerListIterator(Iterator<Entry<T>> iterator) {
+			_iterator = iterator;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return _iterator.hasNext();
+		}
+
+		@Override
+		public T next() {
+			Entry<T> entry = _iterator.next();
+
+			return entry.getService();
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		private final Iterator<Entry<T>> _iterator;
 
 	}
 
