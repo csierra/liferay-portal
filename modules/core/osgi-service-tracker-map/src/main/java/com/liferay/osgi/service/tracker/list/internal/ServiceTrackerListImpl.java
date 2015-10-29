@@ -42,7 +42,13 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 
 		_bundleContext = bundleContext;
 		_serviceTrackerCustomizer = serviceTrackerCustomizer;
-		_comparator = comparator;
+
+		if (comparator == null) {
+			_comparator = new ServiceReferenceNaturalOrderComparator<>();
+		}
+		else {
+			_comparator = comparator;
+		}
 
 		if (filterString != null) {
 			Filter filter = bundleContext.createFilter(
@@ -70,26 +76,111 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 	private final ServiceTracker<T, T> _serviceTracker;
 	private final ServiceTrackerCustomizer<T, T> _serviceTrackerCustomizer;
 
+	private static class EntryImpl<T> implements Entry<T> {
+
+		public EntryImpl(ServiceReference<T> serviceReference, T service) {
+			_serviceReference = serviceReference;
+			_service = service;
+		}
+
+		@Override
+		public T getService() {
+			return _service;
+		}
+
+		@Override
+		public ServiceReference<T> getServiceReference() {
+			return _serviceReference;
+		}
+
+		private final T _service;
+		private final ServiceReference<T> _serviceReference;
+
+	}
+
+	private static class ServiceReferenceNaturalOrderComparator<T>
+		implements Comparator<Entry<T>> {
+
+		@Override
+		public int compare(Entry<T> entry1, Entry<T> entry2) {
+			ServiceReference<T> serviceReference1 =
+				entry1.getServiceReference();
+			ServiceReference<T> serviceReference2 =
+				entry2.getServiceReference();
+
+			return serviceReference1.compareTo(serviceReference2);
+		}
+
+	}
+
 	private class ServiceReferenceServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<T, T> {
 
 		@Override
 		public T addingService(ServiceReference<T> serviceReference) {
-			throw new UnsupportedOperationException();
+			return update(
+				serviceReference, getService(serviceReference), false);
 		}
 
 		@Override
-		public void modifiedService(ServiceReference<T> serviceReference, T t) {
-			throw new UnsupportedOperationException();
+		public void modifiedService(
+			ServiceReference<T> serviceReference, T service) {
+
+			if (_serviceTrackerCustomizer != null) {
+				_serviceTrackerCustomizer.modifiedService(
+					serviceReference, service);
+			}
+
+			update(serviceReference, service, false);
 		}
 
 		@Override
-		public void removedService(ServiceReference<T> serviceReference, T t) {
-			throw new UnsupportedOperationException();
+		public void removedService(
+			ServiceReference<T> serviceReference, T service) {
+
+			if (_serviceTrackerCustomizer != null) {
+				_serviceTrackerCustomizer.removedService(
+					serviceReference, service);
+			}
+
+			update(serviceReference, service, true);
+
+			_bundleContext.ungetService(serviceReference);
 		}
 
-		private final BundleContext _bundleContext;
-		private final ServiceTrackerCustomizer<T, T> _serviceTrackerCustomizer;
+		protected T getService(ServiceReference<T> serviceReference) {
+			if (_serviceTrackerCustomizer == null) {
+				return _bundleContext.getService(serviceReference);
+			}
+
+			return _serviceTrackerCustomizer.addingService(serviceReference);
+		}
+
+		private T update(
+			ServiceReference<T> serviceReference, T service, boolean remove) {
+
+			if (service == null) {
+				return service;
+			}
+
+			Entry<T> entry = new EntryImpl<>(serviceReference, service);
+
+			synchronized(_services) {
+				int index = Collections.binarySearch(
+					_services, entry, _comparator);
+
+				if (remove) {
+					if (index >= 0) {
+						_services.remove(index);
+					}
+				}
+				else if (index < 0) {
+					_services.add(((-index) - 1), entry);
+				}
+			}
+
+			return service;
+		}
 
 	}
 
