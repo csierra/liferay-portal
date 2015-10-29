@@ -25,6 +25,9 @@ public interface ServiceTrackerList<T> extends Iterable<T> {
 	@Override
 	public Iterator<T> iterator();
 
+
+	public int size();
+
 	public interface Entry<T> {
 
 		public T getService();
