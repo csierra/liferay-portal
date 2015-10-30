@@ -41,20 +41,16 @@ public class GreeterBundleActivator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		Dictionary<String, Object> properties = new Hashtable<>();
 
-		properties.put("jaxws", true);
+		properties.put("jaxws.endpoint", true);
 		properties.put("soap.address", "/greeter");
 
 		_serviceRegistration = bundleContext.registerService(
 			Greeter.class, new GreeterImpl(), properties);
 
-		_configAdminBundleActivator = new ConfigurationAdminBundleActivator();
-
-		_configAdminBundleActivator.start(bundleContext);
-
 		Filter filter = bundleContext.createFilter(
 			"(&(objectClass=" + Bus.class.getName() + ")(" +
 				HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH + "=" +
-					"/soap-test))");
+					"/soap))");
 
 		ServiceTracker<Bus, Bus> serviceTracker = new ServiceTracker<>(
 			bundleContext, filter, null);
@@ -96,16 +92,11 @@ public class GreeterBundleActivator implements BundleActivator {
 	}
 
 	protected void cleanUp(BundleContext bundleContext) {
-		try {
-			_configAdminBundleActivator.stop(bundleContext);
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
 		}
-		catch (Exception e) {
-		}
-
-		_serviceRegistration.unregister();
 	}
 
-	private ConfigurationAdminBundleActivator _configAdminBundleActivator;
 	private ServiceRegistration<Greeter> _serviceRegistration;
 
 }

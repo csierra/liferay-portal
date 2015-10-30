@@ -41,7 +41,7 @@ public class JaxWsComponentRegistrationTest {
 
 	@Test
 	public void testIsRegistered() throws Exception {
-		URL url = new URL(_url, "/o/soap-test/greeter?wsdl");
+		URL url = new URL(_url, "/o/soap/greeter?wsdl");
 
 		QName qName = new QName(
 			"http://service.test.extender.soap.portal.liferay.com/",

@@ -14,7 +14,6 @@
 
 package com.liferay.portal.soap.extender.test.activator.handler;
 
-import com.liferay.portal.soap.extender.test.activator.configuration.ConfigurationAdminBundleActivator;
 import com.liferay.portal.soap.extender.test.handler.SampleHandler;
 import com.liferay.portal.soap.extender.test.service.GreeterImpl;
 
@@ -34,11 +33,6 @@ public class JaxWsApiBundleActivator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
-		_configurationAdminBundleActivator =
-			new ConfigurationAdminBundleActivator();
-
-		_configurationAdminBundleActivator.start(bundleContext);
-
 		try {
 			_endpoint = Endpoint.publish("/greeterApi", new GreeterImpl());
 
@@ -55,6 +49,8 @@ public class JaxWsApiBundleActivator implements BundleActivator {
 		}
 		catch (Exception e) {
 			cleanUp(bundleContext);
+
+			throw e;
 		}
 	}
 
@@ -64,17 +60,11 @@ public class JaxWsApiBundleActivator implements BundleActivator {
 	}
 
 	protected void cleanUp(BundleContext bundleContext) {
-		try {
-			_configurationAdminBundleActivator.stop(bundleContext);
+		if (_endpoint != null) {
+			_endpoint.stop();
 		}
-		catch (Exception e) {
-		}
-
-		_endpoint.stop();
 	}
 
-	private ConfigurationAdminBundleActivator
-		_configurationAdminBundleActivator;
 	private Endpoint _endpoint;
 
 }
