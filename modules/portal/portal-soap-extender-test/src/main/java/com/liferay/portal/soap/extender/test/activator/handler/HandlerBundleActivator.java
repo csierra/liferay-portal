@@ -61,10 +61,9 @@ public class HandlerBundleActivator implements BundleActivator {
 		try {
 			_greeterBundleActivator.stop(bundleContext);
 		}
-		catch (Exception e) {
+		finally {
+			_serviceRegistration.unregister();
 		}
-
-		_serviceRegistration.unregister();
 	}
 
 	private GreeterBundleActivator _greeterBundleActivator;

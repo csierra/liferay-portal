@@ -49,6 +49,8 @@ public class JaxWsApiBundleActivator implements BundleActivator {
 		}
 		catch (Exception e) {
 			cleanUp(bundleContext);
+
+			throw e;
 		}
 	}
 
@@ -58,7 +60,9 @@ public class JaxWsApiBundleActivator implements BundleActivator {
 	}
 
 	protected void cleanUp(BundleContext bundleContext) {
-		_endpoint.stop();
+		if (_endpoint != null) {
+			_endpoint.stop();
+		}
 	}
 
 	private Endpoint _endpoint;

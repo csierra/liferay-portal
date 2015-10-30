@@ -92,7 +92,9 @@ public class GreeterBundleActivator implements BundleActivator {
 	}
 
 	protected void cleanUp(BundleContext bundleContext) {
-		_serviceRegistration.unregister();
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
+		}
 	}
 
 	private ServiceRegistration<Greeter> _serviceRegistration;
