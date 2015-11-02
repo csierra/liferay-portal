@@ -66,8 +66,18 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 	}
 
 	@Override
+	public void close() {
+		_serviceTracker.close();
+	}
+
+	@Override
 	public Iterator<T> iterator() {
 		return new ServiceTrackerListIterator<>(_services.iterator());
+	}
+
+	@Override
+	public void open() {
+		_serviceTracker.open();
 	}
 
 	@Override
