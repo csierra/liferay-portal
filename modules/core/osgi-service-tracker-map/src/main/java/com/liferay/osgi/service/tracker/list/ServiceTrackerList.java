@@ -14,17 +14,25 @@
 
 package com.liferay.osgi.service.tracker.list;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 import java.util.Iterator;
+
 import org.osgi.framework.ServiceReference;
 
 /**
  * @author Adolfo Pérez
  */
-public interface ServiceTrackerList<T> extends Iterable<T> {
+public interface ServiceTrackerList<T> extends Closeable, Iterable<T> {
+
+	@Override
+	public void close() throws IOException;
 
 	@Override
 	public Iterator<T> iterator();
 
+	public void open();
 
 	public int size();
 
