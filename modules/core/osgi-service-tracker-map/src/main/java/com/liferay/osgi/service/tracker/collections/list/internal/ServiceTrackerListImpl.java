@@ -37,7 +37,7 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 	public ServiceTrackerListImpl(
 			BundleContext bundleContext, Class<T> clazz, String filterString,
 			ServiceTrackerCustomizer<T, T> serviceTrackerCustomizer,
-			Comparator<Entry<T>> comparator)
+			Comparator<ServiceReference<T>> comparator)
 		throws InvalidSyntaxException {
 
 		_bundleContext = bundleContext;
@@ -47,7 +47,8 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 			_comparator = new ServiceReferenceNaturalOrderComparator<>();
 		}
 		else {
-			_comparator = comparator;
+			_comparator = new ServiceReferenceServiceWrapperComparator<>(
+				comparator);
 		}
 
 		if (filterString != null) {
@@ -86,42 +87,24 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 	}
 
 	private final BundleContext _bundleContext;
-	private final Comparator<Entry<T>> _comparator;
-	private final List<Entry<T>> _services = new CopyOnWriteArrayList<>();
+	private final Comparator<ServiceWrapper<T>> _comparator;
+	private final List<ServiceWrapper<T>> _services =
+		new CopyOnWriteArrayList<>();
 	private final ServiceTracker<T, T> _serviceTracker;
 	private final ServiceTrackerCustomizer<T, T> _serviceTrackerCustomizer;
 
-	private static class EntryImpl<T> implements Entry<T> {
-
-		public EntryImpl(ServiceReference<T> serviceReference, T service) {
-			_serviceReference = serviceReference;
-			_service = service;
-		}
-
-		@Override
-		public T getService() {
-			return _service;
-		}
-
-		@Override
-		public ServiceReference<T> getServiceReference() {
-			return _serviceReference;
-		}
-
-		private final T _service;
-		private final ServiceReference<T> _serviceReference;
-
-	}
-
 	private static class ServiceReferenceNaturalOrderComparator<T>
-		implements Comparator<Entry<T>> {
+		implements Comparator<ServiceWrapper<T>> {
 
 		@Override
-		public int compare(Entry<T> entry1, Entry<T> entry2) {
+		public int compare(
+			ServiceWrapper<T> serviceWrapper1,
+			ServiceWrapper<T> serviceWrapper2) {
+
 			ServiceReference<T> serviceReference1 =
-				entry1.getServiceReference();
+				serviceWrapper1.getServiceReference();
 			ServiceReference<T> serviceReference2 =
-				entry2.getServiceReference();
+				serviceWrapper2.getServiceReference();
 
 			return serviceReference1.compareTo(serviceReference2);
 		}
@@ -130,7 +113,9 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 
 	private static class ServiceTrackerListIterator<T> implements Iterator<T> {
 
-		public ServiceTrackerListIterator(Iterator<Entry<T>> iterator) {
+		public ServiceTrackerListIterator(
+			Iterator<ServiceWrapper<T>> iterator) {
+
 			_iterator = iterator;
 		}
 
@@ -141,9 +126,9 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 
 		@Override
 		public T next() {
-			Entry<T> entry = _iterator.next();
+			ServiceWrapper<T> serviceWrapper = _iterator.next();
 
-			return entry.getService();
+			return serviceWrapper.getService();
 		}
 
 		@Override
@@ -151,7 +136,27 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 			throw new UnsupportedOperationException();
 		}
 
-		private final Iterator<Entry<T>> _iterator;
+		private final Iterator<ServiceWrapper<T>> _iterator;
+
+	}
+
+	private static class ServiceWrapper<T> {
+
+		public ServiceWrapper(ServiceReference<T> serviceReference, T service) {
+			_serviceReference = serviceReference;
+			_service = service;
+		}
+
+		public T getService() {
+			return _service;
+		}
+
+		public ServiceReference<T> getServiceReference() {
+			return _serviceReference;
+		}
+
+		private final T _service;
+		private final ServiceReference<T> _serviceReference;
 
 	}
 
@@ -205,11 +210,12 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 				return service;
 			}
 
-			Entry<T> entry = new EntryImpl<>(serviceReference, service);
+			ServiceWrapper<T> serviceWrapper = new ServiceWrapper<>(
+				serviceReference, service);
 
 			synchronized(_services) {
 				int index = Collections.binarySearch(
-					_services, entry, _comparator);
+					_services, serviceWrapper, _comparator);
 
 				if (remove) {
 					if (index >= 0) {
@@ -217,12 +223,35 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 					}
 				}
 				else if (index < 0) {
-					_services.add(((-index) - 1), entry);
+					_services.add(((-index) - 1), serviceWrapper);
 				}
 			}
 
 			return service;
 		}
+
+	}
+
+	private class ServiceReferenceServiceWrapperComparator<T>
+		implements Comparator<ServiceWrapper<T>> {
+
+		public ServiceReferenceServiceWrapperComparator(
+			Comparator<ServiceReference<T>> comparator) {
+
+			_comparator = comparator;
+		}
+
+		@Override
+		public int compare(
+			ServiceWrapper<T> serviceWrapper1,
+			ServiceWrapper<T> serviceWrapper2) {
+
+			return _comparator.compare(
+				serviceWrapper1.getServiceReference(),
+				serviceWrapper2.getServiceReference());
+		}
+
+		private final Comparator<ServiceReference<T>> _comparator;
 
 	}
 

@@ -19,8 +19,6 @@ import java.io.IOException;
 
 import java.util.Iterator;
 
-import org.osgi.framework.ServiceReference;
-
 /**
  * @author Adolfo Pérez
  */
@@ -35,13 +33,5 @@ public interface ServiceTrackerList<T> extends Closeable, Iterable<T> {
 	public void open();
 
 	public int size();
-
-	public interface Entry<T> {
-
-		public T getService();
-
-		public ServiceReference<T> getServiceReference();
-
-	}
 
 }
