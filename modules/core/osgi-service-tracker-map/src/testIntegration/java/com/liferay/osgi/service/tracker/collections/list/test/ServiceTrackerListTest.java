@@ -109,12 +109,12 @@ public class ServiceTrackerListTest {
 		ServiceTrackerList<Object> serviceTrackerList =
 			createServiceTrackerList(
 				_bundleContext,
-				new Comparator<ServiceTrackerList.Entry<Object>>() {
+				new Comparator<ServiceReference<Object>>() {
 
 					@Override
 					public int compare(
-						ServiceTrackerList.Entry<Object> entry1,
-						ServiceTrackerList.Entry<Object> entry2) {
+						ServiceReference<Object> entry1,
+						ServiceReference<Object> entry2) {
 
 						return 0;
 					}
@@ -151,17 +151,12 @@ public class ServiceTrackerListTest {
 		ServiceTrackerList<Object> serviceTrackerList =
 			createServiceTrackerList(
 				_bundleContext,
-				new Comparator<ServiceTrackerList.Entry<Object>>() {
+				new Comparator<ServiceReference<Object>>() {
 
 				@Override
 				public int compare(
-					ServiceTrackerList.Entry<Object> entry1,
-					ServiceTrackerList.Entry<Object> entry2) {
-
-					ServiceReference<Object> serviceReference1 =
-						entry1.getServiceReference();
-					ServiceReference<Object> serviceReference2 =
-						entry2.getServiceReference();
+					ServiceReference<Object> serviceReference1,
+					ServiceReference<Object> serviceReference2) {
 
 					int serviceRanking1 =
 						(Integer)serviceReference1.getProperty(
@@ -241,7 +236,7 @@ public class ServiceTrackerListTest {
 
 	protected ServiceTrackerList<Object> createServiceTrackerList(
 		BundleContext bundleContext,
-		Comparator<ServiceTrackerList.Entry<Object>> comparator) {
+		Comparator<ServiceReference<Object>> comparator) {
 
 		return createServiceTrackerList(bundleContext, null, null, comparator);
 	}
@@ -249,7 +244,7 @@ public class ServiceTrackerListTest {
 	protected ServiceTrackerList<Object> createServiceTrackerList(
 		BundleContext bundleContext, String filterString,
 		ServiceTrackerCustomizer<Object, Object> serviceTrackerCustomizer,
-		Comparator<ServiceTrackerList.Entry<Object>> comparator) {
+		Comparator<ServiceReference<Object>> comparator) {
 
 		try {
 			_serviceTrackerList = ServiceTrackerListFactory.create(

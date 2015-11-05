@@ -20,6 +20,7 @@ import java.util.Comparator;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
@@ -37,7 +38,7 @@ public class ServiceTrackerListFactory {
 
 	public static <T> ServiceTrackerList<T> create(
 			BundleContext bundleContext, Class<T> clazz,
-			Comparator<ServiceTrackerList.Entry<T>> comparator)
+			Comparator<ServiceReference<T>> comparator)
 		throws InvalidSyntaxException {
 
 		return new ServiceTrackerListImpl<>(
@@ -54,7 +55,7 @@ public class ServiceTrackerListFactory {
 
 	public static <T> ServiceTrackerList<T> create(
 			BundleContext bundleContext, Class<T> clazz, String filterString,
-			Comparator<ServiceTrackerList.Entry<T>> comparator)
+			Comparator<ServiceReference<T>> comparator)
 		throws InvalidSyntaxException {
 
 		return new ServiceTrackerListImpl<>(
@@ -73,7 +74,7 @@ public class ServiceTrackerListFactory {
 	public static <T> ServiceTrackerList<T> create(
 			BundleContext bundleContext, Class<T> clazz, String filterString,
 			ServiceTrackerCustomizer<T, T> serviceTrackerCustomizer,
-			Comparator<ServiceTrackerList.Entry<T>> comparator)
+			Comparator<ServiceReference<T>> comparator)
 		throws InvalidSyntaxException {
 
 		return new ServiceTrackerListImpl<>(
