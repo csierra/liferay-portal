@@ -22,6 +22,7 @@ import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalContentSearchLocalServiceUtil;
 import com.liferay.journal.service.permission.JournalArticlePermission;
+import com.liferay.journal.util.JournalContent;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -29,8 +30,11 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.trash.TrashRenderer;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
@@ -411,6 +415,10 @@ public class JournalArticleAssetRenderer
 
 		request.setAttribute(WebKeys.JOURNAL_ARTICLE, _article);
 
+		request.setAttribute(
+			WebKeys.JOURNAL_ARTICLE_DISPLAY,
+			getArticleDisplay(request, response));
+
 		return super.include(request, response, template);
 	}
 
@@ -448,11 +456,59 @@ public class JournalArticleAssetRenderer
 		return true;
 	}
 
+	public void setJournalContent(JournalContent journalContent) {
+		_journalContent = journalContent;
+	}
+
+	protected JournalArticleDisplay getArticleDisplay(
+			HttpServletRequest request, HttpServletResponse response)
+		throws PortalException {
+
+		boolean workflowAssetPreview = GetterUtil.getBoolean(
+			(Boolean)request.getAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW));
+
+		String ddmTemplateKey = (String)request.getAttribute(
+			WebKeys.JOURNAL_TEMPLATE_ID);
+		String viewMode = ParamUtil.getString(
+			request, "viewMode", Constants.VIEW);
+		String languageId = LanguageUtil.getLanguageId(request);
+		int articlePage = ParamUtil.getInteger(request, "page", 1);
+		PortletRequestModel portletRequestModel = getPortletRequestModel(
+			request, response);
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (!workflowAssetPreview && _article.isApproved()) {
+			return _journalContent.getDisplay(
+				_article.getGroupId(), _article.getArticleId(),
+				_article.getVersion(), ddmTemplateKey, viewMode, languageId,
+				articlePage, portletRequestModel, themeDisplay);
+		}
+		else {
+			return JournalArticleLocalServiceUtil.getArticleDisplay(
+				_article, ddmTemplateKey, viewMode, languageId, articlePage,
+				portletRequestModel, themeDisplay);
+		}
+	}
+
 	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/history.png";
 	}
 
+	protected PortletRequestModel getPortletRequestModel(
+		HttpServletRequest request, HttpServletResponse response) {
+
+		PortletRequest portletRequest = (PortletRequest)request.getAttribute(
+			JavaConstants.JAVAX_PORTLET_REQUEST);
+
+		PortletResponse portletResponse = (PortletResponse)request.getAttribute(
+			JavaConstants.JAVAX_PORTLET_RESPONSE);
+
+		return new PortletRequestModel(portletRequest, portletResponse);
+	}
+
 	private final JournalArticle _article;
+	private JournalContent _journalContent;
 
 }
