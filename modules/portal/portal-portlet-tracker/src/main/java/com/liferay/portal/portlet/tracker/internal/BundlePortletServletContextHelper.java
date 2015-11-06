@@ -55,6 +55,10 @@ public class BundlePortletServletContextHelper extends ServletContextHelper {
 				url = _getResourceInBundleOrFragments(
 					"META-INF/resources/" + name);
 			}
+
+			if (url == null) {
+				url = _bundle.getResource(name);
+			}
 		}
 
 		return url;
