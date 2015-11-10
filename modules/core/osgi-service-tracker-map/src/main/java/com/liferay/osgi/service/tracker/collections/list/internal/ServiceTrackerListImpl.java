@@ -32,12 +32,12 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Adolfo Pérez
  */
-public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
+public class ServiceTrackerListImpl<S, T> implements ServiceTrackerList<S, T> {
 
 	public ServiceTrackerListImpl(
-			BundleContext bundleContext, Class<T> clazz, String filterString,
-			ServiceTrackerCustomizer<T, T> serviceTrackerCustomizer,
-			Comparator<ServiceReference<T>> comparator)
+			BundleContext bundleContext, Class<S> clazz, String filterString,
+			ServiceTrackerCustomizer<S, T> serviceTrackerCustomizer,
+			Comparator<ServiceReference<S>> comparator)
 		throws InvalidSyntaxException {
 
 		_bundleContext = bundleContext;
@@ -87,23 +87,23 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 	}
 
 	private final BundleContext _bundleContext;
-	private final Comparator<ServiceWrapper<T>> _comparator;
-	private final List<ServiceWrapper<T>> _services =
+	private final Comparator<ServiceWrapper<S, T>> _comparator;
+	private final List<ServiceWrapper<S, T>> _services =
 		new CopyOnWriteArrayList<>();
-	private final ServiceTracker<T, T> _serviceTracker;
-	private final ServiceTrackerCustomizer<T, T> _serviceTrackerCustomizer;
+	private final ServiceTracker<S, T> _serviceTracker;
+	private final ServiceTrackerCustomizer<S, T> _serviceTrackerCustomizer;
 
-	private static class ServiceReferenceNaturalOrderComparator<T>
-		implements Comparator<ServiceWrapper<T>> {
+	private static class ServiceReferenceNaturalOrderComparator<S, T>
+		implements Comparator<ServiceWrapper<S, T>> {
 
 		@Override
 		public int compare(
-			ServiceWrapper<T> serviceWrapper1,
-			ServiceWrapper<T> serviceWrapper2) {
+			ServiceWrapper<S, T> serviceWrapper1,
+			ServiceWrapper<S, T> serviceWrapper2) {
 
-			ServiceReference<T> serviceReference1 =
+			ServiceReference<S> serviceReference1 =
 				serviceWrapper1.getServiceReference();
-			ServiceReference<T> serviceReference2 =
+			ServiceReference<S> serviceReference2 =
 				serviceWrapper2.getServiceReference();
 
 			return serviceReference1.compareTo(serviceReference2);
@@ -111,10 +111,11 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 
 	}
 
-	private static class ServiceTrackerListIterator<T> implements Iterator<T> {
+	private static class ServiceTrackerListIterator<S, T>
+		implements Iterator<T> {
 
 		public ServiceTrackerListIterator(
-			Iterator<ServiceWrapper<T>> iterator) {
+			Iterator<ServiceWrapper<S, T>> iterator) {
 
 			_iterator = iterator;
 		}
@@ -126,7 +127,7 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 
 		@Override
 		public T next() {
-			ServiceWrapper<T> serviceWrapper = _iterator.next();
+			ServiceWrapper<S, T> serviceWrapper = _iterator.next();
 
 			return serviceWrapper.getService();
 		}
@@ -136,13 +137,13 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 			throw new UnsupportedOperationException();
 		}
 
-		private final Iterator<ServiceWrapper<T>> _iterator;
+		private final Iterator<ServiceWrapper<S, T>> _iterator;
 
 	}
 
-	private static class ServiceWrapper<T> {
+	private static class ServiceWrapper<S, T> {
 
-		public ServiceWrapper(ServiceReference<T> serviceReference, T service) {
+		public ServiceWrapper(ServiceReference<S> serviceReference, T service) {
 			_serviceReference = serviceReference;
 			_service = service;
 		}
@@ -151,27 +152,27 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 			return _service;
 		}
 
-		public ServiceReference<T> getServiceReference() {
+		public ServiceReference<S> getServiceReference() {
 			return _serviceReference;
 		}
 
 		private final T _service;
-		private final ServiceReference<T> _serviceReference;
+		private final ServiceReference<S> _serviceReference;
 
 	}
 
 	private class ServiceReferenceServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer<T, T> {
+		implements ServiceTrackerCustomizer<S, T> {
 
 		@Override
-		public T addingService(ServiceReference<T> serviceReference) {
+		public T addingService(ServiceReference<S> serviceReference) {
 			return update(
 				serviceReference, getService(serviceReference), false);
 		}
 
 		@Override
 		public void modifiedService(
-			ServiceReference<T> serviceReference, T service) {
+			ServiceReference<S> serviceReference, T service) {
 
 			if (_serviceTrackerCustomizer != null) {
 				_serviceTrackerCustomizer.modifiedService(
@@ -183,7 +184,7 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 
 		@Override
 		public void removedService(
-			ServiceReference<T> serviceReference, T service) {
+			ServiceReference<S> serviceReference, T service) {
 
 			if (_serviceTrackerCustomizer != null) {
 				_serviceTrackerCustomizer.removedService(
@@ -195,22 +196,18 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 			_bundleContext.ungetService(serviceReference);
 		}
 
-		protected T getService(ServiceReference<T> serviceReference) {
-			if (_serviceTrackerCustomizer == null) {
-				return _bundleContext.getService(serviceReference);
-			}
-
+		protected T getService(ServiceReference<S> serviceReference) {
 			return _serviceTrackerCustomizer.addingService(serviceReference);
 		}
 
 		private T update(
-			ServiceReference<T> serviceReference, T service, boolean remove) {
+			ServiceReference<S> serviceReference, T service, boolean remove) {
 
 			if (service == null) {
 				return service;
 			}
 
-			ServiceWrapper<T> serviceWrapper = new ServiceWrapper<>(
+			ServiceWrapper<S, T> serviceWrapper = new ServiceWrapper<>(
 				serviceReference, service);
 
 			synchronized(_services) {
@@ -232,26 +229,26 @@ public class ServiceTrackerListImpl<T> implements ServiceTrackerList<T> {
 
 	}
 
-	private class ServiceReferenceServiceWrapperComparator<T>
-		implements Comparator<ServiceWrapper<T>> {
+	private class ServiceReferenceServiceWrapperComparator<S, T>
+		implements Comparator<ServiceWrapper<S, T>> {
 
 		public ServiceReferenceServiceWrapperComparator(
-			Comparator<ServiceReference<T>> comparator) {
+			Comparator<ServiceReference<S>> comparator) {
 
 			_comparator = comparator;
 		}
 
 		@Override
 		public int compare(
-			ServiceWrapper<T> serviceWrapper1,
-			ServiceWrapper<T> serviceWrapper2) {
+			ServiceWrapper<S, T> serviceWrapper1,
+			ServiceWrapper<S, T> serviceWrapper2) {
 
 			return _comparator.compare(
 				serviceWrapper1.getServiceReference(),
 				serviceWrapper2.getServiceReference());
 		}
 
-		private final Comparator<ServiceReference<T>> _comparator;
+		private final Comparator<ServiceReference<S>> _comparator;
 
 	}
 

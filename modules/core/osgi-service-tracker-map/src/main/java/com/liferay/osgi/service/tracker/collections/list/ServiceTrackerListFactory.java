@@ -28,58 +28,97 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  */
 public class ServiceTrackerListFactory {
 
-	public static <T> ServiceTrackerList<T> create(
-			BundleContext bundleContext, Class<T> clazz)
-		throws InvalidSyntaxException {
-
-		return new ServiceTrackerListImpl<>(
-			bundleContext, clazz, null, null, null);
-	}
-
-	public static <T> ServiceTrackerList<T> create(
-			BundleContext bundleContext, Class<T> clazz,
-			Comparator<ServiceReference<T>> comparator)
-		throws InvalidSyntaxException {
-
-		return new ServiceTrackerListImpl<>(
-			bundleContext, clazz, null, null, comparator);
-	}
-
-	public static <T> ServiceTrackerList<T> create(
-			BundleContext bundleContext, Class<T> clazz, String filterString)
-		throws InvalidSyntaxException {
-
-		return new ServiceTrackerListImpl<>(
-			bundleContext, clazz, filterString, null, null);
-	}
-
-	public static <T> ServiceTrackerList<T> create(
-			BundleContext bundleContext, Class<T> clazz, String filterString,
-			Comparator<ServiceReference<T>> comparator)
-		throws InvalidSyntaxException {
-
-		return new ServiceTrackerListImpl<>(
-			bundleContext, clazz, filterString, null, comparator);
-	}
-
-	public static <T> ServiceTrackerList<T> create(
-			BundleContext bundleContext, Class<T> clazz, String filterString,
-			ServiceTrackerCustomizer<T, T> serviceTrackerCustomizer)
+	public static <S, T> ServiceTrackerList<S, T> create(
+			BundleContext bundleContext, Class<S> clazz, String filterString,
+			ServiceTrackerCustomizer<S, T> serviceTrackerCustomizer)
 		throws InvalidSyntaxException {
 
 		return new ServiceTrackerListImpl<>(
 			bundleContext, clazz, filterString, serviceTrackerCustomizer, null);
 	}
 
-	public static <T> ServiceTrackerList<T> create(
-			BundleContext bundleContext, Class<T> clazz, String filterString,
-			ServiceTrackerCustomizer<T, T> serviceTrackerCustomizer,
-			Comparator<ServiceReference<T>> comparator)
+	public static <S, T> ServiceTrackerList<S, T> create(
+			BundleContext bundleContext, Class<S> clazz, String filterString,
+			ServiceTrackerCustomizer<S, T> serviceTrackerCustomizer,
+			Comparator<ServiceReference<S>> comparator)
 		throws InvalidSyntaxException {
 
 		return new ServiceTrackerListImpl<>(
 			bundleContext, clazz, filterString, serviceTrackerCustomizer,
 			comparator);
+	}
+
+	public static <T> ServiceTrackerList<T, T> create(
+			BundleContext bundleContext, Class<T> clazz)
+		throws InvalidSyntaxException {
+
+		ServiceTrackerCustomizer<T, T> serviceTrackerCustomizer =
+			new IdenticalServiceTrackerCustomizer<>(bundleContext);
+
+		return new ServiceTrackerListImpl<>(
+			bundleContext, clazz, null, serviceTrackerCustomizer, null);
+	}
+
+	public static <T> ServiceTrackerList<T, T> create(
+			BundleContext bundleContext, Class<T> clazz,
+			Comparator<ServiceReference<T>> comparator)
+		throws InvalidSyntaxException {
+
+		ServiceTrackerCustomizer<T, T> serviceTrackerCustomizer =
+			new IdenticalServiceTrackerCustomizer<>(bundleContext);
+
+		return new ServiceTrackerListImpl<>(
+			bundleContext, clazz, null, serviceTrackerCustomizer, comparator);
+	}
+
+	public static <T> ServiceTrackerList<T, T> create(
+			BundleContext bundleContext, Class<T> clazz, String filterString)
+		throws InvalidSyntaxException {
+
+		ServiceTrackerCustomizer<T, T> serviceTrackerCustomizer =
+			new IdenticalServiceTrackerCustomizer<>(bundleContext);
+
+		return new ServiceTrackerListImpl<>(
+			bundleContext, clazz, filterString, serviceTrackerCustomizer, null);
+	}
+
+	public static <T> ServiceTrackerList<T, T> create(
+			BundleContext bundleContext, Class<T> clazz, String filterString,
+			Comparator<ServiceReference<T>> comparator)
+		throws InvalidSyntaxException {
+
+		ServiceTrackerCustomizer<T, T> serviceTrackerCustomizer =
+			new IdenticalServiceTrackerCustomizer<>(bundleContext);
+
+		return new ServiceTrackerListImpl<>(
+			bundleContext, clazz, filterString, serviceTrackerCustomizer,
+			comparator);
+	}
+
+	private static class IdenticalServiceTrackerCustomizer<T>
+		implements ServiceTrackerCustomizer<T, T> {
+
+		public IdenticalServiceTrackerCustomizer(BundleContext bundleContext) {
+			_bundleContext = bundleContext;
+		}
+
+		@Override
+		public T addingService(ServiceReference<T> serviceReference) {
+			return _bundleContext.getService(serviceReference);
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<T> serviceReference, T service) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<T> serviceReference, T service) {
+		}
+
+		private final BundleContext _bundleContext;
+
 	}
 
 }

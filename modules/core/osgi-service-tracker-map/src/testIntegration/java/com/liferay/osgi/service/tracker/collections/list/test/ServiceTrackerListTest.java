@@ -69,7 +69,7 @@ public class ServiceTrackerListTest {
 
 	@Test
 	public void testGetServiceWithCustomizer() {
-		ServiceTrackerList<Object> serviceTrackerList =
+		ServiceTrackerList<Object, Object> serviceTrackerList =
 			createServiceTrackerList(
 				_bundleContext, null,
 				new ServiceTrackerCustomizer<Object, Object>() {
@@ -106,7 +106,7 @@ public class ServiceTrackerListTest {
 
 	@Test
 	public void testServiceInSamePositionIsIgnored() {
-		ServiceTrackerList<Object> serviceTrackerList =
+		ServiceTrackerList<Object, Object> serviceTrackerList =
 			createServiceTrackerList(
 				_bundleContext,
 				new Comparator<ServiceReference<Object>>() {
@@ -133,7 +133,7 @@ public class ServiceTrackerListTest {
 
 	@Test
 	public void testServiceInsertion() {
-		ServiceTrackerList<Object> serviceTrackerList =
+		ServiceTrackerList<Object, Object> serviceTrackerList =
 			createServiceTrackerList(_bundleContext);
 
 		Assert.assertEquals(0, serviceTrackerList.size());
@@ -148,7 +148,7 @@ public class ServiceTrackerListTest {
 
 	@Test
 	public void testServiceIterationOrderWithCustomComparator() {
-		ServiceTrackerList<Object> serviceTrackerList =
+		ServiceTrackerList<Object, Object> serviceTrackerList =
 			createServiceTrackerList(
 				_bundleContext,
 				new Comparator<ServiceReference<Object>>() {
@@ -188,7 +188,7 @@ public class ServiceTrackerListTest {
 
 	@Test
 	public void testServiceIterationOrderWithDefaultComparator() {
-		ServiceTrackerList<Object> serviceTrackerList =
+		ServiceTrackerList<Object, Object> serviceTrackerList =
 			createServiceTrackerList(_bundleContext);
 
 		Object[] services = {new Object(), new Object()};
@@ -209,7 +209,7 @@ public class ServiceTrackerListTest {
 
 	@Test
 	public void testServiceRemoval() {
-		ServiceTrackerList<Object> serviceTrackerList =
+		ServiceTrackerList<Object, Object> serviceTrackerList =
 			createServiceTrackerList(_bundleContext);
 
 		Assert.assertEquals(0, serviceTrackerList.size());
@@ -228,28 +228,34 @@ public class ServiceTrackerListTest {
 	public static class CustomizedService {
 	}
 
-	protected ServiceTrackerList<Object> createServiceTrackerList(
+	protected ServiceTrackerList<Object, Object> createServiceTrackerList(
 		BundleContext bundleContext) {
 
 		return createServiceTrackerList(bundleContext, null, null, null);
 	}
 
-	protected ServiceTrackerList<Object> createServiceTrackerList(
+	protected ServiceTrackerList<Object, Object> createServiceTrackerList(
 		BundleContext bundleContext,
 		Comparator<ServiceReference<Object>> comparator) {
 
 		return createServiceTrackerList(bundleContext, null, null, comparator);
 	}
 
-	protected ServiceTrackerList<Object> createServiceTrackerList(
+	protected ServiceTrackerList<Object, Object> createServiceTrackerList(
 		BundleContext bundleContext, String filterString,
 		ServiceTrackerCustomizer<Object, Object> serviceTrackerCustomizer,
 		Comparator<ServiceReference<Object>> comparator) {
 
 		try {
-			_serviceTrackerList = ServiceTrackerListFactory.create(
-				bundleContext, Object.class, filterString,
-				serviceTrackerCustomizer, comparator);
+			if (serviceTrackerCustomizer == null) {
+				_serviceTrackerList = ServiceTrackerListFactory.create(
+					bundleContext, Object.class, filterString, comparator);
+			}
+			else {
+				_serviceTrackerList = ServiceTrackerListFactory.create(
+					bundleContext, Object.class, filterString,
+					serviceTrackerCustomizer, comparator);
+			}
 		}
 		catch (InvalidSyntaxException ise) {
 			throw new RuntimeException(ise);
@@ -311,6 +317,6 @@ public class ServiceTrackerListTest {
 	}
 
 	private BundleContext _bundleContext;
-	private ServiceTrackerList<Object> _serviceTrackerList;
+	private ServiceTrackerList<Object, Object> _serviceTrackerList;
 
 }
