@@ -17,6 +17,7 @@ package com.liferay.gradle.plugins;
 import aQute.bnd.osgi.Constants;
 
 import com.liferay.gradle.plugins.css.builder.BuildCSSTask;
+import com.liferay.gradle.plugins.css.builder.CSSBuilderPlugin;
 import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.LiferayOSGiExtension;
 import com.liferay.gradle.plugins.jasper.jspc.JspCExtension;
@@ -26,7 +27,6 @@ import com.liferay.gradle.plugins.service.builder.BuildServiceTask;
 import com.liferay.gradle.plugins.tasks.DirectDeployTask;
 import com.liferay.gradle.plugins.wsdd.builder.BuildWSDDTask;
 import com.liferay.gradle.plugins.wsdd.builder.WSDDBuilderPlugin;
-import com.liferay.gradle.plugins.xsd.builder.XSDBuilderPlugin;
 import com.liferay.gradle.util.FileUtil;
 import com.liferay.gradle.util.GradleUtil;
 import com.liferay.gradle.util.Validator;
@@ -72,7 +72,6 @@ import org.gradle.api.tasks.TaskInputs;
 import org.gradle.api.tasks.TaskOutputs;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.War;
-import org.gradle.api.tasks.bundling.Zip;
 import org.gradle.internal.Factory;
 
 /**
@@ -93,6 +92,7 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 		configureJspCExtension(project);
 
 		configureArchivesBaseName(project);
+		configureTaskBuildCSS(project);
 		configureTasksBuildService(project);
 		configureVersion(project);
 
@@ -187,7 +187,7 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 
 		directDeployTask.setAppServerDeployDir(
 			directDeployTask.getTemporaryDir());
-		directDeployTask.setAppServerType("tomcat");
+		directDeployTask.setArgAppServerType("tomcat");
 		directDeployTask.setWebAppType("portlet");
 
 		directDeployTask.doFirst(
@@ -647,51 +647,29 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 		directDeployTask.setWebAppFile(warFile);
 	}
 
-	@Override
-	protected void configureTaskBuildCSSDocrootDirName(
-		BuildCSSTask buildCSSTask) {
+	protected void configureTaskBuildCSS(Project project) {
+		Task task = GradleUtil.getTask(
+			project, CSSBuilderPlugin.BUILD_CSS_TASK_NAME);
 
-		Project project = buildCSSTask.getProject();
-
-		String docrootDirName = buildCSSTask.getDocrootDirName();
-
-		if (Validator.isNotNull(docrootDirName) &&
-			FileUtil.exists(project, docrootDirName)) {
-
-			return;
+		if (task instanceof BuildCSSTask) {
+			configureTaskBuildCSSDocrootDir((BuildCSSTask)task);
 		}
+	}
+
+	protected void configureTaskBuildCSSDocrootDir(BuildCSSTask buildCSSTask) {
+		Project project = buildCSSTask.getProject();
 
 		File docrootDir = project.file("docroot");
 
-		if (!docrootDir.exists()) {
-			super.configureTaskBuildCSSDocrootDirName(buildCSSTask);
-
-			return;
+		if (docrootDir.exists()) {
+			buildCSSTask.setDocrootDir(docrootDir);
 		}
-
-		buildCSSTask.setDocrootDirName(project.relativePath(docrootDir));
 	}
 
 	protected void configureTaskBuildServiceOsgiModule(
 		BuildServiceTask buildServiceTask) {
 
 		buildServiceTask.setOsgiModule(true);
-	}
-
-	@Override
-	protected void configureTaskBuildXSD(Project project) {
-		Zip zip = (Zip)GradleUtil.getTask(
-			project, XSDBuilderPlugin.BUILD_XSD_TASK_NAME);
-
-		configureTaskBuildXSDArchiveName(zip);
-	}
-
-	protected void configureTaskBuildXSDArchiveName(Zip zip) {
-		String bundleSymbolicName = getBundleInstruction(
-			zip.getProject(), Constants.BUNDLE_SYMBOLICNAME);
-
-		zip.setArchiveName(
-			bundleSymbolicName + "-xbean." + Jar.DEFAULT_EXTENSION);
 	}
 
 	@Override
@@ -774,8 +752,6 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 		Project project, LiferayExtension liferayExtension) {
 
 		super.configureTasks(project, liferayExtension);
-
-		configureTaskBuildXSD(project);
 
 		configureTaskAutoUpdateXml(project);
 	}
