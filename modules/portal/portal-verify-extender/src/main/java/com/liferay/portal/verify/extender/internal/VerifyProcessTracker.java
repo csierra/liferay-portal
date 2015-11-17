@@ -21,7 +21,6 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.RunnableUtil;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.output.stream.container.OutputStreamContainer;
 import com.liferay.portal.output.stream.container.OutputStreamContainerFactory;
@@ -88,13 +87,31 @@ public class VerifyProcessTracker {
 	}
 
 	public void executeAll(String outputStreamContainerFactoryName) {
-		Set<String> verifyProcessNames = _verifyProcesses.keySet();
+		final Set<String> verifyProcessNames = _verifyProcesses.keySet();
 
-		for (String verifyProcessName : verifyProcessNames) {
-			executeVerifyProcess(
-				verifyProcessName, outputStreamContainerFactoryName,
-				"verify-" + verifyProcessName);
-		}
+		OutputStreamContainerFactory outputStreamContainerFactory =
+			_outputStreamContainerFactoryTracker.
+				getOutputStreamContainerFactory(
+					outputStreamContainerFactoryName);
+
+		OutputStreamContainer outputStreamContainer =
+			outputStreamContainerFactory.create("all-verifiers");
+
+		System.out.println(
+			"Sending output to: " + outputStreamContainer.getDescription());
+
+		final OutputStream outputStream =
+			outputStreamContainer.getOutputStream();
+
+		_outputStreamContainerFactoryTracker.runWithSwappedLog(new Runnable() {
+			@Override
+			public void run() {
+
+				for (String verifyProcessName : verifyProcessNames) {
+					executeVerifyProcess(verifyProcessName, outputStream);
+				}
+			}
+		}, outputStream);
 	}
 
 	public void list() {
@@ -211,7 +228,10 @@ public class VerifyProcessTracker {
 		final OutputStream outputStream =
 			outputStreamContainer.getOutputStream();
 
-		RunnableUtil.runWithSwappedSystemOut(
+		System.out.println(
+			"Sending output to " + outputStreamContainer.getDescription());
+
+		_outputStreamContainerFactoryTracker.runWithSwappedLog(
 			new Runnable() {
 
 				@Override
