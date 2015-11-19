@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
+		"auth.token.ignore.portlets=" + JournalPortletKeys.JOURNAL_RSS,
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.preferences-owned-by-group=true",
@@ -53,7 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL_RSS,
 		"javax.portlet.security-role-ref=administrator"
 	},
-	service = Portlet.class
+	service = { Object.class, Portlet.class }
 )
 public class JournalRSSPortlet extends MVCPortlet {
 
