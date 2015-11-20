@@ -99,6 +99,6 @@ public class JournalRSSPortlet extends MVCPortlet {
 		_journalRSSUtil = null;
 	}
 
-	private JournalRSSUtil _journalRSSUtil;
+	private volatile JournalRSSUtil _journalRSSUtil;
 
 }
