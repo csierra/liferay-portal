@@ -14,8 +14,6 @@
 
 package com.liferay.portal.output.stream.container;
 
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 
 import java.io.IOException;
