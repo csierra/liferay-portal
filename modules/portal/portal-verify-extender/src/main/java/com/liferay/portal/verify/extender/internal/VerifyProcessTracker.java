@@ -21,6 +21,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.output.stream.container.OutputStreamContainer;
 import com.liferay.portal.output.stream.container.OutputStreamContainerFactory;
@@ -36,8 +37,6 @@ import java.io.PrintWriter;
 
 import java.util.Map;
 import java.util.Set;
-
-import javax.servlet.ServletContext;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -78,17 +77,22 @@ public class VerifyProcessTracker {
 	}
 
 	public void executeAll() {
-		Set<String> verifyProcessNames = _verifyProcesses.keySet();
+		OutputStreamContainerFactory outputStreamContainerFactory =
+			_outputStreamContainerFactoryTracker.
+				getOutputStreamContainerFactory();
 
-		for (String verifyProcessName : verifyProcessNames) {
-			executeVerifyProcess(
-				verifyProcessName, null, "verify-" + verifyProcessName);
-		}
+		OutputStreamContainer outputStreamContainer =
+			outputStreamContainerFactory.create("all-verifiers");
+
+		final OutputStream outputStream =
+			outputStreamContainer.getOutputStream();
+
+		_outputStreamContainerFactoryTracker.runWithSwappedLog(
+			new AllVerifiersRunnable(outputStream),
+			outputStreamContainer.getDescription(), outputStream);
 	}
 
 	public void executeAll(String outputStreamContainerFactoryName) {
-		final Set<String> verifyProcessNames = _verifyProcesses.keySet();
-
 		OutputStreamContainerFactory outputStreamContainerFactory =
 			_outputStreamContainerFactoryTracker.
 				getOutputStreamContainerFactory(
@@ -97,21 +101,12 @@ public class VerifyProcessTracker {
 		OutputStreamContainer outputStreamContainer =
 			outputStreamContainerFactory.create("all-verifiers");
 
-		System.out.println(
-			"Sending output to: " + outputStreamContainer.getDescription());
-
 		final OutputStream outputStream =
 			outputStreamContainer.getOutputStream();
 
-		_outputStreamContainerFactoryTracker.runWithSwappedLog(new Runnable() {
-			@Override
-			public void run() {
-
-				for (String verifyProcessName : verifyProcessNames) {
-					executeVerifyProcess(verifyProcessName, outputStream);
-				}
-			}
-		}, outputStream);
+		_outputStreamContainerFactoryTracker.runWithSwappedLog(
+			new AllVerifiersRunnable(outputStream),
+			outputStreamContainer.getDescription(), outputStream);
 	}
 
 	public void list() {
@@ -208,7 +203,7 @@ public class VerifyProcessTracker {
 		final String verifyProcessName, String outputStreamContainerFactoryName,
 		String outputStreamName) {
 
-		OutputStreamContainerFactory outputStreamContainerFactory = null;
+		OutputStreamContainerFactory outputStreamContainerFactory;
 
 		if (outputStreamContainerFactoryName != null) {
 			outputStreamContainerFactory =
@@ -228,9 +223,6 @@ public class VerifyProcessTracker {
 		final OutputStream outputStream =
 			outputStreamContainer.getOutputStream();
 
-		System.out.println(
-			"Sending output to " + outputStreamContainer.getDescription());
-
 		_outputStreamContainerFactoryTracker.runWithSwappedLog(
 			new Runnable() {
 
@@ -239,7 +231,7 @@ public class VerifyProcessTracker {
 					executeVerifyProcess(verifyProcessName, outputStream);
 				}
 
-			}, outputStream);
+			}, outputStreamName, outputStream);
 
 		close(outputStream);
 	}
@@ -254,6 +246,11 @@ public class VerifyProcessTracker {
 		}
 
 		return verifyProcess;
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind ="-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	@Reference(unbind = "-")
@@ -272,10 +269,6 @@ public class VerifyProcessTracker {
 		_releaseLocalService = releaseLocalService;
 	}
 
-	@Reference(target = "(original.bean=true)", unbind = "-")
-	protected void setServletContext(ServletContext servletContext) {
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		VerifyProcessTracker.class);
 
@@ -285,6 +278,24 @@ public class VerifyProcessTracker {
 	private ServiceTrackerMap<String, VerifyProcess> _verifyProcesses;
 	private VerifyProcessTrackerConfiguration
 		_verifyProcessTrackerConfiguration;
+
+	private class AllVerifiersRunnable implements Runnable {
+		public AllVerifiersRunnable(OutputStream outputStream) {
+			_outputStream = outputStream;
+		}
+
+		@Override
+		public void run() {
+			final Set<String> verifyProcessNames = _verifyProcesses.keySet();
+
+			for (String verifyProcessName : verifyProcessNames) {
+				executeVerifyProcess(verifyProcessName, _outputStream);
+			}
+		}
+
+		private final OutputStream _outputStream;
+
+	}
 
 	private class VerifyServiceTrackerMapListener
 		implements ServiceTrackerMapListener
@@ -309,6 +320,6 @@ public class VerifyProcessTracker {
 			_releaseLocalService.updateRelease(release);
 		}
 
-	};
+	}
 
 }

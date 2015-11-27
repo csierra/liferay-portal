@@ -195,7 +195,7 @@ public class ReleaseManager {
 		_outputStreamContainerFactoryTracker.runWithSwappedLog(
 			new UpgradeInfosRunnable(
 				bundleSymbolicName, upgradeInfos, outputStream),
-			outputStream);
+			outputStreamContainer.getDescription(), outputStream);
 
 		try {
 			outputStream.close();
