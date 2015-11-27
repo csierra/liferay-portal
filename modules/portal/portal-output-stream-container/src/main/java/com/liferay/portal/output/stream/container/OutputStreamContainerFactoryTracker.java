@@ -14,7 +14,10 @@
 
 package com.liferay.portal.output.stream.container;
 
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.output.stream.container.internal.ConsoleOutputStreamContainerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -71,18 +74,21 @@ public class OutputStreamContainerFactoryTracker {
 		return _outputStreamContainerFactories.keySet();
 	}
 
-	@Reference(unbind = "-")
+	public void runWithSwappedLog(Runnable runnable, String outputStreamHint) {
+		OutputStreamContainer outputStreamContainer =
+			_outputStreamContainerFactory.create(outputStreamHint);
+
+		runWithSwappedLog(
+			runnable, outputStreamContainer.getDescription(),
+			outputStreamContainer.getOutputStream());
+	}
+
 	public void runWithSwappedLog(
-		Runnable runnable, String name) {
+		Runnable runnable, String outputStreamName, OutputStream outputStream) {
 
-		OutputStreamContainerFactory outputStreamContainerFactory =
-			_outputStreamContainerFactories.getService(name);
-
-		if ((outputStreamContainerFactory == null) &&
-			(_outputStreamContainerFactory == null)) {
-
-			runnable.run();
-		}
+		_logger.log(
+			org.apache.felix.utils.log.Logger.LOG_INFO, "Using " +
+				outputStreamName + " as output");
 
 		Writer writer = _writerThreadLocal.get();
 
@@ -105,40 +111,47 @@ public class OutputStreamContainerFactoryTracker {
 	}
 
 	public void runWithSwappedLog(
-		Runnable runnable, OutputStream outputStream) {
+		Runnable runnable, String outputStreamHint,
+		String outputStreamContainerName) {
 
-		Writer writer = _writerThreadLocal.get();
+		OutputStreamContainerFactory outputStreamContainerFactory =
+			_outputStreamContainerFactories.getService(
+				outputStreamContainerName);
 
-		OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
-			outputStream, Charset.forName("UTF-8"));
+		if (outputStreamContainerFactory == null) {
+			runWithSwappedLog(runnable, outputStreamHint);
 
-		_writerThreadLocal.set(outputStreamWriter);
-
-		try {
-			runnable.run();
-
-			outputStreamWriter.flush();
+			return;
 		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		finally {
-			_writerThreadLocal.set(writer);
-		}
+
+		OutputStreamContainer outputStreamContainer =
+			outputStreamContainerFactory.create(outputStreamHint);
+
+		runWithSwappedLog(
+			runnable, outputStreamContainer.getDescription(),
+			outputStreamContainer.getOutputStream());
 	}
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
+		policyOption = ReferencePolicyOption.GREEDY, unbind = "-"
 	)
 	public void setOutputStreamContainerFactory(
 		OutputStreamContainerFactory outputStreamContainerFactory) {
 
-		_outputStreamContainerFactory = outputStreamContainerFactory;
+		if (outputStreamContainerFactory == null) {
+			_outputStreamContainerFactory =
+				new ConsoleOutputStreamContainerFactory();
+		}
+		else {
+			_outputStreamContainerFactory = outputStreamContainerFactory;
+		}
 	}
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		_logger = new org.apache.felix.utils.log.Logger(bundleContext);
+
 		try {
 			Logger rootLogger = Logger.getRootLogger();
 
@@ -189,8 +202,6 @@ public class OutputStreamContainerFactoryTracker {
 		catch (InvalidSyntaxException ise) {
 			throw new IllegalStateException(ise);
 		}
-
-		_outputStreamContainerFactories.open();
 	}
 
 	@Deactivate
@@ -207,13 +218,11 @@ public class OutputStreamContainerFactoryTracker {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
+	private org.apache.felix.utils.log.Logger _logger;
 	private ServiceTrackerMap<String, OutputStreamContainerFactory>
 		_outputStreamContainerFactories;
-
 	private volatile OutputStreamContainerFactory _outputStreamContainerFactory;
 	private WriterAppender _writerAppender;
 	private final ThreadLocal<Writer> _writerThreadLocal = new ThreadLocal<>();
-
-	
 
 }
