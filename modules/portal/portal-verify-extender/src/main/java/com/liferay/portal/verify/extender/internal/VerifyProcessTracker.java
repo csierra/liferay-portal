@@ -280,6 +280,7 @@ public class VerifyProcessTracker {
 		_verifyProcessTrackerConfiguration;
 
 	private class AllVerifiersRunnable implements Runnable {
+
 		public AllVerifiersRunnable(OutputStream outputStream) {
 			_outputStream = outputStream;
 		}

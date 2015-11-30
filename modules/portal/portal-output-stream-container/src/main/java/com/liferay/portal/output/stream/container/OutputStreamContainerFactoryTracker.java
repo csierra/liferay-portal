@@ -87,8 +87,8 @@ public class OutputStreamContainerFactoryTracker {
 		Runnable runnable, String outputStreamName, OutputStream outputStream) {
 
 		_logger.log(
-			org.apache.felix.utils.log.Logger.LOG_INFO, "Using " +
-				outputStreamName + " as output");
+			org.apache.felix.utils.log.Logger.LOG_INFO,
+			"Using " + outputStreamName + " as output");
 
 		Writer writer = _writerThreadLocal.get();
 

@@ -29,11 +29,11 @@ import org.osgi.service.component.annotations.Component;
 )
 public class TestVerifier extends VerifyProcess {
 
-	Log _log = LogFactoryUtil.getLog(TestVerifier.class);
-
 	@Override
 	protected void doVerify() throws Exception {
 		_log.error("TEST VERIFIER");
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(TestVerifier.class);
 
 }
