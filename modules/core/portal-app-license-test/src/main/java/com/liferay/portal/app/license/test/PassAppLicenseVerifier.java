@@ -12,13 +12,22 @@
  * details.
  */
 
-package com.liferay.dynamic.data.mapping.data.provider;
+package com.liferay.portal.app.license.test;
+
+import com.liferay.portal.app.license.AppLicenseVerifier;
+
+import org.osgi.framework.Bundle;
 
 /**
- * @author Marcellus Tavares
+ * @author Amos Fong
  */
-public interface DDMDataProviderSettings {
+public class PassAppLicenseVerifier implements AppLicenseVerifier {
 
-	public Class<?> getSettings();
+	@Override
+	public void verify(
+			Bundle bundle, String productId, String productType,
+			String productVersion)
+		throws Exception {
+	}
 
 }
