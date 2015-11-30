@@ -22,7 +22,6 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListene
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.util.RunnableUtil;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.output.stream.container.OutputStreamContainer;
 import com.liferay.portal.output.stream.container.OutputStreamContainerFactory;
@@ -78,22 +77,36 @@ public class VerifyProcessTracker {
 	}
 
 	public void executeAll() {
-		Set<String> verifyProcessNames = _verifyProcesses.keySet();
+		OutputStreamContainerFactory outputStreamContainerFactory =
+			_outputStreamContainerFactoryTracker.
+				getOutputStreamContainerFactory();
 
-		for (String verifyProcessName : verifyProcessNames) {
-			executeVerifyProcess(
-				verifyProcessName, null, "verify-" + verifyProcessName);
-		}
+		OutputStreamContainer outputStreamContainer =
+			outputStreamContainerFactory.create("all-verifiers");
+
+		final OutputStream outputStream =
+			outputStreamContainer.getOutputStream();
+
+		_outputStreamContainerFactoryTracker.runWithSwappedLog(
+			new AllVerifiersRunnable(outputStream),
+			outputStreamContainer.getDescription(), outputStream);
 	}
 
 	public void executeAll(String outputStreamContainerFactoryName) {
-		Set<String> verifyProcessNames = _verifyProcesses.keySet();
+		OutputStreamContainerFactory outputStreamContainerFactory =
+			_outputStreamContainerFactoryTracker.
+				getOutputStreamContainerFactory(
+					outputStreamContainerFactoryName);
 
-		for (String verifyProcessName : verifyProcessNames) {
-			executeVerifyProcess(
-				verifyProcessName, outputStreamContainerFactoryName,
-				"verify-" + verifyProcessName);
-		}
+		OutputStreamContainer outputStreamContainer =
+			outputStreamContainerFactory.create("all-verifiers");
+
+		final OutputStream outputStream =
+			outputStreamContainer.getOutputStream();
+
+		_outputStreamContainerFactoryTracker.runWithSwappedLog(
+			new AllVerifiersRunnable(outputStream),
+			outputStreamContainer.getDescription(), outputStream);
 	}
 
 	public void list() {
@@ -190,7 +203,7 @@ public class VerifyProcessTracker {
 		final String verifyProcessName, String outputStreamContainerFactoryName,
 		String outputStreamName) {
 
-		OutputStreamContainerFactory outputStreamContainerFactory = null;
+		OutputStreamContainerFactory outputStreamContainerFactory;
 
 		if (outputStreamContainerFactoryName != null) {
 			outputStreamContainerFactory =
@@ -210,7 +223,7 @@ public class VerifyProcessTracker {
 		final OutputStream outputStream =
 			outputStreamContainer.getOutputStream();
 
-		RunnableUtil.runWithSwappedSystemOut(
+		_outputStreamContainerFactoryTracker.runWithSwappedLog(
 			new Runnable() {
 
 				@Override
@@ -218,7 +231,7 @@ public class VerifyProcessTracker {
 					executeVerifyProcess(verifyProcessName, outputStream);
 				}
 
-			}, outputStream);
+			}, outputStreamName, outputStream);
 
 		close(outputStream);
 	}
@@ -266,6 +279,25 @@ public class VerifyProcessTracker {
 	private VerifyProcessTrackerConfiguration
 		_verifyProcessTrackerConfiguration;
 
+	private class AllVerifiersRunnable implements Runnable {
+
+		public AllVerifiersRunnable(OutputStream outputStream) {
+			_outputStream = outputStream;
+		}
+
+		@Override
+		public void run() {
+			final Set<String> verifyProcessNames = _verifyProcesses.keySet();
+
+			for (String verifyProcessName : verifyProcessNames) {
+				executeVerifyProcess(verifyProcessName, _outputStream);
+			}
+		}
+
+		private final OutputStream _outputStream;
+
+	}
+
 	private class VerifyServiceTrackerMapListener
 		implements ServiceTrackerMapListener
 			<String, VerifyProcess, VerifyProcess> {
@@ -289,6 +321,6 @@ public class VerifyProcessTracker {
 			_releaseLocalService.updateRelease(release);
 		}
 
-	};
+	}
 
 }
