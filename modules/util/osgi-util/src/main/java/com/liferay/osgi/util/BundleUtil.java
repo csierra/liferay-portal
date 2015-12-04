@@ -36,8 +36,12 @@ public class BundleUtil {
 			return bundle.getEntry(name);
 		}
 
+		String path = file.getParent();
+
+		path = path.replace('\\', '/');
+
 		Enumeration<URL> enumeration = bundle.findEntries(
-			file.getParent(), file.getName(), false);
+			path, file.getName(), false);
 
 		if ((enumeration == null) || !enumeration.hasMoreElements()) {
 			return null;
