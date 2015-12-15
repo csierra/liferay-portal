@@ -20,11 +20,15 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.registry.collections.ServiceReferenceMapperFactory;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
+import com.liferay.registry.collections.ServiceTrackerMapListener;
 
 import java.io.Closeable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -34,13 +38,12 @@ import java.util.ResourceBundle;
 public class ResourceBundleTracker implements Closeable {
 
 	public ResourceBundleTracker(String portletId) {
-		_portletId = portletId;
-
 		_serviceTrackerMap = ServiceTrackerCollections.multiValueMap(
 			ResourceBundle.class,
 			"(&(javax.portlet.name=" + portletId + ")(language.id=*))",
-			ServiceReferenceMapperFactory.<String, Object>create(
-				"language.id"));
+			ServiceReferenceMapperFactory.<String, Object>create("language.id"),
+			new ResourceBundleTrackerServiceTrackerMapListener(
+				_resourceBundles));
 
 		_serviceTrackerMap.open();
 	}
@@ -51,41 +54,108 @@ public class ResourceBundleTracker implements Closeable {
 	}
 
 	public ResourceBundle getResourceBundle(String languageId) {
-		//This method could be optimized and done on insertion
-		//This should be easily done adding ServiceMapListener
-		List<ResourceBundle> resourceBundles = new ArrayList<>();
-
-		while (Validator.isNotNull(languageId)) {
-			List<ResourceBundle> service = _serviceTrackerMap.getService(
-				languageId);
-
-			if (service != null) {
-				resourceBundles.addAll(service);
-			}
-
-			int indexOfUnderline = languageId.lastIndexOf(StringPool.UNDERLINE);
-
-			if (indexOfUnderline > 0) {
-				languageId = languageId.substring(0, indexOfUnderline);
-			}
-			else {
-				break;
-			}
-		}
-
-		List<ResourceBundle> defaultResourceBundle =
-			_serviceTrackerMap.getService("");
-
-		if (defaultResourceBundle != null) {
-			resourceBundles.addAll(defaultResourceBundle);
-		}
-
-		return new AggregateResourceBundle(
-			resourceBundles.toArray(new ResourceBundle[0]));
+		return _resourceBundles.get(languageId);
 	}
 
-	private final String _portletId;
+	private final Map<String, ResourceBundle> _resourceBundles =
+		new HashMap<>();
 	private final ServiceTrackerMap<String, List<ResourceBundle>>
 		_serviceTrackerMap;
+
+	private static class ResourceBundleTrackerServiceTrackerMapListener
+		implements ServiceTrackerMapListener
+			<String, ResourceBundle, List<ResourceBundle>> {
+
+		public ResourceBundleTrackerServiceTrackerMapListener(
+			Map<String, ResourceBundle> resourceBundles) {
+
+			_resourceBundles = resourceBundles;
+		}
+
+		@Override
+		public void keyEmitted(
+			ServiceTrackerMap<String, List<ResourceBundle>>
+				serviceTrackerMap,
+			String languageId, ResourceBundle resourceBundle,
+			List<ResourceBundle> content) {
+
+			rebuildLanguageIds(serviceTrackerMap, languageId);
+		}
+
+		@Override
+		public void keyRemoved(
+			ServiceTrackerMap<String, List<ResourceBundle>>
+				serviceTrackerMap,
+			String languageId, ResourceBundle service,
+			List<ResourceBundle> content) {
+
+			rebuildLanguageIds(serviceTrackerMap, languageId);
+		}
+
+		private AggregateResourceBundle rebuildLanguageId(
+			String languageId, ServiceTrackerMap<String, List<ResourceBundle>>
+				serviceTrackerMap) {
+
+			List<ResourceBundle> resourceBundles = new ArrayList<>();
+
+			while (Validator.isNotNull(languageId)) {
+				List<ResourceBundle> service = serviceTrackerMap.getService(
+					languageId);
+
+				if (service != null) {
+					resourceBundles.addAll(service);
+				}
+
+				int indexOfUnderline = languageId.lastIndexOf(
+					StringPool.UNDERLINE);
+
+				if (indexOfUnderline > 0) {
+					languageId = languageId.substring(0, indexOfUnderline);
+				}
+				else {
+					break;
+				}
+			}
+
+			List<ResourceBundle> defaultResourceBundle =
+				serviceTrackerMap.getService("");
+
+			if (defaultResourceBundle != null) {
+				resourceBundles.addAll(defaultResourceBundle);
+			}
+
+			return new AggregateResourceBundle(
+				resourceBundles.toArray(
+					new ResourceBundle[resourceBundles.size()]));
+		}
+
+		private void rebuildLanguageIds(
+			ServiceTrackerMap<String, List<ResourceBundle>> serviceTrackerMap,
+			String languageId) {
+
+			synchronized (_resourceBundles) {
+				_resourceBundles.put(
+					languageId,
+					rebuildLanguageId(languageId, serviceTrackerMap));
+
+				List<String> languageIds = new ArrayList<>(
+					serviceTrackerMap.keySet());
+
+				Collections.sort(languageIds);
+
+				for (String subLanguageId : languageIds) {
+					if (subLanguageId.startsWith(languageId)) {
+						_resourceBundles.put(
+							languageId,
+							rebuildLanguageId(
+								subLanguageId, serviceTrackerMap));
+					}
+				}
+			}
+		}
+
+		private final Map<String, ResourceBundle> _resourceBundles;
+
+	}
 
 }

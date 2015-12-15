@@ -158,6 +158,20 @@ public class ServiceTrackerCollections {
 			clazz, filterString, serviceReferenceMapper, comparator);
 	}
 
+	public static <K, S> ServiceTrackerMap<K, List<S>> multiValueMap(
+		Class<S> clazz, String filterString,
+		ServiceReferenceMapper<K, ? super S> serviceReferenceMapper,
+		ServiceTrackerMapListener<K, ? super S, List<S>>
+			serviceTrackerMapListener) {
+
+		ServiceTrackerMapFactory serviceTrackerMapFactory =
+			ServiceTrackerMapFactoryUtil.getServiceTrackerMapFactory();
+
+		return serviceTrackerMapFactory.multiValueMap(
+			clazz, filterString, serviceReferenceMapper,
+			serviceTrackerMapListener);
+	}
+
 	public static <K, SR, S> ServiceTrackerMap<K, List<S>> multiValueMap(
 		Class<SR> clazz, String filterString,
 		ServiceReferenceMapper<K, ? super SR> serviceReferenceMapper,

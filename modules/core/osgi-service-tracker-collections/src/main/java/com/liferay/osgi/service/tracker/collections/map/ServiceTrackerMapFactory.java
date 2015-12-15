@@ -80,6 +80,19 @@ public class ServiceTrackerMapFactory {
 			serviceTrackerMapListener);
 	}
 
+	public static <K, S> ServiceTrackerMap<K, List<S>> multiValueMap(
+			BundleContext bundleContext, Class<S> clazz, String filterString,
+			ServiceReferenceMapper<K, S> serviceReferenceMapper,
+			ServiceTrackerMapListener<K, S, List<S>> serviceTrackerMapListener)
+		throws InvalidSyntaxException {
+
+		return new ServiceTrackerMapImpl<>(
+			bundleContext, clazz, filterString, serviceReferenceMapper,
+			new DefaultServiceTrackerCustomizer<S>(bundleContext),
+			new MultiValueServiceTrackerBucketFactory<S, S>(),
+			serviceTrackerMapListener);
+	}
+
 	public static <K, SR, S> ServiceTrackerMap<K, List<S>> multiValueMap(
 			BundleContext bundleContext, Class<SR> clazz, String filterString,
 			ServiceReferenceMapper<K, ? super SR> serviceReferenceMapper,

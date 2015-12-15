@@ -359,6 +359,13 @@ public class ListServiceTrackerMapTest {
 						trackedOnes.add(service);
 					}
 
+					@Override
+					public void keyRemoved(
+						ServiceTrackerMap<String, List<TrackedOne>> map,
+						String key, TrackedOne service,
+						List<TrackedOne> content) {
+					}
+
 				};
 
 		ServiceTrackerMap<String, List<TrackedOne>> serviceTrackerMap =

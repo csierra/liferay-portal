@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.servlet.FileTimestampUtil;
 import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.servlet.ServletContextProvider;
+import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletApp;
 import com.liferay.portal.model.PortletCategory;
@@ -73,6 +75,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -182,8 +185,26 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		Registry registry = RegistryUtil.getRegistry();
 
 		for (Locale locale : LanguageUtil.getAvailableLocales()) {
-			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-				portlet.getResourceBundle(), locale, classLoader);
+			ResourceBundle resourceBundle;
+
+			try {
+				resourceBundle = ResourceBundleUtil.getBundle(
+					portlet.getResourceBundle(), locale, classLoader);
+
+				resourceBundle = new AggregateResourceBundle(
+						resourceBundle,
+						LanguageResources.getResourceBundle(locale));
+			}
+			catch (MissingResourceException mre) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+							"Portlet " + portlet.getPortletName() + " does " +
+								"not have translations for available locale " +
+								locale);
+				}
+
+				resourceBundle = LanguageResources.getResourceBundle(locale);
+			}
 
 			Map<String, Object> properties = new HashMap<>();
 
