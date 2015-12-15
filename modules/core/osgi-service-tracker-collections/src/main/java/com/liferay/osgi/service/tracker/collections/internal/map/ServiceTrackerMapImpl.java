@@ -141,6 +141,20 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 
 			serviceTrackerBucket.remove(keyedServiceReferenceServiceTuple);
 
+			if (_serviceTrackerMapListener != null) {
+				try {
+					_serviceTrackerMapListener.keyRemoved(
+						ServiceTrackerMapImpl.this, emittedKey,
+						keyedServiceReferenceServiceTuple.getService(),
+						serviceTrackerBucket.getContent());
+				}
+				catch (Throwable t) {
+					_logger.log(
+						Logger.LOG_ERROR,
+						"Invocation to listener threw exception", t);
+				}
+			}
+
 			if (serviceTrackerBucket.isDisposable()) {
 				_serviceTrackerBuckets.remove(emittedKey);
 			}
