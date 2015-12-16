@@ -15,8 +15,12 @@
 package com.liferay.portal.kernel.portlet;
 
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.registry.collections.ServiceReferenceMapperFactory;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
@@ -92,51 +96,38 @@ public class ResourceBundleTracker implements Closeable {
 			rebuildLanguageIds(serviceTrackerMap, languageId);
 		}
 
-		private AggregateResourceBundle rebuildLanguageId(
-			String languageId, ServiceTrackerMap<String, List<ResourceBundle>>
+		private void rebuildLanguageId(
+			String languageId,
+			final ServiceTrackerMap<String, List<ResourceBundle>>
 				serviceTrackerMap) {
 
-			List<ResourceBundle> resourceBundles = new ArrayList<>();
+			ResourceBundleUtil.loadResourceBundles(_resourceBundles,
+				LocaleUtil.fromLanguageId(languageId),
+				new ResourceBundleLoader() {
+					@Override
+					public ResourceBundle loadResourceBundle(
+							String languageId) {
 
-			while (Validator.isNotNull(languageId)) {
-				List<ResourceBundle> service = serviceTrackerMap.getService(
-					languageId);
+						List<ResourceBundle> resourceBundles =
+								serviceTrackerMap.getService(languageId);
 
-				if (service != null) {
-					resourceBundles.addAll(service);
-				}
+						if (resourceBundles == null) {
+							return null;
+						}
 
-				int indexOfUnderline = languageId.lastIndexOf(
-					StringPool.UNDERLINE);
-
-				if (indexOfUnderline > 0) {
-					languageId = languageId.substring(0, indexOfUnderline);
-				}
-				else {
-					break;
-				}
-			}
-
-			List<ResourceBundle> defaultResourceBundle =
-				serviceTrackerMap.getService("");
-
-			if (defaultResourceBundle != null) {
-				resourceBundles.addAll(defaultResourceBundle);
-			}
-
-			return new AggregateResourceBundle(
-				resourceBundles.toArray(
-					new ResourceBundle[resourceBundles.size()]));
+						return new AggregateResourceBundle(
+							resourceBundles.toArray(new ResourceBundle[0]));
+					}
+				});
 		}
 
 		private void rebuildLanguageIds(
-			ServiceTrackerMap<String, List<ResourceBundle>> serviceTrackerMap,
+			final ServiceTrackerMap<String, List<ResourceBundle>>
+				serviceTrackerMap,
 			String languageId) {
 
 			synchronized (_resourceBundles) {
-				_resourceBundles.put(
-					languageId,
-					rebuildLanguageId(languageId, serviceTrackerMap));
+				rebuildLanguageId(languageId, serviceTrackerMap);
 
 				List<String> languageIds = new ArrayList<>(
 					serviceTrackerMap.keySet());
@@ -144,11 +135,8 @@ public class ResourceBundleTracker implements Closeable {
 				Collections.sort(languageIds);
 
 				for (String subLanguageId : languageIds) {
-					if (subLanguageId.startsWith(languageId)) {
-						_resourceBundles.put(
-							languageId,
-							rebuildLanguageId(
-								subLanguageId, serviceTrackerMap));
+					if (subLanguageId.startsWith(languageId + "_")) {
+						rebuildLanguageId(subLanguageId, serviceTrackerMap);
 					}
 				}
 			}
