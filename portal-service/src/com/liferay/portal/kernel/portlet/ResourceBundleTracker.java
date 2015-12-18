@@ -15,12 +15,8 @@
 package com.liferay.portal.kernel.portlet;
 
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.registry.collections.ServiceReferenceMapperFactory;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
@@ -28,12 +24,12 @@ import com.liferay.registry.collections.ServiceTrackerMapListener;
 
 import java.io.Closeable;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * @author Raymond Augé
@@ -58,7 +54,44 @@ public class ResourceBundleTracker implements Closeable {
 	}
 
 	public ResourceBundle getResourceBundle(String languageId) {
-		return _resourceBundles.get(languageId);
+		ResourceBundle resourceBundle;
+
+		synchronized (_resourceBundles) {
+			resourceBundle = _resourceBundles.get(languageId);
+
+			if (resourceBundle == null) {
+				ResourceBundleUtil.loadResourceBundles(
+					_resourceBundles, languageId, new ResourceBundleLoader() {
+						@Override
+						public ResourceBundle loadResourceBundle(
+							String languageId) {
+
+							List<ResourceBundle> resourceBundles =
+								_serviceTrackerMap.getService(languageId);
+
+							if ((resourceBundles == null) ||
+								resourceBundles.isEmpty()) {
+
+								return null;
+							}
+
+							int size = resourceBundles.size();
+
+							if (size == 1) {
+								return resourceBundles.get(0);
+							}
+
+							return new AggregateResourceBundle(
+								resourceBundles.toArray(
+									new ResourceBundle[size]));
+						}
+					});
+
+				resourceBundle = _resourceBundles.get(languageId);
+			}
+		}
+
+		return resourceBundle;
 	}
 
 	private final Map<String, ResourceBundle> _resourceBundles =
@@ -82,8 +115,6 @@ public class ResourceBundleTracker implements Closeable {
 				serviceTrackerMap,
 			String languageId, ResourceBundle resourceBundle,
 			List<ResourceBundle> content) {
-
-			rebuildLanguageIds(serviceTrackerMap, languageId);
 		}
 
 		@Override
@@ -93,50 +124,15 @@ public class ResourceBundleTracker implements Closeable {
 			String languageId, ResourceBundle service,
 			List<ResourceBundle> content) {
 
-			rebuildLanguageIds(serviceTrackerMap, languageId);
-		}
-
-		private void rebuildLanguageId(
-			String languageId,
-			final ServiceTrackerMap<String, List<ResourceBundle>>
-				serviceTrackerMap) {
-
-			ResourceBundleUtil.loadResourceBundles(_resourceBundles,
-				LocaleUtil.fromLanguageId(languageId),
-				new ResourceBundleLoader() {
-					@Override
-					public ResourceBundle loadResourceBundle(
-							String languageId) {
-
-						List<ResourceBundle> resourceBundles =
-								serviceTrackerMap.getService(languageId);
-
-						if (resourceBundles == null) {
-							return null;
-						}
-
-						return new AggregateResourceBundle(
-							resourceBundles.toArray(new ResourceBundle[0]));
-					}
-				});
-		}
-
-		private void rebuildLanguageIds(
-			final ServiceTrackerMap<String, List<ResourceBundle>>
-				serviceTrackerMap,
-			String languageId) {
-
 			synchronized (_resourceBundles) {
-				rebuildLanguageId(languageId, serviceTrackerMap);
+				Set<String> keySet = _resourceBundles.keySet();
+				Iterator<String> iterator = keySet.iterator();
 
-				List<String> languageIds = new ArrayList<>(
-					serviceTrackerMap.keySet());
+				while (iterator.hasNext()) {
+					String subLanguageId = iterator.next();
 
-				Collections.sort(languageIds);
-
-				for (String subLanguageId : languageIds) {
-					if (subLanguageId.startsWith(languageId + "_")) {
-						rebuildLanguageId(subLanguageId, serviceTrackerMap);
+					if (subLanguageId.startsWith(languageId)) {
+						iterator.remove();
 					}
 				}
 			}
