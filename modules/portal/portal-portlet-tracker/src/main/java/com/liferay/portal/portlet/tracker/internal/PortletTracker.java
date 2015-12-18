@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.portlet.RestrictPortletServletRequest;
 import com.liferay.portal.kernel.servlet.PortletServlet;
-import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -395,13 +394,24 @@ public class PortletTracker
 		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			ResourceBundle resourceBundle;
 
+			Dictionary<String, Object> properties;
+
 			try {
 				resourceBundle = ResourceBundleUtil.getBundle(
 					portletModel.getResourceBundle(), locale, classLoader);
 
-				resourceBundle = new AggregateResourceBundle(
-					resourceBundle,
-					LanguageResources.getResourceBundle(locale));
+				properties = new HashMapDictionary<>();
+
+				properties.put(
+					"javax.portlet.name", portletModel.getPortletId());
+				properties.put("language.id", LocaleUtil.toLanguageId(locale));
+
+				ServiceRegistration<ResourceBundle> serviceRegistration =
+					bundleContext.registerService(
+						ResourceBundle.class, resourceBundle, properties);
+
+				serviceRegistrations.addServiceRegistration(
+					serviceRegistration);
 			}
 			catch (MissingResourceException mre) {
 				if (_log.isInfoEnabled()) {
@@ -410,18 +420,18 @@ public class PortletTracker
 							"not have translations for available locale " +
 						locale);
 				}
-
-				resourceBundle = LanguageResources.getResourceBundle(locale);
 			}
 
-			Dictionary<String, Object> properties = new HashMapDictionary<>();
+			properties = new HashMapDictionary<>();
 
 			properties.put("javax.portlet.name", portletModel.getPortletId());
-			properties.put("language.id", LocaleUtil.toLanguageId(locale));
+			properties.put("language.id", StringPool.BLANK);
+			properties.put("service.ranking", Integer.MIN_VALUE);
 
 			ServiceRegistration<ResourceBundle> serviceRegistration =
 				bundleContext.registerService(
-					ResourceBundle.class, resourceBundle, properties);
+					ResourceBundle.class,
+					LanguageResources.getResourceBundle(locale), properties);
 
 			serviceRegistrations.addServiceRegistration(serviceRegistration);
 		}
