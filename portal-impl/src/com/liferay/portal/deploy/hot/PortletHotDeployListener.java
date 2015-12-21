@@ -187,13 +187,21 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			ResourceBundle resourceBundle;
 
+			Map<String, Object> properties = new HashMap<>();
+
 			try {
 				resourceBundle = ResourceBundleUtil.getBundle(
 					portlet.getResourceBundle(), locale, classLoader);
 
-				resourceBundle = new AggregateResourceBundle(
-						resourceBundle,
-						LanguageResources.getResourceBundle(locale));
+				properties.put("language.id", LocaleUtil.toLanguageId(locale));
+				properties.put("javax.portlet.name", portlet.getPortletId());
+
+				ServiceRegistration<ResourceBundle> serviceRegistration =
+						registry.registerService(
+								ResourceBundle.class, resourceBundle, properties);
+
+				_serviceRegistrations.put(resourceBundle, serviceRegistration);
+
 			}
 			catch (MissingResourceException mre) {
 				if (_log.isInfoEnabled()) {
@@ -202,18 +210,20 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 								"not have translations for available locale " +
 								locale);
 				}
-
-				resourceBundle = LanguageResources.getResourceBundle(locale);
 			}
 
-			Map<String, Object> properties = new HashMap<>();
+			properties = new HashMap<>();
 
 			properties.put("language.id", LocaleUtil.toLanguageId(locale));
 			properties.put("javax.portlet.name", portlet.getPortletId());
+			properties.put("service.ranking", Integer.MIN_VALUE);
+
+			resourceBundle = LanguageResources.getResourceBundle(locale);
 
 			ServiceRegistration<ResourceBundle> serviceRegistration =
 				registry.registerService(
-					ResourceBundle.class, resourceBundle, properties);
+					ResourceBundle.class,
+						resourceBundle, properties);
 
 			_serviceRegistrations.put(resourceBundle, serviceRegistration);
 		}
