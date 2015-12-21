@@ -425,7 +425,7 @@ public class PortletTracker
 			properties = new HashMapDictionary<>();
 
 			properties.put("javax.portlet.name", portletModel.getPortletId());
-			properties.put("language.id", StringPool.BLANK);
+			properties.put("language.id", LocaleUtil.toLanguageId(locale));
 			properties.put("service.ranking", Integer.MIN_VALUE);
 
 			ServiceRegistration<ResourceBundle> serviceRegistration =
