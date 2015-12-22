@@ -410,6 +410,14 @@ public class ListServiceTrackerMapTest {
 						}
 					}
 
+					@Override
+					public void keyRemoved(
+							ServiceTrackerMap<String, List<TrackedOne>> map,
+							String key, TrackedOne service,
+							List<TrackedOne> content) {
+
+					}
+
 				};
 
 		ServiceTrackerMap<String, List<TrackedOne>> serviceTrackerMap =
@@ -460,6 +468,14 @@ public class ListServiceTrackerMapTest {
 						catch (Throwable t) {
 							throwables.add(t);
 						}
+					}
+
+					@Override
+					public void keyRemoved(
+						ServiceTrackerMap<String, List<TrackedOne>> map,
+						String key, TrackedOne service,
+						List<TrackedOne> content) {
+
 					}
 
 				};

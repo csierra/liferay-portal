@@ -206,8 +206,8 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			catch (MissingResourceException mre) {
 				if (_log.isInfoEnabled()) {
 					_log.info(
-							"Portlet " + portlet.getPortletName() + " does " +
-								"not have translations for available locale " +
+						"Portlet " + portlet.getPortletName() + " does " +
+							"not have translations for available locale " +
 								locale);
 				}
 			}
