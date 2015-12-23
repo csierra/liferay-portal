@@ -959,8 +959,17 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 						input="${testray.testcase.warnings}"
 						override="true"
 						property="testray.testcase.warnings"
-						regexp="]]>([\S]+)"
-						replace="&amp;#93;&amp;#93;&amp;gt;\1"
+						regexp="(?&lt;!&lt;value&gt;\s?)&lt;!\\?\[CDATA\\?\["
+						replace="&amp;lt;!&amp;#91;CDATA&amp;#91;"
+					/>
+
+					<propertyregex
+						global="true"
+						input="${testray.testcase.warnings}"
+						override="true"
+						property="testray.testcase.warnings"
+						regexp="\\?]\\?]&gt;(?!\s*&lt;\/value&gt;)"
+						replace="&amp;#93;&amp;#93;&amp;gt;"
 					/>
 				</then>
 			</if>
@@ -1451,19 +1460,33 @@ ${portal.legacy.file.content}</echo>
 						<![CDATA[
 tell application "System Events"
 	tell process "Safari"
-		set frontmost to true
-
-		repeat until (exists window 1) and subrole of window 1 is "AXDialog" -- wait until the dialog is displayed.
+		repeat until (exists window 1) and subrole of window 1 is "AXDialog"
 			delay 1
 		end repeat
 
-		click button 1 of front window -- install
+		click button 1 of front window
 	end tell
 end tell
 
 tell application "Safari" to quit
 						]]>
 					</echo>
+
+					<if>
+						<contains string="${os.version}" substring="10.11" />
+						<then>
+							<replace file="tools/selenium/safaridriver.scpt">
+								<replacefilter>
+									<replacetoken><![CDATA[repeat until (exists window 1) and subrole of window 1 is "AXDialog"]]></replacetoken>
+									<replacevalue><![CDATA[repeat until exists button 1 of sheet 1 of window 1]]></replacevalue>
+								</replacefilter>
+								<replacefilter>
+									<replacetoken><![CDATA[click button 1 of front window]]></replacetoken>
+									<replacevalue><![CDATA[click button 1 of sheet 1 of window 1]]></replacevalue>
+								</replacefilter>
+							</replace>
+						</then>
+					</if>
 
 					<execute>
 						osascript ${basedir.unix}/tools/selenium/safaridriver.scpt
@@ -2812,6 +2835,12 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<then>
 						<property name="portal.version.url.path" value="6.1.2-ga3" />
 					</then>
+					<elseif>
+						<equals arg1="${portal.version}" arg2="6.2.3" />
+						<then>
+							<property name="portal.version.url.path" value="6.2.3-ga4" />
+						</then>
+					</elseif>
 					<else>
 						<property name="portal.version.url.path" value="${portal.version}" />
 					</else>
@@ -2821,6 +2850,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<or>
 						<equals arg1="${portal.version}" arg2="6.0.6" />
 						<equals arg1="${portal.version}" arg2="6.1.2" />
+						<equals arg1="${portal.version}" arg2="6.2.3" />
 					</or>
 					<then>
 						<propertycopy from="sql.legacy.base.url[ce]" name="sql.legacy.base.url" />
@@ -5044,15 +5074,6 @@ module.framework.properties.osgi.console=11312</echo>
 		</if>
 
 		<if>
-			<isset property="test.assert.warning.exceptions" />
-			<then>
-				<echo append="true" file="${test.ext.properties.file}">
-					test.assert.warning.exceptions=${test.assert.warning.exceptions}
-				</echo>
-			</then>
-		</if>
-
-		<if>
 			<isset property="test.base.dir.name" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
@@ -5792,6 +5813,17 @@ module.framework.properties.osgi.console=11312</echo>
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
 					test.assert.javascript.errors=false
+				</echo>
+			</then>
+		</if>
+
+		<get-testcase-property property.name="test.assert.warning.exceptions" />
+
+		<if>
+			<isset property="test.assert.warning.exceptions" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					test.assert.warning.exceptions=${test.assert.warning.exceptions}
 				</echo>
 			</then>
 		</if>
