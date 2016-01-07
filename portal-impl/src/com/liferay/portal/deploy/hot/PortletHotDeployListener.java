@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.servlet.FileTimestampUtil;
 import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.servlet.ServletContextProvider;
-import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -198,10 +197,10 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 				ServiceRegistration<ResourceBundle> serviceRegistration =
 						registry.registerService(
-								ResourceBundle.class, resourceBundle, properties);
+								ResourceBundle.class, resourceBundle,
+								properties);
 
 				_serviceRegistrations.put(resourceBundle, serviceRegistration);
-
 			}
 			catch (MissingResourceException mre) {
 				if (_log.isInfoEnabled()) {
@@ -222,8 +221,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 			ServiceRegistration<ResourceBundle> serviceRegistration =
 				registry.registerService(
-					ResourceBundle.class,
-						resourceBundle, properties);
+					ResourceBundle.class, resourceBundle, properties);
 
 			_serviceRegistrations.put(resourceBundle, serviceRegistration);
 		}

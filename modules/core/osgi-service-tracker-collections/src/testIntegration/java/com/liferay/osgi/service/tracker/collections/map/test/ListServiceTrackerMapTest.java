@@ -415,7 +415,6 @@ public class ListServiceTrackerMapTest {
 							ServiceTrackerMap<String, List<TrackedOne>> map,
 							String key, TrackedOne service,
 							List<TrackedOne> content) {
-
 					}
 
 				};
@@ -475,7 +474,6 @@ public class ListServiceTrackerMapTest {
 						ServiceTrackerMap<String, List<TrackedOne>> map,
 						String key, TrackedOne service,
 						List<TrackedOne> content) {
-
 					}
 
 				};

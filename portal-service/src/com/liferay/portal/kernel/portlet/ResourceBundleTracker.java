@@ -85,6 +85,7 @@ public class ResourceBundleTracker implements Closeable {
 								resourceBundles.toArray(
 									new ResourceBundle[size]));
 						}
+
 					});
 
 				resourceBundle = _resourceBundles.get(languageId);
