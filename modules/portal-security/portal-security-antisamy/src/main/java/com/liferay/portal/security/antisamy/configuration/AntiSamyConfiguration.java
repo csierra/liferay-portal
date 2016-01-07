@@ -23,9 +23,13 @@ import com.liferay.configuration.admin.ConfigurationAdmin;
  */
 @ConfigurationAdmin(category = "platform")
 @Meta.OCD(
-	id = "com.liferay.portal.security.antisamy.configuration.AntiSamyConfiguration"
+	id = "com.liferay.portal.security.antisamy.configuration.AntiSamyConfiguration",
+	localization = "content/Language", name = "%anti.samy.configuration.name"
 )
 public interface AntiSamyConfiguration {
+
+	@Meta.AD(required = false)
+	public String[] blacklist();
 
 	@Meta.AD(
 		deflt = "/META-INF/resources/sanitizer-configuration.xml",
@@ -35,5 +39,8 @@ public interface AntiSamyConfiguration {
 
 	@Meta.AD(deflt = "true", required = false)
 	public boolean enabled();
+
+	@Meta.AD(required = false)
+	public String[] whitelist();
 
 }

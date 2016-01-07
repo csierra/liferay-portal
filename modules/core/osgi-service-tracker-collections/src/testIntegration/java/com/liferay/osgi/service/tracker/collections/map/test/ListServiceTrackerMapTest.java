@@ -360,6 +360,13 @@ public class ListServiceTrackerMapTest {
 						trackedOnes.add(service);
 					}
 
+					@Override
+					public void keyRemoved(
+						ServiceTrackerMap<String, List<TrackedOne>> map,
+						String key, TrackedOne service,
+						List<TrackedOne> content) {
+					}
+
 				};
 
 		ServiceTrackerMap<String, List<TrackedOne>> serviceTrackerMap =
@@ -401,6 +408,14 @@ public class ListServiceTrackerMapTest {
 						}
 						catch (Exception e) {
 						}
+					}
+
+					@Override
+					public void keyRemoved(
+							ServiceTrackerMap<String, List<TrackedOne>> map,
+							String key, TrackedOne service,
+							List<TrackedOne> content) {
+
 					}
 
 				};
@@ -453,6 +468,14 @@ public class ListServiceTrackerMapTest {
 						catch (Throwable t) {
 							throwables.add(t);
 						}
+					}
+
+					@Override
+					public void keyRemoved(
+						ServiceTrackerMap<String, List<TrackedOne>> map,
+						String key, TrackedOne service,
+						List<TrackedOne> content) {
+
 					}
 
 				};
@@ -548,20 +571,18 @@ public class ListServiceTrackerMapTest {
 	}
 
 	protected ServiceTrackerMap<String, List<TrackedOne>>
-		createServiceTrackerMap(
-			ServiceTrackerMapListener
-				<String, TrackedOne,
-			List<TrackedOne>> serviceTrackerMapListener)
+			createServiceTrackerMap(
+				ServiceTrackerMapListener<String, TrackedOne, List<TrackedOne>>
+					serviceTrackerMapListener)
 		throws InvalidSyntaxException {
 
 		return ServiceTrackerMapFactory.openMultiValueMap(
-				_bundleContext, TrackedOne.class, null,
-				new PropertyServiceReferenceMapper<String, TrackedOne>(
-					"target"),
-				new DefaultServiceTrackerCustomizer<TrackedOne>(_bundleContext),
-				new PropertyServiceReferenceComparator<TrackedOne>(
-					"service.ranking"),
-				serviceTrackerMapListener);
+			_bundleContext, TrackedOne.class, null,
+			new PropertyServiceReferenceMapper<String, TrackedOne>("target"),
+			new DefaultServiceTrackerCustomizer<TrackedOne>(_bundleContext),
+			new PropertyServiceReferenceComparator<TrackedOne>(
+				"service.ranking"),
+			serviceTrackerMapListener);
 	}
 
 	protected ServiceRegistration<TrackedOne> registerService(

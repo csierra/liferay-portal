@@ -468,33 +468,6 @@
 							'aui-base'
 						]
 					},
-					'liferay-management-bar': {
-						path: 'management_bar.js',
-						requires: [
-							'aui-component',
-							'liferay-portlet-base'
-						]
-					},
-					'liferay-map-base': {
-						path: 'map_base.js',
-						requires: [
-							'aui-base'
-						]
-					},
-					'liferay-map-google': {
-						path: 'map_google.js',
-						requires: [
-							'liferay-map-base'
-						]
-					},
-					'liferay-map-openstreet': {
-						path: 'map_openstreet.js',
-						requires: [
-							'jsonp',
-							'liferay-map-base',
-							'timers'
-						]
-					},
 					'liferay-menu': {
 						path: 'menu.js',
 						requires: [
@@ -588,6 +561,12 @@
 						requires: [
 							'aui-base',
 							'transition'
+						]
+					},
+					'liferay-notification': {
+						path: 'notification.js',
+						requires: [
+							'liferay-alert'
 						]
 					},
 					'liferay-pagination': {
@@ -713,7 +692,7 @@
 							'aui-io-request',
 							'aui-timer',
 							'cookie',
-							'liferay-alert'
+							'liferay-notification'
 						]
 					},
 					'liferay-sign-in-modal': {
