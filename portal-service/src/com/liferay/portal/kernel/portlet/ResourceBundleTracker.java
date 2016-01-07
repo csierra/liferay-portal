@@ -61,7 +61,9 @@ public class ResourceBundleTracker implements Closeable {
 
 			if (resourceBundle == null) {
 				ResourceBundleUtil.loadResourceBundles(
-					_resourceBundles, languageId, new ResourceBundleLoader() {
+					_resourceBundles, languageId,
+					new ResourceBundleLoader() {
+
 						@Override
 						public ResourceBundle loadResourceBundle(
 							String languageId) {
