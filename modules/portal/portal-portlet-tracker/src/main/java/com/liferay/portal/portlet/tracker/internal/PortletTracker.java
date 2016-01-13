@@ -1476,10 +1476,6 @@ public class PortletTracker
 
 	private class RestrictPortletServletRequestFilter implements Filter {
 
-		public RestrictPortletServletRequestFilter(ClassLoader classLoader) {
-			_classLoader = classLoader;
-		}
-
 		@Override
 		public void destroy() {
 		}
@@ -1490,18 +1486,10 @@ public class PortletTracker
 				FilterChain filterChain)
 			throws IOException, ServletException {
 
-			Thread thread = Thread.currentThread();
-
-			ClassLoader contextClassLoader = thread.getContextClassLoader();
-
-			thread.setContextClassLoader(_classLoader);
-
 			try {
 				filterChain.doFilter(servletRequest, servletResponse);
 			}
 			finally {
-				thread.setContextClassLoader(contextClassLoader);
-
 				PortletRequest portletRequest =
 					(PortletRequest)servletRequest.getAttribute(
 						JavaConstants.JAVAX_PORTLET_REQUEST);
@@ -1537,8 +1525,6 @@ public class PortletTracker
 		@Override
 		public void init(FilterConfig filterConfig) throws ServletException {
 		}
-
-		private final ClassLoader _classLoader;
 
 	}
 
