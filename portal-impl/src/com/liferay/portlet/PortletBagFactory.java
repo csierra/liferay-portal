@@ -230,6 +230,23 @@ public class PortletBagFactory {
 		_warFile = warFile;
 	}
 
+	protected boolean contains(
+		ServiceTrackerList<PortletDataHandler> portletDataHandlerInstances,
+		String portletDataHandlerClassName) {
+
+		for (PortletDataHandler portletDataHandler :
+				portletDataHandlerInstances ) {
+
+			if (portletDataHandler.getClass().getName().equals(
+					portletDataHandlerClassName)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	protected String getContent(String fileName) throws Exception {
 		String queryString = HttpUtil.getQueryString(fileName);
 
@@ -580,7 +597,10 @@ public class PortletBagFactory {
 		String portletDataHandlerClassName =
 			portlet.getPortletDataHandlerClass();
 
-		if (Validator.isNotNull(portletDataHandlerClassName)) {
+		if (Validator.isNotNull(portletDataHandlerClassName) &&
+			!contains(
+				portletDataHandlerInstances, portletDataHandlerClassName)) {
+
 			PortletDataHandler portletDataHandlerInstance =
 				(PortletDataHandler)newInstance(
 					PortletDataHandler.class, portletDataHandlerClassName);
