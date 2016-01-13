@@ -577,11 +577,13 @@ public class PortletBagFactory {
 			ServiceTrackerCollections.openList(
 				PortletDataHandler.class, filter, properties);
 
-		if (Validator.isNotNull(portlet.getPortletDataHandlerClass())) {
+		String portletDataHandlerClassName =
+			portlet.getPortletDataHandlerClass();
+
+		if (Validator.isNotNull(portletDataHandlerClassName)) {
 			PortletDataHandler portletDataHandlerInstance =
 				(PortletDataHandler)newInstance(
-					PortletDataHandler.class,
-					portlet.getPortletDataHandlerClass());
+					PortletDataHandler.class, portletDataHandlerClassName);
 
 			portletDataHandlerInstance.setPortletId(portlet.getPortletId());
 
