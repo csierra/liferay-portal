@@ -601,13 +601,24 @@ public class PortletBagFactory {
 			!contains(
 				portletDataHandlerInstances, portletDataHandlerClassName)) {
 
-			PortletDataHandler portletDataHandlerInstance =
-				(PortletDataHandler)newInstance(
-					PortletDataHandler.class, portletDataHandlerClassName);
+			try {
+				PortletDataHandler portletDataHandlerInstance =
+						(PortletDataHandler)newInstance(
+								PortletDataHandler.class,
+								portletDataHandlerClassName);
+				portletDataHandlerInstance.setPortletId(portlet.getPortletId());
 
-			portletDataHandlerInstance.setPortletId(portlet.getPortletId());
-
-			portletDataHandlerInstances.add(portletDataHandlerInstance);
+				portletDataHandlerInstances.add(portletDataHandlerInstance);
+			}
+			catch (ClassCastException classCastException) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Cannot find PortletDataHandler " +
+						portletDataHandlerClassName +
+						" from classpath for portlet " +
+						portlet.getPortletId());
+				}
+			}
 		}
 
 		return portletDataHandlerInstances;
