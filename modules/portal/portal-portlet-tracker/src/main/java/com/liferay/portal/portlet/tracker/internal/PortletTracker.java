@@ -15,7 +15,6 @@
 package com.liferay.portal.portlet.tracker.internal;
 
 import com.liferay.osgi.util.ServiceTrackerFactory;
-import com.liferay.osgi.util.classloader.PassThroughClassLoader;
 import com.liferay.portal.kernel.application.type.ApplicationType;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
@@ -28,6 +27,8 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.portlet.RestrictPortletServletRequest;
+import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -54,8 +55,6 @@ import com.liferay.portal.model.PortletInfo;
 import com.liferay.portal.model.PortletInstance;
 import com.liferay.portal.model.PublicRenderParameter;
 import com.liferay.portal.model.impl.PublicRenderParameterImpl;
-import com.liferay.portal.security.permission.ResourceActions;
-import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.CompanyLocalService;
 import com.liferay.portal.service.PortletLocalService;
 import com.liferay.portal.service.ResourceActionLocalService;
@@ -278,8 +277,7 @@ public class PortletTracker
 
 		BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
 
-		PassThroughClassLoader passThroughClassLoader =
-			new PassThroughClassLoader(bundleWiring.getClassLoader());
+		ClassLoader passThroughClassLoader = bundleWiring.getClassLoader();
 
 		Thread thread = Thread.currentThread();
 
@@ -326,7 +324,7 @@ public class PortletTracker
 				bundlePortletApp.getServletContext());
 			portletBagFactory.setWARFile(true);
 
-			portletBagFactory.create(portletModel);
+			portletBagFactory.create(portletModel, true);
 
 			checkWebResources(
 				bundle.getBundleContext(),
