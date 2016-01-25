@@ -60,7 +60,7 @@ refererURL.setParameter("updateLayout", "true");
 			%>
 
 			<div class="lfr-content-category panel-page-category">
-				<a class="collapse-icon list-group-heading" data-toggle="collapse" href="#<%= panelId %>">
+				<a class="collapse-icon collapse-icon-middle list-group-heading" data-toggle="collapse" href="#<%= panelId %>">
 					<liferay-ui:message key="highlighted" />
 
 					<aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon" />
@@ -166,9 +166,9 @@ refererURL.setParameter("updateLayout", "true");
 			PortletURL marketplaceURL = PortalUtil.getControlPanelPortletURL(request, PortletKeys.MARKETPLACE_STORE, PortletRequest.RENDER_PHASE);
 			%>
 
-			<aui:button-row>
+			<div class="button-holder">
 				<aui:button cssClass="btn-lg btn-primary" href="<%= marketplaceURL.toString() %>" value="install-more-applications" />
-			</aui:button-row>
+			</div>
 		</c:if>
 	</div>
 </aui:form>
