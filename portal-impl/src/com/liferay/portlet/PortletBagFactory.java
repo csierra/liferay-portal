@@ -230,6 +230,23 @@ public class PortletBagFactory {
 		_warFile = warFile;
 	}
 
+	protected boolean contains(
+		ServiceTrackerList<PortletDataHandler> portletDataHandlerInstances,
+		String portletDataHandlerClassName) {
+
+		for (PortletDataHandler portletDataHandler :
+				portletDataHandlerInstances ) {
+
+			if (portletDataHandler.getClass().getName().equals(
+					portletDataHandlerClassName)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	protected String getContent(String fileName) throws Exception {
 		String queryString = HttpUtil.getQueryString(fileName);
 
@@ -577,15 +594,31 @@ public class PortletBagFactory {
 			ServiceTrackerCollections.openList(
 				PortletDataHandler.class, filter, properties);
 
-		if (Validator.isNotNull(portlet.getPortletDataHandlerClass())) {
-			PortletDataHandler portletDataHandlerInstance =
-				(PortletDataHandler)newInstance(
-					PortletDataHandler.class,
-					portlet.getPortletDataHandlerClass());
+		String portletDataHandlerClassName =
+			portlet.getPortletDataHandlerClass();
 
-			portletDataHandlerInstance.setPortletId(portlet.getPortletId());
+		if (Validator.isNotNull(portletDataHandlerClassName) &&
+			!contains(
+				portletDataHandlerInstances, portletDataHandlerClassName)) {
 
-			portletDataHandlerInstances.add(portletDataHandlerInstance);
+			try {
+				PortletDataHandler portletDataHandlerInstance =
+						(PortletDataHandler)newInstance(
+								PortletDataHandler.class,
+								portletDataHandlerClassName);
+				portletDataHandlerInstance.setPortletId(portlet.getPortletId());
+
+				portletDataHandlerInstances.add(portletDataHandlerInstance);
+			}
+			catch (ClassCastException classCastException) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Cannot find PortletDataHandler " +
+						portletDataHandlerClassName +
+						" from classpath for portlet " +
+						portlet.getPortletId());
+				}
+			}
 		}
 
 		return portletDataHandlerInstances;
