@@ -798,8 +798,9 @@ public class ServicePreAction extends Action {
 		themeDisplay.setPathFriendlyURLPublic(friendlyURLPublicPath);
 		themeDisplay.setPathImage(imagePath);
 		themeDisplay.setPathJavaScript(
-			PortalWebResourcesUtil.getContextPath(
-				PortalWebResourceConstants.RESOURCE_TYPE_JS));
+			PortalUtil.getPathProxy() +
+				PortalWebResourcesUtil.getContextPath(
+					PortalWebResourceConstants.RESOURCE_TYPE_JS));
 		themeDisplay.setPathMain(mainPath);
 		themeDisplay.setPathSound(contextPath.concat("/html/sound"));
 		themeDisplay.setPermissionChecker(permissionChecker);
