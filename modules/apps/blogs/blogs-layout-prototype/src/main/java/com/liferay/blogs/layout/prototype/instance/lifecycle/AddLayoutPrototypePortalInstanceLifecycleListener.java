@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -60,22 +61,24 @@ public class AddLayoutPrototypePortalInstanceLifecycleListener
 		addBlogPage(company.getCompanyId(), defaultUserId, layoutPrototypes);
 	}
 
+	@Activate
+	protected void activate() {
+		_resourceBundleLoader = new AggregateResourceBundleLoader(
+			ResourceBundleUtil.getResourceBundleLoader(
+				"content.Language", getClassLoader()),
+			LanguageResources.RESOURCE_BUNDLE_LOADER);
+	}
+
 	protected void addBlogPage(
 			long companyId, long defaultUserId,
 			List<LayoutPrototype> layoutPrototypes)
 		throws Exception {
 
-		ResourceBundleLoader resourceBundleLoader =
-			new AggregateResourceBundleLoader(
-				ResourceBundleUtil.getResourceBundleLoader(
-					"content.Language", getClassLoader()),
-				LanguageResources.RESOURCE_BUNDLE_LOADER);
-
 		Map<Locale, String> descriptionMap =
 			ResourceBundleUtil.getLocalizationMap(
-				resourceBundleLoader, "layout-prototype-blog-description");
+				_resourceBundleLoader, "layout-prototype-blog-description");
 		Map<Locale, String> nameMap = ResourceBundleUtil.getLocalizationMap(
-			resourceBundleLoader, "layout-prototype-blog-title");
+			_resourceBundleLoader, "layout-prototype-blog-title");
 
 		Layout layout = DefaultLayoutPrototypesUtil.addLayoutPrototype(
 			companyId, defaultUserId, nameMap, descriptionMap, "2_columns_iii",
@@ -135,6 +138,7 @@ public class AddLayoutPrototypePortalInstanceLifecycleListener
 	}
 
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
+	private ResourceBundleLoader _resourceBundleLoader;
 	private UserLocalService _userLocalService;
 
 }

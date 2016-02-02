@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -65,22 +66,24 @@ public class AddLayoutPrototypePortalInstanceLifecycleListener
 			company.getCompanyId(), defaultUserId, layoutPrototypes);
 	}
 
+	@Activate
+	protected void activate() {
+		_resourceBundleLoader = new AggregateResourceBundleLoader(
+			ResourceBundleUtil.getResourceBundleLoader(
+				"content.Language", getClassLoader()),
+			LanguageResources.RESOURCE_BUNDLE_LOADER);
+	}
+
 	protected void addWebContentPage(
 			long companyId, long defaultUserId,
 			List<LayoutPrototype> layoutPrototypes)
 		throws Exception {
 
-		ResourceBundleLoader resourceBundleLoader =
-			new AggregateResourceBundleLoader(
-				ResourceBundleUtil.getResourceBundleLoader(
-					"content.Language", getClassLoader()),
-				LanguageResources.RESOURCE_BUNDLE_LOADER);
-
 		Map<Locale, String> nameMap = ResourceBundleUtil.getLocalizationMap(
-			resourceBundleLoader, "layout-prototype-web-content-title");
+			_resourceBundleLoader, "layout-prototype-web-content-title");
 		Map<Locale, String> descriptionMap =
 			ResourceBundleUtil.getLocalizationMap(
-				resourceBundleLoader,
+				_resourceBundleLoader,
 				"layout-prototype-web-content-description");
 
 		Layout layout = DefaultLayoutPrototypesUtil.addLayoutPrototype(
@@ -172,6 +175,7 @@ public class AddLayoutPrototypePortalInstanceLifecycleListener
 
 	private LayoutLocalService _layoutLocalService;
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
+	private ResourceBundleLoader _resourceBundleLoader;
 	private UserLocalService _userLocalService;
 
 }

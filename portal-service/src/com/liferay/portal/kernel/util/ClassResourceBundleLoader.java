@@ -14,11 +14,14 @@
 
 package com.liferay.portal.kernel.util;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
  * @author Adolfo Pérez
+ * @author Carlos Sierra
  */
 public class ClassResourceBundleLoader implements ResourceBundleLoader {
 
@@ -33,12 +36,37 @@ public class ClassResourceBundleLoader implements ResourceBundleLoader {
 
 	@Override
 	public ResourceBundle loadResourceBundle(String languageId) {
-		Locale locale = LocaleUtil.fromLanguageId(languageId);
+		if (_resourceBundles.containsKey(languageId)) {
+			return _resourceBundles.get(languageId);
+		}
+		else {
+			synchronized (_resourceBundles) {
+				if (_resourceBundles.containsKey(languageId)) {
+					return _resourceBundles.get(languageId);
+				}
 
-		return ResourceBundleUtil.getBundle(_baseName, locale, _classLoader);
+				ResourceBundle resourceBundle;
+
+				Locale locale = LocaleUtil.fromLanguageId(languageId);
+
+				try {
+					resourceBundle = ResourceBundleUtil.getBundle(
+						_baseName, locale, _classLoader);
+				}
+				catch (Exception e) {
+					resourceBundle = null;
+				}
+
+				_resourceBundles.put(languageId, resourceBundle);
+
+				return resourceBundle;
+			}
+		}
 	}
 
 	private final String _baseName;
 	private final ClassLoader _classLoader;
+	private final Map<String, ResourceBundle> _resourceBundles =
+		new HashMap<>();
 
 }

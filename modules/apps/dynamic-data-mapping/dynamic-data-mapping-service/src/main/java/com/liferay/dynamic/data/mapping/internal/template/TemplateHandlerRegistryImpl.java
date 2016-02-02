@@ -225,6 +225,15 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 			TemplateHandler templateHandler) {
 
 			_templateHandler = templateHandler;
+
+			Class<?> clazz = _templateHandler.getClass();
+
+			_templateHandlerClassLoader = clazz.getClassLoader();
+
+			_resourceBundleLoader = new AggregateResourceBundleLoader(
+				ResourceBundleUtil.getResourceBundleLoader(
+					"content.Language", _templateHandlerClassLoader),
+				LanguageResources.RESOURCE_BUNDLE_LOADER);
 		}
 
 		@Override
@@ -258,21 +267,11 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 					continue;
 				}
 
-				Class<?> clazz = _templateHandler.getClass();
-
-				ClassLoader classLoader = clazz.getClassLoader();
-
-				ResourceBundleLoader resourceBundleLoader =
-					new AggregateResourceBundleLoader(
-						ResourceBundleUtil.getResourceBundleLoader(
-							"content.Language", classLoader),
-						LanguageResources.RESOURCE_BUNDLE_LOADER);
-
 				Map<Locale, String> nameMap = getLocalizationMap(
-					resourceBundleLoader, group.getGroupId(),
+					_resourceBundleLoader, group.getGroupId(),
 					templateElement.elementText("name"));
 				Map<Locale, String> descriptionMap = getLocalizationMap(
-					resourceBundleLoader, group.getGroupId(),
+					_resourceBundleLoader, group.getGroupId(),
 					templateElement.elementText("description"));
 
 				String type = templateElement.elementText("type");
@@ -286,7 +285,8 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 				String scriptFileName = templateElement.elementText(
 					"script-file");
 
-				String script = StringUtil.read(classLoader, scriptFileName);
+				String script = StringUtil.read(
+					_templateHandlerClassLoader, scriptFileName);
 
 				boolean cacheable = GetterUtil.getBoolean(
 					templateElement.elementText("cacheable"));
@@ -325,7 +325,9 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 		private static final String _PORTLET_DISPLAY_TEMPLATE_CLASS_NAME =
 			"com.liferay.portlet.display.template.PortletDisplayTemplate";
 
+		private final ResourceBundleLoader _resourceBundleLoader;
 		private final TemplateHandler _templateHandler;
+		private final ClassLoader _templateHandlerClassLoader;
 
 	}
 
