@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Portlet;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.comparator.PortletNameComparator;
 import com.liferay.portlet.PortletResourceAccessor;
 
@@ -57,7 +58,9 @@ public class ComboServletStaticURLGenerator {
 					String url = portletResource;
 
 					if (!HttpUtil.hasProtocol(portletResource)) {
-						url = portlet.getContextPath() + portletResource;
+						url =
+							PortalUtil.getPathProxy() +
+								portlet.getContextPath() + portletResource;
 					}
 
 					if (_visitedURLs.contains(url)) {

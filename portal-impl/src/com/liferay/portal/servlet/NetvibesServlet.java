@@ -103,7 +103,7 @@ public class NetvibesServlet extends HttpServlet {
 		String iconURL =
 			portalURL + PortalUtil.getPathContext() + portlet.getIcon();
 
-		String widgetJsURL = portalURL;
+		String widgetJsURL = portalURL + PortalUtil.getPathProxy();
 
 		widgetJsURL += PortalWebResourcesUtil.getContextPath(
 			PortalWebResourceConstants.RESOURCE_TYPE_JS);

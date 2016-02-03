@@ -98,7 +98,7 @@ public class GoogleGadgetServlet extends HttpServlet {
 
 		String portalURL = PortalUtil.getPortalURL(request);
 
-		String widgetJsURL = portalURL;
+		String widgetJsURL = portalURL + PortalUtil.getPathProxy();
 
 		widgetJsURL += PortalWebResourcesUtil.getContextPath(
 			PortalWebResourceConstants.RESOURCE_TYPE_JS);
