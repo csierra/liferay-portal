@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
@@ -69,6 +70,8 @@ public abstract class BaseJSPAssetRenderer<T>
 	public void setServletContext(ServletContext servletContext) {
 		_servletContext = servletContext;
 	}
+
+	protected abstract ResourceBundleLoader getResourceBundleLoader();
 
 	protected ServletContext getServletContext() {
 		if (_servletContext != null) {
