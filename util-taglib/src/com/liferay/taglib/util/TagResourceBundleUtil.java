@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PortalUtil;
 
 import java.util.Collections;
@@ -61,6 +62,14 @@ public class TagResourceBundleUtil {
 
 	protected static ResourceBundleLoader getResourceBundleLoader(
 		HttpServletRequest request) {
+
+		ResourceBundleLoader resourceBundleLoader =
+			(ResourceBundleLoader)request.getAttribute(
+				WebKeys.RESOURCE_BUNDLE_LOADER);
+
+		if (resourceBundleLoader != null) {
+			return resourceBundleLoader;
+		}
 
 		ServletContext servletContext = request.getServletContext();
 
