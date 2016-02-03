@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 
@@ -55,7 +56,14 @@ public abstract class BaseJSPAssetRenderer<T>
 		RequestDispatcher requestDispatcher =
 			servletContext.getRequestDispatcher(jspPath);
 
+		ResourceBundleLoader resourceBundleLoader =
+			(ResourceBundleLoader)request.getAttribute(
+				WebKeys.RESOURCE_BUNDLE_LOADER);
+
 		try {
+			request.setAttribute(
+				WebKeys.RESOURCE_BUNDLE_LOADER, getResourceBundleLoader());
+
 			requestDispatcher.include(request, response);
 
 			return true;
@@ -64,6 +72,10 @@ public abstract class BaseJSPAssetRenderer<T>
 			_log.error("Unable to include JSP " + jspPath, se);
 
 			throw new IOException("Unable to include " + jspPath, se);
+		}
+		finally {
+			request.setAttribute(
+				WebKeys.RESOURCE_BUNDLE_LOADER, resourceBundleLoader);
 		}
 	}
 

@@ -14,9 +14,12 @@
 
 package com.liferay.taglib.util;
 
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PortalUtil;
 
 import java.util.Collections;
@@ -54,11 +57,17 @@ public class TagResourceBundleUtil {
 	public static ResourceBundle getResourceBundle(
 		PageContext pageContext, String baseName, Locale locale) {
 
-		ResourceBundle pageResourceBundle = getPageResourceBundle(
-			pageContext, baseName, locale);
-
 		HttpServletRequest request =
 			(HttpServletRequest)pageContext.getRequest();
+
+		ResourceBundleLoader resourceBundleLoader =
+			(ResourceBundleLoader)request.getAttribute(
+				WebKeys.RESOURCE_BUNDLE_LOADER);
+
+		if (resourceBundleLoader != null) {
+			return resourceBundleLoader.loadResourceBundle(
+				LanguageUtil.getLanguageId(locale));
+		}
 
 		ResourceBundle portletResourceBundle = getPortletResourceBundle(
 			request, locale);
@@ -66,13 +75,8 @@ public class TagResourceBundleUtil {
 		ResourceBundle portalResourceBundle = PortalUtil.getResourceBundle(
 			locale);
 
-		if (pageResourceBundle.equals(portletResourceBundle)) {
-			return new AggregateResourceBundle(
-				portletResourceBundle, portalResourceBundle);
-		}
-
 		return new AggregateResourceBundle(
-			pageResourceBundle, portletResourceBundle, portalResourceBundle);
+			portletResourceBundle, portalResourceBundle);
 	}
 
 	protected static ResourceBundle getPageResourceBundle(
