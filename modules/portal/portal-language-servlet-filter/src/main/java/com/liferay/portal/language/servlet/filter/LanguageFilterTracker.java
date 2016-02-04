@@ -119,6 +119,9 @@ public class LanguageFilterTracker {
 
 				ClassLoader classLoader = bundleWiring.getClassLoader();
 
+				Object contextName = serviceReference.getProperty(
+					HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME);
+
 				ResourceBundleLoader resourceBundleLoader =
 					new AggregateResourceBundleLoader(
 						ResourceBundleUtil.getResourceBundleLoader(
@@ -129,6 +132,7 @@ public class LanguageFilterTracker {
 
 				properties.put(
 					"bundle.symbolic.name", bundle.getSymbolicName());
+				properties.put("servlet.context.name", contextName);
 				properties.put("service.ranking", Integer.MIN_VALUE);
 
 				serviceRegistrations.add(
@@ -149,9 +153,6 @@ public class LanguageFilterTracker {
 					new ServiceTrackerResourceBundleLoader(serviceTracker));
 
 				properties = new Hashtable<>();
-
-				Object contextName = serviceReference.getProperty(
-					HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME);
 
 				properties.put(
 					HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
