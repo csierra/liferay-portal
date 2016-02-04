@@ -21,9 +21,9 @@ import java.util.ResourceBundle;
 /**
  * @author Carlos Sierra Andrés
  */
-public class MemoizeResourceBundleLoader implements ResourceBundleLoader {
+public class CachingResourceBundleLoader implements ResourceBundleLoader {
 
-	public MemoizeResourceBundleLoader(
+	public CachingResourceBundleLoader(
 		ResourceBundleLoader resourceBundleLoader) {
 
 		_resourceBundleLoader = resourceBundleLoader;
