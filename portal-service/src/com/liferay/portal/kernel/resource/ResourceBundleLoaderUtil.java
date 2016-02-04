@@ -23,14 +23,14 @@ import com.liferay.registry.collections.ServiceTrackerMap;
  */
 public class ResourceBundleLoaderUtil {
 
-	public ResourceBundleLoader getResourceBundleLoaderByBundleSymbolicName(
+	public static ResourceBundleLoader getResourceBundleLoaderByBundleSymbolicName(
 		String bundleSymbolicName) {
 
 		return _instance._resourceBundleLoaderByBundleSymbolicName.getService(
 			bundleSymbolicName);
 	}
 
-	public ResourceBundleLoader getResourceBundleLoaderByServletContextName(
+	public static ResourceBundleLoader getResourceBundleLoaderByServletContextName(
 		String servletContextName) {
 
 		return _instance._resourceBundleLoaderByServletName.getService(
