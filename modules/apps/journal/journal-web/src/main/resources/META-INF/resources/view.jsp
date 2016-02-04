@@ -33,8 +33,10 @@ data.put("qa-id", "navigation");
 %>
 
 <aui:nav-bar cssClass="collapse-basic-search" data="<%= data %>" markupView="lexicon">
+	<portlet:renderURL var="mainURL" />
+
 	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item label="web-content" selected="<%= true %>" />
+		<aui:nav-item href="<%= mainURL.toString() %>" label="web-content" selected="<%= true %>" />
 	</aui:nav>
 
 	<c:if test="<%= journalDisplayContext.isShowSearch() %>">
@@ -61,9 +63,7 @@ data.put("qa-id", "navigation");
 <div id="<portlet:namespace />journalContainer">
 	<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
 		<c:if test="<%= journalDisplayContext.isShowInfoPanel() %>">
-			<portlet:renderURL var="sidebarPanelURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
-				<portlet:param name="mvcPath" value="/info_panel.jsp" />
-			</portlet:renderURL>
+			<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/journal/info_panel" var="sidebarPanelURL" />
 
 			<liferay-frontend:sidebar-panel
 				resourceURL="<%= sidebarPanelURL %>"

@@ -145,14 +145,14 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 
 					<liferay-staging:content cmd="<%= cmd %>" parameterMap="<%= parameterMap %>" type="<%= Constants.EXPORT %>" />
 
-					<liferay-staging:permissions global="<%= group.isCompany() %>" parameterMap="<%= parameterMap %>" />
+					<liferay-staging:permissions action="export" descriptionCSSClass="permissions-description" global="<%= group.isCompany() %>" labelCSSClass="permissions-label" parameterMap="<%= parameterMap %>" />
 				</aui:fieldset-group>
 			</div>
 
 			<aui:button-row>
 				<aui:button cssClass="btn-lg" type="submit" value="save" />
 
-				<aui:button cssClass="btn-lg" href="<%= portletURL.toString() %>" type="reset" value="cancel" />
+				<aui:button cssClass="btn-lg" href="<%= portletURL.toString() %>" type="cancel" />
 			</aui:button-row>
 		</aui:form>
 	</div>

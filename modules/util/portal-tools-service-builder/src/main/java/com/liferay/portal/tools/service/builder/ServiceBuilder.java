@@ -1219,7 +1219,8 @@ public class ServiceBuilder {
 	}
 
 	public int getMaxLength(String model, String field) {
-		Map<String, String> hints = ModelHintsUtil.getHints(model, field);
+		Map<String, String> hints = ModelHintsUtil.getHints(
+			_apiPackagePath + ".model." + model, field);
 
 		if (hints == null) {
 			return _DEFAULT_COLUMN_MAX_LENGTH;
@@ -1674,7 +1675,7 @@ public class ServiceBuilder {
 				"com.liferay.portal.kernel.search.") ||
 			returnTypeGenericsName.contains("com.liferay.portal.model.Theme") ||
 			returnTypeGenericsName.contains(
-				"com.liferay.portlet.social.model.SocialActivityDefinition") ||
+				"com.liferay.social.kernel.model.SocialActivityDefinition") ||
 			returnTypeGenericsName.equals("java.util.List<java.lang.Object>") ||
 			returnValueName.equals("com.liferay.portal.model.Lock") ||
 			returnValueName.equals(
@@ -3905,8 +3906,7 @@ public class ServiceBuilder {
 
 			if (colType.equals("String")) {
 				columnLengths[i] = getMaxLength(
-					_packagePath + ".model." + entity.getName(),
-					entityColumn.getName());
+					entity.getName(), entityColumn.getName());
 			}
 		}
 
@@ -4067,8 +4067,7 @@ public class ServiceBuilder {
 					sb.append("TEXT");
 				}
 				else if (colType.equals("String")) {
-					int maxLength = getMaxLength(
-						_packagePath + ".model." + entity.getName(), colName);
+					int maxLength = getMaxLength(entity.getName(), colName);
 
 					if (col.isLocalized()) {
 						maxLength = 4000;
@@ -4183,8 +4182,7 @@ public class ServiceBuilder {
 				sb.append("TEXT");
 			}
 			else if (colType.equals("String")) {
-				int maxLength = getMaxLength(
-					_apiPackagePath + ".model." + entity.getName(), colName);
+				int maxLength = getMaxLength(entity.getName(), colName);
 
 				if (col.isLocalized() && (maxLength < 4000)) {
 					maxLength = 4000;

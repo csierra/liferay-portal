@@ -133,6 +133,10 @@ public class DLImpl implements DL {
 		return 0;
 	}
 
+	public void destroy() {
+		_serviceTrackerList.close();
+	}
+
 	@Override
 	public String getAbsolutePath(PortletRequest portletRequest, long folderId)
 		throws PortalException {
@@ -1114,6 +1118,8 @@ public class DLImpl implements DL {
 
 				portletId = result.getPortletId();
 				plid = result.getPlid();
+
+				break;
 			}
 			catch (PortalException pe) {
 			}
@@ -1143,14 +1149,7 @@ public class DLImpl implements DL {
 			ThemeDisplay themeDisplay, String queryString)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(themeDisplay.getPathThemeImages());
-		sb.append("/file_system/large/");
-		sb.append(getGenericName(fileEntry.getExtension()));
-		sb.append(".png");
-
-		String thumbnailSrc = sb.toString();
+		String thumbnailSrc = StringPool.BLANK;
 
 		if (Validator.isNotNull(queryString)) {
 			thumbnailSrc = getPreviewURL(
@@ -1197,10 +1196,6 @@ public class DLImpl implements DL {
 		new TreeSet<>();
 	private static final Set<String> _fileIcons = new HashSet<>();
 	private static final Map<String, String> _genericNames = new HashMap<>();
-	private static final ServiceTrackerList<PortletLayoutFinder>
-		_serviceTrackerList = ServiceTrackerCollections.list(
-			PortletLayoutFinder.class,
-			"(model.class.name=" + FileEntry.class.getName() + ")");
 
 	static {
 		_allMediaGalleryMimeTypes.addAll(
@@ -1254,5 +1249,10 @@ public class DLImpl implements DL {
 			_populateGenericNamesMap(genericName);
 		}
 	}
+
+	private final ServiceTrackerList<PortletLayoutFinder>
+		_serviceTrackerList = ServiceTrackerCollections.openList(
+			PortletLayoutFinder.class,
+			"(model.class.name=" + FileEntry.class.getName() + ")");
 
 }

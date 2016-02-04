@@ -111,9 +111,9 @@ else {
 </liferay-frontend:management-bar>
 
 <div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
-	<portlet:resourceURL id="/wiki/info_panel" var="sidebarPanelURL">
+	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/wiki/info_panel" var="sidebarPanelURL">
 		<portlet:param name="nodeId" value="<%= String.valueOf(node.getNodeId()) %>" />
-	</portlet:resourceURL>
+	</liferay-portlet:resourceURL>
 
 	<liferay-frontend:sidebar-panel
 		resourceURL="<%= sidebarPanelURL %>"
@@ -179,6 +179,11 @@ else {
 
 				<c:choose>
 					<c:when test='<%= displayStyle.equals("descriptive") %>'>
+						<liferay-ui:search-container-column-icon
+							icon="wiki-page"
+							toggleRowChecker="<%= true %>"
+						/>
+
 						<liferay-ui:search-container-column-text colspan="<%= 2 %>">
 
 							<%
@@ -221,7 +226,6 @@ else {
 						/>
 
 						<liferay-ui:search-container-column-status
-							href="<%= rowURL %>"
 							name="status"
 							status="<%= curPage.getStatus() %>"
 						/>
@@ -235,19 +239,16 @@ else {
 						%>
 
 						<liferay-ui:search-container-column-text
-							href="<%= rowURL %>"
 							name="revision"
 							value="<%= revision %>"
 						/>
 
 						<liferay-ui:search-container-column-text
-							href="<%= rowURL %>"
 							name="user"
 							value="<%= HtmlUtil.escape(PortalUtil.getUserName(curPage)) %>"
 						/>
 
 						<liferay-ui:search-container-column-date
-							href="<%= rowURL %>"
 							name="modified-date"
 							value="<%= curPage.getModifiedDate() %>"
 						/>
