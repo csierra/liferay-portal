@@ -21,7 +21,6 @@ import com.liferay.message.boards.kernel.service.MBBanLocalService;
 import com.liferay.portal.kernel.messaging.BaseSchedulerEntryMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
@@ -74,11 +73,6 @@ public class ExpireBanMessageListener
 	@Reference(unbind = "-")
 	protected void setMBBanLocalService(MBBanLocalService mbBanLocalService) {
 		_mbBanLocalService = mbBanLocalService;
-	}
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	@Reference(unbind = "-")

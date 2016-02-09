@@ -843,6 +843,8 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			"(objectClass=" +
 				SchedulerEventMessageListener.class.getName() + ")",
 			new SchedulerEventMessageListenerServiceTrackerCustomizer());
+
+		start();
 	}
 
 	protected void addWeeklyDayPos(
