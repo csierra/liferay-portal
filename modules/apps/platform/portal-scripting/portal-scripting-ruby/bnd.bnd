@@ -19,6 +19,7 @@ Import-Package:\
 Include-Resource: @lib/jruby-complete.jar
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Scripting Engines
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -fixupmessages:\
 	"The default package '.' is not permitted by the Import-Package ...";is:=ignore,\
 	"The JAR is empty: ...";is:=ignore,\

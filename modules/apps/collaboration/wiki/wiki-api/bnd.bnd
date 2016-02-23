@@ -8,4 +8,5 @@ Export-Package:\
 	com.liferay.wiki.*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Wiki
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/collaboration/bnd.bnd

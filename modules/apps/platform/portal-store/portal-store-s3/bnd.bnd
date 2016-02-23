@@ -29,4 +29,5 @@ Include-Resource:\
 	@lib/joda-time.jar
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Data Stores
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/platform/bnd.bnd

@@ -6,5 +6,6 @@ Include-Resource:\
 	@../../../../../util-java/util-java.jar!/com/liferay/util/ContentUtil.class
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title:
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /portlet-settings-web
 -include: ../../../../../marketplace/platform/bnd.bnd

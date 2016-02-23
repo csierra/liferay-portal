@@ -20,4 +20,5 @@ Include-Resource:\
 	@lib/xml-apis-ext.jar
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title:
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/platform/bnd.bnd

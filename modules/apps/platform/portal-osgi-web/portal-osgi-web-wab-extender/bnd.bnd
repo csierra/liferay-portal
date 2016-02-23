@@ -24,4 +24,5 @@ Include-Resource:\
 	@../../../../../portal-service/portal-service.jar!/com/liferay/portal/kernel/util/ReflectionUtil.class
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: WAB
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/platform/bnd.bnd

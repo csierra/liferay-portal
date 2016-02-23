@@ -3,5 +3,6 @@ Bundle-SymbolicName: com.liferay.mobile.device.rules.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Mobile Device Rules
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /mdr-web
 -include: ../../../../../marketplace/platform/bnd.bnd

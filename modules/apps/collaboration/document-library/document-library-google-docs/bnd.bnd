@@ -20,5 +20,6 @@ Import-Package:\
 Include-Resource: @lib/freemarker.jar
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Document Library
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /document-library-google-docs
 -include: ../../../../../marketplace/collaboration/bnd.bnd

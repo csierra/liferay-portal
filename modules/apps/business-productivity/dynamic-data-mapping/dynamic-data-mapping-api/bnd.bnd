@@ -4,4 +4,5 @@ Bundle-Version: 1.0.0
 Export-Package: com.liferay.dynamic.data.mapping.*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Dynamic Data Mapping
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/business-productivity/bnd.bnd

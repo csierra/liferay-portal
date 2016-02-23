@@ -7,6 +7,7 @@ Include-Resource:\
 Liferay-JS-Config: /META-INF/resources/js/config.js
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Dynamic Data Mapping
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /dynamic-data-mapping-web
 -dsannotations-options: inherit
 -include: ../../../../../marketplace/business-productivity/bnd.bnd

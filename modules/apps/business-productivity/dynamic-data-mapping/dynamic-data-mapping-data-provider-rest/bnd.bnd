@@ -3,4 +3,5 @@ Bundle-SymbolicName: com.liferay.dynamic.data.mapping.data.provider.rest
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Dynamic Data Mapping
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/business-productivity/bnd.bnd

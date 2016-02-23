@@ -1,4 +1,5 @@
 Bundle-Name: Liferay Directory Web
 Bundle-SymbolicName: com.liferay.directory.web
 Bundle-Version: 1.0.0
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/platform/bnd.bnd

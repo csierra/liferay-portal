@@ -9,5 +9,6 @@ Include-Resource:\
 Liferay-JS-Config: /META-INF/resources/js/config.js
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Calendar
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /calendar-web
 -include: ../../../../../marketplace/business-productivity/bnd.bnd

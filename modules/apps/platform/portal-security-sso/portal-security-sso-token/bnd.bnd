@@ -7,4 +7,5 @@ Export-Package:\
 	com.liferay.portal.security.sso.token.security.auth.*;version=${plugin.full.version}
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Security Frameworks
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/platform/bnd.bnd

@@ -3,5 +3,6 @@ Bundle-SymbolicName: com.liferay.login.authentication.google.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Login
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /login-authentication-google-web
 -include: ../../../../../marketplace/platform/bnd.bnd

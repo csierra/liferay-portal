@@ -6,5 +6,6 @@ Include-Resource:\
 	@../../../../../util-java/util-java.jar!/com/liferay/util/portlet/PortletProps.class
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title:
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /notifications-web
 -include: ../../../../../marketplace/collaboration/bnd.bnd

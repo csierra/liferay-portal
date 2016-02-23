@@ -154,4 +154,5 @@ Include-Resource:\
 	lib/t-digest.jar=lib/t-digest.jar
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Elasticsearch
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/platform/bnd.bnd

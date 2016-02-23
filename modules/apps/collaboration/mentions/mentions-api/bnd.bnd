@@ -7,4 +7,5 @@ Export-Package:\
 	com.liferay.mentions.util
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Mentions
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/collaboration/bnd.bnd

@@ -3,4 +3,5 @@ Bundle-SymbolicName: com.liferay.document.library.file.version.discussion.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Document Library File Version Discussion Web
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/collaboration/bnd.bnd

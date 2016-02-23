@@ -3,5 +3,6 @@ Bundle-SymbolicName: com.liferay.portal.settings.authentication.ntlm.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Portal Settings
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /portal-settings-authentication-ntlm-web
 -include: ../../../../../marketplace/platform/bnd.bnd

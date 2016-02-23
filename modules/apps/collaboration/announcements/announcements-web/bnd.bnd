@@ -4,5 +4,6 @@ Bundle-Version: 1.0.0
 Export-Package: com.liferay.announcements.web.constants
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title:
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /announcements-web
 -include: ../../../../../marketplace/collaboration/bnd.bnd

@@ -3,5 +3,6 @@ Bundle-SymbolicName: com.liferay.iframe.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Publication Tools
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /iframe-web
 -include: ../../../../../marketplace/web-content-management/bnd.bnd
