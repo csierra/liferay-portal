@@ -174,57 +174,6 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		}
 	}
 
-	protected void checkResourceBundles(
-		ClassLoader classLoader, Portlet portlet) {
-
-		if (Validator.isNull(portlet.getResourceBundle())) {
-			return;
-		}
-
-		Registry registry = RegistryUtil.getRegistry();
-
-		for (Locale locale : LanguageUtil.getAvailableLocales()) {
-			try {
-				ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-					portlet.getResourceBundle(), locale, classLoader);
-
-				Map<String, Object> properties = new HashMap<>();
-
-				properties.put("language.id", LocaleUtil.toLanguageId(locale));
-				properties.put("javax.portlet.name", portlet.getPortletId());
-
-				ServiceRegistration<ResourceBundle> serviceRegistration =
-					registry.registerService(
-						ResourceBundle.class, resourceBundle, properties);
-
-				_serviceRegistrations.put(resourceBundle, serviceRegistration);
-			}
-			catch (MissingResourceException mre) {
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						"Portlet " + portlet.getPortletName() + " does " +
-							"not have translations for available locale " +
-								locale);
-				}
-			}
-
-			Map<String, Object> properties = new HashMap<>();
-
-			properties.put("language.id", LocaleUtil.toLanguageId(locale));
-			properties.put("javax.portlet.name", portlet.getPortletId());
-			properties.put("service.ranking", Integer.MIN_VALUE);
-
-			ResourceBundle resourceBundle = LanguageResources.getResourceBundle(
-				locale);
-
-			ServiceRegistration<ResourceBundle> serviceRegistration =
-				registry.registerService(
-					ResourceBundle.class, resourceBundle, properties);
-
-			_serviceRegistrations.put(resourceBundle, serviceRegistration);
-		}
-	}
-
 	protected void destroyPortlet(Portlet portlet, Set<String> portletIds)
 		throws Exception {
 
@@ -387,8 +336,6 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 			ResourceActionLocalServiceUtil.checkResourceActions(
 				portlet.getPortletId(), portletActions);
-
-			checkResourceBundles(classLoader, portlet);
 
 			for (String modelName : modelNames) {
 				List<String> modelActions =

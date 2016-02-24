@@ -334,10 +334,6 @@ public class PortletTracker
 				bundlePortletApp.getServletContextName(), bundleClassLoader,
 				serviceRegistrations);
 
-			checkResourceBundles(
-				bundle.getBundleContext(), bundleClassLoader, portletModel,
-				serviceRegistrations);
-
 			List<Company> companies = _companyLocalService.getCompanies();
 
 			deployPortlet(serviceReference, portletModel, companies);
@@ -380,58 +376,6 @@ public class PortletTracker
 		portletModel.setStrutsPath(portletId);
 
 		return portletModel;
-	}
-
-	protected void checkResourceBundles(
-		BundleContext bundleContext, ClassLoader classLoader,
-		com.liferay.portal.kernel.model.Portlet portletModel,
-		ServiceRegistrations serviceRegistrations) {
-
-		if (Validator.isBlank(portletModel.getResourceBundle())) {
-			return;
-		}
-
-		for (Locale locale : LanguageUtil.getAvailableLocales()) {
-			try {
-				ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-					portletModel.getResourceBundle(), locale, classLoader);
-
-				Dictionary<String, Object> properties =
-					new HashMapDictionary<>();
-
-				properties.put(
-					"javax.portlet.name", portletModel.getPortletId());
-				properties.put("language.id", LocaleUtil.toLanguageId(locale));
-
-				ServiceRegistration<ResourceBundle> serviceRegistration =
-					bundleContext.registerService(
-						ResourceBundle.class, resourceBundle, properties);
-
-				serviceRegistrations.addServiceRegistration(
-					serviceRegistration);
-			}
-			catch (MissingResourceException mre) {
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						"Portlet " + portletModel.getPortletName() + " does " +
-							"not have translations for available locale " +
-								locale);
-				}
-			}
-
-			Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-			properties.put("javax.portlet.name", portletModel.getPortletId());
-			properties.put("language.id", LocaleUtil.toLanguageId(locale));
-			properties.put("service.ranking", Integer.MIN_VALUE);
-
-			ServiceRegistration<ResourceBundle> serviceRegistration =
-				bundleContext.registerService(
-					ResourceBundle.class,
-					LanguageResources.getResourceBundle(locale), properties);
-
-			serviceRegistrations.addServiceRegistration(serviceRegistration);
-		}
 	}
 
 	protected void checkWebResources(

@@ -71,6 +71,8 @@ class LanguageExtension implements Extension {
 
 				properties.put(
 					"bundle.symbolic.name", _bundle.getSymbolicName());
+				properties.put(
+					"service.ranking", Integer.MIN_VALUE);
 
 				bundleContext.registerService(
 					ResourceBundleLoader.class, resourceBundleLoader,
