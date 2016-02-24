@@ -62,10 +62,6 @@ import javax.servlet.ServletContext;
  */
 public class PortletBagImpl implements PortletBag {
 
-	private String getResourceBundle() {
-		return _resourceBundle;
-	}
-
 	public PortletBagImpl(
 		String portletName, ServletContext servletContext,
 		Portlet portletInstance,
@@ -128,7 +124,6 @@ public class PortletBagImpl implements PortletBag {
 		_workflowHandlerInstances = workflowHandlerInstances;
 		_preferencesValidatorInstances = preferencesValidatorInstances;
 		_resourceBundle = resourceBundle;
-
 	}
 
 	@Override
@@ -380,6 +375,10 @@ public class PortletBagImpl implements PortletBag {
 		}
 	}
 
+	private String getResourceBundle() {
+		return _resourceBundle;
+	}
+
 	private final List<AssetRendererFactory<?>> _assetRendererFactoryInstances;
 	private final List<AtomCollectionAdapter<?>>
 		_atomCollectionAdapterInstances;
@@ -398,7 +397,7 @@ public class PortletBagImpl implements PortletBag {
 	private final List<PortletLayoutListener> _portletLayoutListenerInstances;
 	private String _portletName;
 	private final List<PreferencesValidator> _preferencesValidatorInstances;
-	private String _resourceBundle;
+	private final String _resourceBundle;
 	private final List<SchedulerEventMessageListener>
 		_schedulerEventMessageListeners;
 	private final ServletContext _servletContext;

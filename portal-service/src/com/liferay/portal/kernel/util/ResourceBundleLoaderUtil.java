@@ -24,9 +24,6 @@ import com.liferay.registry.collections.ServiceTrackerMap;
  */
 public class ResourceBundleLoaderUtil {
 
-	private final ServiceTrackerMap<String, ResourceBundleLoader>
-			_resourceBundleLoaderByServletContextNameAndBaseName;
-
 	public static ResourceBundleLoader getPortalResourceBundleLoader() {
 		return _portalResourceBundleLoader;
 	}
@@ -39,18 +36,18 @@ public class ResourceBundleLoaderUtil {
 	}
 
 	public static ResourceBundleLoader
+		getResourceBundleLoaderByServletContextName(String servletContextName) {
+
+		return _instance._resourceBundleLoaderByServletName.getService(
+			servletContextName);
+	}
+
+	public static ResourceBundleLoader
 		getResourceBundleLoaderByServletContextNameAndBaseName(
 			String servletContextName, String baseName) {
 
 		return _instance._resourceBundleLoaderByServletContextNameAndBaseName.
 			getService(servletContextName + ":" + baseName);
-	}
-
-	public static ResourceBundleLoader
-		getResourceBundleLoaderByServletContextName(String servletContextName) {
-
-		return _instance._resourceBundleLoaderByServletName.getService(
-			servletContextName);
 	}
 
 	public static void setPortalResourceBundleLoader(
@@ -68,6 +65,7 @@ public class ResourceBundleLoaderUtil {
 				ResourceBundleLoader.class,
 				"(&(servlet.context.name=*)(baseName=*))",
 				new ServiceReferenceMapper<String, ResourceBundleLoader>() {
+
 					@Override
 					public void map(
 						ServiceReference<ResourceBundleLoader> serviceReference,
@@ -76,11 +74,12 @@ public class ResourceBundleLoaderUtil {
 						Object servletContextName =
 							serviceReference.getProperty(
 								"servlet.context.name");
-						Object baseName =
-							serviceReference.getProperty("baseName");
+						Object baseName = serviceReference.getProperty(
+							"baseName");
 
 						emitter.emit(servletContextName + ":" + baseName);
 					}
+
 				});
 		_resourceBundleLoaderByServletName =
 			ServiceTrackerCollections.openSingleValueMap(
@@ -94,6 +93,8 @@ public class ResourceBundleLoaderUtil {
 
 	private final ServiceTrackerMap<String, ResourceBundleLoader>
 		_resourceBundleLoaderByBundleSymbolicName;
+	private final ServiceTrackerMap<String, ResourceBundleLoader>
+		_resourceBundleLoaderByServletContextNameAndBaseName;
 	private final ServiceTrackerMap<String, ResourceBundleLoader>
 		_resourceBundleLoaderByServletName;
 
