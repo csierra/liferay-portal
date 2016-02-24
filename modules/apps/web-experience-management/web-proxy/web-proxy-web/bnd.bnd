@@ -8,4 +8,5 @@ Include-Resource:\
 	@lib/org.portletbridge.portlet.jar,\
 	@lib/serializer.jar,\
 	@lib/xalan.jar
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /web-proxy-web

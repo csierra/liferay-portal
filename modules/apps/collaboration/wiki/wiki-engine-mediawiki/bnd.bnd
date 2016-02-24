@@ -12,5 +12,6 @@ Import-Package:\
 Include-Resource: @lib/org.jamwiki.jar
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Wiki
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /wiki-engine-mediawiki
 -include: ../../../../../marketplace/collaboration/bnd.bnd

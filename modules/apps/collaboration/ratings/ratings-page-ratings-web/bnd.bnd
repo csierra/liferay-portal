@@ -3,4 +3,5 @@ Bundle-SymbolicName: com.liferay.ratings.page.ratings.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Ratings
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 -include: ../../../../../marketplace/collaboration/bnd.bnd

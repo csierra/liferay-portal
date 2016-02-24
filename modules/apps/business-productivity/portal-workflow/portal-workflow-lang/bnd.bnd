@@ -1,0 +1,4 @@
+Bundle-Name: Liferay Portal Workflow Lang
+Bundle-SymbolicName: com.liferay.portal.workflow.lang
+Bundle-Version: 1.0.0
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"

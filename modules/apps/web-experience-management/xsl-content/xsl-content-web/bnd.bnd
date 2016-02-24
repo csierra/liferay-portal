@@ -3,5 +3,6 @@ Bundle-SymbolicName: com.liferay.xsl.content.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Publication Tools
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /xsl-content-web
 -include: ../../../../../marketplace/web-content-management/bnd.bnd

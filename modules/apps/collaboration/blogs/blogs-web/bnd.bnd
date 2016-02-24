@@ -9,6 +9,7 @@ Export-Package:\
 Liferay-JS-Config: /META-INF/resources/blogs/js/config.js
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Blogs
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /blogs-web
 -dsannotations-options: inherit
 -include: ../../../../../marketplace/collaboration/bnd.bnd

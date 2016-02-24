@@ -28,12 +28,15 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 @Meta.OCD(
 	id = "com.liferay.site.navigation.menu.web.configuration.SiteNavigationMenuPortletInstanceConfiguration",
 	localization = "content/Language",
-	name = "%site.navigation.menu.portlet.instance.configuration.name"
+	name = "site.navigation.menu.portlet.instance.configuration.name"
 )
 public interface SiteNavigationMenuPortletInstanceConfiguration {
 
 	@Meta.AD(required = false)
 	public String bulletStyle();
+
+	@Meta.AD(deflt = "0", required = false)
+	public int displayDepth();
 
 	@Meta.AD(required = false)
 	public String displayStyle();

@@ -11,3 +11,4 @@ Export-Package:	\
 	com.liferay.shopping.service,\
 	com.liferay.shopping.service.persistence,\
 	com.liferay.shopping.util.comparator
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"

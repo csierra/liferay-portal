@@ -3,5 +3,6 @@ Bundle-SymbolicName: com.liferay.comment.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Comments
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /comments-web
 -include: ../../../../../marketplace/collaboration/bnd.bnd

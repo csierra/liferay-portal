@@ -3,5 +3,6 @@ Bundle-SymbolicName: com.liferay.blogs.item.selector.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Blogs
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /blogs-item-selector-web
 -include: ../../../../../marketplace/collaboration/bnd.bnd

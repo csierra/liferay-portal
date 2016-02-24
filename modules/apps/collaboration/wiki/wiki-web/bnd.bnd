@@ -8,5 +8,6 @@ Include-Resource:\
 	@../../../../../util-java/util-java.jar!/com/liferay/util/portlet/PortletProps.class
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Wiki
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /wiki-web
 -include: ../../../../../marketplace/collaboration/bnd.bnd

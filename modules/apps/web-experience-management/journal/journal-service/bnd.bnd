@@ -35,6 +35,7 @@ Liferay-Releng-Module-Group-Title: Web Content
 Liferay-Require-SchemaVersion: 1.0.0
 Liferay-Service: true
 Liferay-Spring-Context: META-INF/spring
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Require-Capability:\
 	liferay.extender;\
 	filter:="(&(liferay.extender=spring.extender)(version>=1.0)(!(version>=2.0)))"

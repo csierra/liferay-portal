@@ -3,5 +3,6 @@ Bundle-SymbolicName: com.liferay.wiki.navigation.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title:
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /wiki-navigation-web
 -include: ../../../../../marketplace/collaboration/bnd.bnd

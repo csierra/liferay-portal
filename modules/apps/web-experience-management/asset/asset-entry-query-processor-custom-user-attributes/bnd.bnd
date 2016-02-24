@@ -4,5 +4,6 @@ Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Asset
 Liferay-Require-SchemaVersion: 1.0.0
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /asset-entry-query-processor-custom-user-attributes
 -include: ../../../../../marketplace/web-content-management/bnd.bnd

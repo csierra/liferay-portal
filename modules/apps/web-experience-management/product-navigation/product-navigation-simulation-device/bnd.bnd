@@ -4,5 +4,6 @@ Bundle-Version: 1.0.0
 Liferay-JS-Config: /META-INF/resources/js/config.js
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title:
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /product-navigation-simulation-device
 -include: ../../../../../marketplace/web-content-management/bnd.bnd

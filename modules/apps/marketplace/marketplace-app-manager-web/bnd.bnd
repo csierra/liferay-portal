@@ -3,5 +3,6 @@ Bundle-SymbolicName: com.liferay.marketplace.app.manager.web
 Bundle-Version: 1.0.0
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title:
+Provide-Capability: liferay.resource.bundle;baseName:String="content.Language"
 Web-ContextPath: /marketplace-app-manager-web
 -include: ../../../../marketplace/marketplace/bnd.bnd
