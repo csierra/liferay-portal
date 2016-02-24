@@ -56,7 +56,6 @@ import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerList;
-import com.liferay.registry.collections.ServiceTrackerMap;
 import com.liferay.util.JS;
 
 import java.io.InputStream;
@@ -899,6 +898,7 @@ public class ResourceActionsImpl implements ResourceActions {
 
 		for (ResourceBundleLoader resourceBundleLoader :
 				_resourceBundleLoaders) {
+
 			ResourceBundle resourceBundle =
 				resourceBundleLoader.loadResourceBundle(languageId);
 
@@ -1269,6 +1269,6 @@ public class ResourceActionsImpl implements ResourceActions {
 	private final Set<String> _portalModelResources = new HashSet<>();
 	private Map<String, PortletResourceActionsBag> _portletResourceActionsBags;
 	private final ServiceTrackerList<ResourceBundleLoader>
-			_resourceBundleLoaders;
+		_resourceBundleLoaders;
 
 }

@@ -165,8 +165,8 @@ public class LanguageFilterTracker {
 					<ResourceBundleLoader, TrackedServletContextHelper> {
 
 			public ResourceBundleLoaderServiceTrackerCustomizer(
-					Map<String, Object> properties, String filterString,
-					Object contextName) {
+				Map<String, Object> properties, String filterString,
+				Object contextName) {
 
 				_properties = properties;
 				_filterString = filterString;
