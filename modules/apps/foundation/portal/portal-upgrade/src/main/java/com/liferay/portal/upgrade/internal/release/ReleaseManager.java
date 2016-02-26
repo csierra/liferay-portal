@@ -68,7 +68,8 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"osgi.command.function=dryrun", "osgi.command.function=execute",
-		"osgi.command.function=list", "osgi.command.scope=upgrade"
+		"osgi.command.function=list", "osgi.command.function=queue",
+		"osgi.command.scope=upgrade"
 	},
 	service = Object.class
 )
@@ -143,6 +144,14 @@ public class ReleaseManager {
 
 		for (UpgradeInfo upgradeProcess : upgradeProcesses) {
 			System.out.println("\t" + upgradeProcess);
+		}
+	}
+
+	public void queue() {
+		System.out.println("Pending Jobs: " + _queue.size());
+
+		for (Callable<Void> callable : _queue) {
+			System.out.println(callable);
 		}
 	}
 
@@ -460,7 +469,7 @@ public class ReleaseManager {
 					_releaseLocalService.updateRelease(
 						_bundleSymbolicName,
 						upgradeInfo.getToSchemaVersionString(),
-						upgradeInfo.getFromSchemaVersionString());
+						fromSchemaVersionString);
 				}
 			}
 			catch (Exception e) {
