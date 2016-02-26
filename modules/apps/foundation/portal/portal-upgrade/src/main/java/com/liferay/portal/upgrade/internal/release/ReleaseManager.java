@@ -278,7 +278,8 @@ public class ReleaseManager {
 
 	private OutputStreamContainerFactoryTracker
 		_outputStreamContainerFactoryTracker;
-	private BlockingDeque<Callable<Void>> _queue = new LinkedBlockingDeque<>();
+	private final BlockingDeque<Callable<Void>> _queue =
+		new LinkedBlockingDeque<>();
 	private ReleaseLocalService _releaseLocalService;
 	private ReleaseManagerConfiguration _releaseManagerConfiguration;
 	private ReleasePublisher _releasePublisher;
@@ -513,7 +514,7 @@ public class ReleaseManager {
 
 		private UpgradeThread() {
 			super("Upgrade Thread");
-			
+
 			start();
 		}
 
