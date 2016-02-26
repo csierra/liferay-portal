@@ -145,8 +145,8 @@ public class LiferayOSGiExtension extends LiferayExtension {
 
 	private static final String[] _BND_PLUGIN_CLASS_NAMES = {
 		JspAnalyzerPlugin.class.getName(), NpmAnalyzerPlugin.class.getName(),
-		ResourceBundleLoaderAnalyzerPlugin.class.getName(), 
-		SassAnalyzerPlugin.class.getName(), SpringComponent.class.getName(), 
+		ResourceBundleLoaderAnalyzerPlugin.class.getName(),
+		SassAnalyzerPlugin.class.getName(), SpringComponent.class.getName(),
 		SpringDependencyAnalyzerPlugin.class.getName()
 	};
 
