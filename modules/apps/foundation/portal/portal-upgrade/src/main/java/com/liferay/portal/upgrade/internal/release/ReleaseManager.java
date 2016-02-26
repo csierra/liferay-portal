@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.output.stream.container.OutputStreamContainer;
 import com.liferay.portal.output.stream.container.OutputStreamContainerFactory;
@@ -42,6 +43,9 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.Callable;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.Set;
 
 import org.apache.felix.utils.log.Logger;
@@ -181,11 +185,15 @@ public class ReleaseManager {
 				new PropertyServiceReferenceComparator<UpgradeStep>(
 					"upgrade.from.schema.version")),
 			serviceTrackerMapListener);
+
+		_upgradeThread = new UpgradeThread();
 	}
 
 	@Deactivate
 	protected void deactivate() {
 		_serviceTrackerMap.close();
+
+		_upgradeThread.cancel();
 	}
 
 	protected void doExecute(
@@ -228,23 +236,11 @@ public class ReleaseManager {
 
 		OutputStream outputStream = outputStreamContainer.getOutputStream();
 
-		_outputStreamContainerFactoryTracker.runWithSwappedLog(
-			new UpgradeInfosRunnable(
-				bundleSymbolicName, upgradeInfos, outputStream),
-			outputStreamContainer.getDescription(), outputStream);
+		Callable<Void> upgradeCallable = new UpgradeCallable(
+			bundleSymbolicName, upgradeInfos, outputStream,
+			outputStreamContainer);
 
-		try {
-			outputStream.close();
-		}
-		catch (IOException ioe) {
-			throw new RuntimeException(ioe);
-		}
-
-		Release release = _releaseLocalService.fetchRelease(bundleSymbolicName);
-
-		if (release != null) {
-			_releasePublisher.publish(release);
-		}
+		_queue.push(upgradeCallable);
 	}
 
 	protected String getSchemaVersionString(String bundleSymbolicName) {
@@ -273,10 +269,12 @@ public class ReleaseManager {
 
 	private OutputStreamContainerFactoryTracker
 		_outputStreamContainerFactoryTracker;
+	private BlockingDeque<Callable<Void>> _queue = new LinkedBlockingDeque<>();
 	private ReleaseLocalService _releaseLocalService;
 	private ReleaseManagerConfiguration _releaseManagerConfiguration;
 	private ReleasePublisher _releasePublisher;
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
+	private UpgradeThread _upgradeThread;
 
 	private static class UpgradeServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<UpgradeStep, UpgradeInfo> {
@@ -329,6 +327,63 @@ public class ReleaseManager {
 
 	}
 
+	private class UpgradeCallable implements Callable<Void> {
+
+		public UpgradeCallable(
+			String bundleSymbolicName, List<UpgradeInfo> upgradeInfos,
+			OutputStream outputStream,
+			OutputStreamContainer outputStreamContainer) {
+
+			_bundleSymbolicName = bundleSymbolicName;
+			_upgradeInfos = upgradeInfos;
+			_outputStream = outputStream;
+			_outputStreamContainer = outputStreamContainer;
+		}
+
+		@Override
+		public Void call() throws Exception {
+			_outputStreamContainerFactoryTracker.runWithSwappedLog(
+				new UpgradeInfosRunnable(
+					_bundleSymbolicName, _upgradeInfos, _outputStream),
+				_outputStreamContainer.getDescription(), _outputStream);
+
+			try {
+				_outputStream.close();
+			}
+			catch (IOException ioe) {
+				throw new RuntimeException(ioe);
+			}
+
+			Release release = _releaseLocalService.fetchRelease(
+				_bundleSymbolicName);
+
+			if (release != null) {
+				_releasePublisher.publish(release);
+			}
+
+			return null;
+		}
+
+		@Override
+		public String toString() {
+			StringBundler sb = new StringBundler(_upgradeInfos.size() + 1);
+
+			sb.append("Task: ");
+
+			for (UpgradeInfo upgradeInfo : _upgradeInfos) {
+				sb.append(upgradeInfo.toString());
+			}
+
+			return sb.toString();
+		}
+
+		private final String _bundleSymbolicName;
+		private final OutputStream _outputStream;
+		private final OutputStreamContainer _outputStreamContainer;
+		private final List<UpgradeInfo> _upgradeInfos;
+
+	}
+
 	private class UpgradeInfoServiceTrackerMapListener
 		implements ServiceTrackerMapListener
 			<String, UpgradeInfo, List<UpgradeInfo>> {
@@ -364,10 +419,29 @@ public class ReleaseManager {
 
 		@Override
 		public void run() {
-			for (UpgradeInfo upgradeInfo : _upgradeInfos) {
-				UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
+			boolean active = CacheRegistryUtil.isActive();
 
-				try {
+			try {
+				CacheRegistryUtil.setActive(false);
+
+				for (UpgradeInfo upgradeInfo : _upgradeInfos) {
+					UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
+
+					String fromSchemaVersionString =
+							upgradeInfo.getFromSchemaVersionString();
+
+					String schemaVersionString = getSchemaVersionString(
+							_bundleSymbolicName);
+
+					if (!fromSchemaVersionString.equals(schemaVersionString)) {
+						_logger.log(
+							Logger.LOG_INFO, "Skipping " + upgradeInfo +
+								". It has been executed in a previous " +
+									"planification");
+
+						continue;
+					}
+
 					upgradeStep.upgrade(
 						new DBProcessContext() {
 
@@ -388,17 +462,57 @@ public class ReleaseManager {
 						upgradeInfo.getToSchemaVersionString(),
 						upgradeInfo.getFromSchemaVersionString());
 				}
-				catch (Exception e) {
-					throw new RuntimeException(e);
-				}
 			}
-
-			CacheRegistryUtil.clear();
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			finally {
+				CacheRegistryUtil.setActive(active);
+			}
 		}
 
 		private final String _bundleSymbolicName;
 		private final OutputStream _outputStream;
 		private final List<UpgradeInfo> _upgradeInfos;
+
+	}
+
+	private class UpgradeThread extends Thread {
+
+		public void cancel() {
+			_canceled = true;
+
+			interrupt();
+		}
+
+		@Override
+		public void run() {
+			while (!isInterrupted() && !isCanceled()) {
+				try {
+					Callable<Void> callable = _queue.takeLast();
+
+					callable.call();
+				}
+				catch (InterruptedException ie) {
+					_canceled = true;
+				}
+				catch (Exception e) {
+					_logger.log(Logger.LOG_ERROR, e.getMessage(), e);
+				}
+			}
+		}
+
+		private UpgradeThread() {
+			super("Upgrade Thread");
+			
+			start();
+		}
+
+		private boolean isCanceled() {
+			return _canceled;
+		}
+
+		private volatile boolean _canceled = false;
 
 	}
 
