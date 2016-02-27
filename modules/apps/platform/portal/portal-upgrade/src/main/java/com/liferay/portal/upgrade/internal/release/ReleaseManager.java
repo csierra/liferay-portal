@@ -324,13 +324,6 @@ public class ReleaseManager {
 				throw new RuntimeException(ioe);
 			}
 
-			Release release = _releaseLocalService.fetchRelease(
-				_bundleSymbolicName);
-
-			if (release != null) {
-				_releasePublisher.publish(release);
-			}
-
 			return null;
 		}
 
@@ -428,6 +421,13 @@ public class ReleaseManager {
 						_bundleSymbolicName,
 						upgradeInfo.getToSchemaVersionString(),
 						fromSchemaVersionString);
+
+					Release release = _releaseLocalService.fetchRelease(
+							_bundleSymbolicName);
+
+					if (release != null) {
+						_releasePublisher.publish(release);
+					}
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e);
