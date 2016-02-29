@@ -297,6 +297,8 @@ public class ReleaseManager {
 		public UpgradeInfo addingService(
 			ServiceReference<UpgradeStep> serviceReference) {
 
+			String bundleSymbolicName = (String)serviceReference.getProperty(
+				"upgrade.bundle.symbolic.name");
 			String fromSchemaVersionString =
 				(String)serviceReference.getProperty(
 					"upgrade.from.schema.version");
@@ -316,7 +318,8 @@ public class ReleaseManager {
 			}
 
 			return new UpgradeInfo(
-				fromSchemaVersionString, toSchemaVersionString, upgradeStep);
+				bundleSymbolicName, fromSchemaVersionString,
+				toSchemaVersionString, upgradeStep);
 		}
 
 		@Override
