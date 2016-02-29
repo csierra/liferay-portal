@@ -31,7 +31,6 @@ public class ResourceBundleLoaderAnalyzerPlugin implements AnalyzerPlugin {
 		Jar jar = analyzer.getJar();
 
 		if (jar.exists("content/Language.properties")) {
-
 			Parameters headerParameters = new Parameters(
 				analyzer.getProperty(Constants.PROVIDE_CAPABILITY));
 
