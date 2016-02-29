@@ -30,8 +30,7 @@ public class ResourceBundleLoaderAnalyzerPlugin implements AnalyzerPlugin {
 	public boolean analyzeJar(Analyzer analyzer) throws Exception {
 		Jar jar = analyzer.getJar();
 
-		if (jar.exists("content/Language.properties") ||
-			jar.exists("WEB-INF/classes/content/Language.properties")) {
+		if (jar.exists("content/Language.properties")) {
 
 			Parameters headerParameters = new Parameters(
 				analyzer.getProperty(Constants.PROVIDE_CAPABILITY));

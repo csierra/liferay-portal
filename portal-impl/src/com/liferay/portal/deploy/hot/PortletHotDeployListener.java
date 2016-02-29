@@ -47,8 +47,11 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.WebAppPool;
@@ -56,9 +59,9 @@ import com.liferay.portlet.PortletContextBag;
 import com.liferay.portlet.PortletContextBagPool;
 import com.liferay.portlet.PortletFilterFactory;
 import com.liferay.portlet.PortletURLListenerFactory;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
-import com.liferay.registry.collections.ServiceRegistrationMap;
-import com.liferay.registry.collections.ServiceRegistrationMapImpl;
 import com.liferay.util.bridges.php.PHPPortlet;
 
 import java.util.HashMap;
@@ -67,7 +70,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.naming.Context;
@@ -165,6 +167,29 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		}
 	}
 
+	protected void checkResourceBundles(
+		ClassLoader classLoader, Portlet portlet) {
+
+		if (Validator.isNull(portlet.getResourceBundle())) {
+			return;
+		}
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		ResourceBundleLoader resourceBundleLoader =
+			ResourceBundleUtil.getResourceBundleLoader(
+				portlet.getResourceBundle(), classLoader);
+
+		Map<String, Object> properties = new HashMap<>();
+
+		properties.put("baseName", portlet.getResourceBundle());
+		properties.put("service.ranking", Integer.MIN_VALUE);
+		properties.put("servlet.context.name", portlet.getContextName());
+
+		_resourceBundleLoaderServiceRegistration = registry.registerService(
+			ResourceBundleLoader.class, resourceBundleLoader, properties);
+	}
+
 	protected void destroyPortlet(Portlet portlet, Set<String> portletIds)
 		throws Exception {
 
@@ -187,14 +212,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 		portletIds.add(portlet.getPortletId());
 
-		for (ResourceBundle resourceBundle : _serviceRegistrations.keySet()) {
-			ServiceRegistration<ResourceBundle> serviceRegistration =
-				_serviceRegistrations.remove(resourceBundle);
-
-			if (serviceRegistration != null) {
-				serviceRegistration.unregister();
-			}
-		}
+		_resourceBundleLoaderServiceRegistration.unregister();
 	}
 
 	protected void doInvokeDeploy(HotDeployEvent hotDeployEvent)
@@ -327,6 +345,8 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 			ResourceActionLocalServiceUtil.checkResourceActions(
 				portlet.getPortletId(), portletActions);
+
+			checkResourceBundles(classLoader, portlet);
 
 			for (String modelName : modelNames) {
 				List<String> modelActions =
@@ -601,7 +621,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		new HashMap<>();
 	private static final Map<String, List<Portlet>> _portlets = new HashMap<>();
 
-	private final ServiceRegistrationMap<ResourceBundle>
-		_serviceRegistrations = new ServiceRegistrationMapImpl<>();
+	private ServiceRegistration<ResourceBundleLoader>
+		_resourceBundleLoaderServiceRegistration;
 
 }
