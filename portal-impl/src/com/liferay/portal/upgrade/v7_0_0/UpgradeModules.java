@@ -176,7 +176,7 @@ public class UpgradeModules extends UpgradeProcess {
 		"com.liferay.portlet.configuration.css.web",
 		"com.liferay.portlet.configuration.web", "com.liferay.quick.note.web",
 		"com.liferay.ratings.page.ratings.web", "com.liferay.rss.web",
-		"com.liferay.search.web", "com.liferay.server.admin.web",
+		"com.liferay.portal.search.web", "com.liferay.server.admin.web",
 		"com.liferay.shopping.service", "com.liferay.shopping.web",
 		"com.liferay.site.browser.web", "com.liferay.site.my.sites.web",
 		"com.liferay.site.navigation.breadcrumb.web",
