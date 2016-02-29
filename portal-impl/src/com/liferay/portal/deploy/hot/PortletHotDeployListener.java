@@ -186,8 +186,10 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		properties.put("service.ranking", Integer.MIN_VALUE);
 		properties.put("servlet.context.name", portlet.getContextName());
 
-		_resourceBundleLoaderServiceRegistration = registry.registerService(
-			ResourceBundleLoader.class, resourceBundleLoader, properties);
+		_resourceBundleLoaderServiceRegistrations.put(
+			portlet.getPortletId(),
+			registry.registerService(
+				ResourceBundleLoader.class, resourceBundleLoader, properties));
 	}
 
 	protected void destroyPortlet(Portlet portlet, Set<String> portletIds)
@@ -212,7 +214,14 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 		portletIds.add(portlet.getPortletId());
 
-		_resourceBundleLoaderServiceRegistration.unregister();
+		ServiceRegistration<ResourceBundleLoader>
+			resourceBundleLoaderServiceRegistration =
+				_resourceBundleLoaderServiceRegistrations.remove(
+					portlet.getPortletId());
+
+		if (resourceBundleLoaderServiceRegistration != null) {
+			resourceBundleLoaderServiceRegistration.unregister();
+		}
 	}
 
 	protected void doInvokeDeploy(HotDeployEvent hotDeployEvent)
@@ -621,7 +630,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		new HashMap<>();
 	private static final Map<String, List<Portlet>> _portlets = new HashMap<>();
 
-	private ServiceRegistration<ResourceBundleLoader>
-		_resourceBundleLoaderServiceRegistration;
+	private final Map<String, ServiceRegistration<ResourceBundleLoader>>
+		_resourceBundleLoaderServiceRegistrations = new HashMap<>();
 
 }
