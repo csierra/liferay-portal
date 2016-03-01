@@ -14,6 +14,7 @@
 
 package com.liferay.portal.test.rule;
 
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.BaseTestRule;
 import com.liferay.portal.kernel.test.rule.BaseTestRule.StatementWrapper;
@@ -32,6 +33,9 @@ import com.liferay.portal.test.rule.callback.SybaseDumpTransactionLogTestCallbac
 import com.liferay.portal.test.rule.callback.UniqueStringRandomizerBumperTestCallback;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceTracker;
 import com.liferay.util.log4j.Log4JUtil;
 
 import java.util.ArrayList;
@@ -113,6 +117,14 @@ public class LiferayIntegrationTestRule extends AggregateTestRule {
 
 							InitUtil.initWithSpring(
 								configLocations, true, true);
+
+							Registry registry = RegistryUtil.getRegistry();
+
+							ServiceTracker<?, ?> serviceTracker =
+								registry.trackServices(
+									BackgroundTaskManager.class);
+
+							serviceTracker.waitForService(60 * 1000L);
 
 							if (configureLog4j) {
 								Log4JUtil.configureLog4J(
