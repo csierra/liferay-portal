@@ -467,13 +467,6 @@ public class ReleaseManager {
 						_bundleSymbolicName,
 						upgradeInfo.getToSchemaVersionString(),
 						fromSchemaVersionString);
-
-					Release release = _releaseLocalService.fetchRelease(
-						_bundleSymbolicName);
-
-					if (release != null) {
-						_releasePublisher.publish(release);
-					}
 				}
 			}
 			catch (Exception e) {
