@@ -72,6 +72,7 @@ public final class ReleasePublisher extends BaseModelListener<Release> {
 
 		properties.put(
 			"release.bundle.symbolic.name", release.getBundleSymbolicName());
+		properties.put("release.schema.verified", release.isVerified());
 		properties.put("release.schema.version", release.getSchemaVersion());
 
 		ServiceRegistration<Release> newServiceRegistration =
