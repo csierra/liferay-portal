@@ -429,10 +429,6 @@ public class ReleaseManager {
 
 					Release release = _releaseLocalService.fetchRelease(
 						_bundleSymbolicName);
-
-					if (release != null) {
-						_releasePublisher.publish(release);
-					}
 				}
 			}
 			catch (Exception e) {
