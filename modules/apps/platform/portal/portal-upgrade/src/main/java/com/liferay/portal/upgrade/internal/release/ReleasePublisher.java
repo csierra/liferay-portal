@@ -15,15 +15,18 @@
 package com.liferay.portal.upgrade.internal.release;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -36,8 +39,21 @@ import org.osgi.service.component.annotations.Reference;
  * @author Miguel Pastor
  * @author Carlos Sierra Andrés
  */
-@Component(immediate = true, service = ReleasePublisher.class)
-public final class ReleasePublisher {
+@Component(
+	immediate = true,
+	service = {ModelListener.class, ReleasePublisher.class}
+)
+public final class ReleasePublisher extends BaseModelListener<Release> {
+
+	@Override
+	public void onAfterCreate(Release release) throws ModelListenerException {
+		publish(release);
+	}
+
+	@Override
+	public void onAfterUpdate(Release release) throws ModelListenerException {
+		publish(release);
+	}
 
 	public void publish(Release release) {
 		ServiceRegistration<Release> oldServiceRegistration =
@@ -45,7 +61,11 @@ public final class ReleasePublisher {
 				release.getServletContextName());
 
 		if (oldServiceRegistration != null) {
-			oldServiceRegistration.unregister();
+			try {
+				oldServiceRegistration.unregister();
+			}
+			catch (IllegalStateException ise) {
+			}
 		}
 
 		Dictionary<String, Object> properties = new Hashtable<>();
@@ -97,6 +117,6 @@ public final class ReleasePublisher {
 	private BundleContext _bundleContext;
 	private ReleaseLocalService _releaseLocalService;
 	private final Map<String, ServiceRegistration<Release>>
-		_serviceConfiguratorRegistrations = new HashMap<>();
+		_serviceConfiguratorRegistrations = new ConcurrentHashMap<>();
 
 }
