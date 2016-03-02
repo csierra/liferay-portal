@@ -45,13 +45,18 @@ public final class ReleasePublisher {
 				release.getServletContextName());
 
 		if (oldServiceRegistration != null) {
-			oldServiceRegistration.unregister();
+			try {
+				oldServiceRegistration.unregister();
+			}
+			catch (IllegalStateException ise) {
+			}
 		}
 
 		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put(
 			"release.bundle.symbolic.name", release.getBundleSymbolicName());
+		properties.put("release.schema.verified", release.isVerified());
 		properties.put("release.schema.version", release.getSchemaVersion());
 
 		ServiceRegistration<Release> newServiceRegistration =
