@@ -60,14 +60,6 @@ public final class ReleasePublisher extends BaseModelListener<Release> {
 			_serviceConfiguratorRegistrations.get(
 				release.getServletContextName());
 
-		if (oldServiceRegistration != null) {
-			try {
-				oldServiceRegistration.unregister();
-			}
-			catch (IllegalStateException ise) {
-			}
-		}
-
 		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put(
@@ -75,11 +67,17 @@ public final class ReleasePublisher extends BaseModelListener<Release> {
 		properties.put("release.schema.verified", release.isVerified());
 		properties.put("release.schema.version", release.getSchemaVersion());
 
-		ServiceRegistration<Release> newServiceRegistration =
-			_bundleContext.registerService(Release.class, release, properties);
+		if (oldServiceRegistration != null) {
+			oldServiceRegistration.setProperties(properties);
+		}
+		else {
+			ServiceRegistration<Release> newServiceRegistration =
+				_bundleContext.registerService(
+					Release.class, release, properties);
 
-		_serviceConfiguratorRegistrations.put(
-			release.getServletContextName(), newServiceRegistration);
+			_serviceConfiguratorRegistrations.put(
+				release.getServletContextName(), newServiceRegistration);
+		}
 	}
 
 	@Activate
