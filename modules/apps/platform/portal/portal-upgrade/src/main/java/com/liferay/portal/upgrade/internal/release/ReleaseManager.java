@@ -40,6 +40,7 @@ import com.liferay.portal.upgrade.registry.UpgradeInfo;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -156,14 +157,14 @@ public class ReleaseManager {
 					"upgrade.from.schema.version")),
 			serviceTrackerMapListener);
 
-		_upgradeThread = new UpgradeThread();
+		_upgradeDispatcher = new UpgradeDispatcher(_queue, 5);
 	}
 
 	@Deactivate
 	protected void deactivate() {
 		_serviceTrackerMap.close();
 
-		_upgradeThread.cancel();
+		_upgradeDispatcher.cancel();
 	}
 
 	protected void doExecute(
@@ -206,7 +207,7 @@ public class ReleaseManager {
 
 		OutputStream outputStream = outputStreamContainer.getOutputStream();
 
-		Callable<Void> upgradeCallable = new UpgradeCallable(
+		UpgradeCallable upgradeCallable = new UpgradeCallable(
 			bundleSymbolicName, upgradeInfos, outputStream,
 			outputStreamContainer);
 
@@ -239,13 +240,13 @@ public class ReleaseManager {
 
 	private OutputStreamContainerFactoryTracker
 		_outputStreamContainerFactoryTracker;
-	private final BlockingDeque<Callable<Void>> _queue =
+	private final BlockingDeque<UpgradeCallable> _queue =
 		new LinkedBlockingDeque<>();
 	private ReleaseLocalService _releaseLocalService;
 	private ReleaseManagerConfiguration _releaseManagerConfiguration;
 	private ReleasePublisher _releasePublisher;
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
-	private UpgradeThread _upgradeThread;
+	private UpgradeDispatcher _upgradeDispatcher;
 
 	private static class UpgradeServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<UpgradeStep, UpgradeInfo> {
@@ -331,6 +332,10 @@ public class ReleaseManager {
 			return null;
 		}
 
+		public String getBundleSymbolicName() {
+			return _bundleSymbolicName;
+		}
+
 		@Override
 		public String toString() {
 			StringBundler sb = new StringBundler(_upgradeInfos.size() + 1);
@@ -348,6 +353,78 @@ public class ReleaseManager {
 		private final OutputStream _outputStream;
 		private final OutputStreamContainer _outputStreamContainer;
 		private final List<UpgradeInfo> _upgradeInfos;
+
+	}
+
+	private class UpgradeDispatcher extends Thread {
+
+		public void cancel() {
+			for (UpgradeThread upgradeThread : _upgradeThreads) {
+				upgradeThread.cancel();
+			}
+
+			_canceled = true;
+
+			interrupt();
+		}
+
+		@Override
+		public void run() {
+			while (!isInterrupted() && !isCanceled()) {
+				try {
+					UpgradeCallable callable = _queue.takeLast();
+
+					String bundleSymbolicName =
+						callable.getBundleSymbolicName();
+
+					int hashCode = bundleSymbolicName.hashCode();
+
+					int bucket = Math.abs(hashCode % _size);
+
+					BlockingDeque<UpgradeCallable> deque = _upgradeQueues.get(
+						bucket);
+
+					deque.addFirst(callable);
+				}
+				catch (InterruptedException ie) {
+					_canceled = true;
+				}
+				catch (Exception e) {
+					_logger.log(Logger.LOG_ERROR, e.getMessage(), e);
+				}
+			}
+		}
+
+		private UpgradeDispatcher(
+			BlockingDeque<UpgradeCallable> queue, int size) {
+
+			_queue = queue;
+			_size = size;
+
+			_upgradeThreads = new ArrayList<>(size);
+			_upgradeQueues = new ArrayList<>(size);
+
+			for (int i = 0; i < size; i++) {
+				LinkedBlockingDeque<UpgradeCallable> blockingDeque =
+					new LinkedBlockingDeque<>();
+
+				_upgradeQueues.add(blockingDeque);
+
+				_upgradeThreads.add(new UpgradeThread(blockingDeque, i));
+			}
+
+			start();
+		}
+
+		private boolean isCanceled() {
+			return _canceled;
+		}
+
+		private boolean _canceled = false;
+		private final BlockingDeque<UpgradeCallable> _queue;
+		private final int _size;
+		private final ArrayList<BlockingDeque<UpgradeCallable>> _upgradeQueues;
+		private final List<UpgradeThread> _upgradeThreads;
 
 	}
 
@@ -425,9 +502,6 @@ public class ReleaseManager {
 						_bundleSymbolicName,
 						upgradeInfo.getToSchemaVersionString(),
 						fromSchemaVersionString);
-
-					Release release = _releaseLocalService.fetchRelease(
-						_bundleSymbolicName);
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e);
@@ -466,8 +540,10 @@ public class ReleaseManager {
 			}
 		}
 
-		private UpgradeThread() {
-			super("Upgrade Thread");
+		private UpgradeThread(BlockingDeque<UpgradeCallable> queue, int i) {
+			super("Upgrade Thread " + i);
+
+			_queue = queue;
 
 			start();
 		}
@@ -477,6 +553,7 @@ public class ReleaseManager {
 		}
 
 		private volatile boolean _canceled = false;
+		private BlockingDeque<UpgradeCallable> _queue;
 
 	}
 
