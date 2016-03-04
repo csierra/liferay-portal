@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.dao.db.DBContext;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.model.Release;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.Validator;
@@ -219,16 +220,16 @@ public class ReleaseManager {
 		return release.getSchemaVersion();
 	}
 
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
 	@Reference(unbind = "-")
 	protected void setReleaseLocalService(
 		ReleaseLocalService releaseLocalService) {
 
 		_releaseLocalService = releaseLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setReleasePublisher(ReleasePublisher releasePublisher) {
-		_releasePublisher = releasePublisher;
 	}
 
 	private static Logger _logger;
@@ -237,7 +238,6 @@ public class ReleaseManager {
 		_outputStreamContainerFactoryTracker;
 	private ReleaseLocalService _releaseLocalService;
 	private ReleaseManagerConfiguration _releaseManagerConfiguration;
-	private ReleasePublisher _releasePublisher;
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
 
 	private static class UpgradeServiceTrackerCustomizer
