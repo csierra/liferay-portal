@@ -269,11 +269,6 @@ public class ReleaseManager {
 		_releaseLocalService = releaseLocalService;
 	}
 
-	@Reference(unbind = "-")
-	protected void setReleasePublisher(ReleasePublisher releasePublisher) {
-		_releasePublisher = releasePublisher;
-	}
-
 	private static Logger _logger;
 
 	private OutputStreamContainerFactoryTracker
@@ -282,7 +277,6 @@ public class ReleaseManager {
 		new LinkedBlockingDeque<>();
 	private ReleaseLocalService _releaseLocalService;
 	private ReleaseManagerConfiguration _releaseManagerConfiguration;
-	private ReleasePublisher _releasePublisher;
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
 	private UpgradeThread _upgradeThread;
 
