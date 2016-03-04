@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.executor.PortalExecutorManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.nio.intraband.Intraband;
 import com.liferay.portal.kernel.nio.intraband.SystemDataType;
 import com.liferay.portal.kernel.nio.intraband.mailbox.MailboxDatagramReceiveHandler;
@@ -52,9 +53,13 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.messageboards.util.MBMessageIndexer;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceRegistration;
 import com.liferay.registry.dependency.ServiceDependencyListener;
 import com.liferay.registry.dependency.ServiceDependencyManager;
 import com.liferay.taglib.servlet.JspFactorySwapper;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.portlet.MimeResponse;
 import javax.portlet.PortletRequest;
@@ -192,6 +197,47 @@ public class StartupAction extends SimpleAction {
 
 		DBUpgrader.verify();
 
+		final Registry registry = RegistryUtil.getRegistry();
+
+		Map<String, Object> properties = new HashMap<>();
+
+		properties.put("module.service.lifecycle", "database.initialized");
+		properties.put("service.vendor", ReleaseInfo.getVendor());
+		properties.put("service.version", ReleaseInfo.getVersion());
+
+		_moduleServiceLifecycleServiceRegistration = registry.registerService(
+			ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+			properties);
+
+		// Cluster master token listener
+
+		ServiceDependencyManager clusterMasterExecutorServiceDependencyManager =
+			new ServiceDependencyManager();
+
+		clusterMasterExecutorServiceDependencyManager.
+			addServiceDependencyListener(
+				new ServiceDependencyListener() {
+
+					@Override
+					public void dependenciesFulfilled() {
+						ClusterMasterExecutor clusterMasterExecutor =
+							registry.getService(ClusterMasterExecutor.class);
+
+						if (!clusterMasterExecutor.isEnabled()) {
+							BackgroundTaskManagerUtil.cleanUpBackgroundTasks();
+						}
+					}
+
+					@Override
+					public void destroy() {
+					}
+
+				});
+
+		clusterMasterExecutorServiceDependencyManager.registerDependencies(
+			BackgroundTaskManager.class, ClusterExecutor.class,
+			ClusterMasterExecutor.class);
+
 		// Liferay JspFactory
 
 		JspFactorySwapper.swap();
@@ -202,6 +248,9 @@ public class StartupAction extends SimpleAction {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(StartupAction.class);
+
+	private ServiceRegistration<ModuleServiceLifecycle>
+		_moduleServiceLifecycleServiceRegistration;
 
 	private static class PortalResiliencyServiceDependencyLister
 		implements ServiceDependencyListener {
