@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
+import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
@@ -40,6 +41,7 @@ import com.liferay.portal.upgrade.registry.UpgradeInfo;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.sql.BatchUpdateException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -157,7 +159,7 @@ public class ReleaseManager {
 					"upgrade.from.schema.version")),
 			serviceTrackerMapListener);
 
-		_upgradeDispatcher = new UpgradeDispatcher(_queue, 5);
+		_upgradeDispatcher = new UpgradeDispatcher(_queue, 1);
 	}
 
 	@Deactivate
@@ -499,7 +501,7 @@ public class ReleaseManager {
 						fromSchemaVersionString);
 				}
 			}
-			catch (Exception e) {
+			catch (UpgradeException e) {
 				throw new RuntimeException(e);
 			}
 			finally {
@@ -524,16 +526,23 @@ public class ReleaseManager {
 		@Override
 		public void run() {
 			while (!isInterrupted() && !isCanceled()) {
-				try {
-					Callable<Void> callable = _queue.takeLast();
 
-					callable.call();
+				try {
+					UpgradeCallable callable = _queue.takeLast();
+
+					try {
+						callable.call();
+					}
+					catch (Exception e) {
+						_logger.log(Logger.LOG_ERROR, e.getMessage(), e);
+
+						_logger.log(Logger.LOG_ERROR, "Retrying...");
+
+						_queue.addFirst(callable);
+					}
 				}
 				catch (InterruptedException ie) {
 					_canceled = true;
-				}
-				catch (Exception e) {
-					_logger.log(Logger.LOG_ERROR, e.getMessage(), e);
 				}
 			}
 		}

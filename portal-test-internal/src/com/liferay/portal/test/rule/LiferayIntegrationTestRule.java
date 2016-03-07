@@ -69,10 +69,10 @@ public class LiferayIntegrationTestRule extends AggregateTestRule {
 		testRules.add(_sybaseDumpTransactionLogTestRule);
 		testRules.add(_clearThreadLocalTestRule);
 		testRules.add(_uniqueStringRandomizerBumperTestRule);
+		testRules.add(_waitingTestRule);
 		testRules.add(_mainServletTestRule);
 		testRules.add(_companyProviderTestRule);
 		testRules.add(_deleteAfterTestRunTestRule);
-		testRules.add(_waitingTestRule);
 
 		return testRules.toArray(new TestRule[testRules.size()]);
 	}
