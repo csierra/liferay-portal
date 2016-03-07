@@ -202,12 +202,6 @@ public class ReleaseManager {
 		catch (IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
-
-		Release release = _releaseLocalService.fetchRelease(bundleSymbolicName);
-
-		if (release != null) {
-			_releasePublisher.publish(release);
-		}
 	}
 
 	protected String getSchemaVersionString(String bundleSymbolicName) {
