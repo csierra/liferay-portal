@@ -41,7 +41,6 @@ import com.liferay.portal.upgrade.registry.UpgradeInfo;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import java.sql.BatchUpdateException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -501,8 +500,8 @@ public class ReleaseManager {
 						fromSchemaVersionString);
 				}
 			}
-			catch (UpgradeException e) {
-				throw new RuntimeException(e);
+			catch (UpgradeException ue) {
+				throw new RuntimeException(ue);
 			}
 			finally {
 				CacheRegistryUtil.setActive(active);
@@ -526,7 +525,6 @@ public class ReleaseManager {
 		@Override
 		public void run() {
 			while (!isInterrupted() && !isCanceled()) {
-
 				try {
 					UpgradeCallable callable = _queue.takeLast();
 

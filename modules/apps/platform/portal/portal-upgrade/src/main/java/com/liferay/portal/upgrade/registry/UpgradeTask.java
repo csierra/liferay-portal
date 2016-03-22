@@ -23,14 +23,6 @@ import java.util.List;
  */
 public class UpgradeTask {
 
-	public List<UpgradeInfo> getUpgradeInfoList() {
-		return _upgradeInfoList;
-	}
-
-	public String getBundleSymbolicName() {
-		return _bundleSymbolicName;
-	}
-
 	public UpgradeTask(
 		String bundleSymbolicName, List<UpgradeInfo> upgradeInfoList,
 		OutputStreamContainer outputStreamContainer) {
@@ -38,14 +30,22 @@ public class UpgradeTask {
 		_bundleSymbolicName = bundleSymbolicName;
 		_upgradeInfoList = upgradeInfoList;
 		_outputStreamContainer = outputStreamContainer;
-
 	}
 
-	private String _bundleSymbolicName;
-	private List<UpgradeInfo> _upgradeInfoList;
-	private OutputStreamContainer _outputStreamContainer;
+	public String getBundleSymbolicName() {
+		return _bundleSymbolicName;
+	}
 
 	public OutputStreamContainer getOutputStreamContainer() {
 		return _outputStreamContainer;
 	}
+
+	public List<UpgradeInfo> getUpgradeInfoList() {
+		return _upgradeInfoList;
+	}
+
+	private final String _bundleSymbolicName;
+	private final OutputStreamContainer _outputStreamContainer;
+	private final List<UpgradeInfo> _upgradeInfoList;
+
 }
