@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1458671029150
+Bnd-LastModified: 1458672828470
 Bundle-ManifestVersion: 2
 Bundle-Name: portal-bootstrap
 Bundle-SymbolicName: portal-bootstrap
@@ -2139,7 +2139,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  ence,com.liferay.portal.kernel.util",com.liferay.blogs.kernel.util.co
  mparator;version="1.0.0";uses:="com.liferay.blogs.kernel.model,com.li
  feray.portal.kernel.util",com.liferay.counter;version="1.0.0",com.lif
- eray.counter.kernel;version="2.1.1",com.liferay.counter.kernel.except
+ eray.counter.kernel;version="2.2.0",com.liferay.counter.kernel.except
  ion;version="1.0.0";uses:="com.liferay.portal.kernel.exception",com.l
  iferay.counter.kernel.model;version="1.0.0";uses:="com.liferay.expand
  o.kernel.model,com.liferay.portal.kernel.annotation,com.liferay.porta
@@ -2421,7 +2421,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  1.0.0",com.liferay.portal.deploy.auto;uses:="com.liferay.portal.kerne
  l.deploy.auto,com.liferay.portal.kernel.deploy.auto.context,com.lifer
  ay.portal.kernel.plugin,com.liferay.portal.tools.deploy";version="1.0
- .0",com.liferay.portal.deploy.hot;version="1.0.2";uses:="com.liferay.
+ .0",com.liferay.portal.deploy.hot;version="1.1.0";uses:="com.liferay.
  portal.kernel.configuration,com.liferay.portal.kernel.deploy.hot,com.
  liferay.portal.kernel.model,com.liferay.portal.kernel.plugin,com.life
  ray.portal.kernel.security.pacl,com.liferay.portal.kernel.service,com
@@ -2572,7 +2572,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  oy.auto;version="7.0.0";uses:="com.liferay.portal.kernel.deploy.auto.
  context,com.liferay.portal.kernel.exception",com.liferay.portal.kerne
  l.deploy.auto.context;version="6.3.0";uses:="com.liferay.portal.kerne
- l.plugin",com.liferay.portal.kernel.deploy.hot;version="7.0.0";uses:=
+ l.plugin",com.liferay.portal.kernel.deploy.hot;version="7.1.0";uses:=
  "com.liferay.portal.kernel.exception,com.liferay.portal.kernel.messag
  ing,com.liferay.portal.kernel.plugin,com.liferay.portal.kernel.util,j
  avax.servlet",com.liferay.portal.kernel.diff;version="1.0.0";uses:="c
@@ -2940,7 +2940,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  l.kernel.exception,com.liferay.portal.kernel.model,com.liferay.portal
  .kernel.service,com.liferay.portal.kernel.service.persistence,com.lif
  eray.portal.kernel.util",com.liferay.portal.kernel.servlet;version="7
- .0.0";uses:="com.liferay.portal.kernel.log,com.liferay.portal.kernel.
+ .1.0";uses:="com.liferay.portal.kernel.log,com.liferay.portal.kernel.
  util,javax.portlet,javax.servlet,javax.servlet.http",com.liferay.port
  al.kernel.servlet.filters.compoundsessionid;version="7.0.0";uses:="co
  m.liferay.portal.kernel.servlet,javax.servlet.http",com.liferay.porta
@@ -3627,7 +3627,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  om.liferay.portal.kernel.service.persistence,com.liferay.portal.kerne
  l.service.persistence.impl,com.liferay.portal.kernel.util,com.liferay
  .portlet.announcements.model.impl";version="1.0.0",com.liferay.portle
- t.asset;version="2.1.1",com.liferay.portlet.asset.action;uses:="com.l
+ t.asset;version="2.2.0",com.liferay.portlet.asset.action;uses:="com.l
  iferay.asset.kernel.model,com.liferay.portal.struts,javax.servlet.htt
  p,org.apache.struts.action";version="1.0.0",com.liferay.portlet.asset
  .model;version="1.0.2";uses:="com.liferay.asset.kernel.model,com.life
@@ -4063,7 +4063,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  eray.portlet.social.util;uses:="com.liferay.portal.kernel.service,com
  .liferay.portal.kernel.theme,com.liferay.portal.kernel.util,com.lifer
  ay.social.kernel.model,com.liferay.social.kernel.util,javax.servlet.h
- ttp";version="1.0.0",com.liferay.portlet.trash;version="2.1.1",com.li
+ ttp";version="1.0.0",com.liferay.portlet.trash;version="2.2.0",com.li
  feray.portlet.trash.model.impl;uses:="com.liferay.expando.kernel.mode
  l,com.liferay.portal.kernel.json,com.liferay.portal.kernel.model,com.
  liferay.portal.kernel.model.impl,com.liferay.portal.kernel.service,co
