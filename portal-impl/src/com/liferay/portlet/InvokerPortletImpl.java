@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletFilterUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
@@ -89,6 +90,8 @@ import org.apache.commons.lang.time.StopWatch;
  */
 public class InvokerPortletImpl
 	implements InvokerFilterContainer, InvokerPortlet {
+
+	private ClassLoader _portletClassLoader;
 
 	public static void clearResponse(
 		HttpSession session, long plid, String portletId, String languageId) {
@@ -199,11 +202,9 @@ public class InvokerPortletImpl
 		ClassLoader contextClassLoader =
 			ClassLoaderUtil.getContextClassLoader();
 
-		ClassLoader portletClassLoader = getPortletClassLoader();
-
 		try {
-			if (portletClassLoader != null) {
-				ClassLoaderUtil.setContextClassLoader(portletClassLoader);
+			if (_portletClassLoader != null) {
+				ClassLoaderUtil.setContextClassLoader(_portletClassLoader);
 			}
 
 			Closeable closeable = (Closeable)_invokerFilterContainer;
@@ -216,7 +217,7 @@ public class InvokerPortletImpl
 			_log.error(ioe, ioe);
 		}
 		finally {
-			if (portletClassLoader != null) {
+			if (_portletClassLoader != null) {
 				ClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
@@ -244,10 +245,15 @@ public class InvokerPortletImpl
 
 	@Override
 	public ClassLoader getPortletClassLoader() {
-		ServletContext servletContext =
-			_liferayPortletContext.getServletContext();
+		ClassLoader classLoader =
+			(ClassLoader)_liferayPortletContext.getAttribute(
+				PluginContextListener.PLUGIN_CLASS_LOADER);
 
-		return servletContext.getClassLoader();
+		if (classLoader == null) {
+			classLoader = ClassLoaderUtil.getPortalClassLoader();
+		}
+
+		return classLoader;
 	}
 
 	@Override
@@ -282,17 +288,17 @@ public class InvokerPortletImpl
 		ClassLoader contextClassLoader =
 			ClassLoaderUtil.getContextClassLoader();
 
-		ClassLoader portletClassLoader = getPortletClassLoader();
+		_portletClassLoader = getPortletClassLoader();
 
 		try {
-			if (portletClassLoader != null) {
-				ClassLoaderUtil.setContextClassLoader(portletClassLoader);
+			if (_portletClassLoader != null) {
+				ClassLoaderUtil.setContextClassLoader(_portletClassLoader);
 			}
 
 			_portlet.init(portletConfig);
 		}
 		finally {
-			if (portletClassLoader != null) {
+			if (_portletClassLoader != null) {
 				ClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
