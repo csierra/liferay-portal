@@ -91,6 +91,8 @@ import org.apache.commons.lang.time.StopWatch;
 public class InvokerPortletImpl
 	implements InvokerFilterContainer, InvokerPortlet {
 
+	private ClassLoader _portletClassLoader;
+
 	public static void clearResponse(
 		HttpSession session, long plid, String portletId, String languageId) {
 
@@ -200,11 +202,9 @@ public class InvokerPortletImpl
 		ClassLoader contextClassLoader =
 			ClassLoaderUtil.getContextClassLoader();
 
-		ClassLoader portletClassLoader = getPortletClassLoader();
-
 		try {
-			if (portletClassLoader != null) {
-				ClassLoaderUtil.setContextClassLoader(portletClassLoader);
+			if (_portletClassLoader != null) {
+				ClassLoaderUtil.setContextClassLoader(_portletClassLoader);
 			}
 
 			Closeable closeable = (Closeable)_invokerFilterContainer;
@@ -217,7 +217,7 @@ public class InvokerPortletImpl
 			_log.error(ioe, ioe);
 		}
 		finally {
-			if (portletClassLoader != null) {
+			if (_portletClassLoader != null) {
 				ClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
@@ -288,17 +288,17 @@ public class InvokerPortletImpl
 		ClassLoader contextClassLoader =
 			ClassLoaderUtil.getContextClassLoader();
 
-		ClassLoader portletClassLoader = getPortletClassLoader();
+		_portletClassLoader = getPortletClassLoader();
 
 		try {
-			if (portletClassLoader != null) {
-				ClassLoaderUtil.setContextClassLoader(portletClassLoader);
+			if (_portletClassLoader != null) {
+				ClassLoaderUtil.setContextClassLoader(_portletClassLoader);
 			}
 
 			_portlet.init(portletConfig);
 		}
 		finally {
-			if (portletClassLoader != null) {
+			if (_portletClassLoader != null) {
 				ClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
