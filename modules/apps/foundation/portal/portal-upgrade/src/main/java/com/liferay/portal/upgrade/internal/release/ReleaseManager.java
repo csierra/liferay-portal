@@ -43,10 +43,10 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.Set;
 
 import org.apache.felix.utils.log.Logger;
 
@@ -428,14 +428,15 @@ public class ReleaseManager {
 					UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
 
 					String fromSchemaVersionString =
-							upgradeInfo.getFromSchemaVersionString();
+						upgradeInfo.getFromSchemaVersionString();
 
 					String schemaVersionString = getSchemaVersionString(
-							_bundleSymbolicName);
+						_bundleSymbolicName);
 
 					if (!fromSchemaVersionString.equals(schemaVersionString)) {
 						_logger.log(
-							Logger.LOG_INFO, "Skipping " + upgradeInfo +
+							Logger.LOG_INFO,
+							"Skipping " + upgradeInfo +
 								". It has been executed in a previous " +
 									"planification");
 
@@ -487,7 +488,7 @@ public class ReleaseManager {
 
 		@Override
 		public void run() {
-			while (!isInterrupted() && !isCanceled()) {
+			while (!isInterrupted() && !_isCanceled()) {
 				try {
 					Callable<Void> callable = _queue.takeLast();
 
@@ -508,7 +509,7 @@ public class ReleaseManager {
 			start();
 		}
 
-		private boolean isCanceled() {
+		private boolean _isCanceled() {
 			return _canceled;
 		}
 
