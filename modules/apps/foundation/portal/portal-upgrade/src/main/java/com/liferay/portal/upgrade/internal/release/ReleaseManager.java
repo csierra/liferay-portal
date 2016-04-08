@@ -349,10 +349,24 @@ public class ReleaseManager {
 
 		@Override
 		public Void call() throws Exception {
-			_outputStreamContainerFactoryTracker.runWithSwappedLog(
-				new UpgradeInfosRunnable(
-					_bundleSymbolicName, _upgradeInfos, _outputStream),
-				_outputStreamContainer.getDescription(), _outputStream);
+			try {
+				_outputStreamContainerFactoryTracker.runWithSwappedLog(
+					new UpgradeInfosRunnable(
+						_bundleSymbolicName, _upgradeInfos, _outputStream),
+					_outputStreamContainer.getDescription(), _outputStream);
+			}
+			catch (RuntimeException e) {
+				Throwable cause = e.getCause();
+
+				Class<? extends Throwable> clazz = cause.getClass();
+				String className = clazz.getName();
+
+				if (className.contains(
+					"HibernateOptimisticLockingFailureException")) {
+
+					_queue.addFirst(this);
+				}
+			}
 
 			try {
 				_outputStream.close();
