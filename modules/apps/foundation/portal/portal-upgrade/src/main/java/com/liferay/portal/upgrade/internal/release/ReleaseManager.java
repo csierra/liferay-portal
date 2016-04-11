@@ -183,6 +183,16 @@ public class ReleaseManager {
 				new PropertyServiceReferenceComparator<UpgradeStep>(
 					"upgrade.from.schema.version")),
 			serviceTrackerMapListener);
+
+		synchronized (_upgradeQueue) {
+			try {
+				_upgradeQueue.wait();
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	@Deactivate

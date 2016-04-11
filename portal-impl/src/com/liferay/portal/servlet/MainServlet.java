@@ -97,6 +97,7 @@ import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
+import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.dependency.ServiceDependencyListener;
 import com.liferay.registry.dependency.ServiceDependencyManager;
 import com.liferay.social.kernel.util.SocialConfigurationUtil;
@@ -1318,6 +1319,16 @@ public class MainServlet extends ActionServlet {
 
 		_servletContextServiceRegistration = registry.registerService(
 			ServletContext.class, getServletContext(), properties);
+
+		ServiceTracker<Object, Object> releaseManagerServiceTracker =
+			registry.trackServices(
+				"com.liferay.portal.upgrade.internal.release.ReleaseManager");
+		try {
+			releaseManagerServiceTracker.waitForService(120 * 1000L);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected void sendError(
