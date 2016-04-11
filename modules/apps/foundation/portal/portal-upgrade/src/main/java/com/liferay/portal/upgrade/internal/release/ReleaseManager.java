@@ -184,14 +184,7 @@ public class ReleaseManager {
 					"upgrade.from.schema.version")),
 			serviceTrackerMapListener);
 
-		synchronized (_upgradeQueue) {
-			try {
-				_upgradeQueue.wait();
-			}
-			catch (InterruptedException ie) {
-				ie.printStackTrace();
-			}
-		}
+		_upgradeQueue.join();
 	}
 
 	@Deactivate
