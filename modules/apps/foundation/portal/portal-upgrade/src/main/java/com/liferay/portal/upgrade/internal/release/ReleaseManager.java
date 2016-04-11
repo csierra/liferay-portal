@@ -183,6 +183,8 @@ public class ReleaseManager {
 				new UpgradeInfoServiceTrackerMapListener();
 		}
 
+		_upgradeThread = new UpgradeThread();
+
 		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
 			bundleContext, UpgradeStep.class,
 			"(&(upgrade.bundle.symbolic.name=*)(|(upgrade.db.type=any)" +
@@ -194,8 +196,6 @@ public class ReleaseManager {
 				new PropertyServiceReferenceComparator<UpgradeStep>(
 					"upgrade.from.schema.version")),
 			serviceTrackerMapListener);
-
-		_upgradeThread = new UpgradeThread();
 	}
 
 	@Deactivate
@@ -249,7 +249,22 @@ public class ReleaseManager {
 			bundleSymbolicName, upgradeInfos, outputStream,
 			outputStreamContainer);
 
-		_queue.push(upgradeCallable);
+		Thread currentThread = Thread.currentThread();
+
+		if (currentThread != _upgradeThread) {
+			synchronized (_queue) {
+				_queue.push(upgradeCallable);
+
+				try {
+					_queue.wait();
+				}
+				catch (InterruptedException ie) {
+				}
+			}
+		}
+		else {
+			_queue.push(upgradeCallable);
+		}
 	}
 
 	protected String getSchemaVersionString(String bundleSymbolicName) {
@@ -280,6 +295,7 @@ public class ReleaseManager {
 		_outputStreamContainerFactoryTracker;
 	private final BlockingDeque<Callable<Void>> _queue =
 		new LinkedBlockingDeque<>();
+	private final Object _queueLock = new Object();
 	private ReleaseLocalService _releaseLocalService;
 	private ReleaseManagerConfiguration _releaseManagerConfiguration;
 	private ReleasePublisher _releasePublisher;
@@ -503,8 +519,15 @@ public class ReleaseManager {
 				catch (InterruptedException ie) {
 					_canceled = true;
 				}
-				catch (Exception e) {
-					_logger.log(Logger.LOG_ERROR, e.getMessage(), e);
+				catch (Throwable t) {
+					_logger.log(Logger.LOG_ERROR, t.getMessage(), t);
+				}
+				finally {
+					if (_queue.isEmpty()) {
+						synchronized (_queue) {
+							_queue.notifyAll();
+						}
+					}
 				}
 			}
 		}
