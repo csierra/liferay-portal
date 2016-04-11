@@ -188,11 +188,10 @@ public class ReleaseManager {
 			try {
 				_upgradeQueue.wait();
 			}
-			catch (InterruptedException e) {
-				e.printStackTrace();
+			catch (InterruptedException ie) {
+				ie.printStackTrace();
 			}
 		}
-
 	}
 
 	@Deactivate
@@ -273,13 +272,13 @@ public class ReleaseManager {
 
 	private OutputStreamContainerFactoryTracker
 		_outputStreamContainerFactoryTracker;
-
-	@Reference
-	private UpgradeQueue _upgradeQueue;
 	private ReleaseLocalService _releaseLocalService;
 	private ReleaseManagerConfiguration _releaseManagerConfiguration;
 	private ReleasePublisher _releasePublisher;
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
+
+	@Reference
+	private UpgradeQueue _upgradeQueue;
 
 	private static class UpgradeServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<UpgradeStep, UpgradeInfo> {
