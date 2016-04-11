@@ -1323,11 +1323,12 @@ public class MainServlet extends ActionServlet {
 		ServiceTracker<Object, Object> releaseManagerServiceTracker =
 			registry.trackServices(
 				"com.liferay.portal.upgrade.internal.release.ReleaseManager");
+
 		try {
 			releaseManagerServiceTracker.waitForService(120 * 1000L);
 		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
+		catch (InterruptedException ie) {
+			ie.printStackTrace();
 		}
 	}
 
