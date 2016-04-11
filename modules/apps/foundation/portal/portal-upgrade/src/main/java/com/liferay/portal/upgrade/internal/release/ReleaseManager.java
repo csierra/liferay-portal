@@ -44,9 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.felix.utils.log.Logger;
 
@@ -68,8 +66,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"osgi.command.function=dryrun", "osgi.command.function=execute",
-		"osgi.command.function=list", "osgi.command.function=queue",
-		"osgi.command.scope=upgrade"
+		"osgi.command.function=list", "osgi.command.scope=upgrade"
 	},
 	service = Object.class
 )
@@ -147,14 +144,6 @@ public class ReleaseManager {
 		}
 	}
 
-	public void queue() {
-		System.out.println("Pending Jobs: " + _queue.size());
-
-		for (Callable<Void> callable : _queue) {
-			System.out.println(callable);
-		}
-	}
-
 	@Reference(unbind = "-")
 	public void setOutputStreamTracker(
 		OutputStreamContainerFactoryTracker
@@ -183,8 +172,6 @@ public class ReleaseManager {
 				new UpgradeInfoServiceTrackerMapListener();
 		}
 
-		_upgradeThread = new UpgradeThread();
-
 		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
 			bundleContext, UpgradeStep.class,
 			"(&(upgrade.bundle.symbolic.name=*)(|(upgrade.db.type=any)" +
@@ -201,8 +188,6 @@ public class ReleaseManager {
 	@Deactivate
 	protected void deactivate() {
 		_serviceTrackerMap.close();
-
-		_upgradeThread.cancel();
 	}
 
 	protected void doExecute(
@@ -249,22 +234,7 @@ public class ReleaseManager {
 			bundleSymbolicName, upgradeInfos, outputStream,
 			outputStreamContainer);
 
-		Thread currentThread = Thread.currentThread();
-
-		if (currentThread != _upgradeThread) {
-			synchronized (_queue) {
-				_queue.push(upgradeCallable);
-
-				try {
-					_queue.wait();
-				}
-				catch (InterruptedException ie) {
-				}
-			}
-		}
-		else {
-			_queue.push(upgradeCallable);
-		}
+		_upgradeQueue.push(upgradeCallable);
 	}
 
 	protected String getSchemaVersionString(String bundleSymbolicName) {
@@ -293,14 +263,13 @@ public class ReleaseManager {
 
 	private OutputStreamContainerFactoryTracker
 		_outputStreamContainerFactoryTracker;
-	private final BlockingDeque<Callable<Void>> _queue =
-		new LinkedBlockingDeque<>();
-	private final Object _queueLock = new Object();
+
+	@Reference
+	private UpgradeQueue _upgradeQueue;
 	private ReleaseLocalService _releaseLocalService;
 	private ReleaseManagerConfiguration _releaseManagerConfiguration;
 	private ReleasePublisher _releasePublisher;
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
-	private UpgradeThread _upgradeThread;
 
 	private static class UpgradeServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<UpgradeStep, UpgradeInfo> {
@@ -497,52 +466,6 @@ public class ReleaseManager {
 		private final String _bundleSymbolicName;
 		private final OutputStream _outputStream;
 		private final List<UpgradeInfo> _upgradeInfos;
-
-	}
-
-	private class UpgradeThread extends Thread {
-
-		public void cancel() {
-			_canceled = true;
-
-			interrupt();
-		}
-
-		@Override
-		public void run() {
-			while (!isInterrupted() && !_isCanceled()) {
-				try {
-					Callable<Void> callable = _queue.takeLast();
-
-					callable.call();
-				}
-				catch (InterruptedException ie) {
-					_canceled = true;
-				}
-				catch (Throwable t) {
-					_logger.log(Logger.LOG_ERROR, t.getMessage(), t);
-				}
-				finally {
-					if (_queue.isEmpty()) {
-						synchronized (_queue) {
-							_queue.notifyAll();
-						}
-					}
-				}
-			}
-		}
-
-		private UpgradeThread() {
-			super("Upgrade Thread");
-
-			start();
-		}
-
-		private boolean _isCanceled() {
-			return _canceled;
-		}
-
-		private volatile boolean _canceled = false;
 
 	}
 
