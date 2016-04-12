@@ -1301,6 +1301,17 @@ public class MainServlet extends ActionServlet {
 	protected void registerPortalInitialized() {
 		Registry registry = RegistryUtil.getRegistry();
 
+		ServiceTracker<Object, Object> releaseManagerServiceTracker =
+			registry.trackServices(
+				"com.liferay.portal.upgrade.internal.release.ReleaseManager");
+
+		try {
+			releaseManagerServiceTracker.waitForService(1_200 * 1000L);
+		}
+		catch (InterruptedException ie) {
+			ie.printStackTrace();
+		}
+
 		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("module.service.lifecycle", "portal.initialized");
@@ -1319,17 +1330,6 @@ public class MainServlet extends ActionServlet {
 
 		_servletContextServiceRegistration = registry.registerService(
 			ServletContext.class, getServletContext(), properties);
-
-		ServiceTracker<Object, Object> releaseManagerServiceTracker =
-			registry.trackServices(
-				"com.liferay.portal.upgrade.internal.release.ReleaseManager");
-
-		try {
-			releaseManagerServiceTracker.waitForService(120 * 1000L);
-		}
-		catch (InterruptedException ie) {
-			ie.printStackTrace();
-		}
 	}
 
 	protected void sendError(
