@@ -44,6 +44,19 @@ public class UpgradeQueue {
 		_upgradeThread.cancel();
 	}
 
+	public void join() {
+		synchronized (this) {
+			if (!_queue.isEmpty()) {
+				try {
+					this.wait();
+				}
+				catch (InterruptedException ie) {
+					ie.printStackTrace();
+				}
+			}
+		}
+	}
+
 	public void push(Callable<Void> voidCallable) {
 		synchronized (this) {
 			_queue.push(voidCallable);
@@ -55,19 +68,6 @@ public class UpgradeQueue {
 
 		for (Callable<Void> callable : _queue) {
 			System.out.println(callable);
-		}
-	}
-
-	public void join() {
-		synchronized (this) {
-			if (!_queue.isEmpty()) {
-				try {
-					this.wait();
-				}
-				catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 
