@@ -55,7 +55,7 @@ public final class ReleasePublisher extends BaseModelListener<Release> {
 		publish(release);
 	}
 
-	public void publish(Release release) {
+	public synchronized void publish(Release release) {
 		ServiceRegistration<Release> oldServiceRegistration =
 			_serviceConfiguratorRegistrations.get(
 				release.getServletContextName());
