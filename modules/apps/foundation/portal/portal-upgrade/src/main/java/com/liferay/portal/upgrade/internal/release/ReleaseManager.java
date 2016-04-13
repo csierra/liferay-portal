@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.dao.db.DBContext;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.model.Release;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -247,6 +248,13 @@ public class ReleaseManager {
 		}
 
 		return release.getSchemaVersion();
+	}
+
+	@Reference(
+		target = ModuleServiceLifecycle.DATABASE_INITIALIZED, unbind = "-"
+	)
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	@Reference(unbind = "-")
