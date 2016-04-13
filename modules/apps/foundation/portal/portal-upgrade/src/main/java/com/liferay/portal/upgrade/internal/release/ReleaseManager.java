@@ -184,8 +184,6 @@ public class ReleaseManager {
 				new PropertyServiceReferenceComparator<UpgradeStep>(
 					"upgrade.from.schema.version")),
 			serviceTrackerMapListener);
-
-		_upgradeQueue.join();
 	}
 
 	@Deactivate
