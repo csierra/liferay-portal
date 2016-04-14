@@ -69,7 +69,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 		"osgi.command.function=dryrun", "osgi.command.function=execute",
 		"osgi.command.function=list", "osgi.command.scope=upgrade"
 	},
-	service = Object.class
+	service = ReleaseManager.class
 )
 public class ReleaseManager {
 
