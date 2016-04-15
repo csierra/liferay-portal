@@ -17,7 +17,9 @@ package com.liferay.portal.upgrade.registry;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -42,19 +44,6 @@ public class UpgradeQueue {
 	@Deactivate
 	public void deactivate() {
 		_upgradeThread.cancel();
-	}
-
-	public void join() {
-		synchronized (this) {
-			if (!_queue.isEmpty()) {
-				try {
-					this.wait();
-				}
-				catch (InterruptedException ie) {
-					ie.printStackTrace();
-				}
-			}
-		}
 	}
 
 	public void push(Callable<Void> voidCallable) {
@@ -91,9 +80,12 @@ public class UpgradeQueue {
 		public void run() {
 			while (!isInterrupted() && !_isCanceled()) {
 				try {
-					Callable<Void> callable = _queue.takeLast();
+					Callable<Void> callable = _queue.pollLast(
+						1, TimeUnit.SECONDS);
 
-					callable.call();
+					if (callable != null) {
+						callable.call();
+					}
 				}
 				catch (InterruptedException ie) {
 					_canceled = true;
