@@ -12,8 +12,9 @@
  * details.
  */
 
-package com.liferay.portal.upgrade.internal.release;
+package com.liferay.portal.spring.extender.internal.context;
 
+import com.liferay.portal.upgrade.registry.UpgradeQueue;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -30,7 +31,7 @@ public class PortalInitializedInitialSynchronizer {
 	}
 
 	@Reference
-	private ReleaseManager _releaseManager;
+	private ModuleApplicationContextExtender _moduleApplicationContextExtender;
 
 	@Reference
 	private UpgradeQueue _upgradeQueue;

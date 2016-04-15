@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import com.liferay.portal.upgrade.registry.UpgradeQueue;
 import org.apache.felix.utils.log.Logger;
 
 import org.osgi.framework.BundleContext;

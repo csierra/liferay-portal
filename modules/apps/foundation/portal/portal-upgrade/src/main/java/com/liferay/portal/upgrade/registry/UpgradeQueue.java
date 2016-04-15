@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.upgrade.internal.release;
+package com.liferay.portal.upgrade.registry;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
