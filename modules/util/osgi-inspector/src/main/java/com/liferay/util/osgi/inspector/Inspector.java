@@ -16,6 +16,7 @@ package com.liferay.util.osgi.inspector;
 
 import alice.tuprolog.InvalidLibraryException;
 import alice.tuprolog.MalformedGoalException;
+import alice.tuprolog.NoMoreSolutionException;
 import alice.tuprolog.NoSolutionException;
 import alice.tuprolog.Prolog;
 import alice.tuprolog.SolveInfo;
@@ -40,18 +41,22 @@ public class Inspector {
 
 	@Activate
 	protected void activate(BundleContext bundleContext)
-		throws Exception {
+		throws InvalidLibraryException {
 		_prolog = new Prolog();
 
 		_prolog.loadLibrary(_myLibrary);
 	}
 
 	public void query(String input)
-		throws MalformedGoalException, NoSolutionException {
+		throws MalformedGoalException, NoSolutionException, NoMoreSolutionException {
 
 		SolveInfo info = _prolog.solve(input);
 
-		System.out.println(info.getSolution());
+		while (true) {
+			System.out.println(info.getSolution());
+
+			info = _prolog.solveNext();
+		}
 	}
 
 	@Reference
