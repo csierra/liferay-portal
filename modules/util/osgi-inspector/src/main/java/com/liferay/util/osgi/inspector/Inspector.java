@@ -44,6 +44,8 @@ public class Inspector {
 		throws InvalidLibraryException {
 		_prolog = new Prolog();
 
+		_prolog.loadLibrary("alice.tuprolog.lib.BasicLibrary");
+		_prolog.loadLibrary("alice.tuprolog.lib.OOLibrary");
 		_prolog.loadLibrary(_myLibrary);
 	}
 
@@ -52,10 +54,22 @@ public class Inspector {
 
 		SolveInfo info = _prolog.solve(input);
 
-		while (true) {
-			System.out.println(info.getSolution());
+		System.out.println(info.getSolution());
 
-			info = _prolog.solveNext();
+		try {
+			while (_prolog.hasOpenAlternatives()) {
+				info = _prolog.solveNext();
+
+				System.out.println(info.getSolution());
+			}
+
+			System.out.println("true.");
+		}
+		catch (NoSolutionException e) {
+			System.out.println("false.");
+		}
+		catch (NoMoreSolutionException e) {
+			System.out.println("true.");
 		}
 	}
 

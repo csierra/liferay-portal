@@ -15,26 +15,20 @@
 package com.liferay.util.osgi.inspector;
 
 import alice.tuprolog.Library;
-import alice.tuprolog.Number;
 import alice.tuprolog.Struct;
 import alice.tuprolog.Term;
-import alice.tuprolog.TermVisitor;
 import alice.tuprolog.Var;
+import alice.tuprolog.lib.InvalidObjectIdException;
+import alice.tuprolog.lib.OOLibrary;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
-import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Carlos Sierra Andrés
@@ -50,59 +44,33 @@ public class MyLibrary extends Library {
 	}
 
 	public String getName() {
-		return "My Library";
+		return "OSGi inspector";
 	}
 
-	private Map<Term, Iterator<Bundle>> _state = new HashMap<>();
-
-	public boolean bundle_1(Term term) {
-		Term t = term.getTerm();
-
-		if (t instanceof Var) {
-			return matchAllBundles((Var)t);
-		}
-
-		return matchBundleNamed(t);
-	}
-
-	protected boolean matchAllBundles(Var var) {
-		if (_state.containsKey(var)) {
-			Iterator<Bundle> bundleIterator = _state.get(var);
-
-			if (!bundleIterator.hasNext()) {
-				return false;
-			}
-
-			Bundle next = bundleIterator.next();
-
-			var.unify(getEngine(), new Struct(next.getSymbolicName()));
-
-			return true;
-		}
+	public void onSolveBegin(Term term) {
+		Library lib = engine.getLibrary("alice.tuprolog.lib.OOLibrary");
 
 		Bundle[] bundles = _bundleContext.getBundles();
 
-		if (bundles == null) {
-			return true;
+		String[] bundleSymbolicNames = new String[bundles.length];
+
+		for (int i = 0; i < bundles.length; i++) {
+			bundleSymbolicNames[i] = bundles[i].getSymbolicName();
 		}
 
-		Iterable<Bundle> iterable = Arrays.asList(bundles);
-
-		_state.put(var, iterable.iterator());
-
-		return matchAllBundles(var);
+		try {
+			((OOLibrary)lib).register(
+				new Struct("bundlesArray"), bundleSymbolicNames);
+		}
+		catch (InvalidObjectIdException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	protected boolean matchBundleNamed(Term term) {
-		String atomName = TermUtil.asString(term);
-
-		for (Bundle bundle : _bundleContext.getBundles()) {
-			if (atomName.equals(bundle.getSymbolicName())) {
-				return true;
-			}
-		}
-
-		return false;
+	public String getTheory() {
+		return "bundleNumber(X, Y) :- array_get(bundlesArray, Y, X).\n" +
+			   "bundleAccum(X, Y) :- bundleNumber(X, Y); Z is Y + 1, bundleAccum(X, Z).\n" +
+			   "bundle(X) :- bundleAccum(X, 0).\n";
 	}
 
 	@Reference
