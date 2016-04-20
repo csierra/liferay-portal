@@ -14,30 +14,22 @@
 
 package com.liferay.util.osgi.inspector;
 
-import alice.tuprolog.Int;
 import alice.tuprolog.Library;
+import alice.tuprolog.Long;
+import alice.tuprolog.Number;
 import alice.tuprolog.Struct;
 import alice.tuprolog.Term;
-import alice.tuprolog.Var;
-import alice.tuprolog.lib.InvalidObjectIdException;
-import alice.tuprolog.lib.OOLibrary;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
-import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
-import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.Function;
 
 /**
  * @author Carlos Sierra Andrés
@@ -47,9 +39,6 @@ public class MyLibrary extends Library {
 
 	private BundleContext _bundleContext;
 	private Bundle[] _bundles;
-	private Collection<ComponentDescriptionDTO>
-			_componentDescriptionDTOs;
-	private ServiceReference[] _serviceReferences;
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
@@ -64,158 +53,62 @@ public class MyLibrary extends Library {
 		Library lib = engine.getLibrary("alice.tuprolog.lib.OOLibrary");
 
 		_bundles = _bundleContext.getBundles();
-		_serviceReferences = Arrays.stream(_bundles).flatMap(
-				b ->
-				{
-					ServiceReference<?>[] registeredServices =
-						b.getRegisteredServices();
-					if (registeredServices != null) {
-						return Arrays.stream(registeredServices);
-					}
-					else {
-						return Stream.empty();
-					}
-				}).collect(
-				Collectors.toList()).toArray(new ServiceReference[0]);
-		_componentDescriptionDTOs =
-			_serviceComponentRuntime.getComponentDescriptionDTOs(_bundles);
-
-		try {
-			((OOLibrary)lib).register(
-				new Struct("bundlesArray"), _bundles);
-		}
-		catch (InvalidObjectIdException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
-	public boolean bundleNumber_2(Term bundle, Term pos)
-		throws InvalidObjectIdException {
-
-		Term bundleTerm = bundle.getTerm();
-		Term posTerm = pos.getTerm();
-
-		if (posTerm instanceof Var) {
-			String bsn = ((Struct)bundleTerm).getName();
-
-
-			for (int i = 0; i < _bundles.length; i++) {
-				if (bsn.equals(_bundles[i].getSymbolicName())) {
-					return pos.unify(getEngine(), new Int(i));
-				}
-			}
-
-			return false;
-		}
-
-		if (posTerm instanceof Int) {
-			int position = ((Int)posTerm).intValue();
-
-			Bundle requested = _bundles[position];
-
-			return bundleTerm.unify(
-				getEngine(), new Struct(requested.getSymbolicName()));
-		}
-
-		return false;
+	public boolean bundles_1(Term bundles) {
+		return bundles.unify(
+			getEngine(),
+			toList(_bundles, b -> new Long(b.getBundleId())));
 	}
 
-	public boolean serviceNumber_2(Term service, Term pos)
-			throws InvalidObjectIdException {
+	public boolean services_2(Term bundleTerm, Term services) {
+		Term term = bundleTerm.getTerm();
 
-		Term serviceTerm = service.getTerm();
-		Term posTerm = pos.getTerm();
+		long bundleId = ((Number)term).longValue();
 
-		if (posTerm instanceof Var) {
-			String interfaceName = ((Struct)serviceTerm).getName();
+		Bundle bundle = _bundleContext.getBundle(bundleId);
 
-			for (int i = 0; i < _serviceReferences.length; i++) {
-				if (interfaceName.equals(_serviceReferences[i].getProperty("objectClass"))) {
-					return pos.unify(getEngine(), new Int(i));
-				}
-			}
-
-			return false;
-		}
-
-		if (posTerm instanceof Int) {
-			int position = ((Int)posTerm).intValue();
-
-			ServiceReference<?> requested = _serviceReferences[position];
-
-			return serviceTerm.unify(
-				getEngine(), new Int(Integer.parseInt(requested.getProperty("service.id").toString())));
-		}
-
-		return false;
+		return services.unify(
+			getEngine(),
+			toList(
+				bundle.getRegisteredServices() != null ? bundle.getRegisteredServices() : new ServiceReference[0],
+				sr -> new Long(java.lang.Long.parseLong(sr.getProperty("service.id").toString())
+			)));
 	}
 
-	public boolean componentNumber_2(Term component, Term pos)
-			throws InvalidObjectIdException {
+	public boolean interfaces_2(Term serviceTerm, Term interfacesTerm)
+		throws InvalidSyntaxException {
 
-		Term bundleTerm = component.getTerm();
-		Term posTerm = pos.getTerm();
+		Term term = serviceTerm.getTerm();
 
-		if (posTerm instanceof Var) {
-			String componentName = ((Struct)bundleTerm).getName();
+		long serviceId = ((Number) term).longValue();
 
-			int i = 0;
+		ServiceReference<?>[] serviceReferences =
+			_bundleContext.getAllServiceReferences(
+				null, "(service.id=" + serviceId + ")");
 
-			for (ComponentDescriptionDTO componentDescriptionDTO : _componentDescriptionDTOs) {
-				if (componentName.equals(componentDescriptionDTO.name)) {
+		ServiceReference<?> serviceReference = serviceReferences[0];
 
-					return pos.unify(getEngine(), new Int(i));
-				}
-
-				i++;
-			}
-
-			return false;
-		}
-
-		if (posTerm instanceof Int) {
-			int position = ((Int)posTerm).intValue();
-
-			Iterator<ComponentDescriptionDTO> iterator =
-				_componentDescriptionDTOs.iterator();
-
-			while (position > 0 && iterator.hasNext()) {
-				iterator.next();
-
-				position--;
-			}
-
-			return bundleTerm.unify(
-				getEngine(), new Struct(iterator.next().name));
-		}
-
-		return false;
+		return interfacesTerm.unify(
+			getEngine(),
+			toList(
+				(Object[])serviceReference.getProperty("objectClass"),
+				s -> new Struct(s.toString())));
 	}
 
-	public boolean state_2(Term component, Term state) {
-		String name = ((Struct) component.getTerm()).getName();
-		Term stateTerm = state.getTerm();
-
-		Optional<Boolean> maybe =
-			_componentDescriptionDTOs.stream().filter(
-				c -> c.name.equals(name)).
-			findFirst().flatMap(cd ->
-				_serviceComponentRuntime.getComponentConfigurationDTOs(cd).
-			stream().findFirst()).map(
-				cc -> stateTerm.unify(getEngine(), new Int(cc.state)));
-
-		return maybe.orElse(false);
+	private <T> Struct toList(T[] array, Function<T, Term> function) {
+		return new Struct(
+			Arrays.stream(
+				array).
+				map(function).
+				toArray(Term[]::new)
+		);
 	}
 
 	public String getTheory() {
-		return "bundleAccum(X, Y) :- bundleNumber(X, Y); Z is Y + 1, bundleAccum(X, Z).\n" +
-			   "bundle(X) :- bundleAccum(X, 0).\n" +
-			   "componentAccum(X, Y) :- componentNumber(X, Y); Z is Y + 1, componentAccum(X, Z).\n" +
-			   "component(X) :- componentAccum(X, 0).\n" +
-			   "serviceAccum(X, Y) :- serviceNumber(X, Y); Z is Y + 1, serviceAccum(X, Z).\n" +
-			   "service(X) :- serviceAccum(X, 0).\n" +
-			   "active(X) :- component(X), state(X, 8).\n" +
-			   "inactive(X) :- component(X), not(state(X, 8)).";
+		return "bundle(X) :- bundles(Bundles), member(X, Bundles).\n" +
+			   "service(B, X) :- bundle(B), services(B, S), member(X, S).\n" +
+			   "interface(X, Y) :- service(X), interfaces(X, Interfaces), member(Y, Interfaces).";
 	}
 
 	@Reference
