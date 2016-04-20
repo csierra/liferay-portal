@@ -14,6 +14,7 @@
 
 package com.liferay.util.osgi.inspector;
 
+import alice.tuprolog.Int;
 import alice.tuprolog.Library;
 import alice.tuprolog.Struct;
 import alice.tuprolog.Term;
@@ -26,9 +27,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
-
-import java.util.Arrays;
-import java.util.Iterator;
 
 /**
  * @author Carlos Sierra Andrés
@@ -50,26 +48,50 @@ public class MyLibrary extends Library {
 	public void onSolveBegin(Term term) {
 		Library lib = engine.getLibrary("alice.tuprolog.lib.OOLibrary");
 
-		Bundle[] bundles = _bundleContext.getBundles();
-
-		String[] bundleSymbolicNames = new String[bundles.length];
-
-		for (int i = 0; i < bundles.length; i++) {
-			bundleSymbolicNames[i] = bundles[i].getSymbolicName();
-		}
-
 		try {
 			((OOLibrary)lib).register(
-				new Struct("bundlesArray"), bundleSymbolicNames);
+				new Struct("bundlesArray"), _bundleContext.getBundles());
 		}
 		catch (InvalidObjectIdException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	public boolean bundleNumber_2(Term bundle, Term pos)
+		throws InvalidObjectIdException {
+
+		Term bundleTerm = bundle.getTerm();
+		Term posTerm = pos.getTerm();
+
+		Bundle[] bundles = _bundleContext.getBundles();
+
+		if (posTerm instanceof Var) {
+			String bsn = ((Struct)bundleTerm).getName();
+
+
+			for (int i = 0; i < bundles.length; i++) {
+				if (bsn.equals(bundles[i].getSymbolicName())) {
+					return pos.unify(getEngine(), new Int(i));
+				}
+			}
+
+			return false;
+		}
+
+		if (posTerm instanceof Int) {
+			int position = ((Int)posTerm).intValue();
+
+			Bundle requested = bundles[position];
+
+			return bundleTerm.unify(
+				getEngine(), new Struct(requested.getSymbolicName()));
+		}
+
+		return false;
+	}
+
 	public String getTheory() {
-		return "bundleNumber(X, Y) :- array_get(bundlesArray, Y, X).\n" +
-			   "bundleAccum(X, Y) :- bundleNumber(X, Y); Z is Y + 1, bundleAccum(X, Z).\n" +
+		return "bundleAccum(X, Y) :- bundleNumber(X, Y); Z is Y + 1, bundleAccum(X, Z).\n" +
 			   "bundle(X) :- bundleAccum(X, 0).\n";
 	}
 
