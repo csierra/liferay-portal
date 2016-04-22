@@ -20,7 +20,10 @@ import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCrite
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -66,7 +69,10 @@ public class ImageEditorConfigContributor extends BaseEditorConfigContributor {
 
 		PortletURL imageEditUrl =
 			requestBackedPortletURLFactory.createRenderURL(
-				"image_editor_portlet");
+				PortletProviderUtil.getPortletId(
+					Image.class.getName(), PortletProvider.Action.EDIT));
+
+		imageEditUrl.setParameter("mvcRenderCommandName", "/image_editor/view");
 
 		try {
 			imageEditUrl.setWindowState(LiferayWindowState.POP_UP);

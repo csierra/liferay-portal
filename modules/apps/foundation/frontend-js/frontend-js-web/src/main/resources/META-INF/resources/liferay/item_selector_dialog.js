@@ -105,9 +105,7 @@ AUI.add(
 										click: function() {
 											var portletURL = new Liferay.PortletURL.createURL(instance.get('editUrl'));
 
-											var currentItem = JSON.parse(instance._currentItem.value);
-
-											portletURL.setParameter('image_editor_url', currentItem.url);
+											portletURL.setParameter('image_editor_url', instance._currentItem.value);
 
 											Liferay.Util.openWindow(
 												{
