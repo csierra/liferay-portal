@@ -463,10 +463,15 @@ if (Validator.isNotNull(keywords)) {
 	</c:if>
 </div>
 
+<liferay-portlet:renderURL portletName="<%= PortletProviderUtil.getPortletId(Image.class.getName(), PortletProvider.Action.EDIT) %>" var="viewImageEditorURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+	<liferay-portlet:param name="mvcRenderCommandName" value="/image_editor/view" />
+</liferay-portlet:renderURL>
+
 <aui:script use="liferay-item-selector-repository-entry-browser">
 	new Liferay.ItemSelectorRepositoryEntryBrowser(
 		{
 			closeCaption: '<%= UnicodeLanguageUtil.get(request, tabName) %>',
+			editItemUrl: '<%= viewImageEditorURL.toString() %>',
 			maxFileSize: '<%= maxFileSize %>',
 			on: {
 				selectedItem: function(event) {

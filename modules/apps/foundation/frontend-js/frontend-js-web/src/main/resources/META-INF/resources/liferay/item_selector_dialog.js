@@ -69,72 +69,6 @@ AUI.add(
 						instance._currentItem = null;
 						instance._selectedItem = null;
 
-						var toolbarFooter = [
-							{
-								cssClass: 'btn-lg btn-primary',
-								disabled: true,
-								id: 'addButton',
-								label: strings.add,
-								on: {
-									click: function() {
-										instance._selectedItem = instance._currentItem;
-										instance.close();
-									}
-								}
-							},
-							{
-								cssClass: 'btn-lg btn-link close-modal',
-								id: 'cancelButton',
-								label: strings.cancel,
-								on: {
-									click: function() {
-										instance.close();
-									}
-								}
-							}
-						];
-
-						if (instance.get('editUrl')) {
-							toolbarFooter.push(
-								{
-									cssClass: 'btn-lg btn-default pull-right',
-									disabled: true,
-									id: 'editButton',
-									label: strings.edit,
-									on: {
-										click: function() {
-											var portletURL = new Liferay.PortletURL.createURL(instance.get('editUrl'));
-
-											portletURL.setParameter('image_editor_url', instance._currentItem.value);
-
-											Liferay.Util.openWindow(
-												{
-													dialog: {
-														zIndex: ++zIndex,
-														'toolbars.footer': [
-															{
-																cssClass: 'btn-lg btn-primary',
-																id: 'saveButton',
-																label: strings.save
-															},
-															{
-																cssClass: 'btn-lg btn-link close-modal',
-																id: 'cancelButton',
-																label: strings.cancel
-															}
-														]
-													},
-													uri: portletURL.toString(),
-													stack: !zIndex,
-													title: Liferay.Language.get('Edit Image')
-												}
-											);
-										}
-									}
-								}
-							);
-						}
-
 						Util.selectEntity(
 							{
 								dialog: {
@@ -148,7 +82,30 @@ AUI.add(
 											}
 										}
 									},
-									'toolbars.footer': toolbarFooter,
+									'toolbars.footer': [
+										{
+											cssClass: 'btn-lg btn-primary',
+											disabled: true,
+											id: 'addButton',
+											label: strings.add,
+											on: {
+												click: function() {
+													instance._selectedItem = instance._currentItem;
+													instance.close();
+												}
+											}
+										},
+										{
+											cssClass: 'btn-lg btn-link close-modal',
+											id: 'cancelButton',
+											label: strings.cancel,
+											on: {
+												click: function() {
+													instance.close();
+												}
+											}
+										}
+									],
 									zIndex: ++zIndex
 								},
 								eventName: eventName,
@@ -171,10 +128,8 @@ AUI.add(
 						var footerNode = dialog.getToolbar('footer').get('boundingBox');
 
 						var addButton = footerNode.one('#addButton');
-						var editButton = footerNode.one('#editButton');
 
 						Util.toggleDisabled(addButton, !currentItem);
-						Util.toggleDisabled(editButton, !currentItem);
 
 						instance._currentItem = currentItem;
 					}
