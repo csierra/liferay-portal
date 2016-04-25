@@ -44,6 +44,7 @@ class ImageEditor extends Component {
 			})
 		];
 
+		// Load the first entry imageData and render it on the app.
 		this.history_[0].getImageData()
 			.then((imageData) => {
 				this.restoreData_(imageData);
@@ -200,6 +201,9 @@ class ImageEditor extends Component {
 		let context = canvas.getContext('2d');
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		context.drawImage(offscreenCanvas, 0, 0, width, height, 0, 0, canvas.width, canvas.height);
+
+		canvas.style.width = canvas.width + 'px';
+		canvas.style.height = canvas.height + 'px';
 	}
 
 	/**

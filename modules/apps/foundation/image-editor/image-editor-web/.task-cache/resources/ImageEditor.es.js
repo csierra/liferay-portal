@@ -216,6 +216,9 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-compo
 			var context = canvas.getContext('2d');
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			context.drawImage(offscreenCanvas, 0, 0, width, height, 0, 0, canvas.width, canvas.height);
+
+			canvas.style.width = canvas.width + 'px';
+			canvas.style.height = canvas.height + 'px';
 		};
 
 		ImageEditor.prototype.syncHistory_ = function syncHistory_() {

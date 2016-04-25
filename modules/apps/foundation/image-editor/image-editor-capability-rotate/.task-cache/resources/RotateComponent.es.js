@@ -67,7 +67,22 @@ define("liferay-image-editor-capability-rotate@1.0.0/RotateComponent.es", ['expo
 
 		RotateComponent.prototype.detached = function detached() {
 			this.cache_ = {};
-			this.rotationAngle_ = 0;
+		};
+
+		RotateComponent.prototype.preview = function preview(imageData) {
+			return this.process(imageData);
+		};
+
+		RotateComponent.prototype.process = function process(imageData) {
+			var promise = this.cache_[this.rotationAngle_];
+
+			if (!promise) {
+				promise = this.rotate_(imageData, this.rotationAngle_);
+
+				this.cache_[this.rotationAngle_] = promise;
+			}
+
+			return promise;
 		};
 
 		RotateComponent.prototype.rotate_ = function rotate_(imageData, rotationAngle) {
@@ -99,28 +114,13 @@ define("liferay-image-editor-capability-rotate@1.0.0/RotateComponent.es", ['expo
 			return cancellablePromise;
 		};
 
-		RotateComponent.prototype.preview = function preview(imageData) {
-			return this.process(imageData);
-		};
-
-		RotateComponent.prototype.process = function process(imageData) {
-			var promise = this.cache_[this.rotationAngle_];
-
-			if (!promise) {
-				promise = this.rotate_(imageData, this.rotationAngle_);
-				this.cache_[this.rotationAngle_] = promise;
-			}
-
-			return promise;
-		};
-
 		RotateComponent.prototype.rotateLeft = function rotateLeft() {
-			this.rotationAngle_ -= 90;
+			this.rotationAngle_ = (this.rotationAngle_ - 90) % 360;
 			this.requestEditorPreview();
 		};
 
 		RotateComponent.prototype.rotateRight = function rotateRight() {
-			this.rotationAngle_ += 90;
+			this.rotationAngle_ = (this.rotationAngle_ + 90) % 360;
 			this.requestEditorPreview();
 		};
 

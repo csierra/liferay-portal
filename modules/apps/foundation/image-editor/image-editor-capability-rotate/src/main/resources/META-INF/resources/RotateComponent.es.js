@@ -24,9 +24,44 @@ class RotateComponent extends Component {
 	 */
 	detached() {
 		this.cache_ = {};
-		this.rotationAngle_ = 0;
 	}
 
+	/**
+	 * Rotates the image to the current selected rotation angle.
+	 *
+	 * @param  {ImageData} imageData ImageData representation of the image.
+	 * @return {CancellablePromise} A promise that will resolve when the processing is complete.
+	 */
+	preview(imageData) {
+		return this.process(imageData);
+	}
+
+	/**
+	 * Rotates the image to the current selected rotation angle.
+	 *
+	 * @param  {ImageData} imageData ImageData representation of the image.
+	 * @return {CancellablePromise} A promise that will resolve when the processing is complete.
+	 */
+	process(imageData) {
+		let promise = this.cache_[this.rotationAngle_];
+
+		if (!promise) {
+			promise = this.rotate_(imageData, this.rotationAngle_);
+
+			this.cache_[this.rotationAngle_] = promise;
+		}
+
+		return promise;
+	}
+
+	/**
+	 * Rotates the passed ImageData to the current rotation angle.
+	 *
+	 * @protected
+	 * @param  {ImageData} imageData The ImageData to rotate
+	 * @param  {number} rotationAngle Normalized rotation angle in degrees in the range [0-360)
+	 * @return {CancellablePromise} A promise to be fullfilled when the image has been rotated.
+	 */
 	rotate_(imageData, rotationAngle) {
 		let cancellablePromise = new CancellablePromise((resolve, reject) => {
 			let imageWidth = imageData.width;
@@ -56,28 +91,19 @@ class RotateComponent extends Component {
 		return cancellablePromise;
 	}
 
-	preview(imageData) {
-		return this.process(imageData);
-	}
-
-	process(imageData) {
-		let promise = this.cache_[this.rotationAngle_];
-
-		if (!promise) {
-			promise = this.rotate_(imageData, this.rotationAngle_);
-			this.cache_[this.rotationAngle_] = promise;
-		}
-
-		return promise;
-	}
-
+	/**
+	 * Rotates the image 90º counter-clockwise.
+	 */
 	rotateLeft() {
-		this.rotationAngle_ -= 90;
+		this.rotationAngle_ = (this.rotationAngle_ - 90) % 360;
 		this.requestEditorPreview();
 	}
 
+	/**
+	 * Rotates the image 90º clockwise.
+	 */
 	rotateRight() {
-		this.rotationAngle_ += 90;
+		this.rotationAngle_ = (this.rotationAngle_ + 90) % 360;
 		this.requestEditorPreview();
 	}
 }
