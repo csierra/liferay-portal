@@ -291,6 +291,8 @@
 				var itemSelectorDialog = instance._itemSelectorDialog;
 
 				if (itemSelectorDialog) {
+					itemSelectorDialog.set('editUrl', editor.config.imageEditUrl);
+					itemSelectorDialog.set('saveUrl', editor.config.saveUrl);
 					itemSelectorDialog.set('eventName', eventName);
 					itemSelectorDialog.set('url', url);
 					itemSelectorDialog.set('zIndex', CKEDITOR.getNextZIndex());
@@ -306,7 +308,9 @@
 								{
 									eventName: eventName,
 									url: url,
-									zIndex: CKEDITOR.getNextZIndex()
+									zIndex: CKEDITOR.getNextZIndex(),
+									editUrl: editor.config.imageEditUrl,
+									saveUrl: editor.config.imageSaveUrl
 								}
 							);
 

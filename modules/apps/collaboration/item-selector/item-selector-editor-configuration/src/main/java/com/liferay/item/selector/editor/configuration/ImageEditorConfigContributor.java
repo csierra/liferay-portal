@@ -20,6 +20,10 @@ import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCrite
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Image;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -29,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletURL;
+import javax.portlet.WindowStateException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -62,11 +67,35 @@ public class ImageEditorConfigContributor extends BaseEditorConfigContributor {
 			itemSelectorCriteria.toArray(
 				new ItemSelectorCriterion[itemSelectorCriteria.size()]));
 
+		PortletURL imageEditUrl =
+			requestBackedPortletURLFactory.createRenderURL(
+				PortletProviderUtil.getPortletId(
+					Image.class.getName(), PortletProvider.Action.EDIT));
+
+		PortletURL imageSaveUrl =
+			requestBackedPortletURLFactory.createActionURL(
+				"com_liferay_document_library_web_portlet_DLPortlet");
+
+		imageEditUrl.setParameter("mvcRenderCommandName", "/image_editor/view");
+
+		imageSaveUrl.setParameter("javax.portlet.action", "/document_library/edit_file_entry");
+		imageSaveUrl.setParameter("cmd", "add");
+		imageSaveUrl.setParameter("folderId", "0");
+		imageSaveUrl.setParameter("repositoryId", "20233");
+
+		try {
+			imageEditUrl.setWindowState(LiferayWindowState.POP_UP);
+		}
+		catch (WindowStateException wse) {
+		}
+
 		if (itemSelectorURL != null) {
 			jsonObject.put(
 				"filebrowserImageBrowseLinkUrl", itemSelectorURL.toString());
 			jsonObject.put(
 				"filebrowserImageBrowseUrl", itemSelectorURL.toString());
+			jsonObject.put("imageEditUrl", imageEditUrl);
+			jsonObject.put("imageSaveUrl", imageSaveUrl);
 		}
 	}
 
