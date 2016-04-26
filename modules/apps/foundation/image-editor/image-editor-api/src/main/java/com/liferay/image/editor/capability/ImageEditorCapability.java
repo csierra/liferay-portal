@@ -14,6 +14,8 @@
 
 package com.liferay.image.editor.capability;
 
+import java.net.URL;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -27,7 +29,11 @@ public interface ImageEditorCapability {
 
 	public String getLabel(Locale locale);
 
+	public String getModuleName();
+
 	public String getName();
+
+	public List<URL> getResourceURLs();
 
 	public ServletContext getServletContext();
 
