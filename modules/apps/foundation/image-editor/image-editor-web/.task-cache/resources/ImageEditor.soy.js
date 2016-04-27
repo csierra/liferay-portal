@@ -93,7 +93,7 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.soy", ['exports', 'metal-comp
       ie_open('img', null, null, 'class', 'img-responsive hide', 'src', opt_data.image);
       ie_close('img');
       ie_void('canvas', null, null, 'class', 'image-preview');
-      ie_void('div', null, null, 'clas', 'loading-animation ' + (opt_data.imageDataReady ? '' : 'hide'));
+      ie_void('div', null, null, 'class', 'loading-animation ' + (opt_data.imageDataReady ? 'hide' : ''));
       ie_close('div');
       ie_open('div', null, null, 'class', 'lfr-image-editor-tools-container');
       $tools(opt_data, null, opt_ijData);
