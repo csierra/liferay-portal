@@ -200,4 +200,18 @@ body {
 			}
 		}
 	}
+
+	.input-group {
+		margin: 0 auto;
+
+		input.form-control {
+			float: none;
+			margin: 0 15px;
+			width: 30%;
+
+			&:not(:focus) {
+				color: $imageeditor-text-color;
+			}
+		}
+	}
 }
