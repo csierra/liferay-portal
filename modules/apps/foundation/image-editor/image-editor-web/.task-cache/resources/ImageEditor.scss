@@ -10,7 +10,7 @@ $imageeditor-history-controls-side: $imageeditor-btn-space !default;
 
 // Skin
 
-$brand-primary: darken(#428bca, 6.5%) !default; // #337ab7
+$brand-primary: darken(#428BCA, 6.5%) !default; // #337ab7
 
 $imageeditor-bg: #111314 !default;
 $imageeditor-history-controls-btn-color: #1E5EC8 !default;
@@ -31,10 +31,10 @@ $slider-height: 20px;
 	}
 
 	.loading-animation {
-		position: absolute;
 		left: 0;
-		right: 0;
 		margin: auto;
+		position: absolute;
+		right: 0;
 		top: 40%;
 	}
 

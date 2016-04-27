@@ -90,8 +90,7 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-compo
 
 			// Load the first entry imageData and render it on the app.
 			_this.history_[0].getImageData().then(function (imageData) {
-				_this.restoreData_(imageData);
-				_this.imageDataReady = true;
+				return _this.restoreData_(imageData);
 			});
 			return _this;
 		}
@@ -177,6 +176,8 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-compo
 			}).then(function (imageData) {
 				return _this4.restoreData_(imageData);
 			});
+
+			this.imageDataReady = false;
 		};
 
 		ImageEditor.prototype.reset = function reset() {
@@ -220,6 +221,8 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-compo
 
 			canvas.style.width = canvas.width + 'px';
 			canvas.style.height = canvas.height + 'px';
+
+			this.imageDataReady = true;
 		};
 
 		ImageEditor.prototype.syncHistory_ = function syncHistory_() {
