@@ -92,6 +92,18 @@ define(['exports', 'metal/src/metal', 'metal-dom/src/all/dom', 'metal-component/
 			}
 		};
 
+		IncrementalDomRenderer.prototype.buildChildrenFn_ = function buildChildrenFn_(calls) {
+			var _this2 = this;
+
+			return function () {
+				_this2.intercept_();
+				for (var i = 0; i < calls.length; i++) {
+					IncrementalDOM[calls[i].name].apply(null, _metal.array.slice(calls[i].args, 1));
+				}
+				_IncrementalDomAop2.default.stopInterception();
+			};
+		};
+
 		IncrementalDomRenderer.prototype.disposeUnusedSubComponents_ = function disposeUnusedSubComponents_() {
 			var keys = Object.keys(this.component_.components);
 			var unused = [];
@@ -108,7 +120,6 @@ define(['exports', 'metal/src/metal', 'metal-dom/src/all/dom', 'metal-component/
 			if (comp.wasRendered) {
 				comp.setState(config);
 			}
-			comp.componentIncrementalDomKey_ = key;
 			return comp;
 		};
 
@@ -146,28 +157,55 @@ define(['exports', 'metal/src/metal', 'metal-dom/src/all/dom', 'metal-component/
 			originalFn(element, name, value);
 		};
 
-		IncrementalDomRenderer.prototype.handleInterceptedCloseCall_ = function handleInterceptedCloseCall_(originalFn, tag) {
-			if (!this.isComponentTag_(tag)) {
-				originalFn(tag);
+		IncrementalDomRenderer.prototype.handleInterceptedChildrenCloseCall_ = function handleInterceptedChildrenCloseCall_(originalFn, callTag) {
+			if (this.isCurrentComponentTag_(callTag) && --this.componentToRender_.tagsCount === 0) {
+				var _componentToRender_ = this.componentToRender_;
+				var calls = _componentToRender_.calls;
+				var config = _componentToRender_.config;
+				var tag = _componentToRender_.tag;
+
+				config.children = this.buildChildrenFn_(calls);
+				this.componentToRender_ = null;
+				_IncrementalDomAop2.default.stopInterception();
+				return this.renderSubComponent_(tag, config).element;
 			}
+			this.componentToRender_.calls.push({
+				name: 'elementClose',
+				args: arguments
+			});
+		};
+
+		IncrementalDomRenderer.prototype.handleInterceptedChildrenOpenCall_ = function handleInterceptedChildrenOpenCall_(originalFn, tag) {
+			if (this.isCurrentComponentTag_(tag)) {
+				this.componentToRender_.tagsCount++;
+			}
+			this.componentToRender_.calls.push({
+				name: 'elementOpen',
+				args: arguments
+			});
+		};
+
+		IncrementalDomRenderer.prototype.handleInterceptedChildrenTextCall_ = function handleInterceptedChildrenTextCall_() {
+			this.componentToRender_.calls.push({
+				name: 'text',
+				args: arguments
+			});
 		};
 
 		IncrementalDomRenderer.prototype.handleInterceptedOpenCall_ = function handleInterceptedOpenCall_(originalFn, tag) {
-			var node;
 			if (this.isComponentTag_(tag)) {
-				node = this.handleSubComponentCall_.apply(this, arguments);
+				return this.handleSubComponentCall_.apply(this, arguments);
 			} else {
-				node = this.handleRegularCall_.apply(this, arguments);
+				return this.handleRegularCall_.apply(this, arguments);
 			}
-			return node;
 		};
 
 		IncrementalDomRenderer.prototype.handleRegularCall_ = function handleRegularCall_(originalFn, tag, key, statics) {
 			var attrsArr = _metal.array.slice(arguments, 4);
 			this.addInlineListeners_((statics || []).concat(attrsArr));
 			var args = _metal.array.slice(arguments, 1);
-			if (!this.rootElementReached_ && this.component_.componentIncrementalDomKey_) {
-				args[1] = this.component_.componentIncrementalDomKey_;
+			if (!this.rootElementReached_ && this.component_.config.key) {
+				args[1] = this.component_.config.key;
 			}
 			var node = originalFn.apply(null, args);
 			if (!this.rootElementReached_) {
@@ -186,23 +224,38 @@ define(['exports', 'metal/src/metal', 'metal-dom/src/all/dom', 'metal-component/
 		};
 
 		IncrementalDomRenderer.prototype.handleSubComponentCall_ = function handleSubComponentCall_(originalFn, tag, key, statics) {
-			var config = {};
+			var config = { key: key };
 			var attrsArr = (statics || []).concat(_metal.array.slice(arguments, 4));
 			for (var i = 0; i < attrsArr.length; i += 2) {
 				config[attrsArr[i]] = attrsArr[i + 1];
 			}
 
-			var tagOrCtor = tag;
-			if (tag === 'Component' && config.ctor) {
-				tagOrCtor = config.ctor;
-				config = config.data || {};
-			}
-			var comp = this.renderSubComponent_(tagOrCtor, config);
-			return comp.element;
+			this.componentToRender_ = {
+				calls: [],
+				config: config,
+				tag: tag,
+				tagsCount: 1
+			};
+			_IncrementalDomAop2.default.startInterception({
+				elementClose: this.handleInterceptedChildrenCloseCall_.bind(this),
+				elementOpen: this.handleInterceptedChildrenOpenCall_.bind(this),
+				text: this.handleInterceptedChildrenTextCall_.bind(this)
+			});
+		};
+
+		IncrementalDomRenderer.prototype.intercept_ = function intercept_() {
+			_IncrementalDomAop2.default.startInterception({
+				attributes: this.handleInterceptedAttributesCall_.bind(this),
+				elementOpen: this.handleInterceptedOpenCall_.bind(this)
+			});
 		};
 
 		IncrementalDomRenderer.prototype.isComponentTag_ = function isComponentTag_(tag) {
 			return !_metal.core.isString(tag) || tag[0] === tag[0].toUpperCase();
+		};
+
+		IncrementalDomRenderer.prototype.isCurrentComponentTag_ = function isCurrentComponentTag_(tag) {
+			return this.isComponentTag_(tag) && this.componentToRender_.tag === tag;
 		};
 
 		IncrementalDomRenderer.prototype.render = function render() {
@@ -222,7 +275,7 @@ define(['exports', 'metal/src/metal', 'metal-dom/src/all/dom', 'metal-component/
 			this.subComponentsFound_ = {};
 			this.generatedKeyCount_ = 0;
 			this.listenersToAttach_ = [];
-			_IncrementalDomAop2.default.startInterception(this.handleInterceptedOpenCall_.bind(this), this.handleInterceptedCloseCall_.bind(this), this.handleInterceptedAttributesCall_.bind(this));
+			this.intercept_();
 			this.renderIncDom();
 			_IncrementalDomAop2.default.stopInterception();
 			this.attachInlineListeners_();

@@ -23,6 +23,10 @@ $gray-lighter: lighten($gray-base, 93.5%) !default; // #eee
 
 $slider-height: 20px;
 
+body {
+	background-color: $imageeditor-bg !important;
+}
+
 .image-editor {
 	background-color: $imageeditor-bg;
 

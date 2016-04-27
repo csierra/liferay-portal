@@ -1,4 +1,4 @@
-define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-component/src/Component', 'metal-soy/src/Soy', 'metal-dom/src/dom', 'metal-promise/src/promise/Promise', 'metal-dropdown/src/Dropdown', './ImageEditorHistoryEntry.es', './ImageEditor.soy'], function (exports, _Component2, _Soy, _dom, _Promise, _Dropdown, _ImageEditorHistoryEntry, _ImageEditor) {
+define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-component/src/Component', 'metal-soy/src/Soy', 'metal/src/core', 'metal-dom/src/dom', 'metal-promise/src/promise/Promise', 'metal-dropdown/src/Dropdown', './ImageEditorHistoryEntry.es', './ImageEditorLoading.es', './ImageEditor.soy'], function (exports, _Component2, _Soy, _core, _dom, _Promise, _Dropdown, _ImageEditorHistoryEntry, _ImageEditorLoading, _ImageEditor) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -9,11 +9,15 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-compo
 
 	var _Soy2 = _interopRequireDefault(_Soy);
 
+	var _core2 = _interopRequireDefault(_core);
+
 	var _dom2 = _interopRequireDefault(_dom);
 
 	var _Dropdown2 = _interopRequireDefault(_Dropdown);
 
 	var _ImageEditorHistoryEntry2 = _interopRequireDefault(_ImageEditorHistoryEntry);
+
+	var _ImageEditorLoading2 = _interopRequireDefault(_ImageEditorLoading);
 
 	var _ImageEditor2 = _interopRequireDefault(_ImageEditor);
 
@@ -90,7 +94,7 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-compo
 
 			// Load the first entry imageData and render it on the app.
 			_this.history_[0].getImageData().then(function (imageData) {
-				return _this.restoreData_(imageData);
+				return _this.syncImageData_(imageData);
 			});
 			return _this;
 		}
@@ -174,10 +178,10 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-compo
 			this.history_[this.historyIndex_].getImageData().then(function (imageData) {
 				return selectedControl.preview(imageData);
 			}).then(function (imageData) {
-				return _this4.restoreData_(imageData);
+				return _this4.syncImageData_(imageData);
 			});
 
-			this.imageDataReady = false;
+			this.components.loading.show = true;
 		};
 
 		ImageEditor.prototype.reset = function reset() {
@@ -186,7 +190,25 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-compo
 			this.syncHistory_();
 		};
 
-		ImageEditor.prototype.restoreData_ = function restoreData_(imageData) {
+		ImageEditor.prototype.syncHistory_ = function syncHistory_() {
+			var _this5 = this;
+
+			return new _Promise.CancellablePromise(function (resolve, reject) {
+				_this5.history_[_this5.historyIndex_].getImageData().then(function (imageData) {
+					_this5.syncImageData_(imageData);
+
+					_this5.history = {
+						canRedo: _this5.historyIndex_ < _this5.history_.length - 1,
+						canReset: _this5.history_.length > 1,
+						canUndo: _this5.historyIndex_ > 0
+					};
+
+					resolve();
+				});
+			});
+		};
+
+		ImageEditor.prototype.syncImageData_ = function syncImageData_(imageData) {
 			var width = imageData.width;
 			var height = imageData.height;
 
@@ -222,25 +244,7 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.es", ['exports', 'metal-compo
 			canvas.style.width = canvas.width + 'px';
 			canvas.style.height = canvas.height + 'px';
 
-			this.imageDataReady = true;
-		};
-
-		ImageEditor.prototype.syncHistory_ = function syncHistory_() {
-			var _this5 = this;
-
-			return new _Promise.CancellablePromise(function (resolve, reject) {
-				_this5.history_[_this5.historyIndex_].getImageData().then(function (imageData) {
-					_this5.restoreData_(imageData);
-
-					_this5.history = {
-						canRedo: _this5.historyIndex_ < _this5.history_.length - 1,
-						canReset: _this5.history_.length > 1,
-						canUndo: _this5.historyIndex_ > 0
-					};
-
-					resolve();
-				});
-			});
+			this.components.loading.show = false;
 		};
 
 		ImageEditor.prototype.undo = function undo() {

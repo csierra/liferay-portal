@@ -7,7 +7,6 @@
  * @param? history
  * @param id
  * @param? image
- * @param? imageDataReady
  * @param? selectedControl
  * @param? selectedTool
  *
@@ -23,7 +22,9 @@
 		<div class="lfr-image-editor-image-container" id="{$id}ImageContainer">
 			<img class="img-responsive hide" src="{$image}">
 			<canvas class="image-preview"></canvas>
-			<div class="loading-animation {$imageDataReady ? 'hide' : ''}"></div>
+			{call ImageEditorLoading.render data="all"}
+				{param key: 'loading' /}
+			{/call}
 		</div>
 
 		<div class="lfr-image-editor-tools-container">

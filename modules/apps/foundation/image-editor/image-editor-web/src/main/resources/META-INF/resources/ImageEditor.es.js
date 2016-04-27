@@ -1,16 +1,27 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 
+import core from 'metal/src/core';
 import dom from 'metal-dom/src/dom';
 import { CancellablePromise } from 'metal-promise/src/promise/Promise';
 import Dropdown from 'metal-dropdown/src/Dropdown';
 
 import ImageEditorHistoryEntry from './ImageEditorHistoryEntry.es';
+import ImageEditorLoading from './ImageEditorLoading.es';
 
 import templates from './ImageEditor.soy';
 
 /**
- * ImageEditor Component
+ * ImageEditor
+ *
+ * This class bootstraps all the necessary parts of an image editor. It only controls
+ * the state and history of the editing process, orchestrating how the different parts
+ * of the application work.
+ *
+ * All image processing is delegated to the different capability implementations. The
+ * editor provides:
+ * - A common way of exposing the functionality.
+ * - Some registration points which can be used by the capability implementors to provide UI controls.
  */
 class ImageEditor extends Component {
 	/**
@@ -46,7 +57,7 @@ class ImageEditor extends Component {
 
 		// Load the first entry imageData and render it on the app.
 		this.history_[0].getImageData()
-			.then((imageData) => this.restoreData_(imageData));
+			.then((imageData) => this.syncImageData_(imageData));
 	}
 
 	/**
@@ -71,6 +82,7 @@ class ImageEditor extends Component {
 	 * Creates a new history entry state.
 	 *
 	 * @param  {ImageData} imageData The ImageData of the new image.
+	 * @protected
 	 */
 	createHistoryEntry_(imageData) {
 		// Push new state and discard stale redo states
@@ -148,9 +160,9 @@ class ImageEditor extends Component {
 
 		this.history_[this.historyIndex_].getImageData()
 			.then((imageData) => selectedControl.preview(imageData))
-			.then((imageData) => this.restoreData_(imageData));
+			.then((imageData) => this.syncImageData_(imageData));
 
-		this.imageDataReady = false;
+		this.components.loading.show = true;
 	}
 
 	/**
@@ -164,11 +176,35 @@ class ImageEditor extends Component {
 	}
 
 	/**
-	 * [restoreData_ description]
-	 * @param  {[type]} imageData [description]
-	 * @return {[type]}           [description]
+	 * Syncs the image and history values after changes to the
+	 * history stack.
+	 *
+	 * @protected
 	 */
-	restoreData_(imageData) {
+	syncHistory_() {
+		return new CancellablePromise((resolve, reject) => {
+			this.history_[this.historyIndex_].getImageData()
+				.then((imageData) => {
+					this.syncImageData_(imageData);
+
+					this.history = {
+						canRedo: this.historyIndex_ < this.history_.length - 1,
+						canReset: this.history_.length > 1,
+						canUndo: this.historyIndex_ > 0
+					};
+
+					resolve();
+				});
+			});
+	}
+
+	/**
+	 * Updates the image data showed in the editable area
+	 *
+	 * @protected
+	 * @param  {ImageData} imageData The new ImageData value to show on the editor
+	 */
+	syncImageData_(imageData) {
 		let width = imageData.width;
 		let height = imageData.height;
 
@@ -204,30 +240,7 @@ class ImageEditor extends Component {
 		canvas.style.width = canvas.width + 'px';
 		canvas.style.height = canvas.height + 'px';
 
-		this.imageDataReady = true;
-	}
-
-	/**
-	 * Syncs the image and history values after changes to the
-	 * history stack.
-	 *
-	 * @protected
-	 */
-	syncHistory_() {
-		return new CancellablePromise((resolve, reject) => {
-			this.history_[this.historyIndex_].getImageData()
-				.then((imageData) => {
-					this.restoreData_(imageData);
-
-					this.history = {
-						canRedo: this.historyIndex_ < this.history_.length - 1,
-						canReset: this.history_.length > 1,
-						canUndo: this.historyIndex_ > 0
-					};
-
-					resolve();
-				});
-			});
+		this.components.loading.show = false;
 	}
 
 	/**

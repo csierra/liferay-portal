@@ -22,6 +22,7 @@ define("liferay-image-editor-web@1.0.0/ImageEditorHistoryEntry.es", ['exports', 
 			_classCallCheck(this, ImageEditorHistoryEntry);
 
 			this.dataPromise_ = new _Promise.CancellablePromise(function (resolve, reject) {
+				// Preemtively fetch the imageData when all we have is the image url
 				if (image.url && !image.data) {
 					_this.loadData_(image.url).then(function (imageData) {
 						return resolve(imageData);
@@ -33,9 +34,10 @@ define("liferay-image-editor-web@1.0.0/ImageEditorHistoryEntry.es", ['exports', 
 		}
 
 		/**
-   * [loadData_ description]
-   * @param  {[type]} imageURL [description]
-   * @return {[type]}          [description]
+   * Fetches an ImageData for a given image url
+   *
+   * @param  {String} imageURL The image url to load
+   * @protected
    */
 
 

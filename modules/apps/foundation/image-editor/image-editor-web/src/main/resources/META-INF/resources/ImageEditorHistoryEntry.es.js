@@ -2,6 +2,10 @@ import { CancellablePromise } from 'metal-promise/src/promise/Promise';
 
 /**
  * Image Editor History Entry
+ *
+ * This class models a step in the image edition process. It stores the
+ * Image data at a given point in time so it can be later recovered for
+ * undo/redo purposes or other visualization needs.
  */
 class ImageEditorHistoryEntry {
 	/**
@@ -9,6 +13,7 @@ class ImageEditorHistoryEntry {
 	 */
 	constructor(image) {
 		this.dataPromise_ = new CancellablePromise((resolve, reject) => {
+			// Preemtively fetch the imageData when all we have is the image url
 			if (image.url && !image.data) {
 				this.loadData_(image.url)
 					.then((imageData) => resolve(imageData));
@@ -20,9 +25,10 @@ class ImageEditorHistoryEntry {
 	}
 
 	/**
-	 * [loadData_ description]
-	 * @param  {[type]} imageURL [description]
-	 * @return {[type]}          [description]
+	 * Fetches an ImageData for a given image url
+	 *
+	 * @param  {String} imageURL The image url to load
+	 * @protected
 	 */
 	loadData_(imageURL) {
 		return new CancellablePromise((resolve, reject) => {
@@ -48,9 +54,9 @@ class ImageEditorHistoryEntry {
 	}
 
 	/**
-	 * [getImageData description]
+	 * Fetches the stored ImageData of this history entry
 	 *
-	 * @return {CancellablePromise} [description]
+	 * @return {CancellablePromise} A promise that will resolve with the stored ImageData value
 	 */
 	getImageData() {
 		return this.dataPromise_;

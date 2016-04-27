@@ -78,7 +78,9 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.soy", ['exports', 'metal-comp
     var itext = IncrementalDom.text;
     var iattr = IncrementalDom.attr;
 
-    var $templateAlias1 = _Soy2.default.getTemplate('Dropdown.incrementaldom', 'render');
+    var $templateAlias2 = _Soy2.default.getTemplate('Dropdown.incrementaldom', 'render');
+
+    var $templateAlias1 = _Soy2.default.getTemplate('ImageEditorLoading.incrementaldom', 'render');
 
     /**
      * @param {Object<string, *>=} opt_data
@@ -93,7 +95,7 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.soy", ['exports', 'metal-comp
       ie_open('img', null, null, 'class', 'img-responsive hide', 'src', opt_data.image);
       ie_close('img');
       ie_void('canvas', null, null, 'class', 'image-preview');
-      ie_void('div', null, null, 'class', 'loading-animation ' + (opt_data.imageDataReady ? 'hide' : ''));
+      $templateAlias1(soy.$$augmentMap(opt_data, { key: 'loading' }), null, opt_ijData);
       ie_close('div');
       ie_open('div', null, null, 'class', 'lfr-image-editor-tools-container');
       $tools(opt_data, null, opt_ijData);
@@ -126,12 +128,12 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.soy", ['exports', 'metal-comp
     function $tools(opt_data, opt_ignored, opt_ijData) {
       ie_open('div', null, null, 'class', 'controls text-center');
       ie_open('ul', null, null, 'class', 'list-inline');
-      var toolList37 = opt_data.capabilities.tools;
-      var toolListLen37 = toolList37.length;
-      for (var toolIndex37 = 0; toolIndex37 < toolListLen37; toolIndex37++) {
-        var toolData37 = toolList37[toolIndex37];
-        ie_open('li', null, null, 'class', opt_data.selectedTool == 'tool-' + toolIndex37 ? 'open' : '', 'style', 'display:inline');
-        $tool(soy.$$augmentMap(opt_data, { tool: toolData37, toolIndex: toolIndex37 }), null, opt_ijData);
+      var toolList38 = opt_data.capabilities.tools;
+      var toolListLen38 = toolList38.length;
+      for (var toolIndex38 = 0; toolIndex38 < toolListLen38; toolIndex38++) {
+        var toolData38 = toolList38[toolIndex38];
+        ie_open('li', null, null, 'class', opt_data.selectedTool == 'tool-' + toolIndex38 ? 'open' : '', 'style', 'display:inline');
+        $tool(soy.$$augmentMap(opt_data, { tool: toolData38, toolIndex: toolIndex38 }), null, opt_ijData);
         ie_close('li');
       }
       ie_close('ul');
@@ -153,11 +155,11 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.soy", ['exports', 'metal-comp
       if (opt_data.tool.controls.length > 1) {
         $tool_dropdown(opt_data, null, opt_ijData);
       } else {
-        var control__soy46 = opt_data.tool.controls[0];
-        ie_open('a', null, null, 'class', 'btn', 'data-onclick', 'requestEditorEdit', 'data-control', control__soy46.variant, 'data-tool', 'tool-' + opt_data.toolIndex, 'href', 'javascript:;');
+        var control__soy47 = opt_data.tool.controls[0];
+        ie_open('a', null, null, 'class', 'btn', 'data-onclick', 'requestEditorEdit', 'data-control', control__soy47.variant, 'data-tool', 'tool-' + opt_data.toolIndex, 'href', 'javascript:;');
         ie_void('span', null, null, 'class', 'icon-' + opt_data.tool.icon + ' icon-monospaced');
         ie_close('a');
-        $tool_control(soy.$$augmentMap(opt_data, { control: control__soy46 }), null, opt_ijData);
+        $tool_control(soy.$$augmentMap(opt_data, { control: control__soy47 }), null, opt_ijData);
       }
     }
     exports.tool = $tool;
@@ -173,29 +175,29 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.soy", ['exports', 'metal-comp
      * @suppress {checkTypes}
      */
     function $tool_dropdown(opt_data, opt_ignored, opt_ijData) {
-      var param57 = function param57() {
+      var param58 = function param58() {
         ie_open('a', null, null, 'class', 'btn', 'data-onclick', 'toggle', 'href', 'javascript:;');
         ie_void('span', null, null, 'class', 'icon-' + opt_data.tool.icon + ' icon-monospaced');
         ie_close('a');
       };
-      var param61 = function param61() {
-        var controlList71 = opt_data.tool.controls;
-        var controlListLen71 = controlList71.length;
-        for (var controlIndex71 = 0; controlIndex71 < controlListLen71; controlIndex71++) {
-          var controlData71 = controlList71[controlIndex71];
+      var param62 = function param62() {
+        var controlList72 = opt_data.tool.controls;
+        var controlListLen72 = controlList72.length;
+        for (var controlIndex72 = 0; controlIndex72 < controlListLen72; controlIndex72++) {
+          var controlData72 = controlList72[controlIndex72];
           ie_open('li', null, null, 'data-onclick', 'toggle');
-          ie_open('a', null, null, 'data-onclick', opt_data.requestEditorEdit, 'data-control', controlData71.variant, 'data-tool', 'tool-' + opt_data.toolIndex);
-          itext((goog.asserts.assert(controlData71.label != null), controlData71.label));
+          ie_open('a', null, null, 'data-onclick', opt_data.requestEditorEdit, 'data-control', controlData72.variant, 'data-tool', 'tool-' + opt_data.toolIndex);
+          itext((goog.asserts.assert(controlData72.label != null), controlData72.label));
           ie_close('a');
           ie_close('li');
         }
       };
-      $templateAlias1({ header: param57, body: param61, elementClasses: 'dropup', position: 0, positionClassOnMenu: true }, null, opt_ijData);
-      var controlList79 = opt_data.tool.controls;
-      var controlListLen79 = controlList79.length;
-      for (var controlIndex79 = 0; controlIndex79 < controlListLen79; controlIndex79++) {
-        var controlData79 = controlList79[controlIndex79];
-        $tool_control(soy.$$augmentMap(opt_data, { control: controlData79 }), null, opt_ijData);
+      $templateAlias2({ header: param58, body: param62, elementClasses: 'dropup', position: 0, positionClassOnMenu: true }, null, opt_ijData);
+      var controlList80 = opt_data.tool.controls;
+      var controlListLen80 = controlList80.length;
+      for (var controlIndex80 = 0; controlIndex80 < controlListLen80; controlIndex80++) {
+        var controlData80 = controlList80[controlIndex80];
+        $tool_control(soy.$$augmentMap(opt_data, { control: controlData80 }), null, opt_ijData);
       }
     }
     exports.tool_dropdown = $tool_dropdown;
@@ -256,15 +258,15 @@ define("liferay-image-editor-web@1.0.0/ImageEditor.soy", ['exports', 'metal-comp
      * @return {void}
      * @suppress {checkTypes}
      */
-    function __deltemplate_s94_266044fb(opt_data, opt_ignored, opt_ijData) {}
-    exports.__deltemplate_s94_266044fb = __deltemplate_s94_266044fb;
+    function __deltemplate_s95_266044fb(opt_data, opt_ignored, opt_ijData) {}
+    exports.__deltemplate_s95_266044fb = __deltemplate_s95_266044fb;
     if (goog.DEBUG) {
-      __deltemplate_s94_266044fb.soyTemplateName = 'ImageEditor.__deltemplate_s94_266044fb';
+      __deltemplate_s95_266044fb.soyTemplateName = 'ImageEditor.__deltemplate_s95_266044fb';
     }
-    soy.$$registerDelegateFn(soy.$$getDelTemplateId('ImageEditor.Controls.idom'), '', 0, __deltemplate_s94_266044fb);
+    soy.$$registerDelegateFn(soy.$$getDelTemplateId('ImageEditor.Controls.idom'), '', 0, __deltemplate_s95_266044fb);
 
-    exports.render.params = ["capabilities", "history", "id", "image", "imageDataReady", "selectedControl", "selectedTool", "getEditorCanvas", "getEditorImageData", "requestEditorEdit", "requestEditorPreview"];
-    exports.render.types = { "capabilities": "any", "history": "any", "id": "any", "image": "any", "imageDataReady": "any", "selectedControl": "any", "selectedTool": "any", "getEditorCanvas": "any", "getEditorImageData": "any", "requestEditorEdit": "any", "requestEditorPreview": "any" };
+    exports.render.params = ["capabilities", "history", "id", "image", "selectedControl", "selectedTool", "getEditorCanvas", "getEditorImageData", "requestEditorEdit", "requestEditorPreview"];
+    exports.render.types = { "capabilities": "any", "history": "any", "id": "any", "image": "any", "selectedControl": "any", "selectedTool": "any", "getEditorCanvas": "any", "getEditorImageData": "any", "requestEditorEdit": "any", "requestEditorPreview": "any" };
     exports.tools.params = ["capabilities", "selectedTool"];
     exports.tools.types = { "capabilities": "any", "selectedTool": "any" };
     exports.tool.params = ["tool", "toolIndex"];
