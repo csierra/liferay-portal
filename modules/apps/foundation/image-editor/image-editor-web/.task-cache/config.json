@@ -1,0 +1,20 @@
+{
+    "liferay-image-editor-web@1.0.0/ImageEditor.es": {
+        "dependencies": ["exports", "metal-component/src/Component", "metal-soy/src/Soy", "metal/src/core", "metal-dom/src/dom", "metal-promise/src/promise/Promise", "metal-dropdown/src/Dropdown", "./ImageEditorHistoryEntry.es", "./ImageEditorLoading.es", "./ImageEditor.soy"]
+    },
+    "liferay-image-editor-web@1.0.0/ImageEditor.soy": {
+        "dependencies": ["exports", "metal-component/src/Component", "metal-soy/src/Soy"]
+    },
+    "liferay-image-editor-web@1.0.0/ImageEditorHistoryEntry.es": {
+        "dependencies": ["exports", "metal-promise/src/promise/Promise"]
+    },
+    "liferay-image-editor-web@1.0.0/ImageEditorLoading.es": {
+        "dependencies": ["exports", "metal-component/src/Component", "metal-soy/src/Soy", "./ImageEditorLoading.soy"]
+    },
+    "liferay-image-editor-web@1.0.0/ImageEditorLoading.soy": {
+        "dependencies": ["exports", "metal-component/src/Component", "metal-soy/src/Soy"]
+    },
+    "liferay-image-editor-web@1.0.0/metal-dropdown/src/Dropdown.soy": {
+        "dependencies": ["exports", "metal-component/src/Component", "metal-soy/src/Soy"]
+    }
+}
