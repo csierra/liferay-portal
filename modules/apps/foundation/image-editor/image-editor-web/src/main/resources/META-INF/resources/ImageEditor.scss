@@ -5,15 +5,14 @@ $imageeditor-btn-padding: 8px 4px !default;
 $imageeditor-btn-space: 24px !default;
 $imageeditor-controls-height: 52px !default;
 $imageeditor-filters-height: 90px !default;
-$imageeditor-history-controls-bottom: $imageeditor-controls-height + 10 !default;
-$imageeditor-history-controls-side: $imageeditor-btn-space !default;
+$imageeditor-history-controls-top: 30px;
 
 // Skin
 
 $brand-primary: darken(#428BCA, 6.5%) !default; // #337ab7
 
 $imageeditor-bg: #111314 !default;
-$imageeditor-history-controls-btn-color: #3A4A57 !default;
+$imageeditor-history-controls-btn-color: #4E6371 !default;
 $imageeditor-link-color: $brand-primary !default;
 $imageeditor-text-color: #FFF !default;
 
@@ -56,7 +55,19 @@ body {
 
 	.lfr-image-editor-history-container {
 		position: absolute;
+		text-align: center;
+		top: $imageeditor-history-controls-top;
 		width: 100%;
+
+		a.btn {
+			background-color: $imageeditor-history-controls-btn-color;
+			margin: 0;
+
+			.lexicon-icon {
+				color: $imageeditor-text-color;
+				margin-top: -7px;
+			}
+		}
 	}
 
 	.lfr-image-editor-image-container {
@@ -121,29 +132,6 @@ body {
 
 			.filters.open {
 				height: $imageeditor-filters-height;
-			}
-		}
-	}
-
-	.history-controls {
-		bottom: $imageeditor-history-controls-bottom;
-		position: absolute;
-
-		&.history-left {
-			left: $imageeditor-history-controls-side;
-		}
-
-		&.history-right {
-			right: $imageeditor-history-controls-side;
-		}
-
-		a.btn {
-			background-color: $imageeditor-history-controls-btn-color;
-			margin: 0 2px;
-
-			.lexicon-icon {
-				color: $imageeditor-text-color;
-				margin-top: -7px;
 			}
 		}
 	}

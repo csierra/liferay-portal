@@ -37,11 +37,17 @@
 			{/call}
 		</div>
 
-		<div class="lfr-image-editor-history-container {$selectedTool ? 'hide' : ''}">
-			<div class="history-controls history-left btn-group" role="group">
+		<div class="lfr-image-editor-history-container">
+			<div class="history-controls btn-group" role="group">
 				<a class="btn btn-link {$history and $history.canUndo ? '' : 'disabled'} icon-monospaced" data-onclick="undo" href="javascript:;">
 					<svg class="lexicon-icon">
 					    <use xlink:href="{$pathThemeImages}/lexicon/icons.svg#angle-left"></use>
+					</svg>
+				</a>
+
+				<a class="btn btn-link {$history and $history.canReset ? '' : 'disabled'} icon-monospaced" data-onclick="reset" href="javascript:;">
+					<svg class="lexicon-icon">
+					    <use xlink:href="{$pathThemeImages}/lexicon/icons.svg#restore"></use>
 					</svg>
 				</a>
 
@@ -50,16 +56,6 @@
 					    <use xlink:href="{$pathThemeImages}/lexicon/icons.svg#angle-right"></use>
 					</svg>
 				</a>
-			</div>
-
-			<div class="history-controls history-right btn-group" role="group">
-
-				<a class="btn btn-link {$history and $history.canReset ? '' : 'disabled'} icon-monospaced" data-onclick="reset" href="javascript:;">
-					<svg class="lexicon-icon">
-					    <use xlink:href="{$pathThemeImages}/lexicon/icons.svg#restore"></use>
-					</svg>
-				</a>
-
 			</div>
 		</div>
 	</div>
