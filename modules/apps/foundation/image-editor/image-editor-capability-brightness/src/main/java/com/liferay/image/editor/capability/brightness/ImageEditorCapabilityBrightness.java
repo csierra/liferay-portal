@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		"com.liferay.image.editor.capability.category=adjust",
 		"com.liferay.image.editor.capability.controls=brightness",
-		"com.liferay.image.editor.capability.icon=sun",
+		"com.liferay.image.editor.capability.icon=effects",
 		"com.liferay.image.editor.capability.name=brightness",
 		"com.liferay.image.editor.capability.type=tool"
 	},

@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		"com.liferay.image.editor.capability.category=filter",
 		"com.liferay.image.editor.capability.controls=filter",
-		"com.liferay.image.editor.capability.icon=picture",
+		"com.liferay.image.editor.capability.icon=magic",
 		"com.liferay.image.editor.capability.name=filter",
 		"com.liferay.image.editor.capability.type=tool"
 	},

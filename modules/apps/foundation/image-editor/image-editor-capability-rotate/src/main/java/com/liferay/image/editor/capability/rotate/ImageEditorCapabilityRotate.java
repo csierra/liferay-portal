@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		"com.liferay.image.editor.capability.category=transform",
 		"com.liferay.image.editor.capability.controls=rotate",
-		"com.liferay.image.editor.capability.icon=circle",
+		"com.liferay.image.editor.capability.icon=transform",
 		"com.liferay.image.editor.capability.name=rotate",
 		"com.liferay.image.editor.capability.type=tool"
 	},

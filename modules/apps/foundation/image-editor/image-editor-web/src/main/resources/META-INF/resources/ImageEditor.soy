@@ -9,6 +9,7 @@
  * @param? image
  * @param? selectedControl
  * @param? selectedTool
+ * @param? pathThemeImages
  *
  * Function References
  *
@@ -36,17 +37,30 @@
 			{/call}
 		</div>
 
-		<div class="lfr-image-editor-history-container">
-			{if not $selectedTool}
-				<div class="history-controls history-left btn-group" role="group">
-					<a class="btn btn-link {$history and $history.canUndo ? '' : 'disabled'} icon-reply icon-monospaced" data-onclick="undo" href="javascript:;"></a>
-					<a class="btn btn-link {$history and $history.canRedo ? '' : 'disabled'} icon-share-alt icon-monospaced" data-onclick="redo" href="javascript:;"></a>
-				</div>
+		<div class="lfr-image-editor-history-container {$selectedTool ? 'hide' : ''}">
+			<div class="history-controls history-left btn-group" role="group">
+				<a class="btn btn-link {$history and $history.canUndo ? '' : 'disabled'} icon-monospaced" data-onclick="undo" href="javascript:;">
+					<svg class="lexicon-icon">
+					    <use xlink:href="{$pathThemeImages}/lexicon/icons.svg#angle-left"></use>
+					</svg>
+				</a>
 
-				<div class="history-controls history-right btn-group" role="group">
-					<a class="btn btn-link icon-undo {$history and $history.canReset ? '' : 'disabled'} icon-monospaced" data-onclick="reset" href="javascript:;"></a>
-				</div>
-			{/if}
+				<a class="btn btn-link {$history and $history.canRedo ? '' : 'disabled'} icon-monospaced" data-onclick="redo" href="javascript:;">
+					<svg class="lexicon-icon">
+					    <use xlink:href="{$pathThemeImages}/lexicon/icons.svg#angle-right"></use>
+					</svg>
+				</a>
+			</div>
+
+			<div class="history-controls history-right btn-group" role="group">
+
+				<a class="btn btn-link {$history and $history.canReset ? '' : 'disabled'} icon-monospaced" data-onclick="reset" href="javascript:;">
+					<svg class="lexicon-icon">
+					    <use xlink:href="{$pathThemeImages}/lexicon/icons.svg#restore"></use>
+					</svg>
+				</a>
+
+			</div>
 		</div>
 	</div>
 {/template}
@@ -77,6 +91,7 @@
  * - Button (dropdown when the tool groups different controls) to enable the control
  * - Interface with the common Apply/Cancel buttons plus the custom control UI
  *
+ * @param? pathThemeImages
  * @param tool
  * @param toolIndex
  */
@@ -89,7 +104,9 @@
 		{let $control : $tool.controls[0] /}
 
 		<a class="btn" data-onclick="requestEditorEdit" data-control="{$control.variant}" data-tool="tool-{$toolIndex}" href="javascript:;">
-			<span class="icon-{$tool.icon} icon-monospaced"></span>
+			<svg class="icon-monospaced lexicon-icon">
+			    <use xlink:href="{$pathThemeImages}/lexicon/icons.svg#{$tool.icon}"></use>
+			</svg>
 		</a>
 
 		{call .tool_control data="all"}
@@ -101,6 +118,7 @@
 /**
  * Renders a dropdown with all the available controls for this tool category
  *
+ * @param? pathThemeImages
  * @param? requestEditorEdit
  * @param tool
  * @param toolIndex
@@ -109,7 +127,9 @@
 	{call Dropdown.render}
 		{param header kind="html"}
 			<a class="btn" data-onclick="toggle" href="javascript:;">
-				<span class="icon-{$tool.icon} icon-monospaced"></span>
+				<svg class="icon-monospaced lexicon-icon">
+				    <use xlink:href="{$pathThemeImages}/lexicon/icons.svg#{$tool.icon}"></use>
+				</svg>
 			</a>
 		{/param}
 

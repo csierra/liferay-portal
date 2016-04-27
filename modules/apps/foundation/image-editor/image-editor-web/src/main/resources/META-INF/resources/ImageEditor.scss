@@ -13,7 +13,7 @@ $imageeditor-history-controls-side: $imageeditor-btn-space !default;
 $brand-primary: darken(#428BCA, 6.5%) !default; // #337ab7
 
 $imageeditor-bg: #111314 !default;
-$imageeditor-history-controls-btn-color: #1E5EC8 !default;
+$imageeditor-history-controls-btn-color: #3A4A57 !default;
 $imageeditor-link-color: $brand-primary !default;
 $imageeditor-text-color: #FFF !default;
 
@@ -55,7 +55,6 @@ body {
 	}
 
 	.lfr-image-editor-history-container {
-		bottom: 100px;
 		position: absolute;
 		width: 100%;
 	}
@@ -140,8 +139,12 @@ body {
 
 		a.btn {
 			background-color: $imageeditor-history-controls-btn-color;
-			color: $imageeditor-text-color;
 			margin: 0 2px;
+
+			.lexicon-icon {
+				color: $imageeditor-text-color;
+				margin-top: -7px;
+			}
 		}
 	}
 
