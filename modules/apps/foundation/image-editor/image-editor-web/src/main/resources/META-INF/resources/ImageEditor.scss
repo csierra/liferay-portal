@@ -15,6 +15,7 @@ $imageeditor-bg: #111314 !default;
 $imageeditor-history-controls-btn-color: #4E6371 !default;
 $imageeditor-link-color: $brand-primary !default;
 $imageeditor-text-color: #FFF !default;
+$imageeditor-filters-text-color: #57636A !default;
 
 $gray-base: #000 !default;
 $gray-light: lighten($gray-base, 46.7%) !default; // #777
@@ -62,6 +63,7 @@ body {
 		a.btn {
 			background-color: $imageeditor-history-controls-btn-color;
 			margin: 0;
+			outline: none;
 
 			.lexicon-icon {
 				color: $imageeditor-text-color;
@@ -113,7 +115,24 @@ body {
 
 					li {
 						display: table-cell;
-						padding: 0 2px;
+						padding: 0 5px;
+
+						&:hover a {
+							color: $imageeditor-link-color;
+							text-decoration: none;
+						}
+					}
+
+					a {
+						color: $imageeditor-filters-text-color;
+
+						&.active {
+							color: $imageeditor-link-color;
+						}
+
+						&.active canvas {
+							outline: 3px solid $imageeditor-link-color;
+						}
 					}
 
 					span {

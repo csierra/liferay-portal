@@ -6,15 +6,16 @@
  * @param filters
  * @param key
  * @param thumbnailSize
+ * @param? currentFilter_
  */
 {template .render}
 	<div id="{$key}">
 		<ul class="list-unstyled list-table">
 			{foreach $filter in $filters}
 				<li>
-					<a data-onclick="previewFilter" data-filter="{$filter}">
+					<a data-onclick="previewFilter" data-filter="{$filter}" class="{$currentFilter_ == $filter ? 'active' : ''}">
 						<div id="{$key}{$filter}" style="position: relative;">
-							<canvas width="{$thumbnailSize}" height="{$thumbnailSize}" style="border: solid 1px #777;"></canvas>
+							<canvas width="{$thumbnailSize}" height="{$thumbnailSize}"></canvas>
 						</div>
 						<span>{$filter}</span>
 					</a>
