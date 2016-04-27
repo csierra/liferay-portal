@@ -46,10 +46,7 @@ class ImageEditor extends Component {
 
 		// Load the first entry imageData and render it on the app.
 		this.history_[0].getImageData()
-			.then((imageData) => {
-				this.restoreData_(imageData);
-				this.imageDataReady = true;
-			});
+			.then((imageData) => this.restoreData_(imageData));
 	}
 
 	/**
@@ -152,6 +149,8 @@ class ImageEditor extends Component {
 		this.history_[this.historyIndex_].getImageData()
 			.then((imageData) => selectedControl.preview(imageData))
 			.then((imageData) => this.restoreData_(imageData));
+
+		this.imageDataReady = false;
 	}
 
 	/**
@@ -204,6 +203,8 @@ class ImageEditor extends Component {
 
 		canvas.style.width = canvas.width + 'px';
 		canvas.style.height = canvas.height + 'px';
+
+		this.imageDataReady = true;
 	}
 
 	/**
