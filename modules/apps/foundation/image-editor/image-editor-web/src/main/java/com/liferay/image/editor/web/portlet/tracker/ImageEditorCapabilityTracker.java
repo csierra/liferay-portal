@@ -15,6 +15,7 @@
 package com.liferay.image.editor.web.portlet.tracker;
 
 import com.liferay.image.editor.capability.ImageEditorCapability;
+import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceComparator;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import java.net.URL;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -89,16 +89,8 @@ public class ImageEditorCapabilityTracker {
 			new PropertyServiceReferenceMapper<String, ImageEditorCapability>(
 				"com.liferay.image.editor.capability.type"),
 			new ImageEditorCapabilityInformationServiceTrackerCustomizer(),
-			new Comparator<ServiceReference<ImageEditorCapability>>() {
-
-				public int compare(
-					ServiceReference<ImageEditorCapability> o1,
-					ServiceReference<ImageEditorCapability> o2) {
-
-					return o1.compareTo(o2);
-				}
-
-			},
+			new PropertyServiceReferenceComparator<ImageEditorCapability>(
+				"service.ranking"),
 			new CapabilityServiceTrackerMapListener());
 	}
 
@@ -168,7 +160,7 @@ public class ImageEditorCapabilityTracker {
 			<String, ImageEditorCapabilityInformation,
 				List<ImageEditorCapabilityInformation>> {
 
-		public void keyEmitted(
+		public synchronized void keyEmitted(
 			ServiceTrackerMap
 				<String, List<ImageEditorCapabilityInformation>>
 					serviceTrackerMap,
@@ -181,7 +173,7 @@ public class ImageEditorCapabilityTracker {
 				serviceTrackerMap);
 		}
 
-		public void keyRemoved(
+		public synchronized void keyRemoved(
 			ServiceTrackerMap<String, List<ImageEditorCapabilityInformation>>
 				serviceTrackerMap,
 			String key,
