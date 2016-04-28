@@ -389,26 +389,11 @@ public class MainServlet extends ActionServlet {
 
 		registerPortalInitialized();
 
-		waitForModules();
+		_waitForModules();
+
+		_registerPortalReady();
 
 		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
-	}
-
-	private void waitForModules() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put("module.service.lifecycle", "portal.waiting.modules");
-		properties.put("service.vendor", ReleaseInfo.getVendor());
-		properties.put("service.version", ReleaseInfo.getVersion());
-
-		ServiceRegistration<ModuleServiceLifecycle> serviceRegistration =
-			registry.registerService(
-				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
-				properties);
-
-		serviceRegistration.unregister();
 	}
 
 	@Override
@@ -1360,6 +1345,37 @@ public class MainServlet extends ActionServlet {
 
 	protected void setPortalInetSocketAddresses(HttpServletRequest request) {
 		PortalUtil.setPortalInetSocketAddresses(request);
+	}
+
+	private void _registerPortalReady() {
+		Registry registry = RegistryUtil.getRegistry();
+
+		Map<String, Object> properties = new HashMap<>();
+
+		properties.put("module.service.lifecycle", "portal.ready");
+		properties.put("service.vendor", ReleaseInfo.getVendor());
+		properties.put("service.version", ReleaseInfo.getVersion());
+
+		registry.registerService(
+			ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+			properties);
+	}
+
+	private void _waitForModules() {
+		Registry registry = RegistryUtil.getRegistry();
+
+		Map<String, Object> properties = new HashMap<>();
+
+		properties.put("module.service.lifecycle", "portal.waiting.modules");
+		properties.put("service.vendor", ReleaseInfo.getVendor());
+		properties.put("service.version", ReleaseInfo.getVersion());
+
+		ServiceRegistration<ModuleServiceLifecycle> serviceRegistration =
+			registry.registerService(
+				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+				properties);
+
+		serviceRegistration.unregister();
 	}
 
 	private static final boolean _HTTP_HEADER_VERSION_VERBOSITY_DEFAULT =

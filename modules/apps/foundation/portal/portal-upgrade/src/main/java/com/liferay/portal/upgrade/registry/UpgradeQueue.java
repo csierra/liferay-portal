@@ -14,18 +14,20 @@
 
 package com.liferay.portal.upgrade.registry;
 
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Carlos Sierra Andrés
@@ -60,6 +62,26 @@ public class UpgradeQueue {
 
 		for (Callable<Void> callable : _queue) {
 			System.out.println(callable);
+		}
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(module.service.lifecycle=portal.waiting.modules)",
+		unbind = "-"
+	)
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+
+		synchronized (this) {
+			try {
+				this.wait();
+			}
+			catch (InterruptedException ie) {
+				ie.printStackTrace();
+			}
 		}
 	}
 
@@ -112,22 +134,6 @@ public class UpgradeQueue {
 
 		private volatile boolean _canceled = false;
 
-	}
-
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		target = "(module.service.lifecycle=portal.waiting.modules)")
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
-
-		synchronized (this) {
-			try {
-				this.wait();
-			}
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 }

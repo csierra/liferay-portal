@@ -19,11 +19,11 @@ package com.liferay.portal.kernel.module.framework;
  */
 public interface ModuleServiceLifecycle {
 
+	public String DATABASE_INITIALIZED =
+		"(module.service.lifecycle=database.initialized)";
+
 	public String PORTAL_INITIALIZED =
 		"(module.service.lifecycle=portal.initialized)";
-
-	public String PORTAL_WAITING_MODULES =
-		"(module.service.lifecycle=portal.waiting.modules)";
 
 	public String SPRING_INITIALIZED =
 		"(module.service.lifecycle=spring.initialized)";
