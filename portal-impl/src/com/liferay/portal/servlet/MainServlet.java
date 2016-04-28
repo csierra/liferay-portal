@@ -389,7 +389,26 @@ public class MainServlet extends ActionServlet {
 
 		registerPortalInitialized();
 
+		waitForModules();
+
 		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
+	}
+
+	private void waitForModules() {
+		Registry registry = RegistryUtil.getRegistry();
+
+		Map<String, Object> properties = new HashMap<>();
+
+		properties.put("module.service.lifecycle", "portal.waiting.modules");
+		properties.put("service.vendor", ReleaseInfo.getVendor());
+		properties.put("service.version", ReleaseInfo.getVersion());
+
+		ServiceRegistration<ModuleServiceLifecycle> serviceRegistration =
+			registry.registerService(
+				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+				properties);
+
+		serviceRegistration.unregister();
 	}
 
 	@Override
