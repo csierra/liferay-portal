@@ -16,7 +16,6 @@ package com.liferay.portal.output.stream.container;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.output.stream.container.internal.ConsoleOutputStreamContainerFactory;
 
 import java.io.IOException;
@@ -164,11 +163,6 @@ public class OutputStreamContainerFactoryTracker {
 		if (rootLogger != null) {
 			rootLogger.removeAppender(_writerAppender);
 		}
-	}
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind ="-")
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	@Reference(
