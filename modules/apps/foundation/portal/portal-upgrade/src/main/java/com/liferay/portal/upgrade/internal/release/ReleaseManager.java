@@ -37,6 +37,7 @@ import com.liferay.portal.output.stream.container.OutputStreamContainerFactoryTr
 import com.liferay.portal.upgrade.internal.configuration.ReleaseManagerConfiguration;
 import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
 import com.liferay.portal.upgrade.registry.UpgradeInfo;
+import com.liferay.portal.upgrade.registry.UpgradeQueue;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,7 +48,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import com.liferay.portal.upgrade.registry.UpgradeQueue;
 import org.apache.felix.utils.log.Logger;
 
 import org.osgi.framework.BundleContext;
