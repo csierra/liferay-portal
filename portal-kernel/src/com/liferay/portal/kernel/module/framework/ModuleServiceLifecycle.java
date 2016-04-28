@@ -19,9 +19,6 @@ package com.liferay.portal.kernel.module.framework;
  */
 public interface ModuleServiceLifecycle {
 
-	public String DATABASE_INITIALIZED =
-		"(module.service.lifecycle=database.initialized)";
-
 	public String PORTAL_INITIALIZED =
 		"(module.service.lifecycle=portal.initialized)";
 
