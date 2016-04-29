@@ -127,6 +127,26 @@ public class DBUpgrader {
 			registry.registerService(
 				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
 				properties);
+
+			properties = new HashMap<>();
+
+			properties.put("module.service.lifecycle", "portal.waiting.modules");
+			properties.put("service.vendor", ReleaseInfo.getVendor());
+			properties.put("service.version", ReleaseInfo.getVersion());
+
+			registry.registerService(
+					ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+					properties);
+
+			properties = new HashMap<>();
+
+			properties.put("module.service.lifecycle", "portal.ready");
+			properties.put("service.vendor", ReleaseInfo.getVendor());
+			properties.put("service.version", ReleaseInfo.getVersion());
+
+			registry.registerService(
+				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+				properties);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
