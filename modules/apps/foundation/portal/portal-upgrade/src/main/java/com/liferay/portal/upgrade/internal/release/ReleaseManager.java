@@ -278,6 +278,10 @@ public class ReleaseManager {
 		_outputStreamContainerFactoryTracker;
 	private ReleaseLocalService _releaseLocalService;
 	private ReleaseManagerConfiguration _releaseManagerConfiguration;
+
+	@Reference
+	private ReleasePublisher _releasePublisher;
+
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
 
 	@Reference
@@ -465,6 +469,9 @@ public class ReleaseManager {
 						_bundleSymbolicName,
 						upgradeInfo.getToSchemaVersionString(),
 						fromSchemaVersionString);
+
+					_releasePublisher.publish(
+						_releaseLocalService.fetchRelease(_bundleSymbolicName));
 				}
 			}
 			catch (Exception e) {
