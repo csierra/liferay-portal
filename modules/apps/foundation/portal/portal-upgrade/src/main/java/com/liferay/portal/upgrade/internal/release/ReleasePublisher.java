@@ -15,9 +15,6 @@
 package com.liferay.portal.upgrade.internal.release;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.exception.ModelListenerException;
-import com.liferay.portal.kernel.model.BaseModelListener;
-import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
@@ -39,21 +36,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Miguel Pastor
  * @author Carlos Sierra Andrés
  */
-@Component(
-	immediate = true,
-	service = {ModelListener.class, ReleasePublisher.class}
-)
-public final class ReleasePublisher extends BaseModelListener<Release> {
-
-	@Override
-	public void onAfterCreate(Release release) throws ModelListenerException {
-		publish(release);
-	}
-
-	@Override
-	public void onAfterUpdate(Release release) throws ModelListenerException {
-		publish(release);
-	}
+@Component(immediate = true, service = ReleasePublisher.class)
+public final class ReleasePublisher {
 
 	public synchronized void publish(Release release) {
 		ServiceRegistration<Release> oldServiceRegistration =
