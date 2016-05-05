@@ -112,6 +112,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletContext;
@@ -143,6 +145,10 @@ public class MainServlet extends ActionServlet {
 	public void destroy() {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Destroy plugins");
+		}
+
+		if (_portalWaitingLifecycleServiceRegistration != null) {
+			_portalWaitingLifecycleServiceRegistration.unregister();
 		}
 
 		_moduleServiceLifecycleServiceRegistration.unregister();
@@ -388,6 +394,8 @@ public class MainServlet extends ActionServlet {
 		StartupHelperUtil.setStartupFinished(true);
 
 		registerPortalInitialized();
+
+		_waitForModules();
 
 		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
 	}
@@ -1343,6 +1351,42 @@ public class MainServlet extends ActionServlet {
 		PortalUtil.setPortalInetSocketAddresses(request);
 	}
 
+	private void _waitForModules() {
+		final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+		final Registry registry = RegistryUtil.getRegistry();
+
+		final Map<String, Object> properties = new HashMap<>();
+
+		properties.put("module.service.lifecycle", "portal.waiting.modules");
+		properties.put("service.vendor", ReleaseInfo.getVendor());
+		properties.put("service.version", ReleaseInfo.getVersion());
+
+		Thread thread = new Thread(
+			new Runnable() {
+
+				public void run() {
+					_portalWaitingLifecycleServiceRegistration =
+						registry.registerService(
+							ModuleServiceLifecycle.class,
+							new ModuleServiceLifecycle() {}, properties);
+
+					countDownLatch.countDown();
+				}
+
+			});
+
+		thread.start();
+
+		try {
+			countDownLatch.await(
+				PropsValues.PORTAL_WAIT_FOR_MODULES_TIMEOUT,
+				TimeUnit.MILLISECONDS);
+		}
+		catch (InterruptedException ie) {
+		}
+	}
+
 	private static final boolean _HTTP_HEADER_VERSION_VERBOSITY_DEFAULT =
 		StringUtil.equalsIgnoreCase(
 			PropsValues.HTTP_HEADER_VERSION_VERBOSITY, ReleaseInfo.getName());
@@ -1358,6 +1402,8 @@ public class MainServlet extends ActionServlet {
 
 	private ServiceRegistration<ModuleServiceLifecycle>
 		_moduleServiceLifecycleServiceRegistration;
+	private ServiceRegistration<ModuleServiceLifecycle>
+		_portalWaitingLifecycleServiceRegistration;
 	private ServiceRegistration<ServletContext>
 		_servletContextServiceRegistration;
 
