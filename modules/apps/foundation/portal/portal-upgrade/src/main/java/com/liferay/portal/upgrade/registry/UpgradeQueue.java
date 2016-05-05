@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Deactivate;
  */
 @Component(
 	immediate = true,
+	property = {"osgi.command.function=queue", "osgi.command.scope=upgrade"},
 	service = UpgradeQueue.class
 )
 public class UpgradeQueue {
@@ -49,6 +50,14 @@ public class UpgradeQueue {
 	public void push(Callable<Void> voidCallable) {
 		synchronized (this) {
 			_queue.push(voidCallable);
+		}
+	}
+
+	public void queue() {
+		System.out.println("Pending Jobs: " + _queue.size());
+
+		for (Callable<Void> callable : _queue) {
+			System.out.println(callable);
 		}
 	}
 
