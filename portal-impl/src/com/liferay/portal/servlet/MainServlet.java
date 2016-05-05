@@ -151,7 +151,7 @@ public class MainServlet extends ActionServlet {
 			_portalWaitingLifecycleServiceRegistration.unregister();
 		}
 
-		_moduleServiceLifecycleServiceRegistration.unregister();
+		_portalInitializedLifecycleServiceRegistration.unregister();
 		_servletContextServiceRegistration.unregister();
 
 		PortalLifecycleUtil.flushDestroys();
@@ -1314,9 +1314,10 @@ public class MainServlet extends ActionServlet {
 		properties.put("service.vendor", ReleaseInfo.getVendor());
 		properties.put("service.version", ReleaseInfo.getVersion());
 
-		_moduleServiceLifecycleServiceRegistration = registry.registerService(
-			ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
-			properties);
+		_portalInitializedLifecycleServiceRegistration =
+			registry.registerService(
+				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+				properties);
 
 		properties = new HashMap<>();
 
@@ -1401,7 +1402,7 @@ public class MainServlet extends ActionServlet {
 	private static final Log _log = LogFactoryUtil.getLog(MainServlet.class);
 
 	private ServiceRegistration<ModuleServiceLifecycle>
-		_moduleServiceLifecycleServiceRegistration;
+		_portalInitializedLifecycleServiceRegistration;
 	private ServiceRegistration<ModuleServiceLifecycle>
 		_portalWaitingLifecycleServiceRegistration;
 	private ServiceRegistration<ServletContext>
