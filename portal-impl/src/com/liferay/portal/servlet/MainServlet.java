@@ -147,6 +147,10 @@ public class MainServlet extends ActionServlet {
 			_log.debug("Destroy plugins");
 		}
 
+		if (_portalReadyLifecycleServiceRegistration != null) {
+			_portalReadyLifecycleServiceRegistration.unregister();
+		}
+
 		if (_portalWaitingLifecycleServiceRegistration != null) {
 			_portalWaitingLifecycleServiceRegistration.unregister();
 		}
@@ -396,6 +400,8 @@ public class MainServlet extends ActionServlet {
 		registerPortalInitialized();
 
 		_waitForModules();
+
+		_registerPortalReady();
 
 		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
 	}
@@ -1352,6 +1358,20 @@ public class MainServlet extends ActionServlet {
 		PortalUtil.setPortalInetSocketAddresses(request);
 	}
 
+	private void _registerPortalReady() {
+		Registry registry = RegistryUtil.getRegistry();
+
+		Map<String, Object> properties = new HashMap<>();
+
+		properties.put("module.service.lifecycle", "portal.ready");
+		properties.put("service.vendor", ReleaseInfo.getVendor());
+		properties.put("service.version", ReleaseInfo.getVersion());
+
+		_portalReadyLifecycleServiceRegistration = registry.registerService(
+			ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+			properties);
+	}
+
 	private void _waitForModules() {
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
 
@@ -1403,6 +1423,8 @@ public class MainServlet extends ActionServlet {
 
 	private ServiceRegistration<ModuleServiceLifecycle>
 		_portalInitializedLifecycleServiceRegistration;
+	private ServiceRegistration<ModuleServiceLifecycle>
+		_portalReadyLifecycleServiceRegistration;
 	private ServiceRegistration<ModuleServiceLifecycle>
 		_portalWaitingLifecycleServiceRegistration;
 	private ServiceRegistration<ServletContext>
