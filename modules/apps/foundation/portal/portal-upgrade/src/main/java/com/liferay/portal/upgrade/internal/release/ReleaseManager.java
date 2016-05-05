@@ -37,6 +37,7 @@ import com.liferay.portal.output.stream.container.OutputStreamContainerFactoryTr
 import com.liferay.portal.upgrade.internal.configuration.ReleaseManagerConfiguration;
 import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
 import com.liferay.portal.upgrade.registry.UpgradeInfo;
+import com.liferay.portal.upgrade.registry.UpgradeQueue;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,6 +46,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.apache.felix.utils.log.Logger;
 
@@ -239,23 +241,11 @@ public class ReleaseManager {
 
 		OutputStream outputStream = outputStreamContainer.getOutputStream();
 
-		_outputStreamContainerFactoryTracker.runWithSwappedLog(
-			new UpgradeInfosRunnable(
-				bundleSymbolicName, upgradeInfos, outputStream),
-			outputStreamContainer.getDescription(), outputStream);
+		Callable<Void> upgradeCallable = new UpgradeCallable(
+			bundleSymbolicName, upgradeInfos, outputStream,
+			outputStreamContainer);
 
-		try {
-			outputStream.close();
-		}
-		catch (IOException ioe) {
-			throw new RuntimeException(ioe);
-		}
-
-		Release release = _releaseLocalService.fetchRelease(bundleSymbolicName);
-
-		if (release != null) {
-			_releasePublisher.publish(release);
-		}
+		_upgradeQueue.push(upgradeCallable);
 	}
 
 	protected String getSchemaVersionString(String bundleSymbolicName) {
@@ -291,7 +281,11 @@ public class ReleaseManager {
 
 	@Reference
 	private ReleasePublisher _releasePublisher;
+
 	private ServiceTrackerMap<String, List<UpgradeInfo>> _serviceTrackerMap;
+
+	@Reference
+	private UpgradeQueue _upgradeQueue;
 
 	private static class UpgradeServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<UpgradeStep, UpgradeInfo> {
@@ -304,6 +298,8 @@ public class ReleaseManager {
 		public UpgradeInfo addingService(
 			ServiceReference<UpgradeStep> serviceReference) {
 
+			String bundleSymbolicName = (String)serviceReference.getProperty(
+				"upgrade.bundle.symbolic.name");
 			String fromSchemaVersionString =
 				(String)serviceReference.getProperty(
 					"upgrade.from.schema.version");
@@ -344,6 +340,56 @@ public class ReleaseManager {
 
 	}
 
+	private class UpgradeCallable implements Callable<Void> {
+
+		public UpgradeCallable(
+			String bundleSymbolicName, List<UpgradeInfo> upgradeInfos,
+			OutputStream outputStream,
+			OutputStreamContainer outputStreamContainer) {
+
+			_bundleSymbolicName = bundleSymbolicName;
+			_upgradeInfos = upgradeInfos;
+			_outputStream = outputStream;
+			_outputStreamContainer = outputStreamContainer;
+		}
+
+		@Override
+		public Void call() throws Exception {
+			_outputStreamContainerFactoryTracker.runWithSwappedLog(
+				new UpgradeInfosRunnable(
+					_bundleSymbolicName, _upgradeInfos, _outputStream),
+				_outputStreamContainer.getDescription(), _outputStream);
+
+			try {
+				_outputStream.close();
+			}
+			catch (IOException ioe) {
+				throw new RuntimeException(ioe);
+			}
+
+			return null;
+		}
+
+		@Override
+		public String toString() {
+			StringBundler sb = new StringBundler(_upgradeInfos.size() + 1);
+
+			sb.append("Task: ");
+
+			for (UpgradeInfo upgradeInfo : _upgradeInfos) {
+				sb.append(upgradeInfo.toString());
+			}
+
+			return sb.toString();
+		}
+
+		private final String _bundleSymbolicName;
+		private final OutputStream _outputStream;
+		private final OutputStreamContainer _outputStreamContainer;
+		private final List<UpgradeInfo> _upgradeInfos;
+
+	}
+
 	private class UpgradeInfoServiceTrackerMapListener
 		implements ServiceTrackerMapListener
 			<String, UpgradeInfo, List<UpgradeInfo>> {
@@ -379,10 +425,26 @@ public class ReleaseManager {
 
 		@Override
 		public void run() {
-			for (UpgradeInfo upgradeInfo : _upgradeInfos) {
-				UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
+			try {
+				for (UpgradeInfo upgradeInfo : _upgradeInfos) {
+					UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
 
-				try {
+					String fromSchemaVersionString =
+						upgradeInfo.getFromSchemaVersionString();
+
+					String schemaVersionString = getSchemaVersionString(
+						_bundleSymbolicName);
+
+					if (!fromSchemaVersionString.equals(schemaVersionString)) {
+						_logger.log(
+							Logger.LOG_INFO,
+							"Skipping " + upgradeInfo +
+								". It has been executed in a previous " +
+									"planification");
+
+						continue;
+					}
+
 					upgradeStep.upgrade(
 						new DBProcessContext() {
 
@@ -401,11 +463,14 @@ public class ReleaseManager {
 					_releaseLocalService.updateRelease(
 						_bundleSymbolicName,
 						upgradeInfo.getToSchemaVersionString(),
-						upgradeInfo.getFromSchemaVersionString());
+						fromSchemaVersionString);
+
+					_releasePublisher.publish(
+						_releaseLocalService.fetchRelease(_bundleSymbolicName));
 				}
-				catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 
 			CacheRegistryUtil.clear();
