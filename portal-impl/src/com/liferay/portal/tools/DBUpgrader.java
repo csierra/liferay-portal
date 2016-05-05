@@ -98,9 +98,27 @@ public class DBUpgrader {
 
 			InitUtil.registerContext();
 
+			System.out.println(
+				"\nCompleted Liferay core upgrade and verify processes in " +
+					(stopWatch.getTime() / Time.SECOND) + " seconds");
+
+			System.out.println(
+				"Running modules upgrades. Connect to Gogo shell to check " +
+					"the status.");
+
 			Registry registry = RegistryUtil.getRegistry();
 
 			Map<String, Object> properties = new HashMap<>();
+
+			properties.put("module.service.lifecycle", "database.initialized");
+			properties.put("service.vendor", ReleaseInfo.getVendor());
+			properties.put("service.version", ReleaseInfo.getVersion());
+
+			registry.registerService(
+				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+				properties);
+
+			properties = new HashMap<>();
 
 			properties.put("module.service.lifecycle", "portal.initialized");
 			properties.put("service.vendor", ReleaseInfo.getVendor());
@@ -110,13 +128,26 @@ public class DBUpgrader {
 				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
 				properties);
 
-			System.out.println(
-				"\nCompleted Liferay core upgrade and verify processes in " +
-					(stopWatch.getTime() / Time.SECOND) + " seconds");
+			properties = new HashMap<>();
 
-			System.out.println(
-				"Running modules upgrades. Connect to Gogo shell to check " +
-					"the status.");
+			properties.put(
+				"module.service.lifecycle", "portal.waiting.modules");
+			properties.put("service.vendor", ReleaseInfo.getVendor());
+			properties.put("service.version", ReleaseInfo.getVersion());
+
+			registry.registerService(
+					ModuleServiceLifecycle.class,
+					new ModuleServiceLifecycle() {}, properties);
+
+			properties = new HashMap<>();
+
+			properties.put("module.service.lifecycle", "portal.ready");
+			properties.put("service.vendor", ReleaseInfo.getVendor());
+			properties.put("service.version", ReleaseInfo.getVersion());
+
+			registry.registerService(
+				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+				properties);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
