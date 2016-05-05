@@ -24,6 +24,10 @@ import java.util.concurrent.TimeUnit;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Carlos Sierra Andrés
@@ -61,7 +65,26 @@ public class UpgradeQueue {
 		}
 	}
 
-	
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(module.service.lifecycle=portal.waiting.modules)",
+		unbind = "-"
+	)
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+
+		synchronized (this) {
+			try {
+				this.wait();
+			}
+			catch (InterruptedException ie) {
+				ie.printStackTrace();
+			}
+		}
+	}
+
 	private final BlockingDeque<Callable<Void>> _queue =
 		new LinkedBlockingDeque<>();
 	private UpgradeThread _upgradeThread;
@@ -95,6 +118,14 @@ public class UpgradeQueue {
 				catch (Exception e) {
 					e.printStackTrace();
 				}
+				finally {
+					if (_queue.isEmpty()) {
+						synchronized (UpgradeQueue.this) {
+							UpgradeQueue.this.notifyAll();
+						}
+					}
+				}
+			}
 		}
 
 		private boolean _isCanceled() {
@@ -106,4 +137,3 @@ public class UpgradeQueue {
 	}
 
 }
-
