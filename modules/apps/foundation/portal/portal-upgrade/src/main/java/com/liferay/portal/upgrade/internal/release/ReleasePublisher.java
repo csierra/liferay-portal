@@ -44,21 +44,23 @@ public final class ReleasePublisher {
 			_serviceConfiguratorRegistrations.get(
 				release.getServletContextName());
 
-		if (oldServiceRegistration != null) {
-			oldServiceRegistration.unregister();
-		}
-
 		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put(
 			"release.bundle.symbolic.name", release.getBundleSymbolicName());
 		properties.put("release.schema.version", release.getSchemaVersion());
 
-		ServiceRegistration<Release> newServiceRegistration =
-			_bundleContext.registerService(Release.class, release, properties);
+		if (oldServiceRegistration != null) {
+			oldServiceRegistration.setProperties(properties);
+		}
+		else {
+			ServiceRegistration<Release> newServiceRegistration =
+				_bundleContext.registerService(
+					Release.class, release, properties);
 
-		_serviceConfiguratorRegistrations.put(
-			release.getServletContextName(), newServiceRegistration);
+			_serviceConfiguratorRegistrations.put(
+				release.getServletContextName(), newServiceRegistration);
+		}
 	}
 
 	@Activate
