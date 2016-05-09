@@ -1,0 +1,5 @@
+Bundle-Name: Liferay OSGi inspector
+Bundle-SymbolicName: com.liferay.util.osgi.inspector
+Bundle-Version: 1.0.0
+Import-Package: !cli.*,!ikvm.*,!org.apache.commons.lang3,org.osgi.service.component.runtime.dto,*
+Include-Resource: @lib/tuprolog.jar,src/main/resources
