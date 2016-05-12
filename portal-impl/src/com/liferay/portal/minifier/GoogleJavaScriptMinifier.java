@@ -19,7 +19,9 @@ import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import com.google.javascript.jscomp.ComposeWarningsGuard;
 import com.google.javascript.jscomp.DiagnosticGroups;
+import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.MessageFormatter;
 import com.google.javascript.jscomp.PropertyRenamingPolicy;
@@ -70,6 +72,23 @@ public class GoogleJavaScriptMinifier implements JavaScriptMinifier {
 		compilerOptions.labelRenaming = true;
 		compilerOptions.removeDeadCode = true;
 		compilerOptions.optimizeArgumentsArray = true;
+
+		compilerOptions.setWarningsGuard(
+			new ComposeWarningsGuard() {
+
+				public CheckLevel level(JSError error) {
+					DiagnosticType errorType = error.getType();
+
+					if (errorType.key.equals(
+							"JSC_NON_GLOBAL_DEFINE_INIT_ERROR")) {
+
+						return CheckLevel.OFF;
+					}
+
+					return super.level(error);
+				}
+
+			});
 
 		compilerOptions.setAssumeClosuresOnlyCaptureReferences(false);
 		compilerOptions.setInlineFunctions(CompilerOptions.Reach.LOCAL_ONLY);
