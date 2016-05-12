@@ -20,6 +20,7 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.google.javascript.jscomp.DiagnosticGroups;
+import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.MessageFormatter;
 import com.google.javascript.jscomp.PropertyRenamingPolicy;
@@ -70,7 +71,6 @@ public class GoogleJavaScriptMinifier implements JavaScriptMinifier {
 		compilerOptions.labelRenaming = true;
 		compilerOptions.removeDeadCode = true;
 		compilerOptions.optimizeArgumentsArray = true;
-
 		compilerOptions.setAssumeClosuresOnlyCaptureReferences(false);
 		compilerOptions.setInlineFunctions(CompilerOptions.Reach.LOCAL_ONLY);
 		compilerOptions.setInlineVariables(CompilerOptions.Reach.LOCAL_ONLY);
@@ -112,6 +112,17 @@ public class GoogleJavaScriptMinifier implements JavaScriptMinifier {
 						jsError.format(checkLevel, _simpleMessageFormatter));
 				}
 			}
+		}
+
+		@Override
+		public void report(CheckLevel checkLevel, JSError error) {
+			DiagnosticType errorType = error.getType();
+
+			if (errorType.key.equals("JSC_NON_GLOBAL_DEFINE_INIT_ERROR")) {
+				return;
+			}
+
+			super.report(checkLevel, error);
 		}
 
 		@Override
