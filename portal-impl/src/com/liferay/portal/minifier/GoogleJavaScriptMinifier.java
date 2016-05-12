@@ -20,6 +20,7 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.google.javascript.jscomp.DiagnosticGroups;
+import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.MessageFormatter;
 import com.google.javascript.jscomp.PropertyRenamingPolicy;
@@ -37,7 +38,19 @@ public class GoogleJavaScriptMinifier implements JavaScriptMinifier {
 
 	@Override
 	public String compress(String resourceName, String content) {
-		Compiler compiler = new Compiler(new LogErrorManager());
+		Compiler compiler = new Compiler(new LogErrorManager()) {
+
+			public CheckLevel getErrorLevel(JSError error) {
+				DiagnosticType errorType = error.getType();
+
+				if (errorType.key.equals("JSC_NON_GLOBAL_DEFINE_INIT_ERROR")) {
+					return CheckLevel.OFF;
+				}
+
+				return super.getErrorLevel(error);
+			}
+
+		};
 
 		compiler.disableThreads();
 
@@ -70,7 +83,6 @@ public class GoogleJavaScriptMinifier implements JavaScriptMinifier {
 		compilerOptions.labelRenaming = true;
 		compilerOptions.removeDeadCode = true;
 		compilerOptions.optimizeArgumentsArray = true;
-
 		compilerOptions.setAssumeClosuresOnlyCaptureReferences(false);
 		compilerOptions.setInlineFunctions(CompilerOptions.Reach.LOCAL_ONLY);
 		compilerOptions.setInlineVariables(CompilerOptions.Reach.LOCAL_ONLY);
