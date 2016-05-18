@@ -360,6 +360,12 @@ public interface PortletLocalService extends BaseLocalService,
 	public void initEAR(ServletContext servletContext, java.lang.String[] xmls,
 		PluginPackage pluginPackage);
 
+	public void initPortletModelDefaultPermissions(long companyId,
+		java.lang.String rootPortletId) throws PortalException;
+
+	public void initPortletRootModelDefaultPermissions(long companyId,
+		java.lang.String rootPortletId) throws PortalException;
+
 	@Clusterable
 	@Transactional(enabled = false)
 	public void removeCompanyPortletsPool(long companyId);

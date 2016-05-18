@@ -426,6 +426,19 @@ public class PortletLocalServiceUtil {
 		getService().initEAR(servletContext, xmls, pluginPackage);
 	}
 
+	public static void initPortletModelDefaultPermissions(long companyId,
+		java.lang.String rootPortletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().initPortletModelDefaultPermissions(companyId, rootPortletId);
+	}
+
+	public static void initPortletRootModelDefaultPermissions(long companyId,
+		java.lang.String rootPortletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService()
+			.initPortletRootModelDefaultPermissions(companyId, rootPortletId);
+	}
+
 	public static void removeCompanyPortletsPool(long companyId) {
 		getService().removeCompanyPortletsPool(companyId);
 	}

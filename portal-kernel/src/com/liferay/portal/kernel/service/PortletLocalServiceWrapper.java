@@ -466,6 +466,22 @@ public class PortletLocalServiceWrapper implements PortletLocalService,
 	}
 
 	@Override
+	public void initPortletModelDefaultPermissions(long companyId,
+		java.lang.String rootPortletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_portletLocalService.initPortletModelDefaultPermissions(companyId,
+			rootPortletId);
+	}
+
+	@Override
+	public void initPortletRootModelDefaultPermissions(long companyId,
+		java.lang.String rootPortletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_portletLocalService.initPortletRootModelDefaultPermissions(companyId,
+			rootPortletId);
+	}
+
+	@Override
 	public void removeCompanyPortletsPool(long companyId) {
 		_portletLocalService.removeCompanyPortletsPool(companyId);
 	}
