@@ -1068,6 +1068,37 @@ public class PortletTracker
 				_log.error(e, e);
 			}
 		}
+
+		List<Company> companies = _companyLocalService.getCompanies();
+
+		String[] portletIds = StringUtil.split(
+			configuration.get("service.configurator.portlet.ids"));
+
+		for (String portletId : portletIds) {
+			List<String> modelNames =
+				ResourceActionsUtil.getPortletModelResources(portletId);
+
+			for (String modelName : modelNames) {
+				List<String> modelActions =
+					ResourceActionsUtil.getModelResourceActions(modelName);
+
+				_resourceActionLocalService.checkResourceActions(
+					modelName, modelActions);
+			}
+
+			for (Company company : companies) {
+				try {
+					_portletLocalService.initPortletRootModelDefaultPermissions(
+						company.getCompanyId(), portletId);
+
+					_portletLocalService.initPortletModelDefaultPermissions(
+						company.getCompanyId(), portletId);
+				}
+				catch (PortalException pe) {
+					_log.error(pe, pe);
+				}
+			}
+		}
 	}
 
 	@Reference(unbind = "-")
