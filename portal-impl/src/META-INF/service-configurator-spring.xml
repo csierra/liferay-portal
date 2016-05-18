@@ -9,5 +9,7 @@
 >
 	<bean class="com.liferay.portal.service.configuration.configurator.impl.ServiceConfiguratorImpl" id="com.liferay.portal.kernel.service.configuration.configurator.ServiceConfigurator">
 		<property name="serviceComponentLocalService" ref="com.liferay.portal.kernel.service.ServiceComponentLocalService" />
+		<property name="companyLocalService" ref="com.liferay.portal.kernel.service.CompanyLocalService" />
+		<property name="portletLocalService" ref="com.liferay.portal.kernel.service.PortletLocalService" />
 	</bean>
 </beans>

@@ -21,6 +21,9 @@ import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -45,7 +48,10 @@ import java.util.Properties;
  * @author Miguel Pastor
  */
 public class ServiceConfiguratorImpl implements ServiceConfigurator {
-	
+
+	private CompanyLocalService _companyLocalService;
+	private PortletLocalService _portletLocalService;
+
 	public void destory() {
 		if (_serviceRegistrar != null) {
 			_serviceRegistrar.destroy();
@@ -78,6 +84,18 @@ public class ServiceConfiguratorImpl implements ServiceConfigurator {
 		ServiceComponentLocalService serviceComponentLocalService) {
 
 		_serviceComponentLocalService = serviceComponentLocalService;
+	}
+
+	public void setCompanyLocalService(
+		CompanyLocalService companyLocalService) {
+
+		_companyLocalService = companyLocalService;
+	}
+
+	public void setPortletLocalService(
+		PortletLocalService portletLocalService) {
+
+		_portletLocalService = portletLocalService;
 	}
 
 	protected void destroyServiceComponent(
@@ -188,6 +206,8 @@ public class ServiceConfiguratorImpl implements ServiceConfigurator {
 			}
 		}
 
+		List<Company> companies = _companyLocalService.getCompanies();
+
 		String[] portletIds = StringUtil.split(
 			configuration.get("service.configurator.portlet.ids"));
 
@@ -201,6 +221,20 @@ public class ServiceConfiguratorImpl implements ServiceConfigurator {
 
 				ResourceActionLocalServiceUtil.checkResourceActions(
 					modelName, modelActions);
+			}
+
+			for (Company company : companies) {
+				try {
+					_portletLocalService.initPortletRootModelDefaultPermissions(
+						company.getCompanyId(), portletId);
+
+					_portletLocalService.initPortletModelDefaultPermissions(
+						company.getCompanyId(), portletId);
+				}
+				catch (PortalException e) {
+					e.printStackTrace();
+				}
+
 			}
 		}
 	}
