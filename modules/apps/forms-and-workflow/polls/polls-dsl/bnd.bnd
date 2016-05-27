@@ -1,0 +1,3 @@
+Bundle-Name: DSL Version of Polls
+Bundle-SymbolicName: com.liferay.portal.polls.dsl
+Bundle-Version: 1.0.0
