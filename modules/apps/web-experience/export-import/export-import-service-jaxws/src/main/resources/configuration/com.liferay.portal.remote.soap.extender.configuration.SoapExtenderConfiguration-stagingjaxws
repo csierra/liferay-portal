@@ -1,0 +1,3 @@
+contextPaths=/staging-ws
+jaxWsHandlerFilterStrings=(staging.jax.ws.handler=true)
+jaxWsServiceFilterStrings=(staging.jax.ws.service=true)
