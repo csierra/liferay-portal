@@ -1,0 +1,7 @@
+Bundle-Name: Liferay Export Import Service JAX-RS
+Bundle-SymbolicName: com.liferay.exportimport.service.jaxrs
+Bundle-Version: 1.0.0
+ConfigurationPath: /configuration
+Include-Resource: configuration=src/main/resources/configuration
+Liferay-Releng-Module-Group-Description:
+Liferay-Releng-Module-Group-Title: Data Management
