@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,27 +14,11 @@
 
 package com.liferay.portal.polls.dsl;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsChoiceBuilder {
+public interface VoteQuerier<T> {
 
-	Step1 name(String name);
+	public static VoteQuerier<Long> JUST_USER_ID = new VoteQuerier<Long>(){};
 
-	interface Step1 {
-		default Final description(String description) {
-			return description(new HashMap<Locale, String>() {{
-				put(Locale.getDefault(), description);
-			}});
-		}
-
-		Final description(Map<Locale, String> description);
-	}
-
-	public interface Final {
-	}
 }

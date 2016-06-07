@@ -14,27 +14,11 @@
 
 package com.liferay.portal.polls.dsl;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsChoiceBuilder {
+public interface Context<C extends Context<C, ?>, D> {
 
-	Step1 name(String name);
+	public C apply(D d);
 
-	interface Step1 {
-		default Final description(String description) {
-			return description(new HashMap<Locale, String>() {{
-				put(Locale.getDefault(), description);
-			}});
-		}
-
-		Final description(Map<Locale, String> description);
-	}
-
-	public interface Final {
-	}
 }

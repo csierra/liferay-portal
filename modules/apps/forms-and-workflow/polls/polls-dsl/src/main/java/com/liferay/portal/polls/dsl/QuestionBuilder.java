@@ -15,17 +15,32 @@
 package com.liferay.portal.polls.dsl;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsBuilder {
+public interface QuestionBuilder {
 
-	Step1 title(String title);
+	default Step1 title(String title) {
+		return title(new HashMap<Locale, String>() {{
+			put(Locale.getDefault(), title);
+		}});
+	}
+
+	Step1 title(Map<Locale, String> titles);
 
 	interface Step1 {
-		Step2 description(String description);
+		default Step2 description(String description) {
+			return description(new HashMap<Locale, String>() {{
+				put(Locale.getDefault(), description);
+			}});
+		}
+
+		Step2 description(Map<Locale, String> descriptions);
 	}
 
 	interface Step2 {

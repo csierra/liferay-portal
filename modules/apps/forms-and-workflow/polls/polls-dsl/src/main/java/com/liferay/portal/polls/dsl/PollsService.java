@@ -14,27 +14,24 @@
 
 package com.liferay.portal.polls.dsl;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.polls.dsl.PollsContext.MultiplePollContext;
+import com.liferay.portal.polls.dsl.PollsContext.SinglePollContext;
+
+import java.util.List;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsChoiceBuilder {
+public interface PollsService {
 
-	Step1 name(String name);
+	<T> T execute(
+		long userId, ServiceContext serviceContext, SinglePollContext spc, QuestionQuerier<T> querier);
+	<T> List<T> execute(long userId, ServiceContext serviceContext, MultiplePollContext mpc, QuestionQuerier<T> querier);
 
-	interface Step1 {
-		default Final description(String description) {
-			return description(new HashMap<Locale, String>() {{
-				put(Locale.getDefault(), description);
-			}});
-		}
+	<C extends PollsContext<C>> void execute(
+		long userId, ServiceContext serviceContext, PollsContext<C> pc);
 
-		Final description(Map<Locale, String> description);
-	}
 
-	public interface Final {
-	}
+
 }

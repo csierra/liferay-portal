@@ -14,85 +14,132 @@
 
 package com.liferay.portal.polls.dsl;
 
-import com.liferay.portal.polls.dsl.PollsQuerierDSL.PollsQuestionWithChoices;
-
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Stream;
-
-import static com.liferay.portal.polls.dsl.PollsOperations.addChoice;
-import static com.liferay.portal.polls.dsl.PollsOperations.voteFor;
-import static com.liferay.portal.polls.dsl.PollsQuerierDSL.POLLS_QUESTION_WITH_CHOICES_AND_VOTES;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsContext {
+public interface PollsContext<C extends PollsContext<C>>
+	extends Context<C, PollsOperations>, Trashable<C> {
 
-	static PollsContext create(
-		Function<PollsBuilder, PollsBuilder.Final>
+	static CreateContext create(
+		Function<QuestionBuilder, QuestionBuilder.Final>
 			pollsQuestionBuilder) {
 
-		return (PollsContext) new Object();
+		return new CreateContext(pollsQuestionBuilder);
 	}
 
-	static PollsContext findById(long id) {
-
-		return (PollsContext) new Object();
+	static IdContext findById(long id) {
+		return new IdContext(id);
 	}
 
-	static MultipleContext findByTitle(String title) {
-		return (MultipleContext) new Object();
+	static MultiplePollContext findByKeywords(String keywords) {
+		return new KeywordsFinder(keywords);
 	}
 
-	static <T> T execute(
-		PollsContext pollsContext,
-		PollsQuerierDSL<T> dsl) {
-
-		return (T)new Object();
+	static MultiplePollContext find(
+		Function<FinderBuilder, FinderBuilder.Final> finder) {
+		return new FindByFinder(finder);
+	}
+	static MultiplePollContext all(long groupId) {
+		return new All(groupId);
 	}
 
-	static <T> List<T> execute(
-		MultipleContext multipleContext,
-		PollsQuerierDSL<T> dsl) {
+	interface FinderBuilder {
+		<F extends FinderBuilder & Final> F byTitle(String title);
 
-		return Collections.emptyList();
+		<F extends FinderBuilder & Final> F byDescription(
+			String description);
+
+		interface Final {}
 	}
 
-	interface MultipleContext {
-		<T> MultipleContext apply(PollsOperations<T> pollsOperations);
+	static abstract class BasePollContext<C extends BasePollContext<C>>
+		implements PollsContext<C> {
+
+		public PollsOperations getPollsOperations() {
+			return _pollsOperations;
+		}
+
+		public TrashOperations getTrashOperations() {
+			return _trashOperations;
+		}
+
+		private PollsOperations _pollsOperations;
+		private TrashOperations _trashOperations;
+
+		public C apply(PollsOperations pollsOperations) {
+			_pollsOperations = pollsOperations;
+
+			return (C)this;
+		}
+
+		public C apply(TrashOperations trashOperations) {
+			_trashOperations = trashOperations;
+
+			return (C)this;
+		}
 	}
 
-	<T> PollsContext apply(PollsOperations<T> pollsOperations);
+	static abstract class SinglePollContext
+		extends BasePollContext<SinglePollContext> {
 
-	public static void main(String[] args) {
-		PollsContext pollsContext = create(p -> p.
-			title("a Polls Title").
-			description("a Polls Description").
-			neverExpires().
-			addChoice(c ->
-				c.name("a").description("Choice a")
-			).
-			addChoice(c ->
-				c.name("b").description("Choice b")
-			)
-		);
+	}
 
-		addChoice(c -> c.
-			name("c").
-			description("Choice c")).
-		then(
-			voteFor(
-				ChoiceContext.findByName("c")));
+	static abstract class MultiplePollContext
+		extends BasePollContext<MultiplePollContext> {
 
-		List<PollsQuestionWithChoices> pollsQuestions =
-			execute(findByTitle("name"),
-				POLLS_QUESTION_WITH_CHOICES_AND_VOTES);
 
-		Stream<Stream<Long>> s = Stream.empty();
+	}
 
-		Stream<Long> longStream = s.flatMap(Function.identity());
+	static class CreateContext extends SinglePollContext {
 
+		public final Function<QuestionBuilder, QuestionBuilder.Final>
+			_pollsQuestionBuilder;
+
+		public CreateContext(
+			Function<QuestionBuilder, QuestionBuilder.Final> pollsQuestionBuilder) {
+
+			_pollsQuestionBuilder = pollsQuestionBuilder;
+		}
+
+	}
+	static class IdContext extends SinglePollContext {
+		public final long _id;
+
+		public IdContext(long id) {
+			_id = id;
+		}
+
+	}
+
+	static class KeywordsFinder extends MultiplePollContext {
+		public final String _keywords;
+
+		public KeywordsFinder(
+			String keywords) {
+
+			_keywords = keywords;
+		}
+
+	}
+
+	static class FindByFinder extends MultiplePollContext {
+		public final Function<FinderBuilder, FinderBuilder.Final>
+			_finder;
+
+		public FindByFinder(
+			Function<FinderBuilder, FinderBuilder.Final> finder) {
+			_finder = finder;
+		}
+
+	}
+
+	static class All extends MultiplePollContext {
+		public final long _groupId;
+
+		public All(long groupId) {
+			_groupId = groupId;
+		}
 	}
 }

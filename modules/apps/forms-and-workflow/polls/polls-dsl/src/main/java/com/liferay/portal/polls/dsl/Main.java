@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,27 +14,21 @@
 
 package com.liferay.portal.polls.dsl;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import static com.liferay.portal.polls.dsl.Monad.sequence;
+import static com.liferay.portal.polls.dsl.PollsOperations.addChoice;
+import static com.liferay.portal.polls.dsl.PollsOperations.voteFor;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface PollsChoiceBuilder {
+public class Main {
 
-	Step1 name(String name);
+	public static void main(String[] args) {
+		PollsOperations operations = sequence(
+			addChoice(c -> c.name("name").description("a description")),
+			voteFor("c")
+		);
 
-	interface Step1 {
-		default Final description(String description) {
-			return description(new HashMap<Locale, String>() {{
-				put(Locale.getDefault(), description);
-			}});
-		}
-
-		Final description(Map<Locale, String> description);
 	}
 
-	public interface Final {
-	}
 }
