@@ -19,7 +19,6 @@ import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.service.PollsChoiceLocalService;
 import com.liferay.polls.service.PollsQuestionLocalService;
 import com.liferay.polls.service.PollsVoteLocalService;
-import com.liferay.polls.service.persistence.PollsChoiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 

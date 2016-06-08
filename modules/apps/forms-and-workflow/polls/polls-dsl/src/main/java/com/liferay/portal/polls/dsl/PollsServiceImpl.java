@@ -22,8 +22,6 @@ import com.liferay.polls.service.PollsVoteLocalService;
 import com.liferay.polls.service.persistence.PollsQuestionFinder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.polls.dsl.PollsContext.MultiplePollContext;
-import com.liferay.portal.polls.dsl.PollsContext.SinglePollContext;
 import com.liferay.portal.polls.dsl.PollsOperations.Interpreter;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -37,9 +35,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.liferay.portal.polls.dsl.PollsContext.all;
-import static com.liferay.portal.polls.dsl.PollsContext.findById;
+import static com.liferay.portal.polls.dsl.Monad.sequence;
 import static com.liferay.portal.polls.dsl.QuestionQuerier.POLLS_QUESTION_WITH_CHOICES_AND_VOTES;
+import static com.liferay.portal.polls.dsl.QuestionQuerier.just;
+import static com.liferay.portal.polls.dsl.QuestionQuerier.title;
 
 /**
  * @author Carlos Sierra Andrés
@@ -54,11 +53,34 @@ import static com.liferay.portal.polls.dsl.QuestionQuerier.POLLS_QUESTION_WITH_C
 )
 public class PollsServiceImpl implements PollsService {
 
+	public PollsContext.SimplePollsContext create(
+		Function<QuestionBuilder, QuestionBuilder.Final> builderFunction) {
+		return new BasePollsContext();
+	}
+
+	public PollsContext.SimplePollsContext findById(long id) {
+		return null;
+	}
+
+	public PollsContext.MultiplePollsContext all() {
+		return null;
+	}
+
+	public PollsContext.MultiplePollsContext findBy(
+		FinderBuilder finderBuilder) {
+		return null;
+	}
+
+
 	public void findPoll(long userId, long id) {
 		try {
-			System.out.println(execute(
-			   userId, new ServiceContext(),
-			   findById(id), POLLS_QUESTION_WITH_CHOICES_AND_VOTES));
+			findById(id).apply(sequence(updateChoice())).apply(publish())
+
+			PollsOperations sequence = sequence(PollsOperations.addChoice(),
+				PollsOperations.voteFor());
+
+
+
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -234,6 +256,8 @@ public class PollsServiceImpl implements PollsService {
 			_pollsVoteLocalService);
 	}
 
+
+
 	private static class MyQuestionBuilder implements QuestionBuilder,
 		QuestionBuilder.Step1, QuestionBuilder.Step2, QuestionBuilder.Step3 {
 		private Optional<Date> _maybeDate;
@@ -325,23 +349,42 @@ public class PollsServiceImpl implements PollsService {
 	}
 
 	private static class MyFinderBuilder implements
-		PollsContext.FinderBuilder, PollsContext.FinderBuilder.Final {
+		PollsService.FinderBuilder, PollsService.FinderBuilder.Final {
 
 		private String _title;
 		private String _description;
 
-		public <F extends PollsContext.FinderBuilder & Final> F byTitle(
+		public <F extends PollsService.FinderBuilder & Final> F byTitle(
 			String title) {
 			_title = title;
 
 			return (F)this;
 		}
 
-		public <F extends PollsContext.FinderBuilder & Final> F byDescription(
+		public <F extends PollsService.FinderBuilder & Final> F byDescription(
 			String description) {
 			_description = description;
 
 			return (F)this;
+		}
+	}
+
+	private abstract class BasePollsContext
+		implements PollsContext.SimplePollsContext {
+
+		private PollsOperations _pollsOperations;
+
+		public SimplePollsContext apply(PollsOperations pollsOperations) {
+			_pollsOperations = pollsOperations;
+			return null;
+		}
+
+		public void execute() {
+			getPollsOperationInterpreter().interpret();
+		}
+
+		public SimplePollsContext apply(TrashOperations trashOperations) {
+			return null;
 		}
 	}
 }

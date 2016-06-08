@@ -14,24 +14,26 @@
 
 package com.liferay.portal.polls.dsl;
 
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.polls.dsl.PollsContext.MultiplePollContext;
-import com.liferay.portal.polls.dsl.PollsContext.SinglePollContext;
-
-import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author Carlos Sierra Andrés
  */
 public interface PollsService {
 
-	<T> T execute(
-		long userId, ServiceContext serviceContext, SinglePollContext spc, QuestionQuerier<T> querier);
-	<T> List<T> execute(long userId, ServiceContext serviceContext, MultiplePollContext mpc, QuestionQuerier<T> querier);
+	PollsContext.SimplePollsContext create(
+		Function<QuestionBuilder, QuestionBuilder.Final> builderFunction);
 
-	<C extends PollsContext<C>> void execute(
-		long userId, ServiceContext serviceContext, PollsContext<C> pc);
+	PollsContext.SimplePollsContext findById(long id);
 
+	PollsContext.MultiplePollsContext all();
 
+	PollsContext.MultiplePollsContext findBy(FinderBuilder finderBuilder);
 
+	interface FinderBuilder {
+		<F extends FinderBuilder & Final> F byTitle(String title);
+		<F extends FinderBuilder & Final> F byDescription(String description);
+
+		interface Final {}
+	}
 }
