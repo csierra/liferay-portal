@@ -242,6 +242,10 @@ public abstract class BaseExportImportLifecycleListener
 		TransientValue<Object> transientValue = getAttributeByType(
 			attributes, TransientValue.class);
 
+		if (transientValue == null) {
+			return null;
+		}
+
 		Object value = transientValue.getValue();
 
 		if (value instanceof StagedModel) {

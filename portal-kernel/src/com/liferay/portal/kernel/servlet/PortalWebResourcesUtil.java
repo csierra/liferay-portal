@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.servlet;
 
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
@@ -45,12 +46,20 @@ public class PortalWebResourcesUtil {
 		PortalWebResources portalWebResources = getPortalWebResources(
 			resourceType);
 
+		if (portalWebResources == null) {
+			return 0;
+		}
+
 		return portalWebResources.getLastModified();
 	}
 
 	public static String getModuleContextPath(String resourceType) {
 		PortalWebResources portalWebResources = getPortalWebResources(
 			resourceType);
+
+		if (portalWebResources == null) {
+			return null;
+		}
 
 		return portalWebResources.getContextPath();
 	}
@@ -127,6 +136,10 @@ public class PortalWebResourcesUtil {
 	public static ServletContext getServletContext(String resourceType) {
 		PortalWebResources portalWebResources = getPortalWebResources(
 			resourceType);
+
+		if (portalWebResources == null) {
+			return null;
+		}
 
 		return portalWebResources.getServletContext();
 	}

@@ -97,6 +97,10 @@ public class ClusterableInvokerUtil {
 		Future<Object> futureResult = ClusterMasterExecutorUtil.executeOnMaster(
 			methodHandler);
 
+		if (futureResult == null) {
+			return methodHandler.invoke();
+		}
+
 		return futureResult.get(
 			_CLUSTERABLE_ADVICE_CALL_MASTER_TIMEOUT, TimeUnit.SECONDS);
 	}

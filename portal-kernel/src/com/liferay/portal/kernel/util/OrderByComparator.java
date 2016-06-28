@@ -38,6 +38,10 @@ public abstract class OrderByComparator<T>
 	public Object[] getOrderByConditionValues(Object obj) {
 		String[] fields = getOrderByConditionFields();
 
+		if (fields == null) {
+			return null;
+		}
+
 		Object[] values = new Object[fields.length];
 
 		for (int i = 0; i < fields.length; i++) {

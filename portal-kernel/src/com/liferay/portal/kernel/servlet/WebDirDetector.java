@@ -53,6 +53,10 @@ public class WebDirDetector {
 	}
 
 	public static String getRootDir(String libDir) {
+		if (libDir == null) {
+			return null;
+		}
+
 		String rootDir = StringUtil.replace(
 			libDir, CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
 

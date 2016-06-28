@@ -51,6 +51,10 @@ public class TunnelUtil {
 
 		HttpURLConnection httpURLConnection = _getConnection(httpPrincipal);
 
+		if (httpURLConnection == null) {
+			return null;
+		}
+
 		TunnelAuthenticationManagerUtil.setCredentials(
 			httpPrincipal.getLogin(), httpURLConnection);
 

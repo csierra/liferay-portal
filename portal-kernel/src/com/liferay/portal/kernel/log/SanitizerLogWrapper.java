@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.log;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 
@@ -181,7 +182,7 @@ public class SanitizerLogWrapper extends LogWrapper {
 
 	protected String sanitize(Object obj) {
 		if (obj == null) {
-			return null;
+			return StringPool.NULL;
 		}
 
 		String message = obj.toString();

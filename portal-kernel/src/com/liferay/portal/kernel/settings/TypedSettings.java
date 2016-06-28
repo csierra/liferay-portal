@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -128,7 +129,9 @@ public class TypedSettings {
 		ModifiableSettings modifiableSettings =
 			_settings.getModifiableSettings();
 
-		modifiableSettings.reset(key);
+		if (Validator.isNotNull(modifiableSettings)) {
+			modifiableSettings.reset(key);
+		}
 	}
 
 	public void setBooleanValue(String key, boolean value) {
@@ -147,14 +150,18 @@ public class TypedSettings {
 		ModifiableSettings modifiableSettings =
 			_settings.getModifiableSettings();
 
-		modifiableSettings.setValue(key, value);
+		if (Validator.isNotNull(modifiableSettings)) {
+			modifiableSettings.setValue(key, value);
+		}
 	}
 
 	public void setValues(String key, String[] values) {
 		ModifiableSettings modifiableSettings =
 			_settings.getModifiableSettings();
 
-		modifiableSettings.setValues(key, values);
+		if (Validator.isNotNull(modifiableSettings)) {
+			modifiableSettings.setValues(key, values);
+		}
 	}
 
 	private final Collection<Locale> _availableLocales;

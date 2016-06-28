@@ -128,7 +128,7 @@ public class TreePathUtil {
 					_previousPrimaryKey, _companyId, _parentPrimaryKey,
 					_MODEL_TREE_REBUILD_QUERY_RESULTS_BATCH_SIZE);
 
-			if (treeModels.isEmpty()) {
+			if (treeModels == null || treeModels.isEmpty()) {
 				return;
 			}
 

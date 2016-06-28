@@ -322,6 +322,10 @@ public class TextFormatter {
 	}
 
 	private static String _formatJ(String s) {
+		if (s == null) {
+			return null;
+		}
+
 		s = StringUtil.replace(s, CharPool.DASH, CharPool.SPACE);
 		s = StringUtil.replace(s, CharPool.UNDERLINE, CharPool.SPACE);
 

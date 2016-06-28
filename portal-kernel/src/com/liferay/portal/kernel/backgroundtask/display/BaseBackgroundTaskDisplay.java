@@ -98,6 +98,10 @@ public abstract class BaseBackgroundTaskDisplay
 			TemplateManagerUtil.getTemplateManager(
 				TemplateConstants.LANG_TYPE_FTL);
 
+		if (templateManager == null) {
+			return StringPool.BLANK;
+		}
+
 		Template template = templateManager.getTemplate(templateResource, true);
 
 		template.put("backgroundTask", backgroundTask);

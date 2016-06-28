@@ -73,6 +73,10 @@ public class ThreadUtil {
 		try {
 			String vendorURL = System.getProperty("java.vendor.url");
 
+			if (vendorURL == null) {
+				return StringPool.BLANK;
+			}
+
 			if (!vendorURL.equals("http://java.oracle.com/") &&
 				!vendorURL.equals("http://java.sun.com/")) {
 

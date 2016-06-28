@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -112,11 +113,13 @@ public class ClassPathUtil {
 	public static String getJVMClassPath(boolean includeBootClassPath) {
 		String jvmClassPath = System.getProperty("java.class.path");
 
-		if (includeBootClassPath) {
+		if (jvmClassPath != null && includeBootClassPath) {
 			String bootClassPath = System.getProperty("sun.boot.class.path");
 
-			jvmClassPath = jvmClassPath.concat(File.pathSeparator).concat(
-				bootClassPath);
+			if (bootClassPath != null) {
+				jvmClassPath = jvmClassPath.concat(File.pathSeparator).concat(
+					bootClassPath);
+			}
 		}
 
 		return jvmClassPath;
@@ -177,6 +180,10 @@ public class ClassPathUtil {
 
 	private static String _buildClassPath(
 		ClassLoader classloader, String className) {
+
+		if (className == null) {
+			return StringPool.BLANK;
+		}
 
 		String pathOfClass = StringUtil.replace(
 			className, CharPool.PERIOD, CharPool.SLASH);

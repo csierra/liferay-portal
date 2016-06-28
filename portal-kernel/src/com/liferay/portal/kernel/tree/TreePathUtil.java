@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.VerifyThreadLocal;
 
 import java.util.Deque;
@@ -131,7 +132,7 @@ public class TreePathUtil {
 					_previousPrimaryKey, _companyId, _parentPrimaryKey,
 					_MODEL_TREE_REBUILD_QUERY_RESULTS_BATCH_SIZE);
 
-			if (treeModels.isEmpty()) {
+			if (treeModels == null || treeModels.isEmpty()) {
 				return;
 			}
 

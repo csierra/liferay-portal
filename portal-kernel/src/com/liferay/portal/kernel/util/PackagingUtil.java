@@ -43,20 +43,24 @@ public class PackagingUtil {
 	protected static void subPackages(
 		File file, Set<String> packages, Stack<String> packageStack) {
 
-		for (File subFile : file.listFiles()) {
-			if (subFile.isDirectory()) {
-				packageStack.push(subFile.getName());
+		File[] files = file.listFiles();
 
-				String packageName = StringUtil.merge(
-					packageStack, StringPool.PERIOD);
+		if (files != null) {
+			for (File subFile : files) {
+				if (subFile.isDirectory()) {
+					packageStack.push(subFile.getName());
 
-				if (packageName.contains(StringPool.PERIOD)) {
-					packages.add(packageName);
+					String packageName = StringUtil.merge(
+						packageStack, StringPool.PERIOD);
+
+					if (packageName.contains(StringPool.PERIOD)) {
+						packages.add(packageName);
+					}
+
+					subPackages(subFile, packages, packageStack);
+
+					packageStack.pop();
 				}
-
-				subPackages(subFile, packages, packageStack);
-
-				packageStack.pop();
 			}
 		}
 	}

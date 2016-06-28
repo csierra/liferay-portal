@@ -173,6 +173,10 @@ public abstract class BaseSocialActivityInterpreter
 			return socialActivityFeedEntry;
 		}
 
+		if (themeDisplay == null) {
+			return null;
+		}
+
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
 
@@ -372,7 +376,7 @@ public abstract class BaseSocialActivityInterpreter
 
 		path = addNoSuchEntryRedirect(path, className, classPK, serviceContext);
 
-		if (!path.startsWith(StringPool.SLASH)) {
+		if ((path == null) || !path.startsWith(StringPool.SLASH)) {
 			return path;
 		}
 

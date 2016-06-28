@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.tree;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.TreeModel;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class TreeModelTasksAdapter<T extends TreeModel>
 	public List<T> findTreeModels(
 		long previousId, long companyId, long parentPrimaryKey, int size) {
 
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	/**
