@@ -1,0 +1,7 @@
+Bundle-Name: Liferay Document Library JAX-RS API
+Bundle-SymbolicName: com.liferay.document.library.jaxrs
+Bundle-Version: 1.0.0
+ConfigurationPath: /configuration
+Include-Resource: configuration=src/main/resources/configuration
+Liferay-Releng-Module-Group-Description:
+Liferay-Releng-Module-Group-Title: Document Library
