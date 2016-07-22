@@ -47,7 +47,7 @@ public class MemoryBasedSAQImpressionPersistence
 		List<SAQImpressionsBucket> buckets = _getBuckets(companyId);
 
 		SAQImpressionsBucket currentBucket;
-		
+
 		if (buckets.isEmpty()) {
 			currentBucket = null;
 		}
@@ -116,8 +116,10 @@ public class MemoryBasedSAQImpressionPersistence
 			}
 			else if ((bucket.getStartMillis() + expiryIntervalMillis) >
 						nowMillis) {
+
 				for (AggregateSAQImpression impression :
 						bucket.getAllImpressions()) {
+
 					totalWeight += impression.getWeight();
 				}
 			}
@@ -162,7 +164,7 @@ public class MemoryBasedSAQImpressionPersistence
 			}
 		}
 
-		if ((intersectSet != null) && (!intersectSet.isEmpty())) {
+		if ((intersectSet != null) && !intersectSet.isEmpty()) {
 			return intersectSet.iterator().next();
 		}
 		else {

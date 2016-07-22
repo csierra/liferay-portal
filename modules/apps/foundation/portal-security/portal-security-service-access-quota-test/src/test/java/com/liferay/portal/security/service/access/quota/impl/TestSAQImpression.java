@@ -50,13 +50,13 @@ public class TestSAQImpression implements SAQImpression {
 	}
 
 	@Override
-	public int getWeight() {
-		return _weight;
+	public Map<String, String> getMetrics() {
+		return _metrics;
 	}
 
 	@Override
-	public Map<String, String> getMetrics() {
-		return _metrics;
+	public int getWeight() {
+		return _weight;
 	}
 
 	@Override
