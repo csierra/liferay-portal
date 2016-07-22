@@ -14,6 +14,9 @@
 
 package com.liferay.document.library.jaxrs;
 
+import com.liferay.document.library.jaxrs.provider.CORSRequestFilter;
+import com.liferay.document.library.jaxrs.provider.CompanyContextProvider;
+import com.liferay.document.library.jaxrs.provider.OptionalBodyWriter;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import io.swagger.jaxrs.config.SwaggerContextService;
@@ -61,7 +64,9 @@ public class DocumentLibraryJaxRApplication extends Application {
 	public Set<Class<?>> getClasses() {
 		return new HashSet<>(
 			Arrays.asList(
-				ApiListingResource.class, SwaggerSerializers.class));
+				ApiListingResource.class, SwaggerSerializers.class,
+				CompanyContextProvider.class, CORSRequestFilter.class,
+				OptionalBodyWriter.class));
 	}
 
 	@Reference
