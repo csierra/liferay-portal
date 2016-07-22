@@ -17,10 +17,7 @@ package com.liferay.portal.security.service.access.quota.persistence;
 import com.liferay.portal.security.service.access.quota.metric.SAQContextMatcher;
 import com.liferay.portal.security.service.access.quota.metric.SAQMetricMatcher;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
 
 /**
  * @author Stian Sigvartsen
@@ -28,10 +25,12 @@ import java.util.Set;
 public abstract class BaseIndexedSAQImpressionPersistence
 	implements SAQImpressionPersistence {
 
-	public abstract Iterator<SAQImpression> findImpressionsMatchingMetric(
-		long companyId, String metric, SAQMetricMatcher metricMatcher);
+	public abstract void findImpressionsMatchingMetric(
+		long companyId, String metric, SAQMetricMatcher metricMatcher,
+		SAQImpressionConsumer consumer);
 
-	public abstract Iterator<SAQImpression> findAllImpressions(long companyId);
+	public abstract void findAllImpressions(
+		long companyId, SAQImpressionConsumer consumer);
 
 	public abstract int getImpressionsCount(
 		long companyId, long expiryIntervalMillis);
@@ -39,120 +38,24 @@ public abstract class BaseIndexedSAQImpressionPersistence
 	public abstract Iterator<String> findAllMetricValues(
 		long companyId, String metricName);
 
-	public Iterator<SAQImpression> findImpressions(
-		long companyId, SAQContextMatcher contextMetricsMatcher) {
+	@Override
+	public void findImpressions(
+		long companyId, final SAQContextMatcher contextMetricsMatcher,
+		SAQImpressionConsumer consumer) {
 
-		return new SAQImpressionsIterator(companyId, contextMetricsMatcher);
-	}
+		for (final String metricName : contextMetricsMatcher.getMetrics()) {
+			findImpressionsMatchingMetric(
+				companyId, metricName,
+				new SAQMetricMatcher() {
 
-	private class SAQImpressionsIterator
-		implements Iterator<SAQImpression>, SAQMetricMatcher {
-
-		public SAQImpressionsIterator(
-			long companyId, SAQContextMatcher contextMetricsMatcher) {
-
-			_companyId = companyId;
-			_contextMetricsMatcher = contextMetricsMatcher;
-
-			_currentMetric = null;
-			_impressionKeys = new HashSet<>();
-			_impressionsMatchingMetricIterator = null;
-			_metricsIterator = contextMetricsMatcher.getMetrics().iterator();
-			_next = null;
-		}
-
-		@Override
-		public boolean hasNext() {
-			if (_next != null) {
-				return true;
-			}
-
-			while (true) {
-				if ((_impressionsMatchingMetricIterator != null) &&
-					_prepareUniqueNextMatchingMetricImpression(
-						_impressionsMatchingMetricIterator)) {
-
-					return true;
-				}
-				else {
-					if (!_metricsIterator.hasNext()) {
-						return false;
+					@Override
+					public boolean matches(String value) {
+						return contextMetricsMatcher.matches(metricName, value);
 					}
 
-					_currentMetric = _metricsIterator.next();
-
-					_impressionsMatchingMetricIterator =
-						findImpressionsMatchingMetric(
-							_companyId, _currentMetric, this);
-				}
-			}
+				},
+				consumer);
 		}
-
-		@Override
-		public boolean matches(String metricValue) {
-			return _contextMetricsMatcher.matches(_currentMetric, metricValue);
-		}
-
-		@Override
-		public SAQImpression next() {
-			if (hasNext()) {
-				SAQImpression next = _next;
-
-				_next = null;
-
-				return next;
-			}
-			else {
-				throw new NoSuchElementException();
-			}
-		}
-
-		@Override
-		public void remove() {
-			throw new RuntimeException("Not implemented");
-		}
-
-		private boolean _prepareUniqueNext(
-			Iterator<SAQImpression> impressionsIterator) {
-
-			if (_next != null) {
-				return true;
-			}
-
-			while (impressionsIterator.hasNext()) {
-				SAQImpression next = impressionsIterator.next();
-
-				if (_impressionKeys.add(next.getKey())) {
-					_next = next;
-
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		private boolean _prepareUniqueNextMatchingMetricImpression(
-			Iterator<SAQImpression> impressionsIterator) {
-
-			if (_prepareUniqueNext(impressionsIterator)) {
-				return true;
-			}
-			else {
-				_impressionsMatchingMetricIterator = null;
-
-				return false;
-			}
-		}
-
-		private final long _companyId;
-		private final SAQContextMatcher _contextMetricsMatcher;
-		private String _currentMetric;
-		private final Set<String> _impressionKeys;
-		private Iterator<SAQImpression> _impressionsMatchingMetricIterator;
-		private final Iterator<String> _metricsIterator;
-		private SAQImpression _next;
-
 	}
 
 }

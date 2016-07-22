@@ -17,6 +17,8 @@ package com.liferay.portal.security.service.access.quota.internal.persistence;
 import com.liferay.portal.security.service.access.quota.metric.SAQMetricMatcher;
 import com.liferay.portal.security.service.access.quota.persistence.BaseIndexedSAQImpressionPersistence;
 import com.liferay.portal.security.service.access.quota.persistence.SAQImpression;
+import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionConsumer;
+import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionPersistence;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionPersistence;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -80,11 +81,20 @@ public class MemoryBasedSAQImpressionPersistence
 	}
 
 	@Override
-	public Iterator<SAQImpression> findImpressionsMatchingMetric(
-		long companyId, String metricName, SAQMetricMatcher metricMatcher) {
+	public void findImpressionsMatchingMetric(
+		long companyId, String metricName, SAQMetricMatcher metricMatcher,
+		SAQImpressionConsumer consumer) {
 
-		return _findImpressions(
-			companyId, metricName, metricMatcher).iterator();
+		for (SAQImpression impression :
+				_findImpressions(companyId, metricName, metricMatcher)) {
+
+			if (consumer.consume(
+					impression).equals(
+						SAQImpressionConsumer.Status.SATISFIED)) {
+
+				return;
+			}
+		}
 	}
 
 	@Override
@@ -117,8 +127,19 @@ public class MemoryBasedSAQImpressionPersistence
 	}
 
 	@Override
-	public Iterator<SAQImpression> findAllImpressions(long companyId) {
-		return _findImpressions(companyId, null, null).iterator();
+	public void findAllImpressions(
+		long companyId, SAQImpressionConsumer consumer) {
+
+		for (SAQImpression impression :
+				_findImpressions(companyId, null, null)) {
+
+			if (consumer.consume(
+					impression).equals(
+						SAQImpressionConsumer.Status.SATISFIED)) {
+
+				return;
+			}
+		}
 	}
 
 	private AggregateSAQImpression _fetchCompleteMetricsMatch(

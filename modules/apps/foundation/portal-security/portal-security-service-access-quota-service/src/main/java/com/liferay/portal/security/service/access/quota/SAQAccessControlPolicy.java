@@ -44,42 +44,13 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Stian Sigvartsen
  */
 @Component(service = AccessControlPolicy.class)
-public class SAQAccessControlPolicy
-	extends BaseAccessControlPolicy implements SAQContextListener {
-
-	public SAQContext buildContext(
-		AccessControlContext accessControlContext, Method method) {
-
-		return SAQContextImpl.buildContext(
-			_quotas, _metricProviders, accessControlContext, method);
-	}
-
-	@Override
-	/**
-	 * This method is a listener method that always throws an exception.
-	 * So basically the caller of this method will always get a RuntimeException
-	 * so we are throwing an exception by proxy.
-	 */
-	public void onQuotaBreached(ServiceAccessQuota quota) {
-		StringBuffer sb = new StringBuffer();
-
-		sb.append(
-			"Breached quota ").append(quota.getMax()).append(
-				'/').append(quota.getIntervalMillis());
-
-		for (ServiceAccessQuotaMetricConfig quotaMetric : quota.getMetrics()) {
-			if (Validator.isNotNull(quotaMetric)) {
-				sb.append('/').append(quotaMetric);
-			}
-		}
-
-		throw new QuotaBreachException(sb.toString());
-	}
+public class SAQAccessControlPolicy extends BaseAccessControlPolicy {
 
 	@Override
 	public void onServiceRemoteAccess(
-		Method method, Object[] arguments,
-		AccessControlled accessControlled) throws SecurityException {
+			Method method, Object[] arguments,
+			AccessControlled accessControlled)
+		throws SecurityException {
 
 		long companyId = CompanyThreadLocal.getCompanyId();
 
@@ -90,21 +61,34 @@ public class SAQAccessControlPolicy
 		AccessControlContext accessControlContext =
 			AccessControlUtil.getAccessControlContext();
 
-		SAQContext context = buildContext(accessControlContext, method);
+		SAQContext context = SAQContextImpl.buildContext(
+			_quotas, _metricProviders, accessControlContext, method);
 
 		if (context.getQuotas().size() == 0) {
 			return;
 		}
 
-		try {
-			context.process(companyId, _impressionPersistence, this);
-		}
-		catch (SecurityException se) {
+		final ServiceAccessQuota[] breachedQuota = new ServiceAccessQuota[1];
+
+		context.process(
+			companyId, _impressionPersistence,
+			new SAQContextListener() {
+
+				@Override
+				public void onQuotaBreached(ServiceAccessQuota quota) {
+					breachedQuota[0] = quota;
+				}
+
+			});
+
+		if (breachedQuota[0] != null) {
+			String quotaBreachedMsg = _getQuotaBreachedMsg(breachedQuota[0]);
+
 			if (_log.isDebugEnabled()) {
-				_log.debug(se.getMessage());
+				_log.debug(quotaBreachedMsg);
 			}
 
-			throw se;
+			throw new QuotaBreachException(quotaBreachedMsg);
 		}
 
 		long largestQuotaIntervalMillis = 0;
@@ -170,6 +154,22 @@ public class SAQAccessControlPolicy
 		}
 
 		return false;
+	}
+
+	private String _getQuotaBreachedMsg(ServiceAccessQuota quota) {
+		StringBuffer sb = new StringBuffer();
+
+		sb.append(
+			"Breached quota ").append(quota.getMax()).append(
+				'/').append(quota.getIntervalMillis());
+
+		for (ServiceAccessQuotaMetricConfig quotaMetric : quota.getMetrics()) {
+			if (Validator.isNotNull(quotaMetric)) {
+				sb.append('/').append(quotaMetric);
+			}
+		}
+
+		return sb.toString();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

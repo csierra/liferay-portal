@@ -16,26 +16,17 @@ package com.liferay.portal.security.service.access.quota.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.security.service.access.quota.metric.SAQContextMatcher;
-
-import java.util.Map;
-
 /**
  * @author Stian Sigvartsen
  */
 @ProviderType
-public interface SAQImpressionPersistence {
+public interface SAQImpressionConsumer {
 
-	public void createImpression(
-		long companyId, Map<String, String> metrics, long expiryIntervalMillis);
+	public Status consume(SAQImpression impression);
 
-	public void findAllImpressions(
-		long companyId, SAQImpressionConsumer consumer);
+	public enum Status {
 
-	public void findImpressions(
-		long companyId, SAQContextMatcher contextMetricsMatcher,
-		SAQImpressionConsumer consumer);
-
-	public int getImpressionsCount(long companyId, long expiryIntervalMillis);
+		HUNGRY, SATISFIED
+	}
 
 }

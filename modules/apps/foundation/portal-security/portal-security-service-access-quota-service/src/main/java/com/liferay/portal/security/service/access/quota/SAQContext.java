@@ -15,12 +15,10 @@
 package com.liferay.portal.security.service.access.quota;
 
 import com.liferay.portal.security.service.access.quota.metric.SAQContextMatcher;
-import com.liferay.portal.security.service.access.quota.persistence.SAQImpression;
 import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionPersistence;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Stian Sigvartsen
@@ -29,16 +27,10 @@ public interface SAQContext extends SAQContextMatcher {
 
 	public Map<String, String> getMetricsMap();
 
-	public String getMetricValue(String metricName);
-
 	public List<ServiceAccessQuota> getQuotas();
-
-	public Set<ServiceAccessQuota> matches(SAQImpression impression);
 
 	public void process(
 		long companyId, SAQImpressionPersistence impressionsPersistence,
 		SAQContextListener listener);
-
-	public void process(SAQImpression impression, SAQContextListener listener);
 
 }

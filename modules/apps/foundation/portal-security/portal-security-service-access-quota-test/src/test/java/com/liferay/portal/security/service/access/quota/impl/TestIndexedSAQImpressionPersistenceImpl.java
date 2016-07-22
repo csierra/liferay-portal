@@ -19,14 +19,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.security.service.access.quota.metric.SAQMetricMatcher;
 import com.liferay.portal.security.service.access.quota.persistence.BaseIndexedSAQImpressionPersistence;
 import com.liferay.portal.security.service.access.quota.persistence.SAQImpression;
+import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionConsumer;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Stian Sigvartsen
@@ -57,13 +56,21 @@ public class TestIndexedSAQImpressionPersistenceImpl
 	}
 
 	@Override
-	public Iterator<SAQImpression> findAllImpressions(long companyId) {
+	public void findAllImpressions(
+		long companyId, SAQImpressionConsumer consumer) {
+
 		if (_log.isDebugEnabled()) {
 			_log.debug("findAllImpressions()");
 			_log.debug(" returning: " + _indexed);
 		}
 
-		return _indexed.iterator();
+		for (SAQImpression impression : _indexed) {
+			if (consumer.consume(impression).equals(
+					SAQImpressionConsumer.Status.SATISFIED)) {
+
+				return;
+			}
+		}
 	}
 
 	@Override
@@ -74,8 +81,9 @@ public class TestIndexedSAQImpressionPersistenceImpl
 	}
 
 	@Override
-	public Iterator<SAQImpression> findImpressionsMatchingMetric(
-		long companyId, String metricName, SAQMetricMatcher metricMatcher) {
+	public void findImpressionsMatchingMetric(
+		long companyId, String metricName, SAQMetricMatcher metricMatcher,
+		SAQImpressionConsumer consumer) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("findImpressionsMatchingMetric(" + metricName + ")");
@@ -84,21 +92,21 @@ public class TestIndexedSAQImpressionPersistenceImpl
 		Iterator<String> metricValuesIterator = findAllMetricValues(
 			companyId, metricName);
 
-		Set<SAQImpression> union = new HashSet<>();
-
 		while (metricValuesIterator.hasNext()) {
 			String value = metricValuesIterator.next();
 
 			if (metricMatcher.matches(value)) {
-				union.addAll(_index.get(metricName).get(value));
+				for (SAQImpression impression :
+						_index.get(metricName).get(value)) {
+
+					if (consumer.consume(impression).equals(
+							SAQImpressionConsumer.Status.SATISFIED)) {
+
+						return;
+					}
+				}
 			}
 		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(" returning: " + union.toString());
-		}
-
-		return union.iterator();
 	}
 
 	@Override
