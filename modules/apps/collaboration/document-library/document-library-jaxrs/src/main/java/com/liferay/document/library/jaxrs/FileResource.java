@@ -14,6 +14,7 @@
 
 package com.liferay.document.library.jaxrs;
 
+import io.swagger.annotations.Api;
 import org.osgi.service.component.annotations.Component;
 
 import javax.ws.rs.GET;
@@ -23,6 +24,7 @@ import javax.ws.rs.Produces;
 /**
  * @author Carlos Sierra Andrés
  */
+@Api
 @Path("/file")
 @Component(immediate = true, service = FileResource.class)
 public class FileResource {
