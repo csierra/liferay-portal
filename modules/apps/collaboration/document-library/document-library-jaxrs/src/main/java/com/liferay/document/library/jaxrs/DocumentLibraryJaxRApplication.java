@@ -14,12 +14,20 @@
 
 package com.liferay.document.library.jaxrs;
 
+import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.jaxrs.config.DefaultJaxrsScanner;
+import io.swagger.jaxrs.config.SwaggerContextService;
+import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.jaxrs.listing.SwaggerSerializers;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -29,8 +37,31 @@ import java.util.Set;
 @Component(immediate = true, service = Application.class)
 public class DocumentLibraryJaxRApplication extends Application {
 
+	@Activate
+	protected void activate() {
+		BeanConfig beanConfig = new BeanConfig();
+
+		beanConfig.setTitle("Files");
+		beanConfig.setDescription("Files with Document Library");
+		beanConfig.setBasePath("/o/document-library/document-library");
+		beanConfig.setResourcePackage("com.liferay.document.library.jaxrs");
+
+		new SwaggerContextService()
+			.withSwaggerConfig(beanConfig)
+			.withScanner(new DefaultJaxrsScanner())
+			.initConfig()
+			.initScanner();
+	}
+
+
 	public Set<Object> getSingletons() {
 		return Collections.<Object>singleton(_fileResource);
+	}
+
+	public Set<Class<?>> getClasses() {
+		return new HashSet<>(
+			Arrays.asList(
+				ApiListingResource.class, SwaggerSerializers.class));
 	}
 
 	@Reference
