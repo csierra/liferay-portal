@@ -17,8 +17,9 @@ package com.liferay.portal.security.service.access.quota.internal.persistence;
 import com.liferay.portal.security.service.access.quota.metric.SAQMetricMatcher;
 import com.liferay.portal.security.service.access.quota.persistence.BaseIndexedSAQImpressionPersistence;
 import com.liferay.portal.security.service.access.quota.persistence.SAQImpression;
+import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionConsumer;
+import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionPersistence;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,9 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionPersistence;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -47,7 +46,14 @@ public class MemoryBasedSAQImpressionPersistence
 
 		List<SAQImpressionsBucket> buckets = _getBuckets(companyId);
 
-		SAQImpressionsBucket currentBucket = buckets.get(buckets.size());
+		SAQImpressionsBucket currentBucket;
+
+		if (buckets.isEmpty()) {
+			currentBucket = null;
+		}
+		else {
+			currentBucket = buckets.get(buckets.size() - 1);
+		}
 
 		if ((currentBucket == null) ||
 			(bucketStartMillis != currentBucket.getStartMillis())) {
@@ -75,11 +81,20 @@ public class MemoryBasedSAQImpressionPersistence
 	}
 
 	@Override
-	public Iterator<SAQImpression> findImpressionsMatchingMetric(
-		long companyId, String metricName, SAQMetricMatcher metricMatcher) {
+	public void findImpressionsMatchingMetric(
+		long companyId, String metricName, SAQMetricMatcher metricMatcher,
+		SAQImpressionConsumer consumer) {
 
-		return _findImpressions(
-			companyId, metricName, metricMatcher).iterator();
+		for (SAQImpression impression :
+				_findImpressions(companyId, metricName, metricMatcher)) {
+
+			if (consumer.consume(
+					impression).equals(
+						SAQImpressionConsumer.Status.SATISFIED)) {
+
+				return;
+			}
+		}
 	}
 
 	@Override
@@ -101,8 +116,10 @@ public class MemoryBasedSAQImpressionPersistence
 			}
 			else if ((bucket.getStartMillis() + expiryIntervalMillis) >
 						nowMillis) {
+
 				for (AggregateSAQImpression impression :
 						bucket.getAllImpressions()) {
+
 					totalWeight += impression.getWeight();
 				}
 			}
@@ -112,8 +129,19 @@ public class MemoryBasedSAQImpressionPersistence
 	}
 
 	@Override
-	public Iterator<SAQImpression> findAllImpressions(long companyId) {
-		return _findImpressions(companyId, null, null).iterator();
+	public void findAllImpressions(
+		long companyId, SAQImpressionConsumer consumer) {
+
+		for (SAQImpression impression :
+				_findImpressions(companyId, null, null)) {
+
+			if (consumer.consume(
+					impression).equals(
+						SAQImpressionConsumer.Status.SATISFIED)) {
+
+				return;
+			}
+		}
 	}
 
 	private AggregateSAQImpression _fetchCompleteMetricsMatch(
@@ -136,7 +164,7 @@ public class MemoryBasedSAQImpressionPersistence
 			}
 		}
 
-		if ((intersectSet != null) && (!intersectSet.isEmpty())) {
+		if ((intersectSet != null) && !intersectSet.isEmpty()) {
 			return intersectSet.iterator().next();
 		}
 		else {
@@ -195,11 +223,16 @@ public class MemoryBasedSAQImpressionPersistence
 	private List<SAQImpressionsBucket> _getBuckets(long companyId) {
 		Long companyIdLong = Long.valueOf(companyId);
 
-		/* If we can't use this yet we need to change this for the Java 7 idiom
-		   for safely creating keys in the ConcurrentMap concurrently
-		  */
-		_buckets.computeIfAbsent(
-			companyIdLong, c -> new CopyOnWriteArrayList<>());
+		List<SAQImpressionsBucket> buckets = _buckets.get(companyIdLong);
+
+		if (buckets == null) {
+			synchronized(this) {
+				if (buckets == null) {
+					buckets = new LinkedList<>();
+					_buckets.put(companyIdLong, buckets);
+				}
+			}
+		}
 
 		return _buckets.get(companyIdLong);
 	}

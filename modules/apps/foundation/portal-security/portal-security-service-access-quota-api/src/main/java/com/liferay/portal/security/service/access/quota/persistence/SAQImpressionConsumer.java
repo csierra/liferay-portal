@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.security.service.access.quota;
+package com.liferay.portal.security.service.access.quota.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -20,8 +20,13 @@ import aQute.bnd.annotation.ProviderType;
  * @author Stian Sigvartsen
  */
 @ProviderType
-public interface SAQContextListener {
+public interface SAQImpressionConsumer {
 
-	public void onQuotaBreached(ServiceAccessQuota quota);
+	public Status consume(SAQImpression impression);
+
+	public enum Status {
+
+		HUNGRY, SATISFIED
+	}
 
 }

@@ -28,8 +28,8 @@ public interface SAQImpression {
 
 	public String getKey();
 
-	public int getWeight();
-
 	public Map<String, String> getMetrics();
+
+	public int getWeight();
 
 }

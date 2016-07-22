@@ -16,12 +16,12 @@ package com.liferay.portal.security.service.access.quota.impl;
 
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.security.service.access.quota.SAQContext;
-import com.liferay.portal.security.service.access.quota.SAQContextListener;
 import com.liferay.portal.security.service.access.quota.SAQMetricProvider;
 import com.liferay.portal.security.service.access.quota.ServiceAccessQuota;
 import com.liferay.portal.security.service.access.quota.ServiceAccessQuotaMetricConfig;
 import com.liferay.portal.security.service.access.quota.metric.SAQContextMatcher;
 import com.liferay.portal.security.service.access.quota.persistence.SAQImpression;
+import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionConsumer;
 import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionPersistence;
 
 import java.lang.reflect.Method;
@@ -116,16 +116,10 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 	}
 
 	@Override
-	public String getMetricValue(String metric) {
-		return _metrics.get(metric);
-	}
-
-	@Override
 	public List<ServiceAccessQuota> getQuotas() {
 		return _relevantQuotas;
 	}
 
-	@Override
 	public Set<ServiceAccessQuota> matches(SAQImpression impression) {
 		_matchedQuotas.clear();
 
@@ -213,9 +207,11 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 	}
 
 	@Override
-	public void process(
-		long companyId, SAQImpressionPersistence impressionsPersistence,
-		SAQContextListener listener) {
+	public SAQContext.ProcessingResult process(
+		long companyId, SAQImpressionPersistence impressionsPersistence) {
+
+		final ProcessingResultImpl processingResult =
+			new ProcessingResultImpl();
 
 		// Fail fast when quotas are configured with no metrics
 
@@ -225,47 +221,52 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 					companyId, quota.getIntervalMillis());
 
 				if (count >= quota.getMax()) {
-					//This throws exception
-					listener.onQuotaBreached(quota);
+					processingResult.setStatus(
+						ProcessingResult.Status.BREACHED_QUOTA);
+					processingResult.setBreachedQuota(quota);
+
+					return processingResult;
 				}
 			}
 		}
 
-		Iterator<SAQImpression> impressions =
-			impressionsPersistence.findImpressions(companyId, this);
+		impressionsPersistence.findImpressions(
+			companyId, this,
+			new SAQImpressionConsumer() {
 
-		if (!impressions.hasNext()) {
-			return;
-		}
+				@Override
+				public SAQImpressionConsumer.Status consume(
+					SAQImpression impression) {
 
-		while (impressions.hasNext()) {
-			SAQImpression impression = impressions.next();
+					Set<ServiceAccessQuota> matchedQuotas = matches(impression);
 
-			process(impression, listener);
-		}
-	}
+					for (ServiceAccessQuota quota : matchedQuotas) {
+						int count = _quotasCount.get(quota);
+						count = count + impression.getWeight();
 
-	@Override
-	public void process(SAQImpression impression, SAQContextListener listener) {
-		Set<ServiceAccessQuota> matchedQuotas = matches(impression);
+						if (count < quota.getMax()) {
+							_quotasCount.put(quota, count);
 
-		for (ServiceAccessQuota quota : matchedQuotas) {
-			int count = _quotasCount.get(quota);
-			count = count + impression.getWeight();
+							continue;
+						}
 
-			if (count < quota.getMax()) {
-				_quotasCount.put(quota, count);
+						// If through impression matching a quota max is hit,
+						// then adding the impression for the current request
+						// later will breach it, so fail fast now
 
-				continue;
-			}
+						processingResult.setStatus(
+							ProcessingResult.Status.BREACHED_QUOTA);
+						processingResult.setBreachedQuota(quota);
 
-			// If through impression matching a quota max is hit,
-			// then adding the impression for the current request later
-			// will breach it, so fail fast now
+						return SAQImpressionConsumer.Status.SATISFIED;
+					}
 
-			//This throws exceptions
-			listener.onQuotaBreached(quota);
-		}
+					return SAQImpressionConsumer.Status.HUNGRY;
+				}
+
+			});
+
+		return processingResult;
 	}
 
 	private SAQContextImpl(
@@ -284,7 +285,6 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 
 			_quotasCount.put(it.next(), 0);
 		}
-
 
 		_metricConfigs = new HashMap<>(metricsMap.size());
 
@@ -349,5 +349,35 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 	private final HashMap<ServiceAccessQuota, Integer> _quotasCount;
 	private final List<ServiceAccessQuota> _relevantQuotas;
 	private final List<ServiceAccessQuota> _relevantQuotasWithoutMetrics;
+
+	private class ProcessingResultImpl implements ProcessingResult {
+
+		public ProcessingResultImpl() {
+			_status = ProcessingResult.Status.NO_BREACHED_QUOTA;
+			_breachedQuota = null;
+		}
+
+		@Override
+		public ServiceAccessQuota getBreachedQuota() {
+			return _breachedQuota;
+		}
+
+		@Override
+		public Status getStatus() {
+			return _status;
+		}
+
+		public void setBreachedQuota(ServiceAccessQuota breachedQuota) {
+			_breachedQuota = breachedQuota;
+		}
+
+		public void setStatus(ProcessingResult.Status status) {
+			_status = status;
+		}
+
+		private ServiceAccessQuota _breachedQuota;
+		private ProcessingResult.Status _status;
+
+	}
 
 }

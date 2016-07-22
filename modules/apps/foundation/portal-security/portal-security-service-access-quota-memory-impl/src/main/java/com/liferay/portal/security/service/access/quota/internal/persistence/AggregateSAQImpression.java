@@ -62,13 +62,13 @@ public class AggregateSAQImpression implements SAQImpression, Serializable {
 		return _key;
 	}
 
+	public Map<String, String> getMetrics() {
+		return _metrics;
+	}
+
 	@Override
 	public int getWeight() {
 		return _weight;
-	}
-
-	public Map<String, String> getMetrics() {
-		return _metrics;
 	}
 
 	public void incrementWeight() {
