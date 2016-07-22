@@ -16,7 +16,6 @@ package com.liferay.portal.security.service.access.quota.impl;
 
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.security.service.access.quota.SAQContext;
-import com.liferay.portal.security.service.access.quota.SAQContextListener;
 import com.liferay.portal.security.service.access.quota.SAQMetricProvider;
 import com.liferay.portal.security.service.access.quota.ServiceAccessQuota;
 import com.liferay.portal.security.service.access.quota.ServiceAccessQuotaMetricConfig;
@@ -208,9 +207,11 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 	}
 
 	@Override
-	public void process(
-		long companyId, SAQImpressionPersistence impressionsPersistence,
-		final SAQContextListener listener) {
+	public SAQContext.ProcessingResult process(
+		long companyId, SAQImpressionPersistence impressionsPersistence) {
+
+		final ProcessingResultImpl processingResult =
+			new ProcessingResultImpl();
 
 		// Fail fast when quotas are configured with no metrics
 
@@ -220,9 +221,11 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 					companyId, quota.getIntervalMillis());
 
 				if (count >= quota.getMax()) {
-					if (listener != null) {
-						listener.onQuotaBreached(quota);
-					}
+					processingResult.setStatus(
+						ProcessingResult.Status.BREACHED_QUOTA);
+					processingResult.setBreachedQuota(quota);
+
+					return processingResult;
 				}
 			}
 		}
@@ -251,7 +254,9 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 						// then adding the impression for the current request
 						// later will breach it, so fail fast now
 
-						listener.onQuotaBreached(quota);
+						processingResult.setStatus(
+							ProcessingResult.Status.BREACHED_QUOTA);
+						processingResult.setBreachedQuota(quota);
 
 						return SAQImpressionConsumer.Status.SATISFIED;
 					}
@@ -260,6 +265,8 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 				}
 
 			});
+
+		return processingResult;
 	}
 
 	private SAQContextImpl(
@@ -342,5 +349,35 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 	private final HashMap<ServiceAccessQuota, Integer> _quotasCount;
 	private final List<ServiceAccessQuota> _relevantQuotas;
 	private final List<ServiceAccessQuota> _relevantQuotasWithoutMetrics;
+
+	private class ProcessingResultImpl implements ProcessingResult {
+
+		public ProcessingResultImpl() {
+			_status = ProcessingResult.Status.NO_BREACHED_QUOTA;
+			_breachedQuota = null;
+		}
+
+		@Override
+		public ServiceAccessQuota getBreachedQuota() {
+			return _breachedQuota;
+		}
+
+		@Override
+		public Status getStatus() {
+			return _status;
+		}
+
+		public void setBreachedQuota(ServiceAccessQuota breachedQuota) {
+			_breachedQuota = breachedQuota;
+		}
+
+		public void setStatus(ProcessingResult.Status status) {
+			_status = status;
+		}
+
+		private ServiceAccessQuota _breachedQuota;
+		private ProcessingResult.Status _status;
+
+	}
 
 }

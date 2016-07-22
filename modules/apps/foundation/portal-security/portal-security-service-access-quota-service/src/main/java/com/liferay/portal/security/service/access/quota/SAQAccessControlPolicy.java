@@ -68,21 +68,14 @@ public class SAQAccessControlPolicy extends BaseAccessControlPolicy {
 			return;
 		}
 
-		final ServiceAccessQuota[] breachedQuota = new ServiceAccessQuota[1];
+		SAQContext.ProcessingResult result = context.process(
+			companyId, _impressionPersistence);
 
-		context.process(
-			companyId, _impressionPersistence,
-			new SAQContextListener() {
+		if (result.getStatus().equals(
+				SAQContext.ProcessingResult.Status.BREACHED_QUOTA)) {
 
-				@Override
-				public void onQuotaBreached(ServiceAccessQuota quota) {
-					breachedQuota[0] = quota;
-				}
-
-			});
-
-		if (breachedQuota[0] != null) {
-			String quotaBreachedMsg = _getQuotaBreachedMsg(breachedQuota[0]);
+			String quotaBreachedMsg = _getQuotaBreachedMsg(
+				result.getBreachedQuota());
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(quotaBreachedMsg);

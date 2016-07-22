@@ -29,8 +29,20 @@ public interface SAQContext extends SAQContextMatcher {
 
 	public List<ServiceAccessQuota> getQuotas();
 
-	public void process(
-		long companyId, SAQImpressionPersistence impressionsPersistence,
-		SAQContextListener listener);
+	public SAQContext.ProcessingResult process(
+		long companyId, SAQImpressionPersistence impressionsPersistence);
+
+	public interface ProcessingResult {
+
+		public ServiceAccessQuota getBreachedQuota();
+
+		public Status getStatus();
+
+		public enum Status {
+
+			NO_BREACHED_QUOTA, BREACHED_QUOTA
+		}
+
+	}
 
 }

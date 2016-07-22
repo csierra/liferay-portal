@@ -17,6 +17,7 @@ package com.liferay.portal.security.service.access.quota;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.security.service.access.quota.SAQContext.ProcessingResult;
 import com.liferay.portal.security.service.access.quota.impl.SAQContextImpl;
 import com.liferay.portal.security.service.access.quota.impl.TestIndexedSAQImpressionPersistenceImpl;
 import com.liferay.portal.security.service.access.quota.impl.TestServiceAccessQuotaImpl;
@@ -49,13 +50,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  */
 @PrepareForTest({AccessControlContext.class})
 @RunWith(PowerMockRunner.class)
-public class SAQContextImplTest
-	extends PowerMockito implements SAQContextListener {
-
-	@Override
-	public void onQuotaBreached(ServiceAccessQuota quota) {
-		throw new QuotaBreachException("Breached " + quota.toString());
-	}
+public class SAQContextImplTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
@@ -112,7 +107,7 @@ public class SAQContextImplTest
 		Assert.assertFalse(context.getMetrics().contains("user"));
 	}
 
-	@Test(expected = QuotaBreachException.class)
+	@Test
 	public void testImpressionsWithNoMetricsCounted()
 		throws NoSuchMethodException, QuotaBreachException {
 
@@ -143,10 +138,12 @@ public class SAQContextImplTest
 
 		Assert.assertEquals(2, context.getQuotas().size());
 
-		context.process(_companyId, iR, this);
+		Assert.assertEquals(
+			ProcessingResult.Status.BREACHED_QUOTA,
+			context.process(_companyId, iR).getStatus());
 	}
 
-	@Test(expected = QuotaBreachException.class)
+	@Test
 	public void testQuotaWithNoMetricsMatchesAllImpressions()
 		throws NoSuchMethodException, QuotaBreachException {
 
@@ -174,10 +171,12 @@ public class SAQContextImplTest
 		SAQContext context = SAQContextImpl.buildContext(
 			quotas, _metricProviders, _accessControlContext, testMethod);
 
-		context.process(_companyId, iR, this);
+		Assert.assertEquals(
+			ProcessingResult.Status.BREACHED_QUOTA,
+			context.process(_companyId, iR).getStatus());
 	}
 
-	@Test(expected = QuotaBreachException.class)
+	@Test
 	public void testWildcardMethodMatching()
 		throws NoSuchMethodException, QuotaBreachException {
 
@@ -199,7 +198,9 @@ public class SAQContextImplTest
 		SAQContext context = SAQContextImpl.buildContext(
 			quotas, _metricProviders, _accessControlContext, testMethod);
 
-		context.process(_companyId, iR, this);
+		Assert.assertEquals(
+			ProcessingResult.Status.BREACHED_QUOTA,
+			context.process(_companyId, iR).getStatus());
 	}
 
 	private static Map<String, String> _stringArrayToMap(String[][] props) {
