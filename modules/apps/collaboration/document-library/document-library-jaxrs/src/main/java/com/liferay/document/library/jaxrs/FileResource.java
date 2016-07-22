@@ -14,12 +14,17 @@
 
 package com.liferay.document.library.jaxrs;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Company;
 import io.swagger.annotations.Api;
 import org.osgi.service.component.annotations.Component;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import java.util.Optional;
 
 /**
  * @author Carlos Sierra Andrés
@@ -31,8 +36,15 @@ public class FileResource {
 
 	@GET
 	@Produces("text/plain")
-	public String greet() {
-		return "Hello";
+	public Optional<String> greet(
+		@Context Company company, @QueryParam("suffix") String suffix) {
+
+		try {
+			return Optional.of(company.getName() + "-" + suffix);
+		}
+		catch (PortalException e) {
+			return Optional.empty();
+		}
 	}
 
 }
