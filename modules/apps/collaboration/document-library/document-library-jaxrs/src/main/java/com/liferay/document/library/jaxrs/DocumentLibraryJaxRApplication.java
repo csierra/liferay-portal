@@ -17,6 +17,8 @@ package com.liferay.document.library.jaxrs;
 import com.liferay.document.library.jaxrs.provider.CORSRequestFilter;
 import com.liferay.document.library.jaxrs.provider.CompanyContextProvider;
 import com.liferay.document.library.jaxrs.provider.OptionalBodyWriter;
+import com.liferay.document.library.jaxrs.provider.PageMessageBodyWriter;
+import com.liferay.document.library.jaxrs.provider.PaginationProvider;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import io.swagger.jaxrs.config.SwaggerContextService;
@@ -36,7 +38,7 @@ import java.util.Set;
 /**
  * @author Carlos Sierra Andrés
  */
-@ApplicationPath("/document-library")
+@ApplicationPath("/api")
 @Component(immediate = true, service = Application.class)
 public class DocumentLibraryJaxRApplication extends Application {
 
@@ -58,7 +60,7 @@ public class DocumentLibraryJaxRApplication extends Application {
 
 
 	public Set<Object> getSingletons() {
-		return Collections.<Object>singleton(_fileResource);
+		return Collections.<Object>singleton(_folderResource);
 	}
 
 	public Set<Class<?>> getClasses() {
@@ -66,10 +68,11 @@ public class DocumentLibraryJaxRApplication extends Application {
 			Arrays.asList(
 				ApiListingResource.class, SwaggerSerializers.class,
 				CompanyContextProvider.class, CORSRequestFilter.class,
-				OptionalBodyWriter.class));
+				OptionalBodyWriter.class, PaginationProvider.class,
+				PageMessageBodyWriter.class));
 	}
 
 	@Reference
-	FileResource _fileResource;
+	FolderResource _folderResource;
 
 }

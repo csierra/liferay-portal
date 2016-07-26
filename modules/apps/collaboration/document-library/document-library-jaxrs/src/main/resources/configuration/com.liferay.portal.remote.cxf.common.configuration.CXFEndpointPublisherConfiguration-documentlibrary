@@ -1,1 +1,2 @@
 contextPath=/document-library
+authVerifierProperties=auth.verifier.PortalSessionAuthVerifier.urls.includes=*
