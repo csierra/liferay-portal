@@ -88,10 +88,9 @@ public class MemoryBasedSAQImpressionPersistence
 		for (SAQImpression impression :
 				_findImpressions(companyId, metricName, metricMatcher)) {
 
-			if (consumer.consume(
-					impression).equals(
-						SAQImpressionConsumer.Status.SATISFIED)) {
+			SAQImpressionConsumer.Status consume = consumer.consume(impression);
 
+			if (consume.equals(SAQImpressionConsumer.Status.SATISFIED)) {
 				return;
 			}
 		}
