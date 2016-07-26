@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -225,11 +226,12 @@ public class MemoryBasedSAQImpressionPersistence
 		List<SAQImpressionsBucket> buckets = _buckets.get(companyIdLong);
 
 		if (buckets == null) {
-			synchronized(this) {
-				if (buckets == null) {
-					buckets = new LinkedList<>();
-					_buckets.put(companyIdLong, buckets);
-				}
+			LinkedList<SAQImpressionsBucket> newBuckets = new LinkedList<>();
+
+			buckets = _buckets.putIfAbsent(companyIdLong, newBuckets);
+
+			if (buckets == null) {
+				buckets = newBuckets;
 			}
 		}
 
@@ -249,7 +251,7 @@ public class MemoryBasedSAQImpressionPersistence
 
 	private static final long _BUCKET_INTERVAL = 1000;
 
-	private final Map<Long, List<SAQImpressionsBucket>> _buckets =
+	private final ConcurrentMap<Long, List<SAQImpressionsBucket>> _buckets =
 		new ConcurrentHashMap<>();
 	private long _nextKey;
 
