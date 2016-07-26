@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.security.access.control.BaseAccessControlPolicy;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.service.access.quota.impl.SAQContextImpl;
@@ -150,13 +151,19 @@ public class SAQAccessControlPolicy extends BaseAccessControlPolicy {
 	}
 
 	private String _getQuotaBreachedMsg(ServiceAccessQuota quota) {
-		StringBuffer sb = new StringBuffer();
+		List<ServiceAccessQuotaMetricConfig> metrics = quota.getMetrics();
 
-		sb.append(
-			"Breached quota ").append(quota.getMax()).append(
-				'/').append(quota.getIntervalMillis());
+		StringBundler sb = new StringBundler(metrics.size() + 4);
 
-		for (ServiceAccessQuotaMetricConfig quotaMetric : quota.getMetrics()) {
+		sb.append("Breached quota ");
+
+		sb.append(quota.getMax());
+
+		sb.append('/');
+
+		sb.append(quota.getIntervalMillis());
+
+		for (ServiceAccessQuotaMetricConfig quotaMetric : metrics) {
 			if (Validator.isNotNull(quotaMetric)) {
 				sb.append('/').append(quotaMetric);
 			}

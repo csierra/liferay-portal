@@ -242,6 +242,7 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 
 					for (ServiceAccessQuota quota : matchedQuotas) {
 						int count = _quotasCount.get(quota);
+
 						count = count + impression.getWeight();
 
 						if (count < quota.getMax()) {
@@ -254,9 +255,9 @@ public class SAQContextImpl implements SAQContextMatcher, SAQContext {
 						// then adding the impression for the current request
 						// later will breach it, so fail fast now
 
+						processingResult.setBreachedQuota(quota);
 						processingResult.setStatus(
 							ProcessingResult.Status.BREACHED_QUOTA);
-						processingResult.setBreachedQuota(quota);
 
 						return SAQImpressionConsumer.Status.SATISFIED;
 					}

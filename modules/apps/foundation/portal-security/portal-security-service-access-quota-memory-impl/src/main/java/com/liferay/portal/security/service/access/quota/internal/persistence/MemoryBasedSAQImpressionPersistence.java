@@ -18,7 +18,6 @@ import com.liferay.portal.security.service.access.quota.metric.SAQMetricMatcher;
 import com.liferay.portal.security.service.access.quota.persistence.BaseIndexedSAQImpressionPersistence;
 import com.liferay.portal.security.service.access.quota.persistence.SAQImpression;
 import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionConsumer;
-import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionPersistence;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.liferay.portal.security.service.access.quota.persistence.SAQImpressionPersistence;
 import org.osgi.service.component.annotations.Component;
 
 /**
