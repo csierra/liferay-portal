@@ -16,6 +16,7 @@ package com.liferay.document.library.jaxrs;
 
 import com.liferay.document.library.jaxrs.provider.CORSRequestFilter;
 import com.liferay.document.library.jaxrs.provider.CompanyContextProvider;
+import com.liferay.document.library.jaxrs.provider.GroupMessageBodyWriter;
 import com.liferay.document.library.jaxrs.provider.OptionalBodyWriter;
 import com.liferay.document.library.jaxrs.provider.PageMessageBodyWriter;
 import com.liferay.document.library.jaxrs.provider.PaginationProvider;
@@ -48,7 +49,7 @@ public class DocumentLibraryJaxRApplication extends Application {
 
 		beanConfig.setTitle("Files");
 		beanConfig.setDescription("Files with Document Library");
-		beanConfig.setBasePath("/o/document-library/document-library");
+		beanConfig.setBasePath("/o/document-library/api");
 		beanConfig.setResourcePackage("com.liferay.document.library.jaxrs");
 
 		new SwaggerContextService()
@@ -60,7 +61,7 @@ public class DocumentLibraryJaxRApplication extends Application {
 
 
 	public Set<Object> getSingletons() {
-		return Collections.<Object>singleton(_folderResource);
+		return Collections.<Object>singleton(_documentLibraryGroupResource);
 	}
 
 	public Set<Class<?>> getClasses() {
@@ -69,10 +70,10 @@ public class DocumentLibraryJaxRApplication extends Application {
 				ApiListingResource.class, SwaggerSerializers.class,
 				CompanyContextProvider.class, CORSRequestFilter.class,
 				OptionalBodyWriter.class, PaginationProvider.class,
-				PageMessageBodyWriter.class));
+				PageMessageBodyWriter.class, GroupMessageBodyWriter.class));
 	}
 
 	@Reference
-	FolderResource _folderResource;
+	DocumentLibraryGroupResource _documentLibraryGroupResource;
 
 }
