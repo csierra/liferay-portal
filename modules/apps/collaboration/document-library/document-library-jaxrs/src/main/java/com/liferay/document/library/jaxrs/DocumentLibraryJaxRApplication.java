@@ -61,7 +61,7 @@ public class DocumentLibraryJaxRApplication extends Application {
 
 
 	public Set<Object> getSingletons() {
-		return Collections.<Object>singleton(_documentLibraryGroupResource);
+		return Collections.<Object>singleton(_documentLibraryRootResource);
 	}
 
 	public Set<Class<?>> getClasses() {
@@ -74,6 +74,6 @@ public class DocumentLibraryJaxRApplication extends Application {
 	}
 
 	@Reference
-	DocumentLibraryGroupResource _documentLibraryGroupResource;
+	DocumentLibraryRootResource _documentLibraryRootResource;
 
 }

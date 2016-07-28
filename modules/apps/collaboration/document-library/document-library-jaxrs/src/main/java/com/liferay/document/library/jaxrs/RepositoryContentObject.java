@@ -16,15 +16,15 @@ public class RepositoryContentObject {
 	}
 
 	public RepositoryContentObject(
-		String uuid, String title, String url,
+		long id, String title, String url,
 		RepositoryContentType type) {
-		_uuid = uuid;
+		_id = id;
 		_title = title;
 		_url = url;
 		_type = type;
 	}
 
-	private String _uuid;
+	private long _id;
 	private String _title;
 	private String _url;
 	private RepositoryContentType _type;
@@ -46,12 +46,12 @@ public class RepositoryContentObject {
 		_type = type;
 	}
 
-	public String getUuid() {
-		return _uuid;
+	public long getId() {
+		return _id;
 	}
 
-	public void setUuid(String uuid) {
-		_uuid = uuid;
+	public void setId(long id) {
+		_id = id;
 	}
 
 	public String getTitle() {
@@ -71,21 +71,21 @@ public class RepositoryContentObject {
 			FileEntry fileEntry = (FileEntry)object;
 
 			return new RepositoryContentObject(
-				fileEntry.getUuid(), fileEntry.getTitle(), "",
+				fileEntry.getFileEntryId(), fileEntry.getTitle(), "",
 				RepositoryContentType.FILE);
 		}
 		else if (object instanceof Folder) {
 			Folder folder = (Folder)object;
 
 			return new RepositoryContentObject(
-				folder.getUuid(), folder.getName(), "",
+				folder.getFolderId(), folder.getName(), "",
 				RepositoryContentType.FOLDER);
 		}
 		else if (object instanceof FileShortcut) {
 			FileShortcut fileShortcut = (FileShortcut)object;
 
 			return new RepositoryContentObject(
-				fileShortcut.getUuid(), fileShortcut.getToTitle(), "",
+				fileShortcut.getFileShortcutId(), fileShortcut.getToTitle(), "",
 				RepositoryContentType.SHORTCUT);
 		}
 		else {
