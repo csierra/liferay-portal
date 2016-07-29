@@ -25,16 +25,25 @@ import com.liferay.portal.kernel.repository.RepositoryProvider;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.GroupService;
-import com.liferay.portal.kernel.service.RepositoryService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -81,10 +90,10 @@ public class DocumentLibraryRootResource {
 	}
 
 	@Path("/objects/files/{fileId}")
-	public FileRestResource getFileResource(@PathParam("fileId") long fileId)
+	public FileResource getFileResource(@PathParam("fileId") long fileId)
 		throws PortalException {
 
-		return new FileRestResource(dlAppService.getFileEntry(fileId));
+		return new FileResource(dlAppService.getFileEntry(fileId));
 	}
 
 	@Path("/objects/folders/{folderId}")
@@ -104,20 +113,18 @@ public class DocumentLibraryRootResource {
 	@Reference
 	protected RepositoryProvider _repositoryProvider;
 
-	@Reference
-	protected RepositoryService _repositoryService;
-
 	@Context
 	protected HttpServletRequest _request;
 
-	public class FileRestResource {
+	public class FileResource {
 		private FileEntry _fileEntry;
 
-		public FileRestResource(FileEntry fileEntry) {
+		public FileResource(FileEntry fileEntry) {
 			_fileEntry = fileEntry;
 		}
 
 		@GET
+		@Path("/")
 		public FileRepr getFileEntry() {
 			return FileRepr.fromFileEntry(_fileEntry, _request);
 		}
@@ -130,6 +137,72 @@ public class DocumentLibraryRootResource {
 				type(_fileEntry.getMimeType()).
 				entity(_fileEntry.getContentStream()).
 				build();
+		}
+
+		@PUT
+		@Consumes("multipart/form-data")
+		public FileRepr updateMetadata(
+			@Multipart("metadata") FileRepr fileRepr,
+			@Multipart("content") Attachment attachment,
+			@Multipart(value = "changelog", required = false) String changelog,
+			@Multipart(value = "majorVersion", required = false)
+				boolean majorVersion)
+			throws PortalException {
+
+			if ((fileRepr == null) || (attachment == null)) {
+				throw new WebApplicationException(
+					Response.
+						status(400).
+						entity("Request is not properly encoded").
+						build()
+				);
+			}
+
+			changelog = GetterUtil.getString(changelog);
+
+			return FileRepr.fromFileEntry(
+				dlAppService.updateFileEntry(
+					_fileEntry.getFileEntryId(), fileRepr.getFileName(),
+					attachment.getContentType().getType(), fileRepr.getTitle(),
+					fileRepr.getDescription(), changelog, majorVersion,
+					attachment.getObject(byte[].class), new ServiceContext()),
+				_request);
+		}
+
+		@PUT
+		@Consumes({"application/json", "application/xml"})
+		public FileRepr updateMetadata(
+				FileRepr fileRepr, @QueryParam("changelog") String changelog,
+				@QueryParam("majorVersion") boolean majorVersion)
+			throws PortalException {
+
+			return FileRepr.fromFileEntry(
+				dlAppService.updateFileEntry(
+					_fileEntry.getFileEntryId(), fileRepr.getFileName(),
+					_fileEntry.getMimeType(), fileRepr.getTitle(),
+					fileRepr.getDescription(), changelog, majorVersion,
+					_fileEntry.getContentStream(), _fileEntry.getSize(),
+					new ServiceContext()),
+				_request);
+		}
+
+		@PUT
+		@Path("/content")
+		public FileRepr updateFile(
+				byte[] bytes,
+				@QueryParam("changelog") String changelog,
+				@QueryParam("majorVersion") boolean majorVersion)
+			throws PortalException {
+
+			changelog = GetterUtil.get(changelog, StringPool.BLANK);
+
+			return FileRepr.fromFileEntry(
+				dlAppService.updateFileEntry(
+					_fileEntry.getFileEntryId(), _fileEntry.getFileName(),
+					_request.getContentType(), _fileEntry.getTitle(),
+					_fileEntry.getDescription(), changelog, majorVersion,
+					bytes, new ServiceContext()),
+				_request);
 		}
 	}
 
@@ -166,6 +239,65 @@ public class DocumentLibraryRootResource {
 				map(RepositoryContentObject::createContentObject).
 				collect(Collectors.toList()));
 		}
+
+		@POST
+		public FileRepr addFile(
+				@Multipart("metadata") FileRepr fileRepr,
+				@Multipart("content") Attachment attachment,
+				@Multipart(value = "changelog", required = false)
+					String changelog)
+			throws PortalException {
+
+			if ((fileRepr == null) || (attachment == null)) {
+				throw new WebApplicationException(
+					Response.
+						status(400).
+						entity("Request is not properly built" +
+							   "We expect a multipart/form-data request with" +
+							   "metadata and content fields").build());
+			}
+
+			changelog = GetterUtil.getString(changelog);
+
+			return FileRepr.fromFileEntry(
+				dlAppService.addFileEntry(
+					_repositoryId, _folderId,
+					fileRepr.getFileName(),
+					attachment.getContentType().getType(), fileRepr.getTitle(),
+					fileRepr.getDescription(), changelog,
+					attachment.getObject(byte[].class), new ServiceContext()),
+				_request);
+		}
+
+		@POST
+		@Path("/{fileName}")
+		public FileRepr addFile(
+				byte[] content, @PathParam("fileName") String fileName,
+				@QueryParam("changelog") String changelog,
+				@QueryParam("title") String title,
+				@QueryParam("description") String description)
+			throws PortalException {
+
+			if ((fileName == null) || (content == null)) {
+				throw new WebApplicationException(
+					Response.
+						status(400).
+						entity("Request is not properly built").build());
+			}
+
+			changelog = GetterUtil.getString(changelog);
+			title = GetterUtil.getString(title, fileName);
+			description = GetterUtil.getString(description, fileName);
+
+			return FileRepr.fromFileEntry(
+				dlAppService.addFileEntry(
+					_repositoryId, _folderId,
+					fileName,
+					_request.getContentType(), title, description, changelog,
+					content, new ServiceContext()),
+				_request);
+		}
+
 	}
 
 	/**

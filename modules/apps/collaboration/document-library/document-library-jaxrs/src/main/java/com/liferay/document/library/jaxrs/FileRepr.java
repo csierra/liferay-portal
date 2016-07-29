@@ -70,20 +70,38 @@ public class FileRepr {
 	}
 
 	private String _title;
+	private long _size;
 	private String _url;
 
-	public FileRepr() {
+	public long getId() {
+		return _id;
+	}
+
+	public void setId(long id) {
+		_id = id;
+	}
+
+	public long getSize() {
+		return _size;
+	}
+
+	public void setSize(long size) {
+		_size = size;
 	}
 
 	public FileRepr(
 		long id, String description, String fileName, String title,
-		String url) {
+		long size, String url) {
 
 		_id = id;
 		_description = description;
 		_fileName = fileName;
 		_title = title;
+		_size = size;
 		_url = url;
+	}
+
+	public FileRepr() {
 	}
 
 	public static FileRepr fromFileEntry(
@@ -94,6 +112,7 @@ public class FileRepr {
 			fileEntry.getDescription(),
 			fileEntry.getFileName(),
 			fileEntry.getTitle(),
+			fileEntry.getSize(),
 			request.getRequestURI() + "/" + fileEntry.getUuid());
 	}
 }

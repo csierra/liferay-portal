@@ -68,8 +68,8 @@ public class RepositoryRepr {
 	public RepositoryRepr(
 		long repositoryId, Date createDate, String description, String name,
 		String uuid, String url) {
-		_repositoryId = repositoryId;
 
+		_repositoryId = repositoryId;
 		_createDate = createDate;
 		_description = description;
 		_name = name;
