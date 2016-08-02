@@ -35,7 +35,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
-	property = {"item.selector.view.order:Integer=100"},
+	property = {
+		"item.selector.view.order:Integer=100",
+		"overwrite.view.key=document-library"
+	},
 	service = ItemSelectorView.class
 )
 public class DLImageItemSelectorView

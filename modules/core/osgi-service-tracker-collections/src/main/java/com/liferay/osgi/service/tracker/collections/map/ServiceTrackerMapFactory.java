@@ -415,6 +415,19 @@ public class ServiceTrackerMapFactory {
 			null);
 	}
 
+	public static <K, SR, S, RR> ServiceTrackerMap<K, RR> valueMap(
+		BundleContext bundleContext, Class<SR> clazz, String filterString,
+		ServiceReferenceMapper<K, ? super SR> serviceReferenceMapper,
+		ServiceTrackerCustomizer<SR, S> serviceTrackerCustomizer,
+		ServiceTrackerBucketFactory<SR, S, RR> serviceTrackerBucketFactory,
+		ServiceTrackerMapListener<K, S, RR> serviceTrackerMapListener) {
+
+		return new ServiceTrackerMapImpl<>(
+			bundleContext, clazz, filterString, serviceReferenceMapper,
+			serviceTrackerCustomizer, serviceTrackerBucketFactory,
+			serviceTrackerMapListener);
+	}
+
 	public static <SR, S> ServiceTrackerMap<String, S> singleValueMap(
 		BundleContext bundleContext, Class<SR> clazz, String propertyKey,
 		ServiceTrackerCustomizer<SR, S> serviceTrackerCustomizer) {

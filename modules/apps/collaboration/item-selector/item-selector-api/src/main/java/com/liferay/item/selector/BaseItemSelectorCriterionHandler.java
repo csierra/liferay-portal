@@ -68,12 +68,13 @@ public abstract class BaseItemSelectorCriterionHandler
 	}
 
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
+		_serviceTrackerMap = ServiceTrackerMapFactory.valueMap(
 			bundleContext, ItemSelectorView.class, null,
 			new ItemSelectorViewServiceReferenceMapper(bundleContext),
-			Collections.reverseOrder(
+			new DefaultServiceTrackerCustomizer(bundleContext),
+			new ItemSelectorViewServiceTrackerBucketFactory(
 				new PropertyServiceReferenceComparator(
-					"item.selector.view.order")));
+					"item.selector.view.order")), null);
 	}
 
 	private boolean _isItemSelectorViewSupported(
