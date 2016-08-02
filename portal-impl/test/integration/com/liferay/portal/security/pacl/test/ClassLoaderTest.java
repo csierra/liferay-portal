@@ -222,7 +222,13 @@ public class ClassLoaderTest {
 
 	@Test
 	public void testGet18() throws Exception {
-		PortletClassLoaderUtil.getClassLoader("pacl-1-test-portlet");
+		try {
+			PortletClassLoaderUtil.getClassLoader("pacl-1-test-portlet");
+
+			Assert.fail();
+		}
+		catch (SecurityException se) {
+		}
 	}
 
 	@Test
