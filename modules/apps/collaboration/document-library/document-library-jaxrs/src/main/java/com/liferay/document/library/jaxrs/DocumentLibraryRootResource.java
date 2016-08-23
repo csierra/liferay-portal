@@ -217,14 +217,15 @@ public class DocumentLibraryRootResource {
 			_repositoryId = folder.getRepositoryId();
 			_folderId = folder.getFolderId();
 			_folderReprFunction =
-				(contents) -> FolderRepr.fromFolder(folder, contents);
+				(contents) -> FolderRepr.fromFolder(folder, contents, _request);
 		}
 
-		public FolderResource(final Repository repository) {
+		public FolderResource(final long groupId, final Repository repository) {
 			_repositoryId = repository.getRepositoryId();
 			_folderId = 0;
 			_folderReprFunction =
-				(contents) -> FolderRepr.fromRepository(repository, contents);
+				(contents) -> FolderRepr.fromRepository(
+					groupId, repository, contents, _request);
 		}
 
 		@GET
@@ -236,7 +237,8 @@ public class DocumentLibraryRootResource {
 				_repositoryId, _folderId, 0,
 				true, -1, -1).
 				stream().
-				map(RepositoryContentObject::createContentObject).
+				map(rco -> RepositoryContentObject.createContentObject(
+					rco, _request)).
 				collect(Collectors.toList()));
 		}
 
@@ -327,7 +329,7 @@ public class DocumentLibraryRootResource {
 			throws PortalException {
 
 			return new FolderResource(
-				_repositoryProvider.getRepository(repositoryId));
+				_groupId, _repositoryProvider.getRepository(repositoryId));
 		}
 
 	}

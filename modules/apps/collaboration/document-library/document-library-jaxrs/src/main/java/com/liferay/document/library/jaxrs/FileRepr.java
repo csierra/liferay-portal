@@ -49,10 +49,6 @@ public class FileRepr {
 		return _url;
 	}
 
-	public void setUrl(String url) {
-		_url = url;
-	}
-
 	public String getTitle() {
 		return _title;
 	}
@@ -113,6 +109,6 @@ public class FileRepr {
 			fileEntry.getFileName(),
 			fileEntry.getTitle(),
 			fileEntry.getSize(),
-			request.getRequestURI() + "/" + fileEntry.getUuid());
+			request.getContextPath() + "/api/objects/" + fileEntry.getUuid());
 	}
 }

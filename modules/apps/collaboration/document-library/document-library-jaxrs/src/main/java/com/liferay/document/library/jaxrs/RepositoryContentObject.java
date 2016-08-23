@@ -4,6 +4,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.Folder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -66,26 +67,34 @@ public class RepositoryContentObject {
 		FILE, FOLDER, SHORTCUT
 	}
 
-	public static RepositoryContentObject createContentObject(Object object) {
+	public static RepositoryContentObject createContentObject(
+		Object object, HttpServletRequest httpServletRequest) {
+
 		if (object instanceof FileEntry) {
 			FileEntry fileEntry = (FileEntry)object;
 
 			return new RepositoryContentObject(
-				fileEntry.getFileEntryId(), fileEntry.getTitle(), "",
+				fileEntry.getFileEntryId(), fileEntry.getTitle(),
+				httpServletRequest.getContextPath() +
+					"/api/objects/files/" + fileEntry.getFileEntryId(),
 				RepositoryContentType.FILE);
 		}
 		else if (object instanceof Folder) {
 			Folder folder = (Folder)object;
 
 			return new RepositoryContentObject(
-				folder.getFolderId(), folder.getName(), "",
+				folder.getFolderId(), folder.getName(),
+				httpServletRequest.getContextPath() +
+					"/api/objects/folders/" + folder.getFolderId(),
 				RepositoryContentType.FOLDER);
 		}
 		else if (object instanceof FileShortcut) {
 			FileShortcut fileShortcut = (FileShortcut)object;
 
 			return new RepositoryContentObject(
-				fileShortcut.getFileShortcutId(), fileShortcut.getToTitle(), "",
+				fileShortcut.getFileShortcutId(), fileShortcut.getToTitle(),
+				httpServletRequest.getContextPath() +
+					"/api/objects/files/" + fileShortcut.getToFileEntryId(),
 				RepositoryContentType.SHORTCUT);
 		}
 		else {
