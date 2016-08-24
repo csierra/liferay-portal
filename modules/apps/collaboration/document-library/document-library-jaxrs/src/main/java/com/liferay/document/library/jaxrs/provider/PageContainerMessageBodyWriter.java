@@ -16,19 +16,7 @@ package com.liferay.document.library.jaxrs.provider;
 
 import com.liferay.portal.kernel.util.HttpUtil;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -36,19 +24,27 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Carlos Sierra Andrés
  */
 @Provider
-public class PageMessageBodyWriter implements MessageBodyWriter<Page<?>> {
+public class PageContainerMessageBodyWriter implements MessageBodyWriter<PageContainer<?>> {
 
 	@Override
 	public boolean isWriteable(
 		Class<?> type, Type genericType, Annotation[] annotations,
 		MediaType mediaType) {
 
-		if (!(Page.class.isAssignableFrom(type))) {
+		if (!(PageContainer.class.isAssignableFrom(type))) {
 			return false;
 		}
 
@@ -58,8 +54,18 @@ public class PageMessageBodyWriter implements MessageBodyWriter<Page<?>> {
 			ParameterizedType parameterizedType =
 				(ParameterizedType)genericType;
 
-			targetClass =
-				(Class<?>)parameterizedType.getActualTypeArguments()[0];
+			Type targetType = parameterizedType.getActualTypeArguments()[0];
+
+			if (targetType instanceof ParameterizedType) {
+				ParameterizedType para = (ParameterizedType) targetType;
+
+				targetClass = (Class<?>)para.getRawType();
+				genericType = para;
+			}
+			else {
+				targetClass = (Class<?>) targetType;
+				genericType = targetType;
+			}
 		}
 
 		if (targetClass == null) {
@@ -67,20 +73,20 @@ public class PageMessageBodyWriter implements MessageBodyWriter<Page<?>> {
 		}
 
 		return (_providers.getMessageBodyWriter(
-			Collection.class, genericType, annotations, mediaType) != null);
+			targetClass, genericType, annotations, mediaType) != null);
 	}
 
 	@Override
 	public long getSize(
-		Page<?> page, Class<?> type, Type genericType, Annotation[] annotations,
-		MediaType mediaType) {
+		PageContainer<?> pageContainer, Class<?> type, Type genericType,
+		Annotation[] annotations, MediaType mediaType) {
 
 		return -1;
 	}
 
 	@Override
 	public void writeTo(
-			Page<?> page, Class<?> type, Type genericType,
+			PageContainer<?> pageContainer, Class<?> type, Type genericType,
 			Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, Object> httpHeaders,
 			OutputStream entityStream)
@@ -88,41 +94,43 @@ public class PageMessageBodyWriter implements MessageBodyWriter<Page<?>> {
 
 		List<Object> linkHeader = new ArrayList<>();
 
-		int currentPage = page.getCurrentPage();
+		int currentPage = pageContainer.getCurrentPage();
 
-		String requestURL = _httpServletRequest.getRequestURL().toString();
+		String requestURL =
+			_httpServletRequest.getRequestURI() + "?" +
+			_httpServletRequest.getQueryString();
 
-		if (page.hasNext()) {
+		if (pageContainer.hasNext()) {
 			String nextPageUrl = HttpUtil.setParameter(
 				requestURL, "page", currentPage + 1);
 
 			nextPageUrl = HttpUtil.setParameter(
-				nextPageUrl, "per_page", page.getItemsPerPage());
+				nextPageUrl, "per_page", pageContainer.getItemsPerPage());
 
 			linkHeader.add(link(nextPageUrl, "next"));
 
 			String lastPageUrl = HttpUtil.setParameter(
-				requestURL, "page", page.getLastPage());
+				requestURL, "page", pageContainer.getLastPage());
 
 			lastPageUrl = HttpUtil.setParameter(
-				lastPageUrl, "per_page", page.getItemsPerPage());
+				lastPageUrl, "per_page", pageContainer.getItemsPerPage());
 
 			linkHeader.add(link(lastPageUrl, "last"));
 		}
 
-		if (page.hasPrevious()) {
+		if (pageContainer.hasPrevious()) {
 			String prevPageUrl = HttpUtil.setParameter(
 				requestURL, "page", currentPage - 1);
 
 			prevPageUrl = HttpUtil.setParameter(
-				prevPageUrl, "per_page", page.getItemsPerPage());
+				prevPageUrl, "per_page", pageContainer.getItemsPerPage());
 
 			linkHeader.add(link(prevPageUrl, "prev"));
 
 			String firstPageUrl = HttpUtil.setParameter(requestURL, "page", 1);
 
 			firstPageUrl = HttpUtil.setParameter(
-				firstPageUrl, "per_page", page.getItemsPerPage());
+				firstPageUrl, "per_page", pageContainer.getItemsPerPage());
 
 			linkHeader.add(link(firstPageUrl, "first"));
 		}
@@ -131,16 +139,29 @@ public class PageMessageBodyWriter implements MessageBodyWriter<Page<?>> {
 
 		ParameterizedType parameterizedType = (ParameterizedType)genericType;
 
-		Type targetClass = parameterizedType.getActualTypeArguments()[0];
+		Type targetType = parameterizedType.getActualTypeArguments()[0];
+
+		Class<Object> targetClass = null;
+
+		if (targetType instanceof ParameterizedType) {
+			ParameterizedType para = (ParameterizedType) targetType;
+
+			targetClass = (Class<Object>) para.getRawType();
+			genericType = para;
+		}
+		else {
+			targetClass = (Class<Object>)targetType;
+			genericType = targetType;
+		}
 
 		@SuppressWarnings("rawtypes")
-		MessageBodyWriter<Collection> messageBodyWriter =
+		MessageBodyWriter<Object> messageBodyWriter =
 			_providers.getMessageBodyWriter(
-				Collection.class, genericType, annotations, mediaType);
+				targetClass, genericType, annotations, mediaType);
 
 		messageBodyWriter.writeTo(
-			page.getItems(), Collection.class, targetClass, annotations,
-			mediaType, httpHeaders, entityStream);
+			pageContainer.getContainer(), targetClass,
+			genericType, annotations, mediaType, httpHeaders, entityStream);
 	}
 
 	private String link(String url, String rel) {

@@ -57,9 +57,9 @@ public class PaginationProvider implements ContextProvider<Pagination> {
 			_itemsPerPage = itemsPerPage;
 		}
 
-		@Override
-		public <T> Page<T> createPage(Collection<T> items, int totalItems) {
-			return new Page<>(items, totalItems, getPage(), getItemsPerPage());
+		public <T> PageContainer<T> createContainer(T t, int totalItems) {
+			return new PageContainer<>(
+				t, totalItems, getPage(), getItemsPerPage());
 		}
 
 		public int getEndPosition() {

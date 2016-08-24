@@ -14,18 +14,15 @@
 
 package com.liferay.document.library.jaxrs.provider;
 
-import java.util.Collection;
-
 /**
  * @author Carlos Sierra Andrés
  */
-public class Page<T> {
+public class PageContainer<T> {
 
-	public Page(
-		Collection<T> items, int totalCount, int currentPage,
-		int itemsPerPage) {
+	public PageContainer(
+		T container, int totalCount, int currentPage, int itemsPerPage) {
 
-		_items = items;
+		_container = container;
 		_totalCount = totalCount;
 		_currentPage = currentPage;
 		_itemsPerPage = itemsPerPage;
@@ -33,10 +30,6 @@ public class Page<T> {
 
 	public int getCurrentPage() {
 		return _currentPage;
-	}
-
-	public Collection<T> getItems() {
-		return _items;
 	}
 
 	public int getItemsPerPage() {
@@ -59,8 +52,12 @@ public class Page<T> {
 		return _currentPage > 1;
 	}
 
+	public T getContainer() {
+		return _container;
+	}
+
+	private final T _container;
 	private final int _currentPage;
-	private final Collection<T> _items;
 	private final int _itemsPerPage;
 	private final int _totalCount;
 

@@ -15,7 +15,7 @@
 package com.liferay.document.library.jaxrs;
 
 import com.liferay.document.library.jaxrs.provider.OrderBySelector;
-import com.liferay.document.library.jaxrs.provider.Page;
+import com.liferay.document.library.jaxrs.provider.PageContainer;
 import com.liferay.document.library.jaxrs.provider.Pagination;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
@@ -74,7 +74,7 @@ public class DocumentLibraryRootResource {
 		value = "List groups", responseContainer = "List",
 		response = GroupRepr.class
 	)
-	public Page<Group> listGroups(
+	public PageContainer<List<Group>> listGroups(
 			@Context Company company, @Context Pagination pagination,
 			@Context OrderBySelector orderBySelector)
 		throws PortalException {
@@ -96,7 +96,7 @@ public class DocumentLibraryRootResource {
 		int maxSize =
 			pagination.getEndPosition() - pagination.getStartPosition();
 
-		return pagination.createPage(
+		return pagination.createContainer(
 			userSitesGroups.
 				stream().
 				skip(pagination.getStartPosition()).
@@ -253,7 +253,7 @@ public class DocumentLibraryRootResource {
 		}
 
 		@GET
-		public FolderRepr getFolder(
+		public PageContainer<FolderRepr> getFolder(
 				@Context Pagination pagination,
 				@Context OrderBySelector orderBySelector)
 			throws PortalException {
@@ -262,16 +262,20 @@ public class DocumentLibraryRootResource {
 				fromMap(RepositoryContentObject.comparators)).
 				orElse(new RepositoryModelTitleComparator<>());
 
-			return _folderReprFunction.apply(
-				dlAppService.getFoldersAndFileEntriesAndFileShortcuts(
-					_repositoryId, _folderId, 0,
-					true, pagination.getStartPosition(),
-					pagination.getEndPosition(),
-					obc).
-				stream().
-				map(rco -> RepositoryContentObject.createContentObject(
+			return pagination.createContainer(
+				_folderReprFunction.apply(
+					dlAppService.getFoldersAndFileEntriesAndFileShortcuts(
+						_repositoryId, _folderId, 0,
+						true, pagination.getStartPosition(),
+						pagination.getEndPosition(),
+						obc).
+					stream().
+					map(rco -> RepositoryContentObject.createContentObject(
 						rco, _request)).
-				collect(Collectors.toList()));
+					collect(Collectors.toList())),
+				dlAppService.getFoldersAndFileEntriesAndFileShortcutsCount(
+					_repositoryId, _folderId, 0, true)
+			);
 		}
 
 		@POST

@@ -14,14 +14,12 @@
 
 package com.liferay.document.library.jaxrs.provider;
 
-import java.util.Collection;
-
 /**
  * @author Carlos Sierra Andrés
  */
 public interface Pagination {
 
-	public <T> Page<T> createPage(Collection<T> items, int totalItems);
+	public <T> PageContainer<T> createContainer(T t, int totalItems);
 
 	public int getEndPosition();
 
