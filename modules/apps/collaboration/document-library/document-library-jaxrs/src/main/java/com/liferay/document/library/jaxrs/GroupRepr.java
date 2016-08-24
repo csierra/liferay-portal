@@ -21,31 +21,62 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class GroupRepr {
-	long id;
-	String url;
+	private long _id;
+	private String _name;
+
+	public String getFriendlyUrl() {
+		return _friendlyUrl;
+	}
+
+	public void setFriendlyUrl(String friendlyUrl) {
+		_friendlyUrl = friendlyUrl;
+	}
+
+	public String getName() {
+		return _name;
+	}
+
+	public void setName(String name) {
+		_name = name;
+	}
+
+	public int getType() {
+		return _type;
+	}
+
+	public void setType(int type) {
+		_type = type;
+	}
+
+	private String _friendlyUrl;
+	private int _type;
+	private String _url;
 
 	public GroupRepr() {
 	}
 
-	public GroupRepr(long id, String url) {
-		this.id = id;
-		this.url = url;
+	public GroupRepr(long id, String url, String name, String friendlyUrl, int type) {
+		_id = id;
+		_url = url;
+		_name = name;
+		_friendlyUrl = friendlyUrl;
+		_type = type;
 	}
 
 	public long getId() {
-		return id;
+		return _id;
 	}
 
 	public void setId(long id) {
-		this.id = id;
+		this._id = id;
 	}
 
 	public String getUrl() {
-		return url;
+		return _url;
 	}
 
 	public void setUrl(String url) {
-		this.url = url;
+		this._url = url;
 	}
 
 }

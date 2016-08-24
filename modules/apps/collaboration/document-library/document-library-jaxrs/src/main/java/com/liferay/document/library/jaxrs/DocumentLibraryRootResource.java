@@ -14,9 +14,11 @@
 
 package com.liferay.document.library.jaxrs;
 
+import com.liferay.document.library.jaxrs.provider.OrderBySelector;
 import com.liferay.document.library.jaxrs.provider.Page;
 import com.liferay.document.library.jaxrs.provider.Pagination;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -24,10 +26,16 @@ import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.RepositoryProvider;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryModel;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.comparator.GroupFriendlyURLComparator;
+import com.liferay.portal.kernel.util.comparator.GroupIdComparator;
+import com.liferay.portal.kernel.util.comparator.GroupNameComparator;
+import com.liferay.portal.kernel.util.comparator.GroupTypeComparator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -46,7 +54,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -64,8 +75,20 @@ public class DocumentLibraryRootResource {
 		response = GroupRepr.class
 	)
 	public Page<Group> listGroups(
-			@Context Company company, @Context Pagination pagination)
+			@Context Company company, @Context Pagination pagination,
+			@Context OrderBySelector orderBySelector)
 		throws PortalException {
+
+		OrderByComparator<Group> groupOrderByComparator =
+			orderBySelector.select(
+				fromMap(
+					new HashMap<String, Function<Boolean, OrderByComparator<Group>>>() {{
+						put("name", GroupNameComparator::new);
+						put("id", GroupIdComparator::new);
+						put("type", GroupTypeComparator::new);
+						put("url", GroupFriendlyURLComparator::new);
+					}})).
+				orElseGet(GroupIdComparator::new);
 
 		List<Group> userSitesGroups =
 			_groupService.getUserSitesGroups();
@@ -78,6 +101,7 @@ public class DocumentLibraryRootResource {
 				stream().
 				skip(pagination.getStartPosition()).
 				limit(maxSize).
+				sorted(groupOrderByComparator).
 				collect(Collectors.toList()),
 			userSitesGroups.size());
 	}
@@ -229,16 +253,24 @@ public class DocumentLibraryRootResource {
 		}
 
 		@GET
-		public FolderRepr getFolder()
+		public FolderRepr getFolder(
+				@Context Pagination pagination,
+				@Context OrderBySelector orderBySelector)
 			throws PortalException {
+
+			OrderByComparator<Object> obc = orderBySelector.select(
+				fromMap(RepositoryContentObject.comparators)).
+				orElse(new RepositoryModelTitleComparator<>());
 
 			return _folderReprFunction.apply(
 				dlAppService.getFoldersAndFileEntriesAndFileShortcuts(
-				_repositoryId, _folderId, 0,
-				true, -1, -1).
+					_repositoryId, _folderId, 0,
+					true, pagination.getStartPosition(),
+					pagination.getEndPosition(),
+					obc).
 				stream().
 				map(rco -> RepositoryContentObject.createContentObject(
-					rco, _request)).
+						rco, _request)).
 				collect(Collectors.toList()));
 		}
 
@@ -333,4 +365,6 @@ public class DocumentLibraryRootResource {
 		}
 
 	}
+
+	public final <K, V> Function<K, Optional<V>> fromMap(Map<K, V> map) {return k -> Optional.ofNullable(map.get(k));}
 }

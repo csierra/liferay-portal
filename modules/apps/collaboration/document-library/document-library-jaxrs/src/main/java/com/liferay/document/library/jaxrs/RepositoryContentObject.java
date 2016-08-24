@@ -1,11 +1,19 @@
 package com.liferay.document.library.jaxrs;
 
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelCreateDateComparator;
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelSizeComparator;
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryModel;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Created by sergiogonzalez on 26/07/16.
@@ -17,8 +25,8 @@ public class RepositoryContentObject {
 	}
 
 	public RepositoryContentObject(
-		long id, String title, String url,
-		RepositoryContentType type) {
+		long id, String title, String url, RepositoryContentType type) {
+
 		_id = id;
 		_title = title;
 		_url = url;
@@ -102,4 +110,12 @@ public class RepositoryContentObject {
 				"Object must be an instance of FileEntry, Folder of FileShortcut");
 		}
 	}
+
+	public static final Map<String, Function<Boolean, OrderByComparator<Object>>>
+		comparators =
+			new HashMap<String, Function<Boolean, OrderByComparator<Object>>>() {{
+				put("title", RepositoryModelTitleComparator::new);
+				put("date", RepositoryModelCreateDateComparator::new);
+				put("size", RepositoryModelSizeComparator::new);
+			}};
 }

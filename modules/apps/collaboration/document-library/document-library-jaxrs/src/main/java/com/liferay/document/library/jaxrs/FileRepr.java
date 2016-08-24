@@ -14,10 +14,14 @@
 
 package com.liferay.document.library.jaxrs;
 
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Carlos Sierra Andrés
@@ -27,7 +31,11 @@ public class FileRepr {
 
 	private long _id;
 	private String _description;
+
 	private String _fileName;
+	private String _title;
+	private long _size;
+	private String _url;
 
 	public String getDescription() {
 		return _description;
@@ -64,10 +72,6 @@ public class FileRepr {
 	public void setUuid(long uuid) {
 		_id = uuid;
 	}
-
-	private String _title;
-	private long _size;
-	private String _url;
 
 	public long getId() {
 		return _id;
@@ -111,4 +115,10 @@ public class FileRepr {
 			fileEntry.getSize(),
 			request.getContextPath() + "/api/objects/" + fileEntry.getUuid());
 	}
+
+	public static final Map<String, OrderByComparator<?>> comparators =
+		new HashMap<String, OrderByComparator<?>>() {{
+			put("title", new RepositoryModelTitleComparator());
+			put("title", new RepositoryModelTitleComparator());
+		}};
 }

@@ -14,33 +14,16 @@
 
 package com.liferay.document.library.jaxrs.provider;
 
-import com.liferay.document.library.jaxrs.GroupRepr;
-import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class GroupMessageBodyWriter extends
-	DelegatingMessageBodyWriter<Group, GroupRepr> {
-
-	@Context
-	HttpServletRequest _httpServletRequest;
-
-	protected Class<Group> getOriginClass() {
-		return Group.class;
-	}
-
-	protected Class<GroupRepr> getDestination() {
-		return GroupRepr.class;
-	}
-
-	protected GroupRepr map(Group group) {
-		return new GroupRepr(
-			group.getGroupId(),
-			_httpServletRequest.getRequestURI() + "/" +
-			group.getGroupId(), group.getName(), group.getFriendlyURL(), group.getType());
-	}
+@FunctionalInterface
+public interface OrderBySelector {
+	public <T> Optional<OrderByComparator<T>> select(
+		Function<String, Optional<Function<Boolean, OrderByComparator<T>>>> function);
 }
