@@ -77,6 +77,12 @@ public abstract class BaseTranslationManagerTag extends IncludeTag {
 		setScopedAttribute("changeableDefaultLanguage", changeableDefaultLanguage);
 	}
 
+	public void setCssClass(java.lang.String cssClass) {
+		_cssClass = cssClass;
+
+		setScopedAttribute("cssClass", cssClass);
+	}
+
 	public void setDefaultLanguageId(java.lang.String defaultLanguageId) {
 		_defaultLanguageId = defaultLanguageId;
 
@@ -113,6 +119,7 @@ public abstract class BaseTranslationManagerTag extends IncludeTag {
 
 		_availableLocales = null;
 		_changeableDefaultLanguage = true;
+		_cssClass = null;
 		_defaultLanguageId = null;
 		_editingLanguageId = null;
 		_id = null;
@@ -128,6 +135,7 @@ public abstract class BaseTranslationManagerTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
 		setNamespacedAttribute(request, "availableLocales", _availableLocales);
+		setNamespacedAttribute(request, "cssClass", _cssClass);
 		setNamespacedAttribute(request, "changeableDefaultLanguage", _changeableDefaultLanguage);
 		setNamespacedAttribute(request, "defaultLanguageId", _defaultLanguageId);
 		setNamespacedAttribute(request, "editingLanguageId", _editingLanguageId);
@@ -149,6 +157,7 @@ public abstract class BaseTranslationManagerTag extends IncludeTag {
 
 	private java.util.Locale[] _availableLocales = null;
 	private boolean _changeableDefaultLanguage = true;
+	private java.lang.String _cssClass = null;
 	private java.lang.String _defaultLanguageId = null;
 	private java.lang.String _editingLanguageId = null;
 	private java.lang.String _id = null;

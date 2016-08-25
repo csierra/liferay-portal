@@ -7,6 +7,7 @@
  * @param availableLocales
  * @param changeableDefaultLanguage
  * @param defaultLocale
+ * @param? elementClasses
  * @param id
  * @param locales
  *
@@ -17,7 +18,7 @@
  * @param removeAvailableLocale
  **/
 {template .render}
-	<div class="lfr-translation-manager" id="{$id}">
+	<div class="lfr-translationmanager{$elementClasses ? ' ' + $elementClasses : ''}" id="{$id}">
 		<ul class="nav nav-tabs nav-tabs-default">
 			{call .defaultLocale data="all" /}
 
@@ -160,7 +161,6 @@
 			{/foreach}
 		{/param}
 
-		{param elementClasses: 'dropdown' /}
 		{param position: 0 /}
 		{param positionClassOnMenu: true /}
 	{/call}

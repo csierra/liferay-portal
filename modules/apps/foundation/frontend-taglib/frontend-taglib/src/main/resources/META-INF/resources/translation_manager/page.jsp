@@ -20,7 +20,7 @@
 Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
 %>
 
-<div class="lfr-translation-manager" id="<%= namespace + id %>">
+<div class="lfr-translationmanager-container" id="<%= namespace + id %>">
 </div>
 
 <c:if test="<%= initialize %>">
@@ -58,6 +58,7 @@ Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroup
 							availableLocales: <%= availableLocalesArray %>,
 							changeableDefaultLanguage: <%= changeableDefaultLanguage %>,
 							defaultLocale: '<%= defaultLanguageId %>',
+							elementClasses: '<%= cssClass %>',
 							locales: <%= localesJSON %>,
 							pathThemeImages: '<%= themeDisplay.getPathThemeImages() %>'
 						},

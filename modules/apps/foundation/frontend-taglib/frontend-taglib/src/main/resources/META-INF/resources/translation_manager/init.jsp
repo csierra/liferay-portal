@@ -29,6 +29,7 @@ page import="java.util.Set" %>
 <%;
 java.util.Locale[] availableLocales = (java.util.Locale[])request.getAttribute("liferay-frontend:translation-manager:availableLocales");
 boolean changeableDefaultLanguage = GetterUtil.getBoolean(String.valueOf(request.getAttribute("liferay-frontend:translation-manager:changeableDefaultLanguage")), true);
+java.lang.String cssClass = GetterUtil.getString((java.lang.String)request.getAttribute("liferay-frontend:translation-manager:cssClass"));
 java.lang.String defaultLanguageId = GetterUtil.getString((java.lang.String)request.getAttribute("liferay-frontend:translation-manager:defaultLanguageId"));
 java.lang.String editingLanguageId = GetterUtil.getString((java.lang.String)request.getAttribute("liferay-frontend:translation-manager:editingLanguageId"));
 java.lang.String id = GetterUtil.getString((java.lang.String)request.getAttribute("liferay-frontend:translation-manager:id"));
