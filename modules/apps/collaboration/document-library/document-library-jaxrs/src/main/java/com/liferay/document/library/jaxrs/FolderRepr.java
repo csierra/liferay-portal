@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.model.Folder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 import java.util.List;
@@ -96,11 +98,12 @@ public class FolderRepr {
 
 	public FolderRepr(
 		long repositoryId, long folderId, String description, Date createDate,
-		String name, List<RepositoryContentObject> repositoryContentObjects, String url) {
+		String name, List<RepositoryContentObject> repositoryContentObjects,
+		String url) {
+
 		_repositoryId = repositoryId;
 		_folderId = folderId;
 		_description = description;
-
 		_createDate = createDate;
 		_name = name;
 		_repositoryContentObjects = repositoryContentObjects;
@@ -109,18 +112,19 @@ public class FolderRepr {
 
 	public static FolderRepr fromFolder(
 		Folder folder, List<RepositoryContentObject> repositoryContentObjects,
-		HttpServletRequest request) {
+		UriBuilder uriBuilder) {
+
+		String url = uriBuilder.
+			path("objects").
+			path("folders").
+			path(Long.toString(folder.getFolderId())).
+			build().
+			toString();
 
 		return new FolderRepr(
-			folder.getRepositoryId(),
-			folder.getFolderId(),
-			folder.getDescription(),
-			folder.getCreateDate(),
-			folder.getName(),
-			repositoryContentObjects,
-			request.getContextPath() + "/api/objects/folders/" +
-				folder.getFolderId()
-		);
+			folder.getRepositoryId(), folder.getFolderId(),
+			folder.getDescription(), folder.getCreateDate(), folder.getName(),
+			repositoryContentObjects, url);
 	}
 
 	public FolderRepr() {
@@ -129,16 +133,17 @@ public class FolderRepr {
 	public static FolderRepr fromRepository(
 		long groupId, Repository repository,
 		List<RepositoryContentObject> repositoryContentObjects,
-		HttpServletRequest request) {
+		UriBuilder uriBuilder) {
+
+		String url = uriBuilder.
+			path(Long.toString(groupId)).
+			path(Long.toString(repository.getRepositoryId())).
+			build().
+			toString();
+
 		return new FolderRepr(
-			repository.getRepositoryId(),
-			0,
-			"",
-			new Date(),
-			"",
-			repositoryContentObjects,
-			request.getContextPath() + "/api/" + groupId + "/" +
-				repository.getRepositoryId()
+			repository.getRepositoryId(), 0, "", new Date(), "",
+			repositoryContentObjects, url
 		);
 	}
 }

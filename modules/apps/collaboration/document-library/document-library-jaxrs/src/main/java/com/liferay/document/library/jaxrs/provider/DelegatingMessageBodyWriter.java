@@ -16,7 +16,6 @@ package com.liferay.document.library.jaxrs.provider;
 
 import com.liferay.document.library.jaxrs.GroupRepr;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -108,6 +107,4 @@ public abstract class DelegatingMessageBodyWriter<F, T> implements MessageBodyWr
 	@Context
 	Providers _providers;
 
-	@Context
-	HttpServletRequest _httpServletRequest;
 }

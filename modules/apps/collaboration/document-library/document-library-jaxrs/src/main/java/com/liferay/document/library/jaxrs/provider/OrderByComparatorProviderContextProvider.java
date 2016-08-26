@@ -14,18 +14,15 @@
 
 package com.liferay.document.library.jaxrs.provider;
 
-import com.liferay.document.library.jaxrs.util.AggregateOrderByComparator;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
 
 import javax.servlet.ServletRequest;
 import javax.ws.rs.ext.Provider;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -44,43 +41,20 @@ public class OrderByComparatorProviderContextProvider
 		String[] orders = request.getParameterValues("order");
 
 		if (orders == null) {
-			return new OrderBySelector() {
-				public <T> Optional<OrderByComparator<T>> select(
-					Function<String, Optional<Function<Boolean, OrderByComparator<T>>>> f) {
-
-					return Optional.empty();
-				}
-			};
+			return availableFields -> Collections.emptyList();
 		}
 
-		return new OrderBySelector() {
-			public <T> Optional<OrderByComparator<T>> select(
-				Function<String, Optional<Function<Boolean, OrderByComparator<T>>>> f) {
-
-				List<OrderByComparator<T>> orderByComparators = Arrays.stream(orders).
-					map(parseOrder(f)).
-					filter(Optional::isPresent).
-					map(Optional::get).
-					collect(Collectors.toList());
-
-				if (orderByComparators.isEmpty()) {
-					return Optional.empty();
-				}
-
-				if (orderByComparators.size() == 1) {
-					return Optional.of(orderByComparators.get(0));
-				}
-
-				return Optional.of(
-					new AggregateOrderByComparator<>(orderByComparators));
-			}
-		};
+		return availableFields ->
+			Arrays.stream(orders).
+				map(this::parseOrder).
+				filter(Optional::isPresent).
+				map(Optional::get).
+				filter(fo -> availableFields.contains(fo.getFieldName())).
+				collect(Collectors.toList());
 	}
 
-	protected <T> Function<String, Optional<OrderByComparator<T>>> parseOrder(
-		Function<String, Optional<Function<Boolean, OrderByComparator<T>>>> f) {
+	protected Optional<OrderBySelector.FieldOrder> parseOrder(String order) {
 
-		return order -> {
 			String[] split = order.split(":");
 
 			if (split.length != 2) {
@@ -91,8 +65,7 @@ public class OrderByComparatorProviderContextProvider
 
 			boolean asc = GetterUtil.getBoolean(split[1], false);
 
-			return f.apply(column).map(f2 -> f2.apply(asc));
-		};
+			return Optional.of(new OrderBySelector.FieldOrder(column, asc));
 	}
 
 }

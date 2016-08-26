@@ -14,22 +14,26 @@
 
 package com.liferay.document.library.jaxrs;
 
+import com.liferay.document.library.jaxrs.provider.OrderByComparatorSelectorUtil;
 import com.liferay.document.library.jaxrs.provider.OrderBySelector;
 import com.liferay.document.library.jaxrs.provider.PageContainer;
 import com.liferay.document.library.jaxrs.provider.Pagination;
+import com.liferay.document.library.jaxrs.provider.VariantUtil;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.RepositoryProvider;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.repository.model.RepositoryModel;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.comparator.GroupFriendlyURLComparator;
@@ -53,11 +57,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -74,20 +81,36 @@ public class DocumentLibraryRootResource {
 		value = "List groups", responseContainer = "List",
 		response = GroupRepr.class
 	)
-	public PageContainer<List<Group>> listGroups(
-			@Context Company company, @Context Pagination pagination,
+	public PageContainer<List<GroupRepr>> listGroups(
+			@Context Request request, @Context Company company,
+			@Context Pagination pagination,
 			@Context OrderBySelector orderBySelector)
 		throws PortalException {
 
+		Variant.VariantListBuilder variantListBuilder =
+			Variant.VariantListBuilder.newInstance();
+
+		variantListBuilder =
+			variantListBuilder.languages(
+				LanguageUtil.getAvailableLocales().toArray(new Locale[0])).
+				add();
+
+		List<Variant> variants = variantListBuilder.build();
+
+		Locale locale =
+			VariantUtil.safeSelectVariant(request, variants).
+				map(Variant::getLanguage).
+				orElse(LocaleUtil.getDefault());
+
 		OrderByComparator<Group> groupOrderByComparator =
-			orderBySelector.select(
-				fromMap(
-					new HashMap<String, Function<Boolean, OrderByComparator<Group>>>() {{
-						put("name", GroupNameComparator::new);
-						put("id", GroupIdComparator::new);
-						put("type", GroupTypeComparator::new);
-						put("url", GroupFriendlyURLComparator::new);
-					}})).
+			OrderByComparatorSelectorUtil.select(
+				orderBySelector,
+				new HashMap<String, Function<Boolean, OrderByComparator<Group>>>() {{
+					put("name", GroupNameComparator::new);
+					put("id", GroupIdComparator::new);
+					put("type", GroupTypeComparator::new);
+					put("url", GroupFriendlyURLComparator::new);
+				}}).
 				orElseGet(GroupIdComparator::new);
 
 		List<Group> userSitesGroups =
@@ -96,12 +119,20 @@ public class DocumentLibraryRootResource {
 		int maxSize =
 			pagination.getEndPosition() - pagination.getStartPosition();
 
+		UriBuilder uriBuilder = _uriInfo.getBaseUriBuilder().path("{groupId}");
+
 		return pagination.createContainer(
 			userSitesGroups.
 				stream().
 				skip(pagination.getStartPosition()).
 				limit(maxSize).
 				sorted(groupOrderByComparator).
+				map(group ->
+					new GroupRepr(
+						group.getGroupId(),
+						uriBuilder.build(group.getGroupId()).toString(),
+						group.getName(locale, true), group.getFriendlyURL(),
+						group.getType())).
 				collect(Collectors.toList()),
 			userSitesGroups.size());
 	}
@@ -139,6 +170,9 @@ public class DocumentLibraryRootResource {
 
 	@Context
 	protected HttpServletRequest _request;
+
+	@Context
+	protected UriInfo _uriInfo;
 
 	public class FileResource {
 		private FileEntry _fileEntry;
@@ -241,7 +275,8 @@ public class DocumentLibraryRootResource {
 			_repositoryId = folder.getRepositoryId();
 			_folderId = folder.getFolderId();
 			_folderReprFunction =
-				(contents) -> FolderRepr.fromFolder(folder, contents, _request);
+				(contents) -> FolderRepr.fromFolder(
+					folder, contents, _uriInfo.getBaseUriBuilder());
 		}
 
 		public FolderResource(final long groupId, final Repository repository) {
@@ -249,7 +284,8 @@ public class DocumentLibraryRootResource {
 			_folderId = 0;
 			_folderReprFunction =
 				(contents) -> FolderRepr.fromRepository(
-					groupId, repository, contents, _request);
+					groupId, repository, contents,
+					_uriInfo.getBaseUriBuilder());
 		}
 
 		@GET
@@ -258,21 +294,23 @@ public class DocumentLibraryRootResource {
 				@Context OrderBySelector orderBySelector)
 			throws PortalException {
 
-			OrderByComparator<Object> obc = orderBySelector.select(
-				fromMap(RepositoryContentObject.comparators)).
+			OrderByComparator<Object> orderByComparator =
+				OrderByComparatorSelectorUtil.select(
+					orderBySelector, RepositoryContentObject.comparators).
 				orElse(new RepositoryModelTitleComparator<>());
+
+			List<RepositoryContentObject> repositoryContentObjects =
+				dlAppService.getFoldersAndFileEntriesAndFileShortcuts(
+					_repositoryId, _folderId, 0, true,
+					pagination.getStartPosition(), pagination.getEndPosition(),
+					orderByComparator).
+				stream().
+					map(DocumentLibraryRootResource.this::toObjectRepository).
+					collect(Collectors.toList());
 
 			return pagination.createContainer(
 				_folderReprFunction.apply(
-					dlAppService.getFoldersAndFileEntriesAndFileShortcuts(
-						_repositoryId, _folderId, 0,
-						true, pagination.getStartPosition(),
-						pagination.getEndPosition(),
-						obc).
-					stream().
-					map(rco -> RepositoryContentObject.createContentObject(
-						rco, _request)).
-					collect(Collectors.toList())),
+					repositoryContentObjects),
 				dlAppService.getFoldersAndFileEntriesAndFileShortcutsCount(
 					_repositoryId, _folderId, 0, true)
 			);
@@ -338,6 +376,53 @@ public class DocumentLibraryRootResource {
 
 	}
 
+	protected RepositoryContentObject toObjectRepository(Object rco) {
+		UriBuilder uriBuilder =
+			_uriInfo.getBaseUriBuilder().path("objects");
+
+		if (rco instanceof FileEntry) {
+			FileEntry fileEntry = (FileEntry) rco;
+
+			String url = uriBuilder.path("files").
+				path(Long.toString(fileEntry.getFileEntryId())).
+				build().
+				toString();
+
+			return new RepositoryContentObject(
+				fileEntry.getFileEntryId(), fileEntry.getTitle(), url,
+				RepositoryContentObject.RepositoryContentType.FILE);
+
+		}
+		else if (rco instanceof Folder) {
+			Folder folder = (Folder) rco;
+
+			String url = uriBuilder.path("folders").
+				path(Long.toString(folder.getFolderId())).
+				build().
+				toString();
+
+			return new RepositoryContentObject(
+				folder.getFolderId(), folder.getName(), url,
+				RepositoryContentObject.RepositoryContentType.FOLDER);
+		}
+		else if (rco instanceof FileShortcut) {
+			FileShortcut fileShortcut = (FileShortcut) rco;
+
+			String url = uriBuilder.path("files").
+				path(Long.toString(fileShortcut.getToFileEntryId())).
+				build().
+				toString();
+
+			return new RepositoryContentObject(
+				fileShortcut.getFileShortcutId(), fileShortcut.getToTitle(),
+				url, RepositoryContentObject.RepositoryContentType.SHORTCUT);
+		}
+		else {
+			throw new IllegalArgumentException(
+				"Object must be an instance of FileEntry, Folder of FileShortcut");
+		}
+	}
+
 	/**
 	 * @author Carlos Sierra Andrés
 	 */
@@ -355,7 +440,8 @@ public class DocumentLibraryRootResource {
 			throws PortalException {
 
 			return _repositoryProvider.getGroupRepositories(_groupId).stream().
-				map(r -> RepositoryRepr.fromRepository(r, _request)).
+				map(r -> RepositoryRepr.fromRepository(
+					r, _uriInfo.getAbsolutePathBuilder().path("{id}"))).
 				collect(Collectors.toList());
 		}
 
@@ -370,5 +456,4 @@ public class DocumentLibraryRootResource {
 
 	}
 
-	public final <K, V> Function<K, Optional<V>> fromMap(Map<K, V> map) {return k -> Optional.ofNullable(map.get(k));}
 }

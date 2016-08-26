@@ -14,13 +14,12 @@
 
 package com.liferay.document.library.jaxrs.provider;
 
-import com.liferay.portal.kernel.util.HttpUtil;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
@@ -30,7 +29,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -96,43 +94,32 @@ public class PageContainerMessageBodyWriter implements MessageBodyWriter<PageCon
 
 		int currentPage = pageContainer.getCurrentPage();
 
-		String requestURL =
-			_httpServletRequest.getRequestURI() + "?" +
-			_httpServletRequest.getQueryString();
+		UriBuilder requestUriBuilder = _uriInfo.getRequestUriBuilder().
+			replaceQueryParam("per_page", pageContainer.getItemsPerPage());
 
 		if (pageContainer.hasNext()) {
-			String nextPageUrl = HttpUtil.setParameter(
-				requestURL, "page", currentPage + 1);
+			UriBuilder builder = requestUriBuilder.clone();
 
-			nextPageUrl = HttpUtil.setParameter(
-				nextPageUrl, "per_page", pageContainer.getItemsPerPage());
+			linkHeader.add(
+				link(
+					builder.replaceQueryParam(
+						"page", currentPage + 1), "next"));
 
-			linkHeader.add(link(nextPageUrl, "next"));
-
-			String lastPageUrl = HttpUtil.setParameter(
-				requestURL, "page", pageContainer.getLastPage());
-
-			lastPageUrl = HttpUtil.setParameter(
-				lastPageUrl, "per_page", pageContainer.getItemsPerPage());
-
-			linkHeader.add(link(lastPageUrl, "last"));
+			linkHeader.add(
+				link(
+					builder.replaceQueryParam(
+						"page", pageContainer.getLastPage()), "last"));
 		}
 
 		if (pageContainer.hasPrevious()) {
-			String prevPageUrl = HttpUtil.setParameter(
-				requestURL, "page", currentPage - 1);
+			UriBuilder builder = requestUriBuilder.clone();
 
-			prevPageUrl = HttpUtil.setParameter(
-				prevPageUrl, "per_page", pageContainer.getItemsPerPage());
+			linkHeader.add(
+				link(
+					builder.replaceQueryParam(
+						"page", currentPage - 1), "prev"));
 
-			linkHeader.add(link(prevPageUrl, "prev"));
-
-			String firstPageUrl = HttpUtil.setParameter(requestURL, "page", 1);
-
-			firstPageUrl = HttpUtil.setParameter(
-				firstPageUrl, "per_page", pageContainer.getItemsPerPage());
-
-			linkHeader.add(link(firstPageUrl, "first"));
+			linkHeader.add(link(builder.replaceQueryParam("page", 1), "first"));
 		}
 
 		httpHeaders.addAll("Link", linkHeader);
@@ -164,15 +151,16 @@ public class PageContainerMessageBodyWriter implements MessageBodyWriter<PageCon
 			genericType, annotations, mediaType, httpHeaders, entityStream);
 	}
 
-	private String link(String url, String rel) {
-		url = url.replace("&", "&amp;");
+	private String link(UriBuilder uriBuilder, String rel) {
 
-		return "<link href=\"" + url + "\" rel=\"" + rel + "\" />";
+		String uri = uriBuilder.build().toString();
+
+		return "<link href=\"" + uri + "\" rel=\"" + rel + "\" />";
 	}
 
 	@Context
 	Providers _providers;
 
 	@Context
-	HttpServletRequest _httpServletRequest;
+	UriInfo _uriInfo;
 }

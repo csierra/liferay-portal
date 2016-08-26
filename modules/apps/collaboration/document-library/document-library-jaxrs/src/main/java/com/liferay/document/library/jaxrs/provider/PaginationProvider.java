@@ -17,7 +17,6 @@ package com.liferay.document.library.jaxrs.provider;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 
-import java.util.Collection;
 import java.util.Map;
 
 import javax.ws.rs.ext.Provider;

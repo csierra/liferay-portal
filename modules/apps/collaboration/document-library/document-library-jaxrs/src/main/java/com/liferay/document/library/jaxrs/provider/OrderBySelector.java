@@ -14,16 +14,58 @@
 
 package com.liferay.document.library.jaxrs.provider;
 
-import com.liferay.portal.kernel.util.OrderByComparator;
-
-import java.util.Optional;
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Carlos Sierra Andrés
  */
 @FunctionalInterface
 public interface OrderBySelector {
-	public <T> Optional<OrderByComparator<T>> select(
-		Function<String, Optional<Function<Boolean, OrderByComparator<T>>>> function);
+
+	public List<FieldOrder> select(
+		Collection<String> availableFields);
+
+	public final class FieldOrder {
+
+		FieldOrder(String fieldName, boolean ascending) {
+			_fieldName = fieldName;
+			_ascending = ascending;
+		}
+
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			FieldOrder that = (FieldOrder) o;
+
+			if (_ascending != that._ascending) {
+				return false;
+			}
+			return _fieldName.equals(that._fieldName);
+
+		}
+
+		public int hashCode() {
+			int result = _fieldName.hashCode();
+			result = 31 * result + (_ascending ? 1 : 0);
+			return result;
+		}
+
+		public String getFieldName() {
+			return _fieldName;
+		}
+
+		public boolean isAscending() {
+			return _ascending;
+		}
+
+		private final String _fieldName;
+		private final boolean _ascending;
+	}
+
 }

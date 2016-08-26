@@ -6,10 +6,9 @@ import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleC
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.repository.model.RepositoryModel;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,42 +72,6 @@ public class RepositoryContentObject {
 
 	public enum RepositoryContentType {
 		FILE, FOLDER, SHORTCUT
-	}
-
-	public static RepositoryContentObject createContentObject(
-		Object object, HttpServletRequest httpServletRequest) {
-
-		if (object instanceof FileEntry) {
-			FileEntry fileEntry = (FileEntry)object;
-
-			return new RepositoryContentObject(
-				fileEntry.getFileEntryId(), fileEntry.getTitle(),
-				httpServletRequest.getContextPath() +
-					"/api/objects/files/" + fileEntry.getFileEntryId(),
-				RepositoryContentType.FILE);
-		}
-		else if (object instanceof Folder) {
-			Folder folder = (Folder)object;
-
-			return new RepositoryContentObject(
-				folder.getFolderId(), folder.getName(),
-				httpServletRequest.getContextPath() +
-					"/api/objects/folders/" + folder.getFolderId(),
-				RepositoryContentType.FOLDER);
-		}
-		else if (object instanceof FileShortcut) {
-			FileShortcut fileShortcut = (FileShortcut)object;
-
-			return new RepositoryContentObject(
-				fileShortcut.getFileShortcutId(), fileShortcut.getToTitle(),
-				httpServletRequest.getContextPath() +
-					"/api/objects/files/" + fileShortcut.getToFileEntryId(),
-				RepositoryContentType.SHORTCUT);
-		}
-		else {
-			throw new IllegalArgumentException(
-				"Object must be an instance of FileEntry, Folder of FileShortcut");
-		}
 	}
 
 	public static final Map<String, Function<Boolean, OrderByComparator<Object>>>

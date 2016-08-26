@@ -16,7 +16,7 @@ package com.liferay.document.library.jaxrs;
 
 import com.liferay.portal.kernel.repository.Repository;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
@@ -96,7 +96,7 @@ public class RepositoryRepr {
 	}
 
 	public static RepositoryRepr fromRepository(
-		Repository repository, HttpServletRequest request) {
+		Repository repository, UriBuilder uriBuilder) {
 
 		return new RepositoryRepr(
 			repository.getRepositoryId(),
@@ -104,7 +104,7 @@ public class RepositoryRepr {
 			"repository",
 			"repository",
 			"uuid",
-			request.getRequestURI() + "/" + repository.getRepositoryId()
+			uriBuilder.build(repository.getRepositoryId()).toString()
 			);
 	}
 
