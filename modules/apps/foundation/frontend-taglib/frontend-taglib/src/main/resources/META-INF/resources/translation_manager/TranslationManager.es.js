@@ -4,6 +4,8 @@ import core from 'metal/src/core';
 
 import Dropdown from 'metal-dropdown/src/Dropdown';
 
+import CompatibilityEventProxy from 'frontend-js-web/liferay/CompatibilityEventProxy.es'
+
 import templates from './TranslationManager.soy';
 
 class TranslationManager extends Component {
@@ -12,8 +14,6 @@ class TranslationManager extends Component {
 	 */
 	constructor(opt_config, opt_element) {
 		super(opt_config, opt_element);
-
-		this.eventTargets_ = [];
 
 		this.resetEditingLocale_();
 
@@ -44,7 +44,7 @@ class TranslationManager extends Component {
 	 * @param  {!Object} target
 	 */
 	addTarget(target) {
-		this.eventTargets_.push(target);
+		this.compatibilityEventProxy_.addTarget(target);
 	}
 
 	/**
@@ -112,44 +112,10 @@ class TranslationManager extends Component {
 	 *
 	 */
 	startCompatibility_() {
-		/**
-		 * Emit the yui-based event on editingLocale change
-		 */
-		this.on(
-			'editingLocaleChanged',
-			function(event) {
-				this.emit('editingLocaleChange', event);
-			}
-		);
-
-		/**
-		 * Emit the yui-based events to added targets
-		 */
-		this.on(
-			'*',
-			function(eventName, event) {
-				this.eventTargets_.forEach((target) => {
-					if (target.fire) {
-						if (core.isObject(event)) {
-							try {
-								event.target = this;
-							} catch(err) {}
-						}
-
-						let prefixedEventName = 'translationmanager:' + eventName;
-						let yuiEvent = target._yuievt.events[prefixedEventName];
-						
-						if(yuiEvent) {
-							yuiEvent.emitFacade = false;
-						}
-
-						target.fire(prefixedEventName, event);
-
-						if(yuiEvent) {
-							yuiEvent.emitFacade = true;
-						}					
-					}
-				});
+		this.compatibilityEventProxy_ = new CompatibilityEventProxy(
+			{
+				host: this,
+				namespace: 'translationmanager'
 			}
 		);
 	}
