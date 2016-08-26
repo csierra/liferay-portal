@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
 import java.util.Map;
@@ -105,7 +106,7 @@ public class FileRepr {
 	}
 
 	public static FileRepr fromFileEntry(
-		FileEntry fileEntry, HttpServletRequest request) {
+		FileEntry fileEntry, UriBuilder uriBuilder) {
 
 		return new FileRepr(
 			fileEntry.getFileEntryId(),
@@ -113,7 +114,7 @@ public class FileRepr {
 			fileEntry.getFileName(),
 			fileEntry.getTitle(),
 			fileEntry.getSize(),
-			request.getContextPath() + "/api/objects/" + fileEntry.getUuid());
+			uriBuilder.build(fileEntry.getUuid()).toString());
 	}
 
 	public static final Map<String, OrderByComparator<?>> comparators =
