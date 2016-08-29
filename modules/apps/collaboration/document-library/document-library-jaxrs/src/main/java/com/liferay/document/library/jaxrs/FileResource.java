@@ -28,10 +28,12 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -39,17 +41,20 @@ import javax.ws.rs.core.UriInfo;
  */
 public class FileResource {
 
-	public FileResource(DLAppService dlAppService, FileEntry fileEntry) {
-		_dlAppService = dlAppService;
+	public FileResource(
+		DLAppService dlAppService, UriBuilder fileUriBuilder,
+		FileEntry fileEntry) {
 
+		_dlAppService = dlAppService;
+		_fileUriBuilder = fileUriBuilder;
 		_fileEntry = fileEntry;
 	}
 
 	@GET
 	@Path("/")
-	public FileRepr getFileEntry(@Context UriInfo uriInfo) {
-		return FileRepr.fromFileEntry(
-			_fileEntry, uriInfo.getAbsolutePathBuilder().path("{id}"));
+	@Produces({"application/json", "application/xml"})
+	public FileRepr getFileEntry() {
+		return FileRepr.fromFileEntry(_fileEntry, _fileUriBuilder);
 	}
 
 	@GET
@@ -65,11 +70,9 @@ public class FileResource {
 	@PUT
 	@Path("/content")
 	public FileRepr updateFile(
-		@Context HttpServletRequest httpServletRequest,
-		@Context UriInfo uriInfo,
-		byte[] bytes,
-		@QueryParam("changelog") String changelog,
-		@QueryParam("majorVersion") boolean majorVersion)
+			@Context HttpServletRequest httpServletRequest, byte[] bytes,
+			@QueryParam("changelog") String changelog,
+			@QueryParam("majorVersion") boolean majorVersion)
 		throws PortalException {
 
 		changelog = GetterUtil.get(changelog, StringPool.BLANK);
@@ -79,16 +82,14 @@ public class FileResource {
 				_fileEntry.getFileEntryId(), _fileEntry.getFileName(),
 				httpServletRequest.getContentType(), _fileEntry.getTitle(),
 				_fileEntry.getDescription(), changelog, majorVersion,
-				bytes, new ServiceContext()),
-			uriInfo.getAbsolutePathBuilder().path("{id}"));
+				bytes, new ServiceContext()), _fileUriBuilder);
 	}
 
 	@PUT
 	@Consumes({"application/json", "application/xml"})
 	public FileRepr updateMetadata(
-		@Context UriInfo uriInfo,
-		FileRepr fileRepr, @QueryParam("changelog") String changelog,
-		@QueryParam("majorVersion") boolean majorVersion)
+			FileRepr fileRepr, @QueryParam("changelog") String changelog,
+			@QueryParam("majorVersion") boolean majorVersion)
 		throws PortalException {
 
 		return FileRepr.fromFileEntry(
@@ -97,18 +98,16 @@ public class FileResource {
 				_fileEntry.getMimeType(), fileRepr.getTitle(),
 				fileRepr.getDescription(), changelog, majorVersion,
 				_fileEntry.getContentStream(), _fileEntry.getSize(),
-				new ServiceContext()),
-			uriInfo.getAbsolutePathBuilder().path("{id}"));
+				new ServiceContext()), _fileUriBuilder);
 	}
 
 	@PUT
 	@Consumes("multipart/form-data")
 	public FileRepr updateMetadata(
-		@Context UriInfo uriInfo,
-		@Multipart("metadata") FileRepr fileRepr,
-		@Multipart("content") Attachment attachment,
-		@Multipart(value = "changelog", required = false) String changelog,
-		@Multipart(value = "majorVersion", required = false)
+			@Multipart("metadata") FileRepr fileRepr,
+			@Multipart("content") Attachment attachment,
+			@Multipart(value = "changelog", required = false) String changelog,
+			@Multipart(value = "majorVersion", required = false)
 		boolean majorVersion)
 		throws PortalException {
 
@@ -129,10 +128,11 @@ public class FileResource {
 				attachment.getContentType().getType(), fileRepr.getTitle(),
 				fileRepr.getDescription(), changelog, majorVersion,
 				attachment.getObject(byte[].class), new ServiceContext()),
-			uriInfo.getAbsolutePathBuilder().path("{id}"));
+			_fileUriBuilder);
 	}
 
 	private DLAppService _dlAppService;
 	private FileEntry _fileEntry;
-	
+	private UriBuilder _fileUriBuilder;
+
 }

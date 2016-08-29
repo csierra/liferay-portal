@@ -35,7 +35,8 @@ import java.util.List;
  * @author Carlos Sierra Andrés
  */
 @Provider
-public class PageContainerMessageBodyWriter implements MessageBodyWriter<PageContainer<?>> {
+public class PageContainerMessageBodyWriter
+	implements MessageBodyWriter<PageContainer<?>> {
 
 	@Override
 	public boolean isWriteable(

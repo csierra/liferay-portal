@@ -1,6 +1,7 @@
 package com.liferay.document.library.jaxrs;
 
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelCreateDateComparator;
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelModifiedDateComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelSizeComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -10,6 +11,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -24,18 +26,32 @@ public class RepositoryContentObject {
 	}
 
 	public RepositoryContentObject(
-		long id, String title, String url, RepositoryContentType type) {
+		long id, String title, String url, RepositoryContentType type,
+		Date createDate, Date modifiedDate) {
 
 		_id = id;
 		_title = title;
 		_url = url;
 		_type = type;
+		_createDate = createDate;
+		_modifiedDate = modifiedDate;
 	}
 
-	private long _id;
-	private String _title;
-	private String _url;
-	private RepositoryContentType _type;
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
+	public Date getModifiedDate() {
+		return _modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		_modifiedDate = modifiedDate;
+	}
 
 	public String getUrl() {
 		return _url;
@@ -71,14 +87,22 @@ public class RepositoryContentObject {
 	}
 
 	public enum RepositoryContentType {
-		FILE, FOLDER, SHORTCUT
+		FILE, FOLDER, SHORTCUT;
 	}
 
 	public static final Map<String, Function<Boolean, OrderByComparator<Object>>>
 		comparators =
 			new HashMap<String, Function<Boolean, OrderByComparator<Object>>>() {{
 				put("title", RepositoryModelTitleComparator::new);
-				put("date", RepositoryModelCreateDateComparator::new);
+				put("createDate", RepositoryModelCreateDateComparator::new);
+				put("modifiedDate", RepositoryModelModifiedDateComparator::new);
 				put("size", RepositoryModelSizeComparator::new);
 			}};
+
+	private Date _createDate;
+	private long _id;
+	private Date _modifiedDate;
+	private String _title;
+	private RepositoryContentType _type;
+	private String _url;
 }

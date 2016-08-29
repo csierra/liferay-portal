@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.repository.RepositoryProvider;
 import com.liferay.portal.kernel.service.GroupService;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.comparator.GroupFriendlyURLComparator;
@@ -40,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriBuilder;
@@ -73,6 +75,7 @@ public class DocumentLibraryRootResource {
 		value = "List groups", responseContainer = "List",
 		response = GroupRepr.class
 	)
+	@Produces({"application/json", "application/xml"})
 	public PageContainer<List<GroupRepr>> listGroups(
 			@Context Company company,
 			@Context OrderBySelector orderBySelector,
@@ -102,7 +105,7 @@ public class DocumentLibraryRootResource {
 			orElseGet(GroupIdComparator::new);
 
 		List<Group> userSitesGroups =
-			_groupService.getUserSitesGroups();
+			groupService.getUserSitesGroups();
 
 		int maxSize =
 			pagination.getEndPosition() - pagination.getStartPosition();
@@ -137,7 +140,8 @@ public class DocumentLibraryRootResource {
 		throws PortalException {
 
 		return new FileResource(
-			dlAppService, dlAppService.getFileEntry(fileId));
+			dlAppService, uriInfo.getRequestUriBuilder(),
+			dlAppService.getFileEntry(fileId));
 	}
 
 	@Path("/objects/folders/{folderId}")
@@ -145,8 +149,14 @@ public class DocumentLibraryRootResource {
 			@PathParam("folderId") long folderId)
 		throws PortalException {
 
+		UriBuilder baseUriBuilder = uriInfo.getBaseUriBuilder();
+
 		return new FolderResource(
-			dlAppService, dlAppService.getFolder(folderId));
+			dlAppService, dlAppService.getFolder(folderId),
+			baseUriBuilder.clone().path(
+				DocumentLibraryRootResource.class, "getFolderResource"),
+			baseUriBuilder.clone().path(
+				DocumentLibraryRootResource.class, "getFileResource"));
 	}
 
 	/**
@@ -162,14 +172,14 @@ public class DocumentLibraryRootResource {
 
 		@GET
 		@Path("/")
-		public List<RepositoryRepr> getDefaultRepositoryHandler(
-				@Context UriInfo uriInfo)
+		@Produces({"application/json", "application/xml"})
+		public List<RepositoryRepr> getDefaultRepositoryHandler()
 			throws PortalException {
 
-			return _repositoryProvider.getGroupRepositories(_groupId).stream().
-				map(r -> RepositoryRepr.fromRepository(
-					r, uriInfo.getAbsolutePathBuilder().path("{id}"))).
-				collect(Collectors.toList());
+			return ListUtil.toList(
+				repositoryProvider.getGroupRepositories(_groupId),
+				r -> RepositoryRepr.fromRepository(
+					r, uriInfo.getRequestUriBuilder().path("{id}")));
 		}
 
 		@Path("/{repositoryId}")
@@ -177,20 +187,27 @@ public class DocumentLibraryRootResource {
 				@PathParam("repositoryId") long repositoryId)
 			throws PortalException {
 
+			UriBuilder baseUriBuilder = uriInfo.getBaseUriBuilder();
+
 			return new FolderResource(
 				dlAppService, _groupId,
-				_repositoryProvider.getRepository(repositoryId));
+				repositoryProvider.getRepository(repositoryId),
+					uriInfo.getRequestUriBuilder(),
+				baseUriBuilder.clone().path(
+					DocumentLibraryRootResource.class, "getFolderResource"),
+				baseUriBuilder.clone().path(
+					DocumentLibraryRootResource.class, "getFileResource"));
 		}
 
 	}
 
 	@Reference
 	protected DLAppService dlAppService;
-
 	@Reference
-	protected GroupService _groupService;
-
+	protected GroupService groupService;
 	@Reference
-	protected RepositoryProvider _repositoryProvider;
+	protected RepositoryProvider repositoryProvider;
+	@Context
+	protected UriInfo uriInfo;
 
 }

@@ -115,10 +115,7 @@ public class FolderRepr {
 		UriBuilder uriBuilder) {
 
 		String url = uriBuilder.
-			path("objects").
-			path("folders").
-			path(Long.toString(folder.getFolderId())).
-			build().
+			build(Long.toString(folder.getFolderId())).
 			toString();
 
 		return new FolderRepr(
@@ -136,9 +133,9 @@ public class FolderRepr {
 		UriBuilder uriBuilder) {
 
 		String url = uriBuilder.
-			path(Long.toString(groupId)).
-			path(Long.toString(repository.getRepositoryId())).
-			build().
+			build(
+				Long.toString(groupId),
+				Long.toString(repository.getRepositoryId())).
 			toString();
 
 		return new FolderRepr(

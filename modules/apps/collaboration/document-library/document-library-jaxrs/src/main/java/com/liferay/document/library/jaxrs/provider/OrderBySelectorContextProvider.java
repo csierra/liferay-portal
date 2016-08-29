@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * @author Carlos Sierra Andrés
  */
 @Provider
-public class OrderByComparatorProviderContextProvider
+public class OrderBySelectorContextProvider
 	implements ContextProvider<OrderBySelector> {
 
 	@Override
