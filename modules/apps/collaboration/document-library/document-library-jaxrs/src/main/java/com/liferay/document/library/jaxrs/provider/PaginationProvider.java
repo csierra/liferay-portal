@@ -51,6 +51,7 @@ public class PaginationProvider implements ContextProvider<Pagination> {
 	}
 
 	private static class DefaultPagination implements Pagination {
+
 		public DefaultPagination(int page, int itemsPerPage) {
 			_page = page;
 			_itemsPerPage = itemsPerPage;

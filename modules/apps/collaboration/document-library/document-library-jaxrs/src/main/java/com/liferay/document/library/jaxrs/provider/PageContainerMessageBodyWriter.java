@@ -14,6 +14,16 @@
 
 package com.liferay.document.library.jaxrs.provider;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -23,13 +33,6 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Carlos Sierra Andrés
@@ -56,13 +59,13 @@ public class PageContainerMessageBodyWriter
 			Type targetType = parameterizedType.getActualTypeArguments()[0];
 
 			if (targetType instanceof ParameterizedType) {
-				ParameterizedType para = (ParameterizedType) targetType;
+				ParameterizedType para = (ParameterizedType)targetType;
 
 				targetClass = (Class<?>)para.getRawType();
 				genericType = para;
 			}
 			else {
-				targetClass = (Class<?>) targetType;
+				targetClass = (Class<?>)targetType;
 				genericType = targetType;
 			}
 		}
@@ -132,9 +135,9 @@ public class PageContainerMessageBodyWriter
 		Class<Object> targetClass = null;
 
 		if (targetType instanceof ParameterizedType) {
-			ParameterizedType para = (ParameterizedType) targetType;
+			ParameterizedType para = (ParameterizedType)targetType;
 
-			targetClass = (Class<Object>) para.getRawType();
+			targetClass = (Class<Object>)para.getRawType();
 			genericType = para;
 		}
 		else {
@@ -148,8 +151,8 @@ public class PageContainerMessageBodyWriter
 				targetClass, genericType, annotations, mediaType);
 
 		messageBodyWriter.writeTo(
-			pageContainer.getContainer(), targetClass,
-			genericType, annotations, mediaType, httpHeaders, entityStream);
+			pageContainer.getContainer(), targetClass, genericType, annotations,
+			mediaType, httpHeaders, entityStream);
 	}
 
 	private String link(UriBuilder uriBuilder, String rel) {

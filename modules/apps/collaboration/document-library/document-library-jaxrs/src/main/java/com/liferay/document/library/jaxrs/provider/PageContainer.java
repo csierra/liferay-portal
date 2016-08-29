@@ -28,6 +28,10 @@ public class PageContainer<T> {
 		_itemsPerPage = itemsPerPage;
 	}
 
+	public T getContainer() {
+		return _container;
+	}
+
 	public int getCurrentPage() {
 		return _currentPage;
 	}
@@ -45,15 +49,19 @@ public class PageContainer<T> {
 	}
 
 	public boolean hasNext() {
-		return getLastPage() > _currentPage;
+		if (getLastPage() > _currentPage) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean hasPrevious() {
-		return _currentPage > 1;
-	}
+		if (_currentPage > 1) {
+			return true;
+		}
 
-	public T getContainer() {
-		return _container;
+		return false;
 	}
 
 	private final T _container;

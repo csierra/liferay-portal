@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+
 import java.util.Optional;
 
 import javax.ws.rs.Produces;
@@ -48,8 +49,7 @@ public class OptionalBodyWriter implements MessageBodyWriter<Optional<?>> {
 		return Response.
 			status(422).
 			entity(new ResourceMissingEntity(
-				"Not found", resourceName, ""
-			)).build();
+				"Not found", resourceName, "")).build();
 	}
 
 	public static Class<?> getTargetClass(Class<?> type, Type genericType) {

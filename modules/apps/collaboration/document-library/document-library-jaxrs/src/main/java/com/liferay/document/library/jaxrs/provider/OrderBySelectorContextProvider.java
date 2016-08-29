@@ -15,15 +15,18 @@
 package com.liferay.document.library.jaxrs.provider;
 
 import com.liferay.portal.kernel.util.GetterUtil;
-import org.apache.cxf.jaxrs.ext.ContextProvider;
-import org.apache.cxf.message.Message;
 
-import javax.servlet.ServletRequest;
-import javax.ws.rs.ext.Provider;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.servlet.ServletRequest;
+
+import javax.ws.rs.ext.Provider;
+
+import org.apache.cxf.jaxrs.ext.ContextProvider;
+import org.apache.cxf.message.Message;
 
 /**
  * @author Carlos Sierra Andrés
@@ -34,38 +37,36 @@ public class OrderBySelectorContextProvider
 
 	@Override
 	public OrderBySelector createContext(Message message) {
-		ServletRequest request =
-			(ServletRequest) message.getContextualProperty(
-				"HTTP.REQUEST");
+		ServletRequest request = (ServletRequest)message.getContextualProperty(
+"HTTP.REQUEST");
 
-		String[] orders = request.getParameterValues("order");
+String[] orders = request.getParameterValues("order");
 
-		if (orders == null) {
-			return availableFields -> Collections.emptyList();
-		}
+if (orders == null) {
+return availableFields -> Collections.emptyList();
+}
 
-		return availableFields ->
-			Arrays.stream(orders).
-				map(this::parseOrder).
-				filter(Optional::isPresent).
-				map(Optional::get).
-				filter(fo -> availableFields.contains(fo.getFieldName())).
-				collect(Collectors.toList());
-	}
+return availableFields ->
+Arrays.stream(orders).
+map(this::parseOrder).
+filter(Optional::isPresent).
+map(Optional::get).
+filter(fo -> availableFields.contains(fo.getFieldName())).
+collect(Collectors.toList());
+}
 
-	protected Optional<OrderBySelector.FieldOrder> parseOrder(String order) {
+protected Optional<OrderBySelector.FieldOrder> parseOrder(String order) {
+String[] split = order.split(":");
 
-			String[] split = order.split(":");
+if (split.length != 2) {
+return Optional.empty();
+}
 
-			if (split.length != 2) {
-				return Optional.empty();
-			}
+String column = split[0];
 
-			String column = split[0];
+boolean asc = GetterUtil.getBoolean(split[1], false);
 
-			boolean asc = GetterUtil.getBoolean(split[1], false);
-
-			return Optional.of(new OrderBySelector.FieldOrder(column, asc));
-	}
+return Optional.of(new OrderBySelector.FieldOrder(column, asc));
+}
 
 }

@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
@@ -29,14 +29,24 @@ import java.util.List;
  */
 public class AggregateOrderByComparator<T> extends OrderByComparator<T> {
 
-	private List<OrderByComparator<T>> _comparators;
+	public AggregateOrderByComparator(List<OrderByComparator<T>> comparators) {
+		_comparators = new ArrayList<>(comparators);
+	}
 
-	public AggregateOrderByComparator(OrderByComparator<T> ... comparators) {
+	public AggregateOrderByComparator(OrderByComparator<T>... comparators) {
 		_comparators = new ArrayList<>(Arrays.asList(comparators));
 	}
 
-	public AggregateOrderByComparator(List<OrderByComparator<T>> comparators) {
-		_comparators = new ArrayList<>(comparators);
+	public int compare(T o1, T o2) {
+		for (OrderByComparator<T> comparator : _comparators) {
+			int compare = comparator.compare(o1, o2);
+
+			if (compare != 0) {
+				return compare;
+			}
+		}
+
+		return 0;
 	}
 
 	public String getOrderBy() {
@@ -59,20 +69,10 @@ public class AggregateOrderByComparator<T> extends OrderByComparator<T> {
 		return sb.toString();
 	}
 
-	public int compare(T o1, T o2) {
-		for (OrderByComparator<T> comparator : _comparators) {
-			int compare = comparator.compare(o1, o2);
-
-			if (compare != 0) {
-				return compare;
-			}
-		}
-
-		return 0;
-	}
-
 	public Comparator<T> reversed() {
 		return Collections.reverseOrder(this);
 	}
+
+	private final List<OrderByComparator<T>> _comparators;
 
 }

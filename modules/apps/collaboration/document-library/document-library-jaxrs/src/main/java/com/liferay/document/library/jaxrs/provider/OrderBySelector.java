@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
@@ -23,8 +23,7 @@ import java.util.List;
 @FunctionalInterface
 public interface OrderBySelector {
 
-	public List<FieldOrder> select(
-		Collection<String> availableFields);
+	public List<FieldOrder> select(Collection<String> availableFields);
 
 	public final class FieldOrder {
 
@@ -37,17 +36,22 @@ public interface OrderBySelector {
 			if (this == o) {
 				return true;
 			}
+
 			if (o == null || getClass() != o.getClass()) {
 				return false;
 			}
 
-			FieldOrder that = (FieldOrder) o;
+			FieldOrder that = (FieldOrder)o;
 
 			if (_ascending != that._ascending) {
 				return false;
 			}
-			return _fieldName.equals(that._fieldName);
 
+			return _fieldName.equals(that._fieldName);
+		}
+
+		public String getFieldName() {
+			return _fieldName;
 		}
 
 		public int hashCode() {
@@ -56,16 +60,13 @@ public interface OrderBySelector {
 			return result;
 		}
 
-		public String getFieldName() {
-			return _fieldName;
-		}
-
 		public boolean isAscending() {
 			return _ascending;
 		}
 
-		private final String _fieldName;
 		private final boolean _ascending;
+		private final String _fieldName;
+
 	}
 
 }

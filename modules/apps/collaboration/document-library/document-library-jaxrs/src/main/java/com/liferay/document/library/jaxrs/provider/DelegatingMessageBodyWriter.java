@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
@@ -16,24 +16,28 @@ package com.liferay.document.library.jaxrs.provider;
 
 import com.liferay.document.library.jaxrs.GroupRepr;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public abstract class DelegatingMessageBodyWriter<F, T> implements MessageBodyWriter<Object> {
+public abstract class DelegatingMessageBodyWriter<F, T>
+	implements MessageBodyWriter<Object> {
 
 	protected abstract Class<F> getOriginClass();
 
@@ -56,8 +60,9 @@ public abstract class DelegatingMessageBodyWriter<F, T> implements MessageBodyWr
 	}
 
 	public void writeTo(
-		Object object, Class<?> type, Type genericType, Annotation[] annotations,
-		MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
+		Object object, Class<?> type, Type genericType,
+		Annotation[] annotations, MediaType mediaType,
+		MultivaluedMap<String, Object> httpHeaders,
 		OutputStream entityStream) throws IOException, WebApplicationException {
 
 		if (Collection.class.isAssignableFrom(type)) {
@@ -65,17 +70,19 @@ public abstract class DelegatingMessageBodyWriter<F, T> implements MessageBodyWr
 				_providers.getMessageBodyWriter(
 					Collection.class,
 					new ParameterizedType() {
+
 						public Type[] getActualTypeArguments() {
-							return new Class[]{getDestination()};
+							return new Class[] {getDestination()};
+						}
+
+						public Type getOwnerType() {
+							return null;
 						}
 
 						public Type getRawType() {
 							return Collection.class;
 						}
 
-						public Type getOwnerType() {
-							return null;
-						}
 					},
 					annotations, mediaType);
 
@@ -85,7 +92,8 @@ public abstract class DelegatingMessageBodyWriter<F, T> implements MessageBodyWr
 				this::map).collect(Collectors.toList());
 
 			collectionMessageBodyWriter.writeTo(
-				collection, Collection.class,
+				collection,
+				Collection.class,
 					GroupRepr.class, annotations, mediaType,
 				httpHeaders, entityStream);
 		}
@@ -97,8 +105,8 @@ public abstract class DelegatingMessageBodyWriter<F, T> implements MessageBodyWr
 			Object destination = map((F)object);
 
 			messageBodyWriter.writeTo(
-				destination, getDestination(), type, annotations,
-				mediaType, httpHeaders, entityStream);
+				destination, getDestination(), type, annotations, mediaType,
+				httpHeaders, entityStream);
 		}
 	}
 

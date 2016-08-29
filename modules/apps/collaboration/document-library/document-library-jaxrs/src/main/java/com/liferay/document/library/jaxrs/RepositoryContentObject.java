@@ -1,26 +1,46 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
 package com.liferay.document.library.jaxrs;
 
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelCreateDateComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelModifiedDateComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelSizeComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
-import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.FileShortcut;
-import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
-import javax.ws.rs.core.UriBuilder;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by sergiogonzalez on 26/07/16.
  */
 @XmlRootElement
 public class RepositoryContentObject {
+
+	public static final Map<String, Function<Boolean, OrderByComparator<Object>>>
+		comparators =
+			new HashMap<String, Function<Boolean, OrderByComparator<Object>>>() { {
+				put("title", RepositoryModelTitleComparator::new);
+				put("createDate", RepositoryModelCreateDateComparator::new);
+				put("modifiedDate", RepositoryModelModifiedDateComparator::new);
+				put("size", RepositoryModelSizeComparator::new);
+			}};
 
 	public RepositoryContentObject() {
 	}
@@ -41,63 +61,54 @@ public class RepositoryContentObject {
 		return _createDate;
 	}
 
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
+	public long getId() {
+		return _id;
 	}
 
 	public Date getModifiedDate() {
 		return _modifiedDate;
 	}
 
-	public void setModifiedDate(Date modifiedDate) {
-		_modifiedDate = modifiedDate;
-	}
-
-	public String getUrl() {
-		return _url;
-	}
-
-	public void setUrl(String url) {
-		_url = url;
+	public String getTitle() {
+		return _title;
 	}
 
 	public RepositoryContentType getType() {
 		return _type;
 	}
 
-	public void setType(
-		RepositoryContentType type) {
-		_type = type;
+	public String getUrl() {
+		return _url;
 	}
 
-	public long getId() {
-		return _id;
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
 	}
 
 	public void setId(long id) {
 		_id = id;
 	}
 
-	public String getTitle() {
-		return _title;
+	public void setModifiedDate(Date modifiedDate) {
+		_modifiedDate = modifiedDate;
 	}
 
 	public void setTitle(String title) {
 		_title = title;
 	}
 
-	public enum RepositoryContentType {
-		FILE, FOLDER, SHORTCUT;
+	public void setType(RepositoryContentType type) {
+		_type = type;
 	}
 
-	public static final Map<String, Function<Boolean, OrderByComparator<Object>>>
-		comparators =
-			new HashMap<String, Function<Boolean, OrderByComparator<Object>>>() {{
-				put("title", RepositoryModelTitleComparator::new);
-				put("createDate", RepositoryModelCreateDateComparator::new);
-				put("modifiedDate", RepositoryModelModifiedDateComparator::new);
-				put("size", RepositoryModelSizeComparator::new);
-			}};
+	public void setUrl(String url) {
+		_url = url;
+	}
+
+	public enum RepositoryContentType {
+
+		FILE, FOLDER, SHORTCUT;
+	}
 
 	private Date _createDate;
 	private long _id;
@@ -105,4 +116,5 @@ public class RepositoryContentObject {
 	private String _title;
 	private RepositoryContentType _type;
 	private String _url;
+
 }

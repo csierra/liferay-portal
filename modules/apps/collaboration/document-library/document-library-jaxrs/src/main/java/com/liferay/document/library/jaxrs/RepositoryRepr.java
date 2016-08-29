@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
@@ -16,9 +16,11 @@ package com.liferay.document.library.jaxrs;
 
 import com.liferay.portal.kernel.repository.Repository;
 
-import javax.ws.rs.core.UriBuilder;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
+
+import javax.ws.rs.core.UriBuilder;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Carlos Sierra Andrés
@@ -26,44 +28,17 @@ import java.util.Date;
 @XmlRootElement
 public class RepositoryRepr {
 
-	private Date _createDate;
-	private String _description;
-	private String _name;
+	public static RepositoryRepr fromRepository(
+		Repository repository, UriBuilder uriBuilder) {
 
-	public String getUuid() {
-		return _uuid;
+		return new RepositoryRepr(
+			repository.getRepositoryId(), new Date(), "repository",
+			"repository", "uuid",
+			uriBuilder.build(repository.getRepositoryId()).toString());
 	}
 
-	public void setUuid(String uuid) {
-		_uuid = uuid;
+	public RepositoryRepr() {
 	}
-
-	public String getName() {
-		return _name;
-	}
-
-	public void setName(String name) {
-		_name = name;
-	}
-
-	public String getDescription() {
-		return _description;
-	}
-
-	public void setDescription(String description) {
-		_description = description;
-	}
-
-	public Date getCreateDate() {
-		return _createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
-
-	private String _uuid;
-	private long _repositoryId;
 
 	public RepositoryRepr(
 		long repositoryId, Date createDate, String description, String name,
@@ -77,15 +52,17 @@ public class RepositoryRepr {
 		_url = url;
 	}
 
-	public void setUrl(String url) {
-		_url = url;
+	public Date getCreateDate() {
+		return _createDate;
 	}
 
-	public void setRepositoryId(long repositoryId) {
-		_repositoryId = repositoryId;
+	public String getDescription() {
+		return _description;
 	}
 
-	private String _url;
+	public String getName() {
+		return _name;
+	}
 
 	public long getRepositoryId() {
 		return _repositoryId;
@@ -95,19 +72,39 @@ public class RepositoryRepr {
 		return _url;
 	}
 
-	public static RepositoryRepr fromRepository(
-		Repository repository, UriBuilder uriBuilder) {
-
-		return new RepositoryRepr(
-			repository.getRepositoryId(),
-			new Date(),
-			"repository",
-			"repository",
-			"uuid",
-			uriBuilder.build(repository.getRepositoryId()).toString()
-			);
+	public String getUuid() {
+		return _uuid;
 	}
 
-	public RepositoryRepr() {
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
 	}
+
+	public void setDescription(String description) {
+		_description = description;
+	}
+
+	public void setName(String name) {
+		_name = name;
+	}
+
+	public void setRepositoryId(long repositoryId) {
+		_repositoryId = repositoryId;
+	}
+
+	public void setUrl(String url) {
+		_url = url;
+	}
+
+	public void setUuid(String uuid) {
+		_uuid = uuid;
+	}
+
+	private Date _createDate;
+	private String _description;
+	private String _name;
+	private long _repositoryId;
+	private String _url;
+	private String _uuid;
+
 }

@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
@@ -29,10 +29,12 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
+import java.util.List;
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -43,8 +45,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import java.util.List;
-import java.util.function.Function;
+
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 /**
  * @author Carlos Sierra Andrés
@@ -61,16 +64,14 @@ public class FolderResource {
 		_folderId = folder.getFolderId();
 
 		_repositoryId = folder.getRepositoryId();
-		_folderReprFunction =
-			contents -> FolderRepr.fromFolder(
-				folder, contents, _folderUriBuilder);
+		_folderReprFunction = contents -> FolderRepr.fromFolder(
+			folder, contents, _folderUriBuilder);
 	}
 
 	public FolderResource(
 		DLAppService dlAppService, final long groupId,
-		final Repository repository,
-		UriBuilder repositoryUriBuilder, UriBuilder folderUriBuilder,
-		UriBuilder fileUriBuilder) {
+		final Repository repository, UriBuilder repositoryUriBuilder,
+		UriBuilder folderUriBuilder, UriBuilder fileUriBuilder) {
 
 		_dlAppService = dlAppService;
 		_folderUriBuilder = folderUriBuilder;
@@ -78,16 +79,15 @@ public class FolderResource {
 
 		_repositoryId = repository.getRepositoryId();
 		_folderId = 0;
-		_folderReprFunction =
-			contents -> FolderRepr.fromRepository(
-				groupId, repository, contents, repositoryUriBuilder);
+		_folderReprFunction = contents -> FolderRepr.fromRepository(
+			groupId, repository, contents, repositoryUriBuilder);
 	}
 
 	@POST
 	public FileRepr addFile(
-		@Multipart("metadata") FileRepr fileRepr,
-		@Multipart("content") Attachment attachment,
-		@Multipart(value = "changelog", required = false) String changelog)
+			@Multipart("metadata") FileRepr fileRepr,
+			@Multipart("content") Attachment attachment,
+			@Multipart(value = "changelog", required = false) String changelog)
 		throws PortalException {
 
 		if ((fileRepr == null) || (attachment == null)) {
@@ -95,24 +95,23 @@ public class FolderResource {
 				Response.
 					status(400).
 					entity("Request is not properly built" +
-						   "We expect a multipart/form-data request with" +
-						   "metadata and content fields").build());
+						"We expect a multipart/form-data request with" +
+						"metadata and content fields").build());
 		}
 
 		changelog = GetterUtil.getString(changelog);
 
 		return FileRepr.fromFileEntry(
 			_dlAppService.addFileEntry(
-				_repositoryId, _folderId,
-				fileRepr.getFileName(),
+				_repositoryId, _folderId, fileRepr.getFileName(),
 				attachment.getContentType().getType(), fileRepr.getTitle(),
 				fileRepr.getDescription(), changelog,
 				attachment.getObject(byte[].class), new ServiceContext()),
 			_fileUriBuilder);
 	}
 
-	@POST
 	@Path("/{fileName}")
+	@POST
 	public FileRepr addFile(
 			@Context HttpServletRequest httpServletRequest, byte[] content,
 			@PathParam("fileName") String fileName,
@@ -134,8 +133,7 @@ public class FolderResource {
 
 		return FileRepr.fromFileEntry(
 			_dlAppService.addFileEntry(
-				_repositoryId, _folderId,
-				fileName,
+				_repositoryId, _folderId, fileName,
 				httpServletRequest.getContentType(), title, description,
 				changelog, content, new ServiceContext()), _fileUriBuilder);
 	}
@@ -143,8 +141,8 @@ public class FolderResource {
 	@GET
 	@Produces({"application/json", "application/xml"})
 	public PageContainer<FolderRepr> getFolder(
-		@Context Pagination pagination,
-		@Context OrderBySelector orderBySelector)
+			@Context Pagination pagination,
+			@Context OrderBySelector orderBySelector)
 		throws PortalException {
 
 		OrderByComparator<Object> orderByComparator =
@@ -160,35 +158,32 @@ public class FolderResource {
 					orderByComparator),
 				this::toObjectRepository);
 
-
 		return pagination.createContainer(
 			_folderReprFunction.apply(repositoryContentObjects),
 			_dlAppService.getFoldersAndFileEntriesAndFileShortcutsCount(
-				_repositoryId, _folderId, 0, true)
-		);
+				_repositoryId, _folderId, 0, true));
 	}
 
-	protected RepositoryContentObject toObjectRepository(Object rco) {
+	public Function<List<RepositoryContentObject>, FolderRepr>
+		_folderReprFunction;
 
+	protected RepositoryContentObject toObjectRepository(Object rco) {
 		if (rco instanceof FileEntry) {
-			FileEntry fileEntry = (FileEntry) rco;
+			FileEntry fileEntry = (FileEntry)rco;
 
 			String url = _fileUriBuilder.
-				build(fileEntry.getFileEntryId()).
-				toString();
+				build(fileEntry.getFileEntryId()).toString();
 
 			return new RepositoryContentObject(
 				fileEntry.getFileEntryId(), fileEntry.getTitle(), url,
 				RepositoryContentObject.RepositoryContentType.FILE,
 				fileEntry.getCreateDate(), fileEntry.getModifiedDate());
-
 		}
 		else if (rco instanceof Folder) {
-			Folder folder = (Folder) rco;
+			Folder folder = (Folder)rco;
 
 			String url = _folderUriBuilder.
-				build(Long.toString(folder.getFolderId())).
-				toString();
+				build(Long.toString(folder.getFolderId())).toString();
 
 			return new RepositoryContentObject(
 				folder.getFolderId(), folder.getName(), url,
@@ -196,7 +191,7 @@ public class FolderResource {
 				folder.getCreateDate(), folder.getModifiedDate());
 		}
 		else if (rco instanceof FileShortcut) {
-			FileShortcut fileShortcut = (FileShortcut) rco;
+			FileShortcut fileShortcut = (FileShortcut)rco;
 
 			String url = _fileUriBuilder.
 				build(Long.toString(fileShortcut.getToFileEntryId())).
@@ -214,14 +209,10 @@ public class FolderResource {
 		}
 	}
 
-
+	private final DLAppService _dlAppService;
+	private final UriBuilder _fileUriBuilder;
 	private final long _folderId;
-
-	public Function<List<RepositoryContentObject>, FolderRepr>
-		_folderReprFunction;
-	private DLAppService _dlAppService;
-	private UriBuilder _fileUriBuilder;
-	private UriBuilder _folderUriBuilder;
+	private final UriBuilder _folderUriBuilder;
 	private final long _repositoryId;
 
 }

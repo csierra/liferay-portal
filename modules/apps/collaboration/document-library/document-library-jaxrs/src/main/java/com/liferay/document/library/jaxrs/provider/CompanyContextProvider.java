@@ -16,12 +16,12 @@ package com.liferay.document.library.jaxrs.provider;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.util.PortalUtil;
 
 import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.ext.Provider;
 
-import com.liferay.portal.kernel.util.PortalUtil;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
 
@@ -30,9 +30,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(
-	immediate = true, service = CompanyContextProvider.class
-)
+@Component(immediate = true, service = CompanyContextProvider.class)
 @Provider
 public class CompanyContextProvider implements ContextProvider<Company> {
 
@@ -43,7 +41,7 @@ public class CompanyContextProvider implements ContextProvider<Company> {
 				(HttpServletRequest)message.getContextualProperty(
 					"HTTP.REQUEST"));
 		}
-		catch (PortalException e) {
+		catch (PortalException pe) {
 			return null;
 		}
 	}
