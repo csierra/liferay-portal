@@ -14,6 +14,9 @@
 
 package com.liferay.portal.upgrade.internal.release;
 
+import com.liferay.osgi.service.tracker.collections.ServiceTrackerMapBuilder;
+import com.liferay.osgi.service.tracker.collections.ServiceTrackerMapBuilder.Builder;
+import com.liferay.osgi.service.tracker.collections.ServiceTrackerMapBuilder.Builder.Final;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceComparator;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
@@ -44,6 +47,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.felix.utils.log.Logger;
 
@@ -169,28 +173,31 @@ public class ReleaseManagerOSGiCommands {
 
 		DB db = DBManagerUtil.getDB();
 
-		ServiceTrackerMapListener<String, UpgradeInfo, List<UpgradeInfo>>
-			serviceTrackerMapListener = null;
-
 		_releaseManagerConfiguration = ConfigurableUtil.createConfigurable(
 			ReleaseManagerConfiguration.class, properties);
 
-		if (_releaseManagerConfiguration.autoUpgrade()) {
-			serviceTrackerMapListener =
-				new UpgradeInfoServiceTrackerMapListener();
-		}
+		_serviceTrackerMap = ServiceTrackerMapBuilder.open(fBuilder -> {
+			Final<String, UpgradeStep, UpgradeInfo, List<UpgradeInfo>> builder =
+				fBuilder.context(bundleContext).
+					tracking(t ->
+						t.clazz(
+							UpgradeStep.class,
+							"(&(upgrade.bundle.symbolic.name=*)" +
+								"(|(upgrade.db.type=any)(upgrade.db.type=" +
+									db.getDBType() + ")))").
+							customize(UpgradeServiceTrackerCustomizer::new)).
+					property("upgrade.bundle.symbolic.name").
+					multi(Collections.reverseOrder(
+						new PropertyServiceReferenceComparator<>(
+							"upgrade.from.schema.version")));
 
-		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
-			bundleContext, UpgradeStep.class,
-			"(&(upgrade.bundle.symbolic.name=*)(|(upgrade.db.type=any)" +
-				"(upgrade.db.type=" + db.getDBType() + ")))",
-			new PropertyServiceReferenceMapper<String, UpgradeStep>(
-				"upgrade.bundle.symbolic.name"),
-			new UpgradeServiceTrackerCustomizer(bundleContext),
-			Collections.reverseOrder(
-				new PropertyServiceReferenceComparator<UpgradeStep>(
-					"upgrade.from.schema.version")),
-			serviceTrackerMapListener);
+			if (_releaseManagerConfiguration.autoUpgrade()) {
+				builder = builder.withListener(
+					new UpgradeInfoServiceTrackerMapListener());
+			}
+
+			return builder;
+		});
 	}
 
 	@Deactivate

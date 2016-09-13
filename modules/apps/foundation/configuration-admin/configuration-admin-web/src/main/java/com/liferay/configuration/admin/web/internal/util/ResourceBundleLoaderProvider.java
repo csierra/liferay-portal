@@ -14,8 +14,8 @@
 
 package com.liferay.configuration.admin.web.internal.util;
 
+import com.liferay.osgi.service.tracker.collections.ServiceTrackerMapBuilder;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
@@ -49,8 +49,13 @@ public class ResourceBundleLoaderProvider {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_resourceBundleLoaders = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, ResourceBundleLoader.class, "bundle.symbolic.name");
+		_resourceBundleLoaders = ServiceTrackerMapBuilder.open(
+			b -> b.
+				context(bundleContext).
+				tracking(t -> t.clazz(ResourceBundleLoader.class)).
+				property("bundle.symbolic.name").
+				single()
+		);
 	}
 
 	@Deactivate

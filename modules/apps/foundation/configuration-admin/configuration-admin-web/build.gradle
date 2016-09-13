@@ -1,10 +1,15 @@
+compileJava {
+	sourceCompatibility = '1.8'
+	targetCompatibility = '1.8'
+}
+
 dependencies {
 	provided group: "com.liferay", name: "com.liferay.application.list.api", version: "2.0.0"
 	provided group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "3.0.0"
 	provided group: "com.liferay", name: "com.liferay.dynamic.data.mapping.form.renderer", version: "2.0.0"
 	provided group: "com.liferay", name: "com.liferay.dynamic.data.mapping.form.values.factory", version: "2.0.0"
 	provided group: "com.liferay", name: "com.liferay.frontend.taglib", version: "2.0.0"
-	provided group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "2.0.0"
+	provided group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "2.0.3"
 	provided group: "com.liferay", name: "com.liferay.portal.configuration.metatype", version: "2.0.0"
 	provided group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "2.0.0"
 	provided group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "2.0.0"
