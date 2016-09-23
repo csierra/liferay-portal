@@ -158,12 +158,10 @@ public class BlogsEntryLocalServiceTest {
 		StringBundler sb = new StringBundler(9);
 
 		sb.append("<picture>");
-		sb.append("<!--[if IE 9]><video style=\"display: none;\"><![endif]-->");
 		sb.append("<source srcset=\"/url1.jpg\" media=\"(max-width=200px)\">");
 		sb.append("<source srcset=\"/url2.jpg\" media=\"(min-width=200px) ");
 		sb.append("and (max-width=800px)\">");
-		sb.append("<source srcset=\"/url3.jpg\" media=\"(max-width=1600px)\">");
-		sb.append("<!--[if IE 9]></video><![endif]-->");
+		sb.append("<source srcset=\"/url3.jpg\" media=\"(max-width=1600px)\" type=\"video/ogg\" >");
 		sb.append("<img src=\"/url.jpg\">");
 		sb.append("</picture>");
 
