@@ -107,7 +107,7 @@ public class StagingRemoteClient {
 		
 		_clientBuilder.register(
 			ExportImporConfigurationMessageBodyWorker.class);
-		_clientBuilder.register(MissingReferencesMessageBodyWorkers.class);
+		_clientBuilder.register(MissingReferencesMessageBodyWriter.class);
 	}
 
 }
