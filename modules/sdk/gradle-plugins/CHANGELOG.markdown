@@ -180,12 +180,88 @@ version 1.0.5.
 - [LPS-68165]: Update the [Liferay TLD Formatter] dependency to version 1.0.1.
 - [LPS-68165]: Update the [Liferay XML Formatter] dependency to version 1.0.1.
 
+## 2.0.36 - 2016-09-20
+
+### Changed
+- [LPS-67352]: Update the [Liferay Source Formatter] dependency to version
+1.0.281.
+
+## 2.0.37 - 2016-09-20
+
+### Changed
+
+### Changed
+- [LPS-66906]: Update the [Liferay Gradle Plugins Gulp] dependency to version
+2.0.0.
+- [LPS-66906]: Update the [Liferay Gradle Plugins JS Module Config Generator]
+dependency to version 2.0.0.
+- [LPS-66906]: Update the [Liferay Gradle Plugins JS Transpiler] dependency to
+version 2.0.0.
+
+## 2.0.38 - 2016-09-21
+
+### Changed
+- [LPS-66853]: Update the [Liferay Source Formatter] dependency to version
+1.0.282.
+
+## 2.0.39 - 2016-09-22
+
+### Changed
+- [LPS-68297]: Update the default value of the
+`liferay.appServers.jboss.version` property to `7.0.0`.
+- [LPS-68297]: Update the [Liferay Source Formatter] dependency to version
+1.0.283.
+
+## 2.0.40 - 2016-09-22
+
+### Added
+- [LPS-66906]: Add the ability to configure the [`sass-binary-path`](https://github.com/sass/node-sass#binary-configuration-parameters)
+argument in the `npmInstall` task by setting the project property
+`nodejs.npm.sass.binary.site`.
+
+### Changed
+- [LPS-66853]: Update the [Liferay Source Formatter] dependency to version
+1.0.284.
+
+## 2.0.41 - 2016-09-23
+
+### Changed
+- [LPS-66853]: Update the [Liferay Source Formatter] dependency to version
+1.0.285.
+
+## 2.0.42 - 2016-09-26
+
+### Changed
+- [LPS-66853]: Update the [Liferay Source Formatter] dependency to version
+1.0.286.
+
+## 2.0.43 - 2016-09-27
+
+### Changed
+- [LPS-66853]: Update the [Liferay Source Formatter] dependency to version
+1.0.287.
+
+## 2.0.44 - 2016-09-27
+
+### Changed
+- [LPS-66853]: Update the [Liferay Gradle Plugins Source Formatter] dependency
+to version 1.0.23.
+
+## 2.0.45 - 2016-09-28
+
+### Changed
+- [LPS-67352]: Update the [Liferay Gradle Plugins Source Formatter] dependency
+to version 1.0.24.
+- [LPS-67352]: Update the [Liferay Source Formatter] dependency to version
+1.0.288.
+
 [Gradle Bundle Plugin]: https://github.com/TomDmitriev/gradle-bundle-plugin
 [Liferay Ant BND]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/ant-bnd
 [Liferay CSS Builder]: https://github.com/liferay/liferay-portal/tree/master/modules/util/css-builder
 [Liferay Gradle Plugins Gulp]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-gulp
 [Liferay Gradle Plugins JS Module Config Generator]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-js-module-config-generator
 [Liferay Gradle Plugins JS Transpiler]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-js-transpiler
+[Liferay Gradle Plugins Source Formatter]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-source-formatter
 [Liferay Javadoc Formatter]: https://github.com/liferay/liferay-portal/tree/master/modules/util/javadoc-formatter
 [Liferay Lang Builder]: https://github.com/liferay/liferay-portal/tree/master/modules/util/lang-builder
 [Liferay Portal Tools Service Builder]: https://github.com/liferay/liferay-portal/tree/master/modules/util/portal-tools-service-builder
@@ -196,6 +272,7 @@ version 1.0.5.
 [Liferay XML Formatter]: https://github.com/liferay/liferay-portal/tree/master/modules/util/xml-formatter
 [LPS-61099]: https://issues.liferay.com/browse/LPS-61099
 [LPS-66853]: https://issues.liferay.com/browse/LPS-66853
+[LPS-66906]: https://issues.liferay.com/browse/LPS-66906
 [LPS-67023]: https://issues.liferay.com/browse/LPS-67023
 [LPS-67352]: https://issues.liferay.com/browse/LPS-67352
 [LPS-67658]: https://issues.liferay.com/browse/LPS-67658
@@ -207,3 +284,4 @@ version 1.0.5.
 [LPS-68035]: https://issues.liferay.com/browse/LPS-68035
 [LPS-68131]: https://issues.liferay.com/browse/LPS-68131
 [LPS-68165]: https://issues.liferay.com/browse/LPS-68165
+[LPS-68297]: https://issues.liferay.com/browse/LPS-68297

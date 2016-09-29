@@ -1124,7 +1124,7 @@ public class StringUtil {
 					continue;
 				}
 
-				if ((i + texts[j].length() <= toIndex + 1) &&
+				if (((i + texts[j].length()) <= (toIndex + 1)) &&
 					s.startsWith(texts[j], i)) {
 
 					return i;
@@ -1556,7 +1556,7 @@ public class StringUtil {
 					continue;
 				}
 
-				if ((i + texts[j].length() <= toIndex + 1) &&
+				if (((i + texts[j].length()) <= (toIndex + 1)) &&
 					s.startsWith(texts[j], i)) {
 
 					return i;
@@ -3405,19 +3405,21 @@ public class StringUtil {
 			return null;
 		}
 
-		if (s.length() <= length) {
+		if (s.codePointCount(0, s.length()) <= length) {
 			return s;
 		}
 
 		if (length < suffix.length()) {
-			return s.substring(0, length);
+			return s.substring(0, s.offsetByCodePoints(0, length));
 		}
 
 		int curLength = length;
 
-		for (int j = (curLength - suffix.length()); j >= 0; j--) {
-			if (Character.isWhitespace(s.charAt(j))) {
-				curLength = j;
+		for (int j = (curLength - suffix.length() + 1), offset; j > 0; j--) {
+			offset = s.offsetByCodePoints(0, j);
+
+			if (Character.isWhitespace(s.codePointBefore(offset))) {
+				curLength = j - 1;
 
 				break;
 			}
@@ -3427,7 +3429,7 @@ public class StringUtil {
 			curLength = length - suffix.length();
 		}
 
-		String temp = s.substring(0, curLength);
+		String temp = s.substring(0, s.offsetByCodePoints(0, curLength));
 
 		return temp.concat(suffix);
 	}
@@ -4359,7 +4361,7 @@ public class StringUtil {
 		int index = 16;
 
 		do {
-			buffer[--index] = HEX_DIGITS[(int) (l & 15)];
+			buffer[--index] = HEX_DIGITS[(int)(l & 15)];
 
 			l >>>= 4;
 		}

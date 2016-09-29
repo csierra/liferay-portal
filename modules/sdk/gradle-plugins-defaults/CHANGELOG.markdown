@@ -236,9 +236,91 @@ directory instead of the root project directory. Doing this lets submodules like
 ### Changed
 - [LPS-68131]: Update the [Liferay Gradle Plugins] dependency to version 2.0.35.
 
+## 1.2.24 - 2016-09-20
+
+### Changed
+- [LPS-67352]: Update the [Liferay Gradle Plugins] dependency to version 2.0.36.
+- [LPS-68230]: Configure [Liferay Gradle Plugins Node] to use version 6.6.0 of
+Node.js.
+
+### Removed
+- [LPS-68230]: To reduce the number of plugins applied to a project and improve
+performance, plugins in `com.liferay.gradle.plugins.defaults.internal` are no
+longer applied via `apply plugin`.
+
+## 1.2.25 - 2016-09-20
+
+### Changed
+- [LPS-66906]: Update the [Liferay Gradle Plugins] dependency to version 2.0.37.
+
+## 1.2.26 - 2016-09-21
+
+### Changed
+- [LPS-66853]: Update the [Liferay Gradle Plugins] dependency to version 2.0.38.
+
+## 1.2.27 - 2016-09-22
+
+### Changed
+- [LPS-68305]: Set the `buildService.buildNumberIncrement` property to `false`
+by default.
+
+## 1.2.28 - 2016-09-22
+
+### Changed
+- [LPS-68297]: Update the [Liferay Gradle Plugins] dependency to version 2.0.39.
+
+## 1.2.29 - 2016-09-22
+
+### Added
+- [LPS-66906]: Override the [`sass-binary-path`](https://github.com/sass/node-sass#binary-configuration-parameters)
+argument in the `npmInstall` task with the value of the project property
+`nodejs.npm.ci.sass.binary.site` when using Jenkins.
+
+### Changed
+- [LPS-66906]: Update the [Liferay Gradle Plugins] dependency to version 2.0.40.
+
+## 1.2.30 - 2016-09-23
+
+### Changed
+- [LPS-66853]: Update the [Liferay Gradle Plugins] dependency to version 2.0.41.
+
+## 1.2.31 - 2016-09-23
+
+### Added
+- [LPS-68306]: Set the system property `portal.pre.build` to `true` to only
+include the projects containing a `.lfrbuild-portal-pre` marker file.
+
+## 1.2.32 - 2016-09-26
+
+### Changed
+- [LPS-66853]: Update the [Liferay Gradle Plugins] dependency to version 2.0.42.
+
+## 1.2.33 - 2016-09-27
+
+### Changed
+- [LPS-66853]: Update the [Liferay Gradle Plugins] dependency to version 2.0.44.
+
+## 1.2.34 - 2016-09-27
+
+### Changed
+- [LPS-67863]: Change dependency version override declarations in
+`.version-override-${project.name}.properties` to follow a new format:
+
+		[artifact group]/[artifact name]=[new version]
+
+### Fixed
+- [LPS-67863]: Fix commit deletion process of version override files.
+
+## 1.2.35 - 2016-09-28
+
+### Changed
+- [LPS-67352]: Update the [Liferay Gradle Plugins] dependency to version 2.0.45.
+
 [Liferay Gradle Plugins]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins
+[Liferay Gradle Plugins Node]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-node
 [LPS-61099]: https://issues.liferay.com/browse/LPS-61099
 [LPS-66853]: https://issues.liferay.com/browse/LPS-66853
+[LPS-66906]: https://issues.liferay.com/browse/LPS-66906
 [LPS-67023]: https://issues.liferay.com/browse/LPS-67023
 [LPS-67352]: https://issues.liferay.com/browse/LPS-67352
 [LPS-67658]: https://issues.liferay.com/browse/LPS-67658
@@ -251,5 +333,9 @@ directory instead of the root project directory. Doing this lets submodules like
 [LPS-68009]: https://issues.liferay.com/browse/LPS-68009
 [LPS-68014]: https://issues.liferay.com/browse/LPS-68014
 [LPS-68131]: https://issues.liferay.com/browse/LPS-68131
+[LPS-68230]: https://issues.liferay.com/browse/LPS-68230
+[LPS-68297]: https://issues.liferay.com/browse/LPS-68297
+[LPS-68305]: https://issues.liferay.com/browse/LPS-68305
+[LPS-68306]: https://issues.liferay.com/browse/LPS-68306
 [LRDOCS-2841]: https://issues.liferay.com/browse/LRDOCS-2841
 [LRDOCS-2981]: https://issues.liferay.com/browse/LRDOCS-2981

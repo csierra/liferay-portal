@@ -36,6 +36,10 @@ AUI.add(
 						}
 					},
 
+					defaultLanguageId: {
+						value: themeDisplay.getDefaultLanguageId()
+					},
+
 					definition: {
 						validator: Lang.isObject
 					},
@@ -195,6 +199,7 @@ AUI.add(
 								fieldType.get('defaultConfig'),
 								{
 									builder: instance,
+									defaultLanguageId: instance.get('defaultLanguageId'),
 									evaluatorURL: instance.get('evaluatorURL'),
 									getFieldTypeSettingFormContextURL: instance.get('getFieldTypeSettingFormContextURL'),
 									portletNamespace: instance.get('portletNamespace'),
@@ -282,11 +287,7 @@ AUI.add(
 
 						var settingsPanel = instance.getFieldSettingsPanel();
 
-						settingsPanel.setAttrs(
-							{
-								field: field
-							}
-						);
+						settingsPanel.set('field', field);
 
 						settingsPanel.open();
 					},

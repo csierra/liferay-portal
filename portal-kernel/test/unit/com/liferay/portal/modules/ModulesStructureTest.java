@@ -25,11 +25,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -39,7 +37,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -64,6 +61,10 @@ public class ModulesStructureTest {
 			classLoader,
 			"com/liferay/portal/modules/dependencies/" +
 				"git_repo_build_gradle.tmpl");
+		final String gitRepoGitAttributesTemplate = StringUtil.read(
+			classLoader,
+			"com/liferay/portal/modules/dependencies/" +
+				"git_repo_gitattributes.tmpl");
 		final String gitRepoGradlePropertiesTemplate = StringUtil.read(
 			classLoader,
 			"com/liferay/portal/modules/dependencies/" +
@@ -100,6 +101,7 @@ public class ModulesStructureTest {
 					if (Files.exists(dirPath.resolve(".gitrepo"))) {
 						_testGitRepoBuildScripts(
 							dirPath, gitRepoBuildGradleTemplate,
+							gitRepoGitAttributesTemplate,
 							gitRepoGradlePropertiesTemplate,
 							gitRepoSettingsGradleTemplate);
 					}
@@ -107,26 +109,25 @@ public class ModulesStructureTest {
 						_testAppBuildScripts(dirPath);
 					}
 					else if (Files.exists(dirPath.resolve("bnd.bnd"))) {
-						if (Files.notExists(buildGradlePath)) {
-							Assert.fail("Missing " + buildGradlePath);
-						}
-
-						if (Files.exists(buildXMLPath)) {
-							Assert.fail("Forbidden " + buildXMLPath);
-						}
+						Assert.assertTrue(
+							"Missing " + buildGradlePath,
+							Files.exists(buildGradlePath));
+						Assert.assertFalse(
+							"Forbidden " + buildXMLPath,
+							Files.exists(buildXMLPath));
 
 						Path ivyXmlPath = dirPath.resolve("ivy.xml");
 
-						if (Files.exists(ivyXmlPath)) {
-							Assert.fail("Forbidden " + ivyXmlPath);
-						}
+						Assert.assertFalse(
+							"Forbidden " + ivyXmlPath,
+							Files.exists(ivyXmlPath));
 
 						return FileVisitResult.SKIP_SUBTREE;
 					}
 					else if (Files.exists(buildXMLPath)) {
-						if (Files.exists(buildGradlePath)) {
-							Assert.fail("Forbidden " + buildGradlePath);
-						}
+						Assert.assertFalse(
+							"Forbidden " + buildGradlePath,
+							Files.exists(buildGradlePath));
 
 						return FileVisitResult.SKIP_SUBTREE;
 					}
@@ -167,8 +168,7 @@ public class ModulesStructureTest {
 					String dirName = dirNamePath.toString();
 
 					if (dirPath.equals(_modulesDirPath) ||
-						(!dirName.equals("journal") &&
-						 Files.exists(dirPath.resolve(".gitrepo")))) {
+						Files.exists(dirPath.resolve(".gitrepo"))) {
 
 						_testGitRepoIgnoreFiles(
 							dirPath, gitRepoGitIgnoreTemplate);
@@ -271,38 +271,6 @@ public class ModulesStructureTest {
 		return false;
 	}
 
-	private boolean _containsFile(Path dirPath, String pattern)
-		throws IOException {
-
-		FileSystem fileSystem = dirPath.getFileSystem();
-
-		final PathMatcher pathMatcher = fileSystem.getPathMatcher(
-			"glob:" + pattern);
-
-		final AtomicBoolean found = new AtomicBoolean();
-
-		Files.walkFileTree(
-			dirPath,
-			new SimpleFileVisitor<Path>() {
-
-				@Override
-				public FileVisitResult visitFile(
-					Path path, BasicFileAttributes basicFileAttributes) {
-
-					if (pathMatcher.matches(path)) {
-						found.set(true);
-
-						return FileVisitResult.TERMINATE;
-					}
-
-					return FileVisitResult.CONTINUE;
-				}
-
-			});
-
-		return found.get();
-	}
-
 	private String _getGitRepoBuildGradle(
 			Path dirPath, String buildGradleTemplate)
 		throws IOException {
@@ -367,6 +335,66 @@ public class ModulesStructureTest {
 			buildGradleTemplate, "[$BUILDSCRIPT_DEPENDENCIES$]", sb.toString());
 	}
 
+	private String _getGitRepoGitIgnore(
+			final Path dirPath, String gitIgnoreTemplate)
+		throws IOException {
+
+		if (dirPath.equals(_modulesDirPath)) {
+			return gitIgnoreTemplate;
+		}
+
+		final Set<String> pluginDirNames = new TreeSet<>();
+
+		Files.walkFileTree(
+			dirPath,
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult preVisitDirectory(
+					Path pluginDirPath,
+					BasicFileAttributes basicFileAttributes) {
+
+					if (Files.exists(pluginDirPath.resolve("build.xml"))) {
+						Path relativePath = dirPath.relativize(pluginDirPath);
+
+						String pluginDirName = relativePath.toString();
+
+						if (File.separatorChar != CharPool.SLASH) {
+							pluginDirName = StringUtil.replace(
+								pluginDirName, File.separatorChar,
+								CharPool.SLASH);
+						}
+
+						pluginDirNames.add(pluginDirName);
+
+						return FileVisitResult.SKIP_SUBTREE;
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
+
+		if (pluginDirNames.isEmpty()) {
+			return gitIgnoreTemplate;
+		}
+
+		StringBundler sb = new StringBundler(pluginDirNames.size() * 4 + 2);
+
+		sb.append(gitIgnoreTemplate);
+		sb.append(CharPool.NEW_LINE);
+
+		for (String pluginDirName : pluginDirNames) {
+			sb.append(CharPool.NEW_LINE);
+
+			sb.append("!/");
+			sb.append(pluginDirName);
+			sb.append("/docroot/WEB-INF/lib");
+		}
+
+		return sb.toString();
+	}
+
 	private String _getGitRepoGradleProperties(
 		Path dirPath, String gradlePropertiesTemplate) {
 
@@ -404,7 +432,8 @@ public class ModulesStructureTest {
 
 	private void _testGitRepoBuildScripts(
 			Path dirPath, String buildGradleTemplate,
-			String gradlePropertiesTemplate, String settingsGradleTemplate)
+			String gitAttributesTemplate, String gradlePropertiesTemplate,
+			String settingsGradleTemplate)
 		throws IOException {
 
 		Path buildGradlePath = dirPath.resolve("build.gradle");
@@ -415,9 +444,7 @@ public class ModulesStructureTest {
 		boolean gradlePropertiesExists = Files.exists(gradlePropertiesPath);
 		boolean settingsGradleExists = Files.exists(settingsGradlePath);
 
-		if (!buildGradleExists) {
-			Assert.fail("Missing " + buildGradlePath);
-		}
+		Assert.assertTrue("Missing " + buildGradlePath, buildGradleExists);
 
 		String buildGradle = _read(buildGradlePath);
 
@@ -425,9 +452,8 @@ public class ModulesStructureTest {
 			"Incorrect " + buildGradlePath,
 			_getGitRepoBuildGradle(dirPath, buildGradleTemplate), buildGradle);
 
-		if (!gradlePropertiesExists) {
-			Assert.fail("Missing " + gradlePropertiesExists);
-		}
+		Assert.assertTrue(
+			"Missing " + gradlePropertiesPath, gradlePropertiesExists);
 
 		String gradleProperties = _read(gradlePropertiesPath);
 
@@ -436,9 +462,8 @@ public class ModulesStructureTest {
 			_getGitRepoGradleProperties(dirPath, gradlePropertiesTemplate),
 			gradleProperties);
 
-		if (!settingsGradleExists) {
-			Assert.fail("Missing " + settingsGradlePath);
-		}
+		Assert.assertTrue(
+			"Missing " + settingsGradlePath, settingsGradleExists);
 
 		String settingsGradle = _read(settingsGradlePath);
 
@@ -448,18 +473,22 @@ public class ModulesStructureTest {
 
 		// LPS-67772
 
-		Path gitAttributesPath = dirPath.resolve(".gitattributes");
+		Path dirNamePath = dirPath.getFileName();
 
-		boolean gitAttributesExists = Files.exists(gitAttributesPath);
+		String dirName = dirNamePath.toString();
 
-		if (_containsFile(dirPath, "**/src/main/resources/**/*.soy")) {
+		if (!dirName.equals("adaptive-media")) {
+			Path gitAttributesPath = dirPath.resolve(".gitattributes");
+
 			Assert.assertTrue(
-				"Missing " + gitAttributesPath, gitAttributesExists);
-			Assert.assertEquals("*.soy\ttext eol=lf", _read(gitAttributesPath));
-		}
-		else {
-			Assert.assertFalse(
-				"Forbidden " + gitAttributesPath, gitAttributesExists);
+				"Missing " + gitAttributesPath,
+				Files.exists(gitAttributesPath));
+
+			String gitAttributes = _read(gitAttributesPath);
+
+			Assert.assertEquals(
+				"Incorrect " + gitAttributesPath, gitAttributesTemplate,
+				gitAttributes);
 		}
 	}
 
@@ -474,7 +503,8 @@ public class ModulesStructureTest {
 		String gitIgnore = _read(gitIgnorePath);
 
 		Assert.assertEquals(
-			"Incorrect " + gitIgnorePath, gitIgnoreTemplate, gitIgnore);
+			"Incorrect " + gitIgnorePath,
+			_getGitRepoGitIgnore(dirPath, gitIgnoreTemplate), gitIgnore);
 	}
 
 	private void _testThemeBuildScripts(Path dirPath) throws IOException {
@@ -486,9 +516,8 @@ public class ModulesStructureTest {
 
 		Path gulpfileJsPath = dirPath.resolve("gulpfile.js");
 
-		if (Files.notExists(gulpfileJsPath)) {
-			Assert.fail("Missing " + gulpfileJsPath);
-		}
+		Assert.assertTrue(
+			"Missing " + gulpfileJsPath, Files.exists(gulpfileJsPath));
 	}
 
 	private void _testThemeIgnoreFiles(Path dirPath, String gitIgnoreTemplate)
