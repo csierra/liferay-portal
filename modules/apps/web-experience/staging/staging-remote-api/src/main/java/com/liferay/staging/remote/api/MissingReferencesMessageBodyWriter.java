@@ -27,12 +27,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class MissingReferencesMessageBodyWorkers
+@Provider
+public class MissingReferencesMessageBodyWriter
 	implements MessageBodyWriter<MissingReferences> {
 
 	@Override
