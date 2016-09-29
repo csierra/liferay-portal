@@ -90,7 +90,9 @@ public class StagingRemoteEndpoint extends Application {
 	@Override
 	public Set<Class<?>> getClasses() {
 		return new HashSet<>(
-			Arrays.asList(ExportImporConfigurationMessageBodyWorker.class));
+			Arrays.asList(
+				ExportImporConfigurationMessageBodyWorker.class,
+				MissingReferencesMessageBodyWriter.class));
 	}
 
 	@Override

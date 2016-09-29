@@ -30,11 +30,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 
 /**
  * @author Carlos Sierra Andrés
  */
+@Provider
 public class ExportImporConfigurationMessageBodyWorker
 	implements MessageBodyWriter<ExportImportConfiguration>,
 			   MessageBodyReader<ExportImportConfiguration> {
