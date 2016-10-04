@@ -1,2 +1,2 @@
 contextPath=/staging-remote
-authVerifierProperties=auth.verifier.PortalSessionAuthVerifier.urls.includes=*
+authVerifierProperties=auth.verifier.TunnelAuthVerifier.urls.includes=/
