@@ -161,6 +161,6 @@ public class ExportImporConfigurationMessageBodyWorker
 	}
 
 	@Context
-	private final Providers _providers;
+	private Providers _providers;
 
 }
