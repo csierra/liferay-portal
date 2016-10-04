@@ -20,9 +20,6 @@
 Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
 %>
 
-<div class="lfr-translationmanager-container" id="<%= namespace + id %>">
-</div>
-
 <c:if test="<%= initialize %>">
 	<%
 	JSONObject localesJSON = JSONFactoryUtil.createJSONObject();
@@ -44,40 +41,22 @@ Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroup
 	}
 	%>
 
-	<aui:script require="frontend-taglib/translation_manager/TranslationManager.es">
-		var TranslationManager = frontendTaglibTranslation_managerTranslationManagerEs.default;
+	<%
+	SoyContext context = new SoyContext();
+	context.put("availableLocales", availableLocalesArray);
+	context.put("changeableDefaultLanguage", changeableDefaultLanguage);
+	context.put("defaultLocale", defaultLanguageId);
+	context.put("elementClasses", cssClass);
+	context.put("id", namespace + id);
+	context.put("locales", localesJSON);
+	context.put("pathThemeImages", themeDisplay.getPathThemeImages());
+	%>
 
-		var translationManager;
-
-		Liferay.component(
-			'<%= namespace + id %>',
-			function() {
-				if (!translationManager) {
-					translationManager = new TranslationManager(
-						{
-							availableLocales: <%= availableLocalesArray %>,
-							changeableDefaultLanguage: <%= changeableDefaultLanguage %>,
-							defaultLocale: '<%= defaultLanguageId %>',
-							elementClasses: '<%= cssClass %>',
-							locales: <%= localesJSON %>,
-							pathThemeImages: '<%= themeDisplay.getPathThemeImages() %>'
-						},
-						'#<%= namespace + id %>'
-					);
-				}
-
-				return translationManager;
-			}
-		);
-
-		var onDestroyPortlet = function(event) {
-			translationManager.dispose();
-
-			Liferay.detach('destroyPortlet', onDestroyPortlet);
-		};
-
-		Liferay.on('destroyPortlet', onDestroyPortlet);
-
-		Liferay.component('<%= namespace + id %>');
-	</aui:script>
+	<div class="lfr-translationmanager-container">
+		<soy:template-renderer
+			context="<%= context %>"
+			module="frontend-taglib/translation_manager/TranslationManager.es"
+			templateNamespace="TranslationManager.render"
+		/>
+	</div>
 </c:if>
