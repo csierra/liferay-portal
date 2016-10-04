@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Carlos Sierra Andrés
  */
-@ApplicationPath("/api")
+@ApplicationPath("/api/liferay/do")
 @Component(
 	immediate = true, property = {"staging.remote=true"},
 	service = Application.class
