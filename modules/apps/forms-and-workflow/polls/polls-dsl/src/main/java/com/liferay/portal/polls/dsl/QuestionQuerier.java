@@ -15,40 +15,35 @@
 package com.liferay.portal.polls.dsl;
 
 
-import com.liferay.polls.model.PollsQuestion;
+import javaslang.Function2;
+import javaslang.Function3;
+import javaslang.Function4;
+import javaslang.Function5;
+import javaslang.Function6;
+import javaslang.Function7;
+import javaslang.Function8;
 
-import java.util.Collections;
+import java.security.cert.PKIXRevocationChecker;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.liferay.portal.polls.dsl.ChoiceQuerier.name;
+import static com.liferay.portal.polls.dsl.ChoiceQuerier.NAME;
+import static com.liferay.portal.polls.dsl.ChoiceQuerier.NUMBER_OF_VOTES;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface QuestionQuerier<T> extends Monad<QuestionQuerier<T>, T>{
+public interface QuestionQuerier<T> {
 
-	static class Impure<T> extends Monad.Impure<QuestionQuerier<T>, T>
-		implements QuestionQuerier<T> {}
-
-	static class Pure<T> extends Monad.Pure<QuestionQuerier<T>, T> implements
-		QuestionQuerier<T> {
-
-		public Pure(T t) {
-			super(t);
-		}
-	}
-
-	class Title extends Impure<Map<Locale, String>> {}
-	class Description extends Impure<String> {}
-	class Expiration extends Impure<Optional<Date>> {}
-	class Choices<T> extends Impure<Stream<T>> {
+	class Title implements QuestionQuerier<Map<Locale, String>> {}
+	class Description implements QuestionQuerier<String> {}
+	class Expiration implements QuestionQuerier<Optional<Date>> {}
+	class Choices<T> implements QuestionQuerier<Stream<T>> {
 
 		public ChoiceQuerier<T> _dsl;
 
@@ -58,34 +53,71 @@ public interface QuestionQuerier<T> extends Monad<QuestionQuerier<T>, T>{
 
 	}
 
-	static <T> QuestionQuerier<T> title(
-		Function<Map<Locale, String>, QuestionQuerier<T>> f) {
+	Title TITLE = new Title();
+	Description DESCRIPTION = new Description();
+	Expiration EXPIRATION = new Expiration();
 
-		return new Title().bind(f);
+	static <T> QuestionQuerier<List<T>> CHOICES(ChoiceQuerier<T> dsl) { return null;}
+
+	public static <A, T> QuestionQuerier<T> lift(
+		Function<A, T> fun, QuestionQuerier<A> a) {
+
+		return null;
 	}
 
-	static <T> QuestionQuerier<T> description(
-		Function<String, QuestionQuerier<T>> f) {
+	public static <A, B, T> QuestionQuerier<T> lift(
+		Function2<A, B, T> fun, QuestionQuerier<A> a, QuestionQuerier<B> b) {
 
-		return new Description().bind(f);
+		return null;
 	}
 
-	static <T> QuestionQuerier<T> expiration(
-		Function<Optional<Date>, QuestionQuerier<T>> f) {
+	public static <A, B, C, T> QuestionQuerier<T> lift(
+		Function3<A, B, C, T> fun, QuestionQuerier<A> a, QuestionQuerier<B> b, QuestionQuerier<C> c) {
 
-		return new Expiration().bind(f);
+		return null;
 	}
 
-	static <T, S> QuestionQuerier<S> choices(
-		ChoiceQuerier<T> dsl, Function<Stream<T>, QuestionQuerier<S>> f) {
-		return new Choices<>(dsl).bind(f);
+	public static <A, B, C, D ,T> QuestionQuerier<T> lift(
+		Function4<A, B, C, D, T> fun, QuestionQuerier<A> a, QuestionQuerier<B> b,
+		QuestionQuerier<C> c, QuestionQuerier<D> d) {
+
+		return null;
 	}
 
-	static <T> QuestionQuerier<T> just(T t) {
-		return new Pure<T>(t);
+	public static <A, B, C, D , E, T> QuestionQuerier<T> lift(
+		Function5<A, B, C, D, E, T> fun, QuestionQuerier<A> a,
+		QuestionQuerier<B> b, QuestionQuerier<C> c, QuestionQuerier<D> d,
+		QuestionQuerier<E> e) {
+
+		return null;
 	}
 
-	class PollsQuestionWithChoices {
+	public static <A, B, C, D , E, F, T> QuestionQuerier<T> lift(
+		Function6<A, B, C, D, E, F, T> fun, QuestionQuerier<A> a,
+		QuestionQuerier<B> b, QuestionQuerier<C> c, QuestionQuerier<D> d,
+		QuestionQuerier<E> e, QuestionQuerier<F> f) {
+
+		return null;
+	}
+
+	public static <A, B, C, D, E, F, G, T> QuestionQuerier<T> lift(
+		Function7<A, B, C, D, E, F, G, T> fun, QuestionQuerier<A> a,
+		QuestionQuerier<B> b, QuestionQuerier<C> c, QuestionQuerier<D> d,
+		QuestionQuerier<E> e, QuestionQuerier<F> f, QuestionQuerier<G> g) {
+
+		return null;
+	}
+
+	public static <A, B, C, D, E, F, G, H, T> QuestionQuerier<T> lift(
+		Function8<A, B, C, D, E, F, G, H, T> fun, QuestionQuerier<A> a,
+		QuestionQuerier<B> b, QuestionQuerier<C> c, QuestionQuerier<D> d,
+		QuestionQuerier<E> e, QuestionQuerier<F> f, QuestionQuerier<G> g,
+		QuestionQuerier<H> h) {
+
+		return null;
+	}
+
+		class PollsQuestionWithChoices {
 		public final Map<Locale, String> title;
 		public final String description;
 		public final Optional<Date> expiration;
@@ -125,81 +157,36 @@ public interface QuestionQuerier<T> extends Monad<QuestionQuerier<T>, T>{
 		}
 	}
 
-	static final ChoiceQuerier<PollChoiceWithVotes> CHOICE_WITH_VOTES =
-		name(name ->
-		ChoiceQuerier.description(choiceDescription ->
-		ChoiceQuerier.votes(VoteQuerier.JUST_USER_ID).bind(votes ->
-		ChoiceQuerier.just(
-			new PollChoiceWithVotes(
-				name, choiceDescription, votes.collect(Collectors.toList()))))));
+	static class ReflexAppl<T> implements QuestionQuerier<T> {
 
-	static final QuestionQuerier<PollsQuestionWithChoices>
-		POLLS_QUESTION_WITH_CHOICES_AND_VOTES =
-			title( t ->
-			description( d ->
-			expiration( exp ->
-			choices(CHOICE_WITH_VOTES, choices ->
-				just(new PollsQuestionWithChoices(
-					t, d, exp,
-					Collections.unmodifiableList(
-						choices.collect(Collectors.toList()))))))));
+		ReflexAppl(Object f, QuestionQuerier<?> ... params) {
 
-
-	class PollsQuerierInterpreter {
-
-		public <T> T interpret(
-			PollsQuestion pq, QuestionQuerier<T> questionQuerier) {
-
-			if (questionQuerier instanceof Title) {
-				Title title = (Title) questionQuerier;
-
-				Function function = title.getFunction();
-
-				return (T)interpret(
-					pq, (QuestionQuerier<T>) function.apply(pq.getTitleMap()));
-			}
-			if (questionQuerier instanceof Description) {
-				Description description = (Description) questionQuerier;
-
-				Function function = description.getFunction();
-
-				return (T)interpret(
-					pq, (QuestionQuerier<T>) function.apply(pq.getDescription()));
-			}
-			if (questionQuerier instanceof Expiration) {
-				Expiration expiration = (Expiration) questionQuerier;
-
-				Function function = expiration.getFunction();
-
-				return (T)interpret(
-					pq, (QuestionQuerier<T>) function.apply(
-						Optional.ofNullable(pq.getExpirationDate())));
-			}
-			if (questionQuerier instanceof Choices) {
-				Choices choices = (Choices) questionQuerier;
-
-				// interpret choices._dsl;
-
-				Function function = choices.getFunction();
-
-				return (T)interpret(
-					pq, (QuestionQuerier<T>) function.apply(
-						pq.getChoices().stream()));
-
-			}
-			if (questionQuerier instanceof Pure) {
-				Pure pure = (Pure) questionQuerier;
-
-				return (T)pure.unwrap();
-			}
-
-			return null;
 		}
-
 	}
 
+	ChoiceQuerier<PollChoiceWithVotes> CHOICE_WITH_VOTES =
+		ChoiceQuerier.lift(
+			PollChoiceWithVotes::new, NAME, ChoiceQuerier.DESCRIPTION,
+			NUMBER_OF_VOTES);
+
+	QuestionQuerier<PollsQuestionWithChoices>
+		POLLS_QUESTION_WITH_CHOICES_AND_VOTES =
+			QuestionQuerier.lift(
+				PollsQuestionWithChoices::new,
+					TITLE, DESCRIPTION, EXPIRATION, CHOICES(CHOICE_WITH_VOTES));
+
 	static void main(String[] args) {
+		Optional<String> s =
+			maybeName().flatMap(
+				x -> maybeCount().map(
+					y -> x + y));
+	}
 
+	static Optional<String> maybeName() {
+		return Optional.of("Carlos");
+	}
 
+	static Optional<Integer> maybeCount() {
+		return Optional.of(5);
 	}
 }
