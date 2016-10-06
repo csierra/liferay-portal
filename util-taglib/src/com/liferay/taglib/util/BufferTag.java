@@ -30,7 +30,7 @@ public class BufferTag extends BodyTagSupport {
 		try {
 			CharSequence bodyContent = StringUtil.trim(getBodyContent().getString());
 
-			bodyContent = HtmlUtil.safeContent(bodyContent);
+			bodyContent = XSS.safeHtml(bodyContent);
 
 			pageContext.setAttribute(_var, bodyContent);
 

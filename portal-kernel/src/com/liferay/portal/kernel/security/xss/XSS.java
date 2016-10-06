@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.security.xss;
 
-import com.liferay.portal.kernel.util.HtmlUtil;
-
 import java.util.function.Function;
 
 /**
@@ -23,8 +21,8 @@ import java.util.function.Function;
  */
 public class XSS {
 
-	public static SafeHtml safeHtmlOnly(SafeHtml SafeHtml) {
-		return SafeHtml;
+	public static SafeHtml safeHtmlOnly(SafeHtml safeHtml) {
+		return safeHtml;
 	}
 
 	public static VerifiedJavaScript verifiedJavaScriptOnly(
@@ -32,63 +30,65 @@ public class XSS {
 
 		return verifiedJavaScript;
 	}
-	public static SafeHtml safeHtml(Object input) {
-		return new XSSSafeHtmlImpl(input);
+	public static SafeHtml safeHtml(CharSequence input) {
+		return _createOrApply(input, EscapeOperations.HTML);
 	}
 
-	public static CharSequence htmlBody(Object input) {
-		EscapedString result = getEscapedString(input);
-
-		return result.escape(p -> XSS.safeHtml(HtmlUtil.escape(p)));
+	public static SafeHtml htmlBody(CharSequence input) {
+		return _createOrApply(input, EscapeOperations.HTML);
 	}
 
-	public static CharSequence attribute(Object input) {
-		EscapedString result = getEscapedString(input);
-
-		return result.escape(p -> XSS.safeHtml(HtmlUtil.escapeAttribute(p)));}
-
-
-	public static CharSequence css(Object input) {
-		EscapedString result = getEscapedString(input);
-
-		return result.escape(p -> XSS.safeHtml(HtmlUtil.escapeCSS(p)));
+	public static SafeHtml attribute(CharSequence input) {
+		return _createOrApply(input, EscapeOperations.ATTRIBUTE);
 	}
 
-	public static CharSequence href(Object input) {
-		EscapedString result = getEscapedString(input);
-
-		return result.escape(p -> XSS.safeHtml(HtmlUtil.escapeHREF(p)));
+	public static SafeHtml css(CharSequence input) {
+		return _createOrApply(input, EscapeOperations.CSS);
 	}
 
-	public static CharSequence src(Object input) {
-		EscapedString result = getEscapedString(input);
-
-		return result.escape(p -> XSS.safeHtml(HtmlUtil.escapeHREF(p)));
+	public static SafeHtml href(CharSequence input) {
+		return _createOrApply(input, EscapeOperations.HREF);
 	}
 
-	public static CharSequence js(Object input) {
-		EscapedString result = getEscapedString(input);
-
-		return result.escape(p -> XSS.safeHtml(HtmlUtil.escapeJS(p)));
+	public static SafeHtml src(CharSequence input) {
+		return _createOrApply(input, EscapeOperations.URL);
 	}
 
-	protected static EscapedString getEscapedString(Object input) {
+	public static VerifiedJavaScript js(CharSequence input) {
+		return _createOrApply(input, EscapeOperations.JS);
+	}
+
+	protected static EscapedString getEscapedString(CharSequence input) {
 		if (input instanceof EscapedString) {
 			return (EscapedString) input;
 		}
 		else {
-			return new XSSEscapedStringImpl(input);
+			return new EscapedStringImpl(input.toString());
 		}
 	}
 
 	public interface EscapedString extends CharSequence {
-		public String getRawString();
 
-		public SafeHtml escape(Function<String, SafeHtml> f);
+		public EscapedString map(Function<String, String> f);
+		public EscapedString apply(EscapeOperation ... escapeOperation);
+
 	}
 
 	public interface SafeHtml extends EscapedString {}
-	public interface VerifiedJavaScript extends EscapedString {}
 
+	public interface VerifiedJavaScript extends EscapedString {}
 	public interface TranslationContent extends EscapedString {}
+
+	private static EscapedStringImpl _createOrApply(
+		CharSequence cs, EscapeOperation ... escapeOperation) {
+
+		if (cs instanceof EscapedStringImpl) {
+			EscapedStringImpl escapedString = (EscapedStringImpl) cs;
+
+			return escapedString.apply(escapeOperation);
+		}
+
+		return new EscapedStringImpl(cs.toString()).apply(escapeOperation);
+	}
+
 }

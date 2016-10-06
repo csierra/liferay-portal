@@ -15,9 +15,6 @@
 package com.liferay.portal.kernel.security.xss;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.language.LanguageWrapper;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.ResourceBundle;
 
 /**
@@ -34,12 +31,12 @@ public class XSSLang {
 		return key;
 	}
 
-	public static CharSequence format(
-		HttpServletRequest request, String pattern, LanguageWrapper argument) {
-
-
-
-	}
+//	public static CharSequence format(
+//		HttpServletRequest request, String pattern, LanguageWrapper argument) {
+//
+//
+//
+//	}
 
 
 
