@@ -62,7 +62,7 @@ public class InlineUtil {
 			if (!key.equals("class")) {
 				sb.append(key.toString());
 				sb.append("=\"");
-				sb.append(XSS.attribute(value));
+				sb.append(XSS.attribute(value.toString()));
 				sb.append("\" ");
 			}
 		}
