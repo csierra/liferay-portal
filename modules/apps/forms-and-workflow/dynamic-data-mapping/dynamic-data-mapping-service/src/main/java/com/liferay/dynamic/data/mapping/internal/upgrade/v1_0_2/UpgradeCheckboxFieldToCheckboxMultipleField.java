@@ -73,8 +73,8 @@ public class UpgradeCheckboxFieldToCheckboxMultipleField
 			PreparedStatement ps2 =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					connection,
-					"update DDMStructure set definition = ? " +
-						" where structureId = ?")) {
+					"update DDMStructure set definition = ? where " +
+						"structureId = ?")) {
 
 			ps1.setInt(1, _SCOPE_FORMS);
 			ps1.setString(2, "%checkbox%");
@@ -89,6 +89,7 @@ public class UpgradeCheckboxFieldToCheckboxMultipleField
 						definition);
 
 					ps2.setString(1, newDefinition);
+
 					ps2.setLong(2, structureId);
 
 					ps2.addBatch();
@@ -190,8 +191,7 @@ public class UpgradeCheckboxFieldToCheckboxMultipleField
 			PreparedStatement ps2 =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					connection,
-					"update DDMContent set data_= ? " +
-						"where contentId = ? ")) {
+					"update DDMContent set data_= ? where contentId = ? ")) {
 
 			ps1.setLong(1, recordSetId);
 
@@ -209,6 +209,7 @@ public class UpgradeCheckboxFieldToCheckboxMultipleField
 					ps2.setString(
 						1,
 						_ddmFormValuesJSONSerializer.serialize(ddmFormValues));
+
 					ps2.setLong(2, contentId);
 
 					ps2.addBatch();

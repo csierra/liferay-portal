@@ -30,6 +30,8 @@ import com.liferay.portal.tools.ToolsUtil;
 import com.liferay.source.formatter.checkstyle.util.CheckStyleUtil;
 import com.liferay.source.formatter.util.FileUtil;
 
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.JavaSource;
 
@@ -996,7 +998,9 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		// LPS-65213
 
-		checkVerifyUpgradeConnection(fileName, className, newContent);
+		if (portalSource) {
+			checkVerifyUpgradeConnection(fileName, className, newContent);
+		}
 
 		checkUpgradeClass(fileName, absolutePath, className, newContent);
 
@@ -1734,10 +1738,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	protected String formatDeprecatedJavadoc(
 			String fileName, String absolutePath, String line)
 		throws Exception {
-
-		if (!portalSource) {
-			return line;
-		}
 
 		Matcher matcher = _deprecatedPattern.matcher(line);
 
@@ -2612,7 +2612,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 					if (trimmedLine.matches("^\\} (catch|else|finally) .*")) {
 						processMessage(
-							fileName, "There should be a line break after '{'",
+							fileName, "There should be a line break after '}'",
 							lineCount);
 					}
 
@@ -4025,10 +4025,10 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		for (String fileName : fileNames) {
 			fileName = StringUtil.replace(
-				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+				fileName, CharPool.BACK_SLASH, CharPool.SLASH);
 
 			String className = StringUtil.replace(
-				fileName, StringPool.SLASH, StringPool.PERIOD);
+				fileName, CharPool.SLASH, CharPool.PERIOD);
 
 			int pos = className.lastIndexOf(".com.liferay.");
 
@@ -4233,6 +4233,50 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		fileNames.addAll(getFileNames(excludes, includes));
 
 		return fileNames;
+	}
+
+	protected List<File> getSuppressionsFiles() throws Exception {
+		String fileName = "checkstyle-suppressions.xml";
+
+		List<File> suppressionsFiles = new ArrayList<>();
+
+		// Find suppressions file in portal-impl/src/
+
+		if (portalSource) {
+			suppressionsFiles.add(
+				getFile("portal-impl/src/" + fileName, PORTAL_MAX_DIR_LEVEL));
+		}
+
+		// Find suppressions files in any parent directory
+
+		String parentDirName = sourceFormatterArgs.getBaseDirName() + "../";
+
+		for (int i = 0; i < PORTAL_MAX_DIR_LEVEL - 1; i++) {
+			File suppressionsFile = new File(parentDirName + fileName);
+
+			if (suppressionsFile.exists()) {
+				suppressionsFiles.add(suppressionsFile);
+			}
+
+			parentDirName += "../";
+		}
+
+		// Find suppressions files in any child directory
+
+		List<String> moduleSuppressionsFileNames =
+			getFileNames(
+				sourceFormatterArgs.getBaseDirName(), null, new String[0],
+				new String[] {"**/modules/**/" + fileName});
+
+		for (String moduleSuppressionsFileName : moduleSuppressionsFileNames) {
+			moduleSuppressionsFileName = StringUtil.replace(
+				moduleSuppressionsFileName, CharPool.BACK_SLASH,
+				CharPool.SLASH);
+
+			suppressionsFiles.add(new File(moduleSuppressionsFileName));
+		}
+
+		return suppressionsFiles;
 	}
 
 	protected String getTruncateLongLinesContent(
@@ -4483,10 +4527,17 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		try {
 			processCheckStyle();
 		}
-		catch (UnknownHostException uhe) {
-			System.out.println(
-				"Could not perform Checkstyle checks. Please check your " +
-					"network connection.");
+		catch (CheckstyleException ce) {
+			Throwable cause = ce.getCause();
+
+			if (cause instanceof UnknownHostException) {
+				System.out.println(
+					"Could not perform Checkstyle checks. Please check your " +
+						"network connection.");
+			}
+			else {
+				throw ce;
+			}
 		}
 	}
 
@@ -4521,7 +4572,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	}
 
 	protected void processCheckStyle() throws Exception {
-		if (!portalSource) {
+		if (_ungeneratedFiles.isEmpty()) {
 			return;
 		}
 
@@ -4529,7 +4580,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		Set<SourceFormatterMessage> sourceFormatterMessages =
 			CheckStyleUtil.process(
-				_ungeneratedFiles, getAbsolutePath(baseDirFile));
+				_ungeneratedFiles, getSuppressionsFiles(),
+				getAbsolutePath(baseDirFile));
 
 		for (SourceFormatterMessage sourceFormatterMessage :
 				sourceFormatterMessages) {

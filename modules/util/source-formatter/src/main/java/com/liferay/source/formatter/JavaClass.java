@@ -108,6 +108,10 @@ public class JavaClass {
 				checkConstructor(javaTerm);
 			}
 
+			if (javaTerm.isClass()) {
+				_formatMissingLineBreak(javaTerm);
+			}
+
 			_formatBooleanStatements(javaTerm);
 			_formatReturnStatements(javaTerm);
 
@@ -1153,6 +1157,11 @@ public class JavaClass {
 				}
 
 				javaTermName = (String)tuple.getObject(0);
+
+				if (!Validator.isVariableName(javaTermName)) {
+					return Collections.emptySet();
+				}
+
 				javaTermStartPosition = javaTermEndPosition;
 				javaTermType = (Integer)tuple.getObject(1);
 
@@ -1585,6 +1594,20 @@ public class JavaClass {
 		}
 	}
 
+	private void _formatMissingLineBreak(JavaTerm javaTerm) {
+		String javaTermContent = javaTerm.getContent();
+
+		Matcher matcher = _missingEmptyLinePattern.matcher(javaTermContent);
+
+		if (matcher.find()) {
+			String newJavaTermContent = StringUtil.insert(
+				javaTermContent, "\n", matcher.start(1));
+
+			_classContent = StringUtil.replace(
+				_classContent, javaTermContent, newJavaTermContent);
+		}
+	}
+
 	private void _formatReturnStatement(
 		String javaTermContent, String returnStatement, String tabs,
 		String ifCondition, String trueValue, String falseValue) {
@@ -1806,6 +1829,8 @@ public class JavaClass {
 	private final Pattern _lineBreakPattern = Pattern.compile(
 		"\n(.*)\\(\n((.+,\n)*.*\\)) \\+\n");
 	private final int _lineCount;
+	private final Pattern _missingEmptyLinePattern = Pattern.compile(
+		"[^\n{](\n)\t*\\}\n*$");
 	private final String _name;
 	private final JavaClass _outerClass;
 	private String _packagePath;

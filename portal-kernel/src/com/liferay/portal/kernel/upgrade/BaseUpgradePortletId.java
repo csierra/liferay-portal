@@ -253,6 +253,7 @@ public abstract class BaseUpgradePortletId extends UpgradeProcess {
 					portletId, oldRootPortletId, newRootPortletId);
 
 				ps2.setString(1, newPortletId);
+
 				ps2.setLong(2, portletPreferencesId);
 
 				ps2.addBatch();
@@ -308,8 +309,8 @@ public abstract class BaseUpgradePortletId extends UpgradeProcess {
 		throws Exception {
 
 		String sql =
-			"update LayoutRevision set typeSettings = ? " +
-				"where layoutRevisionId = " + layoutRevisionId;
+			"update LayoutRevision set typeSettings = ? where " +
+				"layoutRevisionId = " + layoutRevisionId;
 
 		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 			ps.setString(1, typeSettings);

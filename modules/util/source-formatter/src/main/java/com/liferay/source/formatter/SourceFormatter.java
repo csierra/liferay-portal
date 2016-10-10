@@ -194,8 +194,10 @@ public class SourceFormatter {
 		sourceProcessors.add(new JSONSourceProcessor());
 		sourceProcessors.add(new JSPSourceProcessor());
 		sourceProcessors.add(new JSSourceProcessor());
+		sourceProcessors.add(new MarkdownSourceProcessor());
 		sourceProcessors.add(new PropertiesSourceProcessor());
 		sourceProcessors.add(new SHSourceProcessor());
+		sourceProcessors.add(new SoySourceProcessor());
 		sourceProcessors.add(new SQLSourceProcessor());
 		sourceProcessors.add(new TLDSourceProcessor());
 		sourceProcessors.add(new XMLSourceProcessor());
@@ -467,8 +469,9 @@ public class SourceFormatter {
 
 	private static final List<String> _defaultExcludes = Arrays.asList(
 		"**/.git/**", "**/.gradle/**", "**/bin/**", "**/build/**",
-		"**/classes/**", "**/node_modules/**", "**/test-classes/**",
-		"**/test-coverage/**", "**/test-results/**", "**/tmp/**");
+		"**/classes/**", "**/node_modules/**", "**/npm-shrinkwrap.json",
+		"**/test-classes/**", "**/test-coverage/**", "**/test-results/**",
+		"**/tmp/**");
 
 	private volatile SourceMismatchException _firstSourceMismatchException;
 	private final List<String> _modifiedFileNames =

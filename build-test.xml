@@ -4023,6 +4023,137 @@ go]]></replacevalue>
 					match="(&lt;failure\s*)type"
 					replace="\1message"
 				/>
+
+				<local name="file.name" />
+
+				<property name="file.name" value="@{file.name}" />
+
+				<beanshell>
+					<![CDATA[
+						import java.io.BufferedReader;
+						import java.io.File;
+						import java.io.IOException;
+
+						import java.util.regex.Matcher;
+						import java.util.regex.Pattern;
+
+						Pattern failurePattern = Pattern.compile("<failure message=\"(?<failureMessage>[^\"]*)\" />");
+						Pattern testrayTestcaseNamePattern = Pattern.compile("<property name=\"testray.testcase.name\" value=\"(?<testrayTestcaseName>[^\"]*)\" ?/>");
+
+						BufferedReader bufferedReader = null;
+
+						Set testcaseFailures = new HashSet();
+						List testcaseNames = new ArrayList();
+						Map testcasePropertyLocations = new HashMap();
+
+						try {
+							File file = new File(project.getProperty("file.name"));
+
+							bufferedReader = new BufferedReader(new FileReader(file));
+
+							String line;
+
+							List lines = new ArrayList();
+
+							int lineNumber = 0;
+
+							Integer propertiesLocation = null;
+							Boolean testcaseFailed = null;
+							String testrayTestcaseName = null;
+
+							while ((line = bufferedReader.readLine()) != null) {
+								lineNumber++;
+
+								lines.add(line);
+
+								if (line.contains("<testcase>")) {
+									propertiesLocation = null;
+									testcaseFailed = null;
+									testrayTestcaseName = null;
+
+									continue;
+								}
+
+								Matcher testrayTestcaseNameMatcher = testrayTestcaseNamePattern.matcher(line);
+
+								if (testrayTestcaseNameMatcher.find()) {
+									testrayTestcaseName = testrayTestcaseNameMatcher.group("testrayTestcaseName");
+
+									continue;
+								}
+
+								Matcher failureMatcher = failurePattern.matcher(line);
+
+								if (failureMatcher.find()) {
+									testcaseFailed = true;
+
+									continue;
+								}
+
+								if (line.contains("<properties>")) {
+									propertiesLocation = lineNumber;
+
+									continue;
+								}
+
+								if (line.contains("</testcase>")) {
+									if ((testrayTestcaseName != null) && (propertiesLocation != null)) {
+										testcaseNames.add(testrayTestcaseName);
+
+										testcasePropertyLocations.put(propertiesLocation, testrayTestcaseName);
+
+										if ((testcaseFailed != null) && (testcaseFailed.equals(Boolean.TRUE))) {
+											testcaseFailures.add(testrayTestcaseName);
+										}
+
+										testcaseFailed = null;
+										testrayTestcaseName = null;
+										propertiesLocation = null;
+									}
+									else {
+										System.out.println("WARNING: This testcase block doesn't include a testray.testcase.name property");
+									}
+
+									testcaseFailed = null;
+									testrayTestcaseName = null;
+								}
+							}
+
+							bufferedReader.close();
+
+							List propertyLocations = new ArrayList(testcasePropertyLocations.keySet());
+
+							Collections.sort(propertyLocations, Collections.reverseOrder());
+
+							for (Integer propertyLocation : propertyLocations) {
+								String testrayTestcaseName = testcasePropertyLocations.get(propertyLocation);
+
+								lines.add(propertyLocation, "<property name=\"testray.case.type.name\" value=\"Automated Functional Test\" />");
+
+								if (testcaseFailures.contains(testrayTestcaseName)) {
+									lines.add(propertyLocation, "<property name=\"testray.testcase.status\" value=\"failed\" />");
+								}
+								else {
+									lines.add(propertyLocation, "<property name=\"testray.testcase.status\" value=\"passed\" />");
+								}
+							}
+
+
+							FileWriter fileWriter = new FileWriter(file);
+							BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+							for (String currentLine : lines) {
+								bufferedWriter.write(currentLine);
+								bufferedWriter.write('\n');
+							}
+
+							bufferedWriter.close();
+						}
+						catch (IOException e) {
+							e.printStackTrace();
+						}
+					]]>
+				</beanshell>
 			</sequential>
 		</for>
 	</target>
@@ -5591,10 +5722,6 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 	</target>
 
 	<target name="prepare-portal-properties">
-		<execute>
-			<![CDATA[git checkout -- portal-impl/src/portal.properties]]>
-		</execute>
-
 		<replace file="portal-impl/src/portal.properties">
 			<replacefilter
 				token="#upgrade.processes="
@@ -5916,6 +6043,15 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
 					liferay.portal.bundle=${liferay.portal.bundle}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="marketplace.url" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					marketplace.url=${marketplace.url}
 				</echo>
 			</then>
 		</if>
@@ -7975,64 +8111,6 @@ jdbc.default.password=${database.mysql.password}</echo>
 					</then>
 				</if>
 
-				<property name="console.log.base.dir" value="${liferay.home}/logs" />
-
-				<fileset dir="${console.log.base.dir}" erroronmissingdir="false" id="fileset.id">
-					<include name="*.log" />
-				</fileset>
-
-				<property name="console.log.file.names" value="${toString:fileset.id}" />
-
-				<if>
-					<not>
-						<equals arg1="${console.log.file.names}" arg2="" />
-					</not>
-					<then>
-						<beanshell>
-							<![CDATA[
-								import org.apache.commons.io.FileUtils;
-								import org.apache.tools.ant.DirectoryScanner;
-
-								String consoleLogBaseDir = project.getProperty("console.log.base.dir");
-								String consoleLogFileNames = project.getProperty("console.log.file.names");
-
-								Map consoleLogFiles = new TreeMap();
-
-								DirectoryScanner directoryScanner = new DirectoryScanner();
-
-								directoryScanner.setBasedir(consoleLogBaseDir);
-								directoryScanner.setIncludes(consoleLogFileNames.split(";"));
-
-								directoryScanner.scan();
-
-								for (String filePath : directoryScanner.getIncludedFiles()) {
-									filePath = consoleLogBaseDir + "/" + filePath;
-
-									File file = new File(filePath);
-
-									consoleLogFiles.put(Long.toString(file.lastModified()), file);
-								}
-
-								StringBuilder sb = new StringBuilder();
-
-								SortedSet keys = new TreeSet(consoleLogFiles.keySet());
-
-								for (String key : keys) {
-									File file = consoleLogFiles.get(key);
-
-									sb.append(FileUtils.readFileToString(file));
-								}
-
-								project.setProperty("console.log.file.content", sb.toString());
-							]]>
-						</beanshell>
-
-						<echo file="portal-web/test-results/${poshi.runner.results.dir}/liferay.log">${console.log.file.content}</echo>
-
-						<echo file="${jenkins.shared.results.dir}/${job.name}/builds/${env.BUILD_NUMBER}/liferay.log">${console.log.file.content}</echo>
-					</then>
-				</if>
-
 				<antcall target="run-poshi-evaluate-console" />
 
 				<if>
@@ -8259,13 +8337,13 @@ jdbc.default.password=${database.mysql.password}</echo>
 					<then>
 						<exec executable="/bin/bash" os="${os.unix}" outputproperty="cmis.repository.vm.host.name">
 							<arg value="-c" />
-							<arg value="curl &quot;http://it.liferay.com/osb-ici-controller-web/vm/allocation/borrow?leaseTime=300000&amp;resourceType=qa%2E${cmis.repository.type}&quot;" />
+							<arg value="curl &quot;http://it.liferay.com/osb-ici-controller-web/vm/allocation/borrow?leaseTime=600000&amp;resourceType=qa%2E${cmis.repository.type}&quot;" />
 						</exec>
 					</then>
 					<else>
 						<exec executable="cmd" outputproperty="cmis.repository.vm.host.name">
 							<arg value="/c" />
-							<arg value="curl &quot;http://it.liferay.com/osb-ici-controller-web/vm/allocation/borrow?leaseTime=300000&amp;resourceType=qa%2E${cmis.repository.type}&quot;" />
+							<arg value="curl &quot;http://it.liferay.com/osb-ici-controller-web/vm/allocation/borrow?leaseTime=600000&amp;resourceType=qa%2E${cmis.repository.type}&quot;" />
 						</exec>
 					</else>
 				</if>

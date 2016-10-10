@@ -1124,7 +1124,7 @@ public class StringUtil {
 					continue;
 				}
 
-				if ((i + texts[j].length() <= toIndex + 1) &&
+				if (((i + texts[j].length()) <= (toIndex + 1)) &&
 					s.startsWith(texts[j], i)) {
 
 					return i;
@@ -1556,7 +1556,7 @@ public class StringUtil {
 					continue;
 				}
 
-				if ((i + texts[j].length() <= toIndex + 1) &&
+				if (((i + texts[j].length()) <= (toIndex + 1)) &&
 					s.startsWith(texts[j], i)) {
 
 					return i;
@@ -3405,19 +3405,21 @@ public class StringUtil {
 			return null;
 		}
 
-		if (s.length() <= length) {
+		if (s.codePointCount(0, s.length()) <= length) {
 			return s;
 		}
 
 		if (length < suffix.length()) {
-			return s.substring(0, length);
+			return s.substring(0, s.offsetByCodePoints(0, length));
 		}
 
 		int curLength = length;
 
-		for (int j = (curLength - suffix.length()); j >= 0; j--) {
-			if (Character.isWhitespace(s.charAt(j))) {
-				curLength = j;
+		for (int j = (curLength - suffix.length() + 1), offset; j > 0; j--) {
+			offset = s.offsetByCodePoints(0, j);
+
+			if (Character.isWhitespace(s.codePointBefore(offset))) {
+				curLength = j - 1;
 
 				break;
 			}
@@ -3427,7 +3429,7 @@ public class StringUtil {
 			curLength = length - suffix.length();
 		}
 
-		String temp = s.substring(0, curLength);
+		String temp = s.substring(0, s.offsetByCodePoints(0, curLength));
 
 		return temp.concat(suffix);
 	}
@@ -3540,29 +3542,9 @@ public class StringUtil {
 			return _emptyStringArray;
 		}
 
-		if ((delimiter == CharPool.RETURN) ||
-			(delimiter == CharPool.NEW_LINE)) {
-
-			return splitLines(s);
-		}
-
 		List<String> nodeValues = new ArrayList<>();
 
-		int offset = 0;
-
-		int pos = s.indexOf(delimiter, offset);
-
-		while (pos != -1) {
-			nodeValues.add(s.substring(offset, pos));
-
-			offset = pos + 1;
-
-			pos = s.indexOf(delimiter, offset);
-		}
-
-		if (offset < s.length()) {
-			nodeValues.add(s.substring(offset));
-		}
+		_split(nodeValues, s, 0, delimiter);
 
 		return nodeValues.toArray(new String[nodeValues.size()]);
 	}
@@ -3929,23 +3911,22 @@ public class StringUtil {
 
 		while (true) {
 			int returnIndex = s.indexOf(CharPool.RETURN, lastIndex);
-			int newLineIndex = s.indexOf(CharPool.NEW_LINE, lastIndex);
-
-			if ((returnIndex == -1) && (newLineIndex == -1)) {
-				break;
-			}
 
 			if (returnIndex == -1) {
-				lines.add(s.substring(lastIndex, newLineIndex));
+				_split(lines, s, lastIndex, CharPool.NEW_LINE);
 
-				lastIndex = newLineIndex + 1;
+				return lines.toArray(new String[lines.size()]);
 			}
-			else if (newLineIndex == -1) {
-				lines.add(s.substring(lastIndex, returnIndex));
 
-				lastIndex = returnIndex + 1;
+			int newLineIndex = s.indexOf(CharPool.NEW_LINE, lastIndex);
+
+			if (newLineIndex == -1) {
+				_split(lines, s, lastIndex, CharPool.RETURN);
+
+				return lines.toArray(new String[lines.size()]);
 			}
-			else if (newLineIndex < returnIndex) {
+
+			if (newLineIndex < returnIndex) {
 				lines.add(s.substring(lastIndex, newLineIndex));
 
 				lastIndex = newLineIndex + 1;
@@ -3960,12 +3941,6 @@ public class StringUtil {
 				}
 			}
 		}
-
-		if (lastIndex < s.length()) {
-			lines.add(s.substring(lastIndex));
-		}
-
-		return lines.toArray(new String[lines.size()]);
 	}
 
 	/**
@@ -4359,7 +4334,7 @@ public class StringUtil {
 		int index = 16;
 
 		do {
-			buffer[--index] = HEX_DIGITS[(int) (l & 15)];
+			buffer[--index] = HEX_DIGITS[(int)(l & 15)];
 
 			l >>>= 4;
 		}
@@ -5144,6 +5119,24 @@ public class StringUtil {
 		}
 
 		return Character.isWhitespace(c);
+	}
+
+	private static void _split(
+		List<String> values, String s, int offset, char delimiter) {
+
+		int pos = s.indexOf(delimiter, offset);
+
+		while (pos != -1) {
+			values.add(s.substring(offset, pos));
+
+			offset = pos + 1;
+
+			pos = s.indexOf(delimiter, offset);
+		}
+
+		if (offset < s.length()) {
+			values.add(s.substring(offset));
+		}
 	}
 
 	private static String _wrap(String text, int width, String lineSeparator)
