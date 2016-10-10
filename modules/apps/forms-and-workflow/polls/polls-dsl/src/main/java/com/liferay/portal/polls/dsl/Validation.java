@@ -19,7 +19,6 @@ import com.liferay.portal.polls.dsl.ValidationResult.Success;
 
 import java.util.Collections;
 
-import static com.liferay.portal.polls.dsl.ValidationResult.pure;
 
 /**
  * @author Carlos Sierra Andrés
@@ -27,9 +26,16 @@ import static com.liferay.portal.polls.dsl.ValidationResult.pure;
 public interface Validation<T> {
 	public ValidationResult<T> validate(T input);
 
-	public default Validation<T> and(Validation<T> other) {
-		return (input) -> (ValidationResult<T>) validate(input).flatMap(o -> other.validate(input));
-	}
+//	public default Validation<T> and(Validation<T> other) {
+//		return (input) -> {
+//			ValidationResult<T> validate = validate(input);
+//
+//			new Success<>(other::validate).apply(validate);
+//
+//			return validate;
+//		};
+
+//	}
 
 	public static Validation<String> dni = input -> {
 		if (input.length() == 9) {
@@ -53,16 +59,16 @@ public interface Validation<T> {
 	}
 
 	public static void main(String[] args) {
-		Validation<String> validation = dni.and(startsWith("502"));
+		Validation<String> validation = dni;
 
-		ValidationResult<String> safeDni = validation.validate("50111539");
+		ValidationResult<String> safeDni = validation.validate("50111539D");
 
 		ApplicativeInstance<ValidationResult<?>> applicativeInstance =
 			new ApplicativeInstance<ValidationResult<?>>() {};
 
 		Applicative<ValidationResult<?>, OptionalInstance.MyClass> result =
 			applicativeInstance.lift(
-				OptionalInstance.MyClass::new).apply(pure(38), safeDni);
+				OptionalInstance.MyClass::new, new Success<>(38), safeDni);
 
 		System.out.println(result);
 

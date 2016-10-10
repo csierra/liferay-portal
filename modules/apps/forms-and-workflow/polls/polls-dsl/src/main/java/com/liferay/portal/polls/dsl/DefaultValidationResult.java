@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,18 +14,14 @@
 
 package com.liferay.portal.polls.dsl;
 
-import javaslang.Function1;
-
 /**
  * @author Carlos Sierra Andrés
  */
-public interface Applicative<AP, T> extends Functor<T> {
+public interface DefaultValidationResult<T> extends
+	Applicative<ValidationResult<?>, T> {
 
 	@Override
-	<S> Applicative<AP, S> fmap(Function1<T, S> fun);
-
-	<S, U> Applicative<AP, U> apply(Applicative<AP, S> ap);
-
-	<S> Applicative<AP, S> pure(S s);
-
+	default <S> Applicative<ValidationResult<?>, S> pure(S s) {
+		return new ValidationResult.Success<>(s);
+	}
 }

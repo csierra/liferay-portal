@@ -14,6 +14,7 @@
 
 package com.liferay.portal.polls.dsl;
 
+import com.sun.tools.corba.se.idl.constExpr.Not;
 import javaslang.Function1;
 import javaslang.Function2;
 
@@ -26,20 +27,28 @@ public interface OptionalInstance extends ApplicativeInstance<Optional<?>> {
 
 	public interface OptionalApplicative<T> extends Applicative<Optional<?>, T> {
 		@Override
-		<S> OptionalApplicative<S> flatMap(
-			Function1<T, Applicative<Optional<?>, S>> fun);
-
-		@Override
 		<S> OptionalApplicative<S> fmap(Function1<T, S> fun);
 
 		boolean isPresent();
+
+		@Override
+		default <S> Applicative<Optional<?>, S> pure(S s) {
+			return new Some<>(Optional.of(s));
+		}
 	}
 
 	public static class Nothing<T> implements OptionalApplicative<T> {
 
 		@Override
 		public <S> OptionalApplicative<S> fmap(Function1<T, S> fun) {
-			return new Nothing<>();
+			return (OptionalApplicative<S>)new Nothing();
+		}
+
+		@Override
+		public <S, U> Applicative<Optional<?>, U> apply(
+			Applicative<Optional<?>, S> ap) {
+
+			return (OptionalApplicative)new Nothing();
 		}
 
 		@Override
@@ -47,12 +56,12 @@ public interface OptionalInstance extends ApplicativeInstance<Optional<?>> {
 			return false;
 		}
 
-		@Override
-		public <S> OptionalApplicative<S> flatMap(
-			Function1<T, Applicative<Optional<?>, S>> fun) {
-
-			return new Nothing<>();
-		}
+//		@Override
+//		public <S> OptionalApplicative<S> flatMap(
+//			Function1<T, Applicative<Optional<?>, S>> fun) {
+//
+//			return new Nothing<>();
+//		}
 
 		@Override
 		public String toString() {
@@ -74,19 +83,29 @@ public interface OptionalInstance extends ApplicativeInstance<Optional<?>> {
 		}
 
 		@Override
+		public <S, U> Applicative<Optional<?>, U> apply(
+			Applicative<Optional<?>, S> ap) {
+
+			return ((OptionalApplicative<S>) ap).fmap(
+					(Function1<S, U>) _t.get());
+		}
+
+		@Override
 		public boolean isPresent() {
 			return true;
 		}
 
-		@Override
-		public <S> OptionalApplicative<S> flatMap(
-			Function1<T, Applicative<Optional<?>, S>> fun) {
+//		@Override
+//		public <S> OptionalApplicative<S> flatMap(
+//			Function1<T, Applicative<Optional<?>, S>> fun) {
+//
+//			Optional<Applicative<Optional<?>, S>> applicativeOptional =
+//				_t.map(fun);
+//
+//			return (OptionalApplicative<S>)applicativeOptional.get();
+//		}
 
-			Optional<Applicative<Optional<?>, S>> applicativeOptional =
-				_t.map(fun);
 
-			return (OptionalApplicative<S>)applicativeOptional.get();
-		}
 
 		@Override
 		public String toString() {
@@ -101,18 +120,10 @@ public interface OptionalInstance extends ApplicativeInstance<Optional<?>> {
 	public static void main(String[] args) {
 		OptionalInstance optionalInstance = new OptionalInstance(){};
 
-		OptionalApplicative<MyClass> carlos =
-			(OptionalApplicative<MyClass>)
-				optionalInstance.lift(MyClass::new).apply(
-					pureOptional(38),
-					pureOptional("Carlos"));
+		Applicative<Optional<?>, MyClass> carlos = optionalInstance.lift(
+			MyClass::new, pureOptional(38), pureOptional("Carlos"));
 
-		if (carlos.isPresent()) {
-			System.out.println(carlos);
-		}
-		else {
-			System.out.println("Nothing to be shown");
-		}
+		System.out.println(carlos);
 	}
 
 	public static class MyClass {

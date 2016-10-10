@@ -28,85 +28,78 @@ import javaslang.Function8;
  */
 public interface ApplicativeInstance<AP> {
 
-	public default <A, T> Lifted1<AP, A, T> lift(Function1<A, T> fun) {
-		return a -> a.fmap(fun);
+	public default <A, T> Applicative<AP, T> lift(
+		Function1<A, T> fun, Applicative<AP, A> ap) {
+
+		return ap.pure(fun.curried()).apply(ap);
 	}
 
-	public default <A, B, T> Lifted2<AP, A, B, T> lift(Function2<A, B, T> fun) {
-		return (a , b) -> a.fmap(fun.curried()).flatMap(f -> b.fmap(f));
+	public default <A, B, T> Applicative<AP, T> lift(Function2<A, B, T> fun, Applicative<AP, A> a, Applicative<AP, B> b) {
+		return a.pure(fun.curried()).apply(a).apply(b);
 	}
 
-	public default <A, B, C, T> Lifted3<AP, A, B, C, T> lift(Function3<A, B, C, T> fun) {
-		return (a , b, c) -> a.fmap(fun.curried()).flatMap(f -> b.fmap(f)).flatMap(f2 -> c.fmap(f2));
+	public default <A, B, C, T>  Applicative<AP, T> lift(Function3<A, B, C, T> fun, Applicative<AP, A> a, Applicative<AP, B> b, Applicative<AP, C> c) {
+		return a.pure(fun.curried()).apply(a).apply(b).apply(c);
 	}
 
-	public default <A, B, C, D, T> Lifted4<AP, A, B, C, D, T> lift(
-		Function4<A, B, C, D, T> fun) {
-		return (a , b, c, d) -> a.fmap(fun.curried()).flatMap(f -> b.fmap(f)).flatMap(f2 -> c.fmap(f2)).flatMap(f3 -> d.fmap(f3));
-	}
+//	public default <A, B, C, D, T> Lifted4<AP, A, B, C, D, T> lift(
+//		Function4<A, B, C, D, T> fun) {
+//
+//		return (a) -> (Lifted3<AP, B, C, D, T>) a.fmap(fun::apply);
+//	}
+//
+//	public default <A, B, C, D, E, T> Lifted5<AP, A, B, C, D, E, T> lift(
+//		Function5<A, B, C, D, E, T> fun) {
+//
+//		return (a) -> (Lifted4<AP, B, C, D, E, T>) a.fmap(fun::apply);
+//	}
+//
+//	public default <A, B, C, D, E, F, T> Lifted6<AP, A, B, C, D, E, F, T> lift(
+//		Function6<A, B, C, D, E, F, T> fun) {
+//
+//		return (a) -> (Lifted5<AP, B, C, D, E, F, T>) a.fmap(fun::apply);	}
+//
+//	public default <A, B, C, D, E, F, G, T> Lifted7<AP, A, B, C, D, E, F, G, T> lift(
+//		Function7<A, B, C, D, E, F, G, T> fun) {
+//
+//		return (a) -> (Lifted6<AP, B, C, D, E, F, G, T>) a.fmap(fun::apply);	}
+//
+//	public default <A, B, C, D, E, F, G, H, T> Lifted8<AP, A, B, C, D, E, F, G, H, T> lift(
+//		Function8<A, B, C, D, E, F, G, H, T> fun) {
+//
+//		return (a) -> (Lifted7<AP, B, C, D, E, F, G, H, T>) a.fmap(fun::apply);
+//	}
 
-	public default <A, B, C, D, E, T> Lifted5<AP, A, B, C, D, E, T> lift(
-		Function5<A, B, C, D, E, T> fun) {
-		return (a , b, c, d, e) -> a.fmap(fun.curried()).flatMap(f -> b.fmap(f)).flatMap(f2 -> c.fmap(f2)).flatMap(f3 -> d.fmap(f3)).flatMap(f4 -> e.fmap(f4));
-	}
-
-	public default <A, B, C, D, E, F, T> Lifted6<AP, A, B, C, D, E, F, T> lift(
-		Function6<A, B, C, D, E, F, T> fun) {
-		return (a , b, c, d, e, f) -> a.fmap(fun.curried()).flatMap(f1 -> b.fmap(f1)).flatMap(f2 -> c.fmap(f2)).flatMap(f3 -> d.fmap(f3)).flatMap(f4 -> e.fmap(f4)).flatMap(f5 -> f.fmap(f5));
-	}
-
-	public default <A, B, C, D, E, F, G, T> Lifted7<AP, A, B, C, D, E, F, G, T> lift(
-		Function7<A, B, C, D, E, F, G, T> fun) {
-		return (a , b, c, d, e, f, g) -> a.fmap(fun.curried()).flatMap(f1 -> b.fmap(f1)).flatMap(f2 -> c.fmap(f2)).flatMap(f3 -> d.fmap(f3)).flatMap(f4 -> e.fmap(f4)).flatMap(f5 -> f.fmap(f5)).flatMap(f6 -> g.fmap(f6));
-	}
-
-	public default <A, B, C, D, E, F, G, H, T> Lifted8<AP, A, B, C, D, E, F, G, H, T> lift(
-		Function8<A, B, C, D, E, F, G, H, T> fun) {
-		return (a , b, c, d, e, f, g, h) -> a.fmap(fun.curried()).flatMap(f1 -> b.fmap(f1)).flatMap(f2 -> c.fmap(f2)).flatMap(f3 -> d.fmap(f3)).flatMap(f4 -> e.fmap(f4)).flatMap(f5 -> f.fmap(f5)).flatMap(f6 -> g.fmap(f6)).flatMap(f7 -> h.fmap(f7));
-	}
-
-	public interface Lifted1<AP, A, T> {
-		Applicative<AP, T> apply(Applicative<AP, A> a);
-	}
-
-	public interface Lifted2<AP, A, B, T>{
-		Applicative<AP, T> apply(Applicative<AP, A> a, Applicative<AP, B> b);
-	}
-
-	public interface Lifted3<AP, A, B, C, T> {
-		Applicative<AP, T> apply(Applicative<AP, A> a, Applicative<AP, B> b, Applicative<AP, C> c);
-	}
-
-	public interface Lifted4<AP, A, B, C, D, T> {
-		Applicative<AP, T> apply(
-			Applicative<AP, A> a, Applicative<AP, B> b, Applicative<AP, C> c,
-			Applicative<AP, D> d);
-	}
-
-	public interface Lifted5<AP, A, B, C, D, E, T> {
-		Applicative<AP, T> apply(
-			Applicative<AP, A> a, Applicative<AP, B> b, Applicative<AP, C> c,
-			Applicative<AP, D> d, Applicative<AP, E> e);
-	}
-
-	public interface Lifted6<AP, A, B, C, D, E, F, T> {
-		Applicative<AP, T> apply(
-			Applicative<AP, A> a, Applicative<AP, B> b, Applicative<AP, C> c,
-			Applicative<AP, D> d, Applicative<AP, E> e, Applicative<AP, F> f);
-	}
-
-	public interface Lifted7<AP, A, B, C, D, E, F, G, T> {
-		Applicative<AP, T> apply(
-			Applicative<AP, A> a, Applicative<AP, B> b, Applicative<AP, C> c,
-			Applicative<AP, D> d, Applicative<AP, E> e, Applicative<AP, F> f,
-			Applicative<AP, G> g);
-	}
-
-	public interface Lifted8<AP, A, B, C, D, E, F, G, H, T> {
-		Applicative<AP, T> apply(
-			Applicative<AP, A> a, Applicative<AP, B> b, Applicative<AP, C> c,
-			Applicative<AP, D> d, Applicative<AP, E> e, Applicative<AP, F> f,
-			Applicative<AP, G> g, Applicative<AP, H> h);
-	}
+//	public interface Lifted1<AP, A, T> {
+//		Applicative<AP, T> apply(Applicative<AP, A> a);
+//	}
+//
+//	public interface Lifted2<AP, A, B, T> {
+//		Lifted1<AP, B, T> apply(Applicative<AP, A> a);
+//	}
+//
+//	public interface Lifted3<AP, A, B, C, T> {
+//		Lifted2<AP, B, C, T> apply(Applicative<AP, A> a);
+//	}
+//
+//	public interface Lifted4<AP, A, B, C, D, T> extends Applicative<AP, Function4<A, B, C, D, T>> {
+//		Lifted3<AP, B, C, D, T> apply(Applicative<AP, A> a);
+//	}
+//
+//	public interface Lifted5<AP, A, B, C, D, E, T> extends Applicative<AP, Function5<A, B, C, D, E, T>> {
+//		Lifted4<AP, B, C, D, E, T> apply(Applicative<AP, A> a);
+//	}
+//
+//	public interface Lifted6<AP, A, B, C, D, E, F, T> extends Applicative<AP, Function6<A, B, C, D, E, F, T>> {
+//		Lifted5<AP, B, C, D, E, F, T> apply(Applicative<AP, A> a);
+//	}
+//
+//	public interface Lifted7<AP, A, B, C, D, E, F, G, T> extends Applicative<AP, Function7<A, B, C, D, E, F, G, T>> {
+//		Lifted6<AP, B, C, D, E, F, G, T> apply(Applicative<AP, A> a);
+//	}
+//
+//	public interface Lifted8<AP, A, B, C, D, E, F, G, H, T> extends Applicative<AP, Function8<A, B, C, D, E, F, G, H, T>> {
+//		Lifted7<AP, B, C, D, E, F, G, H, T> apply(Applicative<AP, A> a);
+//	}
 
 }

@@ -18,13 +18,13 @@ import com.liferay.portal.polls.dsl.OptionalInstance.MyClass;
 import javaslang.Function1;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface ValidationResult<T>
-	extends Applicative<ValidationResult<?>, T> {
+public interface ValidationResult<T> extends DefaultValidationResult<T> {
 
 	public class Success<T> implements ValidationResult<T> {
 
@@ -38,17 +38,22 @@ public interface ValidationResult<T>
 		public <S> Applicative<ValidationResult<?>, S> fmap(
 			Function1<T, S> fun) {
 
-			S apply = fun.apply(_t);
-
-			return new Success<>(apply);
+			return new Success<>(fun.apply(_t));
 		}
 
 		@Override
-		public <S> Applicative<ValidationResult<?>, S> flatMap(
-			Function1<T, Applicative<ValidationResult<?>, S>> fun) {
+		public <S, U> Applicative<ValidationResult<?>, U> apply(
+			Applicative<ValidationResult<?>, S> ap) {
 
-			return fun.apply(_t);
+			return ap.fmap((Function1<S, U>)_t);
 		}
+
+//		@Override
+//		public <S> Applicative<ValidationResult<?>, S> flatMap(
+//			Function1<T, Applicative<ValidationResult<?>, S>> fun) {
+//
+//			return fun.apply(_t);
+//		}
 
 		@Override
 		public String toString() {
@@ -68,29 +73,49 @@ public interface ValidationResult<T>
 		public <S> Applicative<ValidationResult<?>, S> fmap(
 			Function1<T, S> fun) {
 
-			return (Failure<S>)this;
+			return (ValidationResult)this;
 		}
 
 		@Override
-		public <S> Applicative<ValidationResult<?>, S> flatMap(
-			Function1<T, Applicative<ValidationResult<?>, S>> fun) {
+		public <S, U> Applicative<ValidationResult<?>, U> apply(
+			Applicative<ValidationResult<?>, S> ap) {
 
-			Function1 fun1 = (Function1) fun;
+			if (ap instanceof Failure) {
+				Failure failure = (Failure) ap;
 
-			Object apply = fun1.apply((Function1) o -> o);
+				ArrayList<String> reasons = new ArrayList<>();
 
-			ArrayList<String> reasons = new ArrayList<>();
-
-			reasons.addAll(_reasons);
-
-			if (apply instanceof Failure) {
-				Failure<?> failure = (Failure) apply;
-
+				reasons.addAll(this._reasons);
 				reasons.addAll(failure._reasons);
+
+				return new Failure<>(reasons);
 			}
 
-			return new Failure<>(reasons);
+			else {
+				return (ValidationResult)this;
+			}
 		}
+
+//		@Override
+//		public <S> Applicative<ValidationResult<?>, S> flatMap(
+//			Function1<T, Applicative<ValidationResult<?>, S>> fun) {
+//
+//			Function1 fun1 = (Function1) fun;
+//
+//			Object apply = fun1.apply((Function1) o -> o);
+//
+//			ArrayList<String> reasons = new ArrayList<>();
+//
+//			reasons.addAll(_reasons);
+//
+//			if (apply instanceof Failure) {
+//				Failure<?> failure = (Failure) apply;
+//
+//				reasons.addAll(failure._reasons);
+//			}
+//
+//			return new Failure<>(reasons);
+//		}
 
 		@Override
 		public String toString() {
@@ -98,21 +123,21 @@ public interface ValidationResult<T>
 		}
 	}
 
-	public static <T> Applicative<ValidationResult<?>, T> pure(T t) {
-		return new Success<>(t);
-	}
+
 
 	public static void main(String[] args) {
 		ApplicativeInstance<ValidationResult<?>> applicativeInstance =
 			new ApplicativeInstance<ValidationResult<?>>() {};
 
 		Applicative<ValidationResult<?>, MyClass> carlos =
-			applicativeInstance.lift(MyClass::new).apply(
-				pure(38),
-				pure("Carlos"));
+			applicativeInstance.lift(
+				MyClass::new,
+					new Failure<>(Collections.singletonList("Age must be a number")),
+					new Failure<>(Collections.singletonList("DNI must have 9 digits")));
 
 		System.out.println(carlos);
 	}
+
 
 
 }
