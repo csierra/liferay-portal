@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.security.test;
 
+import com.liferay.portal.kernel.security.xss.EscapeOperations;
 import com.liferay.portal.kernel.security.xss.XSS;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.util.HtmlImpl;
@@ -137,16 +138,17 @@ public class XSSTest {
 	}
 
 	@Test
-	public void testOrderIsStable() {
+	public void testOrderIsConserved() {
 		String original = "<a href=\"http://google.com\"> This is an XSS </a>";
 
-		XSS.EscapedString safeHtml = XSS.attribute(XSS.js(original));
+		XSS.EscapedString safeHtml = XSS.js(original).apply(
+			EscapeOperations.ATTRIBUTE);
 
 		Assert.assertEquals(
 			safeHtml.toString(),
-			HtmlUtil.escapeJS(HtmlUtil.escapeAttribute(original)));
+			HtmlUtil.escapeAttribute(HtmlUtil.escapeJS(original)));
 
-		safeHtml = XSS.js(XSS.attribute(original));
+		safeHtml = XSS.attribute(original).apply(EscapeOperations.JS);
 
 		Assert.assertEquals(
 			safeHtml.toString(),
@@ -154,17 +156,22 @@ public class XSSTest {
 	}
 
 	@Test
-	public void testAvoidDoubleEscapingAndOrderIsStable() {
+	public void testAvoidDoubleEscapingAndOrderIsConserved() {
 		String original = "<a href=\"http://google.com\"> This is an XSS </a>";
 
-		XSS.EscapedString safeHtml = XSS.attribute(
-			XSS.js(XSS.attribute(XSS.js(original))));
+		XSS.EscapedString safeHtml =
+			XSS.js(original).apply(
+				EscapeOperations.ATTRIBUTE, EscapeOperations.JS,
+				EscapeOperations.ATTRIBUTE);
 
 		Assert.assertEquals(
 			safeHtml.toString(),
-			HtmlUtil.escapeJS(HtmlUtil.escapeAttribute(original)));
+			HtmlUtil.escapeAttribute(HtmlUtil.escapeJS(original)));
 
-		safeHtml = XSS.js(XSS.attribute(XSS.js(XSS.attribute(original))));
+		safeHtml =
+			XSS.attribute(original).apply(
+				EscapeOperations.JS, EscapeOperations.ATTRIBUTE,
+				EscapeOperations.JS);
 
 		Assert.assertEquals(
 			safeHtml.toString(),

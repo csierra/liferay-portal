@@ -67,11 +67,18 @@ public class XSS {
 		}
 	}
 
+	public static EscapedString apply(
+		EscapedString escapedString, EscapeOperations ... escapeOperations) {
+
+		return escapedString.apply(escapeOperations);
+	}
+
 	public interface EscapedString extends CharSequence {
 
 		public EscapedString map(Function<String, String> f);
-		public EscapedString apply(EscapeOperation ... escapeOperation);
+		public EscapedString setOperations(EscapeOperation ... escapeOperation);
 
+		EscapedStringImpl apply(EscapeOperation... escapeOperation);
 	}
 
 	public interface SafeHtml extends EscapedString {}
@@ -85,10 +92,10 @@ public class XSS {
 		if (cs instanceof EscapedStringImpl) {
 			EscapedStringImpl escapedString = (EscapedStringImpl) cs;
 
-			return escapedString.apply(escapeOperation);
+			return escapedString.setOperations(escapeOperation);
 		}
 
-		return new EscapedStringImpl(cs.toString()).apply(escapeOperation);
+		return new EscapedStringImpl(cs.toString()).setOperations(escapeOperation);
 	}
 
 }

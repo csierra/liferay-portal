@@ -14,26 +14,11 @@
 
 package com.liferay.portal.kernel.security.xss;
 
-import java.util.Comparator;
-
 /**
  * @author Carlos Sierra Andrés
  */
-public interface EscapeOperation extends Comparator<EscapeOperation> {
-
-	public int getPrecendence();
+public interface EscapeOperation {
 
 	public String escape(String input);
-
-	@Override
-	public default int compare(EscapeOperation o1, EscapeOperation o2) {
-		if (o1.equals(o2)) {
-			return 0;
-		}
-		// If they are not equal but have the same precedence do not return
-		// them as equals or else one could be removed from sets
-		return Math.min(
-			Integer.compare(o1.getPrecendence(), o2.getPrecendence()), -1);
-	}
 
 }

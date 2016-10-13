@@ -15,8 +15,8 @@
 package com.liferay.portal.kernel.security.xss;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author Carlos Sierra Andrés
@@ -33,7 +33,7 @@ public final class EscapedStringImpl
 	private java.util.function.Function<String, String> _transformation =
 		x -> x;
 	private String _escaped;
-	private Set<EscapeOperation> _escapeOperations = new TreeSet<>();
+	private Set<EscapeOperation> _escapeOperations = new LinkedHashSet<>();
 
 	public EscapedStringImpl map(
 		java.util.function.Function<String, String> transformation) {
@@ -53,7 +53,16 @@ public final class EscapedStringImpl
 		}
 	}
 
-	public EscapedStringImpl apply(EscapeOperation ... escapeOperation) {
+	public EscapedStringImpl setOperations(
+		EscapeOperation ... escapeOperation) {
+
+		_escapeOperations.clear();
+
+		return apply(escapeOperation);
+	}
+
+	@Override
+	public EscapedStringImpl apply(EscapeOperation... escapeOperation) {
 		_escapeOperations.addAll(Arrays.asList(escapeOperation));
 
 		recalculate();
