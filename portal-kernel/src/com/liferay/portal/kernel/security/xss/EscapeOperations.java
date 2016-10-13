@@ -23,20 +23,27 @@ import java.util.function.Function;
  */
 public enum EscapeOperations implements EscapeOperation {
 
-	HTML(HtmlUtil::escape),
-	ATTRIBUTE(HtmlUtil::escapeAttribute),
-	CSS(HtmlUtil::escapeCSS),
-	HREF(HtmlUtil::escapeHREF),
-	JS(HtmlUtil::escapeJS),
-	JS_LINK(HtmlUtil::escapeJSLink),
-	URL(HtmlUtil::escapeURL),
-	XPATH(HtmlUtil::escapeXPath),
-	XPATH_ATTRIBUTE(HtmlUtil::escapeXPathAttribute);
+	HTML(0, HtmlUtil::escape),
+	ATTRIBUTE(1, HtmlUtil::escapeAttribute),
+	CSS(2, HtmlUtil::escapeCSS),
+	HREF(3, HtmlUtil::escapeHREF),
+	JS(4, HtmlUtil::escapeJS),
+	JS_LINK(5, HtmlUtil::escapeJSLink),
+	URL(6, HtmlUtil::escapeURL),
+	XPATH(7, HtmlUtil::escapeXPath),
+	XPATH_ATTRIBUTE(8, HtmlUtil::escapeXPathAttribute);
 
+	private final int _precedence;
 	private final Function<String, String> _f;
 
-	EscapeOperations(Function<String, String> f) {
+	EscapeOperations(int precedence, Function<String, String> f) {
+		_precedence = precedence;
 		_f = f;
+	}
+
+	@Override
+	public int getPrecendence() {
+		return _precedence;
 	}
 
 	@Override

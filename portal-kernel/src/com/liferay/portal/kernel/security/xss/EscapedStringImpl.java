@@ -14,6 +14,10 @@
 
 package com.liferay.portal.kernel.security.xss;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * @author Carlos Sierra Andrés
  */
@@ -29,7 +33,7 @@ public final class EscapedStringImpl
 	private java.util.function.Function<String, String> _transformation =
 		x -> x;
 	private String _escaped;
-	private EscapeOperation _escapeOperation;
+	private Set<EscapeOperation> _escapeOperations = new TreeSet<>();
 
 	public EscapedStringImpl map(
 		java.util.function.Function<String, String> transformation) {
@@ -44,11 +48,13 @@ public final class EscapedStringImpl
 	private void recalculate() {
 		_escaped = _transformation.apply(_original);
 
-		_escaped = _escapeOperation.escape(_escaped);
+		for (EscapeOperation escapeOperation : _escapeOperations) {
+			_escaped = escapeOperation.escape(_escaped);
+		}
 	}
 
-	public EscapedStringImpl apply(EscapeOperation escapeOperation) {
-		_escapeOperation = escapeOperation;
+	public EscapedStringImpl apply(EscapeOperation ... escapeOperation) {
+		_escapeOperations.addAll(Arrays.asList(escapeOperation));
 
 		recalculate();
 

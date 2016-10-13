@@ -70,7 +70,7 @@ public class XSS {
 	public interface EscapedString extends CharSequence {
 
 		public EscapedString map(Function<String, String> f);
-		public EscapedString apply(EscapeOperation escapeOperation);
+		public EscapedString apply(EscapeOperation ... escapeOperation);
 
 	}
 
@@ -80,7 +80,7 @@ public class XSS {
 	public interface TranslationContent extends EscapedString {}
 
 	private static EscapedStringImpl _createOrApply(
-		CharSequence cs, EscapeOperation escapeOperation) {
+		CharSequence cs, EscapeOperation ... escapeOperation) {
 
 		if (cs instanceof EscapedStringImpl) {
 			EscapedStringImpl escapedString = (EscapedStringImpl) cs;
