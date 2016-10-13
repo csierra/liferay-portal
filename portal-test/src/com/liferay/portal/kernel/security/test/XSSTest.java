@@ -63,11 +63,11 @@ public class XSSTest {
 			taglibCallBeforeOurChanges(labelForATag.toString());
 
 		// => make sure it's safe
-		Assert.assertTrue(!outputSentToBrowser.contains("'"));
+		Assert.assertFalse(outputSentToBrowser.contains("'"));
 
 		// => but test double escaping -> escaped '&' char
-		Assert.assertTrue(!outputSentToBrowser.contains(HtmlUtil.escape("&")));
-		Assert.assertTrue(!outputSentToBrowser.contains(HtmlUtil.escapeAttribute("&")));
+		Assert.assertFalse(outputSentToBrowser.contains(HtmlUtil.escape("&")));
+		Assert.assertFalse(outputSentToBrowser.contains(HtmlUtil.escapeAttribute("&")));
 
 		/*
 		*
@@ -78,11 +78,11 @@ public class XSSTest {
 			taglibCallAfterOurChanges(labelForATag);
 
 		// => make sure it's safe
-		Assert.assertTrue(!outputSentToBrowser.contains("'"));
+		Assert.assertFalse(outputSentToBrowser.contains("'"));
 
 		// => but test double escaping -> escaped '&' char
-		Assert.assertTrue(!outputSentToBrowser.contains(HtmlUtil.escape("&")));
-		Assert.assertTrue(!outputSentToBrowser.contains(HtmlUtil.escapeAttribute("&")));
+		Assert.assertFalse(outputSentToBrowser.contains(HtmlUtil.escape("&")));
+		Assert.assertFalse(outputSentToBrowser.contains(HtmlUtil.escapeAttribute("&")));
 	}
 
 	protected String taglibCallBeforeOurChanges(String label) {
@@ -134,41 +134,6 @@ public class XSSTest {
 
 		Assert.assertEquals(
 			safeHtml.toString(), HtmlUtil.escape(original));
-	}
-
-	@Test
-	public void testOrderIsStable() {
-		String original = "<a href=\"http://google.com\"> This is an XSS </a>";
-
-		XSS.EscapedString safeHtml = XSS.attribute(XSS.js(original));
-
-		Assert.assertEquals(
-			safeHtml.toString(),
-			HtmlUtil.escapeJS(HtmlUtil.escapeAttribute(original)));
-
-		safeHtml = XSS.js(XSS.attribute(original));
-
-		Assert.assertEquals(
-			safeHtml.toString(),
-			HtmlUtil.escapeJS(HtmlUtil.escapeAttribute(original)));
-	}
-
-	@Test
-	public void testAvoidDoubleEscapingAndOrderIsStable() {
-		String original = "<a href=\"http://google.com\"> This is an XSS </a>";
-
-		XSS.EscapedString safeHtml = XSS.attribute(
-			XSS.js(XSS.attribute(XSS.js(original))));
-
-		Assert.assertEquals(
-			safeHtml.toString(),
-			HtmlUtil.escapeJS(HtmlUtil.escapeAttribute(original)));
-
-		safeHtml = XSS.js(XSS.attribute(XSS.js(XSS.attribute(original))));
-
-		Assert.assertEquals(
-			safeHtml.toString(),
-			HtmlUtil.escapeJS(HtmlUtil.escapeAttribute(original)));
 	}
 
 	@Test
