@@ -1,0 +1,5 @@
+Bundle-Activator: com.liferay.functional.activator.Activator
+Bundle-Name: Functional Version of OSGi
+Bundle-SymbolicName: com.liferay.portal.polls.osgi
+Bundle-Version: 1.0.0
+-includeresource: @javaslang*.jar
