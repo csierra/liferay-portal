@@ -51,13 +51,13 @@ public class OSGi<T>
 	@Override
 	public <S> OSGi<S> map(Function1<T, S> function) {
 		return new OSGi<>(((bundleContext) -> {
-			CompletionStage<OSGiResult<T>> futureResult =
-				_operation.run(bundleContext);
+			OSGiResult<T> osGiResult = _operation.run(bundleContext);
 
-			return futureResult.thenApply(
-				result -> new OSGiResult<>(
-					function.apply(result.t), result.cleanUp, result.close));
-			}));
+			return new OSGiResult<>(
+				osGiResult.t.thenApply(function),
+				osGiResult.cleanUp,
+				osGiResult.close);
+		}));
 	}
 
 	@Override
@@ -65,39 +65,30 @@ public class OSGi<T>
 
 		return new OSGi<>(
 			(bundleContext) -> {
-				CompletionStage<OSGiResult<Function1<S, U>>> osgiResult =
+				OSGiResult<Function1<S, U>> osgiResult =
 					((OSGiOperation<Function1<S, U>>) _operation).run(
 						bundleContext);
 
-				CompletionStage<OSGiResult<S>> apCompletionStage =
+				OSGiResult<S> osgiResult2 =
 					((OSGi<S>) ap)._operation.run(bundleContext);
 
-				return osgiResult.thenCompose(or1 ->
-					apCompletionStage.thenCompose(or2 -> {
-						CompletableFuture<OSGiResult<U>> future =
-							new CompletableFuture<>();
-
-						future.complete(
-							new OSGiResult<>(
-								or1.t.apply(or2.t),
-								or1.cleanUp.applyToEither(or2.cleanUp, x -> x),
-								or1.close.andThen(or2.close)));
-
-						return future;
-					}));
+				return new OSGiResult<>(
+					osgiResult.t.thenCompose(f -> osgiResult2.t.thenApply(f)),
+					osgiResult.cleanUp.applyToEither(
+						osgiResult2.cleanUp, x -> x),
+					osgiResult.close.andThen(osgiResult2.close));
 			});
 	}
 
 	@Override
 	public <S> Applicative<OSGi<?>, S> pure(S s) {
 		return new OSGi<>(((bundleContext) -> {
-			CompletableFuture<OSGiResult<S>> completableFuture =
-				new CompletableFuture<>();
+			CompletableFuture<S> completableFuture = new CompletableFuture<>();
 
-			completableFuture.complete(
-				new OSGiResult<>(s, new CompletableFuture<>(), x -> {}));
+			completableFuture.complete(s);
 
-			return completableFuture;
+			return new OSGiResult<>(
+				completableFuture, new CompletableFuture<>(), x -> {});
 		}));
 	}
 
@@ -107,27 +98,39 @@ public class OSGi<T>
 
 		return new OSGi<>(
 			((bundleContext) -> {
-				CompletionStage<OSGiResult<T>> futureResult =
-					_operation.run(bundleContext);
 
-				Function1<T, CompletionStage<OSGiResult<S>>> funfun =
-					fun.andThen(
-						oc -> ((OSGi<S>) oc)._operation.run(
-							bundleContext));
+				OSGiResult<T> or1 = _operation.run(bundleContext);
 
-				return futureResult.thenCompose(or ->
-					funfun.apply(or.t).thenApply(
-						or2 -> new OSGiResult<>(
-							or2.t,
-							or2.cleanUp.applyToEither(or.cleanUp, x -> x),
-							or.close.andThen(or2.close))));
+				CompletableFuture<S> futureResult =
+					new CompletableFuture<>();
+
+				AtomicReference<CompletionStage<Boolean>> otherCleanup =
+					new AtomicReference<>(new CompletableFuture<>());
+
+				AtomicReference<Consumer<Void>> otherClose =
+					new AtomicReference<>(x -> {});
+
+				or1.t.thenAccept(t -> {
+					OSGi<S> result = (OSGi<S>) fun.apply(t);
+
+					OSGiResult<S> or2 = result._operation.run(bundleContext);
+
+					otherCleanup.set(or2.cleanUp);
+					otherClose.set(or2.close);
+					or2.t.thenAccept(futureResult::complete);
+				});
+
+				return new OSGiResult<>(
+					futureResult,
+					or1.cleanUp.applyToEither(otherCleanup.get(), x -> x),
+					x -> otherClose.get().andThen(or1.close).accept(null));
 			}
 		));
 	}
 
 	public static <T> OSGi<T> service(Class<T> clazz) {
 		return new OSGi<>(bundleContext -> {
-			CompletableFuture<OSGiResult<T>> future = new CompletableFuture<>();
+			CompletableFuture<T> future = new CompletableFuture<>();
 
 			CompletableFuture<Boolean> completed = new CompletableFuture<>();
 
@@ -138,9 +141,7 @@ public class OSGi<T>
 				public T addingService(ServiceReference<T> reference) {
 					T t = super.addingService(reference);
 
-
-					future.complete(
-						new OSGiResult<>(t, completed, x -> close()));
+					future.complete(t);
 
 					return t;
 				}
@@ -164,13 +165,14 @@ public class OSGi<T>
 
 			serviceTracker.open();
 
-			return future;
+			return new OSGiResult<>(
+				future, completed, x -> serviceTracker.close());
 		});
 	}
 
 	public static <T> OSGi<T> service(Class<T> clazz, String filterString) {
 		return new OSGi<>(bundleContext -> {
-			CompletableFuture<OSGiResult<T>> future = new CompletableFuture<>();
+			CompletableFuture<T> future = new CompletableFuture<>();
 
 			Filter filter;
 
@@ -194,8 +196,7 @@ public class OSGi<T>
 
 					T t = super.addingService(reference);
 
-					future.complete(
-						new OSGiResult<>(t, completed, x -> close()));
+					future.complete(t);
 
 					return t;
 				}
@@ -219,7 +220,8 @@ public class OSGi<T>
 
 			serviceTracker.open();
 
-			return future;
+			return new OSGiResult<>(
+				future, completed, x -> serviceTracker.close());
 		});
 	}
 
@@ -231,61 +233,42 @@ public class OSGi<T>
 				bundleContext.registerService(
 					clazz, service, new Hashtable<>(properties));
 
-			CompletableFuture<OSGiResult<ServiceRegistration<T>>>
+			CompletableFuture<ServiceRegistration<T>>
 				future = new CompletableFuture<>();
 
 			CompletableFuture<Boolean> cleanUp = new CompletableFuture<>();
 
-			future.complete(
-				new OSGiResult<>(
-					serviceRegistration, cleanUp,
-					x -> serviceRegistration.unregister()));
+			future.complete(serviceRegistration);
 
-			return future;
+			return new OSGiResult<>(
+				future, cleanUp,
+				x -> serviceRegistration.unregister());
 		});
 	}
 
-	public static <T> CompletionStage<T> runOsgi(
+	public static <T> OSGiResult<T> runOsgi(
 			BundleContext bundleContext, OSGi<T> container,
-			Consumer<T> cleanUp)
+			Consumer<Void> cleanUp)
 		throws ExecutionException, InterruptedException {
-
-		CountDownLatch latch = new CountDownLatch(2);
-
-		AtomicReference<Consumer<Void>> later = new AtomicReference<>();
-
-		AtomicReference<T> t = new AtomicReference<>();
 
 		AtomicBoolean executed = new AtomicBoolean(false);
 
-		Consumer<T> myConsumer = x -> {
-			latch.countDown();
+		OSGiResult<T> osgiResult = container._operation.run(bundleContext);
 
-			try {
-				latch.await();
+		Consumer<Void> myConsumer = x -> {
+			boolean hasBeenExecuted = executed.getAndSet(true);
 
-				if (!executed.get()) {
-					executed.set(true);
-
-					cleanUp.accept(t.get());
-					later.get().accept(null);
-				}
-			}
-			catch (InterruptedException e) {
-				throw new RuntimeException(e);
+			if (!hasBeenExecuted) {
+				osgiResult.close.andThen(cleanUp).accept(null);
 			}
 		};
 
-		return container._operation.run(bundleContext).
-			thenApply(oc -> {
-				t.set(oc.t);
-				oc.cleanUp.thenAccept(x -> myConsumer.accept(null));
-				later.set(oc.close);
-				latch.countDown();
-
-				return oc.t;
-			}).
-			toCompletableFuture();
+		return new OSGiResult<>(
+			osgiResult.t,
+			osgiResult.cleanUp.thenApply(x -> {
+				myConsumer.accept(null); return x;
+			}),
+			myConsumer);
 	}
 
 }

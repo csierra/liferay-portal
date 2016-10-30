@@ -25,15 +25,16 @@ import java.util.function.Consumer;
  */
 public interface OSGiOperation<T> {
 
-	CompletionStage<OSGiResult<T>> run(BundleContext bundleContext);
+	OSGiResult<T> run(BundleContext bundleContext);
 
 	static class OSGiResult<T> {
-		public T t;
+		public CompletionStage<T> t;
 		public CompletionStage<Boolean> cleanUp;
 		public Consumer<Void> close;
 
 		public OSGiResult(
-			T t, CompletionStage<Boolean> cleanUp, Consumer<Void> close) {
+			CompletionStage<T> t, CompletionStage<Boolean> cleanUp,
+			Consumer<Void> close) {
 
 			this.t = t;
 			this.cleanUp = cleanUp;

@@ -16,6 +16,7 @@ package com.liferay.functional.activator;
 
 import com.liferay.functional.Applicative;
 import com.liferay.functional.osgi.OSGi;
+import com.liferay.functional.osgi.OSGiOperation.OSGiResult;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.osgi.framework.BundleActivator;
@@ -23,12 +24,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import java.util.HashMap;
-import java.util.concurrent.CompletionStage;
 
 /**
  * @author Carlos Sierra Andrés
  */
 public class Activator implements BundleActivator {
+
+	private OSGiResult<ServiceRegistration<Component>> _osgiResult;
 
 	static class Component {
 		private CompanyLocalService _companyLocalService;
@@ -62,9 +64,12 @@ public class Activator implements BundleActivator {
 				OSGi.service(
 					ResourceBundleLoader.class,
 					"(bundle.symbolic.name=com.liferay.shopping.web)"))).
-				bind(c -> OSGi.register(Component.class, c, new HashMap<>()));
+				bind(
+					c -> {
+						return OSGi.register(Component.class, c, new HashMap<>());
+					});
 
-		CompletionStage<ServiceRegistration<Component>> future = OSGi.runOsgi(
+		_osgiResult = OSGi.runOsgi(
 			bundleContext, program, x -> System.out.println("CLEANING: " + x));
 
 //		OSGi<ServiceRegistration<Component>> registration =
@@ -73,11 +78,13 @@ public class Activator implements BundleActivator {
 //		CompletionStage<Component> future = OSGi.runOsgi(
 //			bundleContext, componentOSGi, x -> x.unregister());
 
-		future.thenAccept(x -> System.out.println("GOT: " + x));
+		_osgiResult.t.thenAccept(x -> System.out.println("GOT: " + x));
 	}
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
 		System.out.println("Bundle stop");
+
+		_osgiResult.close.accept(null);
 	}
 }
