@@ -21,4 +21,8 @@ public interface Monad<M, T> {
 
 	<S> Monad<M, S> bind(Function1<T, Monad<M, S>> fun);
 
+	default <S> Monad<M, S> then(Monad<M, S> next) {
+		return bind(ignored -> next);
+	}
+
 }

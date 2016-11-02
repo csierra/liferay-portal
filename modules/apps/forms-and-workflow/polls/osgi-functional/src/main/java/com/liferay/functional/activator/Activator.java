@@ -14,41 +14,43 @@
 
 package com.liferay.functional.activator;
 
-import com.liferay.functional.Applicative;
-import com.liferay.functional.osgi.OSGi;
 import com.liferay.functional.osgi.OSGiOperation.OSGiResult;
+import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 import java.util.HashMap;
+
+import static com.liferay.functional.osgi.OSGi.forEach;
+import static com.liferay.functional.osgi.OSGi.register;
+import static com.liferay.functional.osgi.OSGi.runOsgi;
+import static com.liferay.functional.osgi.OSGi.service;
 
 /**
  * @author Carlos Sierra Andrés
  */
 public class Activator implements BundleActivator {
 
-	private OSGiResult<ServiceRegistration<Component>> _osgiResult;
+	private OSGiResult<Void> _osgiResult;
 
 	static class Component {
 		private CompanyLocalService _companyLocalService;
-		private ResourceBundleLoader _resourceBundleLoader;
+		private MessageListener _messageListener;
 
 		public Component(
 			CompanyLocalService companyLocalService,
-			ResourceBundleLoader resourceBundleLoader) {
+			MessageListener messageListener) {
 
 			_companyLocalService = companyLocalService;
-			_resourceBundleLoader = resourceBundleLoader;
+			_messageListener = messageListener;
 		}
 
 		@Override
 		public String toString() {
 			return "Component{" +
 				   "_companyLocalService=" + _companyLocalService +
-				   ", _groupLocalService=" + _resourceBundleLoader +
+				   ", _groupLocalService=" + _messageListener +
 				   '}';
 		}
 	}
@@ -57,34 +59,22 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		System.out.println("Bundle Start");
 
-		OSGi<ServiceRegistration<Component>> program =
-			((OSGi<Component>) Applicative.lift(
-				Component::new,
-				OSGi.service(CompanyLocalService.class),
-				OSGi.service(
-					ResourceBundleLoader.class,
-					"(bundle.symbolic.name=com.liferay.shopping.web)"))).
-				bind(
-					c -> {
-						return OSGi.register(Component.class, c, new HashMap<>());
-					});
+		_osgiResult = runOsgi(
+			bundleContext,
+			service(CompanyLocalService.class).bind(cls ->
+				forEach(MessageListener.class, "(component.id=*)", ml ->
+					register(
+						Component.class, new Component(cls, ml),  new HashMap<>()),
+					x -> System.out.println("Registered: " + x)
+				)),
+			x -> System.out.println("CompanyLocalService is gone"));
 
-		_osgiResult = OSGi.runOsgi(
-			bundleContext, program, x -> System.out.println("CLEANING: " + x));
-
-//		OSGi<ServiceRegistration<Component>> registration =
-//			componentOSGi.bind(x -> OSGi.registerService(x));
-//
-//		CompletionStage<Component> future = OSGi.runOsgi(
-//			bundleContext, componentOSGi, x -> x.unregister());
-
-		_osgiResult.t.thenAccept(x -> System.out.println("GOT: " + x));
 	}
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		System.out.println("Bundle stop");
-
 		_osgiResult.close.accept(null);
+
+		System.out.println("Bundle stop");
 	}
 }

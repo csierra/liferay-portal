@@ -24,14 +24,15 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import java.util.Deque;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -82,6 +83,10 @@ public class OSGi<T>
 
 	@Override
 	public <S> Applicative<OSGi<?>, S> pure(S s) {
+		return just(s);
+	}
+
+	public static <S> OSGi<S> just(S s) {
 		return new OSGi<>(((bundleContext) -> {
 			CompletableFuture<S> completableFuture = new CompletableFuture<>();
 
@@ -170,6 +175,75 @@ public class OSGi<T>
 		});
 	}
 
+	public static <T, S> OSGi<Void> forEach(
+		Class<T> clazz, String filterString, Function1<T, OSGi<S>> program,
+		Consumer<S> then) {
+
+		return new OSGi<>(bundleContext -> {
+			CompletableFuture<Void> future = new CompletableFuture<>();
+
+			future.complete(null);
+
+			Filter filter;
+
+			try {
+				filter = bundleContext.createFilter(
+					"(&(objectClass=" + clazz.getName() + ")" +
+					filterString + ")");
+			}
+			catch (InvalidSyntaxException e) {
+				throw new RuntimeException(e);
+			}
+
+			ServiceTracker<T, OSGiResult<Void>> serviceTracker =
+				new ServiceTracker<>(bundleContext, filter,
+					new ServiceTrackerCustomizer<T, OSGiResult<Void>>() {
+						@Override
+						public OSGiResult<Void> addingService(
+							ServiceReference<T> serviceReference) {
+
+							T service =
+								bundleContext.getService(serviceReference);
+
+
+							OSGi<S> apply = program.apply(service);
+
+							OSGiResult<S> result = runOsgi(
+								bundleContext, apply, x -> {});
+
+							return new OSGiResult<>(
+								result.t.thenAccept(then), result.cleanUp,
+								result.close);
+						}
+
+						@Override
+						public void modifiedService(
+							ServiceReference<T> serviceReference,
+							OSGiResult<Void> osgiResult) {
+
+							removedService(serviceReference, osgiResult);
+
+							addingService(serviceReference);
+						}
+
+						@Override
+						public void removedService(
+							ServiceReference<T> serviceReference,
+							OSGiResult<Void> result) {
+
+							bundleContext.ungetService(serviceReference);
+
+							result.close.accept(null);
+						}
+					});
+
+			serviceTracker.open();
+
+			return new OSGiResult<>(
+				future, new CompletableFuture<>(), x -> serviceTracker.close());
+		});
+	}
+
 	public static <T> OSGi<T> service(Class<T> clazz, String filterString) {
 		return new OSGi<>(bundleContext -> {
 			CompletableFuture<T> future = new CompletableFuture<>();
@@ -248,8 +322,7 @@ public class OSGi<T>
 
 	public static <T> OSGiResult<T> runOsgi(
 			BundleContext bundleContext, OSGi<T> container,
-			Consumer<Void> cleanUp)
-		throws ExecutionException, InterruptedException {
+			Consumer<Void> cleanUp) {
 
 		AtomicBoolean executed = new AtomicBoolean(false);
 
