@@ -98,7 +98,7 @@ public interface FieldValidator<T, R>
 	static FieldValidator<String, String> longerThan(int length) {
 		return predicate(
 			input -> input.length() > length,
-			fieldName -> fieldName + " must have " + length + " letters");
+			fieldName -> fieldName + " must have more than " + length + " letters");
 	}
 
 	FieldValidator<String, String> isANumber = predicate(

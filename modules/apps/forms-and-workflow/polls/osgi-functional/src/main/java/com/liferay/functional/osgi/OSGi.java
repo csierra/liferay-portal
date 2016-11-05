@@ -36,6 +36,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author Carlos Sierra Andrés
@@ -176,8 +177,7 @@ public class OSGi<T>
 	}
 
 	public static <T, S> OSGi<Void> forEach(
-		Class<T> clazz, String filterString, Function1<T, OSGi<S>> program,
-		Consumer<S> then) {
+		Class<T> clazz, String filterString, Function1<T, OSGi<S>> program) {
 
 		return new OSGi<>(bundleContext -> {
 			CompletableFuture<Void> future = new CompletableFuture<>();
@@ -212,7 +212,7 @@ public class OSGi<T>
 								bundleContext, apply, x -> {});
 
 							return new OSGiResult<>(
-								result.t.thenAccept(then), result.cleanUp,
+								result.t.thenAccept(x -> {}), result.cleanUp,
 								result.close);
 						}
 
@@ -241,6 +241,31 @@ public class OSGi<T>
 
 			return new OSGiResult<>(
 				future, new CompletableFuture<>(), x -> serviceTracker.close());
+		});
+	}
+
+	public static <T> OSGi<Void> forEver(OSGi<T> program) {
+		return new OSGi<>(bundleContext -> {
+			AtomicBoolean completed = new AtomicBoolean(false);
+
+			OSGiResult<T> result =
+				forEver0(bundleContext, program, completed);
+
+			return new OSGiResult<>(
+				result.t.thenAccept(x -> {}),
+				new CompletableFuture<>(),
+				result.close.andThen(x -> completed.set(true)));
+		});
+	}
+
+	private static <T> OSGiResult<T> forEver0(
+		BundleContext bundleContext, OSGi<T> program, AtomicBoolean completed) {
+
+		return runOsgi(bundleContext, program, x ->
+		{
+			if (!completed.get()) {
+				forEver0(bundleContext, program, completed);
+			}
 		});
 	}
 

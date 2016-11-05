@@ -14,6 +14,8 @@
 
 package com.liferay.functional;
 
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Optional;
 
 /**
@@ -22,18 +24,27 @@ import java.util.Optional;
 public class ScratchPad {
 
 	public interface Request {
-		String getParameter(String parameter);
+		Optional<String> getParameter(String parameter);
 	}
+
+
 
 	public static void main(String[] args) {
 
 		Request request = parameter -> null;
 
-		String name = request.getParameter("name");
-		String surname = request.getParameter("surname");
-		String day = request.getParameter("day");
-		String month = request.getParameter("month");
-		String year = request.getParameter("year");
+		Optional<String> maybeName = request.getParameter("name");
+		Optional<String> maybeSurname = request.getParameter("surname");
+		Optional<Integer> maybeDay = request.getParameter("day").map(Integer::parseInt);
+		Optional<Integer> maybeMonth = request.getParameter("month").map(Integer::parseInt);
+		Optional<Integer> maybeYear = request.getParameter("year").map(Integer::parseInt);
+
+
+
+
+
+
+
 
 	}
 }

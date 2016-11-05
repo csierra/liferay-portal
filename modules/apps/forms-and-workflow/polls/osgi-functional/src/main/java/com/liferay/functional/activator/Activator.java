@@ -15,14 +15,15 @@
 package com.liferay.functional.activator;
 
 import com.liferay.functional.osgi.OSGiOperation.OSGiResult;
-import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import java.util.HashMap;
 
 import static com.liferay.functional.osgi.OSGi.forEach;
+import static com.liferay.functional.osgi.OSGi.forEver;
 import static com.liferay.functional.osgi.OSGi.register;
 import static com.liferay.functional.osgi.OSGi.runOsgi;
 import static com.liferay.functional.osgi.OSGi.service;
@@ -36,21 +37,21 @@ public class Activator implements BundleActivator {
 
 	static class Component {
 		private CompanyLocalService _companyLocalService;
-		private MessageListener _messageListener;
+		private ResourceBundleLoader _resourceBundleLoader;
 
 		public Component(
 			CompanyLocalService companyLocalService,
-			MessageListener messageListener) {
+			ResourceBundleLoader resourceBundleLoader) {
 
 			_companyLocalService = companyLocalService;
-			_messageListener = messageListener;
+			_resourceBundleLoader = resourceBundleLoader;
 		}
 
 		@Override
 		public String toString() {
 			return "Component{" +
 				   "_companyLocalService=" + _companyLocalService +
-				   ", _groupLocalService=" + _messageListener +
+				   ", _resourceBundleLoader=" + _resourceBundleLoader +
 				   '}';
 		}
 	}
@@ -61,13 +62,13 @@ public class Activator implements BundleActivator {
 
 		_osgiResult = runOsgi(
 			bundleContext,
-			service(CompanyLocalService.class).bind(cls ->
-				forEach(MessageListener.class, "(component.id=*)", ml ->
-					register(
-						Component.class, new Component(cls, ml),  new HashMap<>()),
-					x -> System.out.println("Registered: " + x)
-				)),
-			x -> System.out.println("CompanyLocalService is gone"));
+			forEver(
+				service(CompanyLocalService.class).bind(cls ->
+				forEach(ResourceBundleLoader.class, "(servlet.context.name=shopping-web)", rbl ->
+					register(Component.class, new Component(cls, rbl), new HashMap<>())
+				)
+			)),
+			x -> System.out.println("Shopping web is gone"));
 
 	}
 
