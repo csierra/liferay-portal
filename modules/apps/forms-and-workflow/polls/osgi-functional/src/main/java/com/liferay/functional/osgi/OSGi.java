@@ -23,14 +23,19 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
+import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import java.util.Deque;
+import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -176,6 +181,87 @@ public class OSGi<T>
 		});
 	}
 
+	public static OSGi<Dictionary<String, ?>> configuration(String pid) {
+		return new OSGi<>(bundleContext -> {
+			CompletableFuture<Dictionary<String, ?>>
+				future = new CompletableFuture<>();
+
+			CompletableFuture<Boolean> completed =
+				new CompletableFuture<>();
+
+			ServiceRegistration<ManagedService>
+				serviceRegistration =
+				bundleContext.registerService(
+					ManagedService.class,
+					properties -> {
+						if (properties == null) {
+							completed.complete(true);
+						}
+						else {
+							future.complete(properties);
+						}
+					},
+					new Hashtable<String, Object>() {{
+						put("service.pid", pid);
+					}});
+
+			return new OSGiResult<>(
+				future, completed, x -> serviceRegistration.unregister());
+		});
+	}
+
+	public static OSGi<Void> forEachConfiguration(
+		String factoryPid, Function1<Dictionary<String, ?>, OSGi<?>> program) {
+
+		return new OSGi<>(bundleContext -> {
+			CompletableFuture<Void> future = new CompletableFuture<>();
+
+			future.complete(null);
+
+			CompletableFuture<Boolean> completed = new CompletableFuture<>();
+
+			ConcurrentHashMap<String, OSGiResult<?>> results =
+				new ConcurrentHashMap<>();
+
+			ServiceRegistration<ManagedServiceFactory> serviceRegistration =
+				bundleContext.registerService(
+					ManagedServiceFactory.class, new ManagedServiceFactory() {
+						@Override
+						public String getName() {
+							return "Functional OSGi Managed Service Factory";
+						}
+
+						@Override
+						public void updated(
+							String s, Dictionary<String, ?> dictionary)
+							throws ConfigurationException {
+
+							OSGiResult<?> result = runOsgi(
+								bundleContext, program.apply(dictionary),
+								x -> {});
+
+							results.put(s, result);
+						}
+
+						@Override
+						public void deleted(String s) {
+							OSGiResult<?> result = results.remove(s);
+
+							result.close.accept(null);
+						}
+					}, new Hashtable<String, Object>() {{
+						put("service.pid", factoryPid);
+					}});
+
+			return new OSGiResult<>(
+				future, completed, x -> {
+					serviceRegistration.unregister();
+
+					results.forEach((s, r) -> r.close.accept(null));
+				});
+		});
+	}
+
 	public static <T, S> OSGi<Void> forEach(
 		Class<T> clazz, String filterString, Function1<T, OSGi<S>> program) {
 
@@ -248,23 +334,33 @@ public class OSGi<T>
 		return new OSGi<>(bundleContext -> {
 			AtomicBoolean completed = new AtomicBoolean(false);
 
+			AtomicReference<Consumer<Void>> close = new AtomicReference<>(x -> {});
+
 			OSGiResult<T> result =
-				forEver0(bundleContext, program, completed);
+				forEver0(bundleContext, program, completed, close);
 
 			return new OSGiResult<>(
 				result.t.thenAccept(x -> {}),
 				new CompletableFuture<>(),
-				result.close.andThen(x -> completed.set(true)));
+				result.close.andThen(x -> {
+					completed.set(true);
+
+					close.get().accept(null);
+				}));
 		});
 	}
 
 	private static <T> OSGiResult<T> forEver0(
-		BundleContext bundleContext, OSGi<T> program, AtomicBoolean completed) {
+		BundleContext bundleContext, OSGi<T> program,
+		AtomicBoolean completed, AtomicReference<Consumer<Void>> close) {
 
 		return runOsgi(bundleContext, program, x ->
 		{
 			if (!completed.get()) {
-				forEver0(bundleContext, program, completed);
+				OSGiResult<T> osgiResult =
+					forEver0(bundleContext, program, completed, close);
+
+				close.set(osgiResult.close);
 			}
 		});
 	}
