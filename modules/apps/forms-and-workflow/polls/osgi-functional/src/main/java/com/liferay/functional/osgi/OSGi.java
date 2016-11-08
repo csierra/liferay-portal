@@ -14,10 +14,7 @@
 
 package com.liferay.functional.osgi;
 
-import com.liferay.functional.Applicative;
-import com.liferay.functional.Monad;
 import com.liferay.functional.osgi.OSGiOperation.OSGiResult;
-import javaslang.Function1;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -29,25 +26,21 @@ import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import java.util.Deque;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class OSGi<T>
-	implements Applicative<OSGi<?>, T>, Monad<OSGi<?>, T> {
+public class OSGi<T> {
 
 	private OSGiOperation<T> _operation;
 
@@ -55,8 +48,7 @@ public class OSGi<T>
 		_operation = operation;
 	}
 
-	@Override
-	public <S> OSGi<S> map(Function1<T, S> function) {
+	public <S> OSGi<S> map(Function<T, S> function) {
 		return new OSGi<>(((bundleContext) -> {
 			OSGiResult<T> osGiResult = _operation.run(bundleContext);
 
@@ -65,31 +57,6 @@ public class OSGi<T>
 				osGiResult.cleanUp,
 				osGiResult.close);
 		}));
-	}
-
-	@Override
-	public <S, U> OSGi<U> apply(Applicative<OSGi<?>, S> ap) {
-
-		return new OSGi<>(
-			(bundleContext) -> {
-				OSGiResult<Function1<S, U>> osgiResult =
-					((OSGiOperation<Function1<S, U>>) _operation).run(
-						bundleContext);
-
-				OSGiResult<S> osgiResult2 =
-					((OSGi<S>) ap)._operation.run(bundleContext);
-
-				return new OSGiResult<>(
-					osgiResult.t.thenCompose(f -> osgiResult2.t.thenApply(f)),
-					osgiResult.cleanUp.applyToEither(
-						osgiResult2.cleanUp, x -> x),
-					osgiResult.close.andThen(osgiResult2.close));
-			});
-	}
-
-	@Override
-	public <S> Applicative<OSGi<?>, S> pure(S s) {
-		return just(s);
 	}
 
 	public static <S> OSGi<S> just(S s) {
@@ -103,9 +70,8 @@ public class OSGi<T>
 		}));
 	}
 
-	@Override
-	public <S> OSGi<S> bind(
-		Function1<T, Monad<OSGi<?>, S>> fun) {
+	public <S> OSGi<S> flatMap(
+		Function<T, OSGi<S>> fun) {
 
 		return new OSGi<>(
 			((bundleContext) -> {
@@ -178,11 +144,11 @@ public class OSGi<T>
 
 			return new OSGiResult<>(
 				future, completed, x -> serviceTracker.close());
-		});
+		}) ;
 	}
 
-	public static OSGi<Dictionary<String, ?>> configuration(String pid) {
-		return new OSGi<>(bundleContext -> {
+	public static MOSGi<Dictionary<String, ?>> configuration(String pid) {
+		return new MOSGi<Dictionary<String, ?>>(bundleContext -> {
 			CompletableFuture<Dictionary<String, ?>>
 				future = new CompletableFuture<>();
 
@@ -207,127 +173,58 @@ public class OSGi<T>
 
 			return new OSGiResult<>(
 				future, completed, x -> serviceRegistration.unregister());
-		});
-	}
+		}) {
+			@Override
+			public OSGi<Void> foreach(Function<Dictionary<String, ?>, OSGi<?>> program) {
+				return new OSGi<>(bundleContext -> {
+					CompletableFuture<Void> future = new CompletableFuture<>();
 
-	public static OSGi<Void> forEachConfiguration(
-		String factoryPid, Function1<Dictionary<String, ?>, OSGi<?>> program) {
+					future.complete(null);
 
-		return new OSGi<>(bundleContext -> {
-			CompletableFuture<Void> future = new CompletableFuture<>();
+					CompletableFuture<Boolean> completed = new CompletableFuture<>();
 
-			future.complete(null);
+					ConcurrentHashMap<String, OSGiResult<?>> results =
+						new ConcurrentHashMap<>();
 
-			CompletableFuture<Boolean> completed = new CompletableFuture<>();
+					ServiceRegistration<ManagedServiceFactory> serviceRegistration =
+						bundleContext.registerService(
+							ManagedServiceFactory.class, new ManagedServiceFactory() {
+								@Override
+								public String getName() {
+									return "Functional OSGi Managed Service Factory";
+								}
 
-			ConcurrentHashMap<String, OSGiResult<?>> results =
-				new ConcurrentHashMap<>();
+								@Override
+								public void updated(
+									String s, Dictionary<String, ?> dictionary)
+									throws ConfigurationException {
 
-			ServiceRegistration<ManagedServiceFactory> serviceRegistration =
-				bundleContext.registerService(
-					ManagedServiceFactory.class, new ManagedServiceFactory() {
-						@Override
-						public String getName() {
-							return "Functional OSGi Managed Service Factory";
-						}
+									OSGiResult<?> result = runOsgi(
+										bundleContext, program.apply(dictionary),
+										x -> {});
 
-						@Override
-						public void updated(
-							String s, Dictionary<String, ?> dictionary)
-							throws ConfigurationException {
+									results.put(s, result);
+								}
 
-							OSGiResult<?> result = runOsgi(
-								bundleContext, program.apply(dictionary),
-								x -> {});
+								@Override
+								public void deleted(String s) {
+									OSGiResult<?> result = results.remove(s);
 
-							results.put(s, result);
-						}
+									result.close.accept(null);
+								}
+							}, new Hashtable<String, Object>() {{
+								put("service.pid", pid);
+							}});
 
-						@Override
-						public void deleted(String s) {
-							OSGiResult<?> result = results.remove(s);
+					return new OSGiResult<>(
+						future, completed, x -> {
+						serviceRegistration.unregister();
 
-							result.close.accept(null);
-						}
-					}, new Hashtable<String, Object>() {{
-						put("service.pid", factoryPid);
-					}});
-
-			return new OSGiResult<>(
-				future, completed, x -> {
-					serviceRegistration.unregister();
-
-					results.forEach((s, r) -> r.close.accept(null));
-				});
-		});
-	}
-
-	public static <T, S> OSGi<Void> forEach(
-		Class<T> clazz, String filterString, Function1<T, OSGi<S>> program) {
-
-		return new OSGi<>(bundleContext -> {
-			CompletableFuture<Void> future = new CompletableFuture<>();
-
-			future.complete(null);
-
-			Filter filter;
-
-			try {
-				filter = bundleContext.createFilter(
-					"(&(objectClass=" + clazz.getName() + ")" +
-					filterString + ")");
-			}
-			catch (InvalidSyntaxException e) {
-				throw new RuntimeException(e);
-			}
-
-			ServiceTracker<T, OSGiResult<Void>> serviceTracker =
-				new ServiceTracker<>(bundleContext, filter,
-					new ServiceTrackerCustomizer<T, OSGiResult<Void>>() {
-						@Override
-						public OSGiResult<Void> addingService(
-							ServiceReference<T> serviceReference) {
-
-							T service =
-								bundleContext.getService(serviceReference);
-
-
-							OSGi<S> apply = program.apply(service);
-
-							OSGiResult<S> result = runOsgi(
-								bundleContext, apply, x -> {});
-
-							return new OSGiResult<>(
-								result.t.thenAccept(x -> {}), result.cleanUp,
-								result.close);
-						}
-
-						@Override
-						public void modifiedService(
-							ServiceReference<T> serviceReference,
-							OSGiResult<Void> osgiResult) {
-
-							removedService(serviceReference, osgiResult);
-
-							addingService(serviceReference);
-						}
-
-						@Override
-						public void removedService(
-							ServiceReference<T> serviceReference,
-							OSGiResult<Void> result) {
-
-							bundleContext.ungetService(serviceReference);
-
-							result.close.accept(null);
-						}
+						results.forEach((s, r) -> r.close.accept(null));
 					});
-
-			serviceTracker.open();
-
-			return new OSGiResult<>(
-				future, new CompletableFuture<>(), x -> serviceTracker.close());
-		});
+				});
+			}
+		};
 	}
 
 	public static <T> OSGi<Void> forEver(OSGi<T> program) {
@@ -365,8 +262,8 @@ public class OSGi<T>
 		});
 	}
 
-	public static <T> OSGi<T> service(Class<T> clazz, String filterString) {
-		return new OSGi<>(bundleContext -> {
+	public static <T> MOSGi<T> service(Class<T> clazz, String filterString) {
+		return new MOSGi<T>(bundleContext -> {
 			CompletableFuture<T> future = new CompletableFuture<>();
 
 			Filter filter;
@@ -417,7 +314,75 @@ public class OSGi<T>
 
 			return new OSGiResult<>(
 				future, completed, x -> serviceTracker.close());
-		});
+		}) {
+			@Override
+			public OSGi<Void> foreach(Function<T, OSGi<?>> program) {
+				return new OSGi<>(bundleContext -> {
+					CompletableFuture<Void> future = new CompletableFuture<>();
+
+					future.complete(null);
+
+					Filter filter;
+
+					try {
+						filter = bundleContext.createFilter(
+							"(&(objectClass=" + clazz.getName() + ")" +
+							filterString + ")");
+					}
+					catch (InvalidSyntaxException e) {
+						throw new RuntimeException(e);
+					}
+
+					ServiceTracker<T, OSGiResult<Void>> serviceTracker =
+						new ServiceTracker<>(bundleContext, filter,
+							new ServiceTrackerCustomizer<T, OSGiResult<Void>>() {
+								@Override
+								public OSGiResult<Void> addingService(
+									ServiceReference<T> serviceReference) {
+
+									T service =
+										bundleContext.getService(serviceReference);
+
+
+									OSGi<?> apply = program.apply(service);
+
+									OSGiResult<?> result = runOsgi(
+										bundleContext, apply, x -> {});
+
+									return new OSGiResult<>(
+										result.t.thenAccept(x -> {}), result.cleanUp,
+										result.close);
+								}
+
+								@Override
+								public void modifiedService(
+									ServiceReference<T> serviceReference,
+									OSGiResult<Void> osgiResult) {
+
+									removedService(serviceReference, osgiResult);
+
+									addingService(serviceReference);
+								}
+
+								@Override
+								public void removedService(
+									ServiceReference<T> serviceReference,
+									OSGiResult<Void> result) {
+
+									bundleContext.ungetService(serviceReference);
+
+									result.close.accept(null);
+								}
+							});
+
+					serviceTracker.open();
+
+					return new OSGiResult<>(
+						future, new CompletableFuture<>(), x -> serviceTracker.close());
+
+				});
+			}
+		};
 	}
 
 	public static <T, S extends T> OSGi<ServiceRegistration<T>> register(
@@ -465,4 +430,15 @@ public class OSGi<T>
 			myConsumer);
 	}
 
+	public static abstract class MOSGi<T> extends OSGi<T> {
+
+		public MOSGi(OSGiOperation<T> operation) {
+			super(operation);
+		}
+
+		abstract public OSGi<Void> foreach(Function<T, OSGi<?>> program);
+	}
+
 }
+
+

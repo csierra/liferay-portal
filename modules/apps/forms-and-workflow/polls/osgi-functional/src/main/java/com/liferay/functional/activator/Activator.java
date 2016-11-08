@@ -23,9 +23,6 @@ import org.osgi.framework.BundleContext;
 
 import java.util.HashMap;
 
-import static com.liferay.functional.osgi.OSGi.forEach;
-import static com.liferay.functional.osgi.OSGi.forEachConfiguration;
-import static com.liferay.functional.osgi.OSGi.forEver;
 import static com.liferay.functional.osgi.OSGi.register;
 import static com.liferay.functional.osgi.OSGi.runOsgi;
 import static com.liferay.functional.osgi.OSGi.service;
@@ -62,23 +59,15 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		System.out.println("Bundle Start");
 
-		_osgiResult = runOsgi(bundleContext,
-			service(CompanyLocalService.class).bind(cls ->
-			forEachConfiguration(
-				"com.liferay.portal.remote.soap.extender.configuration.SoapExtenderConfiguration",
-				sec -> {
-					String filter = "(servlet.context.name=" +
-										  sec.get("soapDescriptorBuilderFilter").toString() +
-										  ")";
-					return forEver(service(
-						ResourceBundleLoader.class, filter).bind(rbl ->
-						register(
-							Component.class, new Component(cls, rbl),
-							new HashMap<>())
 
-					));
-				})),
-			x -> System.out.println("Shopping web is gone"));
+		_osgiResult = runOsgi(
+			bundleContext,
+			service(CompanyLocalService.class).flatMap(cls ->
+				service(ResourceBundleLoader.class, "(servlet.context.name=*)").foreach(rbl ->
+					register(Component.class, new Component(cls, rbl),
+						new HashMap<>()))
+			),
+			x -> System.out.println("CompanyLocalService is gone"));
 	}
 
 	@Override
