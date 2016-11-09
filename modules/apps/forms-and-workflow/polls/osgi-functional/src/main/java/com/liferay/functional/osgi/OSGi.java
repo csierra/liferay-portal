@@ -118,9 +118,13 @@ public class OSGi<T> {
 				public T addingService(ServiceReference<T> reference) {
 					T t = super.addingService(reference);
 
-					future.complete(t);
+					boolean completed = future.complete(t);
 
-					return t;
+					if (completed) {
+						return t;
+					}
+					
+					return null;
 				}
 
 				@Override
@@ -288,9 +292,13 @@ public class OSGi<T> {
 
 					T t = super.addingService(reference);
 
-					future.complete(t);
+					boolean completed = future.complete(t);
 
-					return t;
+					if (completed) {
+						return t;
+					}
+
+					return null;
 				}
 
 				@Override
