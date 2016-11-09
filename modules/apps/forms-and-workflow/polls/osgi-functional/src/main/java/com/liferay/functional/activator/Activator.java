@@ -14,6 +14,7 @@
 
 package com.liferay.functional.activator;
 
+import com.liferay.functional.osgi.OSGi;
 import com.liferay.functional.osgi.OSGiOperation.OSGiResult;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import static com.liferay.functional.osgi.OSGi.register;
 import static com.liferay.functional.osgi.OSGi.runOsgi;
 import static com.liferay.functional.osgi.OSGi.service;
+import static com.liferay.functional.osgi.OSGi.services;
 
 /**
  * @author Carlos Sierra Andrés
@@ -59,13 +61,11 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		System.out.println("Bundle Start");
 
-
 		_osgiResult = runOsgi(
 			bundleContext,
-			service(CompanyLocalService.class).flatMap(cls ->
-				service(ResourceBundleLoader.class, "(servlet.context.name=*)").foreach(rbl ->
-					register(Component.class, new Component(cls, rbl),
-						new HashMap<>()))
+			service(CompanyLocalService.class, "(original.bean=true)").flatMap(cls ->
+				services(ResourceBundleLoader.class, "(servlet.context.name=shopping-web)").foreach(rbl ->
+					register(Component.class, new Component(cls, rbl), new HashMap<>()))
 			),
 			x -> System.out.println("CompanyLocalService is gone"));
 	}
