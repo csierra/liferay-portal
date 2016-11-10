@@ -24,6 +24,8 @@ import org.osgi.framework.BundleContext;
 
 import java.util.HashMap;
 
+import static com.liferay.functional.osgi.OSGi.close;
+import static com.liferay.functional.osgi.OSGi.onClose;
 import static com.liferay.functional.osgi.OSGi.register;
 import static com.liferay.functional.osgi.OSGi.runOsgi;
 import static com.liferay.functional.osgi.OSGi.service;
@@ -63,16 +65,18 @@ public class Activator implements BundleActivator {
 
 		_osgiResult = runOsgi(
 			bundleContext,
-			service(CompanyLocalService.class, "(original.bean=true)").flatMap(cls ->
+			service(CompanyLocalService.class).flatMap(cls ->
 				services(ResourceBundleLoader.class, "(servlet.context.name=shopping-web)").foreach(rbl ->
-					register(Component.class, new Component(cls, rbl), new HashMap<>()))
-			),
-			x -> System.out.println("CompanyLocalService is gone"));
+					register(Component.class, new Component(cls, rbl), new HashMap<>())
+				)
+			)
+		);
+
 	}
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		_osgiResult.close.accept(null);
+		close(_osgiResult);
 
 		System.out.println("Bundle stop");
 	}

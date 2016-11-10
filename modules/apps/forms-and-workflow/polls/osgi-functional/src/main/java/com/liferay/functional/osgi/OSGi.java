@@ -31,7 +31,6 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -110,6 +109,10 @@ public class OSGi<T> {
 		));
 	}
 
+	public <S> OSGi<S> then(OSGi<S> next) {
+		return flatMap(ignored -> next);
+	}
+
 	public static MOSGi<Dictionary<String, ?>> configurations(String factoryPid) {
 		return new MOSGi<Dictionary<String, ?>>(bundleContext -> {
 
@@ -184,8 +187,7 @@ public class OSGi<T> {
 									throws ConfigurationException {
 
 									OSGiResult<?> result = runOsgi(
-										bundleContext, program.apply(dictionary),
-										x -> {});
+										bundleContext, program.apply(dictionary));
 
 									results.put(s, result);
 								}
@@ -240,13 +242,25 @@ public class OSGi<T> {
 		});
 	}
 
+	public static OSGi<Void> onClose(Consumer<Void> action) {
+		return new OSGi<>(bundleContext -> {
+			CompletableFuture<Void> future = new CompletableFuture<>();
+
+			future.complete(null);
+
+			return new OSGiResult<>(
+				future, new CompletableFuture<>(),
+				action::accept);
+		});
+	}
+
 	public static <T> OSGi<Void> forEver(OSGi<T> program) {
 		return new OSGi<>(bundleContext -> {
 			AtomicBoolean completed = new AtomicBoolean(false);
 
 			AtomicReference<Consumer<Void>> close = new AtomicReference<>(x -> {});
 
-			OSGiResult<T> result =
+			OSGiResult<Void> result =
 				forEver0(bundleContext, program, completed, close);
 
 			return new OSGiResult<>(
@@ -260,19 +274,19 @@ public class OSGi<T> {
 		});
 	}
 
-	private static <T> OSGiResult<T> forEver0(
+	private static <T> OSGiResult<Void> forEver0(
 		BundleContext bundleContext, OSGi<T> program,
 		AtomicBoolean completed, AtomicReference<Consumer<Void>> close) {
 
-		return runOsgi(bundleContext, program, x ->
+		return runOsgi(bundleContext, program.then(onClose(x ->
 		{
 			if (!completed.get()) {
-				OSGiResult<T> osgiResult =
+				OSGiResult<Void> osgiResult =
 					forEver0(bundleContext, program, completed, close);
 
 				close.set(osgiResult.close);
 			}
-		});
+		})));
 	}
 
 	public static <T> MOSGi<T> services(Class<T> clazz) {
@@ -315,7 +329,7 @@ public class OSGi<T> {
 									OSGi<?> apply = program.apply(service);
 
 									OSGiResult<?> result = runOsgi(
-										bundleContext, apply, x -> {});
+										bundleContext, apply);
 
 									return new OSGiResult<>(
 										result.t.thenAccept(x -> {}), result.cleanUp,
@@ -346,7 +360,8 @@ public class OSGi<T> {
 					serviceTracker.open();
 
 					return new OSGiResult<>(
-						future, new CompletableFuture<>(), x -> serviceTracker.close());
+						future, new CompletableFuture<>(),
+						x -> serviceTracker.close());
 
 				});
 			}
@@ -385,8 +400,7 @@ public class OSGi<T> {
 
 			ServiceTracker<T, T> serviceTracker = new ServiceTracker<T, T>(
 				bundleContext,
-				buildFilter(bundleContext, filterString, clazz),
-				null){
+				buildFilter(bundleContext, filterString, clazz), null) {
 
 				@Override
 				public T addingService(ServiceReference<T> reference) {
@@ -435,33 +449,37 @@ public class OSGi<T> {
 			future.complete(serviceRegistration);
 
 			return new OSGiResult<>(
-				future, cleanUp,
-				x -> serviceRegistration.unregister());
+				future, cleanUp, x -> serviceRegistration.unregister());
 		});
 	}
 
 	public static <T> OSGiResult<T> runOsgi(
-			BundleContext bundleContext, OSGi<T> container,
-			Consumer<Void> cleanUp) {
+		BundleContext bundleContext, OSGi<T> program) {
 
 		AtomicBoolean executed = new AtomicBoolean(false);
 
-		OSGiResult<T> osgiResult = container._operation.run(bundleContext);
+		OSGiResult<T> osgiResult = program._operation.run(bundleContext);
 
-		Consumer<Void> myConsumer = x -> {
+		Consumer<Void> close = x -> {
 			boolean hasBeenExecuted = executed.getAndSet(true);
 
 			if (!hasBeenExecuted) {
-				osgiResult.close.andThen(cleanUp).accept(null);
+				osgiResult.close.accept(null);
 			}
 		};
 
+		Function<Boolean, Boolean> cleanup = x -> {
+			close.accept(null);
+
+			return x;
+		};
+
 		return new OSGiResult<>(
-			osgiResult.t,
-			osgiResult.cleanUp.thenApply(x -> {
-				myConsumer.accept(null); return x;
-			}),
-			myConsumer);
+			osgiResult.t, osgiResult.cleanUp.thenApply(cleanup), close);
+	}
+
+	public static void close(OSGiResult<?> osgiResult) {
+		osgiResult.close.accept(null);
 	}
 
 	public static abstract class MOSGi<T> extends OSGi<Iterable<T>> {

@@ -28,11 +28,11 @@ public interface OSGiOperation<T> {
 	OSGiResult<T> run(BundleContext bundleContext);
 
 	static class OSGiResult<T> {
-		public CompletionStage<T> t;
-		public CompletionStage<Boolean> cleanUp;
-		public Consumer<Void> close;
+		CompletionStage<T> t;
+		CompletionStage<Boolean> cleanUp;
+		Consumer<Void> close;
 
-		public OSGiResult(
+		OSGiResult(
 			CompletionStage<T> t, CompletionStage<Boolean> cleanUp,
 			Consumer<Void> close) {
 
