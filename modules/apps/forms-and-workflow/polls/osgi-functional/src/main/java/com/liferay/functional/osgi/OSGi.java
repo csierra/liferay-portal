@@ -27,13 +27,14 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import rx.subjects.PublishSubject;
 
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,8 +58,8 @@ public class OSGi<T> {
 			OSGiResult<T> osGiResult = _operation.run(bundleContext);
 
 			return new OSGiResult<>(
-				osGiResult.t.thenApply(function),
-				osGiResult.cleanUp,
+				osGiResult.t.map(function::apply),
+				osGiResult.cleanUp.map(function::apply),
 				osGiResult.close);
 		}));
 	}
@@ -74,37 +75,37 @@ public class OSGi<T> {
 		}));
 	}
 
-	public <S> OSGi<S> flatMap(
-		Function<T, OSGi<S>> fun) {
+	public <S> OSGi<S> flatMap(Function<T, OSGi<S>> fun) {
 
 		return new OSGi<>(
 			((bundleContext) -> {
 
 				OSGiResult<T> or1 = _operation.run(bundleContext);
 
-				CompletableFuture<S> futureResult =
-					new CompletableFuture<>();
+				PublishSubject<S> publishSubject = PublishSubject.create();
 
-				AtomicReference<CompletionStage<Boolean>> otherCleanup =
-					new AtomicReference<>(new CompletableFuture<>());
+				Map<T, OSGiResult<S>> map = new IdentityHashMap<>();
 
-				AtomicReference<Consumer<Void>> otherClose =
-					new AtomicReference<>(x -> {});
+				or1.t.forEach(t -> {
+					OSGiResult<S> osgiResult =
+						runOsgi(bundleContext, fun.apply(t));
 
-				or1.t.thenAccept(t -> {
-					OSGi<S> result = fun.apply(t);
-
-					OSGiResult<S> or2 = result._operation.run(bundleContext);
-
-					otherCleanup.set(or2.cleanUp);
-					otherClose.set(or2.close);
-					or2.t.thenAccept(futureResult::complete);
+					map.put(t, new OSGiResult<>(
+						osgiResult.t.map(
+							x -> { publishSubject.onNext(x); return x; }),
+						osgiResult.cleanUp.map(
+							x -> { map.remove(t).close.accept(null); return x; }),
+						x -> {}));
 				});
 
 				return new OSGiResult<>(
-					futureResult,
-					or1.cleanUp.applyToEither(otherCleanup.get(), x -> x),
-					x -> otherClose.get().andThen(or1.close).accept(null));
+					publishSubject,
+					PublishSubject.create(),
+					x -> {
+						for (OSGiResult<S> result : map.values()) {
+							result.close.accept(null);
+						}
+					});
 			}
 		));
 	}
@@ -113,13 +114,16 @@ public class OSGi<T> {
 		return flatMap(ignored -> next);
 	}
 
-	public static MOSGi<Dictionary<String, ?>> configurations(String factoryPid) {
+	public static MOSGi<Dictionary<String, ?>> configurations(
+		String factoryPid) {
+
 		return new MOSGi<Dictionary<String, ?>>(bundleContext -> {
 
-			CompletableFuture<Iterable<Dictionary<String, ?>>>
-				future = new CompletableFuture<>();
+			CompletableFuture<Iterable<Dictionary<String, ?>>> future =
+				new CompletableFuture<>();
 
-			Collection<Dictionary<String, ?>> list = new CopyOnWriteArrayList<>();
+			Collection<Dictionary<String, ?>> list =
+				new CopyOnWriteArrayList<>();
 
 			future.complete(list);
 
@@ -148,13 +152,12 @@ public class OSGi<T> {
 						public void deleted(String s) {
 							list.remove(results.get(s));
 						}
-					}, new Hashtable<String, Object>() {{
+					},
+					new Hashtable<String, Object>() {{
 						put("service.pid", factoryPid);
 					}});
 
-			return new OSGiResult<>(
-				future, new CompletableFuture<>(), x -> {
-
+			return new OSGiResult<>(future, new CompletableFuture<>(), x -> {
 				serviceRegistration.unregister();
 
 				list.clear();
@@ -258,10 +261,11 @@ public class OSGi<T> {
 		return new OSGi<>(bundleContext -> {
 			AtomicBoolean completed = new AtomicBoolean(false);
 
-			AtomicReference<Consumer<Void>> close = new AtomicReference<>(x -> {});
+			AtomicReference<Consumer<Void>> close = new AtomicReference<>(
+				x -> {});
 
-			OSGiResult<Void> result =
-				forEver0(bundleContext, program, completed, close);
+			OSGiResult<Void> result = forEver0(
+				bundleContext, program, completed, close);
 
 			return new OSGiResult<>(
 				result.t.thenAccept(x -> {}),
@@ -278,15 +282,15 @@ public class OSGi<T> {
 		BundleContext bundleContext, OSGi<T> program,
 		AtomicBoolean completed, AtomicReference<Consumer<Void>> close) {
 
-		return runOsgi(bundleContext, program.then(onClose(x ->
-		{
-			if (!completed.get()) {
-				OSGiResult<Void> osgiResult =
-					forEver0(bundleContext, program, completed, close);
+		return runOsgi(
+			bundleContext, program.then(onClose(x -> {
+				if (!completed.get()) {
+					OSGiResult<Void> osgiResult =
+						forEver0(bundleContext, program, completed, close);
 
-				close.set(osgiResult.close);
-			}
-		})));
+					close.set(osgiResult.close);
+				}
+			})));
 	}
 
 	public static <T> MOSGi<T> services(Class<T> clazz) {

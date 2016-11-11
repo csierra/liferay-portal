@@ -15,9 +15,8 @@
 package com.liferay.functional.osgi;
 
 import org.osgi.framework.BundleContext;
+import rx.Observable;
 
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -27,14 +26,13 @@ public interface OSGiOperation<T> {
 
 	OSGiResult<T> run(BundleContext bundleContext);
 
-	static class OSGiResult<T> {
-		CompletionStage<T> t;
-		CompletionStage<Boolean> cleanUp;
+	class OSGiResult<T> {
+		Observable<T> t;
+		Observable<T> cleanUp;
 		Consumer<Void> close;
 
 		OSGiResult(
-			CompletionStage<T> t, CompletionStage<Boolean> cleanUp,
-			Consumer<Void> close) {
+			Observable<T> t, Observable<T> cleanUp, Consumer<Void> close) {
 
 			this.t = t;
 			this.cleanUp = cleanUp;
