@@ -27,15 +27,18 @@ public interface OSGiOperation<T> {
 	OSGiResult<T> run(BundleContext bundleContext);
 
 	class OSGiResult<T> {
-		Observable<T> t;
-		Observable<T> cleanUp;
+		Observable<T> added;
+		Observable<T> removed;
+		Consumer<Void> start;
 		Consumer<Void> close;
 
 		OSGiResult(
-			Observable<T> t, Observable<T> cleanUp, Consumer<Void> close) {
+			Observable<T> added, Observable<T> removed,
+			Consumer<Void> start, Consumer<Void> close) {
 
-			this.t = t;
-			this.cleanUp = cleanUp;
+			this.added = added;
+			this.removed = removed;
+			this.start = start;
 			this.close = close;
 		}
 	}
