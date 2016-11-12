@@ -151,6 +151,10 @@ public class OSGi<T> {
 		return flatMap(ignored -> next);
 	}
 
+	public <S> OSGi<Void> foreach(Function<T, OSGi<S>> fun) {
+		return this.flatMap(fun).map(x -> null);
+	}
+
 	public static OSGi<Dictionary<String, ?>> configurations(
 		String factoryPid) {
 
