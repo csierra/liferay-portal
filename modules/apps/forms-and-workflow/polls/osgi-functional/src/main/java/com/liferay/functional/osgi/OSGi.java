@@ -24,7 +24,6 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.util.tracker.ServiceTracker;
-import rx.Observable;
 import rx.Observer;
 import rx.subjects.PublishSubject;
 
@@ -68,7 +67,7 @@ public class OSGi<T> {
 			PublishSubject<S> publishSubject = PublishSubject.create();
 
 			return new OSGiResult<>(
-				publishSubject, Observable.empty(),
+				publishSubject, PublishSubject.create(),
 				x -> publishSubject.onNext(s), NOOP);
 		}));
 	}
@@ -80,15 +79,19 @@ public class OSGi<T> {
 
 				Map<T, OSGiResult<S>> map = new IdentityHashMap<>();
 
-				PublishSubject<S> publishSubject = PublishSubject.create();
+				PublishSubject<S> added = PublishSubject.create();
+
+				AtomicReference<Consumer<Void>> closeReference =
+					new AtomicReference<>(x -> {});
 
 				Consumer<Void> start = s -> {
-					OSGiResult<T> or1 = runOsgi(bundleContext, this);
+					OSGiResult<T> or1 = _operation.run(bundleContext);
 
 					or1.added.subscribe(t -> {
 						OSGi<S> program = fun.apply(t);
 
-						OSGiResult<S> or2 = runOsgi(bundleContext, program);
+						OSGiResult<S> or2 = program._operation.run(
+							bundleContext);
 
 						map.put(t, or2);
 
@@ -111,29 +114,34 @@ public class OSGi<T> {
 
 							@Override
 							public void onNext(S s) {
-								publishSubject.onNext(s);
+								added.onNext(s);
 							}
 						});
 
-						start(or2);
+						or2.start.accept(null);
 					});
 
 					or1.removed.subscribe(t -> {
 						OSGiResult<S> osgiResult = map.remove(t);
 
-						OSGi.close(osgiResult);
-
+						if (osgiResult != null) {
+							OSGi.close(osgiResult);
+						}
 					});
 
-					start(or1);
+					closeReference.set(or1.close);
+
+					or1.start.accept(null);
 				};
 
 				return new OSGiResult<>(
-					publishSubject, Observable.empty(), start,
+					added, PublishSubject.create(), start,
 					x -> {
 						for (OSGiResult<S> result : map.values()) {
 							close(result);
 						}
+
+						closeReference.get().accept(null);
 					});
 			}
 		));
@@ -229,91 +237,89 @@ public class OSGi<T> {
 					}});
 
 			return new OSGiResult<>(
-				added, Observable.empty(), NOOP,
+				added, PublishSubject.create(), NOOP,
 				x -> serviceRegistration.unregister());
 		});
 	}
 
 	public static OSGi<Void> onClose(Consumer<Void> action) {
 		return new OSGi<>(bundleContext -> new OSGiResult<>(
-			Observable.empty(), Observable.empty(),
+			PublishSubject.create(), PublishSubject.create(),
 			NOOP, action::accept));
 	}
 
-	public static <T> OSGi<Void> forEver(OSGi<T> program) {
-		return new OSGi<>(bundleContext -> {
-			AtomicBoolean completed = new AtomicBoolean(false);
-
-			AtomicReference<Consumer<Void>> close = new AtomicReference<>(
-				x -> {});
-
-			OSGiResult<Void> result = forEver0(
-				bundleContext, program, completed, close);
-
-			return new OSGiResult<>(
-				Observable.empty(),
-				Observable.empty(),
-				NOOP,
-				result.close.andThen(x -> {
-					completed.set(true);
-
-					close.get().accept(null);
-				}));
-		});
-	}
-
-	private static <T> OSGiResult<Void> forEver0(
-		BundleContext bundleContext, OSGi<T> program,
-		AtomicBoolean completed, AtomicReference<Consumer<Void>> close) {
-
-		return runOsgi(
-			bundleContext, program.then(onClose(x -> {
-				if (!completed.get()) {
-					OSGiResult<Void> osgiResult =
-						forEver0(bundleContext, program, completed, close);
-
-					close.set(osgiResult.close);
-				}
-			})));
-	}
-
-	public static <T> OSGi<T> services(Class<T> clazz) {
+	public static <T> MOSGi<T> services(Class<T> clazz) {
 		return services(clazz, null);
 	}
 
-	public static <T> OSGi<T> services(Class<T> clazz, String filterString) {
-		return new OSGi<>(bundleContext -> {
+	public static <T> MOSGi<T> services(Class<T> clazz, String filterString) {
+		return new MOSGi<T>(bundleContext -> {
 			PublishSubject<T> added = PublishSubject.create();
 
 			PublishSubject<T> removed = PublishSubject.create();
 
-			ServiceTracker<T, T> serviceTracker = new ServiceTracker<T, T>(
-				bundleContext,
-				buildFilter(bundleContext, filterString, clazz), null) {
-
-				@Override
-				public T addingService(ServiceReference<T> reference) {
-
-					T t = super.addingService(reference);
-
-					added.onNext(t);
-
-					return t;
-				}
-
-				@Override
-				public void removedService(ServiceReference<T> reference, T t) {
-
-					super.removedService(reference, t);
-
-					removed.onNext(t);
-				}
-			};
+			ServiceTracker<T, T> serviceTracker =
+				getTServiceTracker(clazz, filterString, bundleContext, added,
+					removed);
 
 			return new OSGiResult<>(
 				added, removed, x -> serviceTracker.open(),
 				x -> serviceTracker.close());
-		});
+		}) {
+			public OSGi<T> once() {
+				return new OSGi<>(bundleContext -> {
+					PublishSubject<T> added = PublishSubject.create();
+
+					PublishSubject<T> removed = PublishSubject.create();
+
+					ServiceTracker<T, T> serviceTracker =
+						getTServiceTracker(clazz, filterString, bundleContext, added,
+							removed);
+
+					AtomicReference<T> atomicReference =
+						new AtomicReference<>(null);
+
+					removed.subscribe(t -> {
+						if (atomicReference.get() == t) {
+							added.onCompleted();
+						}
+					});
+
+					return new OSGiResult<>(
+						added.filter(t -> atomicReference.compareAndSet(null, t)),
+						removed, x -> serviceTracker.open(),
+						x -> serviceTracker.close());
+				});
+			}
+		};
+	}
+
+	private static <T> ServiceTracker<T, T> getTServiceTracker(
+		final Class<T> clazz, final String filterString,
+		final BundleContext bundleContext,
+		final PublishSubject<T> added, final PublishSubject<T> removed) {
+		return new ServiceTracker<T, T>(
+					bundleContext,
+					buildFilter(bundleContext, filterString, clazz), null) {
+
+					@Override
+					public T addingService(ServiceReference<T> reference) {
+
+						T t = super.addingService(reference);
+
+						added.onNext(t);
+
+						return t;
+					}
+
+					@Override
+					public void removedService(ServiceReference<T> reference, T t) {
+
+						super.removedService(reference, t);
+
+						removed.onNext(t);
+					}
+				};
 	}
 
 	private static <T> Filter buildFilter(
@@ -336,52 +342,6 @@ public class OSGi<T> {
 		return filter;
 	}
 
-	public static <T> OSGi<T> service(Class<T> clazz) {
-		return service(clazz, null);
-	}
-
-	public static <T> OSGi<T> service(Class<T> clazz, String filterString) {
-		return new OSGi<>(bundleContext -> {
-			AtomicReference<T> atomicReference = new AtomicReference<>(null);
-
-			PublishSubject<T> added = PublishSubject.create();
-
-			ServiceTracker<T, T> serviceTracker = new ServiceTracker<T, T>(
-				bundleContext,
-				buildFilter(bundleContext, filterString, clazz), null) {
-
-				@Override
-				public T addingService(ServiceReference<T> reference) {
-
-					T t = super.addingService(reference);
-
-					if (atomicReference.compareAndSet(null, t)) {
-						added.onNext(t);
-
-						return t;
-					}
-					else {
-						return null;
-					}
-				}
-
-				@Override
-				public void removedService(
-					ServiceReference<T> reference, T service) {
-
-					super.removedService(reference, service);
-
-					added.onCompleted();
-				}
-			};
-
-			return new OSGiResult<>(
-				added,
-				Observable.empty(), x -> serviceTracker.open(),
-				x -> serviceTracker.close());
-		});
-	}
-
 	public static <T, S extends T> OSGi<ServiceRegistration<T>> register(
 		Class<T> clazz, S service, Map<String, Object> properties) {
 
@@ -393,9 +353,15 @@ public class OSGi<T> {
 			PublishSubject<ServiceRegistration<T>>
 				publishSubject = PublishSubject.create();
 			return new OSGiResult<>(
-				publishSubject, Observable.empty(),
+				publishSubject, PublishSubject.create(),
 				x -> publishSubject.onNext(serviceRegistration),
-				x -> serviceRegistration.unregister());
+				x -> {
+					try {
+						serviceRegistration.unregister();
+					}
+					catch (Exception e) {
+					}
+				});
 		});
 	}
 
@@ -432,17 +398,23 @@ public class OSGi<T> {
 		});
 		osgiResult.removed.subscribe();
 
+		osgiResult.start.accept(null);
+
 		return new OSGiResult<>(
 			osgiResult.added, osgiResult.removed,
 			osgiResult.start, close);
 	}
 
-	public static void start(OSGiResult<?> osgiResult) {
-		osgiResult.start.accept(null);
-	}
-
 	public static void close(OSGiResult<?> osgiResult) {
 		osgiResult.close.accept(null);
+	}
+
+	public static abstract class MOSGi<T> extends OSGi<T> {
+		public MOSGi(OSGiOperation<T> operation) {
+			super(operation);
+		}
+
+		public abstract OSGi<T> once();
 	}
 
 }

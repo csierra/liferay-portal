@@ -14,22 +14,19 @@
 
 package com.liferay.functional.activator;
 
-import com.liferay.functional.osgi.OSGi;
-import com.liferay.functional.osgi.OSGiOperation;
 import com.liferay.functional.osgi.OSGiOperation.OSGiResult;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 import java.util.HashMap;
 
 import static com.liferay.functional.osgi.OSGi.close;
 import static com.liferay.functional.osgi.OSGi.just;
+import static com.liferay.functional.osgi.OSGi.onClose;
 import static com.liferay.functional.osgi.OSGi.register;
 import static com.liferay.functional.osgi.OSGi.runOsgi;
-import static com.liferay.functional.osgi.OSGi.service;
 import static com.liferay.functional.osgi.OSGi.services;
 
 /**
@@ -66,15 +63,16 @@ public class Activator implements BundleActivator {
 
 		_osgiResult = runOsgi(
 			bundleContext,
-			service(CompanyLocalService.class).flatMap(cls ->
-			services(ResourceBundleLoader.class, "(servlet.context.name=*)").flatMap(rbl -> {
-				System.out.println("RBL " + rbl);
+			services(CompanyLocalService.class).flatMap(cls ->
+			services(ResourceBundleLoader.class, "(servlet.context.name=*)").flatMap(
+			rbl -> {
+				System.out.println("RBL " + rbl); return
+				register(Component.class, new Component(cls, rbl), new HashMap<>()).then(
+				onClose(x -> System.out.println("RBL " + rbl + " has gone")).then(
+				just(rbl)));
+			}
+		)));
 
-				return register(Component.class, new Component(cls, rbl), new HashMap<>());
-			})
-		));
-
-		OSGi.start(_osgiResult);
 	}
 
 	@Override
