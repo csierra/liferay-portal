@@ -96,9 +96,13 @@ public class OSGi<T> {
 						map.put(t, or2);
 
 						Consumer<Boolean> close = x -> {
-							OSGiResult<S> closer = map.remove(t);
+							synchronized (map) {
+								OSGiResult<S> closer = map.remove(t);
 
-							OSGi.close(closer);
+								if (closer != null) {
+									OSGi.close(closer);
+								}
+							}
 						};
 
 						or2.added.subscribe(new Observer<S>() {
@@ -122,10 +126,12 @@ public class OSGi<T> {
 					});
 
 					or1.removed.subscribe(t -> {
-						OSGiResult<S> osgiResult = map.remove(t);
+						synchronized (map) {
+							OSGiResult<S> osgiResult = map.remove(t);
 
-						if (osgiResult != null) {
-							OSGi.close(osgiResult);
+							if (osgiResult != null) {
+								OSGi.close(osgiResult);
+							}
 						}
 					});
 
@@ -137,8 +143,10 @@ public class OSGi<T> {
 				return new OSGiResult<>(
 					added, PublishSubject.create(), start,
 					x -> {
-						for (OSGiResult<S> result : map.values()) {
-							close(result);
+						synchronized (map) {
+							for (OSGiResult<S> result : map.values()) {
+								close(result);
+							}
 						}
 
 						closeReference.get().accept(null);
@@ -168,8 +176,11 @@ public class OSGi<T> {
 			Map<String, Dictionary<String, ?>> results =
 				new ConcurrentHashMap<>();
 
-			ServiceRegistration<ManagedServiceFactory> serviceRegistration =
-				bundleContext.registerService(
+			AtomicReference<ServiceRegistration<ManagedServiceFactory>>
+				serviceRegistrationReference = new AtomicReference<>(null);
+
+			Consumer<Void> start = x ->
+				serviceRegistrationReference.set(bundleContext.registerService(
 					ManagedServiceFactory.class, new ManagedServiceFactory() {
 						@Override
 						public String getName() {
@@ -196,11 +207,11 @@ public class OSGi<T> {
 					},
 					new Hashtable<String, Object>() {{
 						put("service.pid", factoryPid);
-					}});
+					}}));
 
-			return new OSGiResult<>(added, removed, NOOP,
+			return new OSGiResult<>(added, removed, start,
 				x -> {
-					serviceRegistration.unregister();
+					serviceRegistrationReference.get().unregister();
 
 					for (Dictionary<String, ?> dictionary : results.values()) {
 						removed.onNext(dictionary);
@@ -214,35 +225,42 @@ public class OSGi<T> {
 			PublishSubject<Dictionary<String, ?>> added =
 				PublishSubject.create();
 
+			PublishSubject<Dictionary<String, ?>> removed =
+				PublishSubject.create();
+
 			AtomicReference<Dictionary<?, ?>> atomicReference =
 				new AtomicReference<>(null);
 
-			ServiceRegistration<ManagedService>
-				serviceRegistration =
-				bundleContext.registerService(
-					ManagedService.class,
-					properties -> {
-						if (properties == null) {
-							added.onCompleted();
-						}
-						else {
-							if (atomicReference.compareAndSet(
-								null, properties)) {
+			AtomicReference<ServiceRegistration<ManagedService>>
+				serviceRegistrationReferece = new AtomicReference<>(null);
 
-								added.onNext(properties);
-							}
-							else {
+			Consumer<Void> start = x ->
+				serviceRegistrationReferece.set(
+					bundleContext.registerService(
+						ManagedService.class,
+						properties -> {
+							if (properties == null) {
 								added.onCompleted();
 							}
-						}
-					},
-					new Hashtable<String, Object>() {{
-						put("service.pid", pid);
-					}});
+							else {
+								if (atomicReference.compareAndSet(
+									null, properties)) {
+
+									added.onNext(properties);
+								}
+								else {
+									added.onCompleted();
+								}
+							}
+						},
+						new Hashtable<String, Object>() {{
+							put("service.pid", pid);
+						}}));
+
 
 			return new OSGiResult<>(
-				added, PublishSubject.create(), NOOP,
-				x -> serviceRegistration.unregister());
+				added, removed, start,
+				x -> serviceRegistrationReferece.get().unregister());
 		});
 	}
 
