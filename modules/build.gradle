@@ -70,6 +70,12 @@ gradle.beforeProject {
 			}
 		}
 
+		pluginManager.withPlugin("com.liferay.node") {
+			node {
+				npmArgs "--maxsockets", "3"
+			}
+		}
+
 		pluginManager.withPlugin("com.liferay.osgi.plugin") {
 			afterEvaluate {
 				bundle.jarBuilderFactory.contextClassLoader = buildscript.classLoader
