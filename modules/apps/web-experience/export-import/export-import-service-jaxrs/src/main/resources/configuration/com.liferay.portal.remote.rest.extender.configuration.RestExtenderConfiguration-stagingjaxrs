@@ -1,0 +1,3 @@
+contextPaths=/staging-rs
+jaxRsApplicationFilterStrings=(staging.jaxrs.application=true)
+jaxRsServiceFilterStrings=(staging.jax.rs.service=true)
