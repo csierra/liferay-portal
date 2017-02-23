@@ -1,0 +1,6 @@
+Bundle-Name: Liferay Portal Remote JAXRS Utils Pagination
+Bundle-SymbolicName: com.liferay.portal.remote.jaxrs.utils.pagination
+Bundle-Version: 1.0.0
+Export-Package: com.liferay.portal.remote.jaxrs.utils.pagination
+Liferay-Releng-Module-Group-Description:
+Liferay-Releng-Module-Group-Title:
