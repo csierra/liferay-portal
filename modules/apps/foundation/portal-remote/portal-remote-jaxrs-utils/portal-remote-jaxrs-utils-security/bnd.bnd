@@ -1,0 +1,6 @@
+Bundle-Name: Liferay Portal Remote JAXRS Utils Security
+Bundle-SymbolicName: com.liferay.portal.remote.jaxrs.utils.security
+Bundle-Version: 1.0.0
+Export-Package: com.liferay.portal.remote.jaxrs.utils.security
+Liferay-Releng-Module-Group-Description:
+Liferay-Releng-Module-Group-Title:
