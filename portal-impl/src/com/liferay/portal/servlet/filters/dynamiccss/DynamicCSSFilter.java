@@ -280,12 +280,6 @@ public class DynamicCSSFilter extends IgnoreModuleRequestFilter {
 		}
 	}
 
-	protected String sterilizeQueryString(String queryString) {
-		return StringUtil.replace(
-			queryString, new char[] {CharPool.SLASH, CharPool.BACK_SLASH},
-			new char[] {CharPool.UNDERLINE, CharPool.UNDERLINE});
-	}
-
 	private static final String _CSS_EXTENSION = ".css";
 
 	private static final String _JSP_EXTENSION = ".jsp";

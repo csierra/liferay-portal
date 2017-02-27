@@ -577,12 +577,6 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 		}
 	}
 
-	protected String sterilizeQueryString(String queryString) {
-		return StringUtil.replace(
-			queryString, new char[] {CharPool.SLASH, CharPool.BACK_SLASH},
-			new char[] {CharPool.UNDERLINE, CharPool.UNDERLINE});
-	}
-
 	private static final String _BASE_URL = "@base_url@";
 
 	private static final String _CSS_COMMENT_BEGIN = "/*";
