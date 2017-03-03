@@ -83,6 +83,8 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 			return;
 		}
 
+		checkUpgradeInsecureRequests(response);
+
 		request = handleNonSerializableRequest(request);
 
 		response =
@@ -174,6 +176,13 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		}
 
 		return false;
+	}
+
+	protected void checkUpgradeInsecureRequests(HttpServletResponse response) {
+		if (HttpsThreadLocal.isSecure() && _UPGRADE_INSECURE_CONNECTIONS) {
+			response.addHeader(
+				"Content-Security-Policy", "upgrade-insecure-requests");
+		}
 	}
 
 	protected void clearFilterChainsCache() {
@@ -376,6 +385,10 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
 	private static final String _SECURE_RESPONSE =
 		InvokerFilter.class.getName() + "SECURE_RESPONSE";
+
+	private static final boolean _UPGRADE_INSECURE_CONNECTIONS =
+		GetterUtil.getBoolean(
+			PropsUtil.get(PropsKeys.WEB_SERVER_UPGRADE_INSECURE_CONNECTIONS));
 
 	private static final Log _log = LogFactoryUtil.getLog(InvokerFilter.class);
 
