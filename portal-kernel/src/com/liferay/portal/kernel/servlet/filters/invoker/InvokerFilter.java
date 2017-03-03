@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.servlet.filters.invoker;
 import com.liferay.portal.kernel.concurrent.ConcurrentLFUCache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.HttpsThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpOnlyCookieServletResponse;
 import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
 import com.liferay.portal.kernel.servlet.SanitizedServletResponse;
@@ -24,6 +25,7 @@ import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -72,6 +74,8 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		if (!handleLongRequestURL(request, response, originalURI)) {
 			return;
 		}
+
+		handleHttps(request);
 
 		request = handleNonSerializableRequest(request);
 
@@ -257,6 +261,14 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		}
 
 		return requestURL.toString();
+	}
+
+	protected void handleHttps(HttpServletRequest request) {
+		if (HttpsThreadLocal.isSecure()) {
+			return;
+		}
+
+		HttpsThreadLocal.setSecure(PortalUtil.isSecure(request));
 	}
 
 	protected boolean handleLongRequestURL(
