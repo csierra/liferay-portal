@@ -1737,10 +1737,6 @@ public class PortalImpl implements Portal {
 			createAccountURL.setPortletMode(PortletMode.VIEW);
 			createAccountURL.setWindowState(WindowState.MAXIMIZED);
 
-			if (!PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS) {
-				return createAccountURL.toString();
-			}
-
 			String portalURL = getPortalURL(request);
 			String portalURLSecure = getPortalURL(request, true);
 
@@ -6343,12 +6339,6 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public boolean isLoginRedirectRequired(HttpServletRequest request) {
-		if (PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS &&
-			!request.isSecure()) {
-
-			return true;
-		}
-
 		long companyId = getCompanyId(request);
 
 		if (SSOUtil.isLoginRedirectRequired(companyId)) {
@@ -6433,32 +6423,11 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public boolean isSecure(HttpServletRequest request) {
-		boolean secure = false;
-
 		if (PropsValues.WEB_SERVER_FORWARDED_PROTOCOL_ENABLED) {
 			return isForwardedSecure(request);
 		}
 
-		HttpSession session = request.getSession();
-
-		if (session == null) {
-			return request.isSecure();
-		}
-
-		Boolean httpsInitial = (Boolean)session.getAttribute(
-			WebKeys.HTTPS_INITIAL);
-
-		if (PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS &&
-			!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION &&
-			(httpsInitial != null) && !httpsInitial.booleanValue()) {
-
-			secure = false;
-		}
-		else {
-			secure = request.isSecure();
-		}
-
-		return secure;
+		return request.isSecure();
 	}
 
 	@Override
