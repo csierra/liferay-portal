@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.servlet.filters.invoker;
 import com.liferay.portal.kernel.concurrent.ConcurrentLFUCache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.HttpsThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpOnlyCookieServletResponse;
 import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
 import com.liferay.portal.kernel.servlet.SanitizedServletResponse;
@@ -73,6 +74,9 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 			return;
 		}
 
+		HttpsThreadLocal.setSecure(
+			HttpsThreadLocal.isSecure() || PortalUtil.isSecure(request));
+
 		request = handleNonSerializableRequest(request);
 
 		response =
@@ -100,6 +104,8 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		}
 		finally {
 			request.removeAttribute(WebKeys.INVOKER_FILTER_URI);
+
+			HttpsThreadLocal.clear();
 		}
 	}
 
