@@ -23,8 +23,10 @@ import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
 import com.liferay.portal.kernel.servlet.SanitizedServletResponse;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -76,6 +78,10 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
 		HttpsThreadLocal.setSecure(
 			HttpsThreadLocal.isSecure() || PortalUtil.isSecure(request));
+
+		if (checkHttpsRedirect(request, response, originalURI)) {
+			return;
+		}
 
 		request = handleNonSerializableRequest(request);
 
@@ -133,6 +139,41 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 				throw new ServletException(e);
 			}
 		}
+	}
+
+	protected boolean checkHttpsRedirect(
+			HttpServletRequest request, HttpServletResponse response,
+			String originalURI)
+		throws IOException {
+
+		if (StringUtil.equalsIgnoreCase(
+				Http.HTTPS, PropsUtil.get(PropsKeys.WEB_SERVER_PROTOCOL)) &&
+			!PortalUtil.isSecure(request)) {
+
+			String portalURL = PortalUtil.getPortalURL(
+				request.getServerName(), -1, true);
+
+			StringBuilder stringBuilder = new StringBuilder();
+
+			stringBuilder.append(portalURL);
+
+			if (Validator.isNotNull(originalURI)) {
+				stringBuilder.append(originalURI);
+			}
+
+			String queryString = request.getQueryString();
+
+			if (Validator.isNotNull(queryString)) {
+				stringBuilder.append(StringPool.QUESTION);
+				stringBuilder.append(queryString);
+			}
+
+			response.sendRedirect(stringBuilder.toString());
+
+			return true;
+		}
+
+		return false;
 	}
 
 	protected void clearFilterChainsCache() {
