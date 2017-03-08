@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.security;
 
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -37,6 +38,11 @@ public class HttpsThreadLocal {
 		new AutoResetThreadLocal<>(
 			HttpsThreadLocal.class.getName(),
 			StringUtil.equalsIgnoreCase(
-				Http.HTTPS, PropsUtil.get(PropsKeys.WEB_SERVER_PROTOCOL)));
+				Http.HTTPS, PropsUtil.get(PropsKeys.WEB_SERVER_PROTOCOL)) ||
+				GetterUtil.getBoolean(
+				PropsUtil.get(PropsKeys.WEBDAV_SERVLET_HTTPS_REQUIRED)) ||
+				GetterUtil.getBoolean(
+					PropsUtil.get(
+						PropsKeys.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS)));
 
 }
