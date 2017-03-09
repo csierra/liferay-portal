@@ -75,7 +75,9 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 			return;
 		}
 
-		handleHttps(request);
+		if (!handleHttps(request, response, originalURI)) {
+			return;
+		}
 
 		request = handleNonSerializableRequest(request);
 
@@ -263,12 +265,57 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		return requestURL.toString();
 	}
 
-	protected void handleHttps(HttpServletRequest request) {
-		if (HttpsThreadLocal.isSecure()) {
-			return;
+	protected boolean handleHttps(
+			HttpServletRequest request, HttpServletResponse response,
+			String originalURI)
+		throws IOException {
+
+		boolean secure = PortalUtil.isSecure(request);
+
+		HttpsThreadLocal.setSecure(secure);
+
+		if (secure) {
+			return true;
 		}
 
-		HttpsThreadLocal.setSecure(PortalUtil.isSecure(request));
+		if (!HttpsThreadLocal.isHttpsSupported()) {
+			return true;
+		}
+
+		if (!_UPGRADE_INSECURE_REQUESTS) {
+			return true;
+		}
+
+		boolean browserCanHandleUpgrade = GetterUtil.getBoolean(
+			request.getHeader("Upgrade-Insecure-Requests"));
+
+		if (!browserCanHandleUpgrade) {
+			return true;
+		}
+
+		String portalURL = PortalUtil.getPortalURL(
+			request.getServerName(), -1, true);
+
+		StringBuilder stringBuilder = new StringBuilder();
+
+		stringBuilder.append(portalURL);
+
+		if (Validator.isNotNull(originalURI)) {
+			stringBuilder.append(originalURI);
+		}
+
+		String queryString = request.getQueryString();
+
+		if (Validator.isNotNull(queryString)) {
+			stringBuilder.append(StringPool.QUESTION);
+			stringBuilder.append(queryString);
+		}
+
+		response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
+		response.setHeader("Location", stringBuilder.toString());
+		response.setHeader("Vary", "Upgrade-Insecure-Requests");
+
+		return false;
 	}
 
 	protected boolean handleLongRequestURL(
@@ -341,6 +388,10 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
 	private static final String _SECURE_RESPONSE =
 		InvokerFilter.class.getName() + "SECURE_RESPONSE";
+
+	private static final boolean _UPGRADE_INSECURE_REQUESTS =
+		GetterUtil.getBoolean(
+			PropsUtil.get(PropsKeys.WEB_SERVER_UPGRADE_INSECURE_REQUESTS));
 
 	private static final Log _log = LogFactoryUtil.getLog(InvokerFilter.class);
 

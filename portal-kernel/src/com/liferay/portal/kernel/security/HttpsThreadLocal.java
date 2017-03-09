@@ -26,23 +26,27 @@ import com.liferay.portal.kernel.util.StringUtil;
  */
 public class HttpsThreadLocal {
 
-	public static boolean isSecure() {
-		return _secure.get();
+	public static boolean isHttpsSupported() {
+		return _HTTPS_SUPPORTED;
 	}
 
 	public static void setSecure(boolean secure) {
 		_secure.set(secure);
 	}
 
+	public static boolean isSecure() {
+		return _secure.get();
+	}
+
+	private static final boolean _HTTPS_SUPPORTED = StringUtil.equalsIgnoreCase(
+		Http.HTTPS, PropsUtil.get(PropsKeys.WEB_SERVER_PROTOCOL)) ||
+	GetterUtil.getBoolean(
+		PropsUtil.get(PropsKeys.WEBDAV_SERVLET_HTTPS_REQUIRED)) ||
+	GetterUtil.getBoolean(
+		PropsUtil.get(PropsKeys.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS));
+
 	private static final AutoResetThreadLocal<Boolean> _secure =
 		new AutoResetThreadLocal<>(
-			HttpsThreadLocal.class.getName(),
-			StringUtil.equalsIgnoreCase(
-				Http.HTTPS, PropsUtil.get(PropsKeys.WEB_SERVER_PROTOCOL)) ||
-				GetterUtil.getBoolean(
-				PropsUtil.get(PropsKeys.WEBDAV_SERVLET_HTTPS_REQUIRED)) ||
-				GetterUtil.getBoolean(
-					PropsUtil.get(
-						PropsKeys.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS)));
+			HttpsThreadLocal.class.getName(), _HTTPS_SUPPORTED);
 
 }
