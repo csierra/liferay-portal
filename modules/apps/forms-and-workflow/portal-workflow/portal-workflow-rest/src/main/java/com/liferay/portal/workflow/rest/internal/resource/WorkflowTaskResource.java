@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.workflow.WorkflowException;
-import com.liferay.portal.workflow.rest.internal.helper.WorkflowRestDisplayContext;
+import com.liferay.portal.workflow.rest.internal.helper.WorkflowHelper;
 import com.liferay.portal.workflow.rest.internal.model.WorkflowOperationResultModel;
 import com.liferay.portal.workflow.rest.internal.model.WorkflowTaskModel;
 import com.liferay.portal.workflow.rest.internal.model.WorkflowTaskTransitionOperationModel;
@@ -54,7 +54,7 @@ public class WorkflowTaskResource {
 			@PathParam("workflowTaskId") long workflowTaskId)
 		throws PortalException {
 
-		return _workflowRestDisplayContext.getWorkflowTaskModel(
+		return _workflowHelper.getWorkflowTaskModel(
 			company.getCompanyId(), user.getUserId(), workflowTaskId, locale);
 	}
 
@@ -66,22 +66,24 @@ public class WorkflowTaskResource {
 		@Context Company company, @Context User user,
 		@Context HttpServletResponse response,
 		@PathParam("workflowTaskId") long workflowTaskId,
-		WorkflowTaskTransitionOperationModel operation) {
+		WorkflowTaskTransitionOperationModel
+			workflowTaskTransitionOperationModel) {
 
 		try {
-			_workflowRestDisplayContext.completeWorkflowTask(
+			_workflowHelper.completeWorkflowTask(
 				company.getCompanyId(), user.getUserId(), workflowTaskId,
-				operation);
+				workflowTaskTransitionOperationModel);
 
-			return getSuccessResult();
+			return getSuccessWorkflowOperationResultModel();
 		}
 		catch (PortalException pe) {
-			return getFailureResult(response, pe);
+			return getFailureWorkflowOperationResultModel(response, pe);
 		}
 	}
 
-	protected WorkflowOperationResultModel getFailureResult(
-		HttpServletResponse response, PortalException pe) {
+	protected WorkflowOperationResultModel
+		getFailureWorkflowOperationResultModel(
+			HttpServletResponse response, PortalException pe) {
 
 		if (pe instanceof WorkflowException) {
 			response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -91,15 +93,17 @@ public class WorkflowTaskResource {
 		}
 
 		return new WorkflowOperationResultModel(
-			WorkflowOperationResultModel.ERROR, pe.getMessage());
+			WorkflowOperationResultModel.STATUS_ERROR, pe.getMessage());
 	}
 
-	protected WorkflowOperationResultModel getSuccessResult() {
+	protected WorkflowOperationResultModel
+		getSuccessWorkflowOperationResultModel() {
+
 		return new WorkflowOperationResultModel(
-			WorkflowOperationResultModel.SUCCESS);
+			WorkflowOperationResultModel.STATUS_SUCCESS);
 	}
 
 	@Reference
-	private WorkflowRestDisplayContext _workflowRestDisplayContext;
+	private WorkflowHelper _workflowHelper;
 
 }
