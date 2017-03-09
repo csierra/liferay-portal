@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
 import com.liferay.portal.kernel.servlet.SanitizedServletResponse;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -275,6 +276,15 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		HttpsThreadLocal.setSecure(secure);
 
 		if (secure) {
+			return true;
+		}
+
+		String virtualHostServerProtocol = PropsUtil.get(
+			PropsKeys.WEB_SERVER_PROTOCOL,
+			new com.liferay.portal.kernel.configuration.Filter(
+				request.getServerName()));
+
+		if (StringUtil.equalsIgnoreCase(Http.HTTP, virtualHostServerProtocol)) {
 			return true;
 		}
 
