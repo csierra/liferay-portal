@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -269,6 +270,14 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 			HttpServletRequest request, HttpServletResponse response,
 			String originalURI)
 		throws IOException {
+
+		DispatcherType dispatcherType = request.getDispatcherType();
+
+		if (!((dispatcherType == DispatcherType.REQUEST) ||
+			  (dispatcherType == DispatcherType.ASYNC))) {
+
+			return true;
+		}
 
 		boolean secure = PortalUtil.isSecure(request);
 
