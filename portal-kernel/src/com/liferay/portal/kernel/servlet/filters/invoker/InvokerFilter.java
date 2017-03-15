@@ -106,6 +106,8 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 			invokerFilterChain.doFilter(request, response);
 		}
 		finally {
+			HttpsThreadLocal.clear();
+
 			request.removeAttribute(WebKeys.INVOKER_FILTER_URI);
 		}
 	}
@@ -282,12 +284,13 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		boolean secure = PortalUtil.isSecure(request);
 
 		HttpsThreadLocal.setSecure(secure);
+		HttpsThreadLocal.setServerName(request.getServerName());
 
 		if (secure) {
 			return true;
 		}
 
-		if (!HttpsThreadLocal.isHttpsSupported()) {
+		if (!HttpsThreadLocal.isHttpsSupported(request.getServerName())) {
 			return true;
 		}
 

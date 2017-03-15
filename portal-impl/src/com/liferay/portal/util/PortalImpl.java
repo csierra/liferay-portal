@@ -1419,9 +1419,13 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String getCDNHost(boolean secure) {
-		secure = secure || HttpsThreadLocal.isSecure();
-
 		long companyId = CompanyThreadLocal.getCompanyId();
+
+		Company company = CompanyLocalServiceUtil.fetchCompany(companyId);
+
+		String virtualHostname = company.getVirtualHostname();
+
+		secure = HttpsThreadLocal.isSecure(virtualHostname, secure);
 
 		if (secure) {
 			return getCDNHostHttps(companyId);
@@ -1462,10 +1466,6 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String getCDNHostHttp(long companyId) {
-		if (HttpsThreadLocal.isSecure()) {
-			return getCDNHostHttps(companyId);
-		}
-
 		String cdnHostHttp = _cdnHostHttpMap.get(companyId);
 
 		if (cdnHostHttp != null) {
@@ -2881,8 +2881,6 @@ public class PortalImpl implements Portal {
 			long groupId, String portletId, boolean secure)
 		throws PortalException {
 
-		secure = secure || HttpsThreadLocal.isSecure();
-
 		long plid = getPlidFromPortletId(groupId, portletId);
 
 		if (plid == LayoutConstants.DEFAULT_PLID) {
@@ -2969,31 +2967,37 @@ public class PortalImpl implements Portal {
 			LayoutSet layoutSet, boolean secureConnection)
 		throws PortalException {
 
-		secureConnection = secureConnection || HttpsThreadLocal.isSecure();
-
 		Company company = CompanyLocalServiceUtil.getCompany(
 			layoutSet.getCompanyId());
 		int portalPort = getPortalServerPort(secureConnection);
 
+		String companyVirtualHostname = company.getVirtualHostname();
+
 		String portalURL = getPortalURL(
-			company.getVirtualHostname(), portalPort, secureConnection);
+			companyVirtualHostname, portalPort,
+			HttpsThreadLocal.isSecure(
+				companyVirtualHostname, secureConnection));
 
-		String virtualHostname = getVirtualHostname(layoutSet);
+		String layoutSetVirtualHostName = getVirtualHostname(layoutSet);
 
-		if (Validator.isNotNull(virtualHostname) &&
-			!StringUtil.equalsIgnoreCase(virtualHostname, "localhost")) {
+		if (Validator.isNotNull(layoutSetVirtualHostName) &&
+			!StringUtil.equalsIgnoreCase(
+				layoutSetVirtualHostName, "localhost")) {
 
 			int index = portalURL.indexOf("://");
 
 			String portalDomain = portalURL.substring(index + 3);
 
-			virtualHostname = getCanonicalDomain(virtualHostname, portalDomain);
+			layoutSetVirtualHostName = getCanonicalDomain(
+				layoutSetVirtualHostName, portalDomain);
 
-			virtualHostname = getPortalURL(
-				virtualHostname, portalPort, secureConnection);
+			layoutSetVirtualHostName = getPortalURL(
+				layoutSetVirtualHostName, portalPort,
+				HttpsThreadLocal.isSecure(
+					layoutSetVirtualHostName, secureConnection));
 
-			if (virtualHostname.contains(portalDomain)) {
-				return virtualHostname.concat(getPathContext());
+			if (layoutSetVirtualHostName.contains(portalDomain)) {
+				return layoutSetVirtualHostName.concat(getPathContext());
 			}
 		}
 
@@ -4005,13 +4009,11 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String getPortalURL(HttpServletRequest request) {
-		return getPortalURL(request, isSecure(request));
+		return getPortalURL(request, false);
 	}
 
 	@Override
 	public String getPortalURL(HttpServletRequest request, boolean secure) {
-		secure = secure || HttpsThreadLocal.isSecure();
-
 		String serverName = getForwardedHost(request);
 		int serverPort = getForwardedPort(request);
 
@@ -4079,7 +4081,7 @@ public class PortalImpl implements Portal {
 	public String getPortalURL(
 		String serverName, int serverPort, boolean secure) {
 
-		secure = secure || HttpsThreadLocal.isSecure();
+		secure = HttpsThreadLocal.isSecure(serverName, secure);
 
 		StringBundler sb = new StringBundler(4);
 
