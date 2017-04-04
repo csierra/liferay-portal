@@ -14,13 +14,7 @@
 
 package com.liferay.source.formatter.checks;
 
-import com.liferay.portal.kernel.util.Tuple;
-import com.liferay.source.formatter.SourceFormatterMessage;
 import com.liferay.source.formatter.checks.util.JavaSourceUtil;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Hugo Huijser
@@ -28,37 +22,28 @@ import java.util.Set;
 public class JavaModuleExtendedObjectClassDefinitionCheck
 	extends BaseFileCheck {
 
-	public JavaModuleExtendedObjectClassDefinitionCheck(boolean subrepository) {
-		_subrepository = subrepository;
-	}
-
 	@Override
-	public Tuple process(String fileName, String absolutePath, String content)
-		throws Exception {
+	protected String doProcess(
+		String fileName, String absolutePath, String content) {
 
 		if (absolutePath.contains("/test/") || !content.contains("@Meta.OCD") ||
-			content.contains("@ExtendedObjectClassDefinition") ||
-			!isModulesFile(absolutePath, _subrepository)) {
+			content.contains("@ExtendedObjectClassDefinition")) {
 
-			return new Tuple(content, Collections.emptySet());
+			return content;
 		}
 
 		String packagePath = JavaSourceUtil.getPackagePath(content);
 
 		if (!packagePath.startsWith("com.liferay")) {
-			return new Tuple(content, Collections.emptySet());
+			return content;
 		}
 
-		Set<SourceFormatterMessage> sourceFormatterMessages = new HashSet<>();
-
 		addMessage(
-			sourceFormatterMessages, fileName,
+			fileName,
 			"Specify category using @ExtendedObjectClassDefinition, see " +
 				"LPS-60186");
 
-		return new Tuple(content, sourceFormatterMessages);
+		return content;
 	}
-
-	private final boolean _subrepository;
 
 }

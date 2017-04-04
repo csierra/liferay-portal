@@ -18,14 +18,9 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.source.formatter.SourceFormatterMessage;
 import com.liferay.source.formatter.checks.util.BNDSourceUtil;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,37 +29,25 @@ import java.util.regex.Pattern;
  */
 public class BNDExportsCheck extends BaseFileCheck {
 
-	public BNDExportsCheck(boolean subrepository) {
-		_subrepository = subrepository;
-	}
-
 	@Override
-	public Tuple process(String fileName, String absolutePath, String content)
-		throws Exception {
+	protected String doProcess(
+		String fileName, String absolutePath, String content) {
 
-		if (!fileName.endsWith("/bnd.bnd") ||
-			absolutePath.contains("/testIntegration/") ||
-			absolutePath.contains("/third-party/") ||
-			!isModulesFile(absolutePath, _subrepository)) {
+		if (fileName.endsWith("/bnd.bnd") &&
+			!absolutePath.contains("/testIntegration/") &&
+			!absolutePath.contains("/third-party/")) {
 
-			return new Tuple(content, Collections.emptySet());
+			_checkExports(
+				fileName, content, _exportContentsPattern, "-exportcontents");
+			_checkExports(fileName, content, _exportsPattern, "Export-Package");
 		}
 
-		Set<SourceFormatterMessage> sourceFormatterMessages = new HashSet<>();
-
-		_checkExports(
-			sourceFormatterMessages, fileName, content, _exportContentsPattern,
-			"-exportcontents");
-		_checkExports(
-			sourceFormatterMessages, fileName, content, _exportsPattern,
-			"Export-Package");
-
-		return new Tuple(content, sourceFormatterMessages);
+		return content;
 	}
 
 	private void _checkExports(
-		Set<SourceFormatterMessage> sourceFormatterMessages, String fileName,
-		String content, Pattern pattern, String definitionKey) {
+		String fileName, String content, Pattern pattern,
+		String definitionKey) {
 
 		String bundleSymbolicName = BNDSourceUtil.getDefinitionValue(
 			content, "Bundle-SymbolicName");
@@ -108,7 +91,7 @@ public class BNDExportsCheck extends BaseFileCheck {
 			sb.append("'");
 
 			addMessage(
-				sourceFormatterMessages, fileName, sb.toString(),
+				fileName, sb.toString(),
 				getLineCount(content, matcher.start(2)) + i);
 		}
 	}
@@ -121,6 +104,5 @@ public class BNDExportsCheck extends BaseFileCheck {
 	private final Pattern _exportsPattern = Pattern.compile(
 		"\nExport-Package:(\\\\\n| )((.*?)(\n[^\t]|\\Z))",
 		Pattern.DOTALL | Pattern.MULTILINE);
-	private final boolean _subrepository;
 
 }

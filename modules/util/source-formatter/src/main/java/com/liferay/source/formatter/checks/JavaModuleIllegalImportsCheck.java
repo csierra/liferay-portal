@@ -14,13 +14,8 @@
 
 package com.liferay.source.formatter.checks;
 
-import com.liferay.portal.kernel.util.Tuple;
-import com.liferay.source.formatter.SourceFormatterMessage;
 import com.liferay.source.formatter.checks.util.JavaSourceUtil;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,30 +24,23 @@ import java.util.regex.Pattern;
  */
 public class JavaModuleIllegalImportsCheck extends BaseFileCheck {
 
-	public JavaModuleIllegalImportsCheck(
-		boolean subrepository, boolean checkRegistryInTestClasses) {
-
-		_subrepository = subrepository;
+	public JavaModuleIllegalImportsCheck(boolean checkRegistryInTestClasses) {
 		_checkRegistryInTestClasses = checkRegistryInTestClasses;
 	}
 
 	@Override
-	public Tuple process(String fileName, String absolutePath, String content)
-		throws Exception {
+	protected String doProcess(
+		String fileName, String absolutePath, String content) {
 
-		if (!isModulesFile(absolutePath, _subrepository) ||
-			fileName.endsWith("JavaModuleIllegalImportsCheck.java")) {
-
-			return new Tuple(content, Collections.emptySet());
+		if (fileName.endsWith("JavaModuleIllegalImportsCheck.java")) {
+			return content;
 		}
 
 		String packagePath = JavaSourceUtil.getPackagePath(content);
 
 		if (!packagePath.startsWith("com.liferay")) {
-			return new Tuple(content, Collections.emptySet());
+			return content;
 		}
-
-		Set<SourceFormatterMessage> sourceFormatterMessages = new HashSet<>();
 
 		// LPS-62989
 
@@ -68,7 +56,7 @@ public class JavaModuleIllegalImportsCheck extends BaseFileCheck {
 
 			if (matcher.find()) {
 				addMessage(
-					sourceFormatterMessages, fileName,
+					fileName,
 					"Do not use com.liferay.registry classes in modules, see " +
 						"LPS-62989");
 			}
@@ -78,7 +66,7 @@ public class JavaModuleIllegalImportsCheck extends BaseFileCheck {
 
 		if (content.contains("import com.liferay.util.dao.orm.CustomSQLUtil")) {
 			addMessage(
-				sourceFormatterMessages, fileName,
+				fileName,
 				"Do not use com.liferay.util.dao.orm.CustomSQLUtil in " +
 					"modules, see LPS-64238");
 		}
@@ -87,17 +75,16 @@ public class JavaModuleIllegalImportsCheck extends BaseFileCheck {
 
 		if (content.contains("import com.liferay.util.ContentUtil")) {
 			addMessage(
-				sourceFormatterMessages, fileName,
+				fileName,
 				"Do not use com.liferay.util.ContentUtil in modules, see " +
 					"LPS-64335");
 		}
 
-		return new Tuple(content, sourceFormatterMessages);
+		return content;
 	}
 
 	private final boolean _checkRegistryInTestClasses;
 	private final Pattern _registryImportPattern = Pattern.compile(
 		"\nimport (com\\.liferay\\.registry\\..+);");
-	private final boolean _subrepository;
 
 }

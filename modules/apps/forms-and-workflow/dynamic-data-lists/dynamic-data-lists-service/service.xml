@@ -27,6 +27,7 @@
 
 		<column name="DDMStorageId" type="long" />
 		<column name="recordSetId" type="long" />
+		<column name="recordSetVersion" type="String" />
 		<column name="version" type="String" />
 		<column name="displayIndex" type="int" />
 		<column name="lastPublishDate" type="Date" />
@@ -42,6 +43,10 @@
 		<finder name="R_U" return-type="Collection">
 			<finder-column name="recordSetId" />
 			<finder-column name="userId" />
+		</finder>
+		<finder name="R_R" return-type="Collection">
+			<finder-column name="recordSetId" />
+			<finder-column name="recordSetVersion" />
 		</finder>
 
 		<!-- References -->
@@ -169,6 +174,7 @@
 
 		<column name="DDMStorageId" type="long" />
 		<column name="recordSetId" type="long" />
+		<column name="recordSetVersion" type="String" />
 		<column name="recordId" type="long" />
 		<column name="version" type="String" />
 		<column name="displayIndex" type="int" />
@@ -181,6 +187,10 @@
 
 		<finder name="RecordId" return-type="Collection">
 			<finder-column name="recordId" />
+		</finder>
+		<finder name="R_R" return-type="Collection">
+			<finder-column name="recordSetId" />
+			<finder-column name="recordSetVersion" />
 		</finder>
 		<finder name="R_V" return-type="DDLRecordVersion" unique="true">
 			<finder-column name="recordId" />

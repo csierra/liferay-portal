@@ -20,10 +20,8 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.tools.ToolsUtil;
 
-import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,14 +39,19 @@ public class WhitespaceCheck extends BaseFileCheck {
 	}
 
 	@Override
-	public Tuple process(String fileName, String absolutePath, String content)
+	protected String doProcess(
+			String fileName, String absolutePath, String content)
 		throws Exception {
 
 		content = _trimContent(fileName, content);
 
 		content = StringUtil.replace(content, "\n\n\n", "\n\n");
 
-		return new Tuple(content, Collections.emptySet());
+		if (content.endsWith(StringPool.RETURN)) {
+			content = content.substring(0, content.length() - 1);
+		}
+
+		return content;
 	}
 
 	protected String formatIncorrectSyntax(String line, String regex) {

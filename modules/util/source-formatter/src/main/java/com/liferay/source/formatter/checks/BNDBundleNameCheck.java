@@ -16,46 +16,29 @@ package com.liferay.source.formatter.checks;
 
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Tuple;
-import com.liferay.source.formatter.SourceFormatterMessage;
 import com.liferay.source.formatter.checks.util.BNDSourceUtil;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Hugo Huijser
  */
 public class BNDBundleNameCheck extends BaseFileCheck {
 
-	public BNDBundleNameCheck(boolean subrepository) {
-		_subrepository = subrepository;
-	}
-
 	@Override
-	public Tuple process(String fileName, String absolutePath, String content)
-		throws Exception {
+	protected String doProcess(
+		String fileName, String absolutePath, String content) {
 
-		if (!fileName.endsWith("/bnd.bnd") ||
-			absolutePath.contains("/testIntegration/") ||
-			absolutePath.contains("/third-party/") ||
-			!isModulesFile(absolutePath, _subrepository)) {
+		if (fileName.endsWith("/bnd.bnd") &&
+			!absolutePath.contains("/testIntegration/") &&
+			!absolutePath.contains("/third-party/")) {
 
-			return new Tuple(content, Collections.emptySet());
+			_checkBundleName(fileName, absolutePath, content);
 		}
 
-		Set<SourceFormatterMessage> sourceFormatterMessages = new HashSet<>();
-
-		_checkBundleName(
-			sourceFormatterMessages, fileName, absolutePath, content);
-
-		return new Tuple(content, sourceFormatterMessages);
+		return content;
 	}
 
 	private void _checkBundleName(
-		Set<SourceFormatterMessage> sourceFormatterMessages, String fileName,
-		String absolutePath, String content) {
+		String fileName, String absolutePath, String content) {
 
 		String moduleName = BNDSourceUtil.getModuleName(absolutePath);
 
@@ -78,8 +61,7 @@ public class BNDBundleNameCheck extends BaseFileCheck {
 					strippedBundleName, expectedBundleName)) {
 
 				addMessage(
-					sourceFormatterMessages, fileName,
-					"Incorrect Bundle-Name '" + bundleName + "'");
+					fileName, "Incorrect Bundle-Name '" + bundleName + "'");
 			}
 		}
 
@@ -100,13 +82,11 @@ public class BNDBundleNameCheck extends BaseFileCheck {
 
 			if (!bundleSymbolicName.equals(expectedBundleSymbolicName)) {
 				addMessage(
-					sourceFormatterMessages, fileName,
+					fileName,
 					"Incorrect Bundle-SymbolicName '" + bundleSymbolicName +
 						"'");
 			}
 		}
 	}
-
-	private final boolean _subrepository;
 
 }

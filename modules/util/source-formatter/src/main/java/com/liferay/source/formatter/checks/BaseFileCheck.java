@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.source.formatter.BNDSettings;
-import com.liferay.source.formatter.SourceFormatterMessage;
 import com.liferay.source.formatter.checks.comparator.ElementComparator;
 import com.liferay.source.formatter.checks.util.SourceUtil;
 import com.liferay.source.formatter.util.FileUtil;
@@ -31,7 +30,6 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.dom4j.Element;
@@ -41,41 +39,21 @@ import org.dom4j.Text;
 /**
  * @author Hugo Huijser
  */
-public abstract class BaseFileCheck implements FileCheck {
+public abstract class BaseFileCheck
+	extends BaseSourceCheck implements FileCheck {
 
-	protected void addMessage(
-		Set<SourceFormatterMessage> messages, String fileName, String message) {
+	@Override
+	public String process(String fileName, String absolutePath, String content)
+		throws Exception {
 
-		addMessage(messages, fileName, message, -1);
-	}
+		clearSourceFormatterMessages(fileName);
 
-	protected void addMessage(
-		Set<SourceFormatterMessage> messages, String fileName, String message,
-		int lineCount) {
-
-		addMessage(messages, fileName, message, null, lineCount);
-	}
-
-	protected void addMessage(
-		Set<SourceFormatterMessage> messages, String fileName, String message,
-		String markdownFileName) {
-
-		addMessage(messages, fileName, message, markdownFileName, -1);
-	}
-
-	protected void addMessage(
-		Set<SourceFormatterMessage> messages, String fileName, String message,
-		String markdownFileName, int lineCount) {
-
-		messages.add(
-			new SourceFormatterMessage(
-				fileName, message, markdownFileName, lineCount));
+		return doProcess(fileName, absolutePath, content);
 	}
 
 	protected void checkElementOrder(
-		Set<SourceFormatterMessage> sourceFormatterMessages, String fileName,
-		Element rootElement, String elementName, String parentElementName,
-		ElementComparator elementComparator) {
+		String fileName, Element rootElement, String elementName,
+		String parentElementName, ElementComparator elementComparator) {
 
 		if (rootElement == null) {
 			return;
@@ -124,14 +102,17 @@ public abstract class BaseFileCheck implements FileCheck {
 					sb.append(StringPool.SPACE);
 					sb.append(elementComparator.getElementName(curElement));
 
-					addMessage(
-						sourceFormatterMessages, fileName, sb.toString());
+					addMessage(fileName, sb.toString());
 				}
 			}
 
 			previousNode = curNode;
 		}
 	}
+
+	protected abstract String doProcess(
+			String fileName, String absolutePath, String content)
+		throws Exception;
 
 	protected BNDSettings getBNDSettings(String fileName) throws Exception {
 		for (Map.Entry<String, BNDSettings> entry :
