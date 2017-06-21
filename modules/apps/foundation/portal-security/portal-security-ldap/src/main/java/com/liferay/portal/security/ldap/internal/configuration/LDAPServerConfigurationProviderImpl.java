@@ -246,6 +246,10 @@ public class LDAPServerConfigurationProviderImpl
 				ldapServerConfigurations.add(objectValuePair.getValue());
 			}
 		}
+		
+		ldapServerConfigurations.sort(
+			(LDAPServerConfiguration one, LDAPServerConfiguration other) ->
+				other.authServerPriority() - one.authServerPriority());
 
 		return ldapServerConfigurations;
 	}
