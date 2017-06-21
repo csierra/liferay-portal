@@ -78,7 +78,8 @@ request.setAttribute("websites.classPK", company.getAccountId());
 			}
 		).get();
 
-		$(document.<portlet:namespace />fm).fm('settings--ldap.server.ids--').val(ldapServerIds.join(','));
+		$(document.<portlet:namespace />fm).fm('ldap--authServerPriority--').val(ldapServerIds.join(','));
+
 	}
 
 	function <portlet:namespace />saveLocales() {
