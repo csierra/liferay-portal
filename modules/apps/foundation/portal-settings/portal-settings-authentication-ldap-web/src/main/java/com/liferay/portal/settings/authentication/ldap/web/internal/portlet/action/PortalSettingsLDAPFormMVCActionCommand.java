@@ -14,6 +14,7 @@
 
 package com.liferay.portal.settings.authentication.ldap.web.internal.portlet.action;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseFormMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -21,16 +22,26 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration;
 import com.liferay.portal.security.ldap.configuration.ConfigurationProvider;
+import com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration;
 import com.liferay.portal.security.ldap.constants.LDAPConstants;
 import com.liferay.portal.security.ldap.exportimport.configuration.LDAPExportConfiguration;
 import com.liferay.portal.security.ldap.exportimport.configuration.LDAPImportConfiguration;
 import com.liferay.portal.settings.web.constants.PortalSettingsPortletKeys;
 
+import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -81,6 +92,8 @@ public class PortalSettingsLDAPFormMVCActionCommand
 			themeDisplay.getCompanyId(), LDAPConstants.AUTH_METHOD,
 			LDAPConstants.PASSWORD_ENCRYPTION_ALGORITHM);
 
+		updateAuthServerPriorities(actionRequest, themeDisplay.getCompanyId());
+		
 		updateBooleanProperties(
 			actionRequest, _ldapExportConfigurationProvider,
 			themeDisplay.getCompanyId(), LDAPConstants.EXPORT_ENABLED,
@@ -172,6 +185,18 @@ public class PortalSettingsLDAPFormMVCActionCommand
 		_ldapImportConfigurationProvider = ldapImportConfigurationProvider;
 	}
 
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration)",
+		unbind = "-"
+	)
+	protected void setLDAPServerConfigurationProvider(
+		ConfigurationProvider<LDAPServerConfiguration>
+			ldapServerConfigurationProvider) {
+
+		_ldapServerConfigurationProvider =
+			ldapServerConfigurationProvider;
+	}
+
 	protected void updateBooleanProperties(
 		ActionRequest actionRequest,
 		ConfigurationProvider<?> configurationProvider, long companyId,
@@ -226,6 +251,31 @@ public class PortalSettingsLDAPFormMVCActionCommand
 		configurationProvider.updateProperties(companyId, properties);
 	}
 
+	protected void updateAuthServerPriorities(
+		ActionRequest actionRequest,
+		long companyId) {
+		
+		String authServerPriority = ParamUtil.getString(
+			actionRequest, "ldap--" + LDAPConstants.AUTH_SERVER_PRIORITY + "--");
+		
+		if (Validator.isNotNull(authServerPriority)) {
+			Stream<String> idsStream = Arrays.stream(
+				authServerPriority.split(","));
+
+			List<Long> sortedIds = idsStream.map(
+				GetterUtil::getLong
+			).collect(
+				Collectors.toList()
+			);
+			
+			try {
+				_updateLDAPServerPriorities(companyId, sortedIds);
+			} catch (PortalException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	protected void updateStringProperties(
 		ActionRequest actionRequest,
 		ConfigurationProvider<?> configurationProvider, long companyId,
@@ -244,11 +294,68 @@ public class PortalSettingsLDAPFormMVCActionCommand
 		configurationProvider.updateProperties(companyId, properties);
 	}
 
+	private void _updateLDAPServerPriorities(
+			long companyId, List<Long> sortedIds) throws PortalException {
+
+		List<LDAPServerConfiguration> ldapServerConfigurations = 
+			_ldapServerConfigurationProvider.getConfigurations(companyId, false);
+		
+		Map<Long, LDAPServerConfiguration> 
+			currentLdapServerConfigurations = new LinkedHashMap<>();
+		
+		for (
+				LDAPServerConfiguration ldapServerConfiguration : 
+					ldapServerConfigurations) {
+			
+			if (sortedIds.contains(ldapServerConfiguration.ldapServerId())) {
+				currentLdapServerConfigurations.put(
+					ldapServerConfiguration.ldapServerId(), 
+					ldapServerConfiguration);
+			}
+		}
+		
+		if (currentLdapServerConfigurations.size() != sortedIds.size()) {
+			
+			throw new PortalException("At least one LDAP Server ID was not found");
+		}
+		
+		// currentLdapServerConfigurations has ordered EntrySet by priority
+		//  highest priority configuration first
+		// sortedIds is also order by requested priority
+		//  again highest priority configuration first
+		
+		int i = 0;
+		for (
+				Entry<Long, LDAPServerConfiguration> entry : 
+					currentLdapServerConfigurations.entrySet()) {
+			
+			Long ldapServerId1 = entry.getKey();
+			Long ldapServerId2 = sortedIds.get(i);
+			
+			if (!ldapServerId1.equals(ldapServerId2)) {
+				
+				long newServerPriority = 
+					currentLdapServerConfigurations.get(
+						ldapServerId2).authServerPriority();
+				
+				Dictionary<String, Object> configurationProperties = 
+					_ldapServerConfigurationProvider.getConfigurationProperties(companyId, ldapServerId1);
+				
+				configurationProperties.put("authServerPriority", newServerPriority);
+				_ldapServerConfigurationProvider.updateProperties(companyId, ldapServerId1, configurationProperties);
+			}
+			i++;
+		}
+	}
+		
+	
 	private ConfigurationProvider<LDAPAuthConfiguration>
 		_ldapAuthConfigurationProvider;
 	private ConfigurationProvider<LDAPExportConfiguration>
 		_ldapExportConfigurationProvider;
 	private ConfigurationProvider<LDAPImportConfiguration>
 		_ldapImportConfigurationProvider;
+	private ConfigurationProvider<LDAPServerConfiguration>
+		_ldapServerConfigurationProvider;
 
 }
