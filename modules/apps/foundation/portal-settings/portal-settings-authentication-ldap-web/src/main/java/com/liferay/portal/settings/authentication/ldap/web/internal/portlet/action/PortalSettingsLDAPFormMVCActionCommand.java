@@ -215,7 +215,8 @@ public class PortalSettingsLDAPFormMVCActionCommand
 				l -> GetterUtil.getLong(
 					l.get(LDAPConstants.LDAP_SERVER_ID)) ==
 						GetterUtil.getLong(serverPriorityString)
-			).findFirst().ifPresent(
+			).findFirst(
+			).ifPresent(
 				l -> {
 					l.put(LDAPConstants.AUTH_SERVER_PRIORITY, priority);
 
