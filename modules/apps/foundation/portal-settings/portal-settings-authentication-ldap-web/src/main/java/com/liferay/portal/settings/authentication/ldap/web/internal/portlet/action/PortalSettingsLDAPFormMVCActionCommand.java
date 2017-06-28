@@ -195,21 +195,21 @@ public class PortalSettingsLDAPFormMVCActionCommand
 	}
 
 	protected void sortLdapServerConfigurations(
-		long companyId, String authServerPriorityString) {
+		long companyId, String orderedLdapServerIdsString) {
 
-		if (Validator.isBlank(authServerPriorityString)) {
+		if (Validator.isBlank(orderedLdapServerIdsString)) {
 			return;
 		}
 
-		String[] authServerPriorityStrings = authServerPriorityString.split(
+		String[] orderedLdapServerIds = orderedLdapServerIdsString.split(
 			",");
 
 		List<Dictionary<String, Object>> dictionaries =
 			_ldapServerConfigurationProvider.getConfigurationsProperties(
 				companyId);
 
-		for (int i = 0; i < authServerPriorityStrings.length; i++) {
-			String serverPriorityString = authServerPriorityStrings[i];
+		for (int i = 0; i < orderedLdapServerIds.length; i++) {
+			String ldapServerId = orderedLdapServerIds[i];
 
 			final int priority = i;
 
@@ -218,7 +218,7 @@ public class PortalSettingsLDAPFormMVCActionCommand
 			stream.filter(
 				l -> GetterUtil.getLong(
 					l.get(LDAPConstants.LDAP_SERVER_ID)) ==
-						GetterUtil.getLong(serverPriorityString)
+						GetterUtil.getLong(ldapServerId)
 			).findFirst(
 			).ifPresent(
 				l -> {
