@@ -209,7 +209,7 @@ public class PortalSettingsLDAPFormMVCActionCommand
 				companyId);
 
 		for (int i = 0; i < orderedLdapServerIds.length; i++) {
-			String ldapServerId = orderedLdapServerIds[i];
+			long ldapServerId = GetterUtil.getLong(orderedLdapServerIds[i]);
 
 			final int priority = i;
 
@@ -218,7 +218,7 @@ public class PortalSettingsLDAPFormMVCActionCommand
 			stream.filter(
 				l -> GetterUtil.getLong(
 					l.get(LDAPConstants.LDAP_SERVER_ID)) ==
-						GetterUtil.getLong(ldapServerId)
+						ldapServerId
 			).findFirst(
 			).ifPresent(
 				l -> {
