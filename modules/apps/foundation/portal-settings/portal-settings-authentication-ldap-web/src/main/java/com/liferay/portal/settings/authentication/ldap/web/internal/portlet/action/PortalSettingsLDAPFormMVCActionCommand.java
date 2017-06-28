@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration;
 import com.liferay.portal.security.ldap.configuration.ConfigurationProvider;
@@ -83,7 +84,6 @@ public class PortalSettingsLDAPFormMVCActionCommand
 		updateStringProperties(
 			actionRequest, _ldapAuthConfigurationProvider,
 			themeDisplay.getCompanyId(), LDAPConstants.AUTH_METHOD,
-			LDAPConstants.AUTH_SERVER_PRIORITY,
 			LDAPConstants.PASSWORD_ENCRYPTION_ALGORITHM);
 
 		updateBooleanProperties(
@@ -196,6 +196,10 @@ public class PortalSettingsLDAPFormMVCActionCommand
 
 	protected void sortLdapServerConfigurations(
 		long companyId, String authServerPriorityString) {
+
+		if (Validator.isBlank(authServerPriorityString)) {
+			return;
+		}
 
 		String[] authServerPriorityStrings = authServerPriorityString.split(
 			",");
