@@ -201,8 +201,7 @@ public class PortalSettingsLDAPFormMVCActionCommand
 			return;
 		}
 
-		String[] orderedLdapServerIds = orderedLdapServerIdsString.split(
-			",");
+		String[] orderedLdapServerIds = orderedLdapServerIdsString.split(",");
 
 		List<Dictionary<String, Object>> dictionaries =
 			_ldapServerConfigurationProvider.getConfigurationsProperties(
