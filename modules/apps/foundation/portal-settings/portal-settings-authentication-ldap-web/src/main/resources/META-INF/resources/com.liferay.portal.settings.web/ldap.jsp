@@ -14,6 +14,7 @@
  */
 --%>
 
+<%@page import="com.liferay.portal.kernel.util.StringBundler"%>
 <%@ include file="/com.liferay.portal.settings.web/init.jsp" %>
 
 <%
@@ -86,6 +87,11 @@ boolean ldapExportEnabled = !(ldapImportConfiguration.importUserPasswordAutogene
 </aui:button-row>
 
 <aui:fieldset>
+
+	<%
+	StringBundler ldapServerPriority = new StringBundler();
+	%>
+
 	<aui:input name="<%= ActionRequest.ACTION_NAME %>" type="hidden" value="/portal_settings/ldap" />
 
 	<c:if test="<%= !ldapServerConfigurations.isEmpty() %>">
@@ -108,9 +114,15 @@ boolean ldapExportEnabled = !(ldapImportConfiguration.importUserPasswordAutogene
 				<tbody class="table-data">
 
 					<%
+					
 					for (LDAPServerConfiguration ldapServerConfiguration : ldapServerConfigurations) {
 						long ldapServerId = ldapServerConfiguration.ldapServerId();
 
+						if (ldapServerPriority.length() > 0) {
+							ldapServerPriority.append(",");
+						}
+						ldapServerPriority.append(ldapServerId);
+						
 						String ldapServerName = ldapServerConfiguration.serverName();
 					%>
 
@@ -168,6 +180,7 @@ boolean ldapExportEnabled = !(ldapImportConfiguration.importUserPasswordAutogene
 			</table>
 		</div>
 	</c:if>
+	<aui:input name='<%= "ldap--" + LDAPConstants.AUTH_SERVER_PRIORITY +"--" %>' type="hidden" value="<%= ldapServerPriority %>" />	
 </aui:fieldset>
 
 <h3><liferay-ui:message key="import-export" /></h3>

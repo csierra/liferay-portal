@@ -43,6 +43,9 @@ public interface LDAPServerConfiguration {
 	@Meta.AD(deflt = "", required = false)
 	public String serverName();
 
+ 	@Meta.AD(deflt = "0", required = false)
+ 	public int authServerPriority();
+
 	@Meta.AD(deflt = "ldap://localhost:10389", required = false)
 	public String baseProviderURL();
 
