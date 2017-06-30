@@ -251,11 +251,17 @@ public class LDAPServerConfigurationProviderImpl
 					o -> {
 						Configuration key = o.getKey();
 
-						Dictionary<String, Object> properties =
-							key.getProperties();
+						try {
+							Dictionary<String, Object> properties =
+								key.getProperties();
 
-						return GetterUtil.getLong(
-							properties.get(LDAPConstants.AUTH_SERVER_PRIORITY));
+							return GetterUtil.getLong(
+								properties.get(
+									LDAPConstants.AUTH_SERVER_PRIORITY));
+						}
+						catch (IllegalStateException ise) {
+							return 0L;
+						}
 					}));
 
 			objectValuePairsList.forEach(
