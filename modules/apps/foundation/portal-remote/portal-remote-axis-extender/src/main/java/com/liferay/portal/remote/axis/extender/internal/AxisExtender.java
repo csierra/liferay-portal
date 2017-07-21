@@ -219,10 +219,6 @@ public class AxisExtender {
 		public void modifiedBundle(
 			Bundle bundle, BundleEvent bundleEvent,
 			BundleRegistrationInfo bundleRegistrationInfo) {
-
-			removedBundle(bundle, bundleEvent, bundleRegistrationInfo);
-
-			addingBundle(bundle, bundleEvent);
 		}
 
 		@Override
