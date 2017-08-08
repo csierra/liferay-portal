@@ -104,7 +104,26 @@ public class LanguageExtension implements Extension {
 
 				resourceBundleLoader = processAggregate(
 					(String)aggregate, bundleSymbolicName, (String)baseName,
-					serviceRanking);
+					serviceReference -> {
+						int otherServiceRanking = GetterUtil.getInteger(
+							serviceReference.getProperty("service.ranking"),
+							Integer.MIN_VALUE);
+
+						if (serviceRanking < otherServiceRanking) {
+							return true;
+						}
+
+						long otherBundleId = GetterUtil.getLong(
+							serviceReference.getProperty(
+								"original.service.bundleid"),
+							Integer.MIN_VALUE);
+
+						if (_bundle.getBundleId() < otherBundleId) {
+							return true;
+						}
+
+						return false;
+					});
 			}
 			else if (baseName instanceof String) {
 				resourceBundleLoader = processBaseName(
@@ -125,7 +144,7 @@ public class LanguageExtension implements Extension {
 
 	protected ResourceBundleLoader processAggregate(
 		String aggregate, final String bundleSymbolicName, String baseName,
-		final int limit) {
+		Predicate<? super ServiceReference<?>> predicate) {
 
 		String[] filterStrings = aggregate.split(",");
 
@@ -150,7 +169,7 @@ public class LanguageExtension implements Extension {
 				serviceTracker = new PredicateServiceTracker(
 					filter,
 					new ResourceBundleLoaderPredicate(
-						bundleSymbolicName, baseName, limit));
+						bundleSymbolicName, baseName, predicate));
 
 			serviceTracker.open();
 
@@ -182,6 +201,8 @@ public class LanguageExtension implements Extension {
 		if (Validator.isNull(properties.get("service.ranking"))) {
 			properties.put("service.ranking", Integer.MIN_VALUE);
 		}
+
+		properties.put("original.service.bundleid", _bundle.getBundleId());
 
 		_serviceRegistrations.add(
 			_bundleContext.registerService(
@@ -301,11 +322,12 @@ public class LanguageExtension implements Extension {
 		implements Predicate<ServiceReference<ResourceBundleLoader>> {
 
 		public ResourceBundleLoaderPredicate(
-			String bundleSymbolicName, String baseName, int limit) {
+			String bundleSymbolicName, String baseName,
+			Predicate<? super ServiceReference<?>> predicate) {
 
 			_bundleSymbolicName = bundleSymbolicName;
 			_baseName = baseName;
-			_limit = limit;
+			_predicate = predicate;
 		}
 
 		@Override
@@ -341,13 +363,7 @@ public class LanguageExtension implements Extension {
 			if (_bundleSymbolicName.equals(bundleSymbolicName) &&
 				_baseName.equals(bundleBaseName)) {
 
-				int serviceRanking = GetterUtil.getInteger(
-					serviceReference.getProperty("service.ranking"),
-					Integer.MIN_VALUE);
-
-				if (_limit <= serviceRanking) {
-					return false;
-				}
+				return _predicate.test(serviceReference);
 			}
 
 			return true;
@@ -355,7 +371,7 @@ public class LanguageExtension implements Extension {
 
 		private final String _baseName;
 		private final String _bundleSymbolicName;
-		private final int _limit;
+		private final Predicate<? super ServiceReference<?>> _predicate;
 
 	}
 
