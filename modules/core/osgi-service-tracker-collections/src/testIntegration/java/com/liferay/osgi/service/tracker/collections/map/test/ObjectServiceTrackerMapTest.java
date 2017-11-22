@@ -360,13 +360,12 @@ public class ObjectServiceTrackerMapTest {
 
 	@Test
 	public void testGetServiceWithNullClassAndFilter() {
-		ServiceTrackerMap<String, Object> serviceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				_bundleContext, null, "target");
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+			_bundleContext, null, "target");
 
 		registerService(new TrackedOne());
 
-		Assert.assertNotNull(serviceTrackerMap.getService("aTarget"));
+		Assert.assertNotNull(_serviceTrackerMap.getService("aTarget"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -689,8 +688,10 @@ public class ObjectServiceTrackerMapTest {
 	protected ServiceTrackerMap<String, TrackedOne> createServiceTrackerMap(
 		BundleContext bundleContext) {
 
-		return ServiceTrackerMapFactory.openSingleValueMap(
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, TrackedOne.class, "target");
+
+		return _serviceTrackerMap;
 	}
 
 	protected ServiceRegistration<TrackedOne> registerService(
