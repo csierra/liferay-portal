@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.impl.scopes;
 
-import com.liferay.oauth2.provider.api.scopes.Scope;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes;
 import com.liferay.oauth2.provider.api.scopes.ScopeMatcher;
 import org.osgi.service.component.annotations.Component;
 
@@ -29,49 +29,14 @@ public class DefaultNamespaceManager implements NamespaceManager {
 
 	@Override
 	public Namespace createNamespace() {
-		Collection<NamespacedScope> scopes = new HashSet<>();
-
-		return new Namespace() {
-
-			@Override
-			public NamespacedScope addScope(Class<? extends Scope> scopeType) {
-				NamespacedScope namespacedScope =
-					new NamespacedScopeImpl(scopeType);
-
-				scopes.add(namespacedScope);
-
-				return namespacedScope;
-			}
-
-			@Override
-			public Collection<Class<? extends Scope>> findScopes(
-				ScopeMatcher matcher) {
-
-				Stream<NamespacedScope> stream = scopes.stream();
-
-				return stream.map(
-					NamespacedScope::getScopeType
-				).filter(
-					matcher::matches
-				).collect(
-					Collectors.toList()
-				);
-			}
-
-			@Override
-			public void forEach(Consumer<NamespacedScope> consumer) {
-				scopes.forEach(consumer);
-			}
-
-		};
-
+		return new NamespaceImpl();
 	}
 
 	private static class NamespacedScopeImpl implements NamespacedScope {
 
-		private final Class<? extends Scope> _scopeType;
+		private final Class<? extends OAuth2Scopes> _scopeType;
 
-		public NamespacedScopeImpl(Class<? extends Scope> scopeType) {
+		public NamespacedScopeImpl(Class<? extends OAuth2Scopes> scopeType) {
 			if (scopeType == null) {
 				throw new IllegalArgumentException("ScopeType can't be null");
 			}
@@ -80,7 +45,7 @@ public class DefaultNamespaceManager implements NamespaceManager {
 		}
 
 		@Override
-		public Class<? extends Scope> getScopeType() {
+		public Class<? extends OAuth2Scopes> getScopeType() {
 			return _scopeType;
 		}
 
@@ -101,6 +66,46 @@ public class DefaultNamespaceManager implements NamespaceManager {
 		@Override
 		public int hashCode() {
 			return _scopeType.hashCode();
+		}
+
+	}
+
+	private static class NamespaceImpl implements Namespace {
+
+		private final Collection<NamespacedScope> _scopes;
+
+		public NamespaceImpl() {
+			_scopes = new HashSet<>();
+		}
+
+		@Override
+		public NamespacedScope addScope(Class<? extends OAuth2Scopes> scopeType) {
+			NamespacedScope namespacedScope =
+				new NamespacedScopeImpl(scopeType);
+
+			_scopes.add(namespacedScope);
+
+			return namespacedScope;
+		}
+
+		@Override
+		public Collection<Class<? extends OAuth2Scopes>> findScopes(
+			ScopeMatcher matcher) {
+
+			Stream<NamespacedScope> stream = _scopes.stream();
+
+			return stream.map(
+				NamespacedScope::getScopeType
+			).filter(
+				matcher::matches
+			).collect(
+				Collectors.toList()
+			);
+		}
+
+		@Override
+		public void forEach(Consumer<NamespacedScope> consumer) {
+			_scopes.forEach(consumer);
 		}
 
 	}

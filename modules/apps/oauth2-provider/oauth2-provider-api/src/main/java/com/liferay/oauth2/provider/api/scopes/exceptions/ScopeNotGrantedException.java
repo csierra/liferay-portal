@@ -12,9 +12,24 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.api.scopes;
+package com.liferay.oauth2.provider.api.scopes.exceptions;
 
-public interface ScopeMatchingStrategy {
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes;
 
-	public boolean matches(String string, Class<? extends Scope> scopeType);
+public class ScopeNotGrantedException extends RuntimeException {
+
+	private Class<? extends OAuth2Scopes.Scope> _scope;
+
+	public ScopeNotGrantedException(
+		Class<? extends OAuth2Scopes.Scope> scope) {
+		_scope = scope;
+	}
+
+	public ScopeNotGrantedException(
+		String message,
+		Class<? extends OAuth2Scopes.Scope> scope) {
+		super(message);
+		_scope = scope;
+	}
+
 }

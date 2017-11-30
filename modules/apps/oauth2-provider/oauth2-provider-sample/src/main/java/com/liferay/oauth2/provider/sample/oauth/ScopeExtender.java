@@ -12,35 +12,15 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.api.scopes;
+package com.liferay.oauth2.provider.sample.oauth;
 
-import java.util.Locale;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes.LocalizedScopesDescription;
 
-/**
- * @author Carlos Sierra Andrés
- */
-public interface Scope {
+public class ScopeExtender implements OAuth2Scopes.Extender<ScopeRegistrator.Scopes> {
 
-	public interface Registrator {
-
-		public void register(Registry registry);
-
+	@Override
+	public LocalizedScopesDescription getLocalizedScopesDescription() {
+		return LocalizedScopesDescription.fromResourceBundleLoader(null);
 	}
-
-	interface LocalizedScopeDescription {
-		public String getDescription(Locale language);
-	}
-
-	interface Registry {
-
-		default public void register(Class<? extends Scope> scopeType) {
-			register(scopeType, __ -> "No description");
-		}
-
-		public void register(
-			Class<? extends Scope> scopeType,
-			LocalizedScopeDescription description);
-
-	}
-
 }

@@ -12,14 +12,15 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.api.scopes;
+package com.liferay.oauth2.provider.impl.scopes;
 
+import com.liferay.oauth2.provider.api.scopes.ScopeMatcher;
 
-public class Test {
+public class EverythingStrategy implements Strategy {
 
-	@RequiresScope(Scopes.READ)
-	public String method() {
-		return "hello";
+	@Override
+	public ScopeMatcher matches(String incomingScopeName) {
+		return __ -> true;
 	}
 
 }

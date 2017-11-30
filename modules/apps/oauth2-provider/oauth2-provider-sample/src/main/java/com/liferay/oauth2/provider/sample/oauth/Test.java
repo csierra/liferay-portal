@@ -12,16 +12,26 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.api.scopes;
+package com.liferay.oauth2.provider.sample.oauth;
 
-public interface Scopes {
 
-	interface READ extends Scope {}
+import com.liferay.oauth2.provider.api.scopes.RequiresScope;
+import com.liferay.oauth2.provider.api.scopes.ScopeChecker;
+import com.liferay.oauth2.provider.sample.oauth.ScopeRegistrator.Scopes.READ;
+import com.liferay.oauth2.provider.sample.oauth.ScopeRegistrator.Scopes.WRITE;
+import org.osgi.service.component.annotations.Reference;
 
-	interface WRITE extends Scope {}
+public class Test {
 
-	Class<? extends Scope> READ = READ.class;
+	@RequiresScope(READ.class)
+	public String method() {
+		return "hello";
+	}
 
-	Class<? extends Scope> WRITE = WRITE.class;
+	public void anotherMethod() {
+		_scopeChecker.requires(WRITE.class);
+	}
 
+	@Reference
+	ScopeChecker _scopeChecker;
 }

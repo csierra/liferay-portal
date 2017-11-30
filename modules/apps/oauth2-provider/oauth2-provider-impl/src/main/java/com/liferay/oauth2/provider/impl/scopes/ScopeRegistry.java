@@ -14,12 +14,16 @@
 
 package com.liferay.oauth2.provider.impl.scopes;
 
+import com.liferay.oauth2.provider.api.scopes.ScopeFinder;
+import com.liferay.oauth2.provider.api.scopes.ScopeFinderLocator;
+import com.liferay.oauth2.provider.api.scopes.ScopeMatcher;
 import com.liferay.oauth2.provider.impl.scopes.NamespaceManager.Namespace;
 import com.liferay.oauth2.provider.impl.scopes.NamespaceManager.NamespacedScope;
-import com.liferay.oauth2.provider.api.scopes.Scope;
-import com.liferay.oauth2.provider.api.scopes.Scope.LocalizedScopeDescription;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes.LocalizedScopesDescription;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.portal.kernel.model.Company;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
@@ -29,13 +33,16 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component(immediate = true)
-public class ScopeRegistry {
+public class ScopeRegistry implements ScopeFinderLocator {
 
 	private ConcurrentHashMap<String, Namespace> _nameSpaces;
-	private ConcurrentHashMap<NamespacedScope, LocalizedScopeDescription>
+	private ConcurrentHashMap<NamespacedScope, LocalizedScopesDescription>
 		_scopeDescriptions;
 
 	private ServiceTrackerMap<String, Strategy> _strategiesPerCompany;
@@ -73,8 +80,8 @@ public class ScopeRegistry {
 		unbind = "removeScopeRegistrator"
 	)
 	protected void addScopeRegistrator(
-		ServiceReference<Scope.Registrator> serviceReference,
-		Scope.Registrator registrator) {
+		ServiceReference<OAuth2Scopes.Registrator> serviceReference,
+		OAuth2Scopes.Registrator registrator) {
 
 		Namespace namespace = _namespaceManager.createNamespace();
 
@@ -88,7 +95,7 @@ public class ScopeRegistry {
 	}
 
 	protected void removeScopeRegistrator(
-		ServiceReference<Scope.Registrator> serviceReference) {
+		ServiceReference<OAuth2Scopes.Registrator> serviceReference) {
 
 		Namespace namespace = _nameSpaces.remove(
 			_namespaceIdGenerator.generateName(serviceReference));
@@ -96,7 +103,7 @@ public class ScopeRegistry {
 		namespace.forEach(_scopeDescriptions::remove);
 	}
 
-	protected Strategy getStrategies(long companyId, String namespaceId) {
+	protected Strategy getStrategy(long companyId, String namespaceId) {
 		Strategy strategy =
 			_strategiesPerCompanyAndNamespace.getService(
 				companyId + "-" + namespaceId);
@@ -129,4 +136,24 @@ public class ScopeRegistry {
 	@Reference(target = "(&(|(!(company))(company=0))(!(namespace=*)))")
 	private volatile Strategy _defaultStrategy;
 
+	@Override
+	public ScopeFinder locate(Company company) {
+		return name -> {
+			Stream<Map.Entry<String, Namespace>> stream =
+				_nameSpaces.entrySet().stream();
+
+			return stream.flatMap(
+				entry -> {
+					Strategy strategy = getStrategy(
+						company.getCompanyId(), entry.getKey());
+
+					ScopeMatcher matches = strategy.matches(name);
+
+					return entry.getValue().findScopes(matches).stream();
+				}
+			).collect(
+				Collectors.toList()
+			);
+		};
+	}
 }
