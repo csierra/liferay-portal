@@ -14,20 +14,20 @@
 
 package com.liferay.oauth2.provider.api.scopes.exceptions;
 
-import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scope;
 
 public class ScopeNotGrantedException extends RuntimeException {
 
-	private Class<? extends OAuth2Scopes.Scope> _scope;
+	private Class<? extends OAuth2Scope.Scope> _scope;
 
 	public ScopeNotGrantedException(
-		Class<? extends OAuth2Scopes.Scope> scope) {
+		Class<? extends OAuth2Scope.Scope> scope) {
 		_scope = scope;
 	}
 
 	public ScopeNotGrantedException(
 		String message,
-		Class<? extends OAuth2Scopes.Scope> scope) {
+		Class<? extends OAuth2Scope.Scope> scope) {
 		super(message);
 		_scope = scope;
 	}

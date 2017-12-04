@@ -4,9 +4,9 @@ import com.liferay.oauth2.provider.api.scopes.exceptions.ScopeNotGrantedExceptio
 
 public interface ScopeChecker {
 
-	public void requires(Class<? extends OAuth2Scopes.Scope> scope)
+	public void requires(Class<? extends OAuth2Scope.Scope> scope)
 		throws ScopeNotGrantedException;
 
-	public boolean isGrantedScope(Class<? extends OAuth2Scopes.Scope> scope);
+	public boolean isGrantedScope(Class<? extends OAuth2Scope.Scope> scope);
 
 }

@@ -19,8 +19,8 @@ import com.liferay.oauth2.provider.api.scopes.ScopeFinderLocator;
 import com.liferay.oauth2.provider.api.scopes.ScopeMatcher;
 import com.liferay.oauth2.provider.impl.scopes.NamespaceManager.Namespace;
 import com.liferay.oauth2.provider.impl.scopes.NamespaceManager.NamespacedScope;
-import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes;
-import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes.LocalizedScopesDescription;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scope;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scope.LocalizedScopesDescription;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.Company;
@@ -80,8 +80,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		unbind = "removeScopeRegistrator"
 	)
 	protected void addScopeRegistrator(
-		ServiceReference<OAuth2Scopes.Registrator> serviceReference,
-		OAuth2Scopes.Registrator registrator) {
+		ServiceReference<OAuth2Scope.Registrator> serviceReference,
+		OAuth2Scope.Registrator registrator) {
 
 		Namespace namespace = _namespaceManager.createNamespace();
 
@@ -95,7 +95,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	}
 
 	protected void removeScopeRegistrator(
-		ServiceReference<OAuth2Scopes.Registrator> serviceReference) {
+		ServiceReference<OAuth2Scope.Registrator> serviceReference) {
 
 		Namespace namespace = _nameSpaces.remove(
 			_namespaceIdGenerator.generateName(serviceReference));

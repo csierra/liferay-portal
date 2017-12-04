@@ -6,6 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiresScope {
 
-	Class<? extends OAuth2Scopes.Scope> value();
+	String value();
 
 }

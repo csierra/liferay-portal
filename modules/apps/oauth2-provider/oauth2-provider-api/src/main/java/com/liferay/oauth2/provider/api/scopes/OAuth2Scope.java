@@ -14,51 +14,9 @@
 
 package com.liferay.oauth2.provider.api.scopes;
 
-import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
-
-import java.util.Locale;
-
 /**
  * @author Carlos Sierra Andrés
  */
-public interface OAuth2Scopes {
-
-	public interface Scope {}
-
-	public interface Namespace {}
-
-	public interface Registrator {
-
-		public void register(Registry registry);
-
-	}
-
-	public interface Extender<T extends Namespace> {
-		public LocalizedScopesDescription getLocalizedScopesDescription();
-	}
-
-	interface LocalizedScopesDescription {
-		public String getDescription(
-			Class<? extends Scope> scopeType, Locale language);
-
-		public static LocalizedScopesDescription fromResourceBundleLoader(
-			ResourceBundleLoader resourceBundleLoader) {
-
-			return ((scopeType, language) ->
-				resourceBundleLoader.loadResourceBundle(
-					LanguageUtil.getLanguageId(language)).
-					getString(
-						scopeType.getSimpleName()));
-		}
-	}
-
-	interface Registry {
-
-		public void register(
-			Class<? extends Namespace> namespaceType,
-			LocalizedScopesDescription description);
-
-	}
+public interface OAuth2Scope {
 
 }

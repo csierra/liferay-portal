@@ -15,23 +15,116 @@
 package com.liferay.oauth2.provider.sample.oauth;
 
 
-import com.liferay.oauth2.provider.api.scopes.RequiresScope;
-import com.liferay.oauth2.provider.api.scopes.ScopeChecker;
-import com.liferay.oauth2.provider.sample.oauth.ScopeRegistrator.Scopes.READ;
-import com.liferay.oauth2.provider.sample.oauth.ScopeRegistrator.Scopes.WRITE;
-import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.Component;
 
-public class Test {
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.ext.Provider;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-	@RequiresScope(READ.class)
+@Component(service = Application.class)
+public class Test extends Application{
+
 	public String method() {
 		return "hello";
 	}
 
-	public void anotherMethod() {
-		_scopeChecker.requires(WRITE.class);
+	@Override
+	public Set<Object> getSingletons() {
+		return new HashSet<>(
+			Arrays.asList(new MyContainerRequestFilter(), new MyResource()));
 	}
 
-	@Reference
-	ScopeChecker _scopeChecker;
+	@Override
+	public Set<Class<?>> getClasses() {
+		return Collections.singleton(MyFeature.class);
+	}
+
+	@Override
+	public Map<String, Object> getProperties() {
+		return new HashMap<String, Object>() {{
+			put("jandepora", "atitican");
+		}};
+	}
+
+	@Provider
+	public static class MyFeature implements Feature {
+
+		@Override
+		public boolean configure(FeatureContext context) {
+			System.out.println(
+				"FEATURE: " + context.getConfiguration());
+
+			return false;
+		}
+
+		@Context
+		Application _application;
+	}
+
+	/*@Provider
+	public static class MyDynamicFeature implements DynamicFeature {
+
+		@Override
+		public void configure(
+			ResourceInfo resourceInfo, FeatureContext context) {
+
+			System.out.println("DYNAMIC:" + resourceInfo.getResourceMethod());
+
+			context.register(new MyContainerRequestFilter());
+		}
+	}
+*/
+	@Provider
+	public static class MyContainerRequestFilter implements
+		ContainerRequestFilter {
+
+		@Override
+		public void filter(ContainerRequestContext requestContext) throws
+			IOException {
+			System.out.println(
+				"METHOD: " + _resourceInfo.getResourceMethod());
+			System.out.println(
+				"CLASS: " + _resourceInfo.getResourceClass());
+			System.out.println("APPLICATION:" + _application);
+		}
+
+		@Context
+		ResourceInfo _resourceInfo;
+
+		@Context
+		Application _application;
+	}
+
+	public class MyResource {
+
+		@Path("/sub")
+		public SubResource getSub() {
+			return new SubResource();
+		}
+
+	}
+
+	public class SubResource {
+
+		@GET
+		public String get() {
+			return "hello subresource";
+		}
+
+	}
+
 }

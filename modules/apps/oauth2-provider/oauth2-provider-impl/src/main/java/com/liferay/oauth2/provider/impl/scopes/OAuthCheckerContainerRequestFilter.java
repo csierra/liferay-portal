@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.impl.scopes;
 
-import com.liferay.oauth2.provider.api.scopes.OAuth2Scopes;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scope;
 import com.liferay.oauth2.provider.api.scopes.ScopeFinder;
 import com.liferay.oauth2.provider.api.scopes.ScopeFinderLocator;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -41,7 +41,7 @@ public class OAuthCheckerContainerRequestFilter implements
 
 			ScopeFinder scopeFinder = _scopeFinderLocator.locate(company);
 
-			Collection<Class<? extends OAuth2Scopes>> scopes =
+			Collection<Class<? extends OAuth2Scope>> scopes =
 				scopeFinder.findScopes("incoming");
 		}
 		catch (PortalException e) {
