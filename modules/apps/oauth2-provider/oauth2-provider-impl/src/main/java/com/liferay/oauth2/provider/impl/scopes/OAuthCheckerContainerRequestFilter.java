@@ -14,20 +14,17 @@
 
 package com.liferay.oauth2.provider.impl.scopes;
 
-import com.liferay.oauth2.provider.api.scopes.OAuth2Scope;
-import com.liferay.oauth2.provider.api.scopes.ScopeFinder;
-import com.liferay.oauth2.provider.api.scopes.ScopeFinderLocator;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.PortalUtil;
-import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import java.io.IOException;
-import java.util.Collection;
+import java.lang.reflect.Method;
 
 public class OAuthCheckerContainerRequestFilter implements
 	ContainerRequestFilter {
@@ -39,10 +36,8 @@ public class OAuthCheckerContainerRequestFilter implements
 		try {
 			Company company = PortalUtil.getCompany(_httpServletRequest);
 
-			ScopeFinder scopeFinder = _scopeFinderLocator.locate(company);
+			Method resourceMethod = _resourceInfo.getResourceMethod();
 
-			Collection<Class<? extends OAuth2Scope>> scopes =
-				scopeFinder.findScopes("incoming");
 		}
 		catch (PortalException e) {
 			e.printStackTrace();
@@ -52,7 +47,7 @@ public class OAuthCheckerContainerRequestFilter implements
 	@Context
 	private HttpServletRequest _httpServletRequest;
 
-	@Reference
-	private ScopeFinderLocator _scopeFinderLocator;
+	@Context
+	private ResourceInfo _resourceInfo;
 
 }

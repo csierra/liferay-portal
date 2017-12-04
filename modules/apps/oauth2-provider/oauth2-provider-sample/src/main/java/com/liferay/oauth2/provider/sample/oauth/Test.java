@@ -61,12 +61,12 @@ public class Test extends Application{
 	}
 
 	@Provider
-	public static class MyFeature implements Feature {
+	public class MyFeature implements Feature {
 
 		@Override
 		public boolean configure(FeatureContext context) {
 			System.out.println(
-				"FEATURE: " + context.getConfiguration());
+				"Application: " + _application);
 
 			return false;
 		}

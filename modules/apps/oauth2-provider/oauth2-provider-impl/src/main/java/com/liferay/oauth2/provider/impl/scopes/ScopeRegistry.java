@@ -16,16 +16,10 @@ package com.liferay.oauth2.provider.impl.scopes;
 
 import com.liferay.oauth2.provider.api.scopes.ScopeFinder;
 import com.liferay.oauth2.provider.api.scopes.ScopeFinderLocator;
-import com.liferay.oauth2.provider.api.scopes.ScopeMatcher;
-import com.liferay.oauth2.provider.impl.scopes.NamespaceManager.Namespace;
-import com.liferay.oauth2.provider.impl.scopes.NamespaceManager.NamespacedScope;
-import com.liferay.oauth2.provider.api.scopes.OAuth2Scope;
-import com.liferay.oauth2.provider.api.scopes.OAuth2Scope.LocalizedScopesDescription;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.Company;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -33,127 +27,56 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component(immediate = true)
 public class ScopeRegistry implements ScopeFinderLocator {
 
-	private ConcurrentHashMap<String, Namespace> _nameSpaces;
-	private ConcurrentHashMap<NamespacedScope, LocalizedScopesDescription>
-		_scopeDescriptions;
-
-	private ServiceTrackerMap<String, Strategy> _strategiesPerCompany;
-	private ServiceTrackerMap<String, Strategy>
-		_strategiesPerCompanyAndNamespace;
-	private ServiceTrackerMap<String, Strategy> _strategiesPerNamespace;
+	private BundleContext _bundleContext;
+	private ServiceTrackerMap<String, List<ScopeFinder>>
+		_scopesByCompany;
+	private volatile ScopeFinder _defaultScopeFinder = ScopeFinder.empty();
+	private Collection<ScopeFinder> _defaultScopeFinders =
+		new CopyOnWriteArrayList<>();
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_nameSpaces = new ConcurrentHashMap<>();
+		_bundleContext = bundleContext;
 
-		_scopeDescriptions = new ConcurrentHashMap<>();
-
-		_strategiesPerCompany = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, Strategy.class, "companyId");
-
-		_strategiesPerNamespace = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, Strategy.class, "namespace");
-
-		_strategiesPerCompanyAndNamespace =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, Strategy.class,
-				String.format("(&(%s=*)(%s=*))", "companyId", "namespace"),
-				(serviceReference, emitter) ->
-					emitter.emit(
-						serviceReference.getProperty("companyId") +
-						"-" +
-						serviceReference.getProperty("namespace")));
+		_scopesByCompany = ServiceTrackerMapFactory.openMultiValueMap(
+			bundleContext, ScopeFinder.class, "companyId");
 	}
 
 	@Reference(
 		cardinality = ReferenceCardinality.MULTIPLE,
 		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY,
-		unbind = "removeScopeRegistrator"
+		target = "(!(companyId=*))",
+		unbind = "removeScopeFinder"
 	)
-	protected void addScopeRegistrator(
-		ServiceReference<OAuth2Scope.Registrator> serviceReference,
-		OAuth2Scope.Registrator registrator) {
+	protected void addScopeFinder(ScopeFinder scopeFinder) {
+		_defaultScopeFinders.add(scopeFinder);
 
-		Namespace namespace = _namespaceManager.createNamespace();
-
-		registrator.register(
-			(scopeType, description) ->
-				_scopeDescriptions.put(
-					namespace.addScope(scopeType), description));
-
-		_nameSpaces.put(
-			_namespaceIdGenerator.generateName(serviceReference), namespace);
+		_defaultScopeFinder = ScopeFinder.merge(_defaultScopeFinders);
 	}
 
-	protected void removeScopeRegistrator(
-		ServiceReference<OAuth2Scope.Registrator> serviceReference) {
+	protected void removeScopeFinder(ScopeFinder scopeFinder) {
+		_defaultScopeFinders.remove(scopeFinder);
 
-		Namespace namespace = _nameSpaces.remove(
-			_namespaceIdGenerator.generateName(serviceReference));
-
-		namespace.forEach(_scopeDescriptions::remove);
+		_defaultScopeFinder = ScopeFinder.merge(_defaultScopeFinders);
 	}
-
-	protected Strategy getStrategy(long companyId, String namespaceId) {
-		Strategy strategy =
-			_strategiesPerCompanyAndNamespace.getService(
-				companyId + "-" + namespaceId);
-
-		if (strategy != null) {
-			return strategy;
-		}
-
-		strategy = _strategiesPerNamespace.getService(namespaceId);
-
-		if (strategy != null) {
-			return strategy;
-		}
-
-		strategy = _strategiesPerCompany.getService(namespaceId);
-
-		if (strategy != null) {
-			return strategy;
-		}
-
-		return _defaultStrategy;
-	}
-
-	@Reference(name = "NamespaceManager")
-	private NamespaceManager _namespaceManager;
-
-	@Reference
-	private NamespaceIdGenerator _namespaceIdGenerator;
-
-	@Reference(target = "(&(|(!(company))(company=0))(!(namespace=*)))")
-	private volatile Strategy _defaultStrategy;
 
 	@Override
 	public ScopeFinder locate(Company company) {
-		return name -> {
-			Stream<Map.Entry<String, Namespace>> stream =
-				_nameSpaces.entrySet().stream();
+		ScopeFinder scopeFinder = ScopeFinder.merge(_scopesByCompany.getService(
+			Long.toString(company.getCompanyId())));
 
-			return stream.flatMap(
-				entry -> {
-					Strategy strategy = getStrategy(
-						company.getCompanyId(), entry.getKey());
+		if (scopeFinder != null) {
+			return scopeFinder;
+		}
 
-					ScopeMatcher matches = strategy.matches(name);
-
-					return entry.getValue().findScopes(matches).stream();
-				}
-			).collect(
-				Collectors.toList()
-			);
-		};
+		return _defaultScopeFinder;
 	}
 }
