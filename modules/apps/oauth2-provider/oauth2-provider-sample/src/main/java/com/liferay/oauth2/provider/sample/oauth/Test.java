@@ -14,15 +14,18 @@
 
 package com.liferay.oauth2.provider.sample.oauth;
 
-
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
@@ -55,9 +58,11 @@ public class Test extends Application{
 
 	@Override
 	public Map<String, Object> getProperties() {
-		return new HashMap<String, Object>() {{
-			put("jandepora", "atitican");
-		}};
+		Map<String, Object> properties = new HashMap<>();
+
+		properties.put("scopes.resource.loader", _resourceBundleLoader);
+
+		return properties;
 	}
 
 	@Provider
@@ -65,29 +70,34 @@ public class Test extends Application{
 
 		@Override
 		public boolean configure(FeatureContext context) {
-			System.out.println(
-				"Application: " + _application);
+			Configuration configuration =
+				context.getConfiguration();
 
-			return false;
+
+
+			return true;
 		}
 
 		@Context
 		Application _application;
 	}
 
-	/*@Provider
+	@Provider
 	public static class MyDynamicFeature implements DynamicFeature {
 
 		@Override
 		public void configure(
 			ResourceInfo resourceInfo, FeatureContext context) {
 
-			System.out.println("DYNAMIC:" + resourceInfo.getResourceMethod());
+			Map<String, Object> properties =
+				context.getConfiguration().getProperties();
 
-			context.register(new MyContainerRequestFilter());
+			if (properties.containsKey("scopes.resource.loader")) {
+
+			}
 		}
 	}
-*/
+
 	@Provider
 	public static class MyContainerRequestFilter implements
 		ContainerRequestFilter {
@@ -127,4 +137,5 @@ public class Test extends Application{
 
 	}
 
+	@Reference ResourceBundleLoader _resourceBundleLoader;
 }

@@ -14,25 +14,8 @@
 
 package com.liferay.oauth2.provider.api.scopes;
 
-import java.io.Serializable;
-import java.util.Locale;
+public interface NamespaceAdderFactory {
 
-/**
- * @author Carlos Sierra Andrés
- */
-public interface OAuth2Scope {
-
-	/**
-	 *
-	 * @return a unique identifier for the grant that has to be matched against
-	 *  the different points in the API
-	 */
-	public String getLocalName();
-
-	/**
-	 * @param locale
-	 * @return human readable description of the scope for the given locale.
-	 */
-	public String getDescription(Locale locale);
+	NamespaceAdder create(String namespace);
 
 }

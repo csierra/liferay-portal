@@ -61,7 +61,7 @@ public class DefaultScopeFinder implements ScopeFinder {
 			return Collections.singleton(
 				new OAuth2Scope() {
 					@Override
-					public String scopeUUID() {
+					public String getLocalName() {
 						return _namespace + name;
 					}
 

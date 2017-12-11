@@ -12,24 +12,17 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.api.scopes.exceptions;
+package com.liferay.oauth2.provider.api.scopes;
 
-import com.liferay.oauth2.provider.api.scopes.OAuth2Scope;
+public interface NamespaceAdder {
 
-public class ScopeNotGrantedException extends RuntimeException {
+	public String add(String localName);
 
-	private Class<? extends OAuth2Scope.Scope> _scope;
-
-	public ScopeNotGrantedException(
-		Class<? extends OAuth2Scope.Scope> scope) {
-		_scope = scope;
+	public default NamespaceAdder prepend(NamespaceAdder namespaceAdder) {
+		return localName -> namespaceAdder.add(add(localName));
 	}
 
-	public ScopeNotGrantedException(
-		String message,
-		Class<? extends OAuth2Scope.Scope> scope) {
-		super(message);
-		_scope = scope;
+	public default NamespaceAdder append(NamespaceAdder namespaceAdder) {
+		return localName -> add(namespaceAdder.add(localName));
 	}
-
 }

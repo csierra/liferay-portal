@@ -14,9 +14,12 @@
 
 package com.liferay.oauth2.provider.impl.scopes;
 
+import com.liferay.oauth2.provider.api.scopes.NamespaceAdderFactory;
+import com.liferay.oauth2.provider.api.scopes.ScopeChecker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.PortalUtil;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -26,7 +29,7 @@ import javax.ws.rs.core.Context;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-public class OAuthCheckerContainerRequestFilter implements
+public class OAuthCheckerNamespaceContainerRequestFilter implements
 	ContainerRequestFilter {
 
 	@Override
@@ -36,7 +39,11 @@ public class OAuthCheckerContainerRequestFilter implements
 		try {
 			Company company = PortalUtil.getCompany(_httpServletRequest);
 
-			Method resourceMethod = _resourceInfo.getResourceMethod();
+			_scopeChecker.pushNamespace(
+				_namespaceAdderFactory.create(
+					Long.toString(company.getCompanyId())));
+
+			
 
 		}
 		catch (PortalException e) {
@@ -50,4 +57,9 @@ public class OAuthCheckerContainerRequestFilter implements
 	@Context
 	private ResourceInfo _resourceInfo;
 
+	@Reference
+	ScopeChecker _scopeChecker;
+
+	@Reference
+	NamespaceAdderFactory _namespaceAdderFactory;
 }
