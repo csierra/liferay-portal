@@ -12,10 +12,16 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.api.scopes;
+package com.liferay.oauth2.provider.impl.scopes;
 
-public interface NamespaceAdderFactory<T> {
+import com.liferay.oauth2.provider.api.scopes.NamespaceAdder;
+import com.liferay.oauth2.provider.api.scopes.NamespaceAdderFactory;
 
-	NamespaceAdder create(T t);
+public class DefaultNamespaceAdderFactory implements NamespaceAdderFactory<String> {
+
+	@Override
+	public NamespaceAdder create(String prefix) {
+		return localName -> prefix + "_" + localName;
+	}
 
 }

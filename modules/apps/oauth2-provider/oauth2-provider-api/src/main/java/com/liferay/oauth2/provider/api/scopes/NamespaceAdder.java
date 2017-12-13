@@ -14,15 +14,42 @@
 
 package com.liferay.oauth2.provider.api.scopes;
 
+import java.util.Locale;
+import java.util.stream.Stream;
+
 public interface NamespaceAdder {
 
-	public String add(String localName);
+	public String addNamespace(String localName);
 
 	public default NamespaceAdder prepend(NamespaceAdder namespaceAdder) {
-		return localName -> namespaceAdder.add(add(localName));
+		return localName ->
+			namespaceAdder.addNamespace(addNamespace(localName));
 	}
 
 	public default NamespaceAdder append(NamespaceAdder namespaceAdder) {
-		return localName -> add(namespaceAdder.add(localName));
+		return localName ->
+			addNamespace(namespaceAdder.addNamespace(localName));
+	}
+
+	static NamespaceAdder NULL_ADDER = x -> x;
+
+	public default ScopeFinder prepend(ScopeFinder scopeFinder) {
+		return () -> {
+			Stream<OAuth2Scope> stream = scopeFinder.findScopes();
+
+			return stream.map(
+				o -> new OAuth2Scope() {
+					@Override
+					public String getLocalName() {
+						return addNamespace(o.getLocalName());
+					}
+
+					@Override
+					public String getDescription(Locale locale) {
+						return o.getDescription(locale);
+					}
+				}
+			);
+		};
 	}
 }

@@ -14,52 +14,37 @@
 
 package com.liferay.oauth2.provider.impl.scopes;
 
-import com.liferay.oauth2.provider.api.scopes.NamespaceAdderFactory;
-import com.liferay.oauth2.provider.api.scopes.ScopeChecker;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.util.PortalUtil;
-import org.osgi.service.component.annotations.Reference;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.lang.reflect.Method;
 
-public class OAuthCheckerNamespaceContainerRequestFilter implements
+public class OAuth2ResourceMethodCheckerContainerRequestFilter implements
 	ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext)
 		throws IOException {
 
-		try {
-			Company company = PortalUtil.getCompany(_httpServletRequest);
+		if (!_methodAllowedChecker.isAllowed(
+			_resourceInfo.getResourceMethod())) {
 
-			_scopeChecker.pushNamespace(
-				_namespaceAdderFactory.create(
-					Long.toString(company.getCompanyId())));
-
-			
-
-		}
-		catch (PortalException e) {
-			e.printStackTrace();
+			requestContext.abortWith(
+				Response.status(Response.Status.NOT_FOUND).build());
 		}
 	}
 
-	@Context
-	private HttpServletRequest _httpServletRequest;
+	public OAuth2ResourceMethodCheckerContainerRequestFilter(
+		MethodAllowedChecker methodScopeChecker) {
+
+		_methodAllowedChecker = methodScopeChecker;
+	}
 
 	@Context
-	private ResourceInfo _resourceInfo;
+	ResourceInfo _resourceInfo;
 
-	@Reference
-	ScopeChecker _scopeChecker;
+	private MethodAllowedChecker _methodAllowedChecker;
 
-	@Reference
-	NamespaceAdderFactory _namespaceAdderFactory;
 }

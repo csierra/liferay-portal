@@ -14,69 +14,123 @@
 
 package com.liferay.oauth2.provider.impl.scopes;
 
+import com.liferay.oauth2.provider.api.scopes.NamespaceAdder;
+import com.liferay.oauth2.provider.api.scopes.NamespaceAdderFactory;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scope;
 import com.liferay.oauth2.provider.api.scopes.ScopeFinder;
 import com.liferay.oauth2.provider.api.scopes.ScopeFinderLocator;
+import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
+import com.liferay.osgi.service.tracker.collections.internal.DefaultServiceTrackerCustomizer;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.Company;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @Component(immediate = true)
 public class ScopeRegistry implements ScopeFinderLocator {
 
-	private BundleContext _bundleContext;
-	private ServiceTrackerMap<String, List<ScopeFinder>>
-		_scopesByCompany;
-	private volatile ScopeFinder _defaultScopeFinder = ScopeFinder.empty();
-	private Collection<ScopeFinder> _defaultScopeFinders =
-		new CopyOnWriteArrayList<>();
+	private ServiceTrackerMap<String, ServiceReferenceServiceTuple<?, ScopeFinder>>
+		_scopeFinderByNameServiceTrackerMap;
+	private ServiceTrackerMap<String, NamespaceAdder> _namespacesByName;
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
+		ServiceTrackerCustomizer<ScopeFinder, ScopeFinder>
+			defaultServiceTrackerCustomizer =
+				new DefaultServiceTrackerCustomizer<>(bundleContext);
+		_scopeFinderByNameServiceTrackerMap =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, ScopeFinder.class, "osgi.jaxrs.name",
+				new ServiceTrackerCustomizer<ScopeFinder,
+					ServiceReferenceServiceTuple<?, ScopeFinder>>() {
 
-		_scopesByCompany = ServiceTrackerMapFactory.openMultiValueMap(
-			bundleContext, ScopeFinder.class, "companyId");
-	}
+					@Override
+					public ServiceReferenceServiceTuple<?, ScopeFinder> addingService(
+						ServiceReference<ScopeFinder> reference) {
 
-	@Reference(
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(!(companyId=*))",
-		unbind = "removeScopeFinder"
-	)
-	protected void addScopeFinder(ScopeFinder scopeFinder) {
-		_defaultScopeFinders.add(scopeFinder);
+						ScopeFinder scopeFinder =
+							defaultServiceTrackerCustomizer.addingService(
+								reference);
 
-		_defaultScopeFinder = ScopeFinder.merge(_defaultScopeFinders);
-	}
+						return new ServiceReferenceServiceTuple<>(
+							reference, scopeFinder);
+					}
 
-	protected void removeScopeFinder(ScopeFinder scopeFinder) {
-		_defaultScopeFinders.remove(scopeFinder);
+					@Override
+					public void modifiedService(
+						ServiceReference<ScopeFinder> reference,
+						ServiceReferenceServiceTuple<?, ScopeFinder> tuple) {
 
-		_defaultScopeFinder = ScopeFinder.merge(_defaultScopeFinders);
+					}
+
+					@Override
+					public void removedService(
+						ServiceReference<ScopeFinder> reference,
+						ServiceReferenceServiceTuple<?, ScopeFinder> tuple) {
+
+						defaultServiceTrackerCustomizer.removedService(
+							reference, tuple.getService());
+					}
+				});
+
+		_namespacesByName = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, NamespaceAdder.class, "osgi.jaxrs.name");
+
 	}
 
 	@Override
 	public ScopeFinder locate(Company company) {
-		ScopeFinder scopeFinder = ScopeFinder.merge(_scopesByCompany.getService(
-			Long.toString(company.getCompanyId())));
+		return () -> {
+			NamespaceAdder companyNamespaceAdder =
+				_companyNamespaceAdderFactory.create(company);
 
-		if (scopeFinder != null) {
-			return scopeFinder;
-		}
+			Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
 
-		return _defaultScopeFinder;
+			Stream<OAuth2Scope> stream = Stream.empty();
+
+			for (String name : names) {
+				ServiceReferenceServiceTuple<?, ScopeFinder> tuple =
+					_scopeFinderByNameServiceTrackerMap.getService(name);
+
+				NamespaceAdder namespaceAdder = companyNamespaceAdder.append(
+					_namespaceAdderFactory.create(tuple.getServiceReference()));
+
+				ScopeFinder scopeFinder = namespaceAdder.prepend(
+					tuple.getService());
+
+				stream = Stream.concat(stream, scopeFinder.findScopes());
+			}
+
+			return stream;
+		};
 	}
+
+
+	@Reference
+	private NamespaceAdderFactory<Company> _companyNamespaceAdderFactory;
+
+	@Reference(target = "(default=true)")
+	private NamespaceAdderFactory<ServiceReference<?>>
+		_defaultNamespaceAdderFactory;
+
+	private NamespaceAdderFactory<ServiceReference<?>> _namespaceAdderFactory =
+		sr -> {
+			NamespaceAdder namespaceAdder = _namespacesByName.getService(
+				sr.getProperty("osgi.jaxrs.name").toString());
+
+			if (namespaceAdder == null) {
+				return _defaultNamespaceAdderFactory.create(sr);
+			}
+
+			return namespaceAdder;
+		};
+
 }
