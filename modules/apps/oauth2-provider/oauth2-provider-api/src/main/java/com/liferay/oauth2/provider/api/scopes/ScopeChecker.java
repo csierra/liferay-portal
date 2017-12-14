@@ -1,10 +1,17 @@
 package com.liferay.oauth2.provider.api.scopes;
 
+import com.liferay.oauth2.provider.api.scopes.exceptions.ScopeNotGrantedException;
+
 public interface ScopeChecker {
 
-	public void pushNamespace(NamespaceAdder namespaceAdder);
+	public default void requireScope(String scope)
+		throws ScopeNotGrantedException {
 
-	public void requireScope(String scope);
+		if (!hasScope(scope)) {
+			throw new ScopeNotGrantedException(scope);
+		}
+	}
 
 	public boolean hasScope(String scope);
+
 }

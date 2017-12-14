@@ -14,8 +14,8 @@
 
 package com.liferay.oauth2.provider.api.scopes;
 
-public interface NamespaceAdderFactory<T> {
+public interface NamespaceAdderFactory {
 
-	NamespaceAdder create(T t);
+	NamespaceAdder create(String namespace);
 
 }

@@ -73,7 +73,7 @@ public class OAuthScopeConfigurationFeature implements Feature, DynamicFeature {
 
 		_serviceRegistration = _bundleContext.registerService(
 			ScopeFinder.class,
-			name -> _oAuth2Scopes,
+			() -> _oAuth2Scopes.stream(),
 			new Hashtable<>(serviceProperties)
 		);
 

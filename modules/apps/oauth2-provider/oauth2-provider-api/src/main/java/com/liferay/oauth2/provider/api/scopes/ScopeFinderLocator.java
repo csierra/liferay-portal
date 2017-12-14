@@ -4,6 +4,6 @@ import com.liferay.portal.kernel.model.Company;
 
 public interface ScopeFinderLocator {
 
-	ScopeFinder locate(Company company);
+	ScopeFinder locateScopeFinder(Company company);
 
 }

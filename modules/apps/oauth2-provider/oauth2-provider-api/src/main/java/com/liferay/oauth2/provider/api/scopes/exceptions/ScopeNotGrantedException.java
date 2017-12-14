@@ -12,19 +12,12 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.impl.scopes;
+package com.liferay.oauth2.provider.api.scopes.exceptions;
 
-import com.liferay.oauth2.provider.api.scopes.ScopeMatcher;
+public class ScopeNotGrantedException extends Exception {
 
-public class FQNStrategy implements Strategy {
-
-	@Override
-	public ScopeMatcher matches(String incomingScopeName) {
-		return scopeType -> {
-			String name = scopeType.getName();
-
-			return name.equals(incomingScopeName);
-		};
+	public ScopeNotGrantedException(String scope) {
+		super("Not granted required scope: " + scope);
 	}
 
 }

@@ -14,13 +14,17 @@
 
 package com.liferay.oauth2.provider.impl.scopes;
 
-import com.liferay.oauth2.provider.api.scopes.ScopeMatcher;
+import com.liferay.oauth2.provider.api.scopes.NamespaceAdder;
+import com.liferay.oauth2.provider.api.scopes.NamespaceAdderMapper;
+import com.liferay.oauth2.provider.api.scopes.PropertyGetter;
+import org.osgi.service.component.annotations.Component;
 
-public class EverythingStrategy implements Strategy {
+@Component(immediate = true)
+public class NullNamespaceAdderMapper implements NamespaceAdderMapper {
 
 	@Override
-	public ScopeMatcher matches(String incomingScopeName) {
-		return __ -> true;
+	public NamespaceAdder mapFrom(PropertyGetter propertyHolder) {
+		return NamespaceAdder.NULL_ADDER;
 	}
 
 }

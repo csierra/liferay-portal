@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.api.scopes;
 
+import java.util.Collection;
 import java.util.Locale;
 import java.util.stream.Stream;
 
@@ -31,7 +32,41 @@ public interface NamespaceAdder {
 			addNamespace(namespaceAdder.addNamespace(localName));
 	}
 
-	static NamespaceAdder NULL_ADDER = x -> x;
+	public static NamespaceAdder merge(
+		Collection<NamespaceAdder> namespaceAdders) {
+
+		NamespaceAdder namespaceAdder = NULL_ADDER;
+
+		for (NamespaceAdder na : namespaceAdders) {
+			namespaceAdder = namespaceAdder.append(na);
+		}
+
+		return namespaceAdder;
+	}
+
+	static NamespaceAdder NULL_ADDER = new NamespaceAdder() {
+
+		@Override
+		public String addNamespace(String localName) {
+			return localName;
+		}
+
+		@Override
+		public NamespaceAdder prepend(NamespaceAdder namespaceAdder) {
+			return namespaceAdder;
+		}
+
+		@Override
+		public NamespaceAdder append(NamespaceAdder namespaceAdder) {
+			return namespaceAdder;
+		}
+
+		@Override
+		public ScopeFinder prepend(ScopeFinder scopeFinder) {
+			return scopeFinder;
+		}
+
+	};
 
 	public default ScopeFinder prepend(ScopeFinder scopeFinder) {
 		return () -> {

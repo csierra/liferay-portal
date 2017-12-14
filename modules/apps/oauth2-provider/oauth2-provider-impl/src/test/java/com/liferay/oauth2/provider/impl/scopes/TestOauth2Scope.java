@@ -14,22 +14,25 @@
 
 package com.liferay.oauth2.provider.impl.scopes;
 
-import com.liferay.oauth2.provider.api.scopes.NamespaceAdder;
-import com.liferay.oauth2.provider.api.scopes.NamespaceAdderFactory;
-import com.liferay.portal.kernel.model.Company;
-import org.osgi.service.component.annotations.Reference;
+import com.liferay.oauth2.provider.api.scopes.OAuth2Scope;
 
-import java.awt.*;
+import java.util.Locale;
 
-public class DefaultCompanyNamespaceAdderFactory implements NamespaceAdderFactory<Company> {
+class TestOauth2Scope implements OAuth2Scope {
 
-	@Reference
-	NamespaceAdderFactory<String> _stringNamespaceAdderFactory;
+	private String _localName;
 
-	@Override
-	public NamespaceAdder create(Company company) {
-		return _stringNamespaceAdderFactory.create(
-			Long.toString(company.getCompanyId()));
+	public TestOauth2Scope(String localName) {
+		_localName = localName;
 	}
 
+	@Override
+	public String getLocalName() {
+		return _localName;
+	}
+
+	@Override
+	public String getDescription(Locale locale) {
+		return _localName;
+	}
 }

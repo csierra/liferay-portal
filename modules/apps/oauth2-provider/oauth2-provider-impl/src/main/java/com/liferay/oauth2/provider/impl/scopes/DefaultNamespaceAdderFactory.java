@@ -16,8 +16,11 @@ package com.liferay.oauth2.provider.impl.scopes;
 
 import com.liferay.oauth2.provider.api.scopes.NamespaceAdder;
 import com.liferay.oauth2.provider.api.scopes.NamespaceAdderFactory;
+import org.osgi.service.component.annotations.Component;
 
-public class DefaultNamespaceAdderFactory implements NamespaceAdderFactory<String> {
+
+@Component
+public class DefaultNamespaceAdderFactory implements NamespaceAdderFactory {
 
 	@Override
 	public NamespaceAdder create(String prefix) {
