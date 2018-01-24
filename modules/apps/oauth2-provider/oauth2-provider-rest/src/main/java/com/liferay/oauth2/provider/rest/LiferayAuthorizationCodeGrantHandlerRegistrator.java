@@ -12,12 +12,10 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.cxf;
+package com.liferay.oauth2.provider.rest;
 
 import com.liferay.portal.kernel.util.MapUtil;
-import org.apache.cxf.rs.security.oauth2.grants.clientcred.ClientCredentialsGrantHandler;
-import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerGrantHandler;
-import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
+import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -31,7 +29,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 @Component(immediate = true)
-public class LiferayResourceOwnerGrantHandlerRegistrator {
+public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 	private ServiceRegistration<AccessTokenGrantHandler>
 		_serviceRegistration;
@@ -43,17 +41,15 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 		boolean enabled = MapUtil.getBoolean(properties, "enabled", true);
 
 		if (enabled) {
-			ResourceOwnerGrantHandler resourceOwnerGrantHandler =
-				new ResourceOwnerGrantHandler();
+			AuthorizationCodeGrantHandler authorizationCodeGrantHandler =
+				new AuthorizationCodeGrantHandler();
 
-			resourceOwnerGrantHandler.setLoginHandler(
-				_liferayLoginHandler);
-			resourceOwnerGrantHandler.setDataProvider(
+			authorizationCodeGrantHandler.setDataProvider(
 				_liferayOAuthDataProvider);
 
 			_serviceRegistration = bundleContext.registerService(
 				AccessTokenGrantHandler.class,
-				resourceOwnerGrantHandler, new Hashtable<>());
+				authorizationCodeGrantHandler, new Hashtable<>());
 		}
 	}
 
@@ -68,6 +64,4 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
-	private ResourceOwnerLoginHandler _liferayLoginHandler;
 }
