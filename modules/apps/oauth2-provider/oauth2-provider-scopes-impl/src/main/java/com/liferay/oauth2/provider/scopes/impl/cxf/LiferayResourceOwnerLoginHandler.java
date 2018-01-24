@@ -35,7 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class LiferayResourceOwnerLoginHandler implements ResourceOwnerLoginHandler {
+public class LiferayResourceOwnerLoginHandler
+	implements ResourceOwnerLoginHandler {
 
 	@Override
 	public UserSubject createSubject(String login, String password) {
