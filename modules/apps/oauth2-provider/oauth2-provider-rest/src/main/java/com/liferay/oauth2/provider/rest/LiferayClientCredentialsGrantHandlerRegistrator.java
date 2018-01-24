@@ -12,9 +12,10 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.cxf;
+package com.liferay.oauth2.provider.rest;
 
 import com.liferay.portal.kernel.util.MapUtil;
+import org.apache.cxf.rs.security.oauth2.grants.clientcred.ClientCredentialsGrantHandler;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.osgi.framework.BundleContext;
@@ -29,7 +30,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 @Component(immediate = true)
-public class LiferayAuthorizationCodeGrantHandlerRegistrator {
+public class LiferayClientCredentialsGrantHandlerRegistrator {
 
 	private ServiceRegistration<AccessTokenGrantHandler>
 		_serviceRegistration;
@@ -41,15 +42,15 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		boolean enabled = MapUtil.getBoolean(properties, "enabled", true);
 
 		if (enabled) {
-			AuthorizationCodeGrantHandler authorizationCodeGrantHandler =
-				new AuthorizationCodeGrantHandler();
+			ClientCredentialsGrantHandler clientCredentialsGrantHandler =
+				new ClientCredentialsGrantHandler();
 
-			authorizationCodeGrantHandler.setDataProvider(
+			clientCredentialsGrantHandler.setDataProvider(
 				_liferayOAuthDataProvider);
 
 			_serviceRegistration = bundleContext.registerService(
 				AccessTokenGrantHandler.class,
-				authorizationCodeGrantHandler, new Hashtable<>());
+				clientCredentialsGrantHandler, new Hashtable<>());
 		}
 	}
 

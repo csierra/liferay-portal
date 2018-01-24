@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.cxf;
+package com.liferay.oauth2.provider.rest;
 
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeContext;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
