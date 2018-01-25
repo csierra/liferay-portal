@@ -1,8 +1,6 @@
 package com.liferay.oauth2.provider.scopes.liferay.api;
 
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.model.LiferayOAuth2ScopeExternalIdentifier;
-import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.portal.kernel.model.Company;
 
 import java.util.Collection;
@@ -31,7 +29,7 @@ public interface ScopeFinderLocator {
 	 * @return a collection of scope names that would be a match for the
 	 * company.
 	 */
-	Collection<LiferayOAuth2ScopeExternalIdentifier> listScopes(
+	Collection<LiferayOAuth2Scope> listScopes(
 		Company company);
 
 }
