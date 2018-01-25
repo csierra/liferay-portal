@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.scopes.impl;
 
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.model.LiferayOAuth2ScopeExternalIdentifier;
 import com.liferay.oauth2.provider.scopes.impl.model.LiferayOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
@@ -106,8 +105,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		_scopedScopeMapper;
 
 	@Override
-	public Collection<LiferayOAuth2ScopeExternalIdentifier> listScopes(Company company) {
-		Collection<LiferayOAuth2ScopeExternalIdentifier> scopes = new ArrayList<>();
+	public Collection<LiferayOAuth2Scope> listScopes(Company company) {
+		Collection<LiferayOAuth2Scope> scopes = new ArrayList<>();
 
 		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
 
