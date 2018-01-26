@@ -17,6 +17,8 @@ package com.liferay.oauth2.provider.rest;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.URLCodec;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.osgi.service.component.annotations.Component;
@@ -80,23 +82,23 @@ public class AuthorizationMessageBodyWriter
 		sb.append(StringPool.QUESTION);
 		sb.append("reply_to");
 		sb.append(StringPool.EQUAL);
-		sb.append(oAuthAuthorizationData.getReplyTo());
+		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getReplyTo(), true));
 		sb.append(StringPool.AMPERSAND);
 		sb.append("client_id");
 		sb.append(StringPool.EQUAL);
-		sb.append(oAuthAuthorizationData.getClientId());
+		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getClientId(), true));
 		sb.append(StringPool.AMPERSAND);
 		sb.append("redirect_uri");
 		sb.append(StringPool.EQUAL);
-		sb.append(oAuthAuthorizationData.getRedirectUri());
+		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getRedirectUri(), true));
 		sb.append(StringPool.AMPERSAND);
 		sb.append("session_authenticity_token");
 		sb.append(StringPool.EQUAL);
-		sb.append(oAuthAuthorizationData.getAuthenticityToken());
+		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getAuthenticityToken(), true));
 		sb.append(StringPool.AMPERSAND);
 		sb.append("scope");
 		sb.append(StringPool.EQUAL);
-		sb.append(oAuthAuthorizationData.getProposedScope());
+		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getProposedScope(), true));
 
 		throw new WebApplicationException(
 			Response.status(303).header("Location", sb.toString()).build());
