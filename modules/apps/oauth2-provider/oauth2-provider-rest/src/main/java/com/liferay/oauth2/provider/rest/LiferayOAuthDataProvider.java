@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.rest;
 
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
+import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2Token;
@@ -47,10 +48,12 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component(service = LiferayOAuthDataProvider.class)
 public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvider {
@@ -335,7 +338,10 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	
 		client.setApplicationDescription(
 			oAuth2Application.getDescription());
-	
+
+		client.setRegisteredScopes(
+			OAuthUtils.parseScope(oAuth2Application.getScopes()));
+
 		client.setRedirectUris(
 			Collections.singletonList(oAuth2Application.getRedirectUri()));
 	
