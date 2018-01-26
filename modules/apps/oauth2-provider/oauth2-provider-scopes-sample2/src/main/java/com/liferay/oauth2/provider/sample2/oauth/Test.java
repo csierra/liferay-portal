@@ -18,16 +18,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
-import com.google.gson.reflect.TypeToken;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.scopes.api.LiferayOauth2OSGiFeatureFactory;
 import com.liferay.oauth2.provider.scopes.api.RequiresScope;
-import com.liferay.oauth2.provider.scopes.api.ScopesDescriptionBundle;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
@@ -45,20 +39,23 @@ import org.osgi.framework.Bundle;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import java.util.Collections;
+
 @ApplicationPath("/sample2")
 @Component(
 	immediate = true,
-	property = {"oauth2=true"},
+	property = {
+		"oauth2.scopechecker.type=annotations",
+		"requires.oauth2=true"
+	},
 	service = Application.class
+
 )
-@ScopesDescriptionBundle("content.Language")
 public class Test extends Application {
 
 	@Override
 	public Set<Object> getSingletons() {
-		return new HashSet<>(
-			Arrays.asList(
-				this, _liferayOauth2OSGiFeatureFactory.create("Sample2")));
+		return Collections.singleton(this);
 	}
 
 	@GET
@@ -105,9 +102,6 @@ public class Test extends Application {
 			return new GsonBuilder().create().toJson(e);
 		}
 	}
-
-	@Reference
-	private LiferayOauth2OSGiFeatureFactory _liferayOauth2OSGiFeatureFactory;
 
 	@Reference
 	private ScopeFinderLocator _scopeFinderLocator;

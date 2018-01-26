@@ -19,8 +19,9 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.Supplier;
 import org.osgi.framework.BundleContext;
+
+import java.util.function.Supplier;
 
 public class ScopedServiceTrackerMap<T> {
 

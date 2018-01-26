@@ -146,6 +146,7 @@ public class ThreadLocalServiceScopeChecker
 		_bundleSymbolicName.remove();
 		_bundleVersion.remove();
 		_companyIdThreadLocal.remove();
+		_tokenString.remove();
 	}
 
 	@Reference
