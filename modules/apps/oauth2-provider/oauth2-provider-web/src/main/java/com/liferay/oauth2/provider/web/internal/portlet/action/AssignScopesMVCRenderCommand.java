@@ -50,13 +50,11 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 	public String render(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		Collection<LiferayOAuth2Scope> scopes =
+			_scopeFinderLocator.listScopes();
 
-		Collection<LiferayOAuth2Scope> scopes = _scopeFinderLocator.listScopes(
-			themeDisplay.getCompany());
-
-		Map<String, List<LiferayOAuth2Scope>> applicationScopes = new HashMap<>();
+		Map<String, List<LiferayOAuth2Scope>> applicationScopes =
+			new HashMap<>();
 
 		for (LiferayOAuth2Scope scope : scopes) {
 			List<LiferayOAuth2Scope> applicationScopeList =

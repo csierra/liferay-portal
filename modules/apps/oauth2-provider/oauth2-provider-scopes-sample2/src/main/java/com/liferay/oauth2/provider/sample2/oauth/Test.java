@@ -31,9 +31,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
 
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import org.osgi.framework.Bundle;
 import org.osgi.service.component.annotations.Component;
@@ -75,32 +72,23 @@ public class Test extends Application {
 	@Produces("application/json")
 	@GET
 	public String scopes() {
-		long companyId = CompanyThreadLocal.getCompanyId();
+		Collection<LiferayOAuth2Scope> scopes =
+			_scopeFinderLocator.listScopes();
 
-		try {
-			Company company = _companyLocalService.getCompany(companyId);
+		Gson gson = new GsonBuilder()
+			.registerTypeAdapter(
+				Bundle.class,
+				(JsonSerializer<Bundle>)
+					(src, typeOfSrc, context) -> {
 
-			Collection<LiferayOAuth2Scope> scopes =
-				_scopeFinderLocator.listScopes(company);
+						JsonObject json = new JsonObject();
+						json.addProperty("bundleName", src.getSymbolicName());
+						json.addProperty("bundleVersion", src.getVersion().toString());
+						return json;
+					})
+			.create();
 
-			Gson gson = new GsonBuilder()
-				.registerTypeAdapter(
-					Bundle.class,
-					(JsonSerializer<Bundle>)
-						(src, typeOfSrc, context) -> {
-
-							JsonObject json = new JsonObject();
-							json.addProperty("bundleName", src.getSymbolicName());
-							json.addProperty("bundleVersion", src.getVersion().toString());
-							return json;
-						})
-				.create();
-
-			return gson.toJson(scopes);
-		}
-		catch (PortalException e) {
-			return new GsonBuilder().create().toJson(e);
-		}
+		return gson.toJson(scopes);
 	}
 
 	@Reference

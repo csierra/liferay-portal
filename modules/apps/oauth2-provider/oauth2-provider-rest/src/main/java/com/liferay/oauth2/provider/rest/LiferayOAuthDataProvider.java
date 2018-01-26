@@ -20,7 +20,6 @@ import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2Token;
-import com.liferay.oauth2.provider.scopes.impl.model.LiferayOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService;
@@ -49,7 +48,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -179,13 +177,11 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		List<String> scopeList =
 			OAuthUtils.convertPermissionsToScopeList(serverToken.getScopes());
 
+		Collection<LiferayOAuth2Scope> existingScopes =
+			_scopeFinderLocator.listScopes();
+
 		for (String scope : scopeList) {
 			try {
-				_oAuth2ScopeGrantLocalService.grantScopesToToken(
-					serverToken.getTokenKey(),
-					_scopeFinderLocator.locateScopes(
-						CompanyThreadLocal.getCompanyId(), scope));
-
 				// we need to fine-tune  the scope.externalId(), right now it's
 				// com.liferay.oauth2.provider.sample2/Sample2/everything.readonly
 				// that is built in SerializableLiferayOAuth2Scope#toString() :(
@@ -204,10 +200,15 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				String scopeName = parts[2];
 
 				List<LiferayOAuth2Scope> filteredScopes =
-					_scopeFinderLocator.locateScopes(
-						CompanyThreadLocal.getCompanyId(), scopeName).stream().filter(
-							_scope -> _scope.getApplicationName().equals(applicationName) && _scope.getBundle().getSymbolicName().equals(bundleSymbolicName))
-						.collect(Collectors.toList());
+					existingScopes.stream().filter(
+						_scope ->
+							_scope.getApplicationName().equals(applicationName)
+							&& _scope.getBundle().getSymbolicName().equals(
+								bundleSymbolicName)
+							&& _scope.getScope().equals(scopeName)
+					).collect(
+						Collectors.toList()
+					);
 
 				_oAuth2ScopeGrantLocalService.grantScopesToToken(
 					serverToken.getTokenKey(), filteredScopes);

@@ -14,37 +14,22 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
-import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalServiceUtil;
 import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.WebKeys;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys.SCOPES;
 
 /**
  * @author Tomas Polesovsky
@@ -99,9 +84,6 @@ public class AssignScopesMVCActionCommand implements MVCActionCommand {
 		return true;
 	}
 
-
-	@Reference
-	private ScopeFinderLocator _scopeFinderLocator;
 
 	@Reference
 	OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
