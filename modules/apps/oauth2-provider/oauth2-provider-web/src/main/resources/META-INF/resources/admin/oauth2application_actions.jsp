@@ -14,15 +14,15 @@
  */
 --%>
 
-<%@ include file="../init.jsp" %>
+<%@ include file="init.jsp" %>
 
 <%
-String mvcPath = ParamUtil.getString(request, "mvcPath");
 
-ResultRow row = (ResultRow)request
-				.getAttribute("SEARCH_CONTAINER_RESULT_ROW");
+ResultRow row = (ResultRow)request.getAttribute("SEARCH_CONTAINER_RESULT_ROW");
 
 OAuth2Application oauth2application = (OAuth2Application)row.getObject();
+
+String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2ApplicationId());
 %>
 
 <liferay-ui:icon-menu
@@ -33,9 +33,7 @@ OAuth2Application oauth2application = (OAuth2Application)row.getObject();
 	showWhenSingleIcon="<%= true %>"
 >
 	<portlet:renderURL var="editURL">
-		<portlet:param name="oAuth2ApplicationId"
-			value="<%= String.valueOf(oauth2application.getOAuth2ApplicationId()) %>"
-		/>
+		<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
 
 		<portlet:param name="mvcPath"
 			value="/admin/edit_oauth2application.jsp"
@@ -50,10 +48,16 @@ OAuth2Application oauth2application = (OAuth2Application)row.getObject();
 		url="<%= editURL.toString() %>"
 	/>
 
+	<portlet:renderURL var="assignScopesURL">
+		<portlet:param name="mvcRenderCommandName" value="/admin/assign_scopes" />
+		<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
+		<portlet:param name="redirect" value="<%= currentURL %>" />
+	</portlet:renderURL>
+
+	<liferay-ui:icon message="assign-scopes" url="<%= assignScopesURL.toString() %>" />
+
 	<portlet:actionURL name="deleteOAuth2Application" var="deleteURL">
-		<portlet:param name="oAuth2ApplicationId"
-			value="<%= String.valueOf(oauth2application.getOAuth2ApplicationId()) %>"
-		/>
+		<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
 	</portlet:actionURL>
 
 	<liferay-ui:icon-delete message="delete" url="<%= deleteURL.toString() %>" />

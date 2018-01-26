@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@include file="../init.jsp"%>
+<%@include file="init.jsp"%>
 
 <aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
 	<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
