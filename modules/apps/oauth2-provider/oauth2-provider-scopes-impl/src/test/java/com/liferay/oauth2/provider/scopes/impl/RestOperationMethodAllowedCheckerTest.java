@@ -19,7 +19,7 @@ import static junit.framework.TestCase.assertTrue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 
-import com.liferay.oauth2.provider.scopes.impl.methodallowedchecker.RestOperationMethodAllowedChecker;
+import com.liferay.oauth2.provider.scopes.impl.requestscopechecker.RestOperationMethodAllowedChecker;
 import com.liferay.oauth2.provider.scopes.spi.MethodAllowedChecker;
 import org.junit.Test;
 

@@ -12,17 +12,22 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.methodallowedchecker;
+package com.liferay.oauth2.provider.sample.oauth;
 
-import com.liferay.oauth2.provider.scopes.spi.OperationScopeMapper;
+import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
+import org.osgi.service.component.annotations.Component;
 
-public class DefaultOperationScopeMapper implements OperationScopeMapper {
+@Component(
+	immediate = true,
+	property = "osgi.jaxrs.name=com.liferay.oauth2.provider.sample.oauth.Test"
+)
+public class SampleScopeMapper implements ScopeMapper {
 
 	@Override
-	public String getScope(String httpOperation) {
-		switch (httpOperation) {
-			case "HEAD":
+	public String map(String scope) {
+		switch (scope) {
 			case "GET":
+			case "HEAD":
 			case "OPTIONS":
 				return "everything.readonly";
 		}

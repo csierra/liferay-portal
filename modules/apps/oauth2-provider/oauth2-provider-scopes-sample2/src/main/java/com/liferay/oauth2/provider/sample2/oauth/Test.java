@@ -14,13 +14,7 @@
 
 package com.liferay.oauth2.provider.sample2.oauth;
 
-import com.liferay.oauth2.provider.scopes.api.LiferayOauth2OSGiFeatureFactory;
 import com.liferay.oauth2.provider.scopes.api.RequiresScope;
-import com.liferay.oauth2.provider.scopes.api.ScopesDescriptionBundle;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.GET;
@@ -28,21 +22,24 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+
+import java.util.Collections;
+import java.util.Set;
 
 @ApplicationPath("/sample2")
 @Component(
 	immediate = true,
-	service = Application.class
+	service = Application.class,
+	property = {
+		"oauth2.scopechecker.type=annotations",
+		"requires.oauth2=true"
+	}
 )
-@ScopesDescriptionBundle("content.Language")
 public class Test extends Application {
 
 	@Override
 	public Set<Object> getSingletons() {
-		return new HashSet<>(
-			Arrays.asList(
-				this, _liferayOauth2OSGiFeatureFactory.create("Sample2")));
+		return Collections.singleton(this);
 	}
 
 	@GET
@@ -57,9 +54,5 @@ public class Test extends Application {
 	public String helloEverything() {
 		return "hello everything";
 	}
-
-
-	@Reference
-	LiferayOauth2OSGiFeatureFactory _liferayOauth2OSGiFeatureFactory;
 
 }

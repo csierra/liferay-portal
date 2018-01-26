@@ -15,7 +15,7 @@
 package com.liferay.oauth2.provider.scopes.impl;
 
 import com.liferay.oauth2.provider.scopes.api.RequiresScope;
-import com.liferay.oauth2.provider.scopes.impl.methodallowedchecker.AnnotationMethodAllowedChecker;
+import com.liferay.oauth2.provider.scopes.impl.requestscopechecker.AnnotationRequestScopeChecker;
 import com.liferay.oauth2.provider.scopes.spi.MethodAllowedChecker;
 import org.junit.Test;
 
@@ -29,7 +29,7 @@ public class AnnotationMethodAllowedCheckerTest {
 		TestScopeChecker testScopeChecker = new TestScopeChecker("READ");
 
 		MethodAllowedChecker methodAllowedChecker =
-			new AnnotationMethodAllowedChecker(testScopeChecker);
+			new AnnotationRequestScopeChecker(testScopeChecker);
 
 		assertTrue(
 			methodAllowedChecker.isAllowed(
@@ -41,7 +41,7 @@ public class AnnotationMethodAllowedCheckerTest {
 		TestScopeChecker testScopeChecker = new TestScopeChecker("WRITE");
 
 		MethodAllowedChecker methodAllowedChecker =
-			new AnnotationMethodAllowedChecker(testScopeChecker);
+			new AnnotationRequestScopeChecker(testScopeChecker);
 
 		assertTrue(
 			methodAllowedChecker.isAllowed(
@@ -56,7 +56,7 @@ public class AnnotationMethodAllowedCheckerTest {
 			"READ", "WRITE");
 
 		MethodAllowedChecker methodAllowedChecker =
-			new AnnotationMethodAllowedChecker(testScopeChecker);
+			new AnnotationRequestScopeChecker(testScopeChecker);
 
 		assertTrue(
 			methodAllowedChecker.isAllowed(
@@ -70,7 +70,7 @@ public class AnnotationMethodAllowedCheckerTest {
 		TestScopeChecker testScopeChecker = new TestScopeChecker("READ");
 
 		MethodAllowedChecker methodAllowedChecker =
-			new AnnotationMethodAllowedChecker(testScopeChecker);
+			new AnnotationRequestScopeChecker(testScopeChecker);
 
 		assertTrue(
 			methodAllowedChecker.isAllowed(
@@ -79,7 +79,7 @@ public class AnnotationMethodAllowedCheckerTest {
 		testScopeChecker = new TestScopeChecker("WRITE");
 
 		methodAllowedChecker =
-			new AnnotationMethodAllowedChecker(testScopeChecker);
+			new AnnotationRequestScopeChecker(testScopeChecker);
 
 		assertTrue(
 			methodAllowedChecker.isAllowed(
@@ -88,7 +88,7 @@ public class AnnotationMethodAllowedCheckerTest {
 		testScopeChecker = new TestScopeChecker("RANDOM");
 
 		methodAllowedChecker =
-			new AnnotationMethodAllowedChecker(testScopeChecker);
+			new AnnotationRequestScopeChecker(testScopeChecker);
 
 		assertFalse(
 			methodAllowedChecker.isAllowed(
@@ -103,7 +103,7 @@ public class AnnotationMethodAllowedCheckerTest {
 			"READ", "WRITE");
 
 		MethodAllowedChecker methodAllowedChecker =
-			new AnnotationMethodAllowedChecker(testScopeChecker);
+			new AnnotationRequestScopeChecker(testScopeChecker);
 
 		assertFalse(
 			methodAllowedChecker.isAllowed(

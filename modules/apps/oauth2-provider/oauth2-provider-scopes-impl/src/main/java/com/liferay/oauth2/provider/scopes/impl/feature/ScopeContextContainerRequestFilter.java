@@ -12,42 +12,40 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.jaxrs;
+package com.liferay.oauth2.provider.scopes.impl.feature;
 
-import com.liferay.oauth2.provider.scopes.spi.MethodAllowedChecker;
-
-import java.io.IOException;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopeContext;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import java.io.IOException;
 
-public class OAuth2ResourceMethodCheckerContainerRequestFilter
-	implements ContainerRequestFilter {
+class ScopeContextContainerRequestFilter implements ContainerRequestFilter {
 
-	public OAuth2ResourceMethodCheckerContainerRequestFilter(
-		MethodAllowedChecker methodScopeChecker) {
-
-		_methodAllowedChecker = methodScopeChecker;
+	public ScopeContextContainerRequestFilter(ScopeContext scopeContext) {
+		_scopeContext = scopeContext;
 	}
 
 	@Override
 	public void filter(ContainerRequestContext requestContext)
 		throws IOException {
 
-		if (!_methodAllowedChecker.isAllowed(
-				_resourceInfo.getResourceMethod())) {
+		Bundle bundle = FrameworkUtil.getBundle(_application.getClass());
 
-			requestContext.abortWith(
-				Response.status(Response.Status.NOT_FOUND).build());
+		if (bundle == null) {
+			return;
 		}
+
+		_scopeContext.setBundle(bundle);
+		_scopeContext.setApplicationName(_application.getClass().getName());
 	}
 
 	@Context
-	ResourceInfo _resourceInfo;
+	private Application _application;
 
-	private final MethodAllowedChecker _methodAllowedChecker;
-
+	private ScopeContext _scopeContext;
 }

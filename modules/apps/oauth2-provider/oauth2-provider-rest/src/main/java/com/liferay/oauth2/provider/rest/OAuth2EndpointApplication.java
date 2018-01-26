@@ -36,7 +36,7 @@ import java.util.Set;
 	immediate = true,
 	service = Application.class
 )
-@ApplicationPath("/oauth2")
+@ApplicationPath("/")
 public class OAuth2EndpointApplication extends Application {
 
 	@Override

@@ -12,31 +12,26 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.sample.oauth;
+package com.liferay.oauth2.provider.scopes.impl.requestscopechecker;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.core.Application;
-
+import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
+import com.liferay.oauth2.provider.scopes.spi.RequestScopeChecker;
 import org.osgi.service.component.annotations.Component;
 
-import java.util.Collections;
-import java.util.Set;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Request;
 
 @Component(
 	immediate = true,
-	property = "requires.oauth2=true",
-	service = Application.class
+	property = "default=true"
 )
-public class Test extends Application {
+public class HttpMethodRequestScopeChecker implements RequestScopeChecker {
 
 	@Override
-	public Set<Object> getSingletons() {
-		return Collections.singleton(this);
-	}
+	public boolean isAllowed(
+		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo) {
 
-	@GET
-	public String method() {
-		return "hello";
+		return scopeChecker.hasScope(request.getMethod());
 	}
 
 }
