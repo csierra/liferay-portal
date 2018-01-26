@@ -96,22 +96,7 @@
 		<reference entity="OAuth2Token" package-path="com.liferay.oauth2.provider" />
 	</entity>
 
-	<!--
-
-	Mapping between applications and scopes and later requested+approved tokens and scopes
-
-	<entity name="TokenScopes">
-		<column name="tokenId" type="" />
-		<column name="scopeId" type="" />
-	</entity>
-
-	<entity name="ApplicationScopes">
-		<column name="applicationId" type="" />
-		<column name="scopeId" type="" />
-	</entity>
-
-	-->
-	<entity name="OAuth2Scope" local-service="true" remote-service="false">
+	<entity name="OAuth2ScopeGrant" local-service="true" remote-service="false">
 		<!-- PK fields -->
 
 		<column name="applicationName" primary="true" type="String" />
@@ -119,6 +104,7 @@
 		<column name="bundleVersion" primary="true" type="String" />
 		<column name="companyId" type="long" primary="true" />
 		<column name="oAuth2ScopeName" primary="true" type="String" />
+		<column name="oAuth2TokenId" primary="true" type="String" />
 
 		<!-- Audit fields -->
 

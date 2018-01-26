@@ -335,13 +335,6 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	
 		client.setApplicationDescription(
 			oAuth2Application.getDescription());
-
-		/*
-		client.setRegisteredScopes();
-
-		get scopes from database
-
-		 */
 	
 		client.setRedirectUris(
 			Collections.singletonList(oAuth2Application.getRedirectUri()));

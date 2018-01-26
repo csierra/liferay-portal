@@ -77,16 +77,6 @@ public class LiferayOAuth2ScopesGrantPortlet extends MVCPortlet {
 		printWriter.append(
 			"<input type=\"hidden\" name=\"scope\" value=\"");
 		printWriter.append(ParamUtil.get(httpServletRequest, "scope", ""));
-
-		/*
-			show scopes from scope finder, but filtered against available scopes that are assigned to application
-
-			example: application requests everything, oauth2 admin selected blogs.everything for this app
-				=> show blogs.everything description
-
-			In this version we approve all scopes requested, don't further sub-select
-		*/
-
 		printWriter.append("\">");
 		printWriter.append(
 			"<input type=\"hidden\" name=\"session_authenticity_token\" " +
