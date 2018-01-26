@@ -26,7 +26,8 @@
 		<column name="description" type="String" />
 		<column name="name" type="String" />
 		<column name="webUrl" type="String" />
-		
+		<column name="scopes" type="String" />
+
 		<finder name="C_CI" return-type="OAuth2Application">
 			<finder-column name="companyId" />
 			<finder-column name="clientId" />
