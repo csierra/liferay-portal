@@ -14,25 +14,41 @@
 
 package com.liferay.oauth2.provider.sample2.oauth;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
+import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.api.LiferayOauth2OSGiFeatureFactory;
 import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 import com.liferay.oauth2.provider.scopes.api.ScopesDescriptionBundle;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
 
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import org.osgi.framework.Bundle;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 @ApplicationPath("/sample2")
 @Component(
 	immediate = true,
+	property = {"oauth2=true"},
 	service = Application.class
 )
 @ScopesDescriptionBundle("content.Language")
@@ -58,8 +74,44 @@ public class Test extends Application {
 		return "hello everything";
 	}
 
+	@Path("/scopes")
+	@Produces("application/json")
+	@GET
+	public String scopes() {
+		long companyId = CompanyThreadLocal.getCompanyId();
+
+		try {
+			Company company = _companyLocalService.getCompany(companyId);
+
+			Collection<LiferayOAuth2Scope> scopes =
+				_scopeFinderLocator.listScopes(company);
+
+			Gson gson = new GsonBuilder()
+				.registerTypeAdapter(
+					Bundle.class,
+					(JsonSerializer<Bundle>)
+						(src, typeOfSrc, context) -> {
+
+							JsonObject json = new JsonObject();
+							json.addProperty("bundleName", src.getSymbolicName());
+							json.addProperty("bundleVersion", src.getVersion().toString());
+							return json;
+						})
+				.create();
+
+			return gson.toJson(scopes);
+		}
+		catch (PortalException e) {
+			return new GsonBuilder().create().toJson(e);
+		}
+	}
 
 	@Reference
-	LiferayOauth2OSGiFeatureFactory _liferayOauth2OSGiFeatureFactory;
+	private LiferayOauth2OSGiFeatureFactory _liferayOauth2OSGiFeatureFactory;
 
+	@Reference
+	private ScopeFinderLocator _scopeFinderLocator;
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
 }
