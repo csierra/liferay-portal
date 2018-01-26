@@ -263,7 +263,8 @@ public class OAuth2EndpointApplication extends Application {
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private SubjectCreator _subjectCreator;
 
-	private ServiceRegistration _authorizeEndpointFilterServiceRegistration;
+	private ServiceRegistration<Filter>
+		_authorizeEndpointFilterServiceRegistration;
 	private Configuration _cxfConfiguration;
 	private Configuration _restConfiguration;
 
