@@ -38,9 +38,7 @@ import java.util.Properties;
 @Component(
 	immediate = true,
 	property = {
-		"auth.verifier.OAuth2AuthVerifier.send.body=true",
-		"auth.verifier.OAuth2AuthVerifier.enabled=true",
-		"auth.verifier.OAuth2AuthVerifier.urls.includes=/*"
+		"auth.verifier.OAuth2AuthVerifier.urls.includes=#N/A#"
 	}
 )
 public class OAuth2AuthVerifier implements AuthVerifier {
@@ -83,7 +81,12 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 			
 			for (OAuthPermission scope : accessToken.getScopes()) {
 				ServiceAccessPolicyThreadLocal.addActiveServiceAccessPolicyName(
-					"OAUTH_" + scope.getPermission());
+					scope.getPermission());
+
+				/*
+				Do not prefix the permission, for the sake of transparency send what's granted,
+				this expects the scope.permissions to be initialized with real SAP name
+				 */
 
 			}
 
