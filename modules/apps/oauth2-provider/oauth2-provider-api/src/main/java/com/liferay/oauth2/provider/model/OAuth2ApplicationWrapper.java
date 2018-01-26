@@ -71,6 +71,7 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 		attributes.put("description", getDescription());
 		attributes.put("name", getName());
 		attributes.put("webUrl", getWebUrl());
+		attributes.put("scopes", getScopes());
 
 		return attributes;
 	}
@@ -154,6 +155,12 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 
 		if (webUrl != null) {
 			setWebUrl(webUrl);
+		}
+
+		String scopes = (String)attributes.get("scopes");
+
+		if (scopes != null) {
+			setScopes(scopes);
 		}
 	}
 
@@ -285,6 +292,16 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	@Override
 	public java.lang.String getRedirectUri() {
 		return _oAuth2Application.getRedirectUri();
+	}
+
+	/**
+	* Returns the scopes of this o auth2 application.
+	*
+	* @return the scopes of this o auth2 application
+	*/
+	@Override
+	public java.lang.String getScopes() {
+		return _oAuth2Application.getScopes();
 	}
 
 	/**
@@ -491,6 +508,16 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	@Override
 	public void setRedirectUri(java.lang.String redirectUri) {
 		_oAuth2Application.setRedirectUri(redirectUri);
+	}
+
+	/**
+	* Sets the scopes of this o auth2 application.
+	*
+	* @param scopes the scopes of this o auth2 application
+	*/
+	@Override
+	public void setScopes(java.lang.String scopes) {
+		_oAuth2Application.setScopes(scopes);
 	}
 
 	/**

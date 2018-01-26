@@ -76,7 +76,8 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 			{ "clientConfidential", Types.BOOLEAN },
 			{ "description", Types.VARCHAR },
 			{ "name", Types.VARCHAR },
-			{ "webUrl", Types.VARCHAR }
+			{ "webUrl", Types.VARCHAR },
+			{ "scopes", Types.VARCHAR }
 		};
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
 
@@ -94,9 +95,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("webUrl", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("scopes", Types.VARCHAR);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,clientId VARCHAR(75) null,clientSecret VARCHAR(75) null,redirectUri VARCHAR(75) null,clientConfidential BOOLEAN,description VARCHAR(75) null,name VARCHAR(75) null,webUrl VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,clientId VARCHAR(75) null,clientSecret VARCHAR(75) null,redirectUri VARCHAR(75) null,clientConfidential BOOLEAN,description VARCHAR(75) null,name VARCHAR(75) null,webUrl VARCHAR(75) null,scopes VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2Application";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2Application.oAuth2ApplicationId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2Application.oAuth2ApplicationId ASC";
@@ -168,6 +170,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		attributes.put("description", getDescription());
 		attributes.put("name", getName());
 		attributes.put("webUrl", getWebUrl());
+		attributes.put("scopes", getScopes());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -254,6 +257,12 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 		if (webUrl != null) {
 			setWebUrl(webUrl);
+		}
+
+		String scopes = (String)attributes.get("scopes");
+
+		if (scopes != null) {
+			setScopes(scopes);
 		}
 	}
 
@@ -466,6 +475,21 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_webUrl = webUrl;
 	}
 
+	@Override
+	public String getScopes() {
+		if (_scopes == null) {
+			return "";
+		}
+		else {
+			return _scopes;
+		}
+	}
+
+	@Override
+	public void setScopes(String scopes) {
+		_scopes = scopes;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -510,6 +534,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		oAuth2ApplicationImpl.setDescription(getDescription());
 		oAuth2ApplicationImpl.setName(getName());
 		oAuth2ApplicationImpl.setWebUrl(getWebUrl());
+		oAuth2ApplicationImpl.setScopes(getScopes());
 
 		oAuth2ApplicationImpl.resetOriginalValues();
 
@@ -669,12 +694,20 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 			oAuth2ApplicationCacheModel.webUrl = null;
 		}
 
+		oAuth2ApplicationCacheModel.scopes = getScopes();
+
+		String scopes = oAuth2ApplicationCacheModel.scopes;
+
+		if ((scopes != null) && (scopes.length() == 0)) {
+			oAuth2ApplicationCacheModel.scopes = null;
+		}
+
 		return oAuth2ApplicationCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{oAuth2ApplicationId=");
 		sb.append(getOAuth2ApplicationId());
@@ -702,6 +735,8 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		sb.append(getName());
 		sb.append(", webUrl=");
 		sb.append(getWebUrl());
+		sb.append(", scopes=");
+		sb.append(getScopes());
 		sb.append("}");
 
 		return sb.toString();
@@ -709,7 +744,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(43);
+		StringBundler sb = new StringBundler(46);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.oauth2.provider.model.OAuth2Application");
@@ -767,6 +802,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 			"<column><column-name>webUrl</column-name><column-value><![CDATA[");
 		sb.append(getWebUrl());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>scopes</column-name><column-value><![CDATA[");
+		sb.append(getScopes());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -794,6 +833,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 	private String _description;
 	private String _name;
 	private String _webUrl;
+	private String _scopes;
 	private long _columnBitmask;
 	private OAuth2Application _escapedModel;
 }

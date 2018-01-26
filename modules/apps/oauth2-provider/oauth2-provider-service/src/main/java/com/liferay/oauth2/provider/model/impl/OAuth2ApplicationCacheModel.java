@@ -65,7 +65,7 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{oAuth2ApplicationId=");
 		sb.append(oAuth2ApplicationId);
@@ -93,6 +93,8 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		sb.append(name);
 		sb.append(", webUrl=");
 		sb.append(webUrl);
+		sb.append(", scopes=");
+		sb.append(scopes);
 		sb.append("}");
 
 		return sb.toString();
@@ -171,6 +173,13 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 			oAuth2ApplicationImpl.setWebUrl(webUrl);
 		}
 
+		if (scopes == null) {
+			oAuth2ApplicationImpl.setScopes("");
+		}
+		else {
+			oAuth2ApplicationImpl.setScopes(scopes);
+		}
+
 		oAuth2ApplicationImpl.resetOriginalValues();
 
 		return oAuth2ApplicationImpl;
@@ -194,6 +203,7 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		description = objectInput.readUTF();
 		name = objectInput.readUTF();
 		webUrl = objectInput.readUTF();
+		scopes = objectInput.readUTF();
 	}
 
 	@Override
@@ -258,6 +268,13 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		else {
 			objectOutput.writeUTF(webUrl);
 		}
+
+		if (scopes == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(scopes);
+		}
 	}
 
 	public long oAuth2ApplicationId;
@@ -273,4 +290,5 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 	public String description;
 	public String name;
 	public String webUrl;
+	public String scopes;
 }

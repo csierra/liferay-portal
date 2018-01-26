@@ -280,6 +280,21 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	 */
 	public void setWebUrl(String webUrl);
 
+	/**
+	 * Returns the scopes of this o auth2 application.
+	 *
+	 * @return the scopes of this o auth2 application
+	 */
+	@AutoEscape
+	public String getScopes();
+
+	/**
+	 * Sets the scopes of this o auth2 application.
+	 *
+	 * @param scopes the scopes of this o auth2 application
+	 */
+	public void setScopes(String scopes);
+
 	@Override
 	public boolean isNew();
 

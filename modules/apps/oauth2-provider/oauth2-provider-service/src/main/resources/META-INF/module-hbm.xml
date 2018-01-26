@@ -22,6 +22,7 @@
 		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="webUrl" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="scopes" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.liferay.oauth2.provider.model.impl.OAuth2RefreshTokenImpl" table="OAuth2RefreshToken">
 		<id access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2RefreshTokenId" type="java.lang.String">
