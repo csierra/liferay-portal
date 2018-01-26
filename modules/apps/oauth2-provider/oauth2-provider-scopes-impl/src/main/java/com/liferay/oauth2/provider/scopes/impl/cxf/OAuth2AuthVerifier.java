@@ -81,7 +81,12 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 			
 			for (OAuthPermission scope : accessToken.getScopes()) {
 				ServiceAccessPolicyThreadLocal.addActiveServiceAccessPolicyName(
-					"OAUTH_" + scope.getPermission());
+					scope.getPermission());
+
+				/*
+				Do not prefix the permission, for the sake of transparency send what's granted,
+				this expects the scope.permissions to be initialized with real SAP name
+				 */
 
 			}
 
