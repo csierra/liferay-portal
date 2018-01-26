@@ -691,6 +691,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		oAuth2ApplicationImpl.setDescription(oAuth2Application.getDescription());
 		oAuth2ApplicationImpl.setName(oAuth2Application.getName());
 		oAuth2ApplicationImpl.setWebUrl(oAuth2Application.getWebUrl());
+		oAuth2ApplicationImpl.setScopes(oAuth2Application.getScopes());
 
 		return oAuth2ApplicationImpl;
 	}

@@ -11,7 +11,8 @@ create table OAuth2Application (
 	clientConfidential BOOLEAN,
 	description VARCHAR(75) null,
 	name VARCHAR(75) null,
-	webUrl VARCHAR(75) null
+	webUrl VARCHAR(75) null,
+	scopes STRING null
 );
 
 create table OAuth2RefreshToken (

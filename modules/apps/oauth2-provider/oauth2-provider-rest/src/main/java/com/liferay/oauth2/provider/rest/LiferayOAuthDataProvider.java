@@ -16,9 +16,11 @@ package com.liferay.oauth2.provider.rest;
 
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
+import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2Token;
+import com.liferay.oauth2.provider.scopes.impl.model.LiferayOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService;
@@ -47,10 +49,12 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component(service = LiferayOAuthDataProvider.class)
 public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvider {
@@ -181,6 +185,33 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 					serverToken.getTokenKey(),
 					_scopeFinderLocator.locateScopes(
 						CompanyThreadLocal.getCompanyId(), scope));
+
+				// we need to fine-tune  the scope.externalId(), right now it's
+				// com.liferay.oauth2.provider.sample2/Sample2/everything.readonly
+				// that is built in SerializableLiferayOAuth2Scope#toString() :(
+				//
+				// It requires to add back externalId to LiferayOAuth2Scope
+				// and configure HTTP Verb + annotation matchers/prefix handlers to fill it
+
+				String[] parts = scope.split("/");
+				if (parts.length != 3) {
+					System.out.println("Parts are not 3, probably a refreshToken request !!!: " + scope);
+					continue;
+				}
+
+				String bundleSymbolicName = parts[0];
+				String applicationName = parts[1];
+				String scopeName = parts[2];
+
+				List<LiferayOAuth2Scope> filteredScopes =
+					_scopeFinderLocator.locateScopes(
+						CompanyThreadLocal.getCompanyId(), scopeName).stream().filter(
+							_scope -> _scope.getApplicationName().equals(applicationName) && _scope.getBundle().getSymbolicName().equals(bundleSymbolicName))
+						.collect(Collectors.toList());
+
+				_oAuth2ScopeGrantLocalService.grantScopesToToken(
+					serverToken.getTokenKey(), filteredScopes);
+
 			}
 			catch (NoSuchOAuth2TokenException e) {
 				continue;
@@ -336,13 +367,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		client.setApplicationDescription(
 			oAuth2Application.getDescription());
 
-		/*
-		client.setRegisteredScopes();
+		client.setRegisteredScopes(
+			OAuthUtils.parseScope(oAuth2Application.getScopes()));
 
-		get scopes from database
-
-		 */
-	
 		client.setRedirectUris(
 			Collections.singletonList(oAuth2Application.getRedirectUri()));
 	
