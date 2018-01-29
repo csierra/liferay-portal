@@ -195,6 +195,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 			_log.error(
 				 sb.toString(), e);
+
+			throw new OAuthServiceException(
+				"Unable to save access token", e);
 		}
 
 		List<String> scopeList =
@@ -219,6 +222,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 					"Unable to find token for key " +
 						serverToken.getTokenKey());
 			}
+
+			throw new OAuthServiceException(
+				"Unable to grant scopes for token", e);
 		}
 		catch (Exception e) {
 			StringBundler sb = new StringBundler(6);
@@ -232,6 +238,10 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 					serverToken.getScopes()));
 
 			_log.error(sb.toString(), e);
+
+			throw new OAuthServiceException(
+				"Unable to grant scopes for token", e);
+
 		}
 	}
 
@@ -274,6 +284,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			sb.append(oAuth2RefreshToken.getUserId());
 
 			_log.error(sb.toString(), e);
+
+			throw new OAuthServiceException(
+				"Unable to save refresh token", e);
 		}
 
 
@@ -299,7 +312,13 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				_oAuth2TokenLocalService.updateOAuth2Token(oAuth2Token);
 			}
 			catch (Exception e) {
-				_log.error("Unable to update token", e);
+				_log.error(
+					"Unable to update access token " +
+						"with refresh token reference"
+					, e);
+
+				throw new OAuthServiceException(
+					"Unable to save refresh token", e);
 			}
 		}
 	}
@@ -314,6 +333,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				"Unable to revoke token for client "
 					+ accessToken.getClient().getClientId(),
 				e);
+
+			throw new OAuthServiceException(
+				"Unable to revoke access token", e);
 		}
 	}
 
@@ -336,6 +358,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				"Unable to delete tokens and refresh token for client"
 					+ refreshToken.getClient().getClientId()
 				, e);
+
+			throw new OAuthServiceException(
+				"Unable to revoke refresh token", e);
 		}
 	}
 
