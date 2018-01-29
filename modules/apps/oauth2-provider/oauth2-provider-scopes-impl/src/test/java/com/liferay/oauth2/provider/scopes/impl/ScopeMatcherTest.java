@@ -78,7 +78,7 @@ public class ScopeMatcherTest {
 
 		PrefixHandler namespaceAdder = namespaceAdderFactory.create("TEST");
 
-		ScopeMatcher scopeMatcher = "TEST_RO"::equals;
+		ScopeMatcher scopeMatcher = "TEST/RO"::equals;
 
 		assertEquals(
 			Arrays.asList("RO"),
@@ -86,7 +86,7 @@ public class ScopeMatcherTest {
 				testScopeFinder.findScopes(
 					scopeMatcher.prepend(namespaceAdder))));
 
-		scopeMatcher = "TEST_RW"::equals;
+		scopeMatcher = "TEST/RW"::equals;
 
 		assertEquals(
 			Arrays.asList("RO", "RW"),
@@ -109,13 +109,13 @@ public class ScopeMatcherTest {
 
 		namespaceAdder = namespaceAdder.append(nestedNamespaceAdder);
 
-		ScopeMatcher scopeMatcher = "TEST_NESTED_RO"::equals;
+		ScopeMatcher scopeMatcher = "TEST/NESTED/RO"::equals;
 
 		assertEquals(
 			Arrays.asList("RO"),
 			testScopeFinder.findScopes(scopeMatcher.prepend(namespaceAdder)));
 
-		scopeMatcher = "TEST_NESTED_RW"::equals;
+		scopeMatcher = "TEST/NESTED/RW"::equals;
 
 		assertEquals(
 			Arrays.asList("RO", "RW"),

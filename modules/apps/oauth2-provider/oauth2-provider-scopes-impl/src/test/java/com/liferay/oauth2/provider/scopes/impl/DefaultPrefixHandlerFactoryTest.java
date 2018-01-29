@@ -43,7 +43,7 @@ public class DefaultPrefixHandlerFactoryTest {
 
 		String prefixed = prefixHandler.addPrefix("WORLD");
 
-		assertEquals("HELLO_BEAUTIFUL_COLOURFUL_WORLD", prefixed);
+		assertEquals("HELLO/BEAUTIFUL/COLOURFUL/WORLD", prefixed);
 	}
 
 	@Test
@@ -54,7 +54,7 @@ public class DefaultPrefixHandlerFactoryTest {
 		PrefixHandler prefixHandler = defaultPrefixHandlerFactory.create(
 			"HELLO", "BEAUTIFUL", "COLOURFUL");
 
-		assertEquals("HELLO_BEAUTIFUL_COLOURFUL_WORLD", prefixHandler.addPrefix(
+		assertEquals("HELLO/BEAUTIFUL/COLOURFUL/WORLD", prefixHandler.addPrefix(
 			"WORLD"));
 	}
 
@@ -67,14 +67,14 @@ public class DefaultPrefixHandlerFactoryTest {
 			"TEST");
 
 		assertEquals("HELLO", prefixHandler.removePrefix("HELLO"));
-		assertEquals("HELLO", prefixHandler.removePrefix("TEST_HELLO"));
-		assertEquals("TEST_HELLO", prefixHandler.removePrefix(
-			"TEST_TEST_HELLO"));
+		assertEquals("HELLO", prefixHandler.removePrefix("TEST/HELLO"));
+		assertEquals("TEST/HELLO", prefixHandler.removePrefix(
+			"TEST/TEST/HELLO"));
 
 		prefixHandler = prefixHandler.append(prefixHandler);
 
 		assertEquals("HELLO", prefixHandler.removePrefix(
-			"TEST_TEST_HELLO"));
+			"TEST/TEST/HELLO"));
 
 		prefixHandler = defaultPrefixHandlerFactory.create("TEST");
 
@@ -82,10 +82,10 @@ public class DefaultPrefixHandlerFactoryTest {
 			defaultPrefixHandlerFactory.create("TEST2"));
 
 		assertEquals("HELLO", prefixHandler.removePrefix(
-			"TEST_TEST2_HELLO"));
+			"TEST/TEST2/HELLO"));
 
-		assertEquals("TEST2_TEST_HELLO", prefixHandler.removePrefix(
-			"TEST2_TEST_HELLO"));
+		assertEquals("TEST2/TEST/HELLO", prefixHandler.removePrefix(
+			"TEST2/TEST/HELLO"));
 
 		prefixHandler = defaultPrefixHandlerFactory.create("TEST");
 
@@ -93,10 +93,10 @@ public class DefaultPrefixHandlerFactoryTest {
 			defaultPrefixHandlerFactory.create("TEST2"));
 
 		assertEquals("HELLO", prefixHandler.removePrefix(
-			"TEST2_TEST_HELLO"));
+			"TEST2/TEST/HELLO"));
 
-		assertEquals("TEST_TEST2_HELLO", prefixHandler.removePrefix(
-			"TEST_TEST2_HELLO"));
+		assertEquals("TEST/TEST2/HELLO", prefixHandler.removePrefix(
+			"TEST/TEST2/HELLO"));
 
 	}
 

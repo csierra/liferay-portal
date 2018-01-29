@@ -69,7 +69,7 @@ public class ChunkScopeMatcherFactoryTest {
 			new ChunkScopeMatcherFactory();
 
 		ScopeMatcher scopeMatcher =
-			chunkScopeMatcherFactory.create("test_everything");
+			chunkScopeMatcherFactory.create("test/everything");
 
 		PrefixHandler namespaceAdder =
 			new DefaultPrefixHandlerFactory().create("test");
