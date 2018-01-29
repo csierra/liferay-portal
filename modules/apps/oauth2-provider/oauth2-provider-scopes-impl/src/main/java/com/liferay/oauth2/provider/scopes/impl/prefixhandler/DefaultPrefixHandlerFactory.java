@@ -27,12 +27,12 @@ import java.util.Map;
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.impl.scopes.DefaultNamespaceAdderFactory",
 	property = {
-		"separator=" + StringPool.UNDERLINE
+		"separator=" + StringPool.SLASH
 	}
 )
 public class DefaultPrefixHandlerFactory implements PrefixHandlerFactory {
 
-	private String _separator = StringPool.UNDERLINE;
+	private String _separator = StringPool.SLASH;
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
