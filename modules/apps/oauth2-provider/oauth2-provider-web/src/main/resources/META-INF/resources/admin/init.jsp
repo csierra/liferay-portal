@@ -14,15 +14,10 @@
  */
 --%>
 <%@ include file="../init.jsp" %>
-<%@page import="com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException" %><%@
+<%@ page import="com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException" %><%@
 page import="com.liferay.oauth2.provider.model.LiferayOAuth2Scope" %><%@
-page import="com.liferay.oauth2.provider.model.OAuth2Application" %><%@
-page import="com.liferay.oauth2.provider.service.OAuth2ApplicationLocalServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
-page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
-page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
-page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="java.util.List" %><%@
 page import="java.util.Map" %>
