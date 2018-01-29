@@ -55,7 +55,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -198,34 +200,38 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		List<String> scopeList =
 			OAuthUtils.convertPermissionsToScopeList(serverToken.getScopes());
 
-		for (String scope : scopeList) {
-			try {
-				_oAuth2ScopeGrantLocalService.grantScopesToToken(
-					serverToken.getTokenKey(),
-					_scopeFinderLocator.locateScopes(
-						CompanyThreadLocal.getCompanyId(), scope));
-			}
-			catch (NoSuchOAuth2TokenException e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Unable to find token for key " +
-							serverToken.getTokenKey());
-				}
-				continue;
-			}
-			catch (Exception e) {
-				StringBundler sb = new StringBundler(6);
-				sb.append("Unable to save user ");
-				sb.append(serverToken.getSubject().getId());
-				sb.append(" scopes for client ");
-				sb.append(serverToken.getClient().getClientId());
-				sb.append(" with approved scopes ");
-				sb.append(
-					OAuthUtils.convertPermissionsToScopeList(
-						serverToken.getScopes()));
+		long companyId = CompanyThreadLocal.getCompanyId();
 
-				_log.error(sb.toString(), e);
+		Set<LiferayOAuth2Scope> liferayScopes = new HashSet();
+
+		for (String scope : scopeList) {
+			liferayScopes.addAll(
+				_scopeFinderLocator.locateScopes(companyId, scope));
+		}
+
+		try {
+			_oAuth2ScopeGrantLocalService.grantScopesToToken(
+				serverToken.getTokenKey(), liferayScopes);
+		}
+		catch (NoSuchOAuth2TokenException e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to find token for key " +
+						serverToken.getTokenKey());
 			}
+		}
+		catch (Exception e) {
+			StringBundler sb = new StringBundler(6);
+			sb.append("Unable to save user ");
+			sb.append(serverToken.getSubject().getId());
+			sb.append(" scopes for client ");
+			sb.append(serverToken.getClient().getClientId());
+			sb.append(" with approved scopes ");
+			sb.append(
+				OAuthUtils.convertPermissionsToScopeList(
+					serverToken.getScopes()));
+
+			_log.error(sb.toString(), e);
 		}
 	}
 
