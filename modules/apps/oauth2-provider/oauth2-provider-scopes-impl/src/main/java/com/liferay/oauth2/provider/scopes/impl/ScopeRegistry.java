@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.model.Company;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
@@ -106,7 +107,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 	@Override
 	public Collection<LiferayOAuth2Scope> listScopes(Company company) {
-		Collection<LiferayOAuth2Scope> scopes = new ArrayList<>();
+		Collection<LiferayOAuth2Scope> scopes = new HashSet<>();
 
 		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
 

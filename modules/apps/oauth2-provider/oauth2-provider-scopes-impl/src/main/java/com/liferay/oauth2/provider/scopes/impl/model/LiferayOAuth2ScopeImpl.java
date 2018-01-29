@@ -17,6 +17,8 @@ package com.liferay.oauth2.provider.scopes.impl.model;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import org.osgi.framework.Bundle;
 
+import java.util.Objects;
+
 public class LiferayOAuth2ScopeImpl implements
 	LiferayOAuth2Scope {
 
@@ -41,6 +43,25 @@ public class LiferayOAuth2ScopeImpl implements
 	@Override
 	public String getScope() {
 		return _scope;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		LiferayOAuth2ScopeImpl that = (LiferayOAuth2ScopeImpl) o;
+		return Objects.equals(_applicationName, that._applicationName) &&
+			   Objects.equals(_bundle, that._bundle) &&
+			   Objects.equals(_scope, that._scope);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(_applicationName, _bundle, _scope);
 	}
 
 	private final String _applicationName;
