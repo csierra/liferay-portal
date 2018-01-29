@@ -304,6 +304,11 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 		return _oAuth2Application.getScopes();
 	}
 
+	@Override
+	public java.util.List<java.lang.String> getScopesList() {
+		return _oAuth2Application.getScopesList();
+	}
+
 	/**
 	* Returns the user ID of this o auth2 application.
 	*
@@ -518,6 +523,11 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	@Override
 	public void setScopes(java.lang.String scopes) {
 		_oAuth2Application.setScopes(scopes);
+	}
+
+	@Override
+	public void setScopesList(java.util.List<java.lang.String> scopesList) {
+		_oAuth2Application.setScopesList(scopesList);
 	}
 
 	/**
