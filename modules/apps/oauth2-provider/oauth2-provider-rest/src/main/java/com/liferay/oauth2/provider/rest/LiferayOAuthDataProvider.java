@@ -29,7 +29,10 @@ import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.util.StringBundler;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -54,6 +57,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component(service = LiferayOAuthDataProvider.class)
 public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvider {
@@ -173,7 +177,23 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		oAuth2Token.setScopes(
 			OAuthUtils.convertPermissionsToScope(serverToken.getScopes()));
 
-		_oAuth2TokenLocalService.updateOAuth2Token(oAuth2Token);
+		try {
+			_oAuth2TokenLocalService.updateOAuth2Token(oAuth2Token);
+		}
+		catch (Exception e) {
+			StringBundler sb = new StringBundler(6);
+			sb.append("Unable to save user ");
+			sb.append(serverToken.getSubject().getId());
+			sb.append(" token for client ");
+			sb.append(serverToken.getClient().getClientId());
+			sb.append(" with granted scopes ");
+			sb.append(
+				OAuthUtils.convertPermissionsToScopeList(
+					serverToken.getScopes()));
+
+			_log.error(
+				 sb.toString(), e);
+		}
 
 		List<String> scopeList =
 			OAuthUtils.convertPermissionsToScopeList(serverToken.getScopes());
@@ -186,7 +206,25 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 						CompanyThreadLocal.getCompanyId(), scope));
 			}
 			catch (NoSuchOAuth2TokenException e) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Unable to find token for key " +
+							serverToken.getTokenKey());
+				}
 				continue;
+			}
+			catch (Exception e) {
+				StringBundler sb = new StringBundler(6);
+				sb.append("Unable to save user ");
+				sb.append(serverToken.getSubject().getId());
+				sb.append(" scopes for client ");
+				sb.append(serverToken.getClient().getClientId());
+				sb.append(" with approved scopes ");
+				sb.append(
+					OAuthUtils.convertPermissionsToScopeList(
+						serverToken.getScopes()));
+
+				_log.error(sb.toString(), e);
 			}
 		}
 	}
@@ -218,8 +256,20 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			oAuth2RefreshToken.setUserName(subject.getLogin());
 		}
 
-		_oAuth2RefreshTokenLocalService.updateOAuth2RefreshToken(
-			oAuth2RefreshToken);
+		try {
+			_oAuth2RefreshTokenLocalService.updateOAuth2RefreshToken(
+				oAuth2RefreshToken);
+		}
+		catch (Exception e) {
+			StringBundler sb = new StringBundler();
+			sb.append("Unable to save refresh token for client ");
+			sb.append(refreshToken.getClient().getClientId());
+			sb.append(" for user ");
+			sb.append(oAuth2RefreshToken.getUserId());
+
+			_log.error(sb.toString(), e);
+		}
+
 
 		List<String> accessTokens = refreshToken.getAccessTokens();
 
@@ -227,9 +277,24 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			OAuth2Token oAuth2Token =
 				_oAuth2TokenLocalService.fetchOAuth2Token(accessToken);
 
+			if (oAuth2Token == null) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"No access token found for refresh token for client "
+							+ refreshToken.getClient().getClientId());
+				}
+
+				continue;
+			}
+
 			oAuth2Token.setOAuth2RefreshTokenId(tokenKey);
 
-			_oAuth2TokenLocalService.updateOAuth2Token(oAuth2Token);
+			try {
+				_oAuth2TokenLocalService.updateOAuth2Token(oAuth2Token);
+			}
+			catch (Exception e) {
+				_log.error("Unable to update token", e);
+			}
 		}
 	}
 
@@ -239,13 +304,16 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			_oAuth2TokenLocalService.deleteOAuth2Token(accessToken.getTokenKey());
 		}
 		catch (PortalException e) {
+			_log.error(
+				"Unable to revoke token for client "
+					+ accessToken.getClient().getClientId(),
+				e);
 		}
 	}
 
 	@Override
 	protected void doRevokeRefreshToken(RefreshToken refreshToken) {
 		try {
-
 			Collection<OAuth2Token> oAuth2Tokens =
 				_oAuth2TokenLocalService.findByRefreshToken(
 					refreshToken.getTokenKey());
@@ -258,7 +326,10 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				refreshToken.getTokenKey());
 		}
 		catch (PortalException e) {
-
+			_log.error(
+				"Unable to delete tokens and refresh token for client"
+					+ refreshToken.getClient().getClientId()
+				, e);
 		}
 	}
 
@@ -307,7 +378,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				CompanyThreadLocal.getCompanyId(), clientId);
 
 		if (oAuth2Application == null) {
-			throw new OAuthServiceException("Invalid client");
+			throw new OAuthServiceException("Invalid client " + clientId);
 		}
 
 		return populateClient(oAuth2Application);
@@ -352,8 +423,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
-			_oAuth2ApplicationLocalService.fetchOAuth2Application(
+			_oAuth2ApplicationLocalService.getOAuth2Application(
 				oAuth2Token.getOAuth2ApplicationId());
+
 		Date createDate = oAuth2Token.getCreateDate();
 
 		Client client = getClient(oAuth2Application.getClientId());
@@ -459,6 +531,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		return permissions;
 	}
+
+	private static Log _log =
+		LogFactoryUtil.getLog(LiferayOAuthDataProvider.class);
 
 	@Reference
 	private MultiVMPool _multiVMPool;
