@@ -77,7 +77,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 			{ "description", Types.VARCHAR },
 			{ "name", Types.VARCHAR },
 			{ "webUrl", Types.VARCHAR },
-			{ "scopes", Types.VARCHAR }
+			{ "scopes", Types.CLOB }
 		};
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
 
@@ -95,10 +95,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("webUrl", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("scopes", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("scopes", Types.CLOB);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,clientId VARCHAR(75) null,clientSecret VARCHAR(75) null,redirectUri VARCHAR(75) null,clientConfidential BOOLEAN,description VARCHAR(75) null,name VARCHAR(75) null,webUrl VARCHAR(75) null,scopes VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,clientId VARCHAR(75) null,clientSecret VARCHAR(75) null,redirectUri VARCHAR(75) null,clientConfidential BOOLEAN,description VARCHAR(75) null,name VARCHAR(75) null,webUrl VARCHAR(75) null,scopes TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2Application";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2Application.oAuth2ApplicationId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2Application.oAuth2ApplicationId ASC";

@@ -12,7 +12,7 @@ create table OAuth2Application (
 	description VARCHAR(75) null,
 	name VARCHAR(75) null,
 	webUrl VARCHAR(75) null,
-	scopes VARCHAR(75) null
+	scopes TEXT null
 );
 
 create table OAuth2RefreshToken (
@@ -46,5 +46,5 @@ create table OAuth2Token (
 	oAuth2ApplicationId LONG,
 	oAuth2TokenType VARCHAR(75) null,
 	oAuth2RefreshTokenId VARCHAR(75) null,
-	scopes VARCHAR(75) null
+	scopes TEXT null
 );
