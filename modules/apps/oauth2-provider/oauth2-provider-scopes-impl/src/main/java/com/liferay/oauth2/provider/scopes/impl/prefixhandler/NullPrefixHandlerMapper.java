@@ -19,7 +19,7 @@ import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
 import com.liferay.oauth2.provider.scopes.spi.PropertyGetter;
 import org.osgi.service.component.annotations.Component;
 
-@Component(immediate = true, property = "default=true")
+@Component(immediate = true)
 public class NullPrefixHandlerMapper implements PrefixHandlerMapper {
 
 	@Override

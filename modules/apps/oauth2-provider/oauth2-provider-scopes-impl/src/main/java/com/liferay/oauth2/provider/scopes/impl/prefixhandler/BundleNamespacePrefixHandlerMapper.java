@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-@Component(immediate = true)
+@Component(immediate = true, property = "default=true")
 public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
 
 	@Override
