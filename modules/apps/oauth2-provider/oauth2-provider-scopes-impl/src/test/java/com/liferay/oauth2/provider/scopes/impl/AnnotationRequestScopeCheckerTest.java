@@ -22,7 +22,7 @@ import org.junit.Test;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
-public class AnnotationMethodAllowedCheckerTest {
+public class AnnotationRequestScopeCheckerTest {
 
 	@Test
 	public void testisAllowed() throws NoSuchMethodException {

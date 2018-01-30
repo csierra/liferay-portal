@@ -23,7 +23,7 @@ import com.liferay.oauth2.provider.scopes.impl.requestscopechecker.RestOperation
 import com.liferay.oauth2.provider.scopes.spi.MethodAllowedChecker;
 import org.junit.Test;
 
-public class RestOperationMethodAllowedCheckerTest {
+public class HttpMethodRequestScopeCheckerTest {
 
 	@Test
 	public void testisAllowed() throws NoSuchMethodException {
