@@ -16,55 +16,48 @@ package com.liferay.oauth2.provider.scopes.impl;
 
 import static junit.framework.TestCase.assertTrue;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Request;
 
-import com.liferay.oauth2.provider.scopes.impl.requestscopechecker.RestOperationMethodAllowedChecker;
-import com.liferay.oauth2.provider.scopes.spi.MethodAllowedChecker;
+import com.liferay.oauth2.provider.scopes.impl.requestscopechecker.HttpMethodRequestScopeChecker;
+import com.liferay.oauth2.provider.scopes.spi.RequestScopeChecker;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-public class HttpMethodRequestScopeCheckerTest {
+@RunWith(PowerMockRunner.class)
+public class HttpMethodRequestScopeCheckerTest extends PowerMockito {
 
+	@Before
+	public void setUp() throws Exception {
+		methodAllowedChecker = new HttpMethodRequestScopeChecker();	
+		resourceInfo = Mockito.mock(ResourceInfo.class);
+	}
+	
 	@Test
-	public void testisAllowed() throws NoSuchMethodException {
+	public void testHttpMethodAllowed() throws NoSuchMethodException {
 		TestScopeChecker testScopeChecker = new TestScopeChecker(
-			"everything.readonly");
+			"GET");
 
-		MethodAllowedChecker methodAllowedChecker =
-			new RestOperationMethodAllowedChecker(testScopeChecker);
-
+		Request request = Mockito.mock(Request.class);
+		
+		when(
+			request.getMethod()
+		).thenReturn(
+			"GET"
+		);
+		
 		assertTrue(
 			methodAllowedChecker.isAllowed(
-				EndpointSample.class.getMethod("hello")));
+				testScopeChecker,
+				request,
+				resourceInfo));
 	}
 
-	@Test
-	public void testMethodAllowed() throws NoSuchMethodException {
-		TestScopeChecker testScopeChecker = new TestScopeChecker(
-			"everything");
-
-		MethodAllowedChecker methodAllowedChecker =
-			new RestOperationMethodAllowedChecker(testScopeChecker);
-
-		assertTrue(
-			methodAllowedChecker.isAllowed(
-				EndpointSample.class.getMethod("modify")));
-	}
-
-	private static class EndpointSample {
-
-		@GET
-		public String hello() {
-			return "hello";
-		}
-
-		@PUT
-		public void modify() {
-
-		}
-
-	}
-
-
-
+	protected ResourceInfo resourceInfo;
+	protected RequestScopeChecker methodAllowedChecker;
 }
