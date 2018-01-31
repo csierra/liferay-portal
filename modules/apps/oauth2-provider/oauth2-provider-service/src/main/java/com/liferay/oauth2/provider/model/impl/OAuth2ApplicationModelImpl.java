@@ -21,9 +21,11 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationModel;
+import com.liferay.oauth2.provider.model.OAuth2ApplicationSoap;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
@@ -37,8 +39,10 @@ import java.io.Serializable;
 
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +58,7 @@ import java.util.Map;
  * @see OAuth2ApplicationModel
  * @generated
  */
+@JSON(strict = true)
 @ProviderType
 public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 	implements OAuth2ApplicationModel {
@@ -117,6 +122,59 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 	public static final long CLIENTID_COLUMN_BITMASK = 1L;
 	public static final long COMPANYID_COLUMN_BITMASK = 2L;
 	public static final long OAUTH2APPLICATIONID_COLUMN_BITMASK = 4L;
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 */
+	public static OAuth2Application toModel(OAuth2ApplicationSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		OAuth2Application model = new OAuth2ApplicationImpl();
+
+		model.setOAuth2ApplicationId(soapModel.getOAuth2ApplicationId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setClientId(soapModel.getClientId());
+		model.setClientSecret(soapModel.getClientSecret());
+		model.setRedirectUri(soapModel.getRedirectUri());
+		model.setClientConfidential(soapModel.getClientConfidential());
+		model.setDescription(soapModel.getDescription());
+		model.setName(soapModel.getName());
+		model.setWebUrl(soapModel.getWebUrl());
+		model.setScopes(soapModel.getScopes());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 */
+	public static List<OAuth2Application> toModels(
+		OAuth2ApplicationSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<OAuth2Application> models = new ArrayList<OAuth2Application>(soapModels.length);
+
+		for (OAuth2ApplicationSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.oauth2.provider.service.util.ServiceProps.get(
 				"lock.expiration.time.com.liferay.oauth2.provider.model.OAuth2Application"));
 
@@ -266,6 +324,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		}
 	}
 
+	@JSON
 	@Override
 	public long getOAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
@@ -276,6 +335,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_oAuth2ApplicationId = oAuth2ApplicationId;
 	}
 
+	@JSON
 	@Override
 	public long getCompanyId() {
 		return _companyId;
@@ -298,6 +358,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		return _originalCompanyId;
 	}
 
+	@JSON
 	@Override
 	public long getUserId() {
 		return _userId;
@@ -324,6 +385,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 	public void setUserUuid(String userUuid) {
 	}
 
+	@JSON
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
@@ -339,6 +401,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_userName = userName;
 	}
 
+	@JSON
 	@Override
 	public Date getCreateDate() {
 		return _createDate;
@@ -349,6 +412,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_createDate = createDate;
 	}
 
+	@JSON
 	@Override
 	public Date getModifiedDate() {
 		return _modifiedDate;
@@ -365,6 +429,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_modifiedDate = modifiedDate;
 	}
 
+	@JSON
 	@Override
 	public String getClientId() {
 		if (_clientId == null) {
@@ -390,6 +455,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		return GetterUtil.getString(_originalClientId);
 	}
 
+	@JSON
 	@Override
 	public String getClientSecret() {
 		if (_clientSecret == null) {
@@ -405,6 +471,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_clientSecret = clientSecret;
 	}
 
+	@JSON
 	@Override
 	public String getRedirectUri() {
 		if (_redirectUri == null) {
@@ -420,6 +487,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_redirectUri = redirectUri;
 	}
 
+	@JSON
 	@Override
 	public Boolean getClientConfidential() {
 		return _clientConfidential;
@@ -430,6 +498,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_clientConfidential = clientConfidential;
 	}
 
+	@JSON
 	@Override
 	public String getDescription() {
 		if (_description == null) {
@@ -445,6 +514,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_description = description;
 	}
 
+	@JSON
 	@Override
 	public String getName() {
 		if (_name == null) {
@@ -460,6 +530,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_name = name;
 	}
 
+	@JSON
 	@Override
 	public String getWebUrl() {
 		if (_webUrl == null) {
@@ -475,6 +546,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_webUrl = webUrl;
 	}
 
+	@JSON
 	@Override
 	public String getScopes() {
 		if (_scopes == null) {
