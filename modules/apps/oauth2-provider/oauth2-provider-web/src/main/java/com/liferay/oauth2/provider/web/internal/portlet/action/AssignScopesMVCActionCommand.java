@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.web.internal.portlet.action;
 
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -59,14 +60,7 @@ public class AssignScopesMVCActionCommand implements MVCActionCommand {
 			actionRequest, "oAuth2ApplicationId");
 
 		try {
-			OAuth2Application oAuth2Application =
-				_oAuth2ApplicationLocalService.getOAuth2Application(
-					oAuth2ApplicationId);
-
-			oAuth2Application.setScopesList(scopes);
-
-			_oAuth2ApplicationLocalService.updateOAuth2Application(
-				oAuth2Application);
+			_oAuth2ApplicationService.updateScopes(oAuth2ApplicationId, scopes);
 		}
 		catch (PortalException e) {
 			if (_log.isDebugEnabled()) {
@@ -79,9 +73,11 @@ public class AssignScopesMVCActionCommand implements MVCActionCommand {
 		return true;
 	}
 
-	@Reference
-	OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 
-	private Log _log = LogFactoryUtil.getLog(AssignScopesMVCActionCommand.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssignScopesMVCActionCommand.class);
+
+	@Reference
+	private OAuth2ApplicationService _oAuth2ApplicationService;
 
 }

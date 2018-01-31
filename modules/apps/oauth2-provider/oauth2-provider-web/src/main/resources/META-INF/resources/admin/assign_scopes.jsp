@@ -22,7 +22,7 @@ long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", -1)
 OAuth2Application oAuth2Application = null;
 
 if (oAuth2ApplicationId > -1) {
-	oAuth2Application = OAuth2ApplicationLocalServiceUtil.getOAuth2Application(oAuth2ApplicationId);
+	oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
 }
 
 portletDisplay.setShowBackIcon(true);

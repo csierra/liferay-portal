@@ -15,37 +15,21 @@
 package com.liferay.oauth2.provider.web;
 
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
-import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceActionMapping;
-import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
 
-import com.liferay.portal.kernel.util.WebKeys;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Stian Sigvartsen
@@ -98,13 +82,13 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				
 		try {
 			if (oAuth2ApplicationId <= 0) {
-				_oAuth2ApplicationLocalService.addOAuth2Application(
+				_oAuth2ApplicationService.addOAuth2Application(
 					userId, name, description, webURL, clientConfidential,
 					oAuth2ClientId, oAuth2ClientSecret, oAuth2RedirectURI, 
 					serviceContext);
 			}
 			else {
-				_oAuth2ApplicationLocalService.updateOAuth2Application(
+				_oAuth2ApplicationService.updateOAuth2Application(
 					userId, oAuth2ApplicationId, name, description, webURL, 
 					clientConfidential, oAuth2ClientId, oAuth2ClientSecret, 
 					oAuth2RedirectURI, serviceContext);
@@ -120,13 +104,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		}
 	}
 
-	@Reference(unbind = "-")
-	protected void setOAuth2ApplicationService(
-		OAuth2ApplicationLocalService oAuth2ApplicationLocalService) {
-
-		_oAuth2ApplicationLocalService = oAuth2ApplicationLocalService;
-	}
-
-	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
+	@Reference
+	private OAuth2ApplicationService _oAuth2ApplicationService;
 
 }

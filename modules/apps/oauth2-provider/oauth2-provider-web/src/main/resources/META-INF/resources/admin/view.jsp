@@ -25,9 +25,9 @@
 <div class="closed container-fluid-1280">
 
 	<liferay-ui:search-container
-	    total="<%= OAuth2ApplicationLocalServiceUtil.getOAuth2ApplicationsCount() %>">
+	    total="<%= OAuth2ApplicationServiceUtil.getOAuth2ApplicationsCount() %>">
 	    <liferay-ui:search-container-results
-	        results="<%= OAuth2ApplicationLocalServiceUtil.getOAuth2Applications( 
+	        results="<%= OAuth2ApplicationServiceUtil.getOAuth2Applications(
 	            searchContainer.getStart(), searchContainer.getEnd()) %>" />
 	
 	    <liferay-ui:search-container-row
