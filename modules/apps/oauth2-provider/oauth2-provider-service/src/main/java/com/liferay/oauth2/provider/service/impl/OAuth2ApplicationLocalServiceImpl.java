@@ -19,9 +19,11 @@ import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationLocalServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * The implementation of the o auth2 application local service.
@@ -84,17 +86,19 @@ public class OAuth2ApplicationLocalServiceImpl
 			OAuth2Application.class.getName(),
 			oAuth2Application.getOAuth2ApplicationId(), false, false, false);
 
-		oAuth2ApplicationPersistence.update(oAuth2Application);
-
-		return oAuth2Application;
+		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 	
-	public OAuth2Application fetchOAuth2Application(long companyId, String clientId) {
+	public OAuth2Application fetchOAuth2Application(
+		long companyId, String clientId) {
+
 		return oAuth2ApplicationPersistence.fetchByC_CI(companyId, clientId);
 	}
 
-	public OAuth2Application getOAuth2Application(long companyId, String clientId) 
-			throws NoSuchOAuth2ApplicationException {
+	public OAuth2Application getOAuth2Application(
+			long companyId, String clientId)
+		throws NoSuchOAuth2ApplicationException {
+
 		return oAuth2ApplicationPersistence.findByC_CI(companyId, clientId);
 	}
 
@@ -119,9 +123,22 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setRedirectUri(oAuth2RedirectURI);
 		oAuth2Application.setModifiedDate(now);
 
-		oAuth2ApplicationPersistence.update(oAuth2Application);
+		return oAuth2ApplicationPersistence.update(oAuth2Application);
+	}
 
-		return oAuth2Application;
+	public OAuth2Application updateScopes(
+			long oAuth2ApplicationId, List<String> scopes)
+		throws NoSuchOAuth2ApplicationException {
+
+		OAuth2Application oAuth2Application =
+			oAuth2ApplicationPersistence.findByPrimaryKey(oAuth2ApplicationId);
+
+		Date now = new Date();
+
+		oAuth2Application.setScopesList(scopes);
+		oAuth2Application.setModifiedDate(now);
+
+		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 
 }
