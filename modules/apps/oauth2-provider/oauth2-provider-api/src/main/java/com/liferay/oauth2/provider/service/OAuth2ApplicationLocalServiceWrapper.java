@@ -316,6 +316,14 @@ public class OAuth2ApplicationLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Application updateScopes(
+		long oAuth2ApplicationId, java.util.List<java.lang.String> scopes)
+		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException {
+		return _oAuth2ApplicationLocalService.updateScopes(oAuth2ApplicationId,
+			scopes);
+	}
+
+	@Override
 	public OAuth2ApplicationLocalService getWrappedService() {
 		return _oAuth2ApplicationLocalService;
 	}

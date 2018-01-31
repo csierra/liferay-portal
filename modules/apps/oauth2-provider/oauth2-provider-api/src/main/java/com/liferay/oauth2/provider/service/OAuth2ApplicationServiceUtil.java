@@ -41,6 +41,37 @@ public class OAuth2ApplicationServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2ApplicationServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
+		long userId, java.lang.String name, java.lang.String description,
+		java.lang.String webURL, boolean oAuth2ClientConfidential,
+		java.lang.String oAuth2ClientId, java.lang.String oAuth2ClientSecret,
+		java.lang.String oAuth2RedirectURI,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addOAuth2Application(userId, name, description, webURL,
+			oAuth2ClientConfidential, oAuth2ClientId, oAuth2ClientSecret,
+			oAuth2RedirectURI, serviceContext);
+	}
+
+	public static com.liferay.oauth2.provider.model.OAuth2Application fetchOAuth2Application(
+		long companyId, java.lang.String clientId)
+		throws com.liferay.portal.kernel.security.auth.PrincipalException {
+		return getService().fetchOAuth2Application(companyId, clientId);
+	}
+
+	public static com.liferay.oauth2.provider.model.OAuth2Application getOAuth2Application(
+		long oAuth2ApplicationId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getOAuth2Application(oAuth2ApplicationId);
+	}
+
+	public static com.liferay.oauth2.provider.model.OAuth2Application getOAuth2Application(
+		long companyId, java.lang.String clientId)
+		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException,
+			com.liferay.portal.kernel.security.auth.PrincipalException {
+		return getService().getOAuth2Application(companyId, clientId);
+	}
 
 	/**
 	* Returns the OSGi service identifier.
@@ -49,6 +80,26 @@ public class OAuth2ApplicationServiceUtil {
 	*/
 	public static java.lang.String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
+	}
+
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
+		long userId, long oAuth2ApplicationId, java.lang.String name,
+		java.lang.String description, java.lang.String webURL,
+		boolean oAuth2ClientConfidential, java.lang.String oAuth2ClientId,
+		java.lang.String oAuth2ClientSecret,
+		java.lang.String oAuth2RedirectURI,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateOAuth2Application(userId, oAuth2ApplicationId, name,
+			description, webURL, oAuth2ClientConfidential, oAuth2ClientId,
+			oAuth2ClientSecret, oAuth2RedirectURI, serviceContext);
+	}
+
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopes(
+		long oAuth2ApplicationId, java.util.List<java.lang.String> scopes)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().updateScopes(oAuth2ApplicationId, scopes);
 	}
 
 	public static OAuth2ApplicationService getService() {

@@ -295,6 +295,12 @@ public class OAuth2ApplicationLocalServiceUtil {
 		return getService().updateOAuth2Application(oAuth2Application);
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopes(
+		long oAuth2ApplicationId, java.util.List<java.lang.String> scopes)
+		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException {
+		return getService().updateScopes(oAuth2ApplicationId, scopes);
+	}
+
 	public static OAuth2ApplicationLocalService getService() {
 		return _serviceTracker.getService();
 	}
