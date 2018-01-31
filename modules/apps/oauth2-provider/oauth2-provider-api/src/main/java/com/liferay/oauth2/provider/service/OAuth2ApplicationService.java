@@ -16,14 +16,22 @@ package com.liferay.oauth2.provider.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
+import com.liferay.oauth2.provider.model.OAuth2Application;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.BaseService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+
+import java.util.List;
 
 /**
  * Provides the remote service interface for OAuth2Application. Methods of this
@@ -49,6 +57,25 @@ public interface OAuth2ApplicationService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2ApplicationServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public OAuth2Application addOAuth2Application(long userId,
+		java.lang.String name, java.lang.String description,
+		java.lang.String webURL, boolean oAuth2ClientConfidential,
+		java.lang.String oAuth2ClientId, java.lang.String oAuth2ClientSecret,
+		java.lang.String oAuth2RedirectURI, ServiceContext serviceContext)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public OAuth2Application fetchOAuth2Application(long companyId,
+		java.lang.String clientId) throws PrincipalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public OAuth2Application getOAuth2Application(long oAuth2ApplicationId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public OAuth2Application getOAuth2Application(long companyId,
+		java.lang.String clientId)
+		throws NoSuchOAuth2ApplicationException, PrincipalException;
 
 	/**
 	* Returns the OSGi service identifier.
@@ -56,4 +83,15 @@ public interface OAuth2ApplicationService extends BaseService {
 	* @return the OSGi service identifier
 	*/
 	public java.lang.String getOSGiServiceIdentifier();
+
+	public OAuth2Application updateOAuth2Application(long userId,
+		long oAuth2ApplicationId, java.lang.String name,
+		java.lang.String description, java.lang.String webURL,
+		boolean oAuth2ClientConfidential, java.lang.String oAuth2ClientId,
+		java.lang.String oAuth2ClientSecret,
+		java.lang.String oAuth2RedirectURI, ServiceContext serviceContext)
+		throws PortalException;
+
+	public OAuth2Application updateScopes(long oAuth2ApplicationId,
+		List<java.lang.String> scopes) throws PortalException;
 }

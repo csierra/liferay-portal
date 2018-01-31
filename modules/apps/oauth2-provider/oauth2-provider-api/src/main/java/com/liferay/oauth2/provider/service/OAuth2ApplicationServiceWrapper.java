@@ -33,6 +33,43 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 		_oAuth2ApplicationService = oAuth2ApplicationService;
 	}
 
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
+		long userId, java.lang.String name, java.lang.String description,
+		java.lang.String webURL, boolean oAuth2ClientConfidential,
+		java.lang.String oAuth2ClientId, java.lang.String oAuth2ClientSecret,
+		java.lang.String oAuth2RedirectURI,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2ApplicationService.addOAuth2Application(userId, name,
+			description, webURL, oAuth2ClientConfidential, oAuth2ClientId,
+			oAuth2ClientSecret, oAuth2RedirectURI, serviceContext);
+	}
+
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Application fetchOAuth2Application(
+		long companyId, java.lang.String clientId)
+		throws com.liferay.portal.kernel.security.auth.PrincipalException {
+		return _oAuth2ApplicationService.fetchOAuth2Application(companyId,
+			clientId);
+	}
+
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Application getOAuth2Application(
+		long oAuth2ApplicationId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2ApplicationService.getOAuth2Application(oAuth2ApplicationId);
+	}
+
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Application getOAuth2Application(
+		long companyId, java.lang.String clientId)
+		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException,
+			com.liferay.portal.kernel.security.auth.PrincipalException {
+		return _oAuth2ApplicationService.getOAuth2Application(companyId,
+			clientId);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -41,6 +78,29 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 	@Override
 	public java.lang.String getOSGiServiceIdentifier() {
 		return _oAuth2ApplicationService.getOSGiServiceIdentifier();
+	}
+
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
+		long userId, long oAuth2ApplicationId, java.lang.String name,
+		java.lang.String description, java.lang.String webURL,
+		boolean oAuth2ClientConfidential, java.lang.String oAuth2ClientId,
+		java.lang.String oAuth2ClientSecret,
+		java.lang.String oAuth2RedirectURI,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2ApplicationService.updateOAuth2Application(userId,
+			oAuth2ApplicationId, name, description, webURL,
+			oAuth2ClientConfidential, oAuth2ClientId, oAuth2ClientSecret,
+			oAuth2RedirectURI, serviceContext);
+	}
+
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Application updateScopes(
+		long oAuth2ApplicationId, java.util.List<java.lang.String> scopes)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2ApplicationService.updateScopes(oAuth2ApplicationId,
+			scopes);
 	}
 
 	@Override

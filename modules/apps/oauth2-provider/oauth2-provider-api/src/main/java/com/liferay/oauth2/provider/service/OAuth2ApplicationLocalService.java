@@ -259,4 +259,7 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public OAuth2Application updateOAuth2Application(
 		OAuth2Application oAuth2Application);
+
+	public OAuth2Application updateScopes(long oAuth2ApplicationId,
+		List<java.lang.String> scopes) throws NoSuchOAuth2ApplicationException;
 }
