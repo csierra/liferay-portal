@@ -455,7 +455,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		return GetterUtil.getString(_originalClientId);
 	}
 
-	@JSON
+	@JSON(include = false)
 	@Override
 	public String getClientSecret() {
 		if (_clientSecret == null) {
