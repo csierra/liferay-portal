@@ -75,7 +75,14 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setClientSecret(oAuth2ClientSecret);
 		oAuth2Application.setRedirectUri(oAuth2RedirectURI);
 		oAuth2Application.setCreateDate(now);
-		oAuth2Application.setModifiedDate(now);		
+		oAuth2Application.setModifiedDate(now);
+
+		// Resources
+
+		resourceLocalService.addResources(
+			oAuth2Application.getCompanyId(), 0, oAuth2Application.getUserId(),
+			OAuth2Application.class.getName(),
+			oAuth2Application.getOAuth2ApplicationId(), false, false, false);
 
 		oAuth2ApplicationPersistence.update(oAuth2Application);
 
