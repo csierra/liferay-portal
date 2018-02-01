@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
@@ -109,6 +110,20 @@ public class OAuth2ApplicationServiceImpl
 	}
 
 	@Override
+	public List<OAuth2Application> getOAuth2Applications(
+		long companyId, int start, int end,
+		OrderByComparator<OAuth2Application> orderByComparator) {
+
+		return oAuth2ApplicationPersistence.filterFindByC(
+			companyId, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getOAuth2ApplicationsCount(long companyId) {
+		return oAuth2ApplicationPersistence.filterCountByC(companyId);
+	}
+
+	@Override
 	public OAuth2Application updateOAuth2Application(
 			long userId, long oAuth2ApplicationId, String name,
 			String description, String webURL, boolean oAuth2ClientConfidential,
@@ -178,8 +193,5 @@ public class OAuth2ApplicationServiceImpl
 				oAuth2Application.getOAuth2ApplicationId(), action);
 		}
 	}
-
-	@BeanReference(type = OAuth2ApplicationLocalService.class)
-	protected OAuth2ApplicationLocalService oAuth2ApplicationLocalService;
 
 }
