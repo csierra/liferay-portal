@@ -77,30 +77,23 @@ public class Test extends Application {
 	public String scopes() {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
-		try {
-			Company company = _companyLocalService.getCompany(companyId);
+		Collection<LiferayOAuth2Scope> scopes =
+			_scopeFinderLocator.listScopes(companyId);
 
-			Collection<LiferayOAuth2Scope> scopes =
-				_scopeFinderLocator.listScopes(company);
+		Gson gson = new GsonBuilder()
+			.registerTypeAdapter(
+				Bundle.class,
+				(JsonSerializer<Bundle>)
+					(src, typeOfSrc, context) -> {
 
-			Gson gson = new GsonBuilder()
-				.registerTypeAdapter(
-					Bundle.class,
-					(JsonSerializer<Bundle>)
-						(src, typeOfSrc, context) -> {
+						JsonObject json = new JsonObject();
+						json.addProperty("bundleName", src.getSymbolicName());
+						json.addProperty("bundleVersion", src.getVersion().toString());
+						return json;
+					})
+			.create();
 
-							JsonObject json = new JsonObject();
-							json.addProperty("bundleName", src.getSymbolicName());
-							json.addProperty("bundleVersion", src.getVersion().toString());
-							return json;
-						})
-				.create();
-
-			return gson.toJson(scopes);
-		}
-		catch (PortalException e) {
-			return new GsonBuilder().create().toJson(e);
-		}
+		return gson.toJson(scopes);
 	}
 
 	@Reference

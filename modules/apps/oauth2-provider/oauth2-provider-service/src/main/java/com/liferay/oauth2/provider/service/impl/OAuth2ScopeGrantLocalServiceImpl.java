@@ -76,7 +76,7 @@ public class OAuth2ScopeGrantLocalServiceImpl
 				new OAuth2ScopeGrantPK(
 					scope.getApplicationName(), bundle.getSymbolicName(),
 					version.toString(), oAuth2Token.getCompanyId(),
-					scope.getScope(), tokenString));
+					scope.getInternalScope(), tokenString));
 
 			oAuth2ScopeGrants.add(updateOAuth2ScopeGrant(oAuth2ScopeGrant));
 		}

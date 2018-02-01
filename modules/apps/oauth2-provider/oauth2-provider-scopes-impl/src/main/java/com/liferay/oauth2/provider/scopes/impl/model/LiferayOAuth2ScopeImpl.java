@@ -23,11 +23,13 @@ public class LiferayOAuth2ScopeImpl implements
 	LiferayOAuth2Scope {
 
 	public LiferayOAuth2ScopeImpl(
-		String applicationName, Bundle bundle, String scope) {
+		String applicationName, Bundle bundle, String scope,
+		String internalScope) {
 
 		_applicationName = applicationName;
 		_bundle = bundle;
 		_scope = scope;
+		_internalScope = internalScope;
 	}
 
 	@Override
@@ -46,6 +48,11 @@ public class LiferayOAuth2ScopeImpl implements
 	}
 
 	@Override
+	public String getInternalScope() {
+		return _internalScope;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
@@ -54,18 +61,21 @@ public class LiferayOAuth2ScopeImpl implements
 			return false;
 		}
 		LiferayOAuth2ScopeImpl that = (LiferayOAuth2ScopeImpl) o;
+
 		return Objects.equals(_applicationName, that._applicationName) &&
 			   Objects.equals(_bundle, that._bundle) &&
-			   Objects.equals(_scope, that._scope);
+			   Objects.equals(_scope, that._scope) &&
+			   Objects.equals(_internalScope, that._internalScope);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(_applicationName, _bundle, _scope);
+		return Objects.hash(_applicationName, _bundle, _scope, _internalScope);
 	}
 
 	private final String _applicationName;
 	private final Bundle _bundle;
 	private final String _scope;
+	private final String _internalScope;
 
 }

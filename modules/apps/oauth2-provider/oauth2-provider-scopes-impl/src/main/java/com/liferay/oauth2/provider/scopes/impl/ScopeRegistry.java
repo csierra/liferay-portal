@@ -17,6 +17,8 @@ package com.liferay.oauth2.provider.scopes.impl;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.impl.model.LiferayOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
@@ -27,11 +29,14 @@ import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.portal.kernel.model.Company;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
@@ -91,7 +96,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 				Bundle bundle = serviceReference.getBundle();
 
 				grants.add(
-					new LiferayOAuth2ScopeImpl(name, bundle, grantedScope));
+					new LiferayOAuth2ScopeImpl(
+						name, bundle, scope, grantedScope));
 			}
 		}
 
@@ -104,9 +110,10 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		_scopedScopeMatcherFactories;
 	private ScopedServiceTrackerMap<ScopeMapper>
 		_scopedScopeMapper;
+	private ScopedServiceTrackerMap<ScopeDescriptor> _scopedScopeDescriptors;
 
 	@Override
-	public Collection<LiferayOAuth2Scope> listScopes(Company company) {
+	public Collection<LiferayOAuth2Scope> listScopes(long companyId) {
 		Collection<LiferayOAuth2Scope> scopes = new HashSet<>();
 
 		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
@@ -123,8 +130,6 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			Collection<String> availableScopes = scopeFinder.findScopes(
 				__ -> true);
 
-			long companyId = company.getCompanyId();
-
 			PrefixHandlerMapper prefixHandlerMapper =
 				_scopedPrefixHandlerMappers.getService(companyId, name);
 
@@ -137,16 +142,57 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			for (String availableScope : availableScopes) {
 				Bundle bundle = serviceReference.getBundle();
 
-				availableScope = prefixHandler.addPrefix(
+				String scope = prefixHandler.addPrefix(
 					scopeMapper.map(availableScope));
 
 				scopes.add(
-					new LiferayOAuth2ScopeImpl(name, bundle, availableScope));
+					new LiferayOAuth2ScopeImpl(
+						name, bundle, scope, availableScope));
 			}
 		}
 
 		return scopes;
 	}
+
+/*
+	@Override
+	public Map<String, Set<String>> describeScopes(
+		long companyId, Locale locale, String ... scopes) {
+
+		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes = locateScopes(
+			companyId, scopes);
+
+		Map<String, Set<String>> result = new HashMap<>();
+
+		for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
+			ScopeDescriptor scopeDescriptor =
+				_scopedScopeDescriptors.getService(
+					companyId, liferayOAuth2Scope.getApplicationName());
+
+			Map<String, Set<String>> scopesDescription =
+				scopeDescriptor.describe(Arrays.asList(scopes), locale);
+
+			for (Map.Entry<String, Set<String>> entry :
+				scopesDescription.entrySet()) {
+
+				result.computeIfPresent(
+					entry.getKey(),
+					(__, set) -> {
+						Set<String> strings = new HashSet<>(set);
+
+						strings.addAll(entry.getValue());
+
+						return strings;
+					});
+
+
+				result.putIfAbsent(entry.getKey(), entry.getValue());
+			}
+		}
+
+		return result;
+	}
+*/
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {

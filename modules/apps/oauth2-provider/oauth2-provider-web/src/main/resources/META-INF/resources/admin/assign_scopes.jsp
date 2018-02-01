@@ -44,22 +44,30 @@ List<String> assignedScopes = oAuth2Application.getScopesList();
 			<aui:input type="hidden" name="oAuth2ApplicationId" value='<%= oAuth2ApplicationId %>' />
 
 			<%
-				for (Map.Entry<String, List<LiferayOAuth2Scope>> applicationScopes : scopes.entrySet()) {
-					String applicationName = applicationScopes.getKey();
-
+				for (Map.Entry<String, List<LiferayOAuth2Scope>> aliasedScopes : scopes.entrySet()) {
+					String alias = aliasedScopes.getKey();
 			%>
-			<aui:fieldset label="<%= HtmlUtil.escape(applicationName) %>" localizeLabel="false">
-				<%
-					for (LiferayOAuth2Scope scope : applicationScopes.getValue()) {
-				%>
-					<div>
-						<aui:input checked="<%= assignedScopes.contains(scope.getScope()) %>" label="<%= HtmlUtil.escape(scope.getScope()) %>" localizeLabel="false" name="<%= "scope_" + scope.getScope() %>" type="checkbox" />
-					</div>
-				<%
-					}
-				%>
-			</aui:fieldset>
+				<div>
+					<aui:input checked="<%= assignedScopes.contains(alias) %>" label="<%= HtmlUtil.escape(alias) %>" localizeLabel="false" name="<%= "scope_" + alias %>" type="checkbox" />
+				</div>
 			<%
+					List<LiferayOAuth2Scope> value = aliasedScopes.getValue();
+					if (value.size() > 1) {
+						%>
+						<div>
+							<ul>
+								<%
+								for (LiferayOAuth2Scope internalScope : value) {
+									%>
+										<li><%=internalScope.getApplicationName()%> -> <%=internalScope.getInternalScope()%></li>
+									<%
+								}
+								%>
+							</ul>
+						</div>
+						<%
+					}
+
 				}
 			%>
 		</aui:fieldset-group>

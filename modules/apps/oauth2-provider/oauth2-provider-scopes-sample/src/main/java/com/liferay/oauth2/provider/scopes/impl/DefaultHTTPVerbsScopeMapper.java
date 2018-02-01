@@ -12,16 +12,13 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.sample.oauth;
+package com.liferay.oauth2.provider.scopes.impl;
 
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
 import org.osgi.service.component.annotations.Component;
 
-@Component(
-	immediate = true,
-	property = "osgi.jaxrs.name=com.liferay.oauth2.provider.sample.oauth.Test"
-)
-public class SampleScopeMapper implements ScopeMapper {
+@Component(immediate = true)
+public class DefaultHTTPVerbsScopeMapper implements ScopeMapper {
 
 	@Override
 	public String map(String scope) {

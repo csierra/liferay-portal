@@ -3,6 +3,8 @@ package com.liferay.oauth2.provider.scopes.spi;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class is the entry point to the OAuth2 Scopes framework. Applications
@@ -65,24 +67,6 @@ public interface ScopeFinder {
 	 */
 	public default ScopeMatcherFactory getDefaultScopeMatcherFactory() {
 		return ScopeMatcherFactory.STRICT;
-	}
-
-	/**
-	 * This method allows to describe a particular set of scopes for a given
-	 * locale. This gives an opportunity to collapse global description that
-	 * would be redundant. As an example, if a scope <i>EVERYTHING</i> is
-	 * granted, it might be redundant to describe that the application is
-	 * requesting to do everything, as well as read or write, it is already
-	 * implicit.
-	 *
-	 * @param scopes the set of scopes to be described.
-	 * @param locale the locale requested for the description
-	 * @return a description for the set of scopes in the requested locale.
-	 */
-	public default String describe(
-		Collection<String> scopes, Locale locale) {
-
-		return String.join(", ", scopes);
 	}
 
 }

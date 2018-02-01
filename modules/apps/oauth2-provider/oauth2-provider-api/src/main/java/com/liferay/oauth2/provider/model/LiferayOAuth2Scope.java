@@ -13,4 +13,7 @@ public interface LiferayOAuth2Scope {
 	public String getApplicationName();
 
 	public String getScope();
+
+	public String getInternalScope();
+
 }

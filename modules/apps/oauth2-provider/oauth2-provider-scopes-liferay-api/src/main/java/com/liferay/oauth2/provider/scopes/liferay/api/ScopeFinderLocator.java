@@ -4,6 +4,9 @@ import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.portal.kernel.model.Company;
 
 import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This interface allows to access the ScopeFinders with <i>per-company</i>
@@ -30,6 +33,9 @@ public interface ScopeFinderLocator {
 	 * company.
 	 */
 	Collection<LiferayOAuth2Scope> listScopes(
-		Company company);
+		long companyId);
+
+	/*Map<String, Set<String>> describeScopes(
+		long companyId, Locale locale, String ... scopes);*/
 
 }

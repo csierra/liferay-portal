@@ -15,7 +15,7 @@
 package com.liferay.oauth2.provider.scopes.impl.jaxrs;
 
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
-import com.liferay.oauth2.provider.scopes.impl.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scopes.spi.RequestScopeChecker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;

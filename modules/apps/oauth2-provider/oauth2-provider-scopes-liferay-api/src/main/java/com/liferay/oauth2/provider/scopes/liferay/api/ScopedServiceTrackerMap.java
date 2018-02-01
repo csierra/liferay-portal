@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl;
+package com.liferay.oauth2.provider.scopes.liferay.api;
 
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
@@ -35,18 +35,18 @@ public class ScopedServiceTrackerMap<T> {
 
 		_servicesByCompany = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, clazz,
-			StringBundler.concat("(&(companyId=*)(!(", property, "=*)))"),
+			"(&(companyId=*)(!(" + property + "=*)))",
 			new PropertyServiceReferenceMapper<>("companyId"));
 
 		_servicesByKey = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, clazz,
-			StringBundler.concat("(&(", property, "=*)(!(companyId=*)))"),
+			"(&(" + property + "=*)(!(companyId=*)))",
 			new PropertyServiceReferenceMapper<>(property));
 
 		_servicesByCompanyAndKey =
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, clazz,
-				StringBundler.concat("(&(companyId=*)(", property, "=*))"),
+				"(&(companyId=*)(" + property + "=*))",
 				(serviceReference, emitter) -> {
 					ServiceReferenceMapper<String, T>
 						companyMapper = new PropertyServiceReferenceMapper<>(
@@ -60,14 +60,14 @@ public class ScopedServiceTrackerMap<T> {
 						key1 -> nameMapper.map(
 							serviceReference,
 							key2 -> emitter.emit(
-								StringBundler.concat(key1, "-", key2))));
+								String.join("-", key1, key2))));
 				});
 	}
 
 	public T getService(long companyId, String key) {
 		String companyIdString = Long.toString(companyId);
 		T service = _servicesByCompanyAndKey.getService(
-			StringBundler.concat(companyIdString, "-", key));
+			String.join("-", companyIdString, key));
 
 		if (service != null) {
 			return service;
