@@ -73,6 +73,18 @@ public class OAuth2ApplicationServiceUtil {
 		return getService().getOAuth2Application(companyId, clientId);
 	}
 
+	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Application> getOAuth2Applications(
+		long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Application> orderByComparator) {
+		return getService()
+				   .getOAuth2Applications(companyId, start, end,
+			orderByComparator);
+	}
+
+	public static int getOAuth2ApplicationsCount(long companyId) {
+		return getService().getOAuth2ApplicationsCount(companyId);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*

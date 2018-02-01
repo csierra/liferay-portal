@@ -70,6 +70,19 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 			clientId);
 	}
 
+	@Override
+	public java.util.List<com.liferay.oauth2.provider.model.OAuth2Application> getOAuth2Applications(
+		long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Application> orderByComparator) {
+		return _oAuth2ApplicationService.getOAuth2Applications(companyId,
+			start, end, orderByComparator);
+	}
+
+	@Override
+	public int getOAuth2ApplicationsCount(long companyId) {
+		return _oAuth2ApplicationService.getOAuth2ApplicationsCount(companyId);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
