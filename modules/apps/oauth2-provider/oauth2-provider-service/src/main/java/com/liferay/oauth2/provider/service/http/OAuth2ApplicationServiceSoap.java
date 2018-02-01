@@ -131,6 +131,38 @@ public class OAuth2ApplicationServiceSoap {
 		}
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap[] getOAuth2Applications(
+		long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Application> orderByComparator)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.oauth2.provider.model.OAuth2Application> returnValue =
+				OAuth2ApplicationServiceUtil.getOAuth2Applications(companyId,
+					start, end, orderByComparator);
+
+			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getOAuth2ApplicationsCount(long companyId)
+		throws RemoteException {
+		try {
+			int returnValue = OAuth2ApplicationServiceUtil.getOAuth2ApplicationsCount(companyId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap updateOAuth2Application(
 		long userId, long oAuth2ApplicationId, java.lang.String name,
 		java.lang.String description, java.lang.String webURL,

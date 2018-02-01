@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
@@ -76,6 +77,14 @@ public interface OAuth2ApplicationService extends BaseService {
 	public OAuth2Application getOAuth2Application(long companyId,
 		java.lang.String clientId)
 		throws NoSuchOAuth2ApplicationException, PrincipalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<OAuth2Application> getOAuth2Applications(long companyId,
+		int start, int end,
+		OrderByComparator<OAuth2Application> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getOAuth2ApplicationsCount(long companyId);
 
 	/**
 	* Returns the OSGi service identifier.
