@@ -14,9 +14,9 @@
 
 package com.liferay.oauth2.provider.service.impl;
 
-import com.liferay.oauth2.provider.internal.constants.OAuth2ProviderActionKeys;
+import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
+import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
-import com.liferay.oauth2.provider.internal.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationServiceBaseImpl;
