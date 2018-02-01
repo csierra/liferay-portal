@@ -32,7 +32,8 @@
 			<finder-column name="companyId" />
 			<finder-column name="clientId" />
 		</finder>
-		
+
+		<reference entity="Resource" package-path="com.liferay.portal" />
 	</entity>
 	<entity name="OAuth2Token" local-service="true" remote-service="false">
 		<!-- PK fields -->
