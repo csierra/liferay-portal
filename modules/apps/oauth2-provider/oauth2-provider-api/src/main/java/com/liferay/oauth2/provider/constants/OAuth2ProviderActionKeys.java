@@ -12,13 +12,13 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.internal.constants;
+package com.liferay.oauth2.provider.constants;
 
 /**
  * @author Tomas Polesovsky
  */
-public class OAuth2ProviderConstants {
+public class OAuth2ProviderActionKeys {
 
-	public static String RESOURCE_NAME = "com.liferay.oauth2.provider";
+	public static String ACTION_ADD_APPLICATION = "ADD_APPLICATION";
 
 }
