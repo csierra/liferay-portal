@@ -25,10 +25,10 @@
 <div class="closed container-fluid-1280">
 
 	<liferay-ui:search-container
-	    total="<%= OAuth2ApplicationServiceUtil.getOAuth2ApplicationsCount() %>">
+	    total="<%= OAuth2ApplicationServiceUtil.getOAuth2ApplicationsCount(themeDisplay.getCompanyId()) %>">
 	    <liferay-ui:search-container-results
 	        results="<%= OAuth2ApplicationServiceUtil.getOAuth2Applications(
-	            searchContainer.getStart(), searchContainer.getEnd()) %>" />
+	            themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>" />
 	
 	    <liferay-ui:search-container-row
 	        className="com.liferay.oauth2.provider.model.OAuth2Application" modelVar="oAuth2Application">

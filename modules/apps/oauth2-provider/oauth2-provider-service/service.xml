@@ -28,6 +28,10 @@
 		<column name="webUrl" type="String" />
 		<column name="scopes" type="String" />
 
+		<finder name="C" return-type="Collection">
+			<finder-column name="companyId" />
+		</finder>
+
 		<finder name="C_CI" return-type="OAuth2Application">
 			<finder-column name="companyId" />
 			<finder-column name="clientId" />
