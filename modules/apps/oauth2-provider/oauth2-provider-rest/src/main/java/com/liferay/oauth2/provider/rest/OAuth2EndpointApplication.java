@@ -52,6 +52,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -247,9 +248,18 @@ public class OAuth2EndpointApplication extends Application {
 		OAuth2EndpointApplication.class);
 	@Reference(
 		cardinality = ReferenceCardinality.AT_LEAST_ONE,
-		policyOption = ReferencePolicyOption.GREEDY
+		policyOption = ReferencePolicyOption.GREEDY,
+		unbind = "removeAccessTokenGrantHandler"
 	)
-	private List<AccessTokenGrantHandler> _accessTokenGrantHandlers;
+	public void addAccessTokenGrantHandler(AccessTokenGrantHandler accessTokenGrantHandler) {
+		_accessTokenGrantHandlers.add(accessTokenGrantHandler);
+	}
+	
+	public void removeAccessTokenGrantHandler(AccessTokenGrantHandler accessTokenGrantHandler) {
+		_accessTokenGrantHandlers.remove(accessTokenGrantHandler);
+	}
+	
+	private List<AccessTokenGrantHandler> _accessTokenGrantHandlers = new ArrayList<>();
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
