@@ -13,16 +13,24 @@
  * details.
  */
 --%>
-<%@ include file="init.jsp" %>
+<%@ include file="/admin/init.jsp" %>
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
-long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", -1);
+long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId");
+
 
 OAuth2Application oAuth2Application = null;
 
-if (oAuth2ApplicationId > -1) {
+try {
 	oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
+}
+catch (PrincipalException e) {
+	%>
+		<liferay-ui:error-principal />
+	<%
+
+	return;
 }
 
 portletDisplay.setShowBackIcon(true);

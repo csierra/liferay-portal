@@ -1,3 +1,4 @@
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -11,15 +12,11 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+--%>
+<%@ include file="/init.jsp" %>
+<%@ page import="com.liferay.oauth2.provider.service.OAuth2ApplicationLocalServiceUtil" %><%@
+page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext" %>
 
-package com.liferay.oauth2.provider.constants;
-
-/**
- * @author Tomas Polesovsky
- */
-public class OAuth2ProviderActionKeys {
-
-	public static String ACTION_ADD_APPLICATION = "ADD_APPLICATION";
-	public static String ACTION_AUTHORIZE = "AUTHORIZE";
-
-}
+<%
+OAuth2AuthorizePortletDisplayContext oAuth2AuthorizePortletDisplayContext = new OAuth2AuthorizePortletDisplayContext();
+%>

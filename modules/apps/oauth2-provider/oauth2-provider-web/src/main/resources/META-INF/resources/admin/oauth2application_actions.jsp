@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="init.jsp" %>
+<%@ include file="/admin/init.jsp" %>
 
 <%
 
@@ -32,33 +32,54 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 	message="<%= StringPool.BLANK %>"
 	showWhenSingleIcon="<%= true %>"
 >
-	<portlet:renderURL var="editURL">
-		<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
+	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oauth2application) %>">
+		<portlet:renderURL var="editURL">
+			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
 
-		<portlet:param name="mvcPath"
-			value="/admin/edit_oauth2application.jsp"
+			<portlet:param name="mvcPath"
+				value="/admin/edit_oauth2application.jsp"
+			/>
+
+			<portlet:param name="redirect"
+				value="<%= currentURL %>"
+			/>
+		</portlet:renderURL>
+
+		<liferay-ui:icon message="Edit"
+			url="<%= editURL.toString() %>"
 		/>
 
-		<portlet:param name="redirect"
-			value="<%= currentURL %>"
+		<portlet:renderURL var="assignScopesURL">
+			<portlet:param name="mvcRenderCommandName" value="/admin/assign_scopes" />
+			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+		</portlet:renderURL>
+
+		<liferay-ui:icon message="assign-scopes" url="<%= assignScopesURL.toString() %>" />
+	</c:if>
+
+	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasPermissionsPermission(oauth2application) %>">
+		<liferay-security:permissionsURL
+			modelResource="<%= OAuth2Application.class.getName() %>"
+			modelResourceDescription="<%= oauth2application.getName() %>"
+			resourcePrimKey="<%= oAuth2ApplicationId %>"
+			var="permissionsURL"
+			windowState="<%= LiferayWindowState.POP_UP.toString() %>"
 		/>
-	</portlet:renderURL>
 
-	<liferay-ui:icon message="Edit"
-		url="<%= editURL.toString() %>"
-	/>
+		<liferay-ui:icon
+			message="permissions"
+			method="get"
+			url="<%= permissionsURL %>"
+			useDialog="<%= true %>"
+		/>
+	</c:if>
 
-	<portlet:renderURL var="assignScopesURL">
-		<portlet:param name="mvcRenderCommandName" value="/admin/assign_scopes" />
-		<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
-		<portlet:param name="redirect" value="<%= currentURL %>" />
-	</portlet:renderURL>
+	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasDeletePermission(oauth2application) %>">
+		<portlet:actionURL name="deleteOAuth2Application" var="deleteURL">
+			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
+		</portlet:actionURL>
 
-	<liferay-ui:icon message="assign-scopes" url="<%= assignScopesURL.toString() %>" />
-
-	<portlet:actionURL name="deleteOAuth2Application" var="deleteURL">
-		<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
-	</portlet:actionURL>
-
-	<liferay-ui:icon-delete message="delete" url="<%= deleteURL.toString() %>" />
+		<liferay-ui:icon-delete message="delete" url="<%= deleteURL.toString() %>" />
+	</c:if>
 </liferay-ui:icon-menu>
