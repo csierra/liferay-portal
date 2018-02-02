@@ -34,7 +34,7 @@ public class DefaultScopeDescriptor implements ScopeDescriptor {
 	public String describe(String scope, Locale locale) {
 
 		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(locale);
+			_resourceBundleLoader.loadResourceBundle(locale.toString());
 
 		if (!resourceBundle.containsKey(scope)) {
 			return scope;
