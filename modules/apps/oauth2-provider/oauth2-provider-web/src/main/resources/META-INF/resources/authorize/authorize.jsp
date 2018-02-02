@@ -28,7 +28,7 @@ OAuth2Application oAuth2Application = OAuth2ApplicationLocalServiceUtil.fetchOAu
 	<c:when test="<%= oAuth2Application == null %>">
 		<liferay-ui:header title="authorize-oauth2-application" />
 	</c:when>
-	<c:when test="<%= !oAuth2AuthorizePortletDisplayContext.hasAuthorizeApplicationPermission(oAuth2Application) %>">
+	<c:when test="<%= !oAuth2AuthorizePortletDisplayContext.hasCreateTokenApplicationPermission(oAuth2Application) %>">
 		<liferay-ui:header title="you-dont-have-permissions-to-authorize-the-application" />
 	</c:when>
     <c:otherwise>

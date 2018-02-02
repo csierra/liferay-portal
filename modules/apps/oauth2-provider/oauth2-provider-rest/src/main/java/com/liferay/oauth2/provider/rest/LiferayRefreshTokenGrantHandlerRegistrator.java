@@ -119,7 +119,7 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
 			oAuth2Application.getOAuth2ApplicationId(),
 			oAuth2Application.getUserId(),
-			OAuth2ProviderActionKeys.ACTION_AUTHORIZE)) {
+			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
 
 			return true;
 		}
@@ -127,7 +127,7 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 		if (permissionChecker.hasPermission(
 			0, OAuth2Application.class.getName(),
 			oAuth2Application.getOAuth2ApplicationId(),
-			OAuth2ProviderActionKeys.ACTION_AUTHORIZE)) {
+			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
 
 			return true;
 		}
