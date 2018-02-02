@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@include file="init.jsp"%>
+<%@include file="/admin/init.jsp"%>
 
 <aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
 	<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
@@ -46,17 +46,18 @@
 	    <liferay-ui:search-iterator 
     			markupView="lexicon"
     			searchContainer="<%= searchContainer %>"/>
-		</liferay-ui:search-container>
+	</liferay-ui:search-container>
 
-    <portlet:renderURL var="addOAuth2ApplicationURL">
-        <portlet:param name="mvcPath"
-            value="/admin/edit_oauth2application.jsp" />
-        <portlet:param name="redirect" value="<%= currentURL %>" />
-    </portlet:renderURL>
-	
-	<liferay-frontend:add-menu>
-	    <liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request,
-	    "add-o-auth2-application") %>' url="<%= addOAuth2ApplicationURL.toString() %>" />
-	</liferay-frontend:add-menu>	
+
+	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasAddApplicationPermission() %>">
+		<portlet:renderURL var="addOAuth2ApplicationURL">
+			<portlet:param name="mvcPath" value="/admin/edit_oauth2application.jsp" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+		</portlet:renderURL>
+
+		<liferay-frontend:add-menu>
+			<liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request, "add-o-auth2-application") %>' url="<%= addOAuth2ApplicationURL.toString() %>" />
+		</liferay-frontend:add-menu>
+	</c:if>
 	
 </div>

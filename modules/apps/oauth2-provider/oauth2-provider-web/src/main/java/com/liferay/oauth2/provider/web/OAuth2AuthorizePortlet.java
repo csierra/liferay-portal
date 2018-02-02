@@ -28,8 +28,8 @@ import javax.portlet.Portlet;
 		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"javax.portlet.display-name=OAuth2 Authorize Portlet",
 		"javax.portlet.init-param.portlet-title-based-navigation=true",
-		"javax.portlet.init-param.template-path=/",
-		"javax.portlet.init-param.view-template=/authorize.jsp",
+		"javax.portlet.init-param.template-path=/authorize/",
+		"javax.portlet.init-param.view-template=/authorize/authorize.jsp",
 		"javax.portlet.name=com.liferay.oauth2.provider.web.OAuth2AuthorizePortlet",
 		"javax.portlet.resource-bundle=content.Language"
 	},
