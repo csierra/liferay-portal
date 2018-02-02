@@ -40,6 +40,18 @@ public class LiferayResourceOwnerLoginHandler
 
 	@Override
 	public UserSubject createSubject(String login, String password) {
+		try {
+			User user = authenticateUser(login, password);
+
+			return new UserSubject(
+				user.getLogin(), Long.toString(user.getUserId()));
+		}
+		catch (PortalException e) {
+			return null;
+		}
+	}
+
+	public User authenticateUser(String login, String password) {
 		Long companyId = CompanyThreadLocal.getCompanyId();
 
 		Company company = _companyLocalService.fetchCompany(companyId);
@@ -90,13 +102,7 @@ public class LiferayResourceOwnerLoginHandler
 			return null;
 		}
 
-		try {
-			return new UserSubject(
-				user.getLogin(), Long.toString(user.getUserId()));
-		}
-		catch (PortalException e) {
-			return null;
-		}
+		return user;
 	}
 
 	@Reference

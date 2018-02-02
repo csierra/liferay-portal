@@ -14,18 +14,27 @@
 
 package com.liferay.oauth2.provider.rest;
 
+import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
+import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
-import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
+import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -49,21 +58,98 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 				_liferayOAuthDataProvider);
 
 			_serviceRegistration = bundleContext.registerService(
-				AccessTokenGrantHandler.class, refreshTokenGrantHandler,
+				AccessTokenGrantHandler.class,
+				new LiferayPermissionedAccessTokenGrantHandler(
+					refreshTokenGrantHandler,
+					this::hasCreateTokenPermission),
 				new Hashtable<>());
 		}
 	}
 
-	@Deactivate
-	protected void deactivate() {
+	protected boolean hasCreateTokenPermission(
+		Client client, MultivaluedMap<String, String> params) {
 
-		if (_serviceRegistration != null) {
-			_serviceRegistration.unregister();
+		String refreshTokenString = params.getFirst("refresh_token");
+
+		if (refreshTokenString == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("No refresh_token parameter was provided.");
+			}
+
+			return false;
 		}
+
+		RefreshToken refreshToken =
+			_liferayOAuthDataProvider.getRefreshToken(refreshTokenString);
+
+		if (refreshToken == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("No refresh token found for " + refreshTokenString);
+			}
+
+			return false;
+		}
+
+		OAuth2Application oAuth2Application =
+			_liferayOAuthDataProvider.resolveOAuth2Application(
+				refreshToken.getClient());
+
+		String subjectId = refreshToken.getSubject().getId();
+
+		long userId = Long.parseLong(subjectId);
+
+		PermissionChecker permissionChecker = null;
+
+		try {
+			User user = _userLocalService.getUserById(userId);
+
+			permissionChecker =
+				PermissionCheckerFactoryUtil.create(user);
+		}
+		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to create PermissionChecker for user " + userId);
+			}
+
+			return false;
+		}
+
+		if (permissionChecker.hasOwnerPermission(
+			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
+			oAuth2Application.getOAuth2ApplicationId(),
+			oAuth2Application.getUserId(),
+			OAuth2ProviderActionKeys.ACTION_AUTHORIZE)) {
+
+			return true;
+		}
+
+		if (permissionChecker.hasPermission(
+			0, OAuth2Application.class.getName(),
+			oAuth2Application.getOAuth2ApplicationId(),
+			OAuth2ProviderActionKeys.ACTION_AUTHORIZE)) {
+
+			return true;
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"User " + userId +
+					" doesn't have permission to create refresh token for " +
+						"client " + client.getClientId());
+		}
+
+		return false;
 	}
 
+	private static Log _log =
+		LogFactoryUtil.getLog(
+			LiferayClientCredentialsGrantHandlerRegistrator.class);
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

@@ -127,6 +127,14 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		return serverAuthorizationCodeGrant;
 	}
 
+	public  ServerAuthorizationCodeGrant getCodeGrant(String code) {
+		if (code == null) {
+			return null;
+		}
+
+		return _codeGrantsPortalCache.get(code);
+	}
+
 	@Override
 	public List<ServerAuthorizationCodeGrant> getCodeGrants(
 			Client c, UserSubject subject)

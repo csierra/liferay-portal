@@ -14,9 +14,17 @@
 
 package com.liferay.oauth2.provider.rest;
 
+import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
+import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.clientcred.ClientCredentialsGrantHandler;
-import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -26,6 +34,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -50,7 +59,10 @@ public class LiferayClientCredentialsGrantHandlerRegistrator {
 
 			_serviceRegistration = bundleContext.registerService(
 				AccessTokenGrantHandler.class,
-				clientCredentialsGrantHandler, new Hashtable<>());
+				new LiferayPermissionedAccessTokenGrantHandler(
+					clientCredentialsGrantHandler,
+					this::hasCreateTokenPermission),
+				new Hashtable<>());
 		}
 	}
 
@@ -61,8 +73,66 @@ public class LiferayClientCredentialsGrantHandlerRegistrator {
 		}
 	}
 
+	protected boolean hasCreateTokenPermission(
+		Client client, MultivaluedMap<String, String> params) {
+
+		OAuth2Application oAuth2Application =
+			_liferayOAuthDataProvider.resolveOAuth2Application(client);
+
+		long userId = oAuth2Application.getUserId();
+
+		PermissionChecker permissionChecker = null;
+
+		try {
+			User user = _userLocalService.getUserById(userId);
+
+			permissionChecker =
+				PermissionCheckerFactoryUtil.create(user);
+		}
+		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to create PermissionChecker for user " + userId);
+			}
+
+			return false;
+		}
+
+		if (permissionChecker.hasOwnerPermission(
+			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
+			oAuth2Application.getOAuth2ApplicationId(),
+			oAuth2Application.getUserId(),
+			OAuth2ProviderActionKeys.ACTION_AUTHORIZE)) {
+
+			return true;
+		}
+
+		if (permissionChecker.hasPermission(
+			0, OAuth2Application.class.getName(),
+			oAuth2Application.getOAuth2ApplicationId(),
+			OAuth2ProviderActionKeys.ACTION_AUTHORIZE)) {
+
+			return true;
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"User " + userId +
+					" doesn't have permission to create access token for " +
+						"client " + client.getClientId());
+		}
+
+		return false;
+	}
+
+	private static Log _log =
+		LogFactoryUtil.getLog(
+			LiferayClientCredentialsGrantHandlerRegistrator.class);
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
