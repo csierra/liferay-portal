@@ -26,11 +26,11 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
  */
 public class OAuth2AuthorizePortletDisplayContext {
 
-	public boolean hasAuthorizeApplicationPermission(
+	public boolean hasCreateTokenApplicationPermission(
 		OAuth2Application oAuth2Application) {
 
 		return hasPermission(oAuth2Application,
-			OAuth2ProviderActionKeys.ACTION_AUTHORIZE);
+			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN);
 	}
 
 	public boolean hasPermission(
