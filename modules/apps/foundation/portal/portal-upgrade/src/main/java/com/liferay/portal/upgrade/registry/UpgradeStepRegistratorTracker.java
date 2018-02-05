@@ -36,7 +36,6 @@ import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -50,50 +49,16 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 @Component(immediate = true)
 public class UpgradeStepRegistratorTracker {
 
-	/**
-	* @deprecated As of 2.8.0, replaced by {@link #register(BundleContext,
-	* String, Version, Version, Dictionary, UpgradeStep...)}
-	*/
-	@Deprecated
 	public static List<ServiceRegistration<UpgradeStep>> register(
 		BundleContext bundleContext, String bundleSymbolicName,
 		String fromSchemaVersionString, String toSchemaVersionString,
-		Dictionary<String, Object> properties, UpgradeStep... upgradeSteps) {
-
-		return register(
-			bundleContext, bundleSymbolicName,
-			Version.parseVersion(fromSchemaVersionString),
-			Version.parseVersion(toSchemaVersionString), properties,
-			upgradeSteps);
-	}
-
-	/**
-	* @deprecated As of 2.8.0, replaced by {@link #register(BundleContext,
-	* String, Version, Version, UpgradeStep...)}
-	*/
-	@Deprecated
-	public static List<ServiceRegistration<UpgradeStep>> register(
-		BundleContext bundleContext, String bundleSymbolicName,
-		String fromSchemaVersionString, String toSchemaVersionString,
-		UpgradeStep... upgradeSteps) {
-
-		return register(
-			bundleContext, bundleSymbolicName,
-			Version.parseVersion(fromSchemaVersionString),
-			Version.parseVersion(toSchemaVersionString),
-			new Hashtable<String, Object>(), upgradeSteps);
-	}
-
-	public static List<ServiceRegistration<UpgradeStep>> register(
-		BundleContext bundleContext, String bundleSymbolicName,
-		Version fromSchemaVersion, Version toSchemaVersion,
 		Dictionary<String, Object> properties, UpgradeStep... upgradeSteps) {
 
 		List<ServiceRegistration<UpgradeStep>> serviceRegistrations =
 			new ArrayList<>();
 
 		List<UpgradeInfo> upgradeInfos = createUpgradeInfos(
-			fromSchemaVersion.toString(), toSchemaVersion.toString(),
+			fromSchemaVersionString, toSchemaVersionString,
 			GetterUtil.getInteger(properties.get("build.number")),
 			upgradeSteps);
 
@@ -109,12 +74,13 @@ public class UpgradeStepRegistratorTracker {
 
 	public static List<ServiceRegistration<UpgradeStep>> register(
 		BundleContext bundleContext, String bundleSymbolicName,
-		Version fromSchemaVersion, Version toSchemaVersion,
+		String fromSchemaVersionString, String toSchemaVersionString,
 		UpgradeStep... upgradeSteps) {
 
 		return register(
-			bundleContext, bundleSymbolicName, fromSchemaVersion,
-			toSchemaVersion, new Hashtable<String, Object>(), upgradeSteps);
+			bundleContext, bundleSymbolicName, fromSchemaVersionString,
+			toSchemaVersionString, new Hashtable<String, Object>(),
+			upgradeSteps);
 	}
 
 	protected static List<UpgradeInfo> createUpgradeInfos(
@@ -287,17 +253,6 @@ public class UpgradeStepRegistratorTracker {
 				final String bundleSymbolicName, String fromSchemaVersionString,
 				String toSchemaVersionString, UpgradeStep... upgradeSteps) {
 
-				register(
-					bundleSymbolicName,
-					Version.parseVersion(fromSchemaVersionString),
-					Version.parseVersion(toSchemaVersionString), upgradeSteps);
-			}
-
-			@Override
-			public void register(
-				final String bundleSymbolicName, Version fromSchemaVersion,
-				Version toSchemaVersion, UpgradeStep... upgradeSteps) {
-
 				int buildNumber = 0;
 
 				try {
@@ -324,8 +279,8 @@ public class UpgradeStepRegistratorTracker {
 				}
 
 				List<UpgradeInfo> upgradeInfos = createUpgradeInfos(
-					fromSchemaVersion.toString(), toSchemaVersion.toString(),
-					buildNumber, upgradeSteps);
+					fromSchemaVersionString, toSchemaVersionString, buildNumber,
+					upgradeSteps);
 
 				for (UpgradeInfo upgradeInfo : upgradeInfos) {
 					ServiceRegistration<UpgradeStep> serviceRegistration =

@@ -16,8 +16,6 @@ package com.liferay.portal.upgrade.registry;
 
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 
-import org.osgi.framework.Version;
-
 /**
  * @author Carlos Sierra Andrés
  */
@@ -27,18 +25,9 @@ public interface UpgradeStepRegistrator {
 
 	public interface Registry {
 
-		/**
-		* @deprecated As of 2.8.0, replaced by {@link #register(String, Version,
-		* Version, UpgradeStep...)}
-		*/
-		@Deprecated
 		public void register(
 			String bundleSymbolicName, String fromSchemaVersionString,
 			String toSchemaVersionString, UpgradeStep... upgradeSteps);
-
-		public void register(
-			String bundleSymbolicName, Version fromSchemaVersion,
-			Version toSchemaVersion, UpgradeStep... upgradeSteps);
 
 	}
 
