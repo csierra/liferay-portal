@@ -43,15 +43,12 @@ public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
 
 		Bundle bundle = _bundleContext.getBundle(bundleId);
 
-		Version bundleVersion = bundle.getVersion();
-
 		Object applicationNameObject = propertyGetter.get("osgi.jaxrs.name");
 
 		String applicationName = applicationNameObject.toString();
 
 		PrefixHandler prefixHandler = _namespaceAdderFactory.create(
-			bundle.getSymbolicName(), bundleVersion.toString(),
-			applicationName);
+			bundle.getSymbolicName(), applicationName);
 
 		return (input) -> {
 			if (_excludedScopes.contains(input)) {
