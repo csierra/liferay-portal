@@ -57,7 +57,7 @@ OAuth2Application oAuth2Application = OAuth2ApplicationLocalServiceUtil.fetchOAu
 	    </div>
 
 	    <div class="closed container-fluid-1280">
-		    <aui:form action="<%= HtmlUtil.escapeHREF(replyTo) %>" method="GET" name="fm">
+		    <aui:form action="<%= replyTo %>" method="GET" name="fm">
 			    <aui:input name="client_id" type="hidden" useNamespace="false" value="<%= clientId %>" />
 			    <aui:input name="redirect_uri" type="hidden" useNamespace="false" value="<%= redirectUri %>" />
 			    <aui:input name="scope" type="hidden" useNamespace="false" value="<%= scope %>" />
