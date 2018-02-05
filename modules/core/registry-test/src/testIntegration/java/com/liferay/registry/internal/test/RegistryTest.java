@@ -240,7 +240,7 @@ public class RegistryTest {
 				InterfaceOne.class, interfaceMatchesFilter,
 				propertiesMatchesFilter);
 
-		String filterString = "(&(version>=2.0.0)(version<=2.0.9999))";
+		String filterString = "(&(version>=2.0)(!(version>=2.1)))";
 
 		InterfaceOne[] interfaceOnes = _registry.getServices(
 			InterfaceOne.class.getName(), filterString);
