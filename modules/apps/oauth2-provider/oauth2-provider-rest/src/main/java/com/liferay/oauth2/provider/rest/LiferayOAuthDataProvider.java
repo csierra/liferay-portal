@@ -52,12 +52,14 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -115,6 +117,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	@Override
 	public ServerAuthorizationCodeGrant removeCodeGrant(String code)
 		throws OAuthServiceException {
+
 		if (code == null) {
 			return null;
 		}
@@ -137,7 +140,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	@Override
 	public List<ServerAuthorizationCodeGrant> getCodeGrants(
-			Client c, UserSubject subject)
+			Client client, UserSubject subject)
 		throws OAuthServiceException {
 
 		List<String> keys = _codeGrantsPortalCache.getKeys();
@@ -149,7 +152,11 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			ServerAuthorizationCodeGrant serverAuthorizationCodeGrant =
 				_codeGrantsPortalCache.get(key);
 
-			if (c.equals(serverAuthorizationCodeGrant.getClient()) &&
+			if (serverAuthorizationCodeGrant == null) {
+				continue;
+			}
+
+			if (client.equals(serverAuthorizationCodeGrant.getClient()) &&
 				subject.equals(serverAuthorizationCodeGrant.getSubject())) {
 
 				authorizationCodeGrants.add(serverAuthorizationCodeGrant);
@@ -164,23 +171,20 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		OAuth2Token oAuth2Token = _oAuth2TokenLocalService.createOAuth2Token(
 			serverToken.getTokenKey());
 
-		OAuth2Application oAuth2Application = 
+		OAuth2Application oAuth2Application =
 			resolveOAuth2Application(serverToken.getClient());
 		
 		oAuth2Token.setOAuth2ApplicationId(
 			oAuth2Application.getOAuth2ApplicationId());
 		
 		oAuth2Token.setOAuth2RefreshTokenId(serverToken.getRefreshToken());
-		oAuth2Token.setCreateDate(new Date(serverToken.getIssuedAt()));
-		oAuth2Token.setLifeTime(
-			serverToken.getExpiresIn() == -1 ? -1 :
-				serverToken.getExpiresIn() - serverToken.getIssuedAt());
+		oAuth2Token.setCreateDate(fromCXFIssuedAt(serverToken.getIssuedAt()));
+		oAuth2Token.setLifeTime(serverToken.getExpiresIn());
 		oAuth2Token.setOAuth2TokenType(OAuthConstants.BEARER_TOKEN_TYPE);
 		UserSubject subject = serverToken.getSubject();
 
 		if (subject != null) {
 			oAuth2Token.setUserId(Long.parseLong(subject.getId()));
-
 			oAuth2Token.setUserName(subject.getLogin());
 		}
 
@@ -265,18 +269,20 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			_oAuth2RefreshTokenLocalService.createOAuth2RefreshToken(
 				tokenKey);
 
-		oAuth2RefreshToken.setLifeTime(
-			refreshToken.getExpiresIn() - refreshToken.getIssuedAt());
+		oAuth2RefreshToken.setCompanyId(oAuth2Application.getCompanyId());
+
+		oAuth2RefreshToken.setCreateDate(
+			fromCXFIssuedAt(refreshToken.getIssuedAt()));
+
+		oAuth2RefreshToken.setLifeTime(refreshToken.getExpiresIn());
 
 		oAuth2RefreshToken.setOAuth2ApplicationId(
 			oAuth2Application.getOAuth2ApplicationId());
-		oAuth2RefreshToken.setUserName(refreshToken.getSubject().getLogin());
 
 		UserSubject subject = refreshToken.getSubject();
 
 		if (subject != null) {
 			oAuth2RefreshToken.setUserId(Long.parseLong(subject.getId()));
-
 			oAuth2RefreshToken.setUserName(subject.getLogin());
 		}
 
@@ -379,8 +385,6 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				_oAuth2RefreshTokenLocalService.getOAuth2RefreshToken(
 					refreshTokenKey);
 
-			Date createDate = oAuth2RefreshToken.getCreateDate();
-
 			OAuth2Application oAuth2Application = 
 				_oAuth2ApplicationLocalService.getOAuth2Application(
 					oAuth2RefreshToken.getOAuth2ApplicationId());
@@ -388,7 +392,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			return new RefreshToken(
 				populateClient(oAuth2Application),
 				refreshTokenKey, oAuth2RefreshToken.getLifeTime(),
-				createDate.getTime());
+				toCXFIssuedAt(oAuth2RefreshToken.getCreateDate()));
 		}
 		catch (PortalException e) {
 			throw new OAuthServiceException(e);
@@ -465,13 +469,11 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			_oAuth2ApplicationLocalService.getOAuth2Application(
 				oAuth2Token.getOAuth2ApplicationId());
 
-		Date createDate = oAuth2Token.getCreateDate();
-
 		Client client = getClient(oAuth2Application.getClientId());
 		
 		BearerAccessToken bearerAccessToken = new BearerAccessToken(
 			client, oAuth2Token.getOAuth2TokenId(), oAuth2Token.getLifeTime(),
-			createDate.getTime());
+			toCXFIssuedAt(oAuth2Token.getCreateDate()));
 
 		bearerAccessToken.setSubject(
 			new UserSubject(oAuth2Token.getUserName()));
@@ -569,6 +571,14 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		}
 
 		return permissions;
+	}
+
+	protected Date fromCXFIssuedAt(long issuedAt) {
+		return new Date(issuedAt * 1000);
+	}
+
+	protected long toCXFIssuedAt(Date dateCreated) {
+		return dateCreated.getTime() / 1000;
 	}
 
 	private static Log _log =
