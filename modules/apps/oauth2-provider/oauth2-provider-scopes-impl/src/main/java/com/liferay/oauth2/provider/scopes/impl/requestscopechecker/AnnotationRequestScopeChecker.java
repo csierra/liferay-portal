@@ -45,6 +45,12 @@ public class AnnotationRequestScopeChecker implements RequestScopeChecker {
 
 		RequiresScope annotation = method.getAnnotation(RequiresScope.class);
 
+		if (annotation == null) {
+			Class<?> resourceClass = resourceInfo.getResourceClass();
+
+			annotation = resourceClass.getAnnotation(RequiresScope.class);
+		}
+
 		if (annotation != null) {
 			if (annotation.allNeeded()) {
 				return scopeChecker.hasAllScopes(annotation.value());

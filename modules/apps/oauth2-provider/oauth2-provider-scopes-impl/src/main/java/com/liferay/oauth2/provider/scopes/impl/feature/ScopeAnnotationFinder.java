@@ -47,6 +47,15 @@ class ScopeAnnotationFinder {
 
 		visited.add(classResourceInfo);
 
+		Class<?> resourceClass = classResourceInfo.getResourceClass();
+
+		RequiresScope declaredAnnotation =
+			resourceClass.getDeclaredAnnotation(RequiresScope.class);
+
+		if (declaredAnnotation != null) {
+			accum.addAll(Arrays.asList(declaredAnnotation.value()));
+		}
+
 		MethodDispatcher methodDispatcher =
 			classResourceInfo.getMethodDispatcher();
 
