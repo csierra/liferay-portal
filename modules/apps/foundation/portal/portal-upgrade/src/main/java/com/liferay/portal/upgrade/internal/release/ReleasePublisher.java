@@ -14,6 +14,8 @@
 
 package com.liferay.portal.upgrade.internal.release;
 
+import aQute.bnd.version.Version;
+
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
@@ -52,7 +54,13 @@ public final class ReleasePublisher {
 
 		properties.put(
 			"release.bundle.symbolic.name", release.getBundleSymbolicName());
-		properties.put("release.schema.version", release.getSchemaVersion());
+		properties.put("release.state", release.getState());
+
+		if (Version.isVersion(release.getSchemaVersion())) {
+			properties.put(
+				"release.schema.version",
+				new Version(release.getSchemaVersion()));
+		}
 
 		ServiceRegistration<Release> newServiceRegistration =
 			_bundleContext.registerService(Release.class, release, properties);

@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.dao.db.DBContext;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.model.Release;
+import com.liferay.portal.kernel.model.ReleaseConstants;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -511,6 +512,15 @@ public class ReleaseManagerOSGiCommands {
 			for (UpgradeInfo upgradeInfo : _upgradeInfos) {
 				UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
 
+				Release release = _releaseLocalService.fetchRelease(
+					_bundleSymbolicName);
+
+				if (release != null) {
+					release.setState(ReleaseConstants.STATE_UPGRADE_FAILURE);
+
+					_releaseLocalService.updateRelease(release);
+				}
+
 				try {
 					upgradeStep.upgrade(
 						new DBProcessContext() {
@@ -532,16 +542,18 @@ public class ReleaseManagerOSGiCommands {
 						upgradeInfo.getToSchemaVersionString(),
 						upgradeInfo.getFromSchemaVersionString());
 
+					release = _releaseLocalService.fetchRelease(
+						_bundleSymbolicName);
+
+					release.setState(ReleaseConstants.STATE_GOOD);
+
 					int buildNumber = upgradeInfo.getBuildNumber();
 
 					if (buildNumber > 0) {
-						Release release = _releaseLocalService.fetchRelease(
-							_bundleSymbolicName);
-
 						release.setBuildNumber(buildNumber);
-
-						_releaseLocalService.updateRelease(release);
 					}
+
+					_releaseLocalService.updateRelease(release);
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e);
