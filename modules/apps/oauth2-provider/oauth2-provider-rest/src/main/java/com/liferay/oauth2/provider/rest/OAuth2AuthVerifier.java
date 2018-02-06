@@ -62,12 +62,20 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 		AuthVerifierResult authVerifierResult = new AuthVerifierResult();
 
 		try {
+			if (authorization == null) {
+				return authVerifierResult;
+
+			}
 			String[] basicAuthParts = authorization.split(" ");
+
+			if (basicAuthParts.length != 2) {
+				return authVerifierResult;
+			}
 
 			String basicAuthPart = basicAuthParts[0];
 
 			if (!"Bearer".equalsIgnoreCase(basicAuthPart)) {
-				return new AuthVerifierResult();
+				return authVerifierResult;
 			}
 
 			String token = basicAuthParts[1];
@@ -76,7 +84,7 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 				_liferayOAuthDataProvider.getAccessToken(token);
 
 			if (accessToken == null) {
-				return new AuthVerifierResult();
+				return authVerifierResult;
 			}
 
 			_scopeContext.setTokenString(token);
@@ -98,7 +106,7 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 				_log.debug("OAuth2 Access Token validation failed", e);
 			}
 
-			return new AuthVerifierResult();
+			return authVerifierResult;
 		}
 	}
 
