@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
@@ -29,6 +30,7 @@ import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
 import org.apache.cxf.rs.security.oauth2.services.AccessTokenService;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
@@ -83,6 +85,18 @@ public class OAuth2EndpointApplication extends Application {
 
 			String contextPath = MapUtil.getString(properties, "contextPath", "/oauth2");
 
+			Configuration[] cxfConfigurations =
+				configurationAdmin.listConfigurations(
+					"(&(service.factoryPid=com.liferay.portal.remote.cxf." +
+					"common.configuration.CXFEndpointPublisherConfiguration)" +
+					"(contextPath=" + escapeFilterArgument(contextPath) + "))");
+
+			if (cxfConfigurations != null) {
+				for (Configuration configuration : cxfConfigurations) {
+					configuration.delete();
+				}
+			}
+
 			_cxfConfiguration = configurationAdmin.createFactoryConfiguration(
 				"com.liferay.portal.remote.cxf.common.configuration." +
 				"CXFEndpointPublisherConfiguration",
@@ -94,6 +108,22 @@ public class OAuth2EndpointApplication extends Application {
 
 			_cxfConfiguration.update(dictionary);
 
+			String restComponentNameFilter =
+				"(component.name=" + getClass().getName() + ")";
+
+			Configuration[] restConfigurations =
+				configurationAdmin.listConfigurations(
+					"(&(service.factoryPid=com.liferay.portal.remote.rest." +
+					"extender.configuration.RestExtenderConfiguration)" +
+					"(jaxRsApplicationFilterStrings=" +
+					escapeFilterArgument(restComponentNameFilter) + "))");
+
+			if	(restConfigurations != null) {
+				for (Configuration configuration : restConfigurations) {
+					configuration.delete();
+				}
+			}
+
 			_restConfiguration = configurationAdmin.createFactoryConfiguration(
 				"com.liferay.portal.remote.rest.extender.configuration." +
 				"RestExtenderConfiguration",
@@ -104,7 +134,7 @@ public class OAuth2EndpointApplication extends Application {
 			dictionary.put("contextPaths", new String[]{contextPath});
 			dictionary.put(
 				"jaxRsApplicationFilterStrings",
-				new String[]{"(component.name=" + getClass().getName() + ")"});
+				new String[]{restComponentNameFilter});
 
 			_restConfiguration.update(dictionary);
 
@@ -193,6 +223,9 @@ public class OAuth2EndpointApplication extends Application {
 
 
 		}
+		catch (InvalidSyntaxException e) {
+			_log.error(e);
+		}
 		finally {
 			bundleContext.ungetService(serviceReference);
 		}
@@ -257,6 +290,12 @@ public class OAuth2EndpointApplication extends Application {
 	
 	public void removeAccessTokenGrantHandler(AccessTokenGrantHandler accessTokenGrantHandler) {
 		_accessTokenGrantHandlers.remove(accessTokenGrantHandler);
+	}
+
+	private String escapeFilterArgument(String filter) {
+		return StringUtil.replace(
+			filter, new String[]{"\\", "(", ")"},
+			new String[]{"\\\\", "\\(", "\\)"});
 	}
 	
 	private List<AccessTokenGrantHandler> _accessTokenGrantHandlers = new ArrayList<>();
