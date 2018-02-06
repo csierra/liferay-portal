@@ -515,9 +515,11 @@ public class ReleaseManagerOSGiCommands {
 				Release release = _releaseLocalService.fetchRelease(
 					_bundleSymbolicName);
 
-				release.setState(ReleaseConstants.STATE_UPGRADE_FAILURE);
+				if (release != null) {
+					release.setState(ReleaseConstants.STATE_UPGRADE_FAILURE);
 
-				_releaseLocalService.updateRelease(release);
+					_releaseLocalService.updateRelease(release);
+				}
 
 				try {
 					upgradeStep.upgrade(
