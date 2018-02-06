@@ -55,6 +55,7 @@ public final class ReleasePublisher {
 			"release.bundle.symbolic.name", release.getBundleSymbolicName());
 		properties.put(
 			"release.schema.version", new Version(release.getSchemaVersion()));
+		properties.put("release.state", release.getState());
 
 		ServiceRegistration<Release> newServiceRegistration =
 			_bundleContext.registerService(Release.class, release, properties);
