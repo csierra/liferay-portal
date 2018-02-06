@@ -389,10 +389,17 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				_oAuth2ApplicationLocalService.getOAuth2Application(
 					oAuth2RefreshToken.getOAuth2ApplicationId());
 			
-			return new RefreshToken(
+			RefreshToken refreshToken = new RefreshToken(
 				populateClient(oAuth2Application),
 				refreshTokenKey, oAuth2RefreshToken.getLifeTime(),
 				toCXFIssuedAt(oAuth2RefreshToken.getCreateDate()));
+
+			refreshToken.setSubject(
+				populateUserSubject(
+					oAuth2RefreshToken.getUserId(),
+					oAuth2RefreshToken.getUserName()));
+
+			return refreshToken;
 		}
 		catch (PortalException e) {
 			throw new OAuthServiceException(e);
@@ -476,7 +483,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			toCXFIssuedAt(oAuth2Token.getCreateDate()));
 
 		bearerAccessToken.setSubject(
-			new UserSubject(oAuth2Token.getUserName()));
+			populateUserSubject(
+				oAuth2Token.getUserId(), oAuth2Token.getUserName()));
 
 		List<OAuthPermission> permissions = 
 			convertScopeToPermissions(
@@ -485,6 +493,10 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		bearerAccessToken.setScopes(permissions);
 		
 		return bearerAccessToken;
+	}
+
+	protected UserSubject populateUserSubject(long userId, String userName) {
+		return new UserSubject(userName, String.valueOf(userId));
 	}
 
 	protected OAuth2Application resolveOAuth2Application(Client client) {

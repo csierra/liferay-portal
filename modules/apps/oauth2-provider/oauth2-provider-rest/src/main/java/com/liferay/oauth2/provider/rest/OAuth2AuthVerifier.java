@@ -15,6 +15,8 @@
 package com.liferay.oauth2.provider.rest;
 
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeContext;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
@@ -92,9 +94,15 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 			return authVerifierResult;
 		}
 		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("OAuth2 Access Token validation failed", e);
+			}
+
 			return new AuthVerifierResult();
 		}
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(OAuth2AuthVerifier.class);
 
 	@Reference
 	LiferayOAuthDataProvider _liferayOAuthDataProvider;
