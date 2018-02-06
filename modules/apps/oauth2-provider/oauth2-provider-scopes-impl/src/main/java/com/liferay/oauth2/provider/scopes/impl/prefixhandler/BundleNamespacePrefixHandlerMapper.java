@@ -18,6 +18,8 @@ import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
 import com.liferay.oauth2.provider.scopes.spi.PropertyGetter;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
@@ -25,8 +27,14 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 @Component(immediate = true, property = "default=true")
 public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
+
+	private List<String> _excludedScopes;
 
 	@Override
 	public PrefixHandler mapFrom(PropertyGetter propertyGetter) {
@@ -41,14 +49,30 @@ public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
 
 		String applicationName = applicationNameObject.toString();
 
-		return _namespaceAdderFactory.create(
+		PrefixHandler prefixHandler = _namespaceAdderFactory.create(
 			bundle.getSymbolicName(), bundleVersion.toString(),
 			applicationName);
+
+		return (input) -> {
+			if (_excludedScopes.contains(input)) {
+				return input;
+			}
+
+			return prefixHandler.addPrefix(input);
+		};
 	}
 
 	@Activate
-	protected void activate(BundleContext bundleContext) {
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
 		_bundleContext = bundleContext;
+
+		String excludedScopesProperty = MapUtil.getString(
+			properties, "excluded.scopes");
+
+		_excludedScopes = Arrays.asList(
+			excludedScopesProperty.split(StringPool.COMMA));
 	}
 
 	private BundleContext _bundleContext;
