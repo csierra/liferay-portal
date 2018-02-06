@@ -115,7 +115,7 @@ public class SpringDependencyAnalyzerPlugin implements AnalyzerPlugin {
 
 		String versionRangeFilter = versionRange.toFilter();
 
-		StringBuffer sb = new StringBuffer(6);
+		StringBuffer sb = new StringBuffer(9);
 
 		sb.append("com.liferay.portal.kernel.model.Release ");
 		sb.append("(&(release.bundle.symbolic.name=");
@@ -127,10 +127,9 @@ public class SpringDependencyAnalyzerPlugin implements AnalyzerPlugin {
 		sb.append(")");
 		sb.append(
 			versionRangeFilter.replaceAll("version", "release.schema.version"));
-		sb.append(")");
-		sb.append("(release.state!=");
+		sb.append("(!(release.state=");
 		sb.append(_STATE_UPGRADE_FAILURE);
-		sb.append(")");
+		sb.append("))");
 		sb.append(")");
 
 		return sb.toString();
