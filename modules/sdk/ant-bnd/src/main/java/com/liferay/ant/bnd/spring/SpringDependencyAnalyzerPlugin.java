@@ -128,9 +128,15 @@ public class SpringDependencyAnalyzerPlugin implements AnalyzerPlugin {
 		sb.append(
 			versionRangeFilter.replaceAll("version", "release.schema.version"));
 		sb.append(")");
+		sb.append("(release.state!=");
+		sb.append(_STATE_UPGRADE_FAILURE);
+		sb.append(")");
+		sb.append(")");
 
 		return sb.toString();
 	}
+
+	private static final int _STATE_UPGRADE_FAILURE = 1;
 
 	private static class ContextDependencyWriter extends WriteResource {
 
