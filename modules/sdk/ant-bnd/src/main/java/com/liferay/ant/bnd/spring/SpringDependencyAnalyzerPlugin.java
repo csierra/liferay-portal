@@ -25,8 +25,9 @@ import aQute.bnd.osgi.Jar;
 import aQute.bnd.osgi.Resource;
 import aQute.bnd.osgi.WriteResource;
 import aQute.bnd.service.AnalyzerPlugin;
-
+import aQute.bnd.version.Version;
 import aQute.bnd.version.VersionRange;
+
 import aQute.lib.io.IO;
 
 import java.io.OutputStream;
@@ -85,25 +86,34 @@ public class SpringDependencyAnalyzerPlugin implements AnalyzerPlugin {
 		return false;
 	}
 
-	protected String getReleaseInfo(Analyzer analyzer) {
+	protected String getReleaseInfo(Analyzer analyzer) throws RuntimeException {
 		String property = analyzer.getProperty("Liferay-Require-SchemaVersion");
 
 		if (property == null) {
 			return "";
 		}
 
-		String schemaVersionFilter =
-			"(release.schema.version=" + property + ")";
+		VersionRange versionRange;
 
-		if (VersionRange.isVersionRange(property)) {
-			VersionRange versionRange =
-				VersionRange.parseVersionRange(property);
+		if (Version.isVersion(property)) {
+			Version version = Version.parseVersion(property);
 
-			schemaVersionFilter = versionRange.toFilter();
-
-			schemaVersionFilter = schemaVersionFilter.replaceAll(
-				"version", "release.schema.version");
+			versionRange = new VersionRange(
+				true, new Version(version.getMajor(), version.getMinor(), 0),
+				new Version(version.getMajor(), version.getMinor() + 1, 0),
+				false);
 		}
+		else if (VersionRange.isVersionRange(property)) {
+			versionRange = VersionRange.parseVersionRange(property);
+		}
+		else {
+			throw new RuntimeException(
+				"Invalid format for Liferay-Require-SchemaVersion. Use a " +
+					"version with syntax {major}.{minor}.{micro}.{qualifier} " +
+						"or a range of versions");
+		}
+
+		String versionRangeFilter = versionRange.toFilter();
 
 		StringBuffer sb = new StringBuffer(6);
 
@@ -115,7 +125,8 @@ public class SpringDependencyAnalyzerPlugin implements AnalyzerPlugin {
 		sb.append(entry.getKey());
 
 		sb.append(")");
-		sb.append(schemaVersionFilter);
+		sb.append(
+			versionRangeFilter.replaceAll("version", "release.schema.version"));
 		sb.append(")");
 
 		return sb.toString();
