@@ -27,6 +27,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -217,15 +218,15 @@ public class ScopeMatcherTest {
 	private static class TestScopeMapper implements ScopeMapper {
 
 		@Override
-		public String map(String s) {
+		public Set<String> map(String s) {
 			switch (s) {
 				case "RW":
-					return "RW2";
+					return Collections.singleton("RW2");
 				case "RO":
-					return "RO2";
+					return Collections.singleton("RO2");
 			}
 
-			return s;
+			return Collections.singleton(s);
 		}
 	}
 }

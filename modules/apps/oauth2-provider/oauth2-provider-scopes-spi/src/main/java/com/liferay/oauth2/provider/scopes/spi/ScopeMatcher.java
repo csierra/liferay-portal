@@ -73,7 +73,8 @@ public interface ScopeMatcher {
 	 * {@link ScopeMapper}.
 	 */
 	public default ScopeMatcher withMapper(ScopeMapper scopeMapper) {
-		return localName -> match(scopeMapper.map(localName));
+		return localName ->
+			scopeMapper.map(localName).stream().anyMatch(this::match);
 	}
 
 	public default ScopeMatcher and(ScopeMatcher scopeMatcher) {

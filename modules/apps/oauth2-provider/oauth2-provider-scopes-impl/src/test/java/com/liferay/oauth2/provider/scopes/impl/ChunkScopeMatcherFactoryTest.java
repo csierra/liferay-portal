@@ -22,6 +22,8 @@ import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
 import com.liferay.portal.kernel.util.StringPool;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -135,11 +137,11 @@ public class ChunkScopeMatcherFactoryTest {
 
 		scopeMatcher = scopeMatcher.withMapper(s -> {
 			switch (s) {
-				case "RW": return "everything";
-				case "RO": return "everything.readonly";
+				case "RW": return Collections.singleton("everything");
+				case "RO": return Collections.singleton("everything.readonly");
 			}
 
-			return s;
+			return Collections.singleton(s);
 		});
 
 		assertTrue(scopeMatcher.match("RO"));

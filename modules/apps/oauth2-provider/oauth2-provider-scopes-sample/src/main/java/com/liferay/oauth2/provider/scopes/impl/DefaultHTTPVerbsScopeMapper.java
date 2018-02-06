@@ -15,21 +15,44 @@
 package com.liferay.oauth2.provider.scopes.impl;
 
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
+import com.liferay.portal.kernel.util.MapUtil;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Component(immediate = true)
 public class DefaultHTTPVerbsScopeMapper implements ScopeMapper {
 
+	private boolean _passtrough;
+
 	@Override
-	public String map(String scope) {
+	public Set<String> map(String scope) {
+		Set<String> result = new HashSet<>();
+
 		switch (scope) {
 			case "GET":
 			case "HEAD":
 			case "OPTIONS":
-				return "everything.readonly";
+				result.add("everything.readonly");
+				break;
+			default:
+				result.add("everything");
+				break;
 		}
 
-		return "everything";
+		if (_passtrough) {
+			result.add(scope);
+		}
+
+		return result;
+	}
+
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_passtrough = MapUtil.getBoolean(properties, "passtrough", false);
 	}
 
 }
