@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
+import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 
@@ -77,7 +78,7 @@ public class Test extends Application {
 	public String scopes() {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
-		Collection<LiferayOAuth2Scope> scopes =
+		Collection<LiferayAliasedOAuth2Scope> scopes =
 			_scopeFinderLocator.listScopes(companyId);
 
 		Gson gson = new GsonBuilder()

@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
+import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
@@ -34,12 +35,10 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import static com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys.SCOPES;
@@ -72,16 +71,16 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 		Company company = themeDisplay.getCompany();
 
-		Collection<LiferayOAuth2Scope> scopes = _scopeFinderLocator.listScopes(
+		Collection<LiferayAliasedOAuth2Scope> scopes = _scopeFinderLocator.listScopes(
 			company.getCompanyId());
 
-		Map<String, List<LiferayOAuth2Scope>> aliasedScopes = new HashMap<>();
+		Map<String, List<LiferayAliasedOAuth2Scope>> aliasedScopes = new HashMap<>();
 		Map<String, Set<String>> scopesDescriptions = new HashMap<>();
 
-		for (LiferayOAuth2Scope scope : scopes) {
-			List<LiferayOAuth2Scope> aliasedScopesList =
+		for (LiferayAliasedOAuth2Scope scope : scopes) {
+			List<LiferayAliasedOAuth2Scope> aliasedScopesList =
 				aliasedScopes.computeIfAbsent(
-					scope.getScope(), __ -> new ArrayList<>());
+					scope.getExternalAlias(), __ -> new ArrayList<>());
 
 			aliasedScopesList.add(scope);
 
@@ -90,10 +89,10 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 					company.getCompanyId(), scope.getApplicationName());
 
 			String description = scopeDescriptor.describe(
-				scope.getInternalScope(), themeDisplay.getLocale());
+				scope.getScope(), themeDisplay.getLocale());
 
 			Set<String> descriptionSet = scopesDescriptions.computeIfAbsent(
-				scope.getScope(), __ -> new HashSet<>());
+				scope.getExternalAlias(), __ -> new HashSet<>());
 
 			descriptionSet.add(description);
 		}

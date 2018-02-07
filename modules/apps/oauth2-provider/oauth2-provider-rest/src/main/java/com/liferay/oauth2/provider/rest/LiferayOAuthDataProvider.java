@@ -58,6 +58,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -213,7 +214,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		long companyId = CompanyThreadLocal.getCompanyId();
 
-		Set<LiferayOAuth2Scope> liferayScopes = new HashSet();
+		Set<LiferayOAuth2Scope> liferayScopes = new HashSet<>();
 
 		for (String scope : scopeList) {
 			liferayScopes.addAll(

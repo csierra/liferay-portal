@@ -14,7 +14,9 @@
 
 package com.liferay.oauth2.provider.scopes.impl;
 
+import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scopes.impl.model.LiferayAliasedOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scopes.impl.model.LiferayOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
@@ -96,8 +98,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 				Bundle bundle = serviceReference.getBundle();
 
 				grants.add(
-					new LiferayOAuth2ScopeImpl(
-						name, bundle, scope, grantedScope));
+					new LiferayOAuth2ScopeImpl(name, bundle, grantedScope));
 			}
 		}
 
@@ -113,8 +114,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	private ScopedServiceTrackerMap<ScopeDescriptor> _scopedScopeDescriptors;
 
 	@Override
-	public Collection<LiferayOAuth2Scope> listScopes(long companyId) {
-		Collection<LiferayOAuth2Scope> scopes = new HashSet<>();
+	public Collection<LiferayAliasedOAuth2Scope> listScopes(long companyId) {
+		Collection<LiferayAliasedOAuth2Scope> scopes = new HashSet<>();
 
 		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
 
@@ -148,54 +149,14 @@ public class ScopeRegistry implements ScopeFinderLocator {
 					String prefixedScope = prefixHandler.addPrefix(mappedScope);
 
 					scopes.add(
-						new LiferayOAuth2ScopeImpl(
-							name, bundle, prefixedScope, availableScope));
+						new LiferayAliasedOAuth2ScopeImpl(
+							name, bundle, availableScope, prefixedScope));
 				}
 			}
 		}
 
 		return scopes;
 	}
-
-/*
-	@Override
-	public Map<String, Set<String>> describeScopes(
-		long companyId, Locale locale, String ... scopes) {
-
-		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes = locateScopes(
-			companyId, scopes);
-
-		Map<String, Set<String>> result = new HashMap<>();
-
-		for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
-			ScopeDescriptor scopeDescriptor =
-				_scopedScopeDescriptors.getService(
-					companyId, liferayOAuth2Scope.getApplicationName());
-
-			Map<String, Set<String>> scopesDescription =
-				scopeDescriptor.describe(Arrays.asList(scopes), locale);
-
-			for (Map.Entry<String, Set<String>> entry :
-				scopesDescription.entrySet()) {
-
-				result.computeIfPresent(
-					entry.getKey(),
-					(__, set) -> {
-						Set<String> strings = new HashSet<>(set);
-
-						strings.addAll(entry.getValue());
-
-						return strings;
-					});
-
-
-				result.putIfAbsent(entry.getKey(), entry.getValue());
-			}
-		}
-
-		return result;
-	}
-*/
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {

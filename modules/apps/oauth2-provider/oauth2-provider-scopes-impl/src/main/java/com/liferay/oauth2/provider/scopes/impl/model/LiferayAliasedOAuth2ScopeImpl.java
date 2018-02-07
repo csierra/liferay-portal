@@ -14,19 +14,24 @@
 
 package com.liferay.oauth2.provider.scopes.impl.model;
 
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
 import org.osgi.framework.Bundle;
 
-import java.util.Objects;
+public class LiferayAliasedOAuth2ScopeImpl implements LiferayAliasedOAuth2Scope{
 
-public class LiferayOAuth2ScopeImpl implements LiferayOAuth2Scope {
+	private final String _applicationName;
+	private final Bundle _bundle;
+	private final String _scope;
+	private final String _externalAlias;
 
-	public LiferayOAuth2ScopeImpl(
-		String applicationName, Bundle bundle, String scope) {
+	public LiferayAliasedOAuth2ScopeImpl(
+		String applicationName, Bundle bundle, String scope,
+		String externalAlias) {
 
 		_applicationName = applicationName;
 		_bundle = bundle;
 		_scope = scope;
+		_externalAlias = externalAlias;
 	}
 
 	@Override
@@ -45,27 +50,8 @@ public class LiferayOAuth2ScopeImpl implements LiferayOAuth2Scope {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		LiferayOAuth2ScopeImpl that = (LiferayOAuth2ScopeImpl) o;
-
-		return Objects.equals(_applicationName, that._applicationName) &&
-			   Objects.equals(_bundle, that._bundle) &&
-			   Objects.equals(_scope, that._scope);
+	public String getExternalAlias() {
+		return _externalAlias;
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(_applicationName, _bundle, _scope);
-	}
-
-	private final String _applicationName;
-	private final Bundle _bundle;
-	private final String _scope;
 
 }

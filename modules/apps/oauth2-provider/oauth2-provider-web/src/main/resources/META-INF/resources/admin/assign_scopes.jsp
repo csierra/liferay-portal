@@ -67,7 +67,7 @@ List<String> assignedScopes = oAuth2Application.getScopesList();
 								<%
 								for (LiferayOAuth2Scope internalScope : value) {
 									%>
-										<li><%=internalScope.getApplicationName()%> -> <%=internalScope.getInternalScope()%></li>
+										<li><%=internalScope.getApplicationName()%> -> <%=internalScope.getScope()%></li>
 									<%
 								}
 								%>
