@@ -21,6 +21,9 @@ import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scopes.spi.TokenProvider;
+import com.liferay.oauth2.provider.scopes.spi.TokenProvider.TokenRequest;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
@@ -46,38 +49,41 @@ import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component(service = LiferayOAuthDataProvider.class)
 public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvider {
 
 	private PortalCache<String, ServerAuthorizationCodeGrant>
 		_codeGrantsPortalCache;
+	private ScopedServiceTrackerMap<TokenProvider> _scopedTokenProvider;
 
 	public LiferayOAuthDataProvider() {
 		setInvisibleToClientScopes(
 			Collections.singletonList(OAuthConstants.REFRESH_TOKEN_SCOPE));
+		setUseJwtFormatForAccessTokens(true);
 	}
 
 	@Activate
-	protected void activate() {
+	protected void activate(BundleContext bundleContext) {
 		_codeGrantsPortalCache = (PortalCache<String, ServerAuthorizationCodeGrant>)
 			_multiVMPool.getPortalCache("oauth2-provider-code-grants");
+
+		_scopedTokenProvider = new ScopedServiceTrackerMap<>(
+			bundleContext, TokenProvider.class, "liferay.oauth2.client.id",
+			() -> _defaultTokenProvider);
 	}
 
 	@Override
@@ -116,6 +122,40 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		}
 
 		return super.createAccessToken(reg);
+	}
+
+	@Override
+	protected ServerAccessToken doCreateAccessToken(
+		AccessTokenRegistration atReg) {
+
+		Client client = atReg.getClient();
+
+		TokenRequest tokenRequest = new TokenRequest(
+			client.getClientId(), atReg.getGrantType(),
+			Long.parseLong(atReg.getSubject().getId()), atReg.getNonce(),
+			atReg.getResponseType(), atReg.getGrantCode(), 3600);
+
+		TokenProvider tokenProvider = _scopedTokenProvider.getService(
+			CompanyThreadLocal.getCompanyId(), client.getClientId());
+
+		String tokenString = tokenProvider.createTokenString(tokenRequest);
+
+		ServerAccessToken at = new BearerAccessToken(
+				client, tokenString, 3600, new Date().getTime());
+		at.setAudiences(atReg.getAudiences());
+		at.setGrantType(atReg.getGrantType());
+		List<String> theScopes = atReg.getApprovedScope();
+		List<OAuthPermission> thePermissions =
+			convertScopeToPermissions(atReg.getClient(), theScopes);
+		at.setScopes(thePermissions);
+		at.setSubject(atReg.getSubject());
+		at.setClientCodeVerifier(atReg.getClientCodeVerifier());
+		at.setNonce(atReg.getNonce());
+		at.setResponseType(atReg.getResponseType());
+		at.setGrantCode(atReg.getGrantCode());
+		at.getExtraProperties().putAll(atReg.getExtraProperties());
+
+		return at;
 	}
 
 	@Override
@@ -435,6 +475,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			throw new OAuthServiceException("Invalid client " + clientId);
 		}
 
+		getMessageContext().put(OAuthConstants.CLIENT_ID, clientId);
+
 		return populateClient(oAuth2Application);
 	}
 
@@ -619,6 +661,11 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
 
 	@Reference
-	ScopeFinderLocator _scopeFinderLocator;
+	private ScopeFinderLocator _scopeFinderLocator;
 
+	@Reference(
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(name=default)"
+	)
+	private TokenProvider _defaultTokenProvider;
 }

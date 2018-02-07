@@ -83,7 +83,8 @@ public class OAuth2EndpointApplication extends Application {
 			ConfigurationAdmin configurationAdmin = bundleContext.getService(
 				serviceReference);
 
-			String contextPath = MapUtil.getString(properties, "contextPath", "/oauth2");
+			String contextPath = MapUtil.getString(
+				properties, "contextPath", "/oauth2");
 
 			Configuration[] cxfConfigurations =
 				configurationAdmin.listConfigurations(
