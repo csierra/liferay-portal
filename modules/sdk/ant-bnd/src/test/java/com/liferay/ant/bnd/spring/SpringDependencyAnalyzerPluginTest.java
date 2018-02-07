@@ -172,7 +172,8 @@ public class SpringDependencyAnalyzerPluginTest {
 	private static final String _RELEASE_INFO =
 		"com.liferay.portal.kernel.model.Release " +
 			"(&(release.bundle.symbolic.name=test.bundle)" +
-				"(release.schema.version=1.0.0.1))\n";
+				"(&(release.schema.version>=1.0.0)" +
+				"(!(release.schema.version>=1.1.0)))(!(release.state=1)))\n";
 
 	private static final class JarResource {
 
