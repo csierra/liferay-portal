@@ -163,6 +163,20 @@ public class OAuth2ApplicationServiceSoap {
 		}
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap deleteOAuth2Application(
+		long oAuth2ApplicationId) throws RemoteException {
+		try {
+			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.deleteOAuth2Application(oAuth2ApplicationId);
+
+			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap updateOAuth2Application(
 		long userId, long oAuth2ApplicationId, java.lang.String name,
 		java.lang.String description, java.lang.String webURL,
