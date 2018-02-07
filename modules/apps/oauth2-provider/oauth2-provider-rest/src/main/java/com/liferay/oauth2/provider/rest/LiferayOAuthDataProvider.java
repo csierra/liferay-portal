@@ -100,15 +100,19 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	public ServerAccessToken createAccessToken(AccessTokenRegistration reg)
 		throws OAuthServiceException {
 
+		List<String> approvedScope = new ArrayList<>(
+			reg.getApprovedScope());
+
+		if (approvedScope.isEmpty()) {
+			approvedScope.addAll(reg.getClient().getRegisteredScopes());
+		}
+
+		reg.setApprovedScope(approvedScope);
+
 		if (!OAuthConstants.CLIENT_CREDENTIALS_GRANT.equals(
 			reg.getGrantType())) {
 
-			List<String> approvedScope = new ArrayList<>(
-				reg.getApprovedScope());
-
 			approvedScope.add(OAuthConstants.REFRESH_TOKEN_SCOPE);
-
-			reg.setApprovedScope(approvedScope);
 		}
 
 		return super.createAccessToken(reg);
@@ -465,6 +469,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		client.setRedirectUris(
 			Collections.singletonList(oAuth2Application.getRedirectUri()));
+
+		client.setSubject(populateUserSubject(
+			oAuth2Application.getUserId(), oAuth2Application.getUserName()));
 	
 		return client;
 	}
