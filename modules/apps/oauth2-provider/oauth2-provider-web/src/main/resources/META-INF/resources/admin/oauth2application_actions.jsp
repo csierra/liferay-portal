@@ -45,7 +45,7 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 			/>
 		</portlet:renderURL>
 
-		<liferay-ui:icon message="Edit"
+		<liferay-ui:icon message="edit"
 			url="<%= editURL.toString() %>"
 		/>
 
@@ -56,6 +56,15 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 		</portlet:renderURL>
 
 		<liferay-ui:icon message="assign-scopes" url="<%= assignScopesURL.toString() %>" />
+	</c:if>
+
+
+	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasDeletePermission(oauth2application) %>">
+		<portlet:actionURL name="deleteOAuth2Application" var="deleteURL">
+			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
+		</portlet:actionURL>
+
+		<liferay-ui:icon-delete url="<%= deleteURL.toString() %>" />
 	</c:if>
 
 	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasPermissionsPermission(oauth2application) %>">

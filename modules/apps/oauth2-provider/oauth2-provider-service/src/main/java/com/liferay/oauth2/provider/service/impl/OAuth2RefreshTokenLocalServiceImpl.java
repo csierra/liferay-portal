@@ -14,7 +14,11 @@
 
 package com.liferay.oauth2.provider.service.impl;
 
+import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.service.base.OAuth2RefreshTokenLocalServiceBaseImpl;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.util.Collection;
 
 /**
  * The implementation of the o auth2 refresh token local service.
@@ -37,4 +41,12 @@ public class OAuth2RefreshTokenLocalServiceImpl
 	 *
 	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalServiceUtil} to access the o auth2 refresh token local service.
 	 */
+
+	public Collection<OAuth2RefreshToken> findByApplication(
+		long applicationId, int start, int end,
+		OrderByComparator<OAuth2RefreshToken> orderByComparator) {
+
+		return oAuth2RefreshTokenPersistence.findByA(
+			applicationId, start, end, orderByComparator);
+	}
 }
