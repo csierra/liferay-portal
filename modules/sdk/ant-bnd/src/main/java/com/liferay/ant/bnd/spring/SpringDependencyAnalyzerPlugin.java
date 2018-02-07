@@ -109,7 +109,7 @@ public class SpringDependencyAnalyzerPlugin implements AnalyzerPlugin {
 		else {
 			throw new RuntimeException(
 				"Invalid format for Liferay-Require-SchemaVersion. Use a " +
-					"version with syntax {major}.{minor}.{micro}.{qualifier} " +
+					"version with syntax <major>.<minor>.<micro>[.qualifier] " +
 						"or a range of versions");
 		}
 
