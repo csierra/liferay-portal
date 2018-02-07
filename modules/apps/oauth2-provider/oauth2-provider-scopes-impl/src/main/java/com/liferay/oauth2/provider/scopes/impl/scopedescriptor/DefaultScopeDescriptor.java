@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.scopes.impl.scopedescriptor;
 
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
