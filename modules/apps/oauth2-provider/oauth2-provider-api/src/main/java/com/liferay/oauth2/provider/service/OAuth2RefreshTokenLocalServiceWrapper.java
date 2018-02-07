@@ -186,6 +186,14 @@ public class OAuth2RefreshTokenLocalServiceWrapper
 		return _oAuth2RefreshTokenLocalService.fetchOAuth2RefreshToken(oAuth2RefreshTokenId);
 	}
 
+	@Override
+	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2RefreshToken> findByApplication(
+		long applicationId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2RefreshToken> orderByComparator) {
+		return _oAuth2RefreshTokenLocalService.findByApplication(applicationId,
+			start, end, orderByComparator);
+	}
+
 	/**
 	* Returns the o auth2 refresh token with the primary key.
 	*

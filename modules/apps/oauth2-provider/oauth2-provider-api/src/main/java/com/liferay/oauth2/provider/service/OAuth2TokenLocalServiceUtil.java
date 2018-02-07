@@ -185,6 +185,14 @@ public class OAuth2TokenLocalServiceUtil {
 		return getService().findByApplicationAndUserName(applicationId, username);
 	}
 
+	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByApplicationId(
+		long applicationId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Token> orderByComparator) {
+		return getService()
+				   .findByApplicationId(applicationId, start, end,
+			orderByComparator);
+	}
+
 	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByRefreshToken(
 		java.lang.String refreshToken) {
 		return getService().findByRefreshToken(refreshToken);

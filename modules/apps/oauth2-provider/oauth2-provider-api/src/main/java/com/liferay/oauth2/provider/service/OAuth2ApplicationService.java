@@ -65,6 +65,9 @@ public interface OAuth2ApplicationService extends BaseService {
 		java.lang.String oAuth2RedirectURI, ServiceContext serviceContext)
 		throws PortalException;
 
+	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
+		throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public OAuth2Application fetchOAuth2Application(long companyId,
 		java.lang.String clientId) throws PrincipalException;

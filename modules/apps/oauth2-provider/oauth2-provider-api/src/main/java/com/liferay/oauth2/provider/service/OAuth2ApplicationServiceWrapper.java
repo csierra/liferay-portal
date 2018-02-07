@@ -47,6 +47,13 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 	}
 
 	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Application deleteOAuth2Application(
+		long oAuth2ApplicationId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2ApplicationService.deleteOAuth2Application(oAuth2ApplicationId);
+	}
+
+	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application fetchOAuth2Application(
 		long companyId, java.lang.String clientId)
 		throws com.liferay.portal.kernel.security.auth.PrincipalException {
