@@ -19,7 +19,10 @@ page import="com.liferay.oauth2.provider.service.OAuth2ApplicationServiceUtil" %
 page import="com.liferay.oauth2.provider.model.OAuth2Application" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
-page import="com.liferay.portal.kernel.util.PortalUtil" %>
+page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
+page import="java.util.List" %><%@
+page import="java.util.Map"%><%@
+page import="java.util.Set"%>
 
 <liferay-frontend:defineObjects />
 

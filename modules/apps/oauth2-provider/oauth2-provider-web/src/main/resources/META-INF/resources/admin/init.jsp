@@ -17,14 +17,12 @@
 <%@ page import="com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException" %><%@
 page import="com.liferay.oauth2.provider.model.LiferayOAuth2Scope" %><%@
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@
+page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel"%><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.security.auth.PrincipalException" %><%@
-page import="com.liferay.portal.kernel.util.StringPool" %><%@
-page import="java.util.List" %><%@
-page import="java.util.Map" %>
-
+page import="com.liferay.portal.kernel.util.StringPool" %>
 
 <%
 OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = new OAuth2AdminPortletDisplayContext();

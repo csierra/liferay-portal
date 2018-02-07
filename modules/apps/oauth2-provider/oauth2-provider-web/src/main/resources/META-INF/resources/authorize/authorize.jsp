@@ -13,6 +13,7 @@
  * details.
  */
 --%>
+
 <%@include file="/authorize/init.jsp"%>
 <%
 HttpServletRequest originalServletRequest = PortalUtil.getOriginalServletRequest(request);
@@ -23,6 +24,8 @@ String scope = ParamUtil.getString(originalServletRequest, "scope");
 String sessionAuthenticityToken	= ParamUtil.getString(originalServletRequest, "session_authenticity_token");
 
 OAuth2Application oAuth2Application = OAuth2ApplicationLocalServiceUtil.fetchOAuth2Application(themeDisplay.getCompanyId(), clientId);
+
+AuthorizationRequestModel authorizationRequestModel = (AuthorizationRequestModel)request.getAttribute(OAuth2AdminWebKeys.AUTHORIZATION_REQUEST_MODEL);
 %>
 <c:choose>
 	<c:when test="<%= oAuth2Application == null %>">
@@ -46,12 +49,25 @@ OAuth2Application oAuth2Application = OAuth2ApplicationLocalServiceUtil.fetchOAu
 	    </h4>
 	    <div>
 		    <ul>
-			    <%
-				    for(String requestedScope : scope.split(" ")) {
-			    %>
-				    <li><%= HtmlUtil.escape(requestedScope) %></li>
-			    <%
-				    }
+		    		<%
+				for (String appName : authorizationRequestModel.getApplicationNames()) {
+					%>
+					<div>
+					<ul>
+						<li><%= HtmlUtil.escape(appName) %></li>
+						<ul>
+						<%
+						for (String description : authorizationRequestModel.getApplicationScopeDescription(appName)) {
+							%>
+							<li><%= HtmlUtil.escape(description) %></li>
+							<%
+						}
+						%>
+						</ul>
+					</ul>
+					</div>					
+					<%
+				}
 			    %>
 		    </ul>
 	    </div>

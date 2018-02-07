@@ -39,10 +39,31 @@ portletDisplay.setURLBack(redirect);
 
 renderResponse.setTitle(LanguageUtil.get(request, "assign-scopes"));
 
-Map<String, List<LiferayOAuth2Scope>> scopes = (Map<String, List<LiferayOAuth2Scope>>) request.getAttribute(OAuth2AdminWebKeys.SCOPES);
+Map<String, AuthorizationRequestModel> scopes = (Map<String, AuthorizationRequestModel>) request.getAttribute(OAuth2AdminWebKeys.SCOPES);
+//Map<String, Set<String>> scopeDescriptions = (Map<String, Set<String>>) request.getAttribute(OAuth2AdminWebKeys.SCOPES_DESCRIPTIONS);
 
 List<String> assignedScopes = oAuth2Application.getScopesList();
 %>
+
+<style>
+	.preview-container {
+		background-color: #EEEEEE;
+	}
+	
+	.preview-content {}
+	
+	.dashed-top {
+		height: 8px;
+		border-top: 4px dashed #FFFFFF;
+		background-color: #EEEEEE;
+	}
+	
+	.dashed-bottom {
+		height: 8px;
+		border-top: 4px dashed #EEEEEE;
+		background-color: #FFFFFF;
+	}
+</style>
 
 <div class="container-fluid-1280">
 	<portlet:actionURL name="/admin/assign_scopes" var="updateScopesURL" />
@@ -52,28 +73,52 @@ List<String> assignedScopes = oAuth2Application.getScopesList();
 			<aui:input type="hidden" name="oAuth2ApplicationId" value='<%= oAuth2ApplicationId %>' />
 
 			<%
-				for (Map.Entry<String, List<LiferayOAuth2Scope>> aliasedScopes : scopes.entrySet()) {
+				for (Map.Entry<String, AuthorizationRequestModel> aliasedScopes : scopes.entrySet()) {
 					String alias = aliasedScopes.getKey();
 			%>
-				<div>
+				<div class="row">
+				<div class="col-lg-12">
 					<aui:input checked="<%= assignedScopes.contains(alias) %>" label="<%= HtmlUtil.escape(alias) %>" localizeLabel="false" name="<%= "scope_" + alias %>" type="checkbox" />
 				</div>
+				</div>
 			<%
-					List<LiferayOAuth2Scope> value = aliasedScopes.getValue();
-					if (value.size() > 1) {
-						%>
-						<div>
-							<ul>
+					AuthorizationRequestModel authorizationRequestModel = aliasedScopes.getValue();
+					for (String appName : authorizationRequestModel.getApplicationNames()) {
+					%>
+					<div class="row">
+					<div class="col-lg-6">
+						<ul>
+							<%							
+							for (String internalScope : authorizationRequestModel.getApplicationInternalScopes(appName)) {
+								%>
+									<li><%=appName%> -> <%=internalScope%></li>
 								<%
-								for (LiferayOAuth2Scope internalScope : value) {
+							}								
+							%>
+						</ul>
+					</div>
+					<div class="col-lg-6">
+						<div class="preview-container">
+							<div class="dashed-top"></div>
+							<div class="preview-content">
+							<ul>
+								<li><%= HtmlUtil.escape(appName) %></li>
+								<ul>
+								<%
+								for (String description : authorizationRequestModel.getApplicationScopeDescription(appName)) {
 									%>
-										<li><%=internalScope.getApplicationName()%> -> <%=internalScope.getScope()%></li>
+									<li><%= HtmlUtil.escape(description) %></li>
 									<%
 								}
 								%>
+								</ul>
 							</ul>
+							</div>
+							<div class="dashed-bottom"></div>
 						</div>
-						<%
+					</div>
+					</div>
+					<%
 					}
 
 				}

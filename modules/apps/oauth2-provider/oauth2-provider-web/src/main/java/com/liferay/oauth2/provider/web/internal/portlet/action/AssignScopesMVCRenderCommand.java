@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
+import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -42,7 +43,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys.SCOPES;
-import static com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys.SCOPES_DESCRIPTIONS;
 
 /**
  * @author Tomas Polesovsky
@@ -71,34 +71,36 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 		Company company = themeDisplay.getCompany();
 
-		Collection<LiferayAliasedOAuth2Scope> scopes = _scopeFinderLocator.listScopes(
+		Collection<LiferayAliasedOAuth2Scope> liferayOAuth2Scopes = _scopeFinderLocator.listScopes(
 			company.getCompanyId());
 
-		Map<String, List<LiferayAliasedOAuth2Scope>> aliasedScopes = new HashMap<>();
-		Map<String, Set<String>> scopesDescriptions = new HashMap<>();
+		Map<String, AuthorizationRequestModel> aliasedScopes = 
+			new HashMap<>();
+		
+		AuthorizationRequestModel.ApplicationScopeDescriptor applicationScopeDescriptor =
+			(companyId, applicationName, scope) -> {
+				ScopeDescriptor scopeDescriptor =
+					_scopedScopeDescriptors.getService(
+						companyId, applicationName);
 
-		for (LiferayAliasedOAuth2Scope scope : scopes) {
-			List<LiferayAliasedOAuth2Scope> aliasedScopesList =
+				return scopeDescriptor.describe(
+					scope, themeDisplay.getLocale());
+			};
+		
+		
+		for (LiferayAliasedOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
+			
+			AuthorizationRequestModel authorizationRequestModel =
 				aliasedScopes.computeIfAbsent(
-					scope.getExternalAlias(), __ -> new ArrayList<>());
-
-			aliasedScopesList.add(scope);
-
-			ScopeDescriptor scopeDescriptor =
-				_scopedScopeDescriptors.getService(
-					company.getCompanyId(), scope.getApplicationName());
-
-			String description = scopeDescriptor.describe(
-				scope.getScope(), themeDisplay.getLocale());
-
-			Set<String> descriptionSet = scopesDescriptions.computeIfAbsent(
-				scope.getExternalAlias(), __ -> new HashSet<>());
-
-			descriptionSet.add(description);
+					liferayOAuth2Scope.getExternalAlias(), 
+					__ -> new AuthorizationRequestModel(
+						liferayOAuth2Scopes.size(),
+						applicationScopeDescriptor));
+			
+			authorizationRequestModel.addLiferayOAuth2Scope(liferayOAuth2Scope);
 		}
 
 		renderRequest.setAttribute(SCOPES, aliasedScopes);
-		renderRequest.setAttribute(SCOPES_DESCRIPTIONS, scopesDescriptions);
 
 		return "/admin/assign_scopes.jsp";
 	}

@@ -15,6 +15,8 @@
 --%>
 <%@ include file="/init.jsp" %>
 <%@ page import="com.liferay.oauth2.provider.service.OAuth2ApplicationLocalServiceUtil" %><%@
+page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys"%><%@
+page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel"%><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext" %>
 
 <%

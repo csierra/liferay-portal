@@ -20,6 +20,6 @@ package com.liferay.oauth2.provider.web.internal.constants;
 public class OAuth2AdminWebKeys {
 
 	public static final String SCOPES = "scopes";
-	public static final String SCOPES_DESCRIPTIONS = "scopes.descriptions";
+	public static final String AUTHORIZATION_REQUEST_MODEL = "authorization.request.model";
 
 }
