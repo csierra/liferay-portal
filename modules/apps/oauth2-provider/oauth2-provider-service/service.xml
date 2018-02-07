@@ -37,6 +37,9 @@
 			<finder-column name="clientId" />
 		</finder>
 
+		<reference entity="OAuth2RefreshToken" package-path="com.liferay.oauth2.provider" />
+		<reference entity="OAuth2ScopeGrant" package-path="com.liferay.oauth2.provider" />
+		<reference entity="OAuth2Token" package-path="com.liferay.oauth2.provider" />
 		<reference entity="Resource" package-path="com.liferay.portal" />
 	</entity>
 	<entity name="OAuth2Token" local-service="true" remote-service="false">

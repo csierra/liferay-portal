@@ -17,6 +17,7 @@ package com.liferay.oauth2.provider.service.impl;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.base.OAuth2TokenLocalServiceBaseImpl;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.Collection;
 
@@ -52,4 +53,12 @@ public class OAuth2TokenLocalServiceImpl extends OAuth2TokenLocalServiceBaseImpl
 		return oAuth2TokenPersistence.findByRefreshToken(refreshToken);
 	}
 
+	@Override
+	public Collection<OAuth2Token> findByApplicationId(
+		long applicationId, int start, int end,
+		OrderByComparator<OAuth2Token> orderByComparator) {
+
+		return oAuth2TokenPersistence.findByA(
+			applicationId, start, end, orderByComparator);
+	}
 }

@@ -18,9 +18,11 @@ import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationServiceBaseImpl;
 import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -28,6 +30,7 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -121,6 +124,23 @@ public class OAuth2ApplicationServiceImpl
 	@Override
 	public int getOAuth2ApplicationsCount(long companyId) {
 		return oAuth2ApplicationPersistence.filterCountByC(companyId);
+	}
+
+	@Override
+	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
+		throws PortalException {
+
+		OAuth2Application oAuth2Application =
+			oAuth2ApplicationLocalService.getOAuth2Application(
+				oAuth2ApplicationId);
+
+		check(oAuth2Application, ActionKeys.DELETE);
+
+		oAuth2Application =
+			oAuth2ApplicationLocalService.deleteOAuth2Application(
+				oAuth2ApplicationId);
+
+		return oAuth2Application;
 	}
 
 	@Override

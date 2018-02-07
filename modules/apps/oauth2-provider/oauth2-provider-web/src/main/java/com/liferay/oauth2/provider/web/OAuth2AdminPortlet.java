@@ -51,6 +51,22 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class OAuth2AdminPortlet extends MVCPortlet {
 
+	public void deleteOAuth2Application(
+			ActionRequest request, ActionResponse response)
+		throws PortalException {
+
+		long oAuth2ApplicationId = ParamUtil.getLong(
+			request, "oAuth2ApplicationId");
+
+		try {
+			_oAuth2ApplicationService.deleteOAuth2Application(
+				oAuth2ApplicationId);
+		}
+		catch (PortalException pe) {
+			SessionErrors.add(request, pe.getClass());
+		}
+	}
+
 	public void updateOAuth2Application(
 			ActionRequest request, ActionResponse response)
 		throws PortalException {

@@ -17,11 +17,16 @@ package com.liferay.oauth2.provider.service.impl;
 import com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
+import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
+import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationLocalServiceBaseImpl;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -88,7 +93,40 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
-	
+
+	@Override
+	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
+		throws PortalException {
+
+		Collection<OAuth2Token> oAuth2Tokens =
+			oAuth2TokenLocalService.findByApplicationId(oAuth2ApplicationId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		for (OAuth2Token oAuth2Token : oAuth2Tokens) {
+			Collection<OAuth2ScopeGrant> grants =
+				oAuth2ScopeGrantLocalService.findByTokenId(
+					oAuth2Token.getOAuth2TokenId());
+
+			for (OAuth2ScopeGrant grant : grants) {
+				oAuth2ScopeGrantLocalService.deleteOAuth2ScopeGrant(grant);
+			}
+
+			oAuth2TokenLocalService.deleteOAuth2Token(oAuth2Token);
+		}
+
+		Collection<OAuth2RefreshToken> refreshTokens =
+			oAuth2RefreshTokenLocalService.findByApplication(
+				oAuth2ApplicationId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				null);
+
+		for (OAuth2RefreshToken refreshToken : refreshTokens) {
+			oAuth2RefreshTokenLocalService.deleteOAuth2RefreshToken(
+				refreshToken);
+		}
+
+		return super.deleteOAuth2Application(oAuth2ApplicationId);
+	}
+
 	public OAuth2Application fetchOAuth2Application(
 		long companyId, String clientId) {
 
