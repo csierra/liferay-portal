@@ -129,7 +129,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			ScopeFinder scopeFinder = tuple.getService();
 
 			Collection<String> availableScopes = scopeFinder.findScopes(
-				__ -> true);
+				ScopeMatcher.ALL);
 
 			PrefixHandlerMapper prefixHandlerMapper =
 				_scopedPrefixHandlerMappers.getService(companyId, name);
@@ -150,7 +150,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 					scopes.add(
 						new LiferayAliasedOAuth2ScopeImpl(
-							name, bundle, availableScope, prefixedScope));
+							new LiferayOAuth2ScopeImpl(
+								name, bundle, availableScope), prefixedScope));
 				}
 			}
 		}

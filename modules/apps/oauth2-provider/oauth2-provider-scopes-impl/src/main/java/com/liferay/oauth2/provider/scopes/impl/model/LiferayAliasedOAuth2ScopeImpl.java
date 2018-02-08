@@ -15,43 +15,40 @@
 package com.liferay.oauth2.provider.scopes.impl.model;
 
 import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
+import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import org.osgi.framework.Bundle;
 
 public class LiferayAliasedOAuth2ScopeImpl implements LiferayAliasedOAuth2Scope{
 
-	private final String _applicationName;
-	private final Bundle _bundle;
-	private final String _scope;
-	private final String _externalAlias;
-
 	public LiferayAliasedOAuth2ScopeImpl(
-		String applicationName, Bundle bundle, String scope,
-		String externalAlias) {
+		LiferayOAuth2Scope liferayOAuth2Scope, String externalAlias) {
 
-		_applicationName = applicationName;
-		_bundle = bundle;
-		_scope = scope;
+		_liferayOAuth2Scope = liferayOAuth2Scope;
 		_externalAlias = externalAlias;
 	}
 
 	@Override
 	public Bundle getBundle() {
-		return _bundle;
+		return _liferayOAuth2Scope.getBundle();
 	}
 
 	@Override
 	public String getApplicationName() {
-		return _applicationName;
+		return _liferayOAuth2Scope.getApplicationName();
 	}
 
 	@Override
 	public String getScope() {
-		return _scope;
+		return _liferayOAuth2Scope.getScope();
 	}
 
 	@Override
 	public String getExternalAlias() {
 		return _externalAlias;
 	}
+
+	private final LiferayOAuth2Scope _liferayOAuth2Scope;
+
+	private final String _externalAlias;
 
 }
