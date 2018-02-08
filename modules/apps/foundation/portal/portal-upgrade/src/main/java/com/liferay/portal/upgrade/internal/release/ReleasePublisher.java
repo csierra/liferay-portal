@@ -14,8 +14,11 @@
 
 package com.liferay.portal.upgrade.internal.release;
 
+import aQute.bnd.version.Version;
+
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Release;
+import com.liferay.portal.kernel.model.ReleaseConstants;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
 
@@ -27,7 +30,6 @@ import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -53,14 +55,25 @@ public final class ReleasePublisher {
 
 		properties.put(
 			"release.bundle.symbolic.name", release.getBundleSymbolicName());
-		properties.put(
-			"release.schema.version", new Version(release.getSchemaVersion()));
+		properties.put("release.state", release.getState());
+
+		if (Version.isVersion(release.getSchemaVersion())) {
+			properties.put(
+				"release.schema.version",
+				new Version(release.getSchemaVersion()));
+		}
 
 		ServiceRegistration<Release> newServiceRegistration =
 			_bundleContext.registerService(Release.class, release, properties);
 
 		_serviceConfiguratorRegistrations.put(
 			release.getServletContextName(), newServiceRegistration);
+	}
+
+	public void releaseInProgress(Release release) {
+		release.setState(ReleaseConstants.STATE_IN_PROGRESS);
+
+		publish(release);
 	}
 
 	@Activate
