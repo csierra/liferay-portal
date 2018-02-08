@@ -31,6 +31,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
@@ -67,6 +68,13 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 					refreshTokenGrantHandler,
 					this::hasCreateTokenPermission),
 				new Hashtable<>());
+		}
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
 		}
 	}
 
