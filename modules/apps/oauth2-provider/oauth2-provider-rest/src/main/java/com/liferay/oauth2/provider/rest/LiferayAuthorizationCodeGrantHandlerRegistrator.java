@@ -39,7 +39,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-@Component(immediate = true)
+@Component(
+	configurationPid = "com.liferay.oauth2.configuration.OAuth2Configuration",
+	immediate = true
+)
 public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 	private ServiceRegistration<AccessTokenGrantHandler>
@@ -49,7 +52,8 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		boolean enabled = MapUtil.getBoolean(properties, "enabled", true);
+		boolean enabled = MapUtil.getBoolean(
+				properties, "oauth2.allow.authorization.code.grant", true);
 
 		if (enabled) {
 			AuthorizationCodeGrantHandler authorizationCodeGrantHandler =
