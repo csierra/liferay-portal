@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.rest;
 
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeContext;
+import com.liferay.oauth2.provider.scopes.spi.BearerTokenProvider;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
@@ -24,14 +25,11 @@ import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
 import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 
-import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -52,52 +50,44 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 
 	@Override
 	public AuthVerifierResult verify(
-		AccessControlContext accessControlContext, Properties properties)
+			AccessControlContext accessControlContext, Properties properties)
 		throws AuthException {
-
-		HttpServletRequest request = accessControlContext.getRequest();
-
-		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
 		AuthVerifierResult authVerifierResult = new AuthVerifierResult();
 
 		try {
-			if (authorization == null) {
-				return authVerifierResult;
-
-			}
-			String[] basicAuthParts = authorization.split(" ");
-
-			if (basicAuthParts.length != 2) {
-				return authVerifierResult;
-			}
-
-			String basicAuthPart = basicAuthParts[0];
-
-			if (!"Bearer".equalsIgnoreCase(basicAuthPart)) {
-				return authVerifierResult;
-			}
-
-			String token = basicAuthParts[1];
-
-			ServerAccessToken accessToken =
-				_liferayOAuthDataProvider.getAccessToken(token);
+			BearerTokenProvider.AccessToken accessToken =
+				getAccessToken(accessControlContext);
 
 			if (accessToken == null) {
 				return authVerifierResult;
 			}
 
-			_scopeContext.setTokenString(token);
-			
-			for (OAuthPermission scope : accessToken.getScopes()) {
-				ServiceAccessPolicyThreadLocal.addActiveServiceAccessPolicyName(
-					"OAUTH_" + scope.getPermission());
+			BearerTokenProvider bearerTokenProvider =
+				_liferayOAuthDataProvider.getBearerTokenProvider(
+					accessToken.getOAuth2Application().getCompanyId(),
+					accessToken.getOAuth2Application().getClientId());
 
+			if (bearerTokenProvider == null) {
+				return authVerifierResult;
 			}
 
+			if (!bearerTokenProvider.isValid(accessToken)) {
+				return authVerifierResult;
+			}
+
+			_scopeContext.setTokenString(accessToken.getTokenKey());
+
+			for (String scope : accessToken.getScopes()) {
+				ServiceAccessPolicyThreadLocal.addActiveServiceAccessPolicyName(
+					"OAuth2_" + scope);
+			}
+
+			authVerifierResult.getSettings().put(
+				BearerTokenProvider.AccessToken.class.getName(), accessToken);
+
 			authVerifierResult.setState(AuthVerifierResult.State.SUCCESS);
-			authVerifierResult.setUserId(
-				Long.parseLong(accessToken.getSubject().getId()));
+			authVerifierResult.setUserId(accessToken.getUserId());
 
 			return authVerifierResult;
 		}
@@ -110,12 +100,50 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 		}
 	}
 
+	protected BearerTokenProvider.AccessToken getAccessToken(
+		AccessControlContext accessControlContext) {
+
+		HttpServletRequest request = accessControlContext.getRequest();
+
+		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+		if (authorization == null) {
+			return null;
+		}
+
+		String[] basicAuthParts = authorization.split(" ");
+
+		if (basicAuthParts.length != 2) {
+			return null;
+		}
+
+		String basicAuthPart = basicAuthParts[0];
+
+		if (!"Bearer".equalsIgnoreCase(basicAuthPart)) {
+			return null;
+		}
+
+		String token = basicAuthParts[1];
+
+		ServerAccessToken serverAccessToken =
+			_liferayOAuthDataProvider.getAccessToken(token);
+
+		if (serverAccessToken == null) {
+			return null;
+		}
+
+		BearerTokenProvider.AccessToken accessToken =
+			_liferayOAuthDataProvider.fromCXFAccessToken(serverAccessToken);
+
+		return accessToken;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(OAuth2AuthVerifier.class);
 
 	@Reference
-	LiferayOAuthDataProvider _liferayOAuthDataProvider;
+	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
 	@Reference
-	ScopeContext _scopeContext;
+	private ScopeContext _scopeContext;
 
 }
