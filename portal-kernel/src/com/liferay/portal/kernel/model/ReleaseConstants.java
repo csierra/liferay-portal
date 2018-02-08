@@ -27,6 +27,8 @@ public class ReleaseConstants {
 
 	public static final int STATE_GOOD = 0;
 
+	public static final int STATE_IN_PROGRESS = 3;
+
 	public static final int STATE_UPGRADE_FAILURE = 1;
 
 	public static final int STATE_VERIFY_FAILURE = 2;
