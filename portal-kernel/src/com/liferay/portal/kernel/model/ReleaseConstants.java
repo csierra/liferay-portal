@@ -27,11 +27,11 @@ public class ReleaseConstants {
 
 	public static final int STATE_GOOD = 0;
 
+	public static final int STATE_IN_PROGRESS = 3;
+
 	public static final int STATE_UPGRADE_FAILURE = 1;
 
 	public static final int STATE_VERIFY_FAILURE = 2;
-
-	public static final int STATE_IN_PROGRESS = 3;
 
 	public static final String TEST_STRING = StringBundler.concat(
 		"You take the blue pill, the story ends, you wake up in your bed and ",
