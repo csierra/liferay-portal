@@ -19,6 +19,7 @@ import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.impl.model.LiferayAliasedOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scopes.impl.model.LiferayOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopeMatcherFactoryLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
@@ -29,6 +30,8 @@ import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
+import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
+import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 
@@ -62,6 +65,11 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
 
+		ScopeMatcherFactory scopeMatcherFactory =
+			_scopeMatcherFactoryLocator.locateScopeMatcherFactory(companyId);
+
+		ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scope);
+
 		for (String name : names) {
 			ServiceReferenceServiceTuple<?, ScopeFinder> tuple =
 				_scopeFinderByNameServiceTrackerMap.getService(name);
@@ -74,22 +82,12 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
 				serviceReference::getProperty);
 
-			ScopeFinder scopeFinder = tuple.getService();
-
-			ScopeMatcherFactory scopeMatcherFactory =
-				_scopedScopeMatcherFactories.getService(companyId, name);
-
-			if (scopeMatcherFactory == null) {
-				scopeMatcherFactory =
-					scopeFinder.getDefaultScopeMatcherFactory();
-			}
-
-			ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scope);
-
 			scopeMatcher = scopeMatcher.prepend(prefixHandler);
 
 			scopeMatcher = scopeMatcher.withMapper(
 				_scopedScopeMapper.getService(companyId, name));
+
+			ScopeFinder scopeFinder = tuple.getService();
 
 			Collection<String> grantedScopes = scopeFinder.findScopes(
 				scopeMatcher);
@@ -107,11 +105,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 	private ScopedServiceTrackerMap<PrefixHandlerMapper>
 		_scopedPrefixHandlerMappers;
-	private ScopedServiceTrackerMap<ScopeMatcherFactory>
-		_scopedScopeMatcherFactories;
 	private ScopedServiceTrackerMap<ScopeMapper>
 		_scopedScopeMapper;
-	private ScopedServiceTrackerMap<ScopeDescriptor> _scopedScopeDescriptors;
 
 	@Override
 	public Collection<LiferayAliasedOAuth2Scope> listScopes(long companyId) {
@@ -171,10 +166,6 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			bundleContext, PrefixHandlerMapper.class, "osgi.jaxrs.name",
 			() -> _defaultPrefixHandlerMapper);
 
-		_scopedScopeMatcherFactories = new ScopedServiceTrackerMap<>(
-			bundleContext, ScopeMatcherFactory.class, "osgi.jaxrs.name",
-			() -> null);
-
 		_scopedScopeMapper = new ScopedServiceTrackerMap<>(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
 			() -> ScopeMapper.NULL);
@@ -184,7 +175,6 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	protected void deactivate() {
 		_scopeFinderByNameServiceTrackerMap.close();
 		_scopedPrefixHandlerMappers.close();
-		_scopedScopeMatcherFactories.close();
 		_scopedScopeMapper.close();
 	}
 
@@ -196,6 +186,9 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
+
+	@Reference
+	private ScopeMatcherFactoryLocator _scopeMatcherFactoryLocator;
 
 	private ServiceTrackerMap<
 		String, ServiceReferenceServiceTuple<?, ScopeFinder>>

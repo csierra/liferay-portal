@@ -15,12 +15,15 @@
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
 import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopeMatcherFactoryLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
+import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
+import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
+import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel.ApplicationScopeDescriptor;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -34,11 +37,9 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,25 +72,26 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 		Company company = themeDisplay.getCompany();
 
-		Collection<LiferayAliasedOAuth2Scope> liferayOAuth2Scopes = _scopeFinderLocator.listScopes(
-			company.getCompanyId());
+		long companyId = company.getCompanyId();
 
-		Map<String, AuthorizationRequestModel> aliasedScopes = 
-			new HashMap<>();
+		Collection<LiferayAliasedOAuth2Scope> liferayOAuth2Scopes =
+			_scopeFinderLocator.listScopes(companyId);
+
+		Map<String, Set<String>> implicationMap = _buildImplicationMap(
+			companyId, liferayOAuth2Scopes);
+
+		Map<String, AuthorizationRequestModel> aliasedScopes = new HashMap<>();
 		
-		AuthorizationRequestModel.ApplicationScopeDescriptor applicationScopeDescriptor =
-			(companyId, applicationName, scope) -> {
+		ApplicationScopeDescriptor applicationScopeDescriptor =
+			(cid, applicationName, scope) -> {
 				ScopeDescriptor scopeDescriptor =
-					_scopedScopeDescriptors.getService(
-						companyId, applicationName);
+					_scopedScopeDescriptors.getService(cid, applicationName);
 
 				return scopeDescriptor.describe(
 					scope, themeDisplay.getLocale());
 			};
-		
-		
+
 		for (LiferayAliasedOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
-			
 			AuthorizationRequestModel authorizationRequestModel =
 				aliasedScopes.computeIfAbsent(
 					liferayOAuth2Scope.getExternalAlias(), 
@@ -103,6 +105,38 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		renderRequest.setAttribute(SCOPES, aliasedScopes);
 
 		return "/admin/assign_scopes.jsp";
+	}
+
+	private Map<String, Set<String>> _buildImplicationMap(
+		long companyId,
+		Collection<LiferayAliasedOAuth2Scope> liferayOAuth2Scopes) {
+
+		Set<String> aliases = new HashSet<>();
+
+		for (LiferayAliasedOAuth2Scope liferayOAuth2Scope :
+			liferayOAuth2Scopes) {
+
+			aliases.add(liferayOAuth2Scope.getExternalAlias());
+		}
+
+		ScopeMatcherFactory scopeMatcherFactory =
+			_scopeMatcherFactoryLocator.locateScopeMatcherFactory(companyId);
+
+		HashMap<String, Set<String>> implications = new HashMap<>();
+
+		for (String alias : aliases) {
+			ScopeMatcher scopeMatcher = scopeMatcherFactory.create(alias);
+
+			Set<String> filtered = new HashSet<>(scopeMatcher.filter(aliases));
+
+			filtered.remove(alias);
+
+			if (!filtered.isEmpty()) {
+				implications.put(alias, filtered);
+			}
+		}
+
+		return implications;
 	}
 
 	@Deactivate
@@ -122,5 +156,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 	)
 	private ScopeDescriptor _defaultScopeDescriptor;
 
+	@Reference
+	ScopeMatcherFactoryLocator _scopeMatcherFactoryLocator;
 
 }

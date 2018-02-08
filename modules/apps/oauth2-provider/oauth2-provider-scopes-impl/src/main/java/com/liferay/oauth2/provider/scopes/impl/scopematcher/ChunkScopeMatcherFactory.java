@@ -28,6 +28,7 @@ import java.util.Map;
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.impl.scopes.ChunkScopeMatcherFactory",
 	property = {
+		"default=true",
 		"type=chunks",
 		"separator=" + StringPool.PERIOD
 	}
