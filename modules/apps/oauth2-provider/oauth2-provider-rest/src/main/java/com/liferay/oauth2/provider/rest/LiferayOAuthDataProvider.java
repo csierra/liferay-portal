@@ -14,6 +14,11 @@
 
 package com.liferay.oauth2.provider.rest;
 
+import com.liferay.oauth2.provider.configuration.OAuth2AuthorizationCodeGrantConfiguration;
+import com.liferay.oauth2.provider.configuration.OAuth2ClientCredentialsGrantConfiguration;
+import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
+import com.liferay.oauth2.provider.configuration.OAuth2RefreshTokenGrantConfiguration;
+import com.liferay.oauth2.provider.configuration.OAuth2ResourceOwnerGrantConfiguration;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
@@ -25,14 +30,19 @@ import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.oauth2.provider.service.OAuth2TokenLocalService;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
+
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -58,12 +68,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Component(service = LiferayOAuthDataProvider.class)
+@Component(
+	service = LiferayOAuthDataProvider.class,
+	configurationPid = "com.liferay.oauth2.configuration.OAuth2Configuration"
+)
 public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvider {
 
 	private PortalCache<String, ServerAuthorizationCodeGrant>
@@ -75,9 +89,13 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	@Activate
-	protected void activate() {
+	protected void activate(Map<String, Object> properties) {
+
 		_codeGrantsPortalCache = (PortalCache<String, ServerAuthorizationCodeGrant>)
 			_multiVMPool.getPortalCache("oauth2-provider-code-grants");
+		_oAuth2Configuration = 
+			ConfigurableUtil.createConfigurable(
+				OAuth2Configuration.class, properties);
 	}
 
 	@Override
@@ -473,7 +491,67 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		client.setSubject(populateUserSubject(
 			oAuth2Application.getUserId(), oAuth2Application.getUserName()));
 	
+		try {
+			setAllowedGrantTypesForClient(client);
+		} 
+		catch (ConfigurationException e) {
+			throw new SystemException(e);
+		}
+		
 		return client;
+	}
+	
+	protected void setAllowedGrantTypesForClient(Client client) 
+		throws ConfigurationException {
+		
+		long companyId = CompanyThreadLocal.getCompanyId();
+		
+		boolean authorizationCodeGrantEnabled = 
+			_oAuth2Configuration.allowAuthorizationCodeGrant() 
+				&& _configurationProvider.getCompanyConfiguration(
+					OAuth2AuthorizationCodeGrantConfiguration.class, 
+					companyId).enabled();
+		
+		boolean clientCredentialsGrantEnabled = 
+			_oAuth2Configuration.allowClientCredentialsGrant() 
+				&& _configurationProvider.getCompanyConfiguration(
+					OAuth2ClientCredentialsGrantConfiguration.class, 
+					companyId).enabled();
+		
+		boolean resourceOwnerPasswordCredentialGrantEnabled = 
+			_oAuth2Configuration.allowResourceOwnerPasswordCredentialsGrant() 
+				&& _configurationProvider.getCompanyConfiguration(
+					OAuth2ResourceOwnerGrantConfiguration.class, companyId).enabled();
+		
+		boolean refreshTokenGrantEnabled = 
+			_oAuth2Configuration.allowRefreshTokenGrant() 
+				&& _configurationProvider.getCompanyConfiguration(
+					OAuth2RefreshTokenGrantConfiguration.class, companyId).enabled();
+
+		List<String> allowedGrantTypes = new ArrayList<>(4);
+		
+		if (authorizationCodeGrantEnabled) {
+			allowedGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
+		}
+		
+		if (clientCredentialsGrantEnabled) {
+			allowedGrantTypes.add(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
+		}
+		
+		if (resourceOwnerPasswordCredentialGrantEnabled) {
+			allowedGrantTypes.add(OAuthConstants.RESOURCE_OWNER_GRANT );
+		}
+		
+		if (refreshTokenGrantEnabled) {
+			allowedGrantTypes.add(OAuthConstants.REFRESH_TOKEN_GRANT );
+		}
+		
+		// CXF considers no allowed grant types as allow all!
+		if (allowedGrantTypes.isEmpty()) {
+			allowedGrantTypes.add(StringPool.BLANK);
+		}
+		
+		client.setAllowedGrantTypes(allowedGrantTypes);
 	}
 
 	protected ServerAccessToken populateToken(OAuth2Token oAuth2Token)
@@ -621,4 +699,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	@Reference
 	ScopeFinderLocator _scopeFinderLocator;
 
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+	
+	private OAuth2Configuration _oAuth2Configuration;
 }
