@@ -22,8 +22,8 @@ import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
-import com.liferay.oauth2.provider.scopes.spi.TokenProvider;
-import com.liferay.oauth2.provider.scopes.spi.TokenProvider.TokenRequest;
+import com.liferay.oauth2.provider.scopes.spi.BearerTokenProvider;
+import com.liferay.oauth2.provider.scopes.spi.BearerTokenProvider.AccessToken;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
@@ -68,12 +68,13 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	private PortalCache<String, ServerAuthorizationCodeGrant>
 		_codeGrantsPortalCache;
-	private ScopedServiceTrackerMap<TokenProvider> _scopedTokenProvider;
+
+	private ScopedServiceTrackerMap<BearerTokenProvider>
+		_scopedBearerTokenProvider;
 
 	public LiferayOAuthDataProvider() {
 		setInvisibleToClientScopes(
 			Collections.singletonList(OAuthConstants.REFRESH_TOKEN_SCOPE));
-		setUseJwtFormatForAccessTokens(true);
 	}
 
 	@Activate
@@ -81,9 +82,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		_codeGrantsPortalCache = (PortalCache<String, ServerAuthorizationCodeGrant>)
 			_multiVMPool.getPortalCache("oauth2-provider-code-grants");
 
-		_scopedTokenProvider = new ScopedServiceTrackerMap<>(
-			bundleContext, TokenProvider.class, "liferay.oauth2.client.id",
-			() -> _defaultTokenProvider);
+		_scopedBearerTokenProvider = new ScopedServiceTrackerMap<>(
+			bundleContext, BearerTokenProvider.class, "liferay.oauth2.client.id",
+			() -> _defaultBearerTokenProvider);
 	}
 
 	@Override
@@ -126,36 +127,131 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	@Override
 	protected ServerAccessToken doCreateAccessToken(
-		AccessTokenRegistration atReg) {
+		AccessTokenRegistration accessTokenRegistration) {
 
-		Client client = atReg.getClient();
+		ServerAccessToken serverAccessToken = super.doCreateAccessToken(
+			accessTokenRegistration);
 
-		TokenRequest tokenRequest = new TokenRequest(
-			client.getClientId(), atReg.getGrantType(),
-			Long.parseLong(atReg.getSubject().getId()), atReg.getNonce(),
-			atReg.getResponseType(), atReg.getGrantCode(), 3600);
+		BearerTokenProvider.AccessToken accessToken = fromCXFAccessToken(
+			serverAccessToken);
 
-		TokenProvider tokenProvider = _scopedTokenProvider.getService(
-			CompanyThreadLocal.getCompanyId(), client.getClientId());
+		BearerTokenProvider tokenProvider = getBearerTokenProvider(
+			accessToken.getOAuth2Application().getCompanyId(),
+			accessToken.getOAuth2Application().getClientId());
 
-		String tokenString = tokenProvider.createTokenString(tokenRequest);
+		tokenProvider.createAccessToken(accessToken);
 
-		ServerAccessToken at = new BearerAccessToken(
-				client, tokenString, 3600, toCXFIssuedAt(new Date()));
-		at.setAudiences(atReg.getAudiences());
-		at.setGrantType(atReg.getGrantType());
-		List<String> theScopes = atReg.getApprovedScope();
-		List<OAuthPermission> thePermissions =
-			convertScopeToPermissions(atReg.getClient(), theScopes);
-		at.setScopes(thePermissions);
-		at.setSubject(atReg.getSubject());
-		at.setClientCodeVerifier(atReg.getClientCodeVerifier());
-		at.setNonce(atReg.getNonce());
-		at.setResponseType(atReg.getResponseType());
-		at.setGrantCode(atReg.getGrantCode());
-		at.getExtraProperties().putAll(atReg.getExtraProperties());
+		serverAccessToken.setAudiences(accessToken.getAudiences());
+		serverAccessToken.setClientCodeVerifier(
+			accessToken.getClientCodeVerifier());
+		serverAccessToken.setExpiresIn(accessToken.getExpiresIn());
+		serverAccessToken.setExtraProperties(accessToken.getExtraProperties());
+		serverAccessToken.setGrantCode(accessToken.getGrantCode());
+		serverAccessToken.setGrantType(accessToken.getGrantType());
+		serverAccessToken.setIssuedAt(accessToken.getIssuedAt());
+		serverAccessToken.setIssuer(accessToken.getIssuer());
+		serverAccessToken.setNonce(accessToken.getNonce());
+		serverAccessToken.setParameters(accessToken.getParameters());
+		serverAccessToken.setRefreshToken(accessToken.getRefreshToken());
+		serverAccessToken.setResponseType(accessToken.getResponseType());
+		serverAccessToken.setScopes(
+			convertScopeToPermissions(
+				serverAccessToken.getClient(), accessToken.getScopes()));
+		serverAccessToken.setTokenKey(accessToken.getTokenKey());
+		serverAccessToken.setTokenType(accessToken.getTokenType());
+		serverAccessToken.getSubject().setId(
+			String.valueOf(accessToken.getUserId()));
+		serverAccessToken.getSubject().setLogin(accessToken.getUserName());
 
-		return at;
+		return serverAccessToken;
+	}
+
+	protected BearerTokenProvider getBearerTokenProvider(
+		long companyId, String clientId) {
+
+		return _scopedBearerTokenProvider.getService(companyId, clientId);
+	}
+
+	protected BearerTokenProvider.AccessToken fromCXFAccessToken(
+		ServerAccessToken serverAccessToken) {
+
+		OAuth2Application oAuth2Application =
+			resolveOAuth2Application(serverAccessToken.getClient());
+
+		return new AccessToken(
+			oAuth2Application,
+			serverAccessToken.getAudiences(),
+			serverAccessToken.getClientCodeVerifier(),
+			serverAccessToken.getExpiresIn(),
+			serverAccessToken.getExtraProperties(),
+			serverAccessToken.getGrantCode(),
+			serverAccessToken.getGrantType(),
+			serverAccessToken.getIssuedAt(),
+			serverAccessToken.getIssuer(),
+			serverAccessToken.getNonce(),
+			serverAccessToken.getParameters(),
+			serverAccessToken.getRefreshToken(),
+			serverAccessToken.getResponseType(),
+			OAuthUtils.convertPermissionsToScopeList(
+				serverAccessToken.getScopes()),
+			serverAccessToken.getTokenKey(),
+			serverAccessToken.getTokenType(),
+			Long.parseLong(serverAccessToken.getSubject().getId()),
+			serverAccessToken.getSubject().getLogin());
+	}
+
+	@Override
+	protected RefreshToken doCreateNewRefreshToken(
+		ServerAccessToken serverAccessToken) {
+
+		RefreshToken cxfRefreshToken = super.doCreateNewRefreshToken(
+			serverAccessToken);
+
+		BearerTokenProvider.RefreshToken refreshToken =
+			fromCXFRefreshToken(cxfRefreshToken);
+
+		BearerTokenProvider tokenProvider = getBearerTokenProvider(
+			refreshToken.getOAuth2Application().getCompanyId(),
+			refreshToken.getOAuth2Application().getClientId());
+
+		tokenProvider.createRefreshToken(refreshToken);
+
+		cxfRefreshToken.setAudiences(refreshToken.getAudiences());
+		cxfRefreshToken.setClientCodeVerifier(refreshToken.getClientCodeVerifier());
+		cxfRefreshToken.setExpiresIn(refreshToken.getExpiresIn());
+		cxfRefreshToken.setGrantType(refreshToken.getGrantType());
+		cxfRefreshToken.setIssuedAt(refreshToken.getIssuedAt());
+		cxfRefreshToken.setScopes(
+			convertScopeToPermissions(
+				serverAccessToken.getClient(), refreshToken.getScopes()));
+		cxfRefreshToken.setTokenKey(refreshToken.getTokenKey());
+		cxfRefreshToken.setTokenType(refreshToken.getTokenType());
+		cxfRefreshToken.getSubject().setId(
+			String.valueOf(refreshToken.getUserId()));
+		cxfRefreshToken.getSubject().setLogin(refreshToken.getUserName());
+
+		return cxfRefreshToken;
+	}
+
+	protected BearerTokenProvider.RefreshToken fromCXFRefreshToken(
+		RefreshToken cxfRefreshToken) {
+
+		OAuth2Application oAuth2Application =
+			resolveOAuth2Application(cxfRefreshToken.getClient());
+
+		return new BearerTokenProvider.RefreshToken(
+			oAuth2Application,
+			cxfRefreshToken.getAudiences(),
+			cxfRefreshToken.getClientCodeVerifier(),
+			cxfRefreshToken.getExpiresIn(),
+			cxfRefreshToken.getGrantType(),
+			cxfRefreshToken.getIssuedAt(),
+			OAuthUtils.convertPermissionsToScopeList(
+				cxfRefreshToken.getScopes()),
+			cxfRefreshToken.getTokenKey(),
+			cxfRefreshToken.getTokenType(),
+			Long.parseLong(cxfRefreshToken.getSubject().getId()),
+			cxfRefreshToken.getSubject().getLogin());
 	}
 
 	@Override
@@ -667,5 +763,5 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		policyOption = ReferencePolicyOption.GREEDY,
 		target = "(name=default)"
 	)
-	private TokenProvider _defaultTokenProvider;
+	private BearerTokenProvider _defaultBearerTokenProvider;
 }
