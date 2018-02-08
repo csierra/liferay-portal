@@ -161,7 +161,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		String tokenString = tokenProvider.createTokenString(tokenRequest);
 
 		ServerAccessToken at = new BearerAccessToken(
-				client, tokenString, 3600, new Date().getTime());
+				client, tokenString, 3600, toCXFIssuedAt(new Date()));
 		at.setAudiences(atReg.getAudiences());
 		at.setGrantType(atReg.getGrantType());
 		List<String> theScopes = atReg.getApprovedScope();
