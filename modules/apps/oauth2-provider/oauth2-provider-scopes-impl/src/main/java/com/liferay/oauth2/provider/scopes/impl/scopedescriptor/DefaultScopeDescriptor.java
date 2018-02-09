@@ -36,6 +36,8 @@ public class DefaultScopeDescriptor implements ScopeDescriptor {
 		ResourceBundle resourceBundle =
 			_resourceBundleLoader.loadResourceBundle(locale.toString());
 
+		scope = "oauth2.scope.".concat(scope);
+
 		if (!resourceBundle.containsKey(scope)) {
 			return scope;
 		}

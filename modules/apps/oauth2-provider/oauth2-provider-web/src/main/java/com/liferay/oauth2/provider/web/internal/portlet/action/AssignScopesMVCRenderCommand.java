@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
 import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeMatcherFactoryLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
@@ -33,6 +34,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import javax.portlet.RenderRequest;
@@ -56,13 +58,6 @@ import static com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebK
 )
 public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_scopedScopeDescriptors = new ScopedServiceTrackerMap<>(
-			bundleContext, ScopeDescriptor.class, "osgi.jaxrs.name",
-			() -> _defaultScopeDescriptor);
-	}
-
 	@Override
 	public String render(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
@@ -85,7 +80,8 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		ApplicationScopeDescriptor applicationScopeDescriptor =
 			(cid, applicationName, scope) -> {
 				ScopeDescriptor scopeDescriptor =
-					_scopedScopeDescriptors.getService(cid, applicationName);
+					_scopeDescriptorLocator.locateScopeDescriptorForApplication(
+						applicationName);
 
 				return scopeDescriptor.describe(
 					scope, themeDisplay.getLocale());
@@ -139,22 +135,16 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		return implications;
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_scopedScopeDescriptors.close();
-	}
+	@Reference(
+		policyOption = ReferencePolicyOption.GREEDY,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	private volatile ScopeDescriptorLocator _scopeDescriptorLocator;
 
 
 	@Reference
 	private ScopeFinderLocator _scopeFinderLocator;
 
-	private ScopedServiceTrackerMap<ScopeDescriptor> _scopedScopeDescriptors;
-
-	@Reference(
-		target = "(default=true)",
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private ScopeDescriptor _defaultScopeDescriptor;
 
 	@Reference
 	ScopeMatcherFactoryLocator _scopeMatcherFactoryLocator;

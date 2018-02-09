@@ -19,9 +19,14 @@ import com.liferay.oauth2.provider.scopes.impl.jaxrs.RunnableExecutorContainerRe
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 import com.liferay.oauth2.provider.scopes.impl.jaxrs.ScopedRequestScopeChecker;
 import com.liferay.oauth2.provider.scopes.spi.RequestScopeChecker;
+import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeContext;
-import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
@@ -42,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.osgi.util.tracker.ServiceTracker;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Priorities;
@@ -55,7 +61,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 @Component(
 	immediate = true,
@@ -133,10 +141,10 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		factoryBeanListenerManager.removeListener(_factoryBeanListener);
 	}
 
-	private static class ScopeFinderFactoryBeanListener
+	private class ScopeFinderFactoryBeanListener
 		implements FactoryBeanListener {
 
-		public static final String APPLICATION_CLASS_NAME =
+		public final String APPLICATION_CLASS_NAME =
 			Application.class.getName();
 
 		@Override
@@ -205,7 +213,61 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					processAnnotationStrategy(
 						bundleContext, (JAXRSServiceFactoryBean) factory,
 						endpoint, applicationClassName);
+
+				registerScopeDescriptor(
+					endpoint, bundle, applicationClassName);
 			}
+		}
+
+		private void registerScopeDescriptor(
+			Endpoint endpoint, Bundle bundle, String applicationClassName) {
+
+			String bundleSymbolicName = bundle.getSymbolicName();
+
+			ServiceTracker<ResourceBundleLoader, ResourceBundleLoader>
+				serviceTracker = ServiceTrackerFactory.open(
+					_bundleContext,
+					"(&(objectClass=" + ResourceBundleLoader.class.getName() +
+					")(bundle.symbolic.name=" + bundleSymbolicName + ")" +
+					"(resource.bundle.base.name=content.Language))");
+
+			ServiceRegistration<ScopeDescriptor>
+				serviceRegistration =
+				_bundleContext.registerService(
+					ScopeDescriptor.class,
+					(scope, locale) -> {
+						ResourceBundleLoader resourceBundleLoader =
+							serviceTracker.getService();
+
+						if (resourceBundleLoader == null) {
+							return _defaultScopeDescriptor.describe(
+								scope, locale);
+						}
+
+						ResourceBundle resourceBundle =
+							resourceBundleLoader.loadResourceBundle(
+								LanguageUtil.getLanguageId(locale));
+
+						String key = "oauth2.scope." + scope;
+
+						if (!resourceBundle.containsKey(key)) {
+							return _defaultScopeDescriptor.describe(
+								scope, locale);
+						}
+
+						return resourceBundle.getString(key);
+					},
+					new Hashtable<String, Object>() {{
+						put("osgi.jaxrs.name", applicationClassName);
+					}});
+
+			endpoint.addCleanupHook(
+				() -> {
+					serviceRegistration.unregister();
+
+					serviceTracker.close();
+				}
+			);
 		}
 
 		protected ServiceReference<?> findReference(
@@ -294,6 +356,13 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		target = "(default=true)"
 	)
 	private RequestScopeChecker defaultRequestScopeChecker;
+
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(default=true)"
+	)
+	private volatile ScopeDescriptor _defaultScopeDescriptor;
 
 	private static ThreadLocal<Boolean> _initializedThreadLocal =
 		ThreadLocal.withInitial(() -> Boolean.FALSE);
