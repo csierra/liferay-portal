@@ -68,7 +68,7 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 				true);
 
 			authorizationCodeGrantHandler.setCodeVerifierTransformer(
-				new PlainCodeVerifier());
+				new DigestCodeVerifier());
 
 			_serviceRegistration = bundleContext.registerService(
 				AccessTokenGrantHandler.class,
