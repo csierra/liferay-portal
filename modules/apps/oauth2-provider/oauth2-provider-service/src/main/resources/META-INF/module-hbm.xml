@@ -39,15 +39,14 @@
 		<composite-id class="com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK" name="primaryKey">
 			<key-property name="applicationName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 			<key-property name="bundleSymbolicName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
-			<key-property name="bundleVersion" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 			<key-property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 			<key-property access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2ScopeName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
-			<key-property access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2TokenId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+			<key-property access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2TokenId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		</composite-id>
 		<property name="createDate" type="org.hibernate.type.TimestampType" />
 	</class>
 	<class name="com.liferay.oauth2.provider.model.impl.OAuth2TokenImpl" table="OAuth2Token">
-		<id access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2TokenId" type="java.lang.String">
+		<id access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2TokenId" type="long">
 			<generator class="assigned" />
 		</id>
 		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
@@ -55,6 +54,7 @@
 		<property name="userName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="createDate" type="org.hibernate.type.TimestampType" />
 		<property name="lifeTime" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2TokenContent" type="com.liferay.portal.dao.orm.hibernate.StringClobType" />
 		<property access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2ApplicationId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2TokenType" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2RefreshTokenId" type="com.liferay.portal.dao.orm.hibernate.StringType" />

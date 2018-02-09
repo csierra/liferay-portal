@@ -60,7 +60,6 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 
 		attributes.put("applicationName", getApplicationName());
 		attributes.put("bundleSymbolicName", getBundleSymbolicName());
-		attributes.put("bundleVersion", getBundleVersion());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("oAuth2ScopeName", getOAuth2ScopeName());
 		attributes.put("oAuth2TokenId", getOAuth2TokenId());
@@ -83,12 +82,6 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 			setBundleSymbolicName(bundleSymbolicName);
 		}
 
-		String bundleVersion = (String)attributes.get("bundleVersion");
-
-		if (bundleVersion != null) {
-			setBundleVersion(bundleVersion);
-		}
-
 		Long companyId = (Long)attributes.get("companyId");
 
 		if (companyId != null) {
@@ -101,7 +94,7 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 			setOAuth2ScopeName(oAuth2ScopeName);
 		}
 
-		String oAuth2TokenId = (String)attributes.get("oAuth2TokenId");
+		Long oAuth2TokenId = (Long)attributes.get("oAuth2TokenId");
 
 		if (oAuth2TokenId != null) {
 			setOAuth2TokenId(oAuth2TokenId);
@@ -145,16 +138,6 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 	}
 
 	/**
-	* Returns the bundle version of this o auth2 scope grant.
-	*
-	* @return the bundle version of this o auth2 scope grant
-	*/
-	@Override
-	public java.lang.String getBundleVersion() {
-		return _oAuth2ScopeGrant.getBundleVersion();
-	}
-
-	/**
 	* Returns the company ID of this o auth2 scope grant.
 	*
 	* @return the company ID of this o auth2 scope grant
@@ -195,7 +178,7 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 	* @return the o auth2 token ID of this o auth2 scope grant
 	*/
 	@Override
-	public java.lang.String getOAuth2TokenId() {
+	public long getOAuth2TokenId() {
 		return _oAuth2ScopeGrant.getOAuth2TokenId();
 	}
 
@@ -257,16 +240,6 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 	@Override
 	public void setBundleSymbolicName(java.lang.String bundleSymbolicName) {
 		_oAuth2ScopeGrant.setBundleSymbolicName(bundleSymbolicName);
-	}
-
-	/**
-	* Sets the bundle version of this o auth2 scope grant.
-	*
-	* @param bundleVersion the bundle version of this o auth2 scope grant
-	*/
-	@Override
-	public void setBundleVersion(java.lang.String bundleVersion) {
-		_oAuth2ScopeGrant.setBundleVersion(bundleVersion);
 	}
 
 	@Override
@@ -331,7 +304,7 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 	* @param oAuth2TokenId the o auth2 token ID of this o auth2 scope grant
 	*/
 	@Override
-	public void setOAuth2TokenId(java.lang.String oAuth2TokenId) {
+	public void setOAuth2TokenId(long oAuth2TokenId) {
 		_oAuth2ScopeGrant.setOAuth2TokenId(oAuth2TokenId);
 	}
 

@@ -39,6 +39,7 @@ public class OAuth2TokenSoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setLifeTime(model.getLifeTime());
+		soapModel.setOAuth2TokenContent(model.getOAuth2TokenContent());
 		soapModel.setOAuth2ApplicationId(model.getOAuth2ApplicationId());
 		soapModel.setOAuth2TokenType(model.getOAuth2TokenType());
 		soapModel.setOAuth2RefreshTokenId(model.getOAuth2RefreshTokenId());
@@ -87,19 +88,19 @@ public class OAuth2TokenSoap implements Serializable {
 	public OAuth2TokenSoap() {
 	}
 
-	public String getPrimaryKey() {
+	public long getPrimaryKey() {
 		return _oAuth2TokenId;
 	}
 
-	public void setPrimaryKey(String pk) {
+	public void setPrimaryKey(long pk) {
 		setOAuth2TokenId(pk);
 	}
 
-	public String getOAuth2TokenId() {
+	public long getOAuth2TokenId() {
 		return _oAuth2TokenId;
 	}
 
-	public void setOAuth2TokenId(String oAuth2TokenId) {
+	public void setOAuth2TokenId(long oAuth2TokenId) {
 		_oAuth2TokenId = oAuth2TokenId;
 	}
 
@@ -143,6 +144,14 @@ public class OAuth2TokenSoap implements Serializable {
 		_lifeTime = lifeTime;
 	}
 
+	public String getOAuth2TokenContent() {
+		return _oAuth2TokenContent;
+	}
+
+	public void setOAuth2TokenContent(String oAuth2TokenContent) {
+		_oAuth2TokenContent = oAuth2TokenContent;
+	}
+
 	public long getOAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
 	}
@@ -175,12 +184,13 @@ public class OAuth2TokenSoap implements Serializable {
 		_scopes = scopes;
 	}
 
-	private String _oAuth2TokenId;
+	private long _oAuth2TokenId;
 	private long _companyId;
 	private long _userId;
 	private String _userName;
 	private Date _createDate;
 	private long _lifeTime;
+	private String _oAuth2TokenContent;
 	private long _oAuth2ApplicationId;
 	private String _oAuth2TokenType;
 	private String _oAuth2RefreshTokenId;

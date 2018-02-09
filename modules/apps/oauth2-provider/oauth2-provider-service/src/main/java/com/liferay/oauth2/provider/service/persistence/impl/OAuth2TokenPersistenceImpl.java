@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
@@ -390,7 +391,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Token[] findByA_PrevAndNext(String oAuth2TokenId,
+	public OAuth2Token[] findByA_PrevAndNext(long oAuth2TokenId,
 		long oAuth2ApplicationId,
 		OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException {
@@ -937,7 +938,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Token[] findByA_U_PrevAndNext(String oAuth2TokenId,
+	public OAuth2Token[] findByA_U_PrevAndNext(long oAuth2TokenId,
 		long oAuth2ApplicationId, String userName,
 		OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException {
@@ -1180,6 +1181,254 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	private static final String _FINDER_COLUMN_A_U_USERNAME_1 = "oAuth2Token.userName IS NULL";
 	private static final String _FINDER_COLUMN_A_U_USERNAME_2 = "oAuth2Token.userName = ?";
 	private static final String _FINDER_COLUMN_A_U_USERNAME_3 = "(oAuth2Token.userName IS NULL OR oAuth2Token.userName = '')";
+	public static final FinderPath FINDER_PATH_FETCH_BY_CONTENT = new FinderPath(OAuth2TokenModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2TokenModelImpl.FINDER_CACHE_ENABLED, OAuth2TokenImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByContent",
+			new String[] { String.class.getName() },
+			OAuth2TokenModelImpl.OAUTH2TOKENCONTENT_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_CONTENT = new FinderPath(OAuth2TokenModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2TokenModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByContent",
+			new String[] { String.class.getName() });
+
+	/**
+	 * Returns the o auth2 token where oAuth2TokenContent = &#63; or throws a {@link NoSuchOAuth2TokenException} if it could not be found.
+	 *
+	 * @param oAuth2TokenContent the o auth2 token content
+	 * @return the matching o auth2 token
+	 * @throws NoSuchOAuth2TokenException if a matching o auth2 token could not be found
+	 */
+	@Override
+	public OAuth2Token findByContent(String oAuth2TokenContent)
+		throws NoSuchOAuth2TokenException {
+		OAuth2Token oAuth2Token = fetchByContent(oAuth2TokenContent);
+
+		if (oAuth2Token == null) {
+			StringBundler msg = new StringBundler(4);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("oAuth2TokenContent=");
+			msg.append(oAuth2TokenContent);
+
+			msg.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
+			}
+
+			throw new NoSuchOAuth2TokenException(msg.toString());
+		}
+
+		return oAuth2Token;
+	}
+
+	/**
+	 * Returns the o auth2 token where oAuth2TokenContent = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param oAuth2TokenContent the o auth2 token content
+	 * @return the matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
+	 */
+	@Override
+	public OAuth2Token fetchByContent(String oAuth2TokenContent) {
+		return fetchByContent(oAuth2TokenContent, true);
+	}
+
+	/**
+	 * Returns the o auth2 token where oAuth2TokenContent = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param oAuth2TokenContent the o auth2 token content
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
+	 */
+	@Override
+	public OAuth2Token fetchByContent(String oAuth2TokenContent,
+		boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] { oAuth2TokenContent };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = finderCache.getResult(FINDER_PATH_FETCH_BY_CONTENT,
+					finderArgs, this);
+		}
+
+		if (result instanceof OAuth2Token) {
+			OAuth2Token oAuth2Token = (OAuth2Token)result;
+
+			if (!Objects.equals(oAuth2TokenContent,
+						oAuth2Token.getOAuth2TokenContent())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_SELECT_OAUTH2TOKEN_WHERE);
+
+			boolean bindOAuth2TokenContent = false;
+
+			if (oAuth2TokenContent == null) {
+				query.append(_FINDER_COLUMN_CONTENT_OAUTH2TOKENCONTENT_1);
+			}
+			else if (oAuth2TokenContent.equals("")) {
+				query.append(_FINDER_COLUMN_CONTENT_OAUTH2TOKENCONTENT_3);
+			}
+			else {
+				bindOAuth2TokenContent = true;
+
+				query.append(_FINDER_COLUMN_CONTENT_OAUTH2TOKENCONTENT_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindOAuth2TokenContent) {
+					qPos.add(oAuth2TokenContent);
+				}
+
+				List<OAuth2Token> list = q.list();
+
+				if (list.isEmpty()) {
+					finderCache.putResult(FINDER_PATH_FETCH_BY_CONTENT,
+						finderArgs, list);
+				}
+				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
+
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"OAuth2TokenPersistenceImpl.fetchByContent(String, boolean) with parameters (" +
+								StringUtil.merge(finderArgs) +
+								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
+					OAuth2Token oAuth2Token = list.get(0);
+
+					result = oAuth2Token;
+
+					cacheResult(oAuth2Token);
+
+					if ((oAuth2Token.getOAuth2TokenContent() == null) ||
+							!oAuth2Token.getOAuth2TokenContent()
+											.equals(oAuth2TokenContent)) {
+						finderCache.putResult(FINDER_PATH_FETCH_BY_CONTENT,
+							finderArgs, oAuth2Token);
+					}
+				}
+			}
+			catch (Exception e) {
+				finderCache.removeResult(FINDER_PATH_FETCH_BY_CONTENT,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (OAuth2Token)result;
+		}
+	}
+
+	/**
+	 * Removes the o auth2 token where oAuth2TokenContent = &#63; from the database.
+	 *
+	 * @param oAuth2TokenContent the o auth2 token content
+	 * @return the o auth2 token that was removed
+	 */
+	@Override
+	public OAuth2Token removeByContent(String oAuth2TokenContent)
+		throws NoSuchOAuth2TokenException {
+		OAuth2Token oAuth2Token = findByContent(oAuth2TokenContent);
+
+		return remove(oAuth2Token);
+	}
+
+	/**
+	 * Returns the number of o auth2 tokens where oAuth2TokenContent = &#63;.
+	 *
+	 * @param oAuth2TokenContent the o auth2 token content
+	 * @return the number of matching o auth2 tokens
+	 */
+	@Override
+	public int countByContent(String oAuth2TokenContent) {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_CONTENT;
+
+		Object[] finderArgs = new Object[] { oAuth2TokenContent };
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_OAUTH2TOKEN_WHERE);
+
+			boolean bindOAuth2TokenContent = false;
+
+			if (oAuth2TokenContent == null) {
+				query.append(_FINDER_COLUMN_CONTENT_OAUTH2TOKENCONTENT_1);
+			}
+			else if (oAuth2TokenContent.equals("")) {
+				query.append(_FINDER_COLUMN_CONTENT_OAUTH2TOKENCONTENT_3);
+			}
+			else {
+				bindOAuth2TokenContent = true;
+
+				query.append(_FINDER_COLUMN_CONTENT_OAUTH2TOKENCONTENT_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindOAuth2TokenContent) {
+					qPos.add(oAuth2TokenContent);
+				}
+
+				count = (Long)q.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				finderCache.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_CONTENT_OAUTH2TOKENCONTENT_1 = "oAuth2Token.oAuth2TokenContent IS NULL";
+	private static final String _FINDER_COLUMN_CONTENT_OAUTH2TOKENCONTENT_2 = "CAST_CLOB_TEXT(oAuth2Token.oAuth2TokenContent) = ?";
+	private static final String _FINDER_COLUMN_CONTENT_OAUTH2TOKENCONTENT_3 = "(oAuth2Token.oAuth2TokenContent IS NULL OR CAST_CLOB_TEXT(oAuth2Token.oAuth2TokenContent) = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_REFRESHTOKEN =
 		new FinderPath(OAuth2TokenModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2TokenModelImpl.FINDER_CACHE_ENABLED, OAuth2TokenImpl.class,
@@ -1505,7 +1754,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Token[] findByRefreshToken_PrevAndNext(String oAuth2TokenId,
+	public OAuth2Token[] findByRefreshToken_PrevAndNext(long oAuth2TokenId,
 		String oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException {
@@ -1755,6 +2004,9 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 		entityCache.putResult(OAuth2TokenModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2TokenImpl.class, oAuth2Token.getPrimaryKey(), oAuth2Token);
 
+		finderCache.putResult(FINDER_PATH_FETCH_BY_CONTENT,
+			new Object[] { oAuth2Token.getOAuth2TokenContent() }, oAuth2Token);
+
 		oAuth2Token.resetOriginalValues();
 	}
 
@@ -1807,6 +2059,8 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache((OAuth2TokenModelImpl)oAuth2Token, true);
 	}
 
 	@Override
@@ -1817,6 +2071,42 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 		for (OAuth2Token oAuth2Token : oAuth2Tokens) {
 			entityCache.removeResult(OAuth2TokenModelImpl.ENTITY_CACHE_ENABLED,
 				OAuth2TokenImpl.class, oAuth2Token.getPrimaryKey());
+
+			clearUniqueFindersCache((OAuth2TokenModelImpl)oAuth2Token, true);
+		}
+	}
+
+	protected void cacheUniqueFindersCache(
+		OAuth2TokenModelImpl oAuth2TokenModelImpl) {
+		Object[] args = new Object[] {
+				oAuth2TokenModelImpl.getOAuth2TokenContent()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_CONTENT, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_CONTENT, args,
+			oAuth2TokenModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		OAuth2TokenModelImpl oAuth2TokenModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					oAuth2TokenModelImpl.getOAuth2TokenContent()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_CONTENT, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_CONTENT, args);
+		}
+
+		if ((oAuth2TokenModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_CONTENT.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					oAuth2TokenModelImpl.getOriginalOAuth2TokenContent()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_CONTENT, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_CONTENT, args);
 		}
 	}
 
@@ -1827,7 +2117,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @return the new o auth2 token
 	 */
 	@Override
-	public OAuth2Token create(String oAuth2TokenId) {
+	public OAuth2Token create(long oAuth2TokenId) {
 		OAuth2Token oAuth2Token = new OAuth2TokenImpl();
 
 		oAuth2Token.setNew(true);
@@ -1846,7 +2136,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Token remove(String oAuth2TokenId)
+	public OAuth2Token remove(long oAuth2TokenId)
 		throws NoSuchOAuth2TokenException {
 		return remove((Serializable)oAuth2TokenId);
 	}
@@ -2052,6 +2342,9 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 			OAuth2TokenImpl.class, oAuth2Token.getPrimaryKey(), oAuth2Token,
 			false);
 
+		clearUniqueFindersCache(oAuth2TokenModelImpl, false);
+		cacheUniqueFindersCache(oAuth2TokenModelImpl);
+
 		oAuth2Token.resetOriginalValues();
 
 		return oAuth2Token;
@@ -2073,6 +2366,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 		oAuth2TokenImpl.setUserName(oAuth2Token.getUserName());
 		oAuth2TokenImpl.setCreateDate(oAuth2Token.getCreateDate());
 		oAuth2TokenImpl.setLifeTime(oAuth2Token.getLifeTime());
+		oAuth2TokenImpl.setOAuth2TokenContent(oAuth2Token.getOAuth2TokenContent());
 		oAuth2TokenImpl.setOAuth2ApplicationId(oAuth2Token.getOAuth2ApplicationId());
 		oAuth2TokenImpl.setOAuth2TokenType(oAuth2Token.getOAuth2TokenType());
 		oAuth2TokenImpl.setOAuth2RefreshTokenId(oAuth2Token.getOAuth2RefreshTokenId());
@@ -2113,7 +2407,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Token findByPrimaryKey(String oAuth2TokenId)
+	public OAuth2Token findByPrimaryKey(long oAuth2TokenId)
 		throws NoSuchOAuth2TokenException {
 		return findByPrimaryKey((Serializable)oAuth2TokenId);
 	}
@@ -2173,7 +2467,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @return the o auth2 token, or <code>null</code> if a o auth2 token with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Token fetchByPrimaryKey(String oAuth2TokenId) {
+	public OAuth2Token fetchByPrimaryKey(long oAuth2TokenId) {
 		return fetchByPrimaryKey((Serializable)oAuth2TokenId);
 	}
 
@@ -2229,8 +2523,8 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 
 		query.append(_SQL_SELECT_OAUTH2TOKEN_WHERE_PKS_IN);
 
-		for (int i = 0; i < uncachedPrimaryKeys.size(); i++) {
-			query.append("?");
+		for (Serializable primaryKey : uncachedPrimaryKeys) {
+			query.append((long)primaryKey);
 
 			query.append(",");
 		}
@@ -2247,12 +2541,6 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 			session = openSession();
 
 			Query q = session.createQuery(sql);
-
-			QueryPos qPos = QueryPos.getInstance(q);
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				qPos.add((String)primaryKey);
-			}
 
 			for (OAuth2Token oAuth2Token : (List<OAuth2Token>)q.list()) {
 				map.put(oAuth2Token.getPrimaryKeyObj(), oAuth2Token);

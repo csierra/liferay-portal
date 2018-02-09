@@ -51,7 +51,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 
 		OAuth2TokenCacheModel oAuth2TokenCacheModel = (OAuth2TokenCacheModel)obj;
 
-		if (oAuth2TokenId.equals(oAuth2TokenCacheModel.oAuth2TokenId)) {
+		if (oAuth2TokenId == oAuth2TokenCacheModel.oAuth2TokenId) {
 			return true;
 		}
 
@@ -65,7 +65,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{oAuth2TokenId=");
 		sb.append(oAuth2TokenId);
@@ -79,6 +79,8 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		sb.append(createDate);
 		sb.append(", lifeTime=");
 		sb.append(lifeTime);
+		sb.append(", oAuth2TokenContent=");
+		sb.append(oAuth2TokenContent);
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(oAuth2ApplicationId);
 		sb.append(", oAuth2TokenType=");
@@ -96,13 +98,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 	public OAuth2Token toEntityModel() {
 		OAuth2TokenImpl oAuth2TokenImpl = new OAuth2TokenImpl();
 
-		if (oAuth2TokenId == null) {
-			oAuth2TokenImpl.setOAuth2TokenId("");
-		}
-		else {
-			oAuth2TokenImpl.setOAuth2TokenId(oAuth2TokenId);
-		}
-
+		oAuth2TokenImpl.setOAuth2TokenId(oAuth2TokenId);
 		oAuth2TokenImpl.setCompanyId(companyId);
 		oAuth2TokenImpl.setUserId(userId);
 
@@ -121,6 +117,14 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		}
 
 		oAuth2TokenImpl.setLifeTime(lifeTime);
+
+		if (oAuth2TokenContent == null) {
+			oAuth2TokenImpl.setOAuth2TokenContent("");
+		}
+		else {
+			oAuth2TokenImpl.setOAuth2TokenContent(oAuth2TokenContent);
+		}
+
 		oAuth2TokenImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
 
 		if (oAuth2TokenType == null) {
@@ -151,7 +155,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
-		oAuth2TokenId = objectInput.readUTF();
+		oAuth2TokenId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
 
@@ -160,6 +164,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		createDate = objectInput.readLong();
 
 		lifeTime = objectInput.readLong();
+		oAuth2TokenContent = objectInput.readUTF();
 
 		oAuth2ApplicationId = objectInput.readLong();
 		oAuth2TokenType = objectInput.readUTF();
@@ -170,12 +175,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
-		if (oAuth2TokenId == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(oAuth2TokenId);
-		}
+		objectOutput.writeLong(oAuth2TokenId);
 
 		objectOutput.writeLong(companyId);
 
@@ -191,6 +191,13 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		objectOutput.writeLong(createDate);
 
 		objectOutput.writeLong(lifeTime);
+
+		if (oAuth2TokenContent == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(oAuth2TokenContent);
+		}
 
 		objectOutput.writeLong(oAuth2ApplicationId);
 
@@ -216,12 +223,13 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		}
 	}
 
-	public String oAuth2TokenId;
+	public long oAuth2TokenId;
 	public long companyId;
 	public long userId;
 	public String userName;
 	public long createDate;
 	public long lifeTime;
+	public String oAuth2TokenContent;
 	public long oAuth2ApplicationId;
 	public String oAuth2TokenType;
 	public String oAuth2RefreshTokenId;

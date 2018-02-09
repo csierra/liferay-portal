@@ -37,7 +37,6 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 
 		soapModel.setApplicationName(model.getApplicationName());
 		soapModel.setBundleSymbolicName(model.getBundleSymbolicName());
-		soapModel.setBundleVersion(model.getBundleVersion());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setOAuth2ScopeName(model.getOAuth2ScopeName());
 		soapModel.setOAuth2TokenId(model.getOAuth2TokenId());
@@ -90,13 +89,12 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 
 	public OAuth2ScopeGrantPK getPrimaryKey() {
 		return new OAuth2ScopeGrantPK(_applicationName, _bundleSymbolicName,
-			_bundleVersion, _companyId, _oAuth2ScopeName, _oAuth2TokenId);
+			_companyId, _oAuth2ScopeName, _oAuth2TokenId);
 	}
 
 	public void setPrimaryKey(OAuth2ScopeGrantPK pk) {
 		setApplicationName(pk.applicationName);
 		setBundleSymbolicName(pk.bundleSymbolicName);
-		setBundleVersion(pk.bundleVersion);
 		setCompanyId(pk.companyId);
 		setOAuth2ScopeName(pk.oAuth2ScopeName);
 		setOAuth2TokenId(pk.oAuth2TokenId);
@@ -118,14 +116,6 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 		_bundleSymbolicName = bundleSymbolicName;
 	}
 
-	public String getBundleVersion() {
-		return _bundleVersion;
-	}
-
-	public void setBundleVersion(String bundleVersion) {
-		_bundleVersion = bundleVersion;
-	}
-
 	public long getCompanyId() {
 		return _companyId;
 	}
@@ -142,11 +132,11 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 		_oAuth2ScopeName = oAuth2ScopeName;
 	}
 
-	public String getOAuth2TokenId() {
+	public long getOAuth2TokenId() {
 		return _oAuth2TokenId;
 	}
 
-	public void setOAuth2TokenId(String oAuth2TokenId) {
+	public void setOAuth2TokenId(long oAuth2TokenId) {
 		_oAuth2TokenId = oAuth2TokenId;
 	}
 
@@ -160,9 +150,8 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 
 	private String _applicationName;
 	private String _bundleSymbolicName;
-	private String _bundleVersion;
 	private long _companyId;
 	private String _oAuth2ScopeName;
-	private String _oAuth2TokenId;
+	private long _oAuth2TokenId;
 	private Date _createDate;
 }

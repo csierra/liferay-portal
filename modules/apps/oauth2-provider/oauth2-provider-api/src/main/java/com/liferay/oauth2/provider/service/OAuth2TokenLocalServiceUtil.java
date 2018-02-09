@@ -60,8 +60,26 @@ public class OAuth2TokenLocalServiceUtil {
 	* @return the new o auth2 token
 	*/
 	public static com.liferay.oauth2.provider.model.OAuth2Token createOAuth2Token(
-		java.lang.String oAuth2TokenId) {
+		long oAuth2TokenId) {
 		return getService().createOAuth2Token(oAuth2TokenId);
+	}
+
+	public static com.liferay.oauth2.provider.model.OAuth2Token createOAuth2Token(
+		java.lang.String tokenContent) {
+		return getService().createOAuth2Token(tokenContent);
+	}
+
+	/**
+	* Deletes the o auth2 token with the primary key from the database. Also notifies the appropriate model listeners.
+	*
+	* @param oAuth2TokenId the primary key of the o auth2 token
+	* @return the o auth2 token that was removed
+	* @throws PortalException if a o auth2 token with the primary key could not be found
+	*/
+	public static com.liferay.oauth2.provider.model.OAuth2Token deleteOAuth2Token(
+		long oAuth2TokenId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deleteOAuth2Token(oAuth2TokenId);
 	}
 
 	/**
@@ -73,19 +91,6 @@ public class OAuth2TokenLocalServiceUtil {
 	public static com.liferay.oauth2.provider.model.OAuth2Token deleteOAuth2Token(
 		com.liferay.oauth2.provider.model.OAuth2Token oAuth2Token) {
 		return getService().deleteOAuth2Token(oAuth2Token);
-	}
-
-	/**
-	* Deletes the o auth2 token with the primary key from the database. Also notifies the appropriate model listeners.
-	*
-	* @param oAuth2TokenId the primary key of the o auth2 token
-	* @return the o auth2 token that was removed
-	* @throws PortalException if a o auth2 token with the primary key could not be found
-	*/
-	public static com.liferay.oauth2.provider.model.OAuth2Token deleteOAuth2Token(
-		java.lang.String oAuth2TokenId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().deleteOAuth2Token(oAuth2TokenId);
 	}
 
 	/**
@@ -175,8 +180,13 @@ public class OAuth2TokenLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2Token fetchByContent(
+		java.lang.String oAuth2TokenContent) {
+		return getService().fetchByContent(oAuth2TokenContent);
+	}
+
 	public static com.liferay.oauth2.provider.model.OAuth2Token fetchOAuth2Token(
-		java.lang.String oAuth2TokenId) {
+		long oAuth2TokenId) {
 		return getService().fetchOAuth2Token(oAuth2TokenId);
 	}
 
@@ -193,9 +203,23 @@ public class OAuth2TokenLocalServiceUtil {
 			orderByComparator);
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2Token findByContent(
+		java.lang.String oAuth2TokenContent)
+		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException {
+		return getService().findByContent(oAuth2TokenContent);
+	}
+
 	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByRefreshToken(
 		java.lang.String refreshToken) {
 		return getService().findByRefreshToken(refreshToken);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
 	}
 
 	/**
@@ -206,7 +230,7 @@ public class OAuth2TokenLocalServiceUtil {
 	* @throws PortalException if a o auth2 token with the primary key could not be found
 	*/
 	public static com.liferay.oauth2.provider.model.OAuth2Token getOAuth2Token(
-		java.lang.String oAuth2TokenId)
+		long oAuth2TokenId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getOAuth2Token(oAuth2TokenId);
 	}

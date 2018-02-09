@@ -39,7 +39,6 @@ import java.io.Serializable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Provides the local service interface for OAuth2ScopeGrant. Methods of this
@@ -174,16 +173,11 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	public OAuth2ScopeGrant fetchOAuth2ScopeGrant(
 		OAuth2ScopeGrantPK oAuth2ScopeGrantPK);
 
-	public Optional<OAuth2ScopeGrant> findByA_BNS_BV_C_O_T(
+	public Collection<OAuth2ScopeGrant> findByA_BSN_C_T(
 		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId, java.lang.String scope,
-		java.lang.String tokenId);
+		java.lang.Long companyId, java.lang.String tokenContent);
 
-	public Collection<OAuth2ScopeGrant> findByA_BNS_BV_C_T(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId, java.lang.String tokenId);
-
-	public Collection<OAuth2ScopeGrant> findByTokenId(java.lang.String tokenId);
+	public Collection<OAuth2ScopeGrant> findByToken(long tokenId);
 
 	/**
 	* Returns the o auth2 scope grant with the primary key.

@@ -67,14 +67,12 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(13);
 
 		sb.append("{applicationName=");
 		sb.append(applicationName);
 		sb.append(", bundleSymbolicName=");
 		sb.append(bundleSymbolicName);
-		sb.append(", bundleVersion=");
-		sb.append(bundleVersion);
 		sb.append(", companyId=");
 		sb.append(companyId);
 		sb.append(", oAuth2ScopeName=");
@@ -106,13 +104,6 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 			oAuth2ScopeGrantImpl.setBundleSymbolicName(bundleSymbolicName);
 		}
 
-		if (bundleVersion == null) {
-			oAuth2ScopeGrantImpl.setBundleVersion("");
-		}
-		else {
-			oAuth2ScopeGrantImpl.setBundleVersion(bundleVersion);
-		}
-
 		oAuth2ScopeGrantImpl.setCompanyId(companyId);
 
 		if (oAuth2ScopeName == null) {
@@ -122,12 +113,7 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 			oAuth2ScopeGrantImpl.setOAuth2ScopeName(oAuth2ScopeName);
 		}
 
-		if (oAuth2TokenId == null) {
-			oAuth2ScopeGrantImpl.setOAuth2TokenId("");
-		}
-		else {
-			oAuth2ScopeGrantImpl.setOAuth2TokenId(oAuth2TokenId);
-		}
+		oAuth2ScopeGrantImpl.setOAuth2TokenId(oAuth2TokenId);
 
 		if (createDate == Long.MIN_VALUE) {
 			oAuth2ScopeGrantImpl.setCreateDate(null);
@@ -145,16 +131,15 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		applicationName = objectInput.readUTF();
 		bundleSymbolicName = objectInput.readUTF();
-		bundleVersion = objectInput.readUTF();
 
 		companyId = objectInput.readLong();
 		oAuth2ScopeName = objectInput.readUTF();
-		oAuth2TokenId = objectInput.readUTF();
+
+		oAuth2TokenId = objectInput.readLong();
 		createDate = objectInput.readLong();
 
 		oAuth2ScopeGrantPK = new OAuth2ScopeGrantPK(applicationName,
-				bundleSymbolicName, bundleVersion, companyId, oAuth2ScopeName,
-				oAuth2TokenId);
+				bundleSymbolicName, companyId, oAuth2ScopeName, oAuth2TokenId);
 	}
 
 	@Override
@@ -174,13 +159,6 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 			objectOutput.writeUTF(bundleSymbolicName);
 		}
 
-		if (bundleVersion == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(bundleVersion);
-		}
-
 		objectOutput.writeLong(companyId);
 
 		if (oAuth2ScopeName == null) {
@@ -190,22 +168,15 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 			objectOutput.writeUTF(oAuth2ScopeName);
 		}
 
-		if (oAuth2TokenId == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(oAuth2TokenId);
-		}
-
+		objectOutput.writeLong(oAuth2TokenId);
 		objectOutput.writeLong(createDate);
 	}
 
 	public String applicationName;
 	public String bundleSymbolicName;
-	public String bundleVersion;
 	public long companyId;
 	public String oAuth2ScopeName;
-	public String oAuth2TokenId;
+	public long oAuth2TokenId;
 	public long createDate;
 	public transient OAuth2ScopeGrantPK oAuth2ScopeGrantPK;
 }

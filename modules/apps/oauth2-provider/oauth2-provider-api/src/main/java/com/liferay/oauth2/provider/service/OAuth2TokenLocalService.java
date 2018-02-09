@@ -16,9 +16,12 @@ package com.liferay.oauth2.provider.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -75,16 +78,9 @@ public interface OAuth2TokenLocalService extends BaseLocalService,
 	* @param oAuth2TokenId the primary key for the new o auth2 token
 	* @return the new o auth2 token
 	*/
-	public OAuth2Token createOAuth2Token(java.lang.String oAuth2TokenId);
+	public OAuth2Token createOAuth2Token(long oAuth2TokenId);
 
-	/**
-	* Deletes the o auth2 token from the database. Also notifies the appropriate model listeners.
-	*
-	* @param oAuth2Token the o auth2 token
-	* @return the o auth2 token that was removed
-	*/
-	@Indexable(type = IndexableType.DELETE)
-	public OAuth2Token deleteOAuth2Token(OAuth2Token oAuth2Token);
+	public OAuth2Token createOAuth2Token(java.lang.String tokenContent);
 
 	/**
 	* Deletes the o auth2 token with the primary key from the database. Also notifies the appropriate model listeners.
@@ -94,8 +90,17 @@ public interface OAuth2TokenLocalService extends BaseLocalService,
 	* @throws PortalException if a o auth2 token with the primary key could not be found
 	*/
 	@Indexable(type = IndexableType.DELETE)
-	public OAuth2Token deleteOAuth2Token(java.lang.String oAuth2TokenId)
+	public OAuth2Token deleteOAuth2Token(long oAuth2TokenId)
 		throws PortalException;
+
+	/**
+	* Deletes the o auth2 token from the database. Also notifies the appropriate model listeners.
+	*
+	* @param oAuth2Token the o auth2 token
+	* @return the o auth2 token that was removed
+	*/
+	@Indexable(type = IndexableType.DELETE)
+	public OAuth2Token deleteOAuth2Token(OAuth2Token oAuth2Token);
 
 	/**
 	* @throws PortalException
@@ -164,7 +169,10 @@ public interface OAuth2TokenLocalService extends BaseLocalService,
 		Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public OAuth2Token fetchOAuth2Token(java.lang.String oAuth2TokenId);
+	public OAuth2Token fetchByContent(java.lang.String oAuth2TokenContent);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public OAuth2Token fetchOAuth2Token(long oAuth2TokenId);
 
 	public Collection<OAuth2Token> findByApplicationAndUserName(
 		long applicationId, java.lang.String username);
@@ -172,8 +180,17 @@ public interface OAuth2TokenLocalService extends BaseLocalService,
 	public Collection<OAuth2Token> findByApplicationId(long applicationId,
 		int start, int end, OrderByComparator<OAuth2Token> orderByComparator);
 
+	public OAuth2Token findByContent(java.lang.String oAuth2TokenContent)
+		throws NoSuchOAuth2TokenException;
+
 	public Collection<OAuth2Token> findByRefreshToken(
 		java.lang.String refreshToken);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ActionableDynamicQuery getActionableDynamicQuery();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
 	* Returns the o auth2 token with the primary key.
@@ -183,7 +200,7 @@ public interface OAuth2TokenLocalService extends BaseLocalService,
 	* @throws PortalException if a o auth2 token with the primary key could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public OAuth2Token getOAuth2Token(java.lang.String oAuth2TokenId)
+	public OAuth2Token getOAuth2Token(long oAuth2TokenId)
 		throws PortalException;
 
 	/**

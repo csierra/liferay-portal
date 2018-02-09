@@ -27,8 +27,11 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -91,7 +94,7 @@ public abstract class OAuth2TokenLocalServiceBaseImpl
 	 * @return the new o auth2 token
 	 */
 	@Override
-	public OAuth2Token createOAuth2Token(String oAuth2TokenId) {
+	public OAuth2Token createOAuth2Token(long oAuth2TokenId) {
 		return oAuth2TokenPersistence.create(oAuth2TokenId);
 	}
 
@@ -104,7 +107,7 @@ public abstract class OAuth2TokenLocalServiceBaseImpl
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public OAuth2Token deleteOAuth2Token(String oAuth2TokenId)
+	public OAuth2Token deleteOAuth2Token(long oAuth2TokenId)
 		throws PortalException {
 		return oAuth2TokenPersistence.remove(oAuth2TokenId);
 	}
@@ -205,7 +208,7 @@ public abstract class OAuth2TokenLocalServiceBaseImpl
 	}
 
 	@Override
-	public OAuth2Token fetchOAuth2Token(String oAuth2TokenId) {
+	public OAuth2Token fetchOAuth2Token(long oAuth2TokenId) {
 		return oAuth2TokenPersistence.fetchByPrimaryKey(oAuth2TokenId);
 	}
 
@@ -217,9 +220,45 @@ public abstract class OAuth2TokenLocalServiceBaseImpl
 	 * @throws PortalException if a o auth2 token with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Token getOAuth2Token(String oAuth2TokenId)
+	public OAuth2Token getOAuth2Token(long oAuth2TokenId)
 		throws PortalException {
 		return oAuth2TokenPersistence.findByPrimaryKey(oAuth2TokenId);
+	}
+
+	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(oAuth2TokenLocalService);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(OAuth2Token.class);
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("oAuth2TokenId");
+
+		return actionableDynamicQuery;
+	}
+
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(oAuth2TokenLocalService);
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(OAuth2Token.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
+			"oAuth2TokenId");
+
+		return indexableActionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(oAuth2TokenLocalService);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(OAuth2Token.class);
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("oAuth2TokenId");
 	}
 
 	/**

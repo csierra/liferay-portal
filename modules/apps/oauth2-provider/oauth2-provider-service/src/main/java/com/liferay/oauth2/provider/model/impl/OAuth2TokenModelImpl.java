@@ -16,6 +16,9 @@ package com.liferay.oauth2.provider.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
+
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.model.OAuth2TokenModel;
 
@@ -24,6 +27,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -60,12 +64,13 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	 */
 	public static final String TABLE_NAME = "OAuth2Token";
 	public static final Object[][] TABLE_COLUMNS = {
-			{ "oAuth2TokenId", Types.VARCHAR },
+			{ "oAuth2TokenId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
 			{ "userId", Types.BIGINT },
 			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
 			{ "lifeTime", Types.BIGINT },
+			{ "oAuth2TokenContent", Types.CLOB },
 			{ "oAuth2ApplicationId", Types.BIGINT },
 			{ "oAuth2TokenType", Types.VARCHAR },
 			{ "oAuth2RefreshTokenId", Types.VARCHAR },
@@ -74,19 +79,20 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
 
 	static {
-		TABLE_COLUMNS_MAP.put("oAuth2TokenId", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("oAuth2TokenId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("lifeTime", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("oAuth2TokenContent", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("oAuth2ApplicationId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("oAuth2TokenType", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("oAuth2RefreshTokenId", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("scopes", Types.CLOB);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2Token (oAuth2TokenId VARCHAR(75) not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,oAuth2ApplicationId LONG,oAuth2TokenType VARCHAR(75) null,oAuth2RefreshTokenId VARCHAR(75) null,scopes TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2Token (oAuth2TokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,oAuth2TokenContent TEXT null,oAuth2ApplicationId LONG,oAuth2TokenType VARCHAR(75) null,oAuth2RefreshTokenId VARCHAR(75) null,scopes TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2Token";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2Token.oAuth2TokenId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2Token.oAuth2TokenId ASC";
@@ -104,8 +110,9 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 			true);
 	public static final long OAUTH2APPLICATIONID_COLUMN_BITMASK = 1L;
 	public static final long OAUTH2REFRESHTOKENID_COLUMN_BITMASK = 2L;
-	public static final long USERNAME_COLUMN_BITMASK = 4L;
-	public static final long OAUTH2TOKENID_COLUMN_BITMASK = 8L;
+	public static final long OAUTH2TOKENCONTENT_COLUMN_BITMASK = 4L;
+	public static final long USERNAME_COLUMN_BITMASK = 8L;
+	public static final long OAUTH2TOKENID_COLUMN_BITMASK = 16L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.oauth2.provider.service.util.ServiceProps.get(
 				"lock.expiration.time.com.liferay.oauth2.provider.model.OAuth2Token"));
 
@@ -113,12 +120,12 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	}
 
 	@Override
-	public String getPrimaryKey() {
+	public long getPrimaryKey() {
 		return _oAuth2TokenId;
 	}
 
 	@Override
-	public void setPrimaryKey(String primaryKey) {
+	public void setPrimaryKey(long primaryKey) {
 		setOAuth2TokenId(primaryKey);
 	}
 
@@ -129,7 +136,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 	@Override
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		setPrimaryKey((String)primaryKeyObj);
+		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
 	@Override
@@ -152,6 +159,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("lifeTime", getLifeTime());
+		attributes.put("oAuth2TokenContent", getOAuth2TokenContent());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
 		attributes.put("oAuth2TokenType", getOAuth2TokenType());
 		attributes.put("oAuth2RefreshTokenId", getOAuth2RefreshTokenId());
@@ -165,7 +173,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		String oAuth2TokenId = (String)attributes.get("oAuth2TokenId");
+		Long oAuth2TokenId = (Long)attributes.get("oAuth2TokenId");
 
 		if (oAuth2TokenId != null) {
 			setOAuth2TokenId(oAuth2TokenId);
@@ -201,6 +209,12 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 			setLifeTime(lifeTime);
 		}
 
+		String oAuth2TokenContent = (String)attributes.get("oAuth2TokenContent");
+
+		if (oAuth2TokenContent != null) {
+			setOAuth2TokenContent(oAuth2TokenContent);
+		}
+
 		Long oAuth2ApplicationId = (Long)attributes.get("oAuth2ApplicationId");
 
 		if (oAuth2ApplicationId != null) {
@@ -228,17 +242,12 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	}
 
 	@Override
-	public String getOAuth2TokenId() {
-		if (_oAuth2TokenId == null) {
-			return "";
-		}
-		else {
-			return _oAuth2TokenId;
-		}
+	public long getOAuth2TokenId() {
+		return _oAuth2TokenId;
 	}
 
 	@Override
-	public void setOAuth2TokenId(String oAuth2TokenId) {
+	public void setOAuth2TokenId(long oAuth2TokenId) {
 		_oAuth2TokenId = oAuth2TokenId;
 	}
 
@@ -324,6 +333,31 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	}
 
 	@Override
+	public String getOAuth2TokenContent() {
+		if (_oAuth2TokenContent == null) {
+			return "";
+		}
+		else {
+			return _oAuth2TokenContent;
+		}
+	}
+
+	@Override
+	public void setOAuth2TokenContent(String oAuth2TokenContent) {
+		_columnBitmask |= OAUTH2TOKENCONTENT_COLUMN_BITMASK;
+
+		if (_originalOAuth2TokenContent == null) {
+			_originalOAuth2TokenContent = _oAuth2TokenContent;
+		}
+
+		_oAuth2TokenContent = oAuth2TokenContent;
+	}
+
+	public String getOriginalOAuth2TokenContent() {
+		return GetterUtil.getString(_originalOAuth2TokenContent);
+	}
+
+	@Override
 	public long getOAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
 	}
@@ -405,6 +439,19 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	}
 
 	@Override
+	public ExpandoBridge getExpandoBridge() {
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			OAuth2Token.class.getName(), getPrimaryKey());
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
+	}
+
+	@Override
 	public OAuth2Token toEscapedModel() {
 		if (_escapedModel == null) {
 			_escapedModel = (OAuth2Token)ProxyUtil.newProxyInstance(_classLoader,
@@ -424,6 +471,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		oAuth2TokenImpl.setUserName(getUserName());
 		oAuth2TokenImpl.setCreateDate(getCreateDate());
 		oAuth2TokenImpl.setLifeTime(getLifeTime());
+		oAuth2TokenImpl.setOAuth2TokenContent(getOAuth2TokenContent());
 		oAuth2TokenImpl.setOAuth2ApplicationId(getOAuth2ApplicationId());
 		oAuth2TokenImpl.setOAuth2TokenType(getOAuth2TokenType());
 		oAuth2TokenImpl.setOAuth2RefreshTokenId(getOAuth2RefreshTokenId());
@@ -436,9 +484,17 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 	@Override
 	public int compareTo(OAuth2Token oAuth2Token) {
-		String primaryKey = oAuth2Token.getPrimaryKey();
+		long primaryKey = oAuth2Token.getPrimaryKey();
 
-		return getPrimaryKey().compareTo(primaryKey);
+		if (getPrimaryKey() < primaryKey) {
+			return -1;
+		}
+		else if (getPrimaryKey() > primaryKey) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
 	}
 
 	@Override
@@ -453,9 +509,9 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 		OAuth2Token oAuth2Token = (OAuth2Token)obj;
 
-		String primaryKey = oAuth2Token.getPrimaryKey();
+		long primaryKey = oAuth2Token.getPrimaryKey();
 
-		if (getPrimaryKey().equals(primaryKey)) {
+		if (getPrimaryKey() == primaryKey) {
 			return true;
 		}
 		else {
@@ -465,7 +521,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 	@Override
 	public int hashCode() {
-		return getPrimaryKey().hashCode();
+		return (int)getPrimaryKey();
 	}
 
 	@Override
@@ -484,6 +540,8 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 		oAuth2TokenModelImpl._originalUserName = oAuth2TokenModelImpl._userName;
 
+		oAuth2TokenModelImpl._originalOAuth2TokenContent = oAuth2TokenModelImpl._oAuth2TokenContent;
+
 		oAuth2TokenModelImpl._originalOAuth2ApplicationId = oAuth2TokenModelImpl._oAuth2ApplicationId;
 
 		oAuth2TokenModelImpl._setOriginalOAuth2ApplicationId = false;
@@ -498,12 +556,6 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		OAuth2TokenCacheModel oAuth2TokenCacheModel = new OAuth2TokenCacheModel();
 
 		oAuth2TokenCacheModel.oAuth2TokenId = getOAuth2TokenId();
-
-		String oAuth2TokenId = oAuth2TokenCacheModel.oAuth2TokenId;
-
-		if ((oAuth2TokenId != null) && (oAuth2TokenId.length() == 0)) {
-			oAuth2TokenCacheModel.oAuth2TokenId = null;
-		}
 
 		oAuth2TokenCacheModel.companyId = getCompanyId();
 
@@ -527,6 +579,14 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		}
 
 		oAuth2TokenCacheModel.lifeTime = getLifeTime();
+
+		oAuth2TokenCacheModel.oAuth2TokenContent = getOAuth2TokenContent();
+
+		String oAuth2TokenContent = oAuth2TokenCacheModel.oAuth2TokenContent;
+
+		if ((oAuth2TokenContent != null) && (oAuth2TokenContent.length() == 0)) {
+			oAuth2TokenCacheModel.oAuth2TokenContent = null;
+		}
 
 		oAuth2TokenCacheModel.oAuth2ApplicationId = getOAuth2ApplicationId();
 
@@ -560,7 +620,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{oAuth2TokenId=");
 		sb.append(getOAuth2TokenId());
@@ -574,6 +634,8 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		sb.append(getCreateDate());
 		sb.append(", lifeTime=");
 		sb.append(getLifeTime());
+		sb.append(", oAuth2TokenContent=");
+		sb.append(getOAuth2TokenContent());
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(getOAuth2ApplicationId());
 		sb.append(", oAuth2TokenType=");
@@ -589,7 +651,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.oauth2.provider.model.OAuth2Token");
@@ -620,6 +682,10 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		sb.append(getLifeTime());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>oAuth2TokenContent</column-name><column-value><![CDATA[");
+		sb.append(getOAuth2TokenContent());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>oAuth2ApplicationId</column-name><column-value><![CDATA[");
 		sb.append(getOAuth2ApplicationId());
 		sb.append("]]></column-value></column>");
@@ -645,13 +711,15 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
 			OAuth2Token.class
 		};
-	private String _oAuth2TokenId;
+	private long _oAuth2TokenId;
 	private long _companyId;
 	private long _userId;
 	private String _userName;
 	private String _originalUserName;
 	private Date _createDate;
 	private long _lifeTime;
+	private String _oAuth2TokenContent;
+	private String _originalOAuth2TokenContent;
 	private long _oAuth2ApplicationId;
 	private long _originalOAuth2ApplicationId;
 	private boolean _setOriginalOAuth2ApplicationId;

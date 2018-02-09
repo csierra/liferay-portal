@@ -54,29 +54,28 @@ public interface OAuth2TokenModel extends BaseModel<OAuth2Token>, ShardedModel {
 	 *
 	 * @return the primary key of this o auth2 token
 	 */
-	public String getPrimaryKey();
+	public long getPrimaryKey();
 
 	/**
 	 * Sets the primary key of this o auth2 token.
 	 *
 	 * @param primaryKey the primary key of this o auth2 token
 	 */
-	public void setPrimaryKey(String primaryKey);
+	public void setPrimaryKey(long primaryKey);
 
 	/**
 	 * Returns the o auth2 token ID of this o auth2 token.
 	 *
 	 * @return the o auth2 token ID of this o auth2 token
 	 */
-	@AutoEscape
-	public String getOAuth2TokenId();
+	public long getOAuth2TokenId();
 
 	/**
 	 * Sets the o auth2 token ID of this o auth2 token.
 	 *
 	 * @param oAuth2TokenId the o auth2 token ID of this o auth2 token
 	 */
-	public void setOAuth2TokenId(String oAuth2TokenId);
+	public void setOAuth2TokenId(long oAuth2TokenId);
 
 	/**
 	 * Returns the company ID of this o auth2 token.
@@ -164,6 +163,21 @@ public interface OAuth2TokenModel extends BaseModel<OAuth2Token>, ShardedModel {
 	 * @param lifeTime the life time of this o auth2 token
 	 */
 	public void setLifeTime(long lifeTime);
+
+	/**
+	 * Returns the o auth2 token content of this o auth2 token.
+	 *
+	 * @return the o auth2 token content of this o auth2 token
+	 */
+	@AutoEscape
+	public String getOAuth2TokenContent();
+
+	/**
+	 * Sets the o auth2 token content of this o auth2 token.
+	 *
+	 * @param oAuth2TokenContent the o auth2 token content of this o auth2 token
+	 */
+	public void setOAuth2TokenContent(String oAuth2TokenContent);
 
 	/**
 	 * Returns the o auth2 application ID of this o auth2 token.

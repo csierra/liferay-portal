@@ -97,21 +97,6 @@ public interface OAuth2ScopeGrantModel extends BaseModel<OAuth2ScopeGrant>,
 	public void setBundleSymbolicName(String bundleSymbolicName);
 
 	/**
-	 * Returns the bundle version of this o auth2 scope grant.
-	 *
-	 * @return the bundle version of this o auth2 scope grant
-	 */
-	@AutoEscape
-	public String getBundleVersion();
-
-	/**
-	 * Sets the bundle version of this o auth2 scope grant.
-	 *
-	 * @param bundleVersion the bundle version of this o auth2 scope grant
-	 */
-	public void setBundleVersion(String bundleVersion);
-
-	/**
 	 * Returns the company ID of this o auth2 scope grant.
 	 *
 	 * @return the company ID of this o auth2 scope grant
@@ -147,15 +132,14 @@ public interface OAuth2ScopeGrantModel extends BaseModel<OAuth2ScopeGrant>,
 	 *
 	 * @return the o auth2 token ID of this o auth2 scope grant
 	 */
-	@AutoEscape
-	public String getOAuth2TokenId();
+	public long getOAuth2TokenId();
 
 	/**
 	 * Sets the o auth2 token ID of this o auth2 scope grant.
 	 *
 	 * @param oAuth2TokenId the o auth2 token ID of this o auth2 scope grant
 	 */
-	public void setOAuth2TokenId(String oAuth2TokenId);
+	public void setOAuth2TokenId(long oAuth2TokenId);
 
 	/**
 	 * Returns the create date of this o auth2 scope grant.

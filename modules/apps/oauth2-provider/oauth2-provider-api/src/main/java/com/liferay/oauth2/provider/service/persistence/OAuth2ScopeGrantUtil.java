@@ -117,8 +117,7 @@ public class OAuth2ScopeGrantUtil {
 	* @param oAuth2TokenId the o auth2 token ID
 	* @return the matching o auth2 scope grants
 	*/
-	public static List<OAuth2ScopeGrant> findByToken(
-		java.lang.String oAuth2TokenId) {
+	public static List<OAuth2ScopeGrant> findByToken(long oAuth2TokenId) {
 		return getPersistence().findByToken(oAuth2TokenId);
 	}
 
@@ -134,8 +133,8 @@ public class OAuth2ScopeGrantUtil {
 	* @param end the upper bound of the range of o auth2 scope grants (not inclusive)
 	* @return the range of matching o auth2 scope grants
 	*/
-	public static List<OAuth2ScopeGrant> findByToken(
-		java.lang.String oAuth2TokenId, int start, int end) {
+	public static List<OAuth2ScopeGrant> findByToken(long oAuth2TokenId,
+		int start, int end) {
 		return getPersistence().findByToken(oAuth2TokenId, start, end);
 	}
 
@@ -152,8 +151,8 @@ public class OAuth2ScopeGrantUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching o auth2 scope grants
 	*/
-	public static List<OAuth2ScopeGrant> findByToken(
-		java.lang.String oAuth2TokenId, int start, int end,
+	public static List<OAuth2ScopeGrant> findByToken(long oAuth2TokenId,
+		int start, int end,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
 		return getPersistence()
 				   .findByToken(oAuth2TokenId, start, end, orderByComparator);
@@ -173,8 +172,8 @@ public class OAuth2ScopeGrantUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching o auth2 scope grants
 	*/
-	public static List<OAuth2ScopeGrant> findByToken(
-		java.lang.String oAuth2TokenId, int start, int end,
+	public static List<OAuth2ScopeGrant> findByToken(long oAuth2TokenId,
+		int start, int end,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -190,8 +189,7 @@ public class OAuth2ScopeGrantUtil {
 	* @return the first matching o auth2 scope grant
 	* @throws NoSuchOAuth2ScopeGrantException if a matching o auth2 scope grant could not be found
 	*/
-	public static OAuth2ScopeGrant findByToken_First(
-		java.lang.String oAuth2TokenId,
+	public static OAuth2ScopeGrant findByToken_First(long oAuth2TokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ScopeGrantException {
 		return getPersistence()
@@ -205,8 +203,7 @@ public class OAuth2ScopeGrantUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
 	*/
-	public static OAuth2ScopeGrant fetchByToken_First(
-		java.lang.String oAuth2TokenId,
+	public static OAuth2ScopeGrant fetchByToken_First(long oAuth2TokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
 		return getPersistence()
 				   .fetchByToken_First(oAuth2TokenId, orderByComparator);
@@ -220,8 +217,7 @@ public class OAuth2ScopeGrantUtil {
 	* @return the last matching o auth2 scope grant
 	* @throws NoSuchOAuth2ScopeGrantException if a matching o auth2 scope grant could not be found
 	*/
-	public static OAuth2ScopeGrant findByToken_Last(
-		java.lang.String oAuth2TokenId,
+	public static OAuth2ScopeGrant findByToken_Last(long oAuth2TokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ScopeGrantException {
 		return getPersistence()
@@ -235,8 +231,7 @@ public class OAuth2ScopeGrantUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
 	*/
-	public static OAuth2ScopeGrant fetchByToken_Last(
-		java.lang.String oAuth2TokenId,
+	public static OAuth2ScopeGrant fetchByToken_Last(long oAuth2TokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
 		return getPersistence()
 				   .fetchByToken_Last(oAuth2TokenId, orderByComparator);
@@ -252,7 +247,7 @@ public class OAuth2ScopeGrantUtil {
 	* @throws NoSuchOAuth2ScopeGrantException if a o auth2 scope grant with the primary key could not be found
 	*/
 	public static OAuth2ScopeGrant[] findByToken_PrevAndNext(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK, java.lang.String oAuth2TokenId,
+		OAuth2ScopeGrantPK oAuth2ScopeGrantPK, long oAuth2TokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ScopeGrantException {
 		return getPersistence()
@@ -265,7 +260,7 @@ public class OAuth2ScopeGrantUtil {
 	*
 	* @param oAuth2TokenId the o auth2 token ID
 	*/
-	public static void removeByToken(java.lang.String oAuth2TokenId) {
+	public static void removeByToken(long oAuth2TokenId) {
 		getPersistence().removeByToken(oAuth2TokenId);
 	}
 
@@ -275,369 +270,103 @@ public class OAuth2ScopeGrantUtil {
 	* @param oAuth2TokenId the o auth2 token ID
 	* @return the number of matching o auth2 scope grants
 	*/
-	public static int countByToken(java.lang.String oAuth2TokenId) {
+	public static int countByToken(long oAuth2TokenId) {
 		return getPersistence().countByToken(oAuth2TokenId);
 	}
 
 	/**
-	* Returns all the o auth2 scope grants where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
+	* Returns the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63; or throws a {@link NoSuchOAuth2ScopeGrantException} if it could not be found.
 	*
 	* @param applicationName the application name
 	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @return the matching o auth2 scope grants
-	*/
-	public static List<OAuth2ScopeGrant> findByA_BSN_BV_C_T(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2TokenId) {
-		return getPersistence()
-				   .findByA_BSN_BV_C_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2TokenId);
-	}
-
-	/**
-	* Returns a range of all the o auth2 scope grants where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ScopeGrantModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
-	* </p>
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @param start the lower bound of the range of o auth2 scope grants
-	* @param end the upper bound of the range of o auth2 scope grants (not inclusive)
-	* @return the range of matching o auth2 scope grants
-	*/
-	public static List<OAuth2ScopeGrant> findByA_BSN_BV_C_T(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2TokenId, int start, int end) {
-		return getPersistence()
-				   .findByA_BSN_BV_C_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2TokenId, start, end);
-	}
-
-	/**
-	* Returns an ordered range of all the o auth2 scope grants where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ScopeGrantModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
-	* </p>
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @param start the lower bound of the range of o auth2 scope grants
-	* @param end the upper bound of the range of o auth2 scope grants (not inclusive)
-	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	* @return the ordered range of matching o auth2 scope grants
-	*/
-	public static List<OAuth2ScopeGrant> findByA_BSN_BV_C_T(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2TokenId, int start, int end,
-		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
-		return getPersistence()
-				   .findByA_BSN_BV_C_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2TokenId, start, end,
-			orderByComparator);
-	}
-
-	/**
-	* Returns an ordered range of all the o auth2 scope grants where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ScopeGrantModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
-	* </p>
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @param start the lower bound of the range of o auth2 scope grants
-	* @param end the upper bound of the range of o auth2 scope grants (not inclusive)
-	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	* @param retrieveFromCache whether to retrieve from the finder cache
-	* @return the ordered range of matching o auth2 scope grants
-	*/
-	public static List<OAuth2ScopeGrant> findByA_BSN_BV_C_T(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2TokenId, int start, int end,
-		OrderByComparator<OAuth2ScopeGrant> orderByComparator,
-		boolean retrieveFromCache) {
-		return getPersistence()
-				   .findByA_BSN_BV_C_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2TokenId, start, end,
-			orderByComparator, retrieveFromCache);
-	}
-
-	/**
-	* Returns the first o auth2 scope grant in the ordered set where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	* @return the first matching o auth2 scope grant
-	* @throws NoSuchOAuth2ScopeGrantException if a matching o auth2 scope grant could not be found
-	*/
-	public static OAuth2ScopeGrant findByA_BSN_BV_C_T_First(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2TokenId,
-		OrderByComparator<OAuth2ScopeGrant> orderByComparator)
-		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ScopeGrantException {
-		return getPersistence()
-				   .findByA_BSN_BV_C_T_First(applicationName,
-			bundleSymbolicName, bundleVersion, companyId, oAuth2TokenId,
-			orderByComparator);
-	}
-
-	/**
-	* Returns the first o auth2 scope grant in the ordered set where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	* @return the first matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
-	*/
-	public static OAuth2ScopeGrant fetchByA_BSN_BV_C_T_First(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2TokenId,
-		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
-		return getPersistence()
-				   .fetchByA_BSN_BV_C_T_First(applicationName,
-			bundleSymbolicName, bundleVersion, companyId, oAuth2TokenId,
-			orderByComparator);
-	}
-
-	/**
-	* Returns the last o auth2 scope grant in the ordered set where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	* @return the last matching o auth2 scope grant
-	* @throws NoSuchOAuth2ScopeGrantException if a matching o auth2 scope grant could not be found
-	*/
-	public static OAuth2ScopeGrant findByA_BSN_BV_C_T_Last(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2TokenId,
-		OrderByComparator<OAuth2ScopeGrant> orderByComparator)
-		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ScopeGrantException {
-		return getPersistence()
-				   .findByA_BSN_BV_C_T_Last(applicationName,
-			bundleSymbolicName, bundleVersion, companyId, oAuth2TokenId,
-			orderByComparator);
-	}
-
-	/**
-	* Returns the last o auth2 scope grant in the ordered set where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	* @return the last matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
-	*/
-	public static OAuth2ScopeGrant fetchByA_BSN_BV_C_T_Last(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2TokenId,
-		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
-		return getPersistence()
-				   .fetchByA_BSN_BV_C_T_Last(applicationName,
-			bundleSymbolicName, bundleVersion, companyId, oAuth2TokenId,
-			orderByComparator);
-	}
-
-	/**
-	* Returns the o auth2 scope grants before and after the current o auth2 scope grant in the ordered set where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
-	*
-	* @param oAuth2ScopeGrantPK the primary key of the current o auth2 scope grant
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	* @return the previous, current, and next o auth2 scope grant
-	* @throws NoSuchOAuth2ScopeGrantException if a o auth2 scope grant with the primary key could not be found
-	*/
-	public static OAuth2ScopeGrant[] findByA_BSN_BV_C_T_PrevAndNext(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK,
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2TokenId,
-		OrderByComparator<OAuth2ScopeGrant> orderByComparator)
-		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ScopeGrantException {
-		return getPersistence()
-				   .findByA_BSN_BV_C_T_PrevAndNext(oAuth2ScopeGrantPK,
-			applicationName, bundleSymbolicName, bundleVersion, companyId,
-			oAuth2TokenId, orderByComparator);
-	}
-
-	/**
-	* Removes all the o auth2 scope grants where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63; from the database.
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	*/
-	public static void removeByA_BSN_BV_C_T(java.lang.String applicationName,
-		java.lang.String bundleSymbolicName, java.lang.String bundleVersion,
-		long companyId, java.lang.String oAuth2TokenId) {
-		getPersistence()
-			.removeByA_BSN_BV_C_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2TokenId);
-	}
-
-	/**
-	* Returns the number of o auth2 scope grants where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2TokenId = &#63;.
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
-	* @param companyId the company ID
-	* @param oAuth2TokenId the o auth2 token ID
-	* @return the number of matching o auth2 scope grants
-	*/
-	public static int countByA_BSN_BV_C_T(java.lang.String applicationName,
-		java.lang.String bundleSymbolicName, java.lang.String bundleVersion,
-		long companyId, java.lang.String oAuth2TokenId) {
-		return getPersistence()
-				   .countByA_BSN_BV_C_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2TokenId);
-	}
-
-	/**
-	* Returns the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63; or throws a {@link NoSuchOAuth2ScopeGrantException} if it could not be found.
-	*
-	* @param applicationName the application name
-	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
 	* @param companyId the company ID
 	* @param oAuth2ScopeName the o auth2 scope name
 	* @param oAuth2TokenId the o auth2 token ID
 	* @return the matching o auth2 scope grant
 	* @throws NoSuchOAuth2ScopeGrantException if a matching o auth2 scope grant could not be found
 	*/
-	public static OAuth2ScopeGrant findByA_BSN_BV_C_O_T(
+	public static OAuth2ScopeGrant findByA_BSN_C_O_T(
 		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2ScopeName, java.lang.String oAuth2TokenId)
+		long companyId, java.lang.String oAuth2ScopeName, long oAuth2TokenId)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ScopeGrantException {
 		return getPersistence()
-				   .findByA_BSN_BV_C_O_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2ScopeName, oAuth2TokenId);
+				   .findByA_BSN_C_O_T(applicationName, bundleSymbolicName,
+			companyId, oAuth2ScopeName, oAuth2TokenId);
 	}
 
 	/**
-	* Returns the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	* Returns the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	*
 	* @param applicationName the application name
 	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
 	* @param companyId the company ID
 	* @param oAuth2ScopeName the o auth2 scope name
 	* @param oAuth2TokenId the o auth2 token ID
 	* @return the matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
 	*/
-	public static OAuth2ScopeGrant fetchByA_BSN_BV_C_O_T(
+	public static OAuth2ScopeGrant fetchByA_BSN_C_O_T(
 		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2ScopeName, java.lang.String oAuth2TokenId) {
+		long companyId, java.lang.String oAuth2ScopeName, long oAuth2TokenId) {
 		return getPersistence()
-				   .fetchByA_BSN_BV_C_O_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2ScopeName, oAuth2TokenId);
+				   .fetchByA_BSN_C_O_T(applicationName, bundleSymbolicName,
+			companyId, oAuth2ScopeName, oAuth2TokenId);
 	}
 
 	/**
-	* Returns the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	* Returns the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	*
 	* @param applicationName the application name
 	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
 	* @param companyId the company ID
 	* @param oAuth2ScopeName the o auth2 scope name
 	* @param oAuth2TokenId the o auth2 token ID
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
 	*/
-	public static OAuth2ScopeGrant fetchByA_BSN_BV_C_O_T(
+	public static OAuth2ScopeGrant fetchByA_BSN_C_O_T(
 		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2ScopeName, java.lang.String oAuth2TokenId,
+		long companyId, java.lang.String oAuth2ScopeName, long oAuth2TokenId,
 		boolean retrieveFromCache) {
 		return getPersistence()
-				   .fetchByA_BSN_BV_C_O_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2ScopeName, oAuth2TokenId,
-			retrieveFromCache);
+				   .fetchByA_BSN_C_O_T(applicationName, bundleSymbolicName,
+			companyId, oAuth2ScopeName, oAuth2TokenId, retrieveFromCache);
 	}
 
 	/**
-	* Removes the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63; from the database.
+	* Removes the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63; from the database.
 	*
 	* @param applicationName the application name
 	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
 	* @param companyId the company ID
 	* @param oAuth2ScopeName the o auth2 scope name
 	* @param oAuth2TokenId the o auth2 token ID
 	* @return the o auth2 scope grant that was removed
 	*/
-	public static OAuth2ScopeGrant removeByA_BSN_BV_C_O_T(
+	public static OAuth2ScopeGrant removeByA_BSN_C_O_T(
 		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId,
-		java.lang.String oAuth2ScopeName, java.lang.String oAuth2TokenId)
+		long companyId, java.lang.String oAuth2ScopeName, long oAuth2TokenId)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ScopeGrantException {
 		return getPersistence()
-				   .removeByA_BSN_BV_C_O_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2ScopeName, oAuth2TokenId);
+				   .removeByA_BSN_C_O_T(applicationName, bundleSymbolicName,
+			companyId, oAuth2ScopeName, oAuth2TokenId);
 	}
 
 	/**
-	* Returns the number of o auth2 scope grants where applicationName = &#63; and bundleSymbolicName = &#63; and bundleVersion = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63;.
+	* Returns the number of o auth2 scope grants where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2ScopeName = &#63; and oAuth2TokenId = &#63;.
 	*
 	* @param applicationName the application name
 	* @param bundleSymbolicName the bundle symbolic name
-	* @param bundleVersion the bundle version
 	* @param companyId the company ID
 	* @param oAuth2ScopeName the o auth2 scope name
 	* @param oAuth2TokenId the o auth2 token ID
 	* @return the number of matching o auth2 scope grants
 	*/
-	public static int countByA_BSN_BV_C_O_T(java.lang.String applicationName,
-		java.lang.String bundleSymbolicName, java.lang.String bundleVersion,
-		long companyId, java.lang.String oAuth2ScopeName,
-		java.lang.String oAuth2TokenId) {
+	public static int countByA_BSN_C_O_T(java.lang.String applicationName,
+		java.lang.String bundleSymbolicName, long companyId,
+		java.lang.String oAuth2ScopeName, long oAuth2TokenId) {
 		return getPersistence()
-				   .countByA_BSN_BV_C_O_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, oAuth2ScopeName, oAuth2TokenId);
+				   .countByA_BSN_C_O_T(applicationName, bundleSymbolicName,
+			companyId, oAuth2ScopeName, oAuth2TokenId);
 	}
 
 	/**

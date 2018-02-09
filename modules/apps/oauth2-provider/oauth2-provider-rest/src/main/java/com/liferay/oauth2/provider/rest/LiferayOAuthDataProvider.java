@@ -489,7 +489,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		for (String accessToken : accessTokens) {
 			OAuth2Token oAuth2Token =
-				_oAuth2TokenLocalService.fetchOAuth2Token(accessToken);
+				_oAuth2TokenLocalService.fetchByContent(accessToken);
 
 			if (oAuth2Token == null) {
 				if (_log.isWarnEnabled()) {
@@ -521,7 +521,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	@Override
 	protected void doRevokeAccessToken(ServerAccessToken accessToken) {
 		try {
-			_oAuth2TokenLocalService.deleteOAuth2Token(accessToken.getTokenKey());
+			_oAuth2TokenLocalService.deleteOAuth2Token(
+				_oAuth2TokenLocalService.findByContent(
+					accessToken.getTokenKey()));
 		}
 		catch (PortalException e) {
 			_log.error(
@@ -633,7 +635,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		throws OAuthServiceException {
 
 		try {
-			OAuth2Token oAuth2Token = _oAuth2TokenLocalService.getOAuth2Token(
+			OAuth2Token oAuth2Token = _oAuth2TokenLocalService.findByContent(
 				accessToken);
 
 			return populateToken(oAuth2Token);
@@ -736,7 +738,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		Client client = getClient(oAuth2Application.getClientId());
 		
 		BearerAccessToken bearerAccessToken = new BearerAccessToken(
-			client, oAuth2Token.getOAuth2TokenId(), oAuth2Token.getLifeTime(),
+			client, oAuth2Token.getOAuth2TokenContent(),
+			oAuth2Token.getLifeTime(),
 			toCXFIssuedAt(oAuth2Token.getCreateDate()));
 
 		bearerAccessToken.setSubject(

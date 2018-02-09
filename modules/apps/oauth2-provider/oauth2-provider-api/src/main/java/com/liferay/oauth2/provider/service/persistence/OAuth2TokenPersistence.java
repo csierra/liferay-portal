@@ -153,7 +153,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the previous, current, and next o auth2 token
 	* @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	*/
-	public OAuth2Token[] findByA_PrevAndNext(java.lang.String oAuth2TokenId,
+	public OAuth2Token[] findByA_PrevAndNext(long oAuth2TokenId,
 		long oAuth2ApplicationId,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException;
@@ -299,7 +299,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the previous, current, and next o auth2 token
 	* @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	*/
-	public OAuth2Token[] findByA_U_PrevAndNext(java.lang.String oAuth2TokenId,
+	public OAuth2Token[] findByA_U_PrevAndNext(long oAuth2TokenId,
 		long oAuth2ApplicationId, java.lang.String userName,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException;
@@ -320,6 +320,51 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the number of matching o auth2 tokens
 	*/
 	public int countByA_U(long oAuth2ApplicationId, java.lang.String userName);
+
+	/**
+	* Returns the o auth2 token where oAuth2TokenContent = &#63; or throws a {@link NoSuchOAuth2TokenException} if it could not be found.
+	*
+	* @param oAuth2TokenContent the o auth2 token content
+	* @return the matching o auth2 token
+	* @throws NoSuchOAuth2TokenException if a matching o auth2 token could not be found
+	*/
+	public OAuth2Token findByContent(java.lang.String oAuth2TokenContent)
+		throws NoSuchOAuth2TokenException;
+
+	/**
+	* Returns the o auth2 token where oAuth2TokenContent = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param oAuth2TokenContent the o auth2 token content
+	* @return the matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
+	*/
+	public OAuth2Token fetchByContent(java.lang.String oAuth2TokenContent);
+
+	/**
+	* Returns the o auth2 token where oAuth2TokenContent = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param oAuth2TokenContent the o auth2 token content
+	* @param retrieveFromCache whether to retrieve from the finder cache
+	* @return the matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
+	*/
+	public OAuth2Token fetchByContent(java.lang.String oAuth2TokenContent,
+		boolean retrieveFromCache);
+
+	/**
+	* Removes the o auth2 token where oAuth2TokenContent = &#63; from the database.
+	*
+	* @param oAuth2TokenContent the o auth2 token content
+	* @return the o auth2 token that was removed
+	*/
+	public OAuth2Token removeByContent(java.lang.String oAuth2TokenContent)
+		throws NoSuchOAuth2TokenException;
+
+	/**
+	* Returns the number of o auth2 tokens where oAuth2TokenContent = &#63;.
+	*
+	* @param oAuth2TokenContent the o auth2 token content
+	* @return the number of matching o auth2 tokens
+	*/
+	public int countByContent(java.lang.String oAuth2TokenContent);
 
 	/**
 	* Returns all the o auth2 tokens where oAuth2RefreshTokenId = &#63;.
@@ -438,8 +483,8 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the previous, current, and next o auth2 token
 	* @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	*/
-	public OAuth2Token[] findByRefreshToken_PrevAndNext(
-		java.lang.String oAuth2TokenId, java.lang.String oAuth2RefreshTokenId,
+	public OAuth2Token[] findByRefreshToken_PrevAndNext(long oAuth2TokenId,
+		java.lang.String oAuth2RefreshTokenId,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException;
 
@@ -478,7 +523,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @param oAuth2TokenId the primary key for the new o auth2 token
 	* @return the new o auth2 token
 	*/
-	public OAuth2Token create(java.lang.String oAuth2TokenId);
+	public OAuth2Token create(long oAuth2TokenId);
 
 	/**
 	* Removes the o auth2 token with the primary key from the database. Also notifies the appropriate model listeners.
@@ -487,7 +532,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the o auth2 token that was removed
 	* @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	*/
-	public OAuth2Token remove(java.lang.String oAuth2TokenId)
+	public OAuth2Token remove(long oAuth2TokenId)
 		throws NoSuchOAuth2TokenException;
 
 	public OAuth2Token updateImpl(OAuth2Token oAuth2Token);
@@ -499,7 +544,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the o auth2 token
 	* @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	*/
-	public OAuth2Token findByPrimaryKey(java.lang.String oAuth2TokenId)
+	public OAuth2Token findByPrimaryKey(long oAuth2TokenId)
 		throws NoSuchOAuth2TokenException;
 
 	/**
@@ -508,7 +553,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @param oAuth2TokenId the primary key of the o auth2 token
 	* @return the o auth2 token, or <code>null</code> if a o auth2 token with the primary key could not be found
 	*/
-	public OAuth2Token fetchByPrimaryKey(java.lang.String oAuth2TokenId);
+	public OAuth2Token fetchByPrimaryKey(long oAuth2TokenId);
 
 	@Override
 	public java.util.Map<java.io.Serializable, OAuth2Token> fetchByPrimaryKeys(

@@ -53,8 +53,28 @@ public class OAuth2TokenLocalServiceWrapper implements OAuth2TokenLocalService,
 	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Token createOAuth2Token(
-		java.lang.String oAuth2TokenId) {
+		long oAuth2TokenId) {
 		return _oAuth2TokenLocalService.createOAuth2Token(oAuth2TokenId);
+	}
+
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Token createOAuth2Token(
+		java.lang.String tokenContent) {
+		return _oAuth2TokenLocalService.createOAuth2Token(tokenContent);
+	}
+
+	/**
+	* Deletes the o auth2 token with the primary key from the database. Also notifies the appropriate model listeners.
+	*
+	* @param oAuth2TokenId the primary key of the o auth2 token
+	* @return the o auth2 token that was removed
+	* @throws PortalException if a o auth2 token with the primary key could not be found
+	*/
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Token deleteOAuth2Token(
+		long oAuth2TokenId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2TokenLocalService.deleteOAuth2Token(oAuth2TokenId);
 	}
 
 	/**
@@ -67,20 +87,6 @@ public class OAuth2TokenLocalServiceWrapper implements OAuth2TokenLocalService,
 	public com.liferay.oauth2.provider.model.OAuth2Token deleteOAuth2Token(
 		com.liferay.oauth2.provider.model.OAuth2Token oAuth2Token) {
 		return _oAuth2TokenLocalService.deleteOAuth2Token(oAuth2Token);
-	}
-
-	/**
-	* Deletes the o auth2 token with the primary key from the database. Also notifies the appropriate model listeners.
-	*
-	* @param oAuth2TokenId the primary key of the o auth2 token
-	* @return the o auth2 token that was removed
-	* @throws PortalException if a o auth2 token with the primary key could not be found
-	*/
-	@Override
-	public com.liferay.oauth2.provider.model.OAuth2Token deleteOAuth2Token(
-		java.lang.String oAuth2TokenId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2TokenLocalService.deleteOAuth2Token(oAuth2TokenId);
 	}
 
 	/**
@@ -179,8 +185,14 @@ public class OAuth2TokenLocalServiceWrapper implements OAuth2TokenLocalService,
 	}
 
 	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Token fetchByContent(
+		java.lang.String oAuth2TokenContent) {
+		return _oAuth2TokenLocalService.fetchByContent(oAuth2TokenContent);
+	}
+
+	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Token fetchOAuth2Token(
-		java.lang.String oAuth2TokenId) {
+		long oAuth2TokenId) {
 		return _oAuth2TokenLocalService.fetchOAuth2Token(oAuth2TokenId);
 	}
 
@@ -200,9 +212,26 @@ public class OAuth2TokenLocalServiceWrapper implements OAuth2TokenLocalService,
 	}
 
 	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Token findByContent(
+		java.lang.String oAuth2TokenContent)
+		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException {
+		return _oAuth2TokenLocalService.findByContent(oAuth2TokenContent);
+	}
+
+	@Override
 	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByRefreshToken(
 		java.lang.String refreshToken) {
 		return _oAuth2TokenLocalService.findByRefreshToken(refreshToken);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _oAuth2TokenLocalService.getActionableDynamicQuery();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _oAuth2TokenLocalService.getIndexableActionableDynamicQuery();
 	}
 
 	/**
@@ -214,7 +243,7 @@ public class OAuth2TokenLocalServiceWrapper implements OAuth2TokenLocalService,
 	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Token getOAuth2Token(
-		java.lang.String oAuth2TokenId)
+		long oAuth2TokenId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _oAuth2TokenLocalService.getOAuth2Token(oAuth2TokenId);
 	}

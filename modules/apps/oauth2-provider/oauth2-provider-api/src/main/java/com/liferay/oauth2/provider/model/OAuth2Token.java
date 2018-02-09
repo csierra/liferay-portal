@@ -37,15 +37,15 @@ public interface OAuth2Token extends OAuth2TokenModel, PersistedModel {
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.oauth2.provider.model.impl.OAuth2TokenImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<OAuth2Token, String> O_AUTH2_TOKEN_ID_ACCESSOR = new Accessor<OAuth2Token, String>() {
+	public static final Accessor<OAuth2Token, Long> O_AUTH2_TOKEN_ID_ACCESSOR = new Accessor<OAuth2Token, Long>() {
 			@Override
-			public String get(OAuth2Token oAuth2Token) {
+			public Long get(OAuth2Token oAuth2Token) {
 				return oAuth2Token.getOAuth2TokenId();
 			}
 
 			@Override
-			public Class<String> getAttributeClass() {
-				return String.class;
+			public Class<Long> getAttributeClass() {
+				return Long.class;
 			}
 
 			@Override

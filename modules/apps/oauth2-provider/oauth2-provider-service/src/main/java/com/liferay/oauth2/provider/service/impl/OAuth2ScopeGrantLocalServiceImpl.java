@@ -58,7 +58,7 @@ public class OAuth2ScopeGrantLocalServiceImpl
 			return Collections.emptyList();
 		}
 
-		OAuth2Token oAuth2Token = oAuth2TokenLocalService.fetchOAuth2Token(
+		OAuth2Token oAuth2Token = oAuth2TokenPersistence.fetchByContent(
 			tokenString);
 
 		if (oAuth2Token == null) {
@@ -70,13 +70,12 @@ public class OAuth2ScopeGrantLocalServiceImpl
 
 		for (LiferayOAuth2Scope scope : scopes) {
 			Bundle bundle = scope.getBundle();
-			Version version = bundle.getVersion();
 
 			OAuth2ScopeGrant oAuth2ScopeGrant = createOAuth2ScopeGrant(
 				new OAuth2ScopeGrantPK(
 					scope.getApplicationName(), bundle.getSymbolicName(),
-					version.toString(), oAuth2Token.getCompanyId(),
-					scope.getScope(), tokenString));
+					oAuth2Token.getCompanyId(), scope.getScope(),
+					oAuth2Token.getOAuth2TokenId()));
 
 			oAuth2ScopeGrants.add(updateOAuth2ScopeGrant(oAuth2ScopeGrant));
 		}
@@ -84,27 +83,17 @@ public class OAuth2ScopeGrantLocalServiceImpl
 		return oAuth2ScopeGrants;
 	}
 
-	public Collection<OAuth2ScopeGrant> findByTokenId(String tokenId) {
+	@Override
+	public Collection<OAuth2ScopeGrant> findByA_BSN_C_T(
+		String applicationName, String bundleSymbolicName, Long companyId,
+		String tokenContent) {
+
+		return oAuth2ScopeGrantFinder.findByA_BSN_C_T(
+			applicationName, bundleSymbolicName, companyId, tokenContent);
+	}
+
+	public Collection<OAuth2ScopeGrant> findByToken(long tokenId) {
 		return oAuth2ScopeGrantPersistence.findByToken(tokenId);
-	}
-
-	public Collection<OAuth2ScopeGrant> findByA_BNS_BV_C_T(
-		String applicationName, String bundleSymbolicName, String bundleVersion,
-		long companyId, String tokenId) {
-
-		return oAuth2ScopeGrantPersistence.findByA_BSN_BV_C_T(
-			applicationName, bundleSymbolicName, bundleVersion, companyId,
-			tokenId);
-	}
-
-	public Optional<OAuth2ScopeGrant> findByA_BNS_BV_C_O_T(
-		String applicationName, String bundleSymbolicName, String bundleVersion,
-		long companyId, String scope, String tokenId) {
-
-		return Optional.ofNullable(
-			oAuth2ScopeGrantPersistence.fetchByA_BSN_BV_C_O_T(
-				applicationName, bundleSymbolicName, bundleVersion, companyId,
-				scope, tokenId));
 	}
 
 }

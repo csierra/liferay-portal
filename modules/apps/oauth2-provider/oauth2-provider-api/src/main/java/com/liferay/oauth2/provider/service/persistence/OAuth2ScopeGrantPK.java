@@ -30,20 +30,18 @@ public class OAuth2ScopeGrantPK implements Comparable<OAuth2ScopeGrantPK>,
 	Serializable {
 	public String applicationName;
 	public String bundleSymbolicName;
-	public String bundleVersion;
 	public long companyId;
 	public String oAuth2ScopeName;
-	public String oAuth2TokenId;
+	public long oAuth2TokenId;
 
 	public OAuth2ScopeGrantPK() {
 	}
 
 	public OAuth2ScopeGrantPK(String applicationName,
-		String bundleSymbolicName, String bundleVersion, long companyId,
-		String oAuth2ScopeName, String oAuth2TokenId) {
+		String bundleSymbolicName, long companyId, String oAuth2ScopeName,
+		long oAuth2TokenId) {
 		this.applicationName = applicationName;
 		this.bundleSymbolicName = bundleSymbolicName;
-		this.bundleVersion = bundleVersion;
 		this.companyId = companyId;
 		this.oAuth2ScopeName = oAuth2ScopeName;
 		this.oAuth2TokenId = oAuth2TokenId;
@@ -65,14 +63,6 @@ public class OAuth2ScopeGrantPK implements Comparable<OAuth2ScopeGrantPK>,
 		this.bundleSymbolicName = bundleSymbolicName;
 	}
 
-	public String getBundleVersion() {
-		return bundleVersion;
-	}
-
-	public void setBundleVersion(String bundleVersion) {
-		this.bundleVersion = bundleVersion;
-	}
-
 	public long getCompanyId() {
 		return companyId;
 	}
@@ -89,11 +79,11 @@ public class OAuth2ScopeGrantPK implements Comparable<OAuth2ScopeGrantPK>,
 		this.oAuth2ScopeName = oAuth2ScopeName;
 	}
 
-	public String getOAuth2TokenId() {
+	public long getOAuth2TokenId() {
 		return oAuth2TokenId;
 	}
 
-	public void setOAuth2TokenId(String oAuth2TokenId) {
+	public void setOAuth2TokenId(long oAuth2TokenId) {
 		this.oAuth2TokenId = oAuth2TokenId;
 	}
 
@@ -112,12 +102,6 @@ public class OAuth2ScopeGrantPK implements Comparable<OAuth2ScopeGrantPK>,
 		}
 
 		value = bundleSymbolicName.compareTo(pk.bundleSymbolicName);
-
-		if (value != 0) {
-			return value;
-		}
-
-		value = bundleVersion.compareTo(pk.bundleVersion);
 
 		if (value != 0) {
 			return value;
@@ -143,7 +127,15 @@ public class OAuth2ScopeGrantPK implements Comparable<OAuth2ScopeGrantPK>,
 			return value;
 		}
 
-		value = oAuth2TokenId.compareTo(pk.oAuth2TokenId);
+		if (oAuth2TokenId < pk.oAuth2TokenId) {
+			value = -1;
+		}
+		else if (oAuth2TokenId > pk.oAuth2TokenId) {
+			value = 1;
+		}
+		else {
+			value = 0;
+		}
 
 		if (value != 0) {
 			return value;
@@ -166,10 +158,9 @@ public class OAuth2ScopeGrantPK implements Comparable<OAuth2ScopeGrantPK>,
 
 		if ((applicationName.equals(pk.applicationName)) &&
 				(bundleSymbolicName.equals(pk.bundleSymbolicName)) &&
-				(bundleVersion.equals(pk.bundleVersion)) &&
 				(companyId == pk.companyId) &&
 				(oAuth2ScopeName.equals(pk.oAuth2ScopeName)) &&
-				(oAuth2TokenId.equals(pk.oAuth2TokenId))) {
+				(oAuth2TokenId == pk.oAuth2TokenId)) {
 			return true;
 		}
 		else {
@@ -183,7 +174,6 @@ public class OAuth2ScopeGrantPK implements Comparable<OAuth2ScopeGrantPK>,
 
 		hashCode = HashUtil.hash(hashCode, applicationName);
 		hashCode = HashUtil.hash(hashCode, bundleSymbolicName);
-		hashCode = HashUtil.hash(hashCode, bundleVersion);
 		hashCode = HashUtil.hash(hashCode, companyId);
 		hashCode = HashUtil.hash(hashCode, oAuth2ScopeName);
 		hashCode = HashUtil.hash(hashCode, oAuth2TokenId);
@@ -193,7 +183,7 @@ public class OAuth2ScopeGrantPK implements Comparable<OAuth2ScopeGrantPK>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(14);
+		StringBundler sb = new StringBundler(12);
 
 		sb.append("{");
 
@@ -203,9 +193,6 @@ public class OAuth2ScopeGrantPK implements Comparable<OAuth2ScopeGrantPK>,
 		sb.append(", bundleSymbolicName=");
 
 		sb.append(bundleSymbolicName);
-		sb.append(", bundleVersion=");
-
-		sb.append(bundleVersion);
 		sb.append(", companyId=");
 
 		sb.append(companyId);

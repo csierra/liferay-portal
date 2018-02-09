@@ -18,6 +18,7 @@ import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeContext;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
+import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -36,8 +37,6 @@ public class ThreadLocalServiceScopeChecker
 	ThreadLocal<Long> _companyIdThreadLocal = ThreadLocal.withInitial(() -> 0L);
 	ThreadLocal<String> _bundleSymbolicName = ThreadLocal.withInitial(
 		() -> StringPool.BLANK);
-	ThreadLocal<String> _bundleVersion = ThreadLocal.withInitial(
-		() -> StringPool.BLANK);
 	ThreadLocal<String> _applicationName = ThreadLocal.withInitial(
 		() -> StringPool.BLANK);
 	ThreadLocal<String> _tokenString = ThreadLocal.withInitial(
@@ -49,13 +48,13 @@ public class ThreadLocalServiceScopeChecker
 			throw new IllegalArgumentException("Scope can't be null");
 		}
 
-		Optional<OAuth2ScopeGrant> optionalScope =
-			_oAuth2ScopeGrantLocalService.findByA_BNS_BV_C_O_T(
+		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
+			_oAuth2ScopeGrantLocalService.findByA_BSN_C_T(
 				_applicationName.get(), _bundleSymbolicName.get(),
-				_bundleVersion.get(), _companyIdThreadLocal.get(),
-				scope, _tokenString.get());
+				_companyIdThreadLocal.get(), _tokenString.get());
 
-		return optionalScope.isPresent();
+		return oAuth2ScopeGrants.stream().anyMatch(
+			o -> scope.equals(o.getOAuth2ScopeName()));
 	}
 
 	@Override
@@ -65,10 +64,9 @@ public class ThreadLocalServiceScopeChecker
 		}
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
 			new ArrayList<>(
-				_oAuth2ScopeGrantLocalService.findByA_BNS_BV_C_T(
+				_oAuth2ScopeGrantLocalService.findByA_BSN_C_T(
 					_applicationName.get(), _bundleSymbolicName.get(),
-					_bundleVersion.get(), _companyIdThreadLocal.get(),
-					_tokenString.get()));
+					_companyIdThreadLocal.get(), _tokenString.get()));
 
 		if (scopes.length > oAuth2ScopeGrants.size()) {
 			return false;
@@ -95,10 +93,9 @@ public class ThreadLocalServiceScopeChecker
 			throw new IllegalArgumentException("Scopes can't be null");
 		}
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
-			_oAuth2ScopeGrantLocalService.findByA_BNS_BV_C_T(
+			_oAuth2ScopeGrantLocalService.findByA_BSN_C_T(
 				_applicationName.get(), _bundleSymbolicName.get(),
-				_bundleVersion.get(), _companyIdThreadLocal.get(),
-				_tokenString.get());
+				_companyIdThreadLocal.get(), _tokenString.get());
 
 		for (String scope : scopes) {
 			if (Validator.isNull(scope)) {
@@ -122,7 +119,6 @@ public class ThreadLocalServiceScopeChecker
 	@Override
 	public void setBundle(Bundle bundle) {
 		_bundleSymbolicName.set(bundle.getSymbolicName());
-		_bundleVersion.set(bundle.getVersion().toString());
 	}
 
 	@Override
@@ -144,7 +140,6 @@ public class ThreadLocalServiceScopeChecker
 	public void clear() {
 		_applicationName.remove();
 		_bundleSymbolicName.remove();
-		_bundleVersion.remove();
 		_companyIdThreadLocal.remove();
 		_tokenString.remove();
 	}

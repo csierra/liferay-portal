@@ -180,26 +180,17 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 		return getService().fetchOAuth2ScopeGrant(oAuth2ScopeGrantPK);
 	}
 
-	public static java.util.Optional<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByA_BNS_BV_C_O_T(
+	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByA_BSN_C_T(
 		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId, java.lang.String scope,
-		java.lang.String tokenId) {
+		java.lang.Long companyId, java.lang.String tokenContent) {
 		return getService()
-				   .findByA_BNS_BV_C_O_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, scope, tokenId);
+				   .findByA_BSN_C_T(applicationName, bundleSymbolicName,
+			companyId, tokenContent);
 	}
 
-	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByA_BNS_BV_C_T(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String bundleVersion, long companyId, java.lang.String tokenId) {
-		return getService()
-				   .findByA_BNS_BV_C_T(applicationName, bundleSymbolicName,
-			bundleVersion, companyId, tokenId);
-	}
-
-	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByTokenId(
-		java.lang.String tokenId) {
-		return getService().findByTokenId(tokenId);
+	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByToken(
+		long tokenId) {
+		return getService().findByToken(tokenId);
 	}
 
 	/**

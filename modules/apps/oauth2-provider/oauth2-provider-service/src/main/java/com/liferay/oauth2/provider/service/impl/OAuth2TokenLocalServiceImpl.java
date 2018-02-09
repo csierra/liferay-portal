@@ -61,4 +61,24 @@ public class OAuth2TokenLocalServiceImpl extends OAuth2TokenLocalServiceBaseImpl
 		return oAuth2TokenPersistence.findByA(
 			applicationId, start, end, orderByComparator);
 	}
+
+	public OAuth2Token fetchByContent(String oAuth2TokenContent) {
+		return oAuth2TokenPersistence.fetchByContent(oAuth2TokenContent);
+	}
+
+	public OAuth2Token findByContent(String oAuth2TokenContent)
+		throws NoSuchOAuth2TokenException {
+
+		return oAuth2TokenPersistence.findByContent(oAuth2TokenContent);
+	}
+
+	public OAuth2Token createOAuth2Token(String tokenContent) {
+		OAuth2Token oAuth2Token =
+			createOAuth2Token(counterLocalService.increment());
+
+		oAuth2Token.setOAuth2TokenContent(tokenContent);
+
+		return updateOAuth2Token(oAuth2Token);
+	}
+
 }

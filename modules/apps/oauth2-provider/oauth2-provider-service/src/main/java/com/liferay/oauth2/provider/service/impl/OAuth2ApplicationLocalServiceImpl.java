@@ -23,7 +23,6 @@ import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationLocalServiceBaseImpl;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.util.Collection;
@@ -104,7 +103,7 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		for (OAuth2Token oAuth2Token : oAuth2Tokens) {
 			Collection<OAuth2ScopeGrant> grants =
-				oAuth2ScopeGrantLocalService.findByTokenId(
+				oAuth2ScopeGrantLocalService.findByToken(
 					oAuth2Token.getOAuth2TokenId());
 
 			for (OAuth2ScopeGrant grant : grants) {
