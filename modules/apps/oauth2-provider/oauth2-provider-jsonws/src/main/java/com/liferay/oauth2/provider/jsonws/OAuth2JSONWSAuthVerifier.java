@@ -1,0 +1,226 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+package com.liferay.oauth2.provider.jsonws;
+
+import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
+import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.model.OAuth2Token;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scopes.spi.BearerTokenProvider;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.oauth2.provider.service.OAuth2TokenLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.auth.AccessControlContext;
+import com.liferay.portal.kernel.security.auth.AuthException;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
+import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyThreadLocal;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.util.StringPool;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.stream.Stream;
+
+/**
+ * @author Tomas Polesovsky
+ */
+@Component(
+	immediate = true,
+	property = {
+		"auth.verifier.OAuth2JSONWSAuthVerifier.urls.includes=/api/jsonws/*"
+	}
+)
+public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
+
+	@Activate
+	public void activate(BundleContext bundleContext){
+		_bundleContext = bundleContext;
+
+		_scopedBearerTokenProvider = new ScopedServiceTrackerMap<>(
+			bundleContext, BearerTokenProvider.class, "liferay.oauth2.client.id",
+			() -> _defaultBearerTokenProvider);
+	}
+
+	@Override
+	public String getAuthType() {
+		return "OAuth2";
+	}
+
+	@Override
+	public AuthVerifierResult verify(
+			AccessControlContext accessControlContext, Properties properties)
+		throws AuthException {
+
+		AuthVerifierResult authVerifierResult = new AuthVerifierResult();
+
+		try {
+			BearerTokenProvider.AccessToken accessToken =
+				getAccessToken(accessControlContext);
+
+			if (accessToken == null) {
+				return authVerifierResult;
+			}
+
+			long companyId = accessToken.getOAuth2Application().getCompanyId();
+
+			BearerTokenProvider bearerTokenProvider =
+				_scopedBearerTokenProvider.getService(
+					companyId,
+					accessToken.getOAuth2Application().getClientId());
+
+			if (bearerTokenProvider == null) {
+				return authVerifierResult;
+			}
+
+			if (!bearerTokenProvider.isValid(accessToken)) {
+				return authVerifierResult;
+			}
+
+			Stream<String> scopesStream = accessToken.getScopes().stream();
+
+			scopesStream
+				.flatMap (
+					scope -> _scopeFinderLocator.locateScopes(companyId, scope).stream()
+				)
+				.filter(
+					scope -> scope.getApplicationName().equals(OAuth2SAPEntryScopesPublisher.JSONWS_APPLICATION_NAME)
+				)
+				.filter(
+					scope -> scope.getBundle().equals(_bundleContext.getBundle())
+				)
+				.map(
+					LiferayOAuth2Scope::getScope
+				)
+				.map(
+					scope -> OAuth2SAPEntryScopesPublisher.OAUTH2_SAP_PREFIX + scope
+				)
+				.forEach(
+					ServiceAccessPolicyThreadLocal::addActiveServiceAccessPolicyName
+				);
+
+			authVerifierResult.getSettings().put(
+				BearerTokenProvider.AccessToken.class.getName(), accessToken);
+
+			authVerifierResult.setState(AuthVerifierResult.State.SUCCESS);
+			authVerifierResult.setUserId(accessToken.getUserId());
+
+			return authVerifierResult;
+		}
+		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("OAuth2 Access Token validation failed", e);
+			}
+
+			return authVerifierResult;
+		}
+	}
+
+	protected BearerTokenProvider.AccessToken getAccessToken(
+			AccessControlContext accessControlContext)
+		throws PortalException {
+
+		HttpServletRequest request = accessControlContext.getRequest();
+
+		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+		if (authorization == null) {
+			return null;
+		}
+
+		String[] basicAuthParts = authorization.split(" ");
+
+		if (basicAuthParts.length != 2) {
+			return null;
+		}
+
+		String basicAuthPart = basicAuthParts[0];
+
+		if (!"Bearer".equalsIgnoreCase(basicAuthPart)) {
+			return null;
+		}
+
+		String token = basicAuthParts[1];
+		OAuth2Token oAuth2Token = null;
+		try {
+			oAuth2Token = _oAuth2TokenLocalService.getOAuth2Token(token);
+		}
+		catch (NoSuchOAuth2TokenException e) {
+			return null;
+		}
+
+		OAuth2Application oAuth2Application =
+			_oAuth2ApplicationLocalService.getOAuth2Application(
+				oAuth2Token.getOAuth2ApplicationId());
+
+		BearerTokenProvider.AccessToken accessToken =
+			new BearerTokenProvider.AccessToken(
+				oAuth2Application,
+				new ArrayList<>(),
+				StringPool.BLANK,
+				oAuth2Token.getLifeTime(),
+				new HashMap<>(),
+				StringPool.BLANK,
+				StringPool.BLANK,
+				oAuth2Token.getCreateDate().getTime(),
+				StringPool.BLANK,
+				StringPool.BLANK,
+				new HashMap<>(),
+				StringPool.BLANK,
+				StringPool.BLANK,
+				oAuth2Token.getScopesList(),
+				oAuth2Token.getOAuth2TokenId(),
+				"Bearer",
+				oAuth2Token.getUserId(),
+				oAuth2Token.getUserName());
+
+		return accessToken;
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(OAuth2JSONWSAuthVerifier.class);
+
+	private BundleContext _bundleContext;
+
+	@Reference(
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(name=default)"
+	)
+	private volatile BearerTokenProvider _defaultBearerTokenProvider;
+
+	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	private volatile ScopeFinderLocator _scopeFinderLocator;
+
+	@Reference
+	private volatile OAuth2TokenLocalService _oAuth2TokenLocalService;
+
+	@Reference
+	private volatile OAuth2ApplicationLocalService
+		_oAuth2ApplicationLocalService;
+
+	private volatile ScopedServiceTrackerMap<BearerTokenProvider>
+		_scopedBearerTokenProvider;
+
+}

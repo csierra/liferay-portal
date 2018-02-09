@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
+import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyManager;
+import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyManagerUtil;
 import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 
@@ -38,10 +40,10 @@ import java.util.Properties;
 @Component(
 	immediate = true,
 	property = {
-		"auth.verifier.OAuth2AuthVerifier.urls.includes=#N/A#"
+		"auth.verifier.OAuth2RestAuthVerifier.urls.includes=#N/A#"
 	}
 )
-public class OAuth2AuthVerifier implements AuthVerifier {
+public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 	@Override
 	public String getAuthType() {
@@ -78,10 +80,9 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 
 			_scopeContext.setTokenString(accessToken.getTokenKey());
 
-			for (String scope : accessToken.getScopes()) {
-				ServiceAccessPolicyThreadLocal.addActiveServiceAccessPolicyName(
-					"OAuth2_" + scope);
-			}
+			ServiceAccessPolicyThreadLocal.addActiveServiceAccessPolicyName(
+				_serviceAccessPolicyManager.getDefaultUserServiceAccessPolicyName(
+					accessToken.getOAuth2Application().getCompanyId()));
 
 			authVerifierResult.getSettings().put(
 				BearerTokenProvider.AccessToken.class.getName(), accessToken);
@@ -138,10 +139,13 @@ public class OAuth2AuthVerifier implements AuthVerifier {
 		return accessToken;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(OAuth2AuthVerifier.class);
+	private static Log _log = LogFactoryUtil.getLog(OAuth2RestAuthVerifier.class);
 
 	@Reference
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+
+	@Reference
+	private ServiceAccessPolicyManager _serviceAccessPolicyManager;
 
 	@Reference
 	private ScopeContext _scopeContext;

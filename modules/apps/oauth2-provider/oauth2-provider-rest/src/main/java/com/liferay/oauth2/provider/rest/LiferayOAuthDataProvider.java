@@ -516,14 +516,6 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	@Override
 	protected void doRevokeRefreshToken(RefreshToken refreshToken) {
 		try {
-			Collection<OAuth2Token> oAuth2Tokens =
-				_oAuth2TokenLocalService.findByRefreshToken(
-					refreshToken.getTokenKey());
-
-			for (OAuth2Token oAuth2Token : oAuth2Tokens) {
-				_oAuth2TokenLocalService.deleteOAuth2Token(oAuth2Token);
-			}
-
 			_oAuth2RefreshTokenLocalService.deleteOAuth2RefreshToken(
 				refreshToken.getTokenKey());
 		}
@@ -558,6 +550,23 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				populateUserSubject(
 					oAuth2RefreshToken.getUserId(),
 					oAuth2RefreshToken.getUserName()));
+
+			Collection<OAuth2Token> oAuth2Tokens =
+				_oAuth2TokenLocalService.findByRefreshToken(
+					refreshToken.getTokenKey());
+
+			List<String> accessTokens = new ArrayList<>(oAuth2Tokens.size());
+			Set<String> scopes = new HashSet<>();
+
+			for (OAuth2Token oAuth2Token : oAuth2Tokens) {
+				accessTokens.add(oAuth2Token.getOAuth2TokenId());
+				scopes.addAll(oAuth2Token.getScopesList());
+			}
+
+			refreshToken.setAccessTokens(accessTokens);
+			refreshToken.setScopes(
+				convertScopeToPermissions(
+					refreshToken.getClient(), new ArrayList(scopes)));
 
 			return refreshToken;
 		}
@@ -788,7 +797,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	@Override
 	public List<OAuthPermission> convertScopeToPermissions(
-		Client client, List<String> requestedScopes) {
+		Client cliaent, List<String> requestedScopes) {
 
 		List<String> invisibleToClientScopes = getInvisibleToClientScopes();
 

@@ -68,9 +68,9 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		ScopeMatcherFactory scopeMatcherFactory =
 			_scopeMatcherFactoryLocator.locateScopeMatcherFactory(companyId);
 
-		ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scope);
-
 		for (String name : names) {
+			ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scope);
+
 			ServiceReferenceServiceTuple<?, ScopeFinder> tuple =
 				_scopeFinderByNameServiceTrackerMap.getService(name);
 
