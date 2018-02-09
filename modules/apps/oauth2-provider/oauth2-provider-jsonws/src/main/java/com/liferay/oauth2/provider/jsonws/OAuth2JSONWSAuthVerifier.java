@@ -166,7 +166,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		String token = basicAuthParts[1];
 		OAuth2Token oAuth2Token = null;
 		try {
-			oAuth2Token = _oAuth2TokenLocalService.getOAuth2Token(token);
+			oAuth2Token = _oAuth2TokenLocalService.findByContent(token);
 		}
 		catch (NoSuchOAuth2TokenException e) {
 			return null;
@@ -192,7 +192,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				StringPool.BLANK,
 				StringPool.BLANK,
 				oAuth2Token.getScopesList(),
-				oAuth2Token.getOAuth2TokenId(),
+				oAuth2Token.getOAuth2TokenContent(),
 				"Bearer",
 				oAuth2Token.getUserId(),
 				oAuth2Token.getUserName());
