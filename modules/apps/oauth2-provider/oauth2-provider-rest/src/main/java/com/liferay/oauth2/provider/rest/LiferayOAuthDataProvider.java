@@ -725,18 +725,14 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	protected OAuth2Application resolveOAuth2Application(Client client) {
-		OAuth2Application oAuth2Application;
-		
 		try {
-			oAuth2Application = 
-				_oAuth2ApplicationLocalService.getOAuth2Application(
+			return _oAuth2ApplicationLocalService.getOAuth2Application(
 						CompanyThreadLocal.getCompanyId(), 
 						client.getClientId());
 		} 
 		catch (NoSuchOAuth2ApplicationException e) {
 			throw new SystemException(e);
 		}
-		return oAuth2Application;
 	}
 
 	@Override
