@@ -25,6 +25,8 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
+import org.apache.cxf.rs.security.oauth2.grants.code.DigestCodeVerifier;
+import org.apache.cxf.rs.security.oauth2.grants.code.PlainCodeVerifier;
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.osgi.framework.BundleContext;
@@ -61,6 +63,12 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 			authorizationCodeGrantHandler.setDataProvider(
 				_liferayOAuthDataProvider);
+
+			authorizationCodeGrantHandler.setExpectCodeVerifierForPublicClients(
+				true);
+
+			authorizationCodeGrantHandler.setCodeVerifierTransformer(
+				new PlainCodeVerifier());
 
 			_serviceRegistration = bundleContext.registerService(
 				AccessTokenGrantHandler.class,

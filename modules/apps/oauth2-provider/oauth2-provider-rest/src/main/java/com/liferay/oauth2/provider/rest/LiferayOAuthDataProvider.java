@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
+import com.liferay.portal.kernel.util.Validator;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -716,9 +717,15 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	protected Client populateClient(OAuth2Application oAuth2Application) {
+		String clientSecret = oAuth2Application.getClientSecret();
+
+		if (Validator.isBlank(clientSecret)) {
+			clientSecret = null;
+		}
+
 		Client client = new Client(
 			oAuth2Application.getClientId(),
-			oAuth2Application.getClientSecret(),
+			clientSecret,
 			oAuth2Application.getClientConfidential(),
 			oAuth2Application.getName(),
 			oAuth2Application.getWebUrl());

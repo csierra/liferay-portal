@@ -255,6 +255,7 @@ public class OAuth2EndpointApplication extends Application {
 		AuthorizationCodeGrantService authorizationCodeGrantService =
 			new AuthorizationCodeGrantService();
 
+		authorizationCodeGrantService.setCanSupportPublicClients(true);
 		authorizationCodeGrantService.setDataProvider(
 			_liferayOAuthDataProvider);
 
@@ -263,8 +264,8 @@ public class OAuth2EndpointApplication extends Application {
 		AccessTokenService accessTokenService = new AccessTokenService();
 
 		accessTokenService.setBlockUnsecureRequests(true);
+		accessTokenService.setCanSupportPublicClients(true);
 		accessTokenService.setDataProvider(_liferayOAuthDataProvider);
-
 		accessTokenService.setGrantHandlers(_accessTokenGrantHandlers);
 
 		return new HashSet<>(

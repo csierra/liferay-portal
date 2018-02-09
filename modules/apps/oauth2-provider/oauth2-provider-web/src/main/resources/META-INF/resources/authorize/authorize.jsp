@@ -19,6 +19,7 @@
 HttpServletRequest originalServletRequest = PortalUtil.getOriginalServletRequest(request);
 String replyTo = PortalUtil.escapeRedirect(ParamUtil.getString(originalServletRequest, "reply_to"));
 String clientId = ParamUtil.getString(originalServletRequest, "client_id");
+String codeChallenge = ParamUtil.getString(originalServletRequest, "code_challenge");
 String redirectUri = ParamUtil.getString(originalServletRequest, "redirect_uri");
 String scope = ParamUtil.getString(originalServletRequest, "scope");
 String sessionAuthenticityToken	= ParamUtil.getString(originalServletRequest, "session_authenticity_token");
@@ -74,11 +75,12 @@ AuthorizationRequestModel authorizationRequestModel = (AuthorizationRequestModel
 
 	    <div class="closed container-fluid-1280">
 		    <aui:form action="<%= replyTo %>" method="GET" name="fm">
-			    <aui:input name="client_id" type="hidden" useNamespace="false" value="<%= clientId %>" />
+				<aui:input name="client_id" type="hidden" useNamespace="false" value="<%= clientId %>" />
+				<aui:input name="code_challenge" type="hidden" useNamespace="false" value="<%= codeChallenge %>" />
 			    <aui:input name="redirect_uri" type="hidden" useNamespace="false" value="<%= redirectUri %>" />
 			    <aui:input name="scope" type="hidden" useNamespace="false" value="<%= scope %>" />
 			    <aui:input name="session_authenticity_token" type="hidden" useNamespace="false" value="<%= sessionAuthenticityToken %>" />
-			    <aui:input name="oauthDecision" type="hidden" useNamespace="false" value="deny" />
+				<aui:input name="oauthDecision" type="hidden" useNamespace="false" value="deny" />
 
 			    <aui:fieldset>
 				    <aui:button-row>
