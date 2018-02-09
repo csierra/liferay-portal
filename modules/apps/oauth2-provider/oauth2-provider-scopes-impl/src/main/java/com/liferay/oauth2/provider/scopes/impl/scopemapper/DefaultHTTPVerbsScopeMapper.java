@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl;
+package com.liferay.oauth2.provider.scopes.impl.scopemapper;
 
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
 import com.liferay.portal.kernel.util.MapUtil;
