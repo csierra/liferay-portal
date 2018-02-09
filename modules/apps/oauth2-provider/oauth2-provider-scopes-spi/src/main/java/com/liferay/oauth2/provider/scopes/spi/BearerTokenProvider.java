@@ -15,6 +15,10 @@ public interface BearerTokenProvider {
 
 	public boolean isValid(AccessToken accessToken);
 
+	public default boolean isValid(RefreshToken refreshToken) {
+		return true;
+	}
+
 	public static class AccessToken {
 		public AccessToken(
 			OAuth2Application oAuth2Application,

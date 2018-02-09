@@ -69,6 +69,11 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 		return true;
 	}
 
+	@Override
+	public boolean isValid(RefreshToken refreshToken) {
+		return true;
+	}
+
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		_accessTokenExpiresIn =

@@ -225,6 +225,33 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	@Override
+	public ServerAccessToken refreshAccessToken(
+			Client client, String refreshTokenKey,
+			List<String> restrictedScopes)
+		throws OAuthServiceException {
+
+		RefreshToken cxfRefreshToken = getRefreshToken(refreshTokenKey);
+
+		BearerTokenProvider.RefreshToken refreshToken =
+			fromCXFRefreshToken(cxfRefreshToken);
+
+		OAuth2Application oAuth2Application =
+			resolveOAuth2Application(client);
+
+		BearerTokenProvider tokenProvider =
+			getBearerTokenProvider(
+				oAuth2Application.getCompanyId(),
+				oAuth2Application.getClientId());
+
+		if (!tokenProvider.isValid(refreshToken)) {
+			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
+		}
+
+		return super.refreshAccessToken(client, refreshTokenKey,
+			restrictedScopes);
+	}
+
+	@Override
 	protected RefreshToken doCreateNewRefreshToken(
 		ServerAccessToken serverAccessToken) {
 
@@ -276,6 +303,49 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			cxfRefreshToken.getTokenType(),
 			Long.parseLong(cxfRefreshToken.getSubject().getId()),
 			cxfRefreshToken.getSubject().getLogin());
+	}
+
+	@Override
+	protected ServerAccessToken doRefreshAccessToken(
+		Client client, RefreshToken oldRefreshToken,
+		List<String> restrictedScopes) {
+
+		ServerAccessToken serverAccessToken =
+			super.doRefreshAccessToken(
+				client, oldRefreshToken, restrictedScopes);
+
+		BearerTokenProvider.AccessToken accessToken = fromCXFAccessToken(
+			serverAccessToken);
+
+		BearerTokenProvider tokenProvider = getBearerTokenProvider(
+			accessToken.getOAuth2Application().getCompanyId(),
+			accessToken.getOAuth2Application().getClientId());
+
+		tokenProvider.createAccessToken(accessToken);
+
+		serverAccessToken.setAudiences(accessToken.getAudiences());
+		serverAccessToken.setClientCodeVerifier(
+			accessToken.getClientCodeVerifier());
+		serverAccessToken.setExpiresIn(accessToken.getExpiresIn());
+		serverAccessToken.setExtraProperties(accessToken.getExtraProperties());
+		serverAccessToken.setGrantCode(accessToken.getGrantCode());
+		serverAccessToken.setGrantType(accessToken.getGrantType());
+		serverAccessToken.setIssuedAt(accessToken.getIssuedAt());
+		serverAccessToken.setIssuer(accessToken.getIssuer());
+		serverAccessToken.setNonce(accessToken.getNonce());
+		serverAccessToken.setParameters(accessToken.getParameters());
+		serverAccessToken.setRefreshToken(accessToken.getRefreshToken());
+		serverAccessToken.setResponseType(accessToken.getResponseType());
+		serverAccessToken.setScopes(
+			convertScopeToPermissions(
+				serverAccessToken.getClient(), accessToken.getScopes()));
+		serverAccessToken.setTokenKey(accessToken.getTokenKey());
+		serverAccessToken.setTokenType(accessToken.getTokenType());
+		serverAccessToken.getSubject().setId(
+			String.valueOf(accessToken.getUserId()));
+		serverAccessToken.getSubject().setLogin(accessToken.getUserName());
+
+		return serverAccessToken;
 	}
 
 	@Override
