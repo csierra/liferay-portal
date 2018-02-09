@@ -364,6 +364,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		oAuth2Token.setScopes(
 			OAuthUtils.convertPermissionsToScope(serverToken.getScopes()));
+
 		try {
 			_oAuth2TokenLocalService.updateOAuth2Token(oAuth2Token);
 		}
@@ -539,25 +540,6 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	@Override
 	protected void doRevokeRefreshToken(RefreshToken refreshToken) {
 		try {
-			_invokeTransactionally(
-				() -> _transactionalDoRevokeRefreshToken(refreshToken));
-		}
-		catch (Throwable throwable) {
-			throw new OAuthServiceException(throwable);
-		}
-
-	}
-
-	private void _transactionalDoRevokeRefreshToken(RefreshToken refreshToken) {
-		try {
-			Collection<OAuth2Token> oAuth2Tokens =
-				_oAuth2TokenLocalService.findByRefreshToken(
-					refreshToken.getTokenKey());
-
-			for (OAuth2Token oAuth2Token : oAuth2Tokens) {
-				_oAuth2TokenLocalService.deleteOAuth2Token(oAuth2Token);
-			}
-
 			_oAuth2RefreshTokenLocalService.deleteOAuth2RefreshToken(
 				refreshToken.getTokenKey());
 		}
