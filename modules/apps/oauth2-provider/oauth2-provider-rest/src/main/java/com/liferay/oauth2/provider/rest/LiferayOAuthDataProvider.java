@@ -43,6 +43,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionConfig;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
@@ -329,15 +332,25 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	@Override
 	protected void saveAccessToken(ServerAccessToken serverToken) {
+		try {
+			_invokeTransactionally(
+				() -> _transactionalSaveAccessToken(serverToken));
+		}
+		catch (Throwable throwable) {
+			throw new OAuthServiceException(throwable);
+		}
+	}
+
+	private void _transactionalSaveAccessToken(ServerAccessToken serverToken) {
 		OAuth2Token oAuth2Token = _oAuth2TokenLocalService.createOAuth2Token(
 			serverToken.getTokenKey());
 
 		OAuth2Application oAuth2Application =
 			resolveOAuth2Application(serverToken.getClient());
-		
+
 		oAuth2Token.setOAuth2ApplicationId(
 			oAuth2Application.getOAuth2ApplicationId());
-		
+
 		oAuth2Token.setOAuth2RefreshTokenId(serverToken.getRefreshToken());
 		oAuth2Token.setCreateDate(fromCXFIssuedAt(serverToken.getIssuedAt()));
 		oAuth2Token.setLifeTime(serverToken.getExpiresIn());
@@ -351,7 +364,6 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		oAuth2Token.setScopes(
 			OAuthUtils.convertPermissionsToScope(serverToken.getScopes()));
-
 		try {
 			_oAuth2TokenLocalService.updateOAuth2Token(oAuth2Token);
 		}
@@ -420,6 +432,16 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	@Override
 	protected void saveRefreshToken(RefreshToken refreshToken) {
+		try {
+			_invokeTransactionally(
+				() -> _transactionalSaveRefreshToken(refreshToken));
+		}
+		catch (Throwable throwable) {
+			throw new OAuthServiceException(throwable);
+		}
+	}
+
+	private void _transactionalSaveRefreshToken(RefreshToken refreshToken) {
 		OAuth2Application oAuth2Application =
 			resolveOAuth2Application(refreshToken.getClient());
 		
@@ -462,7 +484,6 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			throw new OAuthServiceException(
 				"Unable to save refresh token", e);
 		}
-
 
 		List<String> accessTokens = refreshToken.getAccessTokens();
 
@@ -515,6 +536,17 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	@Override
 	protected void doRevokeRefreshToken(RefreshToken refreshToken) {
+		try {
+			_invokeTransactionally(
+				() -> _transactionalDoRevokeRefreshToken(refreshToken));
+		}
+		catch (Throwable throwable) {
+			throw new OAuthServiceException(throwable);
+		}
+
+	}
+
+	private void _transactionalDoRevokeRefreshToken(RefreshToken refreshToken) {
 		try {
 			Collection<OAuth2Token> oAuth2Tokens =
 				_oAuth2TokenLocalService.findByRefreshToken(
@@ -816,6 +848,15 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	private static Log _log =
 		LogFactoryUtil.getLog(LiferayOAuthDataProvider.class);
+
+	private static void _invokeTransactionally(Runnable runnable)
+		throws Throwable{
+
+		TransactionInvokerUtil.invoke(
+			TransactionConfig.Factory.create(
+				Propagation.REQUIRED, new Class[]{Exception.class}),
+			() -> { runnable.run(); return null;});
+	}
 
 	@Reference
 	private MultiVMPool _multiVMPool;
