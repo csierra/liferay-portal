@@ -29,6 +29,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
 import org.apache.cxf.rs.security.oauth2.services.AccessTokenService;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
+import org.apache.cxf.rs.security.oauth2.services.TokenIntrospectionService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -252,15 +253,6 @@ public class OAuth2EndpointApplication extends Application {
 
 	@Override
 	public Set<Object> getSingletons() {
-		AuthorizationCodeGrantService authorizationCodeGrantService =
-			new AuthorizationCodeGrantService();
-
-		authorizationCodeGrantService.setCanSupportPublicClients(true);
-		authorizationCodeGrantService.setDataProvider(
-			_liferayOAuthDataProvider);
-
-		authorizationCodeGrantService.setSubjectCreator(_subjectCreator);
-
 		AccessTokenService accessTokenService = new AccessTokenService();
 
 		accessTokenService.setBlockUnsecureRequests(true);
@@ -268,10 +260,11 @@ public class OAuth2EndpointApplication extends Application {
 		accessTokenService.setDataProvider(_liferayOAuthDataProvider);
 		accessTokenService.setGrantHandlers(_accessTokenGrantHandlers);
 
-		return new HashSet<>(
-			Arrays.asList(
-				authorizationCodeGrantService, accessTokenService,
-				_authorizationMessageBodyWriter));
+		ArrayList<Object> endpoints = new ArrayList<>(_liferayOauth2Endpoints);
+		endpoints.addAll(
+			Arrays.asList(accessTokenService, _authorizationMessageBodyWriter));
+
+		return new HashSet<>(endpoints);
 	}
 
 	@Override
@@ -281,6 +274,7 @@ public class OAuth2EndpointApplication extends Application {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2EndpointApplication.class);
+
 	@Reference(
 		cardinality = ReferenceCardinality.AT_LEAST_ONE,
 		policyOption = ReferencePolicyOption.GREEDY,
@@ -294,12 +288,28 @@ public class OAuth2EndpointApplication extends Application {
 		_accessTokenGrantHandlers.remove(accessTokenGrantHandler);
 	}
 
+	@Reference(
+		cardinality = ReferenceCardinality.AT_LEAST_ONE,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(liferay.oauth2.endpoint=true)",
+		unbind = "removeOauth2Endpoint"
+	)
+	public void addOauth2Endpoint(Object endpoint) {
+		_liferayOauth2Endpoints.add(endpoint);
+	}
+
+	public void removeOauth2Endpoint(Object endpoint) {
+		_liferayOauth2Endpoints.remove(endpoint);
+	}
+
 	private String escapeFilterArgument(String filter) {
 		return StringUtil.replace(
 			filter, new String[]{"\\", "(", ")"},
 			new String[]{"\\\\", "\\(", "\\)"});
 	}
-	
+
+	private List<Object> _liferayOauth2Endpoints = new ArrayList<>();
+
 	private List<AccessTokenGrantHandler> _accessTokenGrantHandlers = new ArrayList<>();
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
@@ -310,9 +320,6 @@ public class OAuth2EndpointApplication extends Application {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
-	private SubjectCreator _subjectCreator;
 
 	private ServiceRegistration<Filter>
 		_authorizeEndpointFilterServiceRegistration;

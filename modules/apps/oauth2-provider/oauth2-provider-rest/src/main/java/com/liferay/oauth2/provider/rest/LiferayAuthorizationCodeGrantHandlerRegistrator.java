@@ -26,9 +26,10 @@ import com.liferay.portal.kernel.util.MapUtil;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth2.grants.code.DigestCodeVerifier;
-import org.apache.cxf.rs.security.oauth2.grants.code.PlainCodeVerifier;
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
+import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
+import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -48,7 +49,8 @@ import java.util.Map;
 public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 	private ServiceRegistration<AccessTokenGrantHandler>
-		_serviceRegistration;
+		_grantHandlerServiceRegistration;
+	private ServiceRegistration<Object> _endpointServiceRegistration;
 
 	@Activate
 	protected void activate(
@@ -58,6 +60,23 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 				properties, "oauth2.allow.authorization.code.grant", true);
 
 		if (enabled) {
+			AuthorizationCodeGrantService authorizationCodeGrantService =
+				new AuthorizationCodeGrantService();
+
+			authorizationCodeGrantService.setCanSupportPublicClients(true);
+			authorizationCodeGrantService.setDataProvider(
+				_liferayOAuthDataProvider);
+
+			authorizationCodeGrantService.setSubjectCreator(_subjectCreator);
+
+			Hashtable<String, Object> endpointProperties = new Hashtable<>();
+
+			endpointProperties.put("liferay.oauth2.endpoint", true);
+
+			_endpointServiceRegistration = bundleContext.registerService(
+				Object.class, authorizationCodeGrantService,
+				endpointProperties);
+
 			AuthorizationCodeGrantHandler authorizationCodeGrantHandler =
 				new AuthorizationCodeGrantHandler();
 
@@ -70,14 +89,12 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 			authorizationCodeGrantHandler.setCodeVerifierTransformer(
 				new DigestCodeVerifier());
 
-			_serviceRegistration = bundleContext.registerService(
+			_grantHandlerServiceRegistration = bundleContext.registerService(
 				AccessTokenGrantHandler.class,
 				new LiferayPermissionedAccessTokenGrantHandler(
 					authorizationCodeGrantHandler,
 					this::hasCreateTokenPermission),
 				new Hashtable<>());
-
-
 		}
 	}
 
@@ -159,8 +176,11 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 	@Deactivate
 	protected void deactivate() {
-		if (_serviceRegistration != null) {
-			_serviceRegistration.unregister();
+		if (_endpointServiceRegistration != null) {
+			_endpointServiceRegistration.unregister();
+		}
+		if (_grantHandlerServiceRegistration != null) {
+			_grantHandlerServiceRegistration.unregister();
 		}
 	}
 
@@ -173,5 +193,8 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 	@Reference
 	private UserLocalService _userLocalService;
+
+	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	private SubjectCreator _subjectCreator;
 
 }
