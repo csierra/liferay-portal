@@ -54,7 +54,7 @@ public interface ScopeFinder {
 		ScopeMatcherFactory scopeMatcherFactory =
 			getDefaultScopeMatcherFactory();
 
-		return findScopes(scopeMatcherFactory.create(scope));
+		return findScopes(scopeMatcherFactory.createScopeMatcher(scope));
 	}
 
 	/**

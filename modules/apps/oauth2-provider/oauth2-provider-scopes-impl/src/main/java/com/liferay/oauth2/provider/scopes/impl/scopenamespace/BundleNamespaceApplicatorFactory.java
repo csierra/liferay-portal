@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
+package com.liferay.oauth2.provider.scopes.impl.scopenamespace;
 
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicator;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicatorBuilder;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicatorFactory;
 import com.liferay.oauth2.provider.scopes.spi.PropertyGetter;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -34,12 +34,12 @@ import java.util.List;
 import java.util.Map;
 
 @Component(immediate = true, property = "default=true")
-public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
+public class BundleNamespaceApplicatorFactory implements NamespaceApplicatorFactory {
 
 	private List<String> _excludedScopes = new ArrayList<>();
 
 	@Override
-	public PrefixHandler mapFrom(PropertyGetter propertyGetter) {
+	public NamespaceApplicator mapFrom(PropertyGetter propertyGetter) {
 		long bundleId = Long.parseLong(
 			propertyGetter.get("service.bundleid").toString());
 
@@ -49,15 +49,15 @@ public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
 
 		String applicationName = applicationNameObject.toString();
 
-		PrefixHandler prefixHandler = _namespaceAdderFactory.create(
+		NamespaceApplicator namespaceApplicator = _namespaceApplicatorBuilder.build(
 			bundle.getSymbolicName(), applicationName);
 
-		return (input) -> {
-			if (_excludedScopes.contains(input)) {
-				return input;
+		return (target) -> {
+			if (_excludedScopes.contains(target)) {
+				return target;
 			}
 
-			return prefixHandler.addPrefix(input);
+			return namespaceApplicator.applyNamespace(target);
 		};
 	}
 
@@ -79,6 +79,6 @@ public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
 	private BundleContext _bundleContext;
 
 	@Reference
-	PrefixHandlerFactory _namespaceAdderFactory;
+	NamespaceApplicatorBuilder _namespaceApplicatorBuilder;
 
 }

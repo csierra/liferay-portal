@@ -19,85 +19,43 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
-import com.liferay.oauth2.provider.scopes.impl.prefixhandler.DefaultPrefixHandlerFactory;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
+import com.liferay.oauth2.provider.scopes.impl.scopenamespace.DefaultNamespaceApplicatorBuilder;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicator;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicatorBuilder;
 import org.junit.Test;
 
 public class DefaultPrefixHandlerFactoryTest {
 
 	@Test
 	public void testMerge() {
-		PrefixHandlerFactory defaultPrefixHandlerFactory =
-			new DefaultPrefixHandlerFactory();
+		NamespaceApplicatorBuilder defaultNamespaceApplicatorBuilder =
+			new DefaultNamespaceApplicatorBuilder();
 
-		PrefixHandler prefixHandler1 = defaultPrefixHandlerFactory.create(
+		NamespaceApplicator namespaceApplicator1 = defaultNamespaceApplicatorBuilder.build(
 			"HELLO");
-		PrefixHandler prefixHandler2 = defaultPrefixHandlerFactory.create(
+		NamespaceApplicator namespaceApplicator2 = defaultNamespaceApplicatorBuilder.build(
 			"BEAUTIFUL");
-		PrefixHandler prefixHandler3 = defaultPrefixHandlerFactory.create(
+		NamespaceApplicator namespaceApplicator3 = defaultNamespaceApplicatorBuilder.build(
 			"COLOURFUL");
 
-		PrefixHandler prefixHandler = PrefixHandler.merge(
-			Arrays.asList(prefixHandler1, prefixHandler2, prefixHandler3));
+		NamespaceApplicator namespaceApplicator = NamespaceApplicator.intersect(
+			Arrays.asList(namespaceApplicator1, namespaceApplicator2, namespaceApplicator3));
 
-		String prefixed = prefixHandler.addPrefix("WORLD");
+		String namespaced = namespaceApplicator.applyNamespace("WORLD");
 
-		assertEquals("HELLO/BEAUTIFUL/COLOURFUL/WORLD", prefixed);
+		assertEquals("HELLO/BEAUTIFUL/COLOURFUL/WORLD", namespaced);
 	}
 
 	@Test
 	public void testCreateWithSeveralStrings() {
-		DefaultPrefixHandlerFactory defaultPrefixHandlerFactory =
-			new DefaultPrefixHandlerFactory();
+		DefaultNamespaceApplicatorBuilder defaultNamespaceApplicatorBuilder =
+			new DefaultNamespaceApplicatorBuilder();
 
-		PrefixHandler prefixHandler = defaultPrefixHandlerFactory.create(
+		NamespaceApplicator namespaceApplicator = defaultNamespaceApplicatorBuilder.build(
 			"HELLO", "BEAUTIFUL", "COLOURFUL");
 
-		assertEquals("HELLO/BEAUTIFUL/COLOURFUL/WORLD", prefixHandler.addPrefix(
+		assertEquals("HELLO/BEAUTIFUL/COLOURFUL/WORLD", namespaceApplicator.applyNamespace(
 			"WORLD"));
-	}
-
-	@Test
-	public void testRemovePrefix() {
-		DefaultPrefixHandlerFactory defaultPrefixHandlerFactory =
-			new DefaultPrefixHandlerFactory();
-
-		PrefixHandler prefixHandler = defaultPrefixHandlerFactory.create(
-			"TEST");
-
-		assertEquals("HELLO", prefixHandler.removePrefix("HELLO"));
-		assertEquals("HELLO", prefixHandler.removePrefix("TEST/HELLO"));
-		assertEquals("TEST/HELLO", prefixHandler.removePrefix(
-			"TEST/TEST/HELLO"));
-
-		prefixHandler = prefixHandler.append(prefixHandler);
-
-		assertEquals("HELLO", prefixHandler.removePrefix(
-			"TEST/TEST/HELLO"));
-
-		prefixHandler = defaultPrefixHandlerFactory.create("TEST");
-
-		prefixHandler = prefixHandler.append(
-			defaultPrefixHandlerFactory.create("TEST2"));
-
-		assertEquals("HELLO", prefixHandler.removePrefix(
-			"TEST/TEST2/HELLO"));
-
-		assertEquals("TEST2/TEST/HELLO", prefixHandler.removePrefix(
-			"TEST2/TEST/HELLO"));
-
-		prefixHandler = defaultPrefixHandlerFactory.create("TEST");
-
-		prefixHandler = prefixHandler.prepend(
-			defaultPrefixHandlerFactory.create("TEST2"));
-
-		assertEquals("HELLO", prefixHandler.removePrefix(
-			"TEST2/TEST/HELLO"));
-
-		assertEquals("TEST/TEST2/HELLO", prefixHandler.removePrefix(
-			"TEST/TEST2/HELLO"));
-
 	}
 
 }

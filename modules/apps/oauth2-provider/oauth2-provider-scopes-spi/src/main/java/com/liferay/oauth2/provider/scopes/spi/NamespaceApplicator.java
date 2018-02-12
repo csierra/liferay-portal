@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.spi;
 
-import com.liferay.portal.kernel.util.StringPool;
+//import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.Collection;
 
@@ -23,83 +23,50 @@ import java.util.Collection;
  * will allow the framework to adapt the applications to different scope
  * naming hopefully without having to change code.
  */
-public interface PrefixHandler {
+public interface NamespaceApplicator {
 
-	public static PrefixHandler merge(
-		Collection<PrefixHandler> namespaceAdders) {
+	public static NamespaceApplicator intersect(
+		Collection<NamespaceApplicator> namespaceApplicators) {
 
-		PrefixHandler namespaceAdder = NULL_HANDLER;
+		NamespaceApplicator namespaceApplicator = NULL_HANDLER;
 
-		for (PrefixHandler na : namespaceAdders) {
-			namespaceAdder = namespaceAdder.append(na);
+		for (NamespaceApplicator na : namespaceApplicators) {
+			namespaceApplicator = namespaceApplicator.intersect(na);
 		}
 
-		return namespaceAdder;
+		return namespaceApplicator;
 	}
 
 	/**
 	 * Adds the prefix to a given input.
-	 * @param input String to be prefixed.
+	 * @param target String to be prefixed.
 	 * @return a new String with the prefix.
 	 */
-	public String addPrefix(String input);
+	public String applyNamespace(String target);
 
 	/**
-	 * Tries to remove the prefix from a string, when possible.
-	 * Some implementations may provide an optimized implementation.
-	 *
-	 * @param prefixed the string to remove the prefix from.
-	 * @return a string without the prefix, if possible.
-	 */
-	public default String removePrefix(String prefixed) {
-		String namespace = addPrefix(StringPool.BLANK);
-
-		if (!prefixed.startsWith(namespace)) {
-			return prefixed;
-		}
-
-		return namespace.substring(namespace.length());
-	}
-
-	/**
-	 * A new {@link PrefixHandler} taking into account the given
-	 * {@link PrefixHandler}
+	 * A new {@link NamespaceApplicator} taking into account the given
+	 * {@link NamespaceApplicator}
 	 *
 	 * @param prefixHandler the prefix handler to append.
 	 * @return a new prefix handler combining both prefix handlers.
 	 */
-	public default PrefixHandler append(PrefixHandler prefixHandler) {
-		return string -> addPrefix(prefixHandler.addPrefix(string));
+	public default NamespaceApplicator intersect(NamespaceApplicator prefixHandler) {
+		return string -> applyNamespace(prefixHandler.applyNamespace(string));
 	}
 
 	/**
-	 * A new {@link PrefixHandler} taking into account the given
-	 * {@link PrefixHandler}
-	 *
-	 * @param prefixHandler the prefix handler to prepend.
-	 * @return a new prefix handler combining both prefix handlers.
+	 * A {@link NamespaceApplicator} that does nothing.
 	 */
-	public default PrefixHandler prepend(PrefixHandler prefixHandler) {
-		return string -> prefixHandler.addPrefix(addPrefix(string));
-	}
-
-	/**
-	 * A {@link PrefixHandler} that does nothing.
-	 */
-	static PrefixHandler NULL_HANDLER = new PrefixHandler() {
+	static NamespaceApplicator NULL_HANDLER = new NamespaceApplicator() {
 
 		@Override
-		public String addPrefix(String input) {
-			return input;
+		public String applyNamespace(String target) {
+			return target;
 		}
 
 		@Override
-		public PrefixHandler append(PrefixHandler prefixHandler) {
-			return prefixHandler;
-		}
-
-		@Override
-		public PrefixHandler prepend(PrefixHandler prefixHandler) {
+		public NamespaceApplicator intersect(NamespaceApplicator prefixHandler) {
 			return prefixHandler;
 		}
 

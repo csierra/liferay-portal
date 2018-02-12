@@ -12,42 +12,28 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
+package com.liferay.oauth2.provider.scopes.impl.scopenamespace;
 
 
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicator;
 import com.liferay.portal.kernel.util.StringPool;
 
-public class DefaultPrefixHandler implements PrefixHandler {
+public class DefaultNamespaceApplicator implements NamespaceApplicator {
 
-	private String _prefix;
+	private String _namespace;
 
-	public DefaultPrefixHandler(String prefix) {
-		_prefix = prefix;
+	public DefaultNamespaceApplicator(String namespace) {
+		_namespace = namespace;
 	}
 
 	@Override
-	public String addPrefix(String input) {
-		return _prefix + input;
+	public String applyNamespace(String target) {
+		return _namespace + target;
 	}
 
 	@Override
-	public PrefixHandler append(PrefixHandler prefixHandler) {
-		return new DefaultPrefixHandler(
-			_prefix + prefixHandler.addPrefix(StringPool.BLANK));
-	}
-
-	@Override
-	public PrefixHandler prepend(PrefixHandler prefixHandler) {
-		return new DefaultPrefixHandler(prefixHandler.addPrefix(_prefix));
-	}
-
-	@Override
-	public String removePrefix(String prefixed) {
-		if (prefixed.startsWith(_prefix)) {
-			return prefixed.substring(_prefix.length());
-		}
-
-		return prefixed;
+	public NamespaceApplicator intersect(NamespaceApplicator prefixHandler) {
+		return new DefaultNamespaceApplicator(
+			_namespace + prefixHandler.applyNamespace(StringPool.BLANK));
 	}
 }

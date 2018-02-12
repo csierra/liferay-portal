@@ -22,10 +22,10 @@ public interface ScopeMatcherFactory {
 
 	/**
 	 * Creates a {@link ScopeMatcher} for the given input.
-	 * @param input the input the matcher will match against.
+	 * @param scopesAlias the input the matcher will match against.
 	 * @return the ScopeMatcher that will match against the input.
 	 */
-	ScopeMatcher create(String input);
+	ScopeMatcher createScopeMatcher(String scopesAlias);
 
 	public static ScopeMatcherFactory STRICT = s -> s::equals;
 
