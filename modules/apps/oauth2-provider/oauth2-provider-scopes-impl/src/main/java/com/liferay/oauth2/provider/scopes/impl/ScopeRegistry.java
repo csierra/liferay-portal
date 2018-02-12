@@ -141,12 +141,12 @@ public class ScopeRegistry implements ScopeFinderLocator {
 				Set<String> mappedScopes = scopeMapper.map(availableScope);
 
 				for (String mappedScope : mappedScopes) {
-					String prefixedScope = prefixHandler.addPrefix(mappedScope);
+					String externalAlias = prefixHandler.addPrefix(mappedScope);
 
 					scopes.add(
 						new LiferayAliasedOAuth2ScopeImpl(
 							new LiferayOAuth2ScopeImpl(
-								name, bundle, availableScope), prefixedScope));
+								name, bundle, availableScope), externalAlias));
 				}
 			}
 		}
