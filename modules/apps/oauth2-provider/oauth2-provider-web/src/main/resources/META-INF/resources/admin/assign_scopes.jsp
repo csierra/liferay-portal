@@ -95,19 +95,8 @@ List<String> assignedScopes = oAuth2Application.getScopesList();
 						<ul>
 							<%							
 							for (String internalScope : authorizationRequestModel.getApplicationInternalScopes(appName)) {
-								ApplicationDescriptor applicationDescriptor = applicationDescriptors.getService(appName);
-
-								String applicationDescription;
-
-								if (applicationDescriptor == null) {
-									applicationDescription = appName;
-								}
-								else {
-									applicationDescription = applicationDescriptor.describeApplication(locale);
-								}
-
-							%>
-									<li><%=applicationDescription%> -> <%=internalScope%></li>
+								%>
+									<li><%=appName%> -> <%=internalScope%></li>
 								<%
 							}								
 							%>
@@ -118,9 +107,21 @@ List<String> assignedScopes = oAuth2Application.getScopesList();
 							<div class="dashed-top"></div>
 							<div class="preview-content">
 							<ul>
-								<li><%= HtmlUtil.escape(appName) %></li>
-								<ul>
 								<%
+								ApplicationDescriptor applicationDescriptor = applicationDescriptors.getService(appName);
+
+								String applicationDescription;
+
+								if (applicationDescriptor == null) {
+									applicationDescription = appName;
+								}
+								else {
+									applicationDescription = applicationDescriptor.describeApplication(locale);
+								}
+								%>
+								<li><%= HtmlUtil.escape(applicationDescription) %></li>
+								<ul>
+								<%																
 								for (String description : authorizationRequestModel.getApplicationScopeDescription(appName)) {
 									%>
 									<li><%= HtmlUtil.escape(description) %></li>
