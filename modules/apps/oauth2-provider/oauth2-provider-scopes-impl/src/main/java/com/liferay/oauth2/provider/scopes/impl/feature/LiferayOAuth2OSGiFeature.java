@@ -24,7 +24,7 @@ import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeContext;
 import com.liferay.osgi.util.ServiceTrackerFactory;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
@@ -351,7 +351,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 				ResourceBundle resourceBundle =
 					resourceBundleLoader.loadResourceBundle(
-						LanguageUtil.getLanguageId(locale));
+						LocaleUtil.toLanguageId(locale));
 
 				String key = "oauth2.scope." + scope;
 
@@ -372,7 +372,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 				ResourceBundle resourceBundle =
 					resourceBundleLoader.loadResourceBundle(
-						LanguageUtil.getLanguageId(locale));
+						LocaleUtil.toLanguageId(locale));
 
 				String key = "oauth2.application.description." +
 					 _applicationClassName;
