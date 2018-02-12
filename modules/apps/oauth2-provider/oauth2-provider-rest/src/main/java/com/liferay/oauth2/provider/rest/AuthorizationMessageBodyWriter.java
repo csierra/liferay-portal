@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.URLCodec;
 
+import com.liferay.portal.kernel.util.Validator;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.osgi.service.component.annotations.Component;
@@ -99,14 +100,20 @@ public class AuthorizationMessageBodyWriter
 		sb.append("scope");
 		sb.append(StringPool.EQUAL);
 		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getProposedScope(), true));
-		sb.append(StringPool.AMPERSAND);
-		sb.append("code_challenge");
-		sb.append(StringPool.EQUAL);
-		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getClientCodeChallenge(), true));
+
+		String clientCodeChallenge =
+			oAuthAuthorizationData.getClientCodeChallenge();
+
+		if (Validator.isNotNull(clientCodeChallenge)) {
+			sb.append(StringPool.AMPERSAND);
+			sb.append("code_challenge");
+			sb.append(StringPool.EQUAL);
+			sb.append(URLCodec.encodeURL(
+				clientCodeChallenge, true));
+		}
 
 		throw new WebApplicationException(
 			Response.status(303).header("Location", sb.toString()).build());
-
 	}
 
 	@Context

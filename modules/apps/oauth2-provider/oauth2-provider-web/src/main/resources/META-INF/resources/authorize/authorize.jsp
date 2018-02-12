@@ -1,4 +1,4 @@
-<%--
+<%@ page import="com.liferay.portal.kernel.util.Validator" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -76,7 +76,9 @@ AuthorizationRequestModel authorizationRequestModel = (AuthorizationRequestModel
 	    <div class="closed container-fluid-1280">
 		    <aui:form action="<%= replyTo %>" method="GET" name="fm">
 				<aui:input name="client_id" type="hidden" useNamespace="false" value="<%= clientId %>" />
-				<aui:input name="code_challenge" type="hidden" useNamespace="false" value="<%= codeChallenge %>" />
+				<% if (Validator.isNotNull(codeChallenge)) { %>
+					<aui:input name="code_challenge" type="hidden" useNamespace="false" value="<%= codeChallenge %>" />
+				<% } %>
 			    <aui:input name="redirect_uri" type="hidden" useNamespace="false" value="<%= redirectUri %>" />
 			    <aui:input name="scope" type="hidden" useNamespace="false" value="<%= scope %>" />
 			    <aui:input name="session_authenticity_token" type="hidden" useNamespace="false" value="<%= sessionAuthenticityToken %>" />
