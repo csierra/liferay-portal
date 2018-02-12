@@ -18,13 +18,15 @@ import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeMatcherFactoryLocator;
-import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scopes.spi.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel.ApplicationScopeDescriptor;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -83,7 +85,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 					_scopeDescriptorLocator.locateScopeDescriptorForApplication(
 						applicationName);
 
-				return scopeDescriptor.describe(
+				return scopeDescriptor.describeScope(
 					scope, themeDisplay.getLocale());
 			};
 
@@ -99,6 +101,8 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		}
 
 		renderRequest.setAttribute(SCOPES, aliasedScopes);
+		renderRequest.setAttribute(
+			"applicationDescriptors", _applicationDescriptors);
 
 		return "/admin/assign_scopes.jsp";
 	}
@@ -135,11 +139,25 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		return implications;
 	}
 
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_applicationDescriptors = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, ApplicationDescriptor.class, "osgi.jaxrs.name");
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_applicationDescriptors.close();
+	}
+
 	@Reference(
 		policyOption = ReferencePolicyOption.GREEDY,
 		policy = ReferencePolicy.DYNAMIC
 	)
 	private volatile ScopeDescriptorLocator _scopeDescriptorLocator;
+
+	private ServiceTrackerMap<String, ApplicationDescriptor>
+		_applicationDescriptors;
 
 
 	@Reference

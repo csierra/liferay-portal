@@ -121,7 +121,7 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 						_scopedScopeDescriptors.getService(
 							companyId, applicationName);
 	
-					return scopeDescriptor.describe(
+					return scopeDescriptor.describeScope(
 						internalScope, locale);
 				};
 		

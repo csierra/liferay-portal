@@ -140,7 +140,7 @@ public class OAuth2SAPEntryScopesPublisher {
 		}
 
 		@Override
-		public String describe(String scope, Locale locale) {
+		public String describeScope(String scope, Locale locale) {
 			try {
 				String sapEntryName = OAUTH2_SAP_PREFIX + scope;
 

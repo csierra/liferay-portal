@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.scopes.impl.scopedescriptor;
 
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -32,8 +31,7 @@ import java.util.ResourceBundle;
 public class DefaultScopeDescriptor implements ScopeDescriptor {
 
 	@Override
-	public String describe(String scope, Locale locale) {
-
+	public String describeScope(String scope, Locale locale) {
 		ResourceBundle resourceBundle =
 			_resourceBundleLoader.loadResourceBundle(locale.toString());
 
@@ -52,5 +50,4 @@ public class DefaultScopeDescriptor implements ScopeDescriptor {
 		target = "(bundle.symbolic.name=com.liferay.oauth2.provider.scopes.impl)"
 	)
 	private volatile ResourceBundleLoader _resourceBundleLoader;
-
 }

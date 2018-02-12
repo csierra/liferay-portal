@@ -11,6 +11,6 @@ public interface ScopeDescriptor {
 	 * @param locale the locale requested for the description.
 	 * @return a description for the scope in the requested locale.
 	 */
-	public String describe(String scope, Locale locale);
+	public String describeScope(String scope, Locale locale);
 
 }

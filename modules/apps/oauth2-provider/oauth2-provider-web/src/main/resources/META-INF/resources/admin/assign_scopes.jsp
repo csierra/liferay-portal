@@ -1,4 +1,7 @@
-<%--
+<%@ page
+	import="com.liferay.oauth2.provider.scopes.spi.ApplicationDescriptor" %>
+<%@ page
+	import="com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -41,6 +44,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "assign-scopes"));
 
 Map<String, AuthorizationRequestModel> scopes = (Map<String, AuthorizationRequestModel>) request.getAttribute(OAuth2AdminWebKeys.SCOPES);
 //Map<String, Set<String>> scopeDescriptions = (Map<String, Set<String>>) request.getAttribute(OAuth2AdminWebKeys.SCOPES_DESCRIPTIONS);
+
+ServiceTrackerMap<String, ApplicationDescriptor> applicationDescriptors = (ServiceTrackerMap<String, ApplicationDescriptor>) request.getAttribute("applicationDescriptors");
 
 List<String> assignedScopes = oAuth2Application.getScopesList();
 %>
@@ -90,8 +95,19 @@ List<String> assignedScopes = oAuth2Application.getScopesList();
 						<ul>
 							<%							
 							for (String internalScope : authorizationRequestModel.getApplicationInternalScopes(appName)) {
-								%>
-									<li><%=appName%> -> <%=internalScope%></li>
+								ApplicationDescriptor applicationDescriptor = applicationDescriptors.getService(appName);
+
+								String applicationDescription;
+
+								if (applicationDescriptor == null) {
+									applicationDescription = appName;
+								}
+								else {
+									applicationDescription = applicationDescriptor.describeApplication(locale);
+								}
+
+							%>
+									<li><%=applicationDescription%> -> <%=internalScope%></li>
 								<%
 							}								
 							%>

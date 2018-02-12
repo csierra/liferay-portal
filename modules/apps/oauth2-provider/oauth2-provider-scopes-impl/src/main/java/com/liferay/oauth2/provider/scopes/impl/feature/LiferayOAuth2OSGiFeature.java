@@ -18,14 +18,13 @@ import com.liferay.oauth2.provider.scopes.impl.jaxrs.CompanyRetrieverContainerRe
 import com.liferay.oauth2.provider.scopes.impl.jaxrs.RunnableExecutorContainerResponseFilter;
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 import com.liferay.oauth2.provider.scopes.impl.jaxrs.ScopedRequestScopeChecker;
+import com.liferay.oauth2.provider.scopes.spi.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.RequestScopeChecker;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeContext;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
@@ -214,12 +213,12 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 						bundleContext, (JAXRSServiceFactoryBean) factory,
 						endpoint, applicationClassName);
 
-				registerScopeDescriptor(
+				registerDescriptors(
 					endpoint, bundle, applicationClassName);
 			}
 		}
 
-		private void registerScopeDescriptor(
+		private void registerDescriptors(
 			Endpoint endpoint, Bundle bundle, String applicationClassName) {
 
 			String bundleSymbolicName = bundle.getSymbolicName();
@@ -231,32 +230,15 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					")(bundle.symbolic.name=" + bundleSymbolicName + ")" +
 					"(resource.bundle.base.name=content.Language))");
 
-			ServiceRegistration<ScopeDescriptor>
+			ServiceRegistration<?>
 				serviceRegistration =
 				_bundleContext.registerService(
-					ScopeDescriptor.class,
-					(scope, locale) -> {
-						ResourceBundleLoader resourceBundleLoader =
-							serviceTracker.getService();
-
-						if (resourceBundleLoader == null) {
-							return _defaultScopeDescriptor.describe(
-								scope, locale);
-						}
-
-						ResourceBundle resourceBundle =
-							resourceBundleLoader.loadResourceBundle(
-								LanguageUtil.getLanguageId(locale));
-
-						String key = "oauth2.scope." + scope;
-
-						if (!resourceBundle.containsKey(key)) {
-							return _defaultScopeDescriptor.describe(
-								scope, locale);
-						}
-
-						return resourceBundle.getString(key);
+					new String[]{
+						ScopeDescriptor.class.getName(),
+						ApplicationDescriptor.class.getName()
 					},
+					new AplicationDescriptorsImpl(
+						serviceTracker, applicationClassName),
 					new Hashtable<String, Object>() {{
 						put("osgi.jaxrs.name", applicationClassName);
 					}});
@@ -343,6 +325,61 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			endpoint.addCleanupHook(serviceRegistration::unregister);
 		}
 
+		private class AplicationDescriptorsImpl
+			implements ScopeDescriptor, ApplicationDescriptor {
+
+			private final ServiceTracker<?, ResourceBundleLoader>
+				_serviceTracker;
+			private String _applicationClassName;
+
+			public AplicationDescriptorsImpl(
+				ServiceTracker<?, ResourceBundleLoader> serviceTracker,
+				String applicationClassName) {
+
+				_serviceTracker = serviceTracker;
+				_applicationClassName = applicationClassName;
+			}
+
+			@Override
+			public String describeScope(String scope, Locale locale) {
+				ResourceBundleLoader resourceBundleLoader =
+					_serviceTracker.getService();
+
+				if (resourceBundleLoader == null) {
+					return _defaultScopeDescriptor.describeScope(scope, locale);
+				}
+
+				ResourceBundle resourceBundle =
+					resourceBundleLoader.loadResourceBundle(
+						LanguageUtil.getLanguageId(locale));
+
+				String key = "oauth2.scope." + scope;
+
+				if (!resourceBundle.containsKey(key)) {
+					return _defaultScopeDescriptor.describeScope(
+						scope, locale);
+				}
+
+				return resourceBundle.getString(key);
+			}
+
+			@Override
+			public String describeApplication(
+				Locale locale) {
+
+				ResourceBundleLoader resourceBundleLoader =
+					_serviceTracker.getService();
+
+				ResourceBundle resourceBundle =
+					resourceBundleLoader.loadResourceBundle(
+						LanguageUtil.getLanguageId(locale));
+
+				String key = "oauth2.application.description." +
+					 _applicationClassName;
+
+				return resourceBundle.getString(key);
+			}
+		}
 	}
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
