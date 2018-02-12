@@ -37,13 +37,17 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
-import java.util.stream.Stream;
+import java.util.Set;
 
 /**
  * @author Tomas Polesovsky
@@ -100,27 +104,34 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				return authVerifierResult;
 			}
 
-			Stream<String> scopesStream = accessToken.getScopes().stream();
+			Set<String> scopeNames = new HashSet<>();
 
-			scopesStream
-				.flatMap (
-					scope -> _scopeFinderLocator.locateScopes(companyId, scope).stream()
-				)
-				.filter(
-					scope -> scope.getApplicationName().equals(OAuth2SAPEntryScopesPublisher.JSONWS_APPLICATION_NAME)
-				)
-				.filter(
-					scope -> scope.getBundle().equals(_bundleContext.getBundle())
-				)
-				.map(
-					LiferayOAuth2Scope::getScope
-				)
-				.map(
-					scope -> OAuth2SAPEntryScopesPublisher.OAUTH2_SAP_PREFIX + scope
-				)
-				.forEach(
-					ServiceAccessPolicyThreadLocal::addActiveServiceAccessPolicyName
-				);
+			for (String accessTokenScope : accessToken.getScopes()) {
+				Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
+					_scopeFinderLocator.locateScopes(
+						companyId, accessTokenScope);
+
+				for (LiferayOAuth2Scope liferayOAuth2Scope :
+					liferayOAuth2Scopes) {
+
+					if (liferayOAuth2Scope.getBundle().equals(
+						_bundleContext.getBundle())) {
+
+						scopeNames.add(liferayOAuth2Scope.getScope());
+					}
+				}
+			}
+
+			List<SAPEntryScope> sapEntryScopes =
+				_sapEntryScopeRegistry.getSAPEntryScopes(companyId);
+
+			for (SAPEntryScope sapEntryScope : sapEntryScopes) {
+				if (scopeNames.contains(sapEntryScope.getScopeName())) {
+					ServiceAccessPolicyThreadLocal.
+						addActiveServiceAccessPolicyName(
+							sapEntryScope.getSapEntryName());
+				}
+			}
 
 			authVerifierResult.getSettings().put(
 				BearerTokenProvider.AccessToken.class.getName(), accessToken);
@@ -205,22 +216,28 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	private BundleContext _bundleContext;
 
 	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY,
 		target = "(name=default)"
 	)
 	private volatile BearerTokenProvider _defaultBearerTokenProvider;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
 	private volatile ScopeFinderLocator _scopeFinderLocator;
 
 	@Reference
-	private volatile OAuth2TokenLocalService _oAuth2TokenLocalService;
+	private OAuth2TokenLocalService _oAuth2TokenLocalService;
 
 	@Reference
-	private volatile OAuth2ApplicationLocalService
-		_oAuth2ApplicationLocalService;
+	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 
-	private volatile ScopedServiceTrackerMap<BearerTokenProvider>
+	@Reference
+	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
+
+	private ScopedServiceTrackerMap<BearerTokenProvider>
 		_scopedBearerTokenProvider;
 
 }

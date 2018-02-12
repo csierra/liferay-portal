@@ -92,16 +92,16 @@ public class OAuth2SAPEntryPublisher {
 	@Reference(
 		target = "(bundle.symbolic.name=com.liferay.oauth2.provider.jsonws)"
 	)
-	private volatile ResourceBundleLoader _resourceBundleLoader;
+	private ResourceBundleLoader _resourceBundleLoader;
 
 	@Reference
-	private volatile SAPEntryLocalService _sapEntryLocalService;
+	private SAPEntryLocalService _sapEntryLocalService;
 
 	private ServiceRegistration<PortalInstanceLifecycleListener>
 		_serviceRegistration;
 
 	@Reference
-	private volatile UserLocalService _userLocalService;
+	private UserLocalService _userLocalService;
 
 	private class PolicyPortalInstanceLifecycleListener
 		extends BasePortalInstanceLifecycleListener {

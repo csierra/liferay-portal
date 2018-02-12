@@ -14,16 +14,18 @@
 
 package com.liferay.oauth2.provider.jsonws;
 
+import com.liferay.oauth2.provider.scopes.spi.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
-import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
 import org.osgi.framework.BundleContext;
@@ -33,40 +35,57 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Tomas Polesovsky
  */
-@Component(immediate=true)
+@Component(
+	immediate=true,
+	property = "oauth2.portal.jsonws.application.name=JSONWS"
+)
 public class OAuth2SAPEntryScopesPublisher {
-	public static final String OAUTH2_SAP_PREFIX = "OAUTH2_";
-	public static final String JSONWS_APPLICATION_NAME = "jsonws";
 
 	@Activate
-	public void activate(BundleContext bundleContext) {
+	public void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
 		_bundleContext = bundleContext;
+
+		_oauth2PortalJSONWSApplicationName = MapUtil.getString(
+			properties, "oauth2.portal.jsonws.application.name",
+			_oauth2PortalJSONWSApplicationName);
+
+		Dictionary<String, Object> applicationDescriptorProperties =
+			new Hashtable<>();
+
+		applicationDescriptorProperties.put(
+			"osgi.jaxrs.name", _oauth2PortalJSONWSApplicationName);
+
+		_serviceRegistrations.add(
+			bundleContext.registerService(
+				ApplicationDescriptor.class, this::describeApplication,
+				applicationDescriptorProperties));
 
 		_serviceRegistrations.add(
 			bundleContext.registerService(
 				PortalInstanceLifecycleListener.class,
-				new BasePortalInstanceLifecycleListener(){
+				new BasePortalInstanceLifecycleListener() {
 					public void portalInstanceRegistered(Company company) {
-						registerSAPEntryScopeFinderDescriptor(
-							company.getCompanyId());
+						registerPortalInstance(company.getCompanyId());
 					}
 				},
 				null));
 	}
 
 	@Deactivate
-	public void deactivate(){
+	public void deactivate() {
 		for (ServiceRegistration serviceRegistration : _serviceRegistrations) {
 			serviceRegistration.unregister();
 		}
@@ -74,10 +93,46 @@ public class OAuth2SAPEntryScopesPublisher {
 		_serviceRegistrations.clear();
 	}
 
-	protected void registerSAPEntryScopeFinderDescriptor(long companyId) {
+	public String describeApplication(Locale locale) {
+		String languageId = LocaleUtil.toLanguageId(locale);
+
+		ResourceBundle resourceBundle =
+			_resourceBundleLoader.loadResourceBundle(languageId);
+
+		String key =
+			"oauth2.application.description." +
+				_oauth2PortalJSONWSApplicationName;
+
+		return resourceBundle.getString(key);
+	}
+
+	public void registerPortalInstance(long companyId) {
+		try {
+			registerSAPEntries(companyId);
+			registerSAPEntryScopeDescriptorFinder(companyId);
+		}
+		catch (Exception e) {
+			_log.error(
+				"Unable to get and register SAP entries for company "
+					+ companyId,
+				e);
+		}
+	}
+
+	protected void registerSAPEntries(long companyId) {
+		List<SAPEntry> sapEntries =
+			_sapEntryLocalService.getCompanySAPEntries(
+				companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		for (SAPEntry sapEntry : sapEntries) {
+			_sapEntryScopeRegistry.registerSAPEntry(sapEntry);
+		}
+	}
+
+	protected void registerSAPEntryScopeDescriptorFinder(long companyId) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 
-		properties.put("osgi.jaxrs.name", JSONWS_APPLICATION_NAME);
+		properties.put("osgi.jaxrs.name", _oauth2PortalJSONWSApplicationName);
 		properties.put("companyId", String.valueOf(companyId));
 
 		_serviceRegistrations.add(
@@ -85,82 +140,30 @@ public class OAuth2SAPEntryScopesPublisher {
 				new String[]{
 					ScopeDescriptor.class.getName(),
 					ScopeFinder.class.getName()},
-				new SAPEntryScopeFinderDescriptor(companyId),
+				new SAPEntryScopeDescriptorFinder(
+					companyId, _sapEntryScopeRegistry),
 				properties));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2SAPEntryScopesPublisher.class);
 
-	private volatile BundleContext _bundleContext;
+	private BundleContext _bundleContext;
+
+	@Reference(
+		target = "(bundle.symbolic.name=com.liferay.oauth2.provider.jsonws)"
+	)
+	private ResourceBundleLoader _resourceBundleLoader;
 
 	@Reference
-	private volatile SAPEntryLocalService _sapEntryLocalService;
+	private SAPEntryLocalService _sapEntryLocalService;
+
+	@Reference
+	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
+
+	private String _oauth2PortalJSONWSApplicationName = "JSONWS";
 
 	private List<ServiceRegistration> _serviceRegistrations =
 		new CopyOnWriteArrayList();
-
-	private class SAPEntryScopeFinderDescriptor
-		implements ScopeFinder, ScopeDescriptor {
-
-		public SAPEntryScopeFinderDescriptor(long companyId) {
-			_companyId = companyId;
-		}
-
-		@Override
-		public Collection<String> findScopes(ScopeMatcher scopeMatcher) {
-			List<String> names = new ArrayList<>();
-
-			try {
-				List<SAPEntry> policies =
-					_sapEntryLocalService.getCompanySAPEntries(
-						_companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-				for (SAPEntry policy : policies) {
-					String policyName = policy.getName();
-
-					if (!StringUtil.startsWith(policyName, OAUTH2_SAP_PREFIX)) {
-						continue;
-					}
-
-					String scopeName = policyName.substring(
-						OAUTH2_SAP_PREFIX.length());
-
-					names.add(scopeName);
-				}
-			}
-			catch (Exception e) {
-				_log.error(
-					"Unable to publish OAuth2 scopes from SAP for company "
-					+ _companyId,
-					e);
-			}
-
-			return scopeMatcher.filter(names);
-		}
-
-		@Override
-		public String describeScope(String scope, Locale locale) {
-			try {
-				String sapEntryName = OAUTH2_SAP_PREFIX + scope;
-
-				SAPEntry sapEntry = _sapEntryLocalService.fetchSAPEntry(
-					_companyId, sapEntryName);
-
-				if (sapEntry == null) {
-					return scope;
-				}
-
-				return sapEntry.getTitle(locale);
-			}
-			catch (Exception e) {
-				_log.error("Unable to localize SAP scope " + scope, e);
-			}
-
-			return scope;
-		}
-
-		private final long _companyId;
-	}
 
 }
