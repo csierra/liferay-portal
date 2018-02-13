@@ -12,19 +12,19 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
+package com.liferay.oauth2.provider.scopes.impl.scopenamespace;
 
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicator;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicatorFactory;
 import com.liferay.oauth2.provider.scopes.spi.PropertyGetter;
 import org.osgi.service.component.annotations.Component;
 
 @Component(immediate = true)
-public class NullPrefixHandlerMapper implements PrefixHandlerMapper {
+public class NullNamespaceApplicatorFactory implements NamespaceApplicatorFactory {
 
 	@Override
-	public PrefixHandler mapFrom(PropertyGetter propertyGetter) {
-		return PrefixHandler.NULL_HANDLER;
+	public NamespaceApplicator mapFrom(PropertyGetter propertyGetter) {
+		return NamespaceApplicator.NULL_HANDLER;
 	}
 
 }

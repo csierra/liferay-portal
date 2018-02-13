@@ -12,10 +12,10 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
+package com.liferay.oauth2.provider.scopes.impl.scopenamespace;
 
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicator;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicatorBuilder;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -25,12 +25,12 @@ import org.osgi.service.component.annotations.Component;
 import java.util.Map;
 
 @Component(
-	configurationPid = "com.liferay.oauth2.provider.impl.scopes.DefaultNamespaceAdderFactory",
+	configurationPid = "com.liferay.oauth2.provider.scopes.impl.scopenamespace.DefaultNamespaceApplicatorBuilder",
 	property = {
 		"separator=" + StringPool.SLASH
 	}
 )
-public class DefaultPrefixHandlerFactory implements PrefixHandlerFactory {
+public class DefaultNamespaceApplicatorBuilder implements NamespaceApplicatorBuilder {
 
 	private String _separator = StringPool.SLASH;
 
@@ -44,19 +44,19 @@ public class DefaultPrefixHandlerFactory implements PrefixHandlerFactory {
 	}
 
 	@Override
-	public PrefixHandler create(String prefix) {
-		return new DefaultPrefixHandler(prefix + _separator);
+	public NamespaceApplicator build(String namespace) {
+		return new DefaultNamespaceApplicator(namespace + _separator);
 	}
 
 	@Override
-	public PrefixHandler create(String ... prefixes) {
-		StringBundler sb = new StringBundler(prefixes.length * 2);
+	public NamespaceApplicator build(String ... namespaces) {
+		StringBundler sb = new StringBundler(namespaces.length * 2);
 
-		for (String namespace : prefixes) {
+		for (String namespace : namespaces) {
 			sb.append(namespace);
 			sb.append(_separator);
 		}
 
-		return new DefaultPrefixHandler(sb.toString());
+		return new DefaultNamespaceApplicator(sb.toString());
 	}
 }

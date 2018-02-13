@@ -25,8 +25,8 @@ import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicator;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicatorFactory;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
@@ -59,7 +59,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 	@Override
 	public Collection<LiferayOAuth2Scope> locateScopes(
-		long companyId, String scope) {
+		long companyId, String scopesAlias) {
 
 		Collection<LiferayOAuth2Scope> grants = new ArrayList<>();
 
@@ -69,22 +69,22 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			_scopeMatcherFactoryLocator.locateScopeMatcherFactory(companyId);
 
 		for (String name : names) {
-			ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scope);
+			ScopeMatcher scopeMatcher = scopeMatcherFactory.createScopeMatcher(scopesAlias);
 
 			ServiceReferenceServiceTuple<?, ScopeFinder> tuple =
 				_scopeFinderByNameServiceTrackerMap.getService(name);
 
 			ServiceReference<?> serviceReference = tuple.getServiceReference();
 
-			PrefixHandlerMapper prefixHandlerMapper =
-				_scopedPrefixHandlerMappers.getService(companyId, name);
+			NamespaceApplicatorFactory namespaceApplicatorFactory =
+				_scopedNamespaceApplicatorFactories.getService(companyId, name);
 
-			PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
+			NamespaceApplicator namespaceApplicator = namespaceApplicatorFactory.mapFrom(
 				serviceReference::getProperty);
 
-			scopeMatcher = scopeMatcher.prepend(prefixHandler);
+			scopeMatcher = scopeMatcher.withNamespaceApplicator(namespaceApplicator);
 
-			scopeMatcher = scopeMatcher.withMapper(
+			scopeMatcher = scopeMatcher.withScopeMapper(
 				_scopedScopeMapper.getService(companyId, name));
 
 			ScopeFinder scopeFinder = tuple.getService();
@@ -103,8 +103,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		return grants;
 	}
 
-	private ScopedServiceTrackerMap<PrefixHandlerMapper>
-		_scopedPrefixHandlerMappers;
+	private ScopedServiceTrackerMap<NamespaceApplicatorFactory>
+		_scopedNamespaceApplicatorFactories;
 	private ScopedServiceTrackerMap<ScopeMapper>
 		_scopedScopeMapper;
 
@@ -126,10 +126,10 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			Collection<String> availableScopes = scopeFinder.findScopes(
 				ScopeMatcher.ALL);
 
-			PrefixHandlerMapper prefixHandlerMapper =
-				_scopedPrefixHandlerMappers.getService(companyId, name);
+			NamespaceApplicatorFactory namespaceApplicatorFactory =
+				_scopedNamespaceApplicatorFactories.getService(companyId, name);
 
-			PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
+			NamespaceApplicator namespaceApplicator = namespaceApplicatorFactory.mapFrom(
 				serviceReference::getProperty);
 
 			ScopeMapper scopeMapper =
@@ -141,7 +141,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 				Set<String> mappedScopes = scopeMapper.map(availableScope);
 
 				for (String mappedScope : mappedScopes) {
-					String externalAlias = prefixHandler.addPrefix(mappedScope);
+					String externalAlias = namespaceApplicator.applyNamespace(mappedScope);
 
 					scopes.add(
 						new LiferayAliasedOAuth2ScopeImpl(
@@ -162,9 +162,9 @@ public class ScopeRegistry implements ScopeFinderLocator {
 				new ScopeFinderServiceTupleServiceTrackerCustomizer(
 					bundleContext));
 
-		_scopedPrefixHandlerMappers = new ScopedServiceTrackerMap<>(
-			bundleContext, PrefixHandlerMapper.class, "osgi.jaxrs.name",
-			() -> _defaultPrefixHandlerMapper);
+		_scopedNamespaceApplicatorFactories = new ScopedServiceTrackerMap<>(
+			bundleContext, NamespaceApplicatorFactory.class, "osgi.jaxrs.name",
+			() -> _defaultNamespaceApplicatorFactory);
 
 		_scopedScopeMapper = new ScopedServiceTrackerMap<>(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
@@ -174,7 +174,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	@Deactivate
 	protected void deactivate() {
 		_scopeFinderByNameServiceTrackerMap.close();
-		_scopedPrefixHandlerMappers.close();
+		_scopedNamespaceApplicatorFactories.close();
 		_scopedScopeMapper.close();
 	}
 
@@ -182,7 +182,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		target = "(default=true)",
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private PrefixHandlerMapper _defaultPrefixHandlerMapper;
+	private NamespaceApplicatorFactory _defaultNamespaceApplicatorFactory;
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;

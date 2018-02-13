@@ -14,11 +14,11 @@
 
 package com.liferay.oauth2.provider.scopes.impl;
 
-import com.liferay.oauth2.provider.scopes.impl.prefixhandler.DefaultPrefixHandlerFactory;
-import com.liferay.oauth2.provider.scopes.impl.scopematcher.ChunkScopeMatcherFactory;
+import com.liferay.oauth2.provider.scopes.impl.scopematcher.HierarchicalScopeMatcherFactory;
+import com.liferay.oauth2.provider.scopes.impl.scopenamespace.DefaultNamespaceApplicatorBuilder;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicator;
 import com.liferay.portal.kernel.util.StringPool;
 import org.junit.Test;
 
@@ -27,15 +27,15 @@ import java.util.Collections;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ChunkScopeMatcherFactoryTest {
+public class HierarchicalScopeMatcherFactoryTest {
 
 	@Test
 	public void testMatch() throws Exception {
-		ScopeMatcherFactory chunkScopeMatcherFactory =
-			new ChunkScopeMatcherFactory();
+		ScopeMatcherFactory hierarchicalScopeMatcherFactory =
+			new HierarchicalScopeMatcherFactory();
 
 		ScopeMatcher scopeMatcher =
-			chunkScopeMatcherFactory.create("everything.readonly");
+			hierarchicalScopeMatcherFactory.createScopeMatcher("everything.readonly");
 
 		assertTrue(scopeMatcher.match("everything.readonly"));
 		assertFalse(scopeMatcher.match("everything"));
@@ -43,11 +43,11 @@ public class ChunkScopeMatcherFactoryTest {
 
 	@Test
 	public void testMatch2() throws Exception {
-		ScopeMatcherFactory chunkScopeMatcherFactory =
-			new ChunkScopeMatcherFactory();
+		ScopeMatcherFactory hierarchicalScopeMatcherFactory =
+			new HierarchicalScopeMatcherFactory();
 
 		ScopeMatcher scopeMatcher =
-			chunkScopeMatcherFactory.create("everything");
+			hierarchicalScopeMatcherFactory.createScopeMatcher("everything");
 
 		assertTrue(scopeMatcher.match("everything.readonly"));
 		assertTrue(scopeMatcher.match("everything"));
@@ -55,11 +55,11 @@ public class ChunkScopeMatcherFactoryTest {
 
 	@Test
 	public void testMatchMatchesWholeChunksOnly() throws Exception {
-		ScopeMatcherFactory chunkScopeMatcherFactory =
-			new ChunkScopeMatcherFactory();
+		ScopeMatcherFactory hierarchicalScopeMatcherFactory =
+			new HierarchicalScopeMatcherFactory();
 
 		ScopeMatcher scopeMatcher =
-			chunkScopeMatcherFactory.create("everything");
+			hierarchicalScopeMatcherFactory.createScopeMatcher("everything");
 
 		assertFalse(scopeMatcher.match("everything2.readonly"));
 		assertFalse(scopeMatcher.match("everything2"));
@@ -67,16 +67,16 @@ public class ChunkScopeMatcherFactoryTest {
 
 	@Test
 	public void testMatchWithNamespaces() throws Exception {
-		ScopeMatcherFactory chunkScopeMatcherFactory =
-			new ChunkScopeMatcherFactory();
+		ScopeMatcherFactory hierarchicalScopeMatcherFactory =
+			new HierarchicalScopeMatcherFactory();
 
 		ScopeMatcher scopeMatcher =
-			chunkScopeMatcherFactory.create("test/everything");
+			hierarchicalScopeMatcherFactory.createScopeMatcher("test/everything");
 
-		PrefixHandler namespaceAdder =
-			new DefaultPrefixHandlerFactory().create("test");
+		NamespaceApplicator namespaceApplicator =
+			new DefaultNamespaceApplicatorBuilder().build("test");
 
-		scopeMatcher = scopeMatcher.prepend(namespaceAdder);
+		scopeMatcher = scopeMatcher.withNamespaceApplicator(namespaceApplicator);
 
 		assertTrue(scopeMatcher.match("everything.readonly"));
 		assertTrue(scopeMatcher.match("everything"));
@@ -86,14 +86,14 @@ public class ChunkScopeMatcherFactoryTest {
 	public void testMatchWithNamespacesMatchingChunksAndEmpty()
 		throws Exception {
 
-		ScopeMatcherFactory chunkScopeMatcherFactory =
-			new ChunkScopeMatcherFactory();
+		ScopeMatcherFactory hierarchicalScopeMatcherFactory =
+			new HierarchicalScopeMatcherFactory();
 
-		ScopeMatcher scopeMatcher = chunkScopeMatcherFactory.create("test.");
+		ScopeMatcher scopeMatcher = hierarchicalScopeMatcherFactory.createScopeMatcher("test.");
 
-		PrefixHandler namespaceAdder = localName -> "test." + localName;
+		NamespaceApplicator namespaceApplicator = localName -> "test." + localName;
 
-		scopeMatcher = scopeMatcher.prepend(namespaceAdder);
+		scopeMatcher = scopeMatcher.withNamespaceApplicator(namespaceApplicator);
 
 		assertFalse(scopeMatcher.match("everything.readonly"));
 		assertFalse(scopeMatcher.match("everything"));
@@ -104,15 +104,15 @@ public class ChunkScopeMatcherFactoryTest {
 
 	@Test
 	public void testMatchWithNamespacesMatchingChunks() throws Exception {
-		ScopeMatcherFactory chunkScopeMatcherFactory =
-			new ChunkScopeMatcherFactory();
+		ScopeMatcherFactory hierarchicalScopeMatcherFactory =
+			new HierarchicalScopeMatcherFactory();
 
 		ScopeMatcher scopeMatcher =
-			chunkScopeMatcherFactory.create("test.everything");
+			hierarchicalScopeMatcherFactory.createScopeMatcher("test.everything");
 
-		PrefixHandler namespaceAdder = localName -> "test." + localName;
+		NamespaceApplicator namespaceApplicator = localName -> "test." + localName;
 
-		scopeMatcher = scopeMatcher.prepend(namespaceAdder);
+		scopeMatcher = scopeMatcher.withNamespaceApplicator(namespaceApplicator);
 
 		assertTrue(scopeMatcher.match("everything.readonly"));
 		assertTrue(scopeMatcher.match("everything"));
@@ -125,17 +125,17 @@ public class ChunkScopeMatcherFactoryTest {
 	public void testMatchWithNamespacesAndMapperMatchingChunks()
 		throws Exception {
 
-		ScopeMatcherFactory chunkScopeMatcherFactory =
-			new ChunkScopeMatcherFactory();
+		ScopeMatcherFactory hierarchicalScopeMatcherFactory =
+			new HierarchicalScopeMatcherFactory();
 
-		ScopeMatcher scopeMatcher = chunkScopeMatcherFactory.create(
+		ScopeMatcher scopeMatcher = hierarchicalScopeMatcherFactory.createScopeMatcher(
 			"test.everything");
 
-		PrefixHandler namespaceAdder = localName -> "test." + localName;
+		NamespaceApplicator namespaceApplicator = localName -> "test." + localName;
 
-		scopeMatcher = scopeMatcher.prepend(namespaceAdder);
+		scopeMatcher = scopeMatcher.withNamespaceApplicator(namespaceApplicator);
 
-		scopeMatcher = scopeMatcher.withMapper(s -> {
+		scopeMatcher = scopeMatcher.withScopeMapper(s -> {
 			switch (s) {
 				case "RW": return Collections.singleton("everything");
 				case "RO": return Collections.singleton("everything.readonly");

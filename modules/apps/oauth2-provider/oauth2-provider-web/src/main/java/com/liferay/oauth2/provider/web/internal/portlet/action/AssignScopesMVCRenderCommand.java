@@ -125,7 +125,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		HashMap<String, Set<String>> implications = new HashMap<>();
 
 		for (String alias : aliases) {
-			ScopeMatcher scopeMatcher = scopeMatcherFactory.create(alias);
+			ScopeMatcher scopeMatcher = scopeMatcherFactory.createScopeMatcher(alias);
 
 			Set<String> filtered = new HashSet<>(scopeMatcher.filter(aliases));
 

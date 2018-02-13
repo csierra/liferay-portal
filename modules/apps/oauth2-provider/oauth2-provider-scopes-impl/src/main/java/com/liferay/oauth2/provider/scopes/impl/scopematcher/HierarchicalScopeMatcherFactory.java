@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.impl.scopematcher;
 
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
+import com.liferay.oauth2.provider.scopes.spi.NamespaceApplicator;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.portal.kernel.util.StringPool;
@@ -26,14 +26,14 @@ import org.osgi.service.component.annotations.Component;
 import java.util.Map;
 
 @Component(
-	configurationPid = "com.liferay.oauth2.provider.impl.scopes.ChunkScopeMatcherFactory",
+	configurationPid = "com.liferay.oauth2.provider.scopes.impl.scopematcher.HierarchicalScopeMatcherFactory",
 	property = {
 		"default=true",
 		"type=chunks",
 		"separator=" + StringPool.PERIOD
 	}
 )
-public class ChunkScopeMatcherFactory implements ScopeMatcherFactory {
+public class HierarchicalScopeMatcherFactory implements ScopeMatcherFactory {
 
 	private String _separator = StringPool.PERIOD;
 
@@ -50,37 +50,37 @@ public class ChunkScopeMatcherFactory implements ScopeMatcherFactory {
 	}
 
 	@Override
-	public ScopeMatcher create(String input) {
-		String[] inputParts = StringUtil.split(input, _separator);
+	public ScopeMatcher createScopeMatcher(String scopesAlias) {
+		String[] scopesAliasParts = StringUtil.split(scopesAlias, _separator);
 
-		if (inputParts.length == 0) {
+		if (scopesAliasParts.length == 0) {
 			return ScopeMatcher.NONE;
 		}
 
-		return new ChunkScopeMatcher(input, inputParts);
+		return new HierarchicalScopeMatcher(scopesAlias, scopesAliasParts);
 	}
 
-	private class ChunkScopeMatcher implements ScopeMatcher {
-		private String _input;
-		private final String[] _inputParts;
+	private class HierarchicalScopeMatcher implements ScopeMatcher {
+		private String _scopesAlias;
+		private final String[] _scopesAliasParts;
 
-		private ChunkScopeMatcher(String input, String[] inputParts) {
-			_input = input;
-			_inputParts = inputParts;
+		private HierarchicalScopeMatcher(String scopesAlias, String[] scopesAliasParts) {
+			_scopesAlias = scopesAlias;
+			_scopesAliasParts = scopesAliasParts;
 		}
 
 		@Override
-		public boolean match(String name) {
-			String[] scopeParts = StringUtil.split(name, _separator);
+		public boolean match(String scopesAlias) {
+			String[] scopesAliasParts = StringUtil.split(scopesAlias, _separator);
 
-			if (scopeParts.length < _inputParts.length) {
+			if (scopesAliasParts.length < _scopesAliasParts.length) {
 				return false;
 			}
 
-			for (int i = 0; i < _inputParts.length; i++) {
-				String inputPart = _inputParts[i];
+			for (int i = 0; i < _scopesAliasParts.length; i++) {
+				String thisScopesAliasPart = _scopesAliasParts[i];
 
-				if (inputPart.equals(scopeParts[i])) {
+				if (thisScopesAliasPart.equals(scopesAliasParts[i])) {
 					continue;
 				}
 
@@ -91,14 +91,14 @@ public class ChunkScopeMatcherFactory implements ScopeMatcherFactory {
 		}
 
 		@Override
-		public ScopeMatcher prepend(PrefixHandler prefixHandler) {
-			String namespace = prefixHandler.addPrefix(StringPool.BLANK);
+		public ScopeMatcher withNamespaceApplicator(NamespaceApplicator namespaceApplicator) {
+			String namespace = namespaceApplicator.applyNamespace(StringPool.BLANK);
 
-			if (!_input.startsWith(namespace)) {
+			if (!_scopesAlias.startsWith(namespace)) {
 				return ScopeMatcher.NONE;
 			}
 
-			return create(_input.substring(namespace.length()));
+			return createScopeMatcher(_scopesAlias.substring(namespace.length()));
 		}
 	}
 

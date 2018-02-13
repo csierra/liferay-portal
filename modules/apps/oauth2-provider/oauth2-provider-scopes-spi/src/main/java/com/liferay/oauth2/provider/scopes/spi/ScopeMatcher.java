@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  *	   </li>
  * </ul>
  *
- * ScopeMatcher might also be combined with {@link PrefixHandler} and
+ * ScopeMatcher might also be combined with {@link NamespaceApplicator} and
  * {@link ScopeMapper} to tailor the matching strategy to the framework
  * configuration.
  *
@@ -37,7 +37,7 @@ public interface ScopeMatcher {
 	 * @return true if the input scope is a match for the {@link ScopeMatcher},
 	 * false otherwise.
 	 */
-	public boolean match(String name);
+	public boolean match(String scopesAlias);
 
 	/**
 	 * Applies the matcher to a collection of scopes. Some implementations
@@ -46,22 +46,22 @@ public interface ScopeMatcher {
 	 * @param names the collection of scopes to match.
 	 * @return a collection containing those scopes that matched.
 	 */
-	public default Collection<String> filter(Collection<String> names) {
-		return names.stream().filter(this::match).collect(Collectors.toList());
+	public default Collection<String> filter(Collection<String> scopesAliases) {
+		return scopesAliases.stream().filter(this::match).collect(Collectors.toList());
 	}
 
 	/**
 	 * Returns a new {@link ScopeMatcher} that takes into account the effect
-	 * of the given {@link PrefixHandler}. Some implementations might have
+	 * of the given {@link NamespaceApplicator}. Some implementations might have
 	 * optimization opportunities.
 	 *
-	 * @param prefixHandler the prefix handler that will affect the scope
+	 * @param namespaceApplicator the prefix handler that will affect the scope
 	 * matcher.
 	 * @return the new ScopeMatcher that takes into account the
-	 * {@link PrefixHandler}
+	 * {@link NamespaceApplicator}
 	 */
-	public default ScopeMatcher prepend(PrefixHandler prefixHandler) {
-		return localName -> match(prefixHandler.addPrefix(localName));
+	public default ScopeMatcher withNamespaceApplicator(NamespaceApplicator namespaceApplicator) {
+		return scopesAlias -> match(namespaceApplicator.applyNamespace(scopesAlias));
 	}
 
 	/**
@@ -72,7 +72,7 @@ public interface ScopeMatcher {
 	 * @return the new {@link ScopeMatcher} that takes into account the given
 	 * {@link ScopeMapper}.
 	 */
-	public default ScopeMatcher withMapper(ScopeMapper scopeMapper) {
+	public default ScopeMatcher withScopeMapper(ScopeMapper scopeMapper) {
 		return localName ->
 			scopeMapper.map(localName).stream().anyMatch(this::match);
 	}

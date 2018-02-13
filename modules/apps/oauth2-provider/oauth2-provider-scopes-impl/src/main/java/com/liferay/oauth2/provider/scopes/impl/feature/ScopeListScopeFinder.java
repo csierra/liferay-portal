@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.impl.feature;
 
-import com.liferay.oauth2.provider.scopes.impl.scopematcher.ChunkScopeMatcherFactory;
+import com.liferay.oauth2.provider.scopes.impl.scopematcher.HierarchicalScopeMatcherFactory;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
@@ -36,6 +36,6 @@ class ScopeListScopeFinder implements ScopeFinder {
 
 	@Override
 	public ScopeMatcherFactory getDefaultScopeMatcherFactory() {
-		return new ChunkScopeMatcherFactory();
+		return new HierarchicalScopeMatcherFactory();
 	}
 }
