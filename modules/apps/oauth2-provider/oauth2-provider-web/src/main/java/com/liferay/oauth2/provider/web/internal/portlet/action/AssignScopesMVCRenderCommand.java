@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
-import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
+import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeMatcherFactoryLocator;
@@ -71,11 +71,11 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 		long companyId = company.getCompanyId();
 
-		Collection<LiferayAliasedOAuth2Scope> liferayOAuth2Scopes =
-			_scopeFinderLocator.listScopes(companyId);
+		Collection<String> externalAliases =
+			_scopeFinderLocator.listAliases(companyId);
 
 		Map<String, Set<String>> implicationMap = _buildImplicationMap(
-			companyId, liferayOAuth2Scopes);
+			companyId, externalAliases);
 
 		Map<String, AuthorizationRequestModel> aliasedScopes = new HashMap<>();
 		
@@ -89,15 +89,20 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 					scope, themeDisplay.getLocale());
 			};
 
-		for (LiferayAliasedOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
+		for (String externalAlias : externalAliases) {
 			AuthorizationRequestModel authorizationRequestModel =
 				aliasedScopes.computeIfAbsent(
-					liferayOAuth2Scope.getExternalAlias(), 
+					externalAlias,
 					__ -> new AuthorizationRequestModel(
-						liferayOAuth2Scopes.size(),
+						externalAliases.size(),
 						applicationScopeDescriptor));
-			
-			authorizationRequestModel.addLiferayOAuth2Scope(liferayOAuth2Scope);
+
+			Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
+				_scopeFinderLocator.locateScopes(companyId, externalAlias);
+
+			for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
+				authorizationRequestModel.addLiferayOAuth2Scope(liferayOAuth2Scope);
+			}
 		}
 
 		renderRequest.setAttribute(SCOPES, aliasedScopes);
@@ -108,16 +113,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	private Map<String, Set<String>> _buildImplicationMap(
-		long companyId,
-		Collection<LiferayAliasedOAuth2Scope> liferayOAuth2Scopes) {
-
-		Set<String> aliases = new HashSet<>();
-
-		for (LiferayAliasedOAuth2Scope liferayOAuth2Scope :
-			liferayOAuth2Scopes) {
-
-			aliases.add(liferayOAuth2Scope.getExternalAlias());
-		}
+		long companyId, Collection<String> aliases) {
 
 		ScopeMatcherFactory scopeMatcherFactory =
 			_scopeMatcherFactoryLocator.locateScopeMatcherFactory(companyId);

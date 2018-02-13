@@ -18,7 +18,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
-import com.liferay.oauth2.provider.model.LiferayAliasedOAuth2Scope;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 
@@ -32,8 +31,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
 
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import org.osgi.framework.Bundle;
@@ -41,6 +38,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 @ApplicationPath("/sample2")
 @Component(
@@ -78,8 +76,12 @@ public class Test extends Application {
 	public String scopes() {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
-		Collection<LiferayAliasedOAuth2Scope> scopes =
-			_scopeFinderLocator.listScopes(companyId);
+		Collection<LiferayOAuth2Scope> scopes =
+			_scopeFinderLocator.listAliases(companyId).stream().flatMap(
+				s -> _scopeFinderLocator.locateScopes(companyId, s).stream()
+			).collect(
+				Collectors.toList()
+			);
 
 		Gson gson = new GsonBuilder()
 			.registerTypeAdapter(
