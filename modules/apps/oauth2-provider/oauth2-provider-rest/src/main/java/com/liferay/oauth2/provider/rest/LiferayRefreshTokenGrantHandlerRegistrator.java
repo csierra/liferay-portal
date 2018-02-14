@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUti
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 
 @Component(
 	configurationPid = "com.liferay.oauth2.configuration.OAuth2Configuration",
@@ -78,6 +80,30 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 		}
 	}
 
+
+	protected boolean clientsMatch(Client client1, Client client2) {
+		String client1Id = client1.getClientId();
+		String client2Id = client2.getClientId();
+
+		if (!Objects.equals(client1Id, client2Id)) {
+			return false;
+		}
+
+		Map<String, String> properties = client1.getProperties();
+
+		String companyId1 = properties.get("companyId");
+
+		properties = client2.getProperties();
+
+		String companyId2 = properties.get("companyId");
+
+		if (!Objects.equals(companyId1, companyId2)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	protected boolean hasCreateTokenPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
@@ -97,6 +123,27 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 		if (refreshToken == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No refresh token found for " + refreshTokenString);
+			}
+
+			return false;
+		}
+
+		if(!clientsMatch(client, refreshToken.getClient())) {
+			// audit: Trying to refresh token with other client's authentication
+
+			_liferayOAuthDataProvider.doRevokeRefreshToken(refreshToken);
+
+			for (String accessToken : refreshToken.getAccessTokens()) {
+				ServerAccessToken serverAccessToken =
+					_liferayOAuthDataProvider.getAccessToken(accessToken);
+
+				_liferayOAuthDataProvider.doRevokeAccessToken(
+					serverAccessToken);
+			}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Client authentication doesn't mach refresh token's client");
 			}
 
 			return false;
