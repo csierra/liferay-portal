@@ -72,7 +72,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		long companyId = company.getCompanyId();
 
 		Collection<String> externalAliases =
-			_scopeFinderLocator.listAliases(companyId);
+			_scopeFinderLocator.listScopesAliases(companyId);
 
 		Map<String, Set<String>> implicationMap = _buildImplicationMap(
 			companyId, externalAliases);

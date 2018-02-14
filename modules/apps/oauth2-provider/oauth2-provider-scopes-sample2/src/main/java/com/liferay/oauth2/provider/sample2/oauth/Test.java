@@ -77,7 +77,7 @@ public class Test extends Application {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
 		Collection<LiferayOAuth2Scope> scopes =
-			_scopeFinderLocator.listAliases(companyId).stream().flatMap(
+			_scopeFinderLocator.listScopesAliases(companyId).stream().flatMap(
 				s -> _scopeFinderLocator.locateScopes(companyId, s).stream()
 			).collect(
 				Collectors.toList()
