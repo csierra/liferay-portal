@@ -123,19 +123,19 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	private ScopedServiceTrackerMap<ScopeMapper>
 		_scopedScopeMapper;
 
-	private Collection<String> _doListAliases(long companyId) {
+	private Collection<String> _doListScopesAliases(long companyId) {
 		Collection<String> scopes = new HashSet<>();
 
 		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
 
 		for (String name : names) {
-			scopes.addAll(listAliasesForApplication(companyId, name));
+			scopes.addAll(listScopesAliasesForApplication(companyId, name));
 		}
 
 		return scopes;
 	}
 
-	private Collection<String> _doListAliasesForApplication(
+	private Collection<String> _doListScopesAliasesForApplication(
 		long companyId, String applicationName) {
 
 		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
@@ -243,20 +243,20 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	}
 
 	@Override
-	public Collection<String> listAliases(long companyId) {
+	public Collection<String> listScopesAliases(long companyId) {
 		return (Collection<String>)
 			_invocationCache.computeIfAbsent(
-				"listAliases" + companyId, __ -> this._doListAliases(companyId));
+				"listAliases" + companyId, __ -> this._doListScopesAliases(companyId));
 	}
 
 	@Override
-	public Collection<String> listAliasesForApplication(
+	public Collection<String> listScopesAliasesForApplication(
 
 		long companyId, String applicationName) {
 		return (Collection<String>)
 			_invocationCache.computeIfAbsent(
 				"listAliases" + companyId + applicationName,
-				__ -> this._doListAliasesForApplication(
+				__ -> this._doListScopesAliasesForApplication(
 					companyId, applicationName));
 	}
 
