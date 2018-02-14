@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 
 @Component(
 	configurationPid = "com.liferay.oauth2.configuration.OAuth2Configuration",
@@ -98,6 +99,29 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		}
 	}
 
+	protected boolean clientsMatch(Client client1, Client client2) {
+		String client1Id = client1.getClientId();
+		String client2Id = client2.getClientId();
+
+		if (!Objects.equals(client1Id, client2Id)) {
+			return false;
+		}
+
+		Map<String, String> properties = client1.getProperties();
+
+		String companyId1 = properties.get("companyId");
+
+		properties = client2.getProperties();
+
+		String companyId2 = properties.get("companyId");
+
+		if (!Objects.equals(companyId1, companyId2)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	protected boolean hasCreateTokenPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
@@ -117,6 +141,18 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		if (serverAuthorizationCodeGrant == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No code grant found for code " + code);
+			}
+
+			return false;
+		}
+
+		if(!clientsMatch(client, serverAuthorizationCodeGrant.getClient())) {
+			// audit: Trying to get other client's code
+
+			_liferayOAuthDataProvider.removeCodeGrant(code);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("Client authentication doesn't mach code's client");
 			}
 
 			return false;
