@@ -36,18 +36,4 @@ public class DefaultPrefixHandler implements PrefixHandler {
 		return new DefaultPrefixHandler(
 			_prefix + prefixHandler.addPrefix(StringPool.BLANK));
 	}
-
-	@Override
-	public PrefixHandler prepend(PrefixHandler prefixHandler) {
-		return new DefaultPrefixHandler(prefixHandler.addPrefix(_prefix));
-	}
-
-	@Override
-	public String removePrefix(String prefixed) {
-		if (prefixed.startsWith(_prefix)) {
-			return prefixed.substring(_prefix.length());
-		}
-
-		return prefixed;
-	}
 }

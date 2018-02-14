@@ -45,23 +45,6 @@ public interface PrefixHandler {
 	public String addPrefix(String input);
 
 	/**
-	 * Tries to remove the prefix from a string, when possible.
-	 * Some implementations may provide an optimized implementation.
-	 *
-	 * @param prefixed the string to remove the prefix from.
-	 * @return a string without the prefix, if possible.
-	 */
-	public default String removePrefix(String prefixed) {
-		String namespace = addPrefix(StringPool.BLANK);
-
-		if (!prefixed.startsWith(namespace)) {
-			return prefixed;
-		}
-
-		return namespace.substring(namespace.length());
-	}
-
-	/**
 	 * A new {@link PrefixHandler} taking into account the given
 	 * {@link PrefixHandler}
 	 *
@@ -70,17 +53,6 @@ public interface PrefixHandler {
 	 */
 	public default PrefixHandler append(PrefixHandler prefixHandler) {
 		return string -> addPrefix(prefixHandler.addPrefix(string));
-	}
-
-	/**
-	 * A new {@link PrefixHandler} taking into account the given
-	 * {@link PrefixHandler}
-	 *
-	 * @param prefixHandler the prefix handler to prepend.
-	 * @return a new prefix handler combining both prefix handlers.
-	 */
-	public default PrefixHandler prepend(PrefixHandler prefixHandler) {
-		return string -> prefixHandler.addPrefix(addPrefix(string));
 	}
 
 	/**
@@ -95,11 +67,6 @@ public interface PrefixHandler {
 
 		@Override
 		public PrefixHandler append(PrefixHandler prefixHandler) {
-			return prefixHandler;
-		}
-
-		@Override
-		public PrefixHandler prepend(PrefixHandler prefixHandler) {
 			return prefixHandler;
 		}
 
