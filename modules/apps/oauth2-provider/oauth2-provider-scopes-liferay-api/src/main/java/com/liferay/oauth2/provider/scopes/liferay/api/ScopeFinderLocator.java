@@ -30,7 +30,7 @@ public interface ScopeFinderLocator {
 	 * scope name
 	 */
 	Collection<LiferayOAuth2Scope> locateScopesForApplication(
-		long companyId, String applicationName, String scope);
+		long companyId, String scope, String applicationName);
 
 	/**
 	 * Returns a list of the scope names that would be a match if
