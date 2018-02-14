@@ -17,6 +17,7 @@ package com.liferay.oauth2.provider.web;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.scopes.liferay.api.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
@@ -29,8 +30,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
@@ -66,13 +65,6 @@ import javax.servlet.http.HttpServletRequest;
 )
 public class OAuth2AuthorizePortlet extends MVCPortlet {
 	
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_scopedScopeDescriptors = new ScopedServiceTrackerMap<>(
-			bundleContext, ScopeDescriptor.class, "osgi.jaxrs.name",
-			() -> _defaultScopeDescriptor);
-	}
-		
 	@Override
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws IOException, PortletException {
@@ -118,8 +110,9 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 			applicationScopeDescriptor =
 				(__, applicationName, internalScope) -> {
 					ScopeDescriptor scopeDescriptor =
-						_scopedScopeDescriptors.getService(
-							companyId, applicationName);
+						_scopeDescriptorLocator.
+							locateScopeDescriptorForApplication(
+								applicationName);
 	
 					return scopeDescriptor.describeScope(
 						internalScope, locale);
@@ -151,7 +144,8 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 	@Reference
 	private ScopeFinderLocator _scopeFinderLocator;
 
-	private ScopedServiceTrackerMap<ScopeDescriptor> _scopedScopeDescriptors;
+	@Reference
+	ScopeDescriptorLocator _scopeDescriptorLocator;
 
 	@Reference(
 		target = "(default=true)",

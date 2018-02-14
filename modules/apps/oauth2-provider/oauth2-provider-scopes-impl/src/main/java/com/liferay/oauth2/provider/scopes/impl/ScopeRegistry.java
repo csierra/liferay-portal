@@ -27,14 +27,21 @@ import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
+import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -48,8 +55,10 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 @Component(immediate = true, service = ScopeFinderLocator.class)
 public class ScopeRegistry implements ScopeFinderLocator {
 
-	@Override
-	public Collection<LiferayOAuth2Scope> locateScopes(
+	private ConcurrentMap<String, Object> _invocationCache =
+		new ConcurrentHashMap<>();
+
+	private Collection<LiferayOAuth2Scope> _doLocateScopes(
 		long companyId, String scope) {
 
 		Collection<LiferayOAuth2Scope> grants = new ArrayList<>();
@@ -63,8 +72,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		return grants;
 	}
 
-	@Override
-	public Collection<LiferayOAuth2Scope> locateScopesForApplication(
+	private Collection<LiferayOAuth2Scope> _doLocateScopesForApplication(
 		long companyId, String scope, String name) {
 
 		ScopeMatcherFactory scopeMatcherFactory =
@@ -72,8 +80,14 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scope);
 
-		ServiceReferenceServiceTuple<?, ScopeFinder> tuple =
+		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
 			_scopeFinderByNameServiceTrackerMap.getService(name);
+
+		if (tuples == null || tuples.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		ServiceReferenceServiceTuple<?, ScopeFinder> tuple = tuples.get(0);
 
 		ServiceReference<?> serviceReference = tuple.getServiceReference();
 
@@ -109,8 +123,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	private ScopedServiceTrackerMap<ScopeMapper>
 		_scopedScopeMapper;
 
-	@Override
-	public Collection<String> listAliases(long companyId) {
+	private Collection<String> _doListAliases(long companyId) {
 		Collection<String> scopes = new HashSet<>();
 
 		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
@@ -122,12 +135,17 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		return scopes;
 	}
 
-	@Override
-	public Collection<String> listAliasesForApplication(
+	private Collection<String> _doListAliasesForApplication(
 		long companyId, String applicationName) {
 
-		ServiceReferenceServiceTuple<?, ScopeFinder> tuple =
+		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
 			_scopeFinderByNameServiceTrackerMap.getService(applicationName);
+
+		if (tuples == null || tuples.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		ServiceReferenceServiceTuple<?, ScopeFinder> tuple = tuples.get(0);
 
 		ServiceReference<?> serviceReference =
 			tuple.getServiceReference();
@@ -164,18 +182,20 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_scopeFinderByNameServiceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, ScopeFinder.class, "osgi.jaxrs.name",
+			ServiceTrackerMapFactory.openMultiValueMap(
+				bundleContext, ScopeFinder.class, "(osgi.jaxrs.name=*)",
+				new PropertyServiceReferenceMapper<>("osgi.jaxrs.name"),
 				new ScopeFinderServiceTupleServiceTrackerCustomizer(
-					bundleContext));
+					bundleContext), Comparator.naturalOrder(),
+				new CacheClearServiceTrackerMapListener());
 
 		_scopedPrefixHandlerMappers = new ScopedServiceTrackerMap<>(
 			bundleContext, PrefixHandlerMapper.class, "osgi.jaxrs.name",
-			() -> _defaultPrefixHandlerMapper);
+			() -> _defaultPrefixHandlerMapper, _invocationCache::clear);
 
 		_scopedScopeMapper = new ScopedServiceTrackerMap<>(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
-			() -> ScopeMapper.NULL);
+			() -> ScopeMapper.NULL, _invocationCache::clear);
 	}
 
 	@Deactivate
@@ -198,8 +218,47 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	private ScopeMatcherFactoryLocator _scopeMatcherFactoryLocator;
 
 	private ServiceTrackerMap<
-		String, ServiceReferenceServiceTuple<?, ScopeFinder>>
+		String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
 			_scopeFinderByNameServiceTrackerMap;
+
+	@Override
+	public Collection<LiferayOAuth2Scope> locateScopes(
+		long companyId, String scope) {
+
+		return (Collection<LiferayOAuth2Scope>)
+			_invocationCache.computeIfAbsent(
+				"locateScopes" + companyId + scope,
+				__ -> this._doLocateScopes(companyId, scope));
+	}
+
+	@Override
+	public Collection<LiferayOAuth2Scope> locateScopesForApplication(
+		long companyId, String applicationName, String scope) {
+
+		return (Collection<LiferayOAuth2Scope>)
+			_invocationCache.computeIfAbsent(
+				"locateScopes" + companyId + applicationName + scope,
+				__ -> this._doLocateScopesForApplication(
+					companyId, applicationName, scope));
+	}
+
+	@Override
+	public Collection<String> listAliases(long companyId) {
+		return (Collection<String>)
+			_invocationCache.computeIfAbsent(
+				"listAliases" + companyId, __ -> this._doListAliases(companyId));
+	}
+
+	@Override
+	public Collection<String> listAliasesForApplication(
+
+		long companyId, String applicationName) {
+		return (Collection<String>)
+			_invocationCache.computeIfAbsent(
+				"listAliases" + companyId + applicationName,
+				__ -> this._doListAliasesForApplication(
+					companyId, applicationName));
+	}
 
 	private static class ScopeFinderServiceTupleServiceTrackerCustomizer
 		implements
@@ -237,6 +296,36 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			_bundleContext.ungetService(reference);
 		}
 
+	}
+
+	private class CacheClearServiceTrackerMapListener implements
+		ServiceTrackerMapListener<
+			String, ServiceReferenceServiceTuple<?, ScopeFinder>,
+				List<ServiceReferenceServiceTuple<?, ScopeFinder>>> {
+
+		@Override
+		public void keyEmitted(
+			ServiceTrackerMap<
+				String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
+					serviceTrackerMap,
+			String key,
+			ServiceReferenceServiceTuple<?, ScopeFinder> service,
+			List<ServiceReferenceServiceTuple<?, ScopeFinder>> content) {
+
+			_invocationCache.clear();
+		}
+
+		@Override
+		public void keyRemoved(
+			ServiceTrackerMap<
+				String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
+					serviceTrackerMap,
+			String key,
+			ServiceReferenceServiceTuple<?, ScopeFinder> service,
+			List<ServiceReferenceServiceTuple<?, ScopeFinder>> content) {
+
+			_invocationCache.clear();
+		}
 	}
 
 }

@@ -18,33 +18,46 @@ import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReference
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
 import com.liferay.portal.kernel.util.StringBundler;
 import org.osgi.framework.BundleContext;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class ScopedServiceTrackerMap<T> {
 
 	private Supplier<T> _defaultServiceSupplier;
+	private Runnable _onChange;
 
 	public ScopedServiceTrackerMap(
 		BundleContext bundleContext, Class<T> clazz, String property,
 		Supplier<T> defaultServiceSupplier) {
 
-		_defaultServiceSupplier = defaultServiceSupplier;
+		this(bundleContext, clazz, property, defaultServiceSupplier, () -> {});
+	}
 
-		_servicesByCompany = ServiceTrackerMapFactory.openSingleValueMap(
+	public ScopedServiceTrackerMap(
+		BundleContext bundleContext, Class<T> clazz, String property,
+		Supplier<T> defaultServiceSupplier, Runnable onChange) {
+
+		_defaultServiceSupplier = defaultServiceSupplier;
+		_onChange = onChange;
+
+		_servicesByCompany = ServiceTrackerMapFactory.openMultiValueMap(
 			bundleContext, clazz,
 			"(&(companyId=*)(!(" + property + "=*)))",
-			new PropertyServiceReferenceMapper<>("companyId"));
+			new PropertyServiceReferenceMapper<>("companyId"),
+			new ServiceTrackerMapListenerImpl<>());
 
-		_servicesByKey = ServiceTrackerMapFactory.openSingleValueMap(
+		_servicesByKey = ServiceTrackerMapFactory.openMultiValueMap(
 			bundleContext, clazz,
 			"(&(" + property + "=*)(!(companyId=*)))",
-			new PropertyServiceReferenceMapper<>(property));
+			new PropertyServiceReferenceMapper<>(property),
+			new ServiceTrackerMapListenerImpl<>());
 
 		_servicesByCompanyAndKey =
-			ServiceTrackerMapFactory.openSingleValueMap(
+			ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, clazz,
 				"(&(companyId=*)(" + property + "=*))",
 				(serviceReference, emitter) -> {
@@ -61,28 +74,29 @@ public class ScopedServiceTrackerMap<T> {
 							serviceReference,
 							key2 -> emitter.emit(
 								String.join("-", key1, key2))));
-				});
+				},
+				new ServiceTrackerMapListenerImpl<>());
 	}
 
 	public T getService(long companyId, String key) {
 		String companyIdString = Long.toString(companyId);
-		T service = _servicesByCompanyAndKey.getService(
+		List<T> services = _servicesByCompanyAndKey.getService(
 			String.join("-", companyIdString, key));
 
-		if (service != null) {
-			return service;
+		if (services != null && !services.isEmpty()) {
+			return services.get(0);
 		}
 
-		service = _servicesByKey.getService(key);
+		services = _servicesByKey.getService(key);
 
-		if (service != null) {
-			return service;
+		if (services != null && !services.isEmpty()) {
+			return services.get(0);
 		}
 
-		service = _servicesByCompany.getService(companyIdString);
+		services = _servicesByCompany.getService(companyIdString);
 
-		if (service != null) {
-			return service;
+		if (services != null && !services.isEmpty()) {
+			return services.get(0);
 		}
 
 		return _defaultServiceSupplier.get();
@@ -94,8 +108,28 @@ public class ScopedServiceTrackerMap<T> {
 		_servicesByKey.close();
 	}
 
-	private ServiceTrackerMap<String, T> _servicesByCompany;
-	private ServiceTrackerMap<String, T> _servicesByCompanyAndKey;
-	private ServiceTrackerMap<String, T> _servicesByKey;
+	private ServiceTrackerMap<String, List<T>> _servicesByCompany;
+	private ServiceTrackerMap<String, List<T>> _servicesByCompanyAndKey;
+	private ServiceTrackerMap<String, List<T>> _servicesByKey;
 
+	private class ServiceTrackerMapListenerImpl<T>
+		implements ServiceTrackerMapListener<String, T, List<T>> {
+		@Override
+		public void keyEmitted(
+			ServiceTrackerMap<String, List<T>> serviceTrackerMap,
+			String key,
+			T service, List<T> content) {
+
+			_onChange.run();
+		}
+
+		@Override
+		public void keyRemoved(
+			ServiceTrackerMap<String, List<T>> serviceTrackerMap,
+			String key,
+			T service, List<T> content) {
+
+			_onChange.run();
+		}
+	}
 }
