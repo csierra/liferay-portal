@@ -58,46 +58,4 @@ public class DefaultPrefixHandlerFactoryTest {
 			"WORLD"));
 	}
 
-	@Test
-	public void testRemovePrefix() {
-		DefaultPrefixHandlerFactory defaultPrefixHandlerFactory =
-			new DefaultPrefixHandlerFactory();
-
-		PrefixHandler prefixHandler = defaultPrefixHandlerFactory.create(
-			"TEST");
-
-		assertEquals("HELLO", prefixHandler.removePrefix("HELLO"));
-		assertEquals("HELLO", prefixHandler.removePrefix("TEST/HELLO"));
-		assertEquals("TEST/HELLO", prefixHandler.removePrefix(
-			"TEST/TEST/HELLO"));
-
-		prefixHandler = prefixHandler.append(prefixHandler);
-
-		assertEquals("HELLO", prefixHandler.removePrefix(
-			"TEST/TEST/HELLO"));
-
-		prefixHandler = defaultPrefixHandlerFactory.create("TEST");
-
-		prefixHandler = prefixHandler.append(
-			defaultPrefixHandlerFactory.create("TEST2"));
-
-		assertEquals("HELLO", prefixHandler.removePrefix(
-			"TEST/TEST2/HELLO"));
-
-		assertEquals("TEST2/TEST/HELLO", prefixHandler.removePrefix(
-			"TEST2/TEST/HELLO"));
-
-		prefixHandler = defaultPrefixHandlerFactory.create("TEST");
-
-		prefixHandler = prefixHandler.prepend(
-			defaultPrefixHandlerFactory.create("TEST2"));
-
-		assertEquals("HELLO", prefixHandler.removePrefix(
-			"TEST2/TEST/HELLO"));
-
-		assertEquals("TEST/TEST2/HELLO", prefixHandler.removePrefix(
-			"TEST/TEST2/HELLO"));
-
-	}
-
 }
