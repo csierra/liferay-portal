@@ -43,8 +43,13 @@ public class LiferayResourceOwnerLoginHandler
 		try {
 			User user = authenticateUser(login, password);
 
-			return new UserSubject(
+			UserSubject userSubject = new UserSubject(
 				user.getLogin(), Long.toString(user.getUserId()));
+
+			userSubject.getProperties().put(
+				"companyId", Long.toString(user.getCompanyId()));
+
+			return userSubject;
 		}
 		catch (PortalException e) {
 			return null;

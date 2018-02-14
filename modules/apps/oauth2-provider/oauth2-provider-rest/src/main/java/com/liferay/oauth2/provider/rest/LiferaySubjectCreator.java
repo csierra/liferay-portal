@@ -45,8 +45,13 @@ public class LiferaySubjectCreator implements SubjectCreator {
 			User user = _userLocalService.getUser(
 				Long.parseLong(userPrincipal.getName()));
 
-			return new UserSubject(
+			UserSubject userSubject = new UserSubject(
 				user.getLogin(), Long.toString(user.getUserId()));
+
+			userSubject.getProperties().put(
+				"companyId", Long.toString(user.getCompanyId()));
+
+			return userSubject;
 		}
 		catch (PortalException e) {
 			throw new OAuthServiceException(e);
