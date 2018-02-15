@@ -60,7 +60,7 @@
 		<column name="oAuth2TokenContent" type="String" />
 		<column name="oAuth2ApplicationId" type="long" />
 		<column name="oAuth2TokenType" type="String" />
-		<column name="oAuth2RefreshTokenId" type="String" />
+		<column name="oAuth2RefreshTokenId" type="long" />
 		<column name="scopes" type="String" />
 
 		<finder name="A" return-type="Collection">
@@ -83,7 +83,7 @@
 	<entity name="OAuth2RefreshToken" local-service="true" remote-service="false">
 		<!-- PK fields -->
 
-		<column name="oAuth2RefreshTokenId" primary="true" type="String" />
+		<column name="oAuth2RefreshTokenId" primary="true" type="long" />
 
 		<!-- Audit fields -->
 
@@ -95,6 +95,7 @@
 
 		<!-- Other fields -->
 
+		<column name="oAuth2RefreshTokenContent" type="String" />
 		<column name="oAuth2ApplicationId" type="long" />
 
 		<finder name="A" return-type="Collection">
@@ -103,6 +104,9 @@
 		<finder name="A_U" return-type="Collection">
 			<finder-column name="oAuth2ApplicationId" />
 			<finder-column name="userName" />
+		</finder>
+		<finder name="Content" return-type="OAuth2RefreshToken">
+			<finder-column name="oAuth2RefreshTokenContent" />
 		</finder>
 
 		<reference entity="OAuth2Application" package-path="com.liferay.oauth2.provider" />
