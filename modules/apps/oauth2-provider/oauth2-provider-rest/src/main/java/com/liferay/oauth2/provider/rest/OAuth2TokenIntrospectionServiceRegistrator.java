@@ -39,6 +39,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -60,7 +62,6 @@ import java.util.Objects;
 public class OAuth2TokenIntrospectionServiceRegistrator {
 
 	private ServiceRegistration<Object> _endpointServiceRegistration;
-	private ServiceRegistration<Class> _classServiceRegistration;
 
 	@Activate
 	protected void activate(
@@ -81,25 +82,14 @@ public class OAuth2TokenIntrospectionServiceRegistrator {
 			endpointProperties.put("liferay.oauth2.endpoint", true);
 
 			_endpointServiceRegistration = bundleContext.registerService(
-				Object.class, oAuth2TokenIntrospectionService,
+				Object.class,
+				new TokenIntrospectionFeature(oAuth2TokenIntrospectionService),
 				endpointProperties);
-
-			Hashtable<String, Object> classProperties = new Hashtable<>();
-
-			classProperties.put("liferay.oauth2.class", true);
-
-			_classServiceRegistration = bundleContext.registerService(
-				Class.class, TokenIntrospectionJSONProvider.class,
-				classProperties);
 		}
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		if (_classServiceRegistration != null) {
-			_classServiceRegistration.unregister();
-		}
-
 		if (_endpointServiceRegistration != null) {
 			_endpointServiceRegistration.unregister();
 		}
@@ -107,6 +97,26 @@ public class OAuth2TokenIntrospectionServiceRegistrator {
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+
+	@Provider
+	private static class TokenIntrospectionFeature implements Feature {
+		private final OAuth2TokenIntrospectionService
+			_oAuth2TokenIntrospectionService;
+
+		public TokenIntrospectionFeature(
+			OAuth2TokenIntrospectionService oAuth2TokenIntrospectionService) {
+
+			_oAuth2TokenIntrospectionService = oAuth2TokenIntrospectionService;
+		}
+
+		@Override
+		public boolean configure(FeatureContext context) {
+			context.register(_oAuth2TokenIntrospectionService);
+			context.register(TokenIntrospectionJSONProvider.class);
+
+			return true;
+		}
+	}
 
 	@Path("introspect")
 	public class OAuth2TokenIntrospectionService extends AbstractTokenService {
