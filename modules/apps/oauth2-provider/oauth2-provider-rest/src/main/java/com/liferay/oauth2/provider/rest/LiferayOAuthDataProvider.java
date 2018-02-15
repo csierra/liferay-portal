@@ -715,7 +715,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				companyId, clientId);
 
 		if (oAuth2Application == null) {
-			throw new OAuthServiceException("Invalid client " + clientId);
+			//audit: trying non-existing or removed clientId
+
+			return null;
 		}
 
 		getMessageContext().put(OAuthConstants.CLIENT_ID, clientId);
