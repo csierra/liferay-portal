@@ -25,5 +25,6 @@ dependencies {
 	compileOnly project(":apps:oauth2-provider:oauth2-provider-scopes-api")
 	compileOnly project(":apps:oauth2-provider:oauth2-provider-scopes-liferay-api")
 	compileOnly project(":apps:oauth2-provider:oauth2-provider-scopes-spi")
+	compileOnly project(":apps:oauth2-provider:oauth2-provider-rest-spi")
 
 }

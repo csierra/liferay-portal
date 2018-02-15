@@ -1,4 +1,4 @@
-package com.liferay.oauth2.provider.scopes.spi;
+package com.liferay.oauth2.provider.rest.tokenprovider.spi;
 
 import com.liferay.oauth2.provider.model.OAuth2Application;
 
