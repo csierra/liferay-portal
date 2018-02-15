@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -206,7 +207,10 @@ public class OAuth2EndpointApplication extends Application {
 								HttpServletResponse response =
 									(HttpServletResponse) servletResponse;
 
-								response.sendRedirect(loginPage);
+								response.setStatus(
+									HttpServletResponse.SC_SEE_OTHER);
+
+								response.setHeader(HttpHeaders.LOCATION, loginPage);
 							}
 							catch (Exception e) {
 								_log.error(
