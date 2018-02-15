@@ -183,8 +183,7 @@ public interface OAuth2TokenLocalService extends BaseLocalService,
 	public OAuth2Token findByContent(java.lang.String oAuth2TokenContent)
 		throws NoSuchOAuth2TokenException;
 
-	public Collection<OAuth2Token> findByRefreshToken(
-		java.lang.String refreshToken);
+	public Collection<OAuth2Token> findByRefreshToken(long oAuth2RefreshTokenId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();

@@ -210,8 +210,8 @@ public class OAuth2TokenLocalServiceUtil {
 	}
 
 	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByRefreshToken(
-		java.lang.String refreshToken) {
-		return getService().findByRefreshToken(refreshToken);
+		long oAuth2RefreshTokenId) {
+		return getService().findByRefreshToken(oAuth2RefreshTokenId);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {

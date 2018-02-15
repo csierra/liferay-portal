@@ -426,7 +426,15 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		oAuth2Token.setOAuth2ApplicationId(
 			oAuth2Application.getOAuth2ApplicationId());
 
-		oAuth2Token.setOAuth2RefreshTokenId(token.getRefreshToken());
+		OAuth2RefreshToken oAuth2RefreshToken =
+			_oAuth2RefreshTokenLocalService.fetchByContent(
+				token.getRefreshToken());
+
+		if (oAuth2RefreshToken != null) {
+			oAuth2Token.setOAuth2RefreshTokenId(
+				oAuth2RefreshToken.getOAuth2RefreshTokenId());
+		}
+
 		oAuth2Token.setOAuth2TokenType(OAuthConstants.BEARER_TOKEN_TYPE);
 
 		oAuth2Token.setScopes(
@@ -608,8 +616,14 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	@Override
 	protected void doRevokeRefreshToken(RefreshToken refreshToken) {
 		try {
-			_oAuth2RefreshTokenLocalService.deleteOAuth2RefreshToken(
-				refreshToken.getTokenKey());
+			OAuth2RefreshToken oAuth2RefreshToken =
+				_oAuth2RefreshTokenLocalService.findByContent(
+					refreshToken.getTokenKey());
+
+			if (oAuth2RefreshToken != null) {
+				_oAuth2RefreshTokenLocalService.deleteOAuth2RefreshToken(
+					oAuth2RefreshToken);
+			}
 		}
 		catch (PortalException e) {
 			_log.error(
@@ -626,8 +640,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	protected RefreshToken getRefreshToken(String refreshTokenKey) {
 		try {
 			OAuth2RefreshToken oAuth2RefreshToken =
-				_oAuth2RefreshTokenLocalService.fetchOAuth2RefreshToken(
-					refreshTokenKey);
+				_oAuth2RefreshTokenLocalService.fetchByContent(refreshTokenKey);
 
 			if (oAuth2RefreshToken == null ){
 				// audit: trying to use expired token or brute-force token
@@ -652,7 +665,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 			Collection<OAuth2Token> oAuth2Tokens =
 				_oAuth2TokenLocalService.findByRefreshToken(
-					refreshToken.getTokenKey());
+					oAuth2RefreshToken.getOAuth2RefreshTokenId());
 
 			List<String> accessTokens = new ArrayList<>(oAuth2Tokens.size());
 			Set<String> scopes = new HashSet<>();

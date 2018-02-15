@@ -1434,7 +1434,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 			OAuth2TokenModelImpl.FINDER_CACHE_ENABLED, OAuth2TokenImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByRefreshToken",
 			new String[] {
-				String.class.getName(),
+				Long.class.getName(),
 				
 			Integer.class.getName(), Integer.class.getName(),
 				OrderByComparator.class.getName()
@@ -1443,12 +1443,12 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 		new FinderPath(OAuth2TokenModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2TokenModelImpl.FINDER_CACHE_ENABLED, OAuth2TokenImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByRefreshToken",
-			new String[] { String.class.getName() },
+			new String[] { Long.class.getName() },
 			OAuth2TokenModelImpl.OAUTH2REFRESHTOKENID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_REFRESHTOKEN = new FinderPath(OAuth2TokenModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2TokenModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByRefreshToken",
-			new String[] { String.class.getName() });
+			new String[] { Long.class.getName() });
 
 	/**
 	 * Returns all the o auth2 tokens where oAuth2RefreshTokenId = &#63;.
@@ -1457,7 +1457,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @return the matching o auth2 tokens
 	 */
 	@Override
-	public List<OAuth2Token> findByRefreshToken(String oAuth2RefreshTokenId) {
+	public List<OAuth2Token> findByRefreshToken(long oAuth2RefreshTokenId) {
 		return findByRefreshToken(oAuth2RefreshTokenId, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 	}
@@ -1475,7 +1475,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @return the range of matching o auth2 tokens
 	 */
 	@Override
-	public List<OAuth2Token> findByRefreshToken(String oAuth2RefreshTokenId,
+	public List<OAuth2Token> findByRefreshToken(long oAuth2RefreshTokenId,
 		int start, int end) {
 		return findByRefreshToken(oAuth2RefreshTokenId, start, end, null);
 	}
@@ -1494,7 +1494,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @return the ordered range of matching o auth2 tokens
 	 */
 	@Override
-	public List<OAuth2Token> findByRefreshToken(String oAuth2RefreshTokenId,
+	public List<OAuth2Token> findByRefreshToken(long oAuth2RefreshTokenId,
 		int start, int end, OrderByComparator<OAuth2Token> orderByComparator) {
 		return findByRefreshToken(oAuth2RefreshTokenId, start, end,
 			orderByComparator, true);
@@ -1515,7 +1515,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @return the ordered range of matching o auth2 tokens
 	 */
 	@Override
-	public List<OAuth2Token> findByRefreshToken(String oAuth2RefreshTokenId,
+	public List<OAuth2Token> findByRefreshToken(long oAuth2RefreshTokenId,
 		int start, int end, OrderByComparator<OAuth2Token> orderByComparator,
 		boolean retrieveFromCache) {
 		boolean pagination = true;
@@ -1545,8 +1545,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OAuth2Token oAuth2Token : list) {
-					if (!Objects.equals(oAuth2RefreshTokenId,
-								oAuth2Token.getOAuth2RefreshTokenId())) {
+					if ((oAuth2RefreshTokenId != oAuth2Token.getOAuth2RefreshTokenId())) {
 						list = null;
 
 						break;
@@ -1568,19 +1567,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 
 			query.append(_SQL_SELECT_OAUTH2TOKEN_WHERE);
 
-			boolean bindOAuth2RefreshTokenId = false;
-
-			if (oAuth2RefreshTokenId == null) {
-				query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_1);
-			}
-			else if (oAuth2RefreshTokenId.equals("")) {
-				query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_3);
-			}
-			else {
-				bindOAuth2RefreshTokenId = true;
-
-				query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_2);
-			}
+			query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_2);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
@@ -1602,9 +1589,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (bindOAuth2RefreshTokenId) {
-					qPos.add(oAuth2RefreshTokenId);
-				}
+				qPos.add(oAuth2RefreshTokenId);
 
 				if (!pagination) {
 					list = (List<OAuth2Token>)QueryUtil.list(q, getDialect(),
@@ -1645,7 +1630,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @throws NoSuchOAuth2TokenException if a matching o auth2 token could not be found
 	 */
 	@Override
-	public OAuth2Token findByRefreshToken_First(String oAuth2RefreshTokenId,
+	public OAuth2Token findByRefreshToken_First(long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException {
 		OAuth2Token oAuth2Token = fetchByRefreshToken_First(oAuth2RefreshTokenId,
@@ -1675,7 +1660,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @return the first matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
 	 */
 	@Override
-	public OAuth2Token fetchByRefreshToken_First(String oAuth2RefreshTokenId,
+	public OAuth2Token fetchByRefreshToken_First(long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator) {
 		List<OAuth2Token> list = findByRefreshToken(oAuth2RefreshTokenId, 0, 1,
 				orderByComparator);
@@ -1696,7 +1681,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @throws NoSuchOAuth2TokenException if a matching o auth2 token could not be found
 	 */
 	@Override
-	public OAuth2Token findByRefreshToken_Last(String oAuth2RefreshTokenId,
+	public OAuth2Token findByRefreshToken_Last(long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException {
 		OAuth2Token oAuth2Token = fetchByRefreshToken_Last(oAuth2RefreshTokenId,
@@ -1726,7 +1711,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @return the last matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
 	 */
 	@Override
-	public OAuth2Token fetchByRefreshToken_Last(String oAuth2RefreshTokenId,
+	public OAuth2Token fetchByRefreshToken_Last(long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator) {
 		int count = countByRefreshToken(oAuth2RefreshTokenId);
 
@@ -1755,7 +1740,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 */
 	@Override
 	public OAuth2Token[] findByRefreshToken_PrevAndNext(long oAuth2TokenId,
-		String oAuth2RefreshTokenId,
+		long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException {
 		OAuth2Token oAuth2Token = findByPrimaryKey(oAuth2TokenId);
@@ -1786,7 +1771,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	}
 
 	protected OAuth2Token getByRefreshToken_PrevAndNext(Session session,
-		OAuth2Token oAuth2Token, String oAuth2RefreshTokenId,
+		OAuth2Token oAuth2Token, long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
@@ -1801,19 +1786,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 
 		query.append(_SQL_SELECT_OAUTH2TOKEN_WHERE);
 
-		boolean bindOAuth2RefreshTokenId = false;
-
-		if (oAuth2RefreshTokenId == null) {
-			query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_1);
-		}
-		else if (oAuth2RefreshTokenId.equals("")) {
-			query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_3);
-		}
-		else {
-			bindOAuth2RefreshTokenId = true;
-
-			query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_2);
-		}
+		query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_2);
 
 		if (orderByComparator != null) {
 			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
@@ -1883,9 +1856,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (bindOAuth2RefreshTokenId) {
-			qPos.add(oAuth2RefreshTokenId);
-		}
+		qPos.add(oAuth2RefreshTokenId);
 
 		if (orderByComparator != null) {
 			Object[] values = orderByComparator.getOrderByConditionValues(oAuth2Token);
@@ -1911,7 +1882,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @param oAuth2RefreshTokenId the o auth2 refresh token ID
 	 */
 	@Override
-	public void removeByRefreshToken(String oAuth2RefreshTokenId) {
+	public void removeByRefreshToken(long oAuth2RefreshTokenId) {
 		for (OAuth2Token oAuth2Token : findByRefreshToken(
 				oAuth2RefreshTokenId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(oAuth2Token);
@@ -1925,7 +1896,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 	 * @return the number of matching o auth2 tokens
 	 */
 	@Override
-	public int countByRefreshToken(String oAuth2RefreshTokenId) {
+	public int countByRefreshToken(long oAuth2RefreshTokenId) {
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_REFRESHTOKEN;
 
 		Object[] finderArgs = new Object[] { oAuth2RefreshTokenId };
@@ -1937,19 +1908,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 
 			query.append(_SQL_COUNT_OAUTH2TOKEN_WHERE);
 
-			boolean bindOAuth2RefreshTokenId = false;
-
-			if (oAuth2RefreshTokenId == null) {
-				query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_1);
-			}
-			else if (oAuth2RefreshTokenId.equals("")) {
-				query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_3);
-			}
-			else {
-				bindOAuth2RefreshTokenId = true;
-
-				query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_2);
-			}
+			query.append(_FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_2);
 
 			String sql = query.toString();
 
@@ -1962,9 +1921,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (bindOAuth2RefreshTokenId) {
-					qPos.add(oAuth2RefreshTokenId);
-				}
+				qPos.add(oAuth2RefreshTokenId);
 
 				count = (Long)q.uniqueResult();
 
@@ -1983,12 +1940,8 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_1 =
-		"oAuth2Token.oAuth2RefreshTokenId IS NULL";
 	private static final String _FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_2 =
 		"oAuth2Token.oAuth2RefreshTokenId = ?";
-	private static final String _FINDER_COLUMN_REFRESHTOKEN_OAUTH2REFRESHTOKENID_3 =
-		"(oAuth2Token.oAuth2RefreshTokenId IS NULL OR oAuth2Token.oAuth2RefreshTokenId = '')";
 
 	public OAuth2TokenPersistenceImpl() {
 		setModelClass(OAuth2Token.class);

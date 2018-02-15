@@ -373,7 +373,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the matching o auth2 tokens
 	*/
 	public java.util.List<OAuth2Token> findByRefreshToken(
-		java.lang.String oAuth2RefreshTokenId);
+		long oAuth2RefreshTokenId);
 
 	/**
 	* Returns a range of all the o auth2 tokens where oAuth2RefreshTokenId = &#63;.
@@ -388,7 +388,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the range of matching o auth2 tokens
 	*/
 	public java.util.List<OAuth2Token> findByRefreshToken(
-		java.lang.String oAuth2RefreshTokenId, int start, int end);
+		long oAuth2RefreshTokenId, int start, int end);
 
 	/**
 	* Returns an ordered range of all the o auth2 tokens where oAuth2RefreshTokenId = &#63;.
@@ -404,7 +404,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the ordered range of matching o auth2 tokens
 	*/
 	public java.util.List<OAuth2Token> findByRefreshToken(
-		java.lang.String oAuth2RefreshTokenId, int start, int end,
+		long oAuth2RefreshTokenId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator);
 
 	/**
@@ -422,7 +422,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the ordered range of matching o auth2 tokens
 	*/
 	public java.util.List<OAuth2Token> findByRefreshToken(
-		java.lang.String oAuth2RefreshTokenId, int start, int end,
+		long oAuth2RefreshTokenId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator,
 		boolean retrieveFromCache);
 
@@ -434,8 +434,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the first matching o auth2 token
 	* @throws NoSuchOAuth2TokenException if a matching o auth2 token could not be found
 	*/
-	public OAuth2Token findByRefreshToken_First(
-		java.lang.String oAuth2RefreshTokenId,
+	public OAuth2Token findByRefreshToken_First(long oAuth2RefreshTokenId,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException;
 
@@ -446,8 +445,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
 	*/
-	public OAuth2Token fetchByRefreshToken_First(
-		java.lang.String oAuth2RefreshTokenId,
+	public OAuth2Token fetchByRefreshToken_First(long oAuth2RefreshTokenId,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator);
 
 	/**
@@ -458,8 +456,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @return the last matching o auth2 token
 	* @throws NoSuchOAuth2TokenException if a matching o auth2 token could not be found
 	*/
-	public OAuth2Token findByRefreshToken_Last(
-		java.lang.String oAuth2RefreshTokenId,
+	public OAuth2Token findByRefreshToken_Last(long oAuth2RefreshTokenId,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException;
 
@@ -470,8 +467,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
 	*/
-	public OAuth2Token fetchByRefreshToken_Last(
-		java.lang.String oAuth2RefreshTokenId,
+	public OAuth2Token fetchByRefreshToken_Last(long oAuth2RefreshTokenId,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator);
 
 	/**
@@ -484,7 +480,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	*/
 	public OAuth2Token[] findByRefreshToken_PrevAndNext(long oAuth2TokenId,
-		java.lang.String oAuth2RefreshTokenId,
+		long oAuth2RefreshTokenId,
 		com.liferay.portal.kernel.util.OrderByComparator<OAuth2Token> orderByComparator)
 		throws NoSuchOAuth2TokenException;
 
@@ -493,7 +489,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	*
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID
 	*/
-	public void removeByRefreshToken(java.lang.String oAuth2RefreshTokenId);
+	public void removeByRefreshToken(long oAuth2RefreshTokenId);
 
 	/**
 	* Returns the number of o auth2 tokens where oAuth2RefreshTokenId = &#63;.
@@ -501,7 +497,7 @@ public interface OAuth2TokenPersistence extends BasePersistence<OAuth2Token> {
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID
 	* @return the number of matching o auth2 tokens
 	*/
-	public int countByRefreshToken(java.lang.String oAuth2RefreshTokenId);
+	public int countByRefreshToken(long oAuth2RefreshTokenId);
 
 	/**
 	* Caches the o auth2 token in the entity cache if it is enabled.

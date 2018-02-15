@@ -16,12 +16,13 @@ create table OAuth2Application (
 );
 
 create table OAuth2RefreshToken (
-	oAuth2RefreshTokenId VARCHAR(75) not null primary key,
+	oAuth2RefreshTokenId LONG not null primary key,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	lifeTime LONG,
+	oAuth2RefreshTokenContent TEXT null,
 	oAuth2ApplicationId LONG
 );
 
@@ -45,6 +46,6 @@ create table OAuth2Token (
 	oAuth2TokenContent TEXT null,
 	oAuth2ApplicationId LONG,
 	oAuth2TokenType VARCHAR(75) null,
-	oAuth2RefreshTokenId VARCHAR(75) null,
+	oAuth2RefreshTokenId LONG,
 	scopes TEXT null
 );

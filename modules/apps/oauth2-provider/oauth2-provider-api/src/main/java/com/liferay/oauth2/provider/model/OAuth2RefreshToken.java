@@ -38,16 +38,16 @@ public interface OAuth2RefreshToken extends OAuth2RefreshTokenModel,
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.oauth2.provider.model.impl.OAuth2RefreshTokenImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<OAuth2RefreshToken, String> O_AUTH2_REFRESH_TOKEN_ID_ACCESSOR =
-		new Accessor<OAuth2RefreshToken, String>() {
+	public static final Accessor<OAuth2RefreshToken, Long> O_AUTH2_REFRESH_TOKEN_ID_ACCESSOR =
+		new Accessor<OAuth2RefreshToken, Long>() {
 			@Override
-			public String get(OAuth2RefreshToken oAuth2RefreshToken) {
+			public Long get(OAuth2RefreshToken oAuth2RefreshToken) {
 				return oAuth2RefreshToken.getOAuth2RefreshTokenId();
 			}
 
 			@Override
-			public Class<String> getAttributeClass() {
-				return String.class;
+			public Class<Long> getAttributeClass() {
+				return Long.class;
 			}
 
 			@Override

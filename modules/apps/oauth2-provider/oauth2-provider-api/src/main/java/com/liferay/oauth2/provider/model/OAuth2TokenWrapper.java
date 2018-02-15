@@ -129,8 +129,7 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 			setOAuth2TokenType(oAuth2TokenType);
 		}
 
-		String oAuth2RefreshTokenId = (String)attributes.get(
-				"oAuth2RefreshTokenId");
+		Long oAuth2RefreshTokenId = (Long)attributes.get("oAuth2RefreshTokenId");
 
 		if (oAuth2RefreshTokenId != null) {
 			setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
@@ -204,7 +203,7 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 	* @return the o auth2 refresh token ID of this o auth2 token
 	*/
 	@Override
-	public java.lang.String getOAuth2RefreshTokenId() {
+	public long getOAuth2RefreshTokenId() {
 		return _oAuth2Token.getOAuth2RefreshTokenId();
 	}
 
@@ -395,7 +394,7 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID of this o auth2 token
 	*/
 	@Override
-	public void setOAuth2RefreshTokenId(java.lang.String oAuth2RefreshTokenId) {
+	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
 		_oAuth2Token.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 	}
 

@@ -55,29 +55,28 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	 *
 	 * @return the primary key of this o auth2 refresh token
 	 */
-	public String getPrimaryKey();
+	public long getPrimaryKey();
 
 	/**
 	 * Sets the primary key of this o auth2 refresh token.
 	 *
 	 * @param primaryKey the primary key of this o auth2 refresh token
 	 */
-	public void setPrimaryKey(String primaryKey);
+	public void setPrimaryKey(long primaryKey);
 
 	/**
 	 * Returns the o auth2 refresh token ID of this o auth2 refresh token.
 	 *
 	 * @return the o auth2 refresh token ID of this o auth2 refresh token
 	 */
-	@AutoEscape
-	public String getOAuth2RefreshTokenId();
+	public long getOAuth2RefreshTokenId();
 
 	/**
 	 * Sets the o auth2 refresh token ID of this o auth2 refresh token.
 	 *
 	 * @param oAuth2RefreshTokenId the o auth2 refresh token ID of this o auth2 refresh token
 	 */
-	public void setOAuth2RefreshTokenId(String oAuth2RefreshTokenId);
+	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId);
 
 	/**
 	 * Returns the company ID of this o auth2 refresh token.
@@ -165,6 +164,21 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	 * @param lifeTime the life time of this o auth2 refresh token
 	 */
 	public void setLifeTime(long lifeTime);
+
+	/**
+	 * Returns the o auth2 refresh token content of this o auth2 refresh token.
+	 *
+	 * @return the o auth2 refresh token content of this o auth2 refresh token
+	 */
+	@AutoEscape
+	public String getOAuth2RefreshTokenContent();
+
+	/**
+	 * Sets the o auth2 refresh token content of this o auth2 refresh token.
+	 *
+	 * @param oAuth2RefreshTokenContent the o auth2 refresh token content of this o auth2 refresh token
+	 */
+	public void setOAuth2RefreshTokenContent(String oAuth2RefreshTokenContent);
 
 	/**
 	 * Returns the o auth2 application ID of this o auth2 refresh token.

@@ -39,6 +39,7 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setLifeTime(model.getLifeTime());
+		soapModel.setOAuth2RefreshTokenContent(model.getOAuth2RefreshTokenContent());
 		soapModel.setOAuth2ApplicationId(model.getOAuth2ApplicationId());
 
 		return soapModel;
@@ -87,19 +88,19 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 	public OAuth2RefreshTokenSoap() {
 	}
 
-	public String getPrimaryKey() {
+	public long getPrimaryKey() {
 		return _oAuth2RefreshTokenId;
 	}
 
-	public void setPrimaryKey(String pk) {
+	public void setPrimaryKey(long pk) {
 		setOAuth2RefreshTokenId(pk);
 	}
 
-	public String getOAuth2RefreshTokenId() {
+	public long getOAuth2RefreshTokenId() {
 		return _oAuth2RefreshTokenId;
 	}
 
-	public void setOAuth2RefreshTokenId(String oAuth2RefreshTokenId) {
+	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
 		_oAuth2RefreshTokenId = oAuth2RefreshTokenId;
 	}
 
@@ -143,6 +144,14 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 		_lifeTime = lifeTime;
 	}
 
+	public String getOAuth2RefreshTokenContent() {
+		return _oAuth2RefreshTokenContent;
+	}
+
+	public void setOAuth2RefreshTokenContent(String oAuth2RefreshTokenContent) {
+		_oAuth2RefreshTokenContent = oAuth2RefreshTokenContent;
+	}
+
 	public long getOAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
 	}
@@ -151,11 +160,12 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 		_oAuth2ApplicationId = oAuth2ApplicationId;
 	}
 
-	private String _oAuth2RefreshTokenId;
+	private long _oAuth2RefreshTokenId;
 	private long _companyId;
 	private long _userId;
 	private String _userName;
 	private Date _createDate;
 	private long _lifeTime;
+	private String _oAuth2RefreshTokenContent;
 	private long _oAuth2ApplicationId;
 }

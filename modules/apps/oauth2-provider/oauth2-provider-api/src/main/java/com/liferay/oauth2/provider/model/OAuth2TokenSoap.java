@@ -168,11 +168,11 @@ public class OAuth2TokenSoap implements Serializable {
 		_oAuth2TokenType = oAuth2TokenType;
 	}
 
-	public String getOAuth2RefreshTokenId() {
+	public long getOAuth2RefreshTokenId() {
 		return _oAuth2RefreshTokenId;
 	}
 
-	public void setOAuth2RefreshTokenId(String oAuth2RefreshTokenId) {
+	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
 		_oAuth2RefreshTokenId = oAuth2RefreshTokenId;
 	}
 
@@ -193,6 +193,6 @@ public class OAuth2TokenSoap implements Serializable {
 	private String _oAuth2TokenContent;
 	private long _oAuth2ApplicationId;
 	private String _oAuth2TokenType;
-	private String _oAuth2RefreshTokenId;
+	private long _oAuth2RefreshTokenId;
 	private String _scopes;
 }

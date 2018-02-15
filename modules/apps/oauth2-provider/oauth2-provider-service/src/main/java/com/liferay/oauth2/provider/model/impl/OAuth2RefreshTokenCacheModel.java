@@ -51,8 +51,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 		OAuth2RefreshTokenCacheModel oAuth2RefreshTokenCacheModel = (OAuth2RefreshTokenCacheModel)obj;
 
-		if (oAuth2RefreshTokenId.equals(
-					oAuth2RefreshTokenCacheModel.oAuth2RefreshTokenId)) {
+		if (oAuth2RefreshTokenId == oAuth2RefreshTokenCacheModel.oAuth2RefreshTokenId) {
 			return true;
 		}
 
@@ -66,7 +65,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{oAuth2RefreshTokenId=");
 		sb.append(oAuth2RefreshTokenId);
@@ -80,6 +79,8 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		sb.append(createDate);
 		sb.append(", lifeTime=");
 		sb.append(lifeTime);
+		sb.append(", oAuth2RefreshTokenContent=");
+		sb.append(oAuth2RefreshTokenContent);
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(oAuth2ApplicationId);
 		sb.append("}");
@@ -91,13 +92,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 	public OAuth2RefreshToken toEntityModel() {
 		OAuth2RefreshTokenImpl oAuth2RefreshTokenImpl = new OAuth2RefreshTokenImpl();
 
-		if (oAuth2RefreshTokenId == null) {
-			oAuth2RefreshTokenImpl.setOAuth2RefreshTokenId("");
-		}
-		else {
-			oAuth2RefreshTokenImpl.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
-		}
-
+		oAuth2RefreshTokenImpl.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 		oAuth2RefreshTokenImpl.setCompanyId(companyId);
 		oAuth2RefreshTokenImpl.setUserId(userId);
 
@@ -116,6 +111,14 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		}
 
 		oAuth2RefreshTokenImpl.setLifeTime(lifeTime);
+
+		if (oAuth2RefreshTokenContent == null) {
+			oAuth2RefreshTokenImpl.setOAuth2RefreshTokenContent("");
+		}
+		else {
+			oAuth2RefreshTokenImpl.setOAuth2RefreshTokenContent(oAuth2RefreshTokenContent);
+		}
+
 		oAuth2RefreshTokenImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
 
 		oAuth2RefreshTokenImpl.resetOriginalValues();
@@ -125,7 +128,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
-		oAuth2RefreshTokenId = objectInput.readUTF();
+		oAuth2RefreshTokenId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
 
@@ -134,6 +137,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		createDate = objectInput.readLong();
 
 		lifeTime = objectInput.readLong();
+		oAuth2RefreshTokenContent = objectInput.readUTF();
 
 		oAuth2ApplicationId = objectInput.readLong();
 	}
@@ -141,12 +145,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
-		if (oAuth2RefreshTokenId == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(oAuth2RefreshTokenId);
-		}
+		objectOutput.writeLong(oAuth2RefreshTokenId);
 
 		objectOutput.writeLong(companyId);
 
@@ -163,14 +162,22 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 		objectOutput.writeLong(lifeTime);
 
+		if (oAuth2RefreshTokenContent == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(oAuth2RefreshTokenContent);
+		}
+
 		objectOutput.writeLong(oAuth2ApplicationId);
 	}
 
-	public String oAuth2RefreshTokenId;
+	public long oAuth2RefreshTokenId;
 	public long companyId;
 	public long userId;
 	public String userName;
 	public long createDate;
 	public long lifeTime;
+	public String oAuth2RefreshTokenContent;
 	public long oAuth2ApplicationId;
 }

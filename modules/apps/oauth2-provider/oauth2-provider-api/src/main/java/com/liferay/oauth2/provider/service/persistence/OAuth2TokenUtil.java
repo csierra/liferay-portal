@@ -524,7 +524,7 @@ public class OAuth2TokenUtil {
 	* @return the matching o auth2 tokens
 	*/
 	public static List<OAuth2Token> findByRefreshToken(
-		java.lang.String oAuth2RefreshTokenId) {
+		long oAuth2RefreshTokenId) {
 		return getPersistence().findByRefreshToken(oAuth2RefreshTokenId);
 	}
 
@@ -541,7 +541,7 @@ public class OAuth2TokenUtil {
 	* @return the range of matching o auth2 tokens
 	*/
 	public static List<OAuth2Token> findByRefreshToken(
-		java.lang.String oAuth2RefreshTokenId, int start, int end) {
+		long oAuth2RefreshTokenId, int start, int end) {
 		return getPersistence()
 				   .findByRefreshToken(oAuth2RefreshTokenId, start, end);
 	}
@@ -560,7 +560,7 @@ public class OAuth2TokenUtil {
 	* @return the ordered range of matching o auth2 tokens
 	*/
 	public static List<OAuth2Token> findByRefreshToken(
-		java.lang.String oAuth2RefreshTokenId, int start, int end,
+		long oAuth2RefreshTokenId, int start, int end,
 		OrderByComparator<OAuth2Token> orderByComparator) {
 		return getPersistence()
 				   .findByRefreshToken(oAuth2RefreshTokenId, start, end,
@@ -582,7 +582,7 @@ public class OAuth2TokenUtil {
 	* @return the ordered range of matching o auth2 tokens
 	*/
 	public static List<OAuth2Token> findByRefreshToken(
-		java.lang.String oAuth2RefreshTokenId, int start, int end,
+		long oAuth2RefreshTokenId, int start, int end,
 		OrderByComparator<OAuth2Token> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -599,7 +599,7 @@ public class OAuth2TokenUtil {
 	* @throws NoSuchOAuth2TokenException if a matching o auth2 token could not be found
 	*/
 	public static OAuth2Token findByRefreshToken_First(
-		java.lang.String oAuth2RefreshTokenId,
+		long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException {
 		return getPersistence()
@@ -615,7 +615,7 @@ public class OAuth2TokenUtil {
 	* @return the first matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
 	*/
 	public static OAuth2Token fetchByRefreshToken_First(
-		java.lang.String oAuth2RefreshTokenId,
+		long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator) {
 		return getPersistence()
 				   .fetchByRefreshToken_First(oAuth2RefreshTokenId,
@@ -631,7 +631,7 @@ public class OAuth2TokenUtil {
 	* @throws NoSuchOAuth2TokenException if a matching o auth2 token could not be found
 	*/
 	public static OAuth2Token findByRefreshToken_Last(
-		java.lang.String oAuth2RefreshTokenId,
+		long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException {
 		return getPersistence()
@@ -647,7 +647,7 @@ public class OAuth2TokenUtil {
 	* @return the last matching o auth2 token, or <code>null</code> if a matching o auth2 token could not be found
 	*/
 	public static OAuth2Token fetchByRefreshToken_Last(
-		java.lang.String oAuth2RefreshTokenId,
+		long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator) {
 		return getPersistence()
 				   .fetchByRefreshToken_Last(oAuth2RefreshTokenId,
@@ -664,7 +664,7 @@ public class OAuth2TokenUtil {
 	* @throws NoSuchOAuth2TokenException if a o auth2 token with the primary key could not be found
 	*/
 	public static OAuth2Token[] findByRefreshToken_PrevAndNext(
-		long oAuth2TokenId, java.lang.String oAuth2RefreshTokenId,
+		long oAuth2TokenId, long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2Token> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException {
 		return getPersistence()
@@ -677,8 +677,7 @@ public class OAuth2TokenUtil {
 	*
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID
 	*/
-	public static void removeByRefreshToken(
-		java.lang.String oAuth2RefreshTokenId) {
+	public static void removeByRefreshToken(long oAuth2RefreshTokenId) {
 		getPersistence().removeByRefreshToken(oAuth2RefreshTokenId);
 	}
 
@@ -688,7 +687,7 @@ public class OAuth2TokenUtil {
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID
 	* @return the number of matching o auth2 tokens
 	*/
-	public static int countByRefreshToken(java.lang.String oAuth2RefreshTokenId) {
+	public static int countByRefreshToken(long oAuth2RefreshTokenId) {
 		return getPersistence().countByRefreshToken(oAuth2RefreshTokenId);
 	}
 

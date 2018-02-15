@@ -64,6 +64,8 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("lifeTime", getLifeTime());
+		attributes.put("oAuth2RefreshTokenContent",
+			getOAuth2RefreshTokenContent());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
 
 		return attributes;
@@ -71,8 +73,7 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		String oAuth2RefreshTokenId = (String)attributes.get(
-				"oAuth2RefreshTokenId");
+		Long oAuth2RefreshTokenId = (Long)attributes.get("oAuth2RefreshTokenId");
 
 		if (oAuth2RefreshTokenId != null) {
 			setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
@@ -106,6 +107,13 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 
 		if (lifeTime != null) {
 			setLifeTime(lifeTime);
+		}
+
+		String oAuth2RefreshTokenContent = (String)attributes.get(
+				"oAuth2RefreshTokenContent");
+
+		if (oAuth2RefreshTokenContent != null) {
+			setOAuth2RefreshTokenContent(oAuth2RefreshTokenContent);
 		}
 
 		Long oAuth2ApplicationId = (Long)attributes.get("oAuth2ApplicationId");
@@ -171,12 +179,22 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 	}
 
 	/**
+	* Returns the o auth2 refresh token content of this o auth2 refresh token.
+	*
+	* @return the o auth2 refresh token content of this o auth2 refresh token
+	*/
+	@Override
+	public java.lang.String getOAuth2RefreshTokenContent() {
+		return _oAuth2RefreshToken.getOAuth2RefreshTokenContent();
+	}
+
+	/**
 	* Returns the o auth2 refresh token ID of this o auth2 refresh token.
 	*
 	* @return the o auth2 refresh token ID of this o auth2 refresh token
 	*/
 	@Override
-	public java.lang.String getOAuth2RefreshTokenId() {
+	public long getOAuth2RefreshTokenId() {
 		return _oAuth2RefreshToken.getOAuth2RefreshTokenId();
 	}
 
@@ -186,7 +204,7 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 	* @return the primary key of this o auth2 refresh token
 	*/
 	@Override
-	public java.lang.String getPrimaryKey() {
+	public long getPrimaryKey() {
 		return _oAuth2RefreshToken.getPrimaryKey();
 	}
 
@@ -317,12 +335,23 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 	}
 
 	/**
+	* Sets the o auth2 refresh token content of this o auth2 refresh token.
+	*
+	* @param oAuth2RefreshTokenContent the o auth2 refresh token content of this o auth2 refresh token
+	*/
+	@Override
+	public void setOAuth2RefreshTokenContent(
+		java.lang.String oAuth2RefreshTokenContent) {
+		_oAuth2RefreshToken.setOAuth2RefreshTokenContent(oAuth2RefreshTokenContent);
+	}
+
+	/**
 	* Sets the o auth2 refresh token ID of this o auth2 refresh token.
 	*
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID of this o auth2 refresh token
 	*/
 	@Override
-	public void setOAuth2RefreshTokenId(java.lang.String oAuth2RefreshTokenId) {
+	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
 		_oAuth2RefreshToken.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 	}
 
@@ -332,7 +361,7 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 	* @param primaryKey the primary key of this o auth2 refresh token
 	*/
 	@Override
-	public void setPrimaryKey(java.lang.String primaryKey) {
+	public void setPrimaryKey(long primaryKey) {
 		_oAuth2RefreshToken.setPrimaryKey(primaryKey);
 	}
 

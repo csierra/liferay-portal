@@ -248,7 +248,7 @@ public class OAuth2RefreshTokenUtil {
 	* @throws NoSuchOAuth2RefreshTokenException if a o auth2 refresh token with the primary key could not be found
 	*/
 	public static OAuth2RefreshToken[] findByA_PrevAndNext(
-		java.lang.String oAuth2RefreshTokenId, long oAuth2ApplicationId,
+		long oAuth2RefreshTokenId, long oAuth2ApplicationId,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException {
 		return getPersistence()
@@ -431,7 +431,7 @@ public class OAuth2RefreshTokenUtil {
 	* @throws NoSuchOAuth2RefreshTokenException if a o auth2 refresh token with the primary key could not be found
 	*/
 	public static OAuth2RefreshToken[] findByA_U_PrevAndNext(
-		java.lang.String oAuth2RefreshTokenId, long oAuth2ApplicationId,
+		long oAuth2RefreshTokenId, long oAuth2ApplicationId,
 		java.lang.String userName,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException {
@@ -464,6 +464,65 @@ public class OAuth2RefreshTokenUtil {
 	}
 
 	/**
+	* Returns the o auth2 refresh token where oAuth2RefreshTokenContent = &#63; or throws a {@link NoSuchOAuth2RefreshTokenException} if it could not be found.
+	*
+	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
+	* @return the matching o auth2 refresh token
+	* @throws NoSuchOAuth2RefreshTokenException if a matching o auth2 refresh token could not be found
+	*/
+	public static OAuth2RefreshToken findByContent(
+		java.lang.String oAuth2RefreshTokenContent)
+		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException {
+		return getPersistence().findByContent(oAuth2RefreshTokenContent);
+	}
+
+	/**
+	* Returns the o auth2 refresh token where oAuth2RefreshTokenContent = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
+	* @return the matching o auth2 refresh token, or <code>null</code> if a matching o auth2 refresh token could not be found
+	*/
+	public static OAuth2RefreshToken fetchByContent(
+		java.lang.String oAuth2RefreshTokenContent) {
+		return getPersistence().fetchByContent(oAuth2RefreshTokenContent);
+	}
+
+	/**
+	* Returns the o auth2 refresh token where oAuth2RefreshTokenContent = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
+	* @param retrieveFromCache whether to retrieve from the finder cache
+	* @return the matching o auth2 refresh token, or <code>null</code> if a matching o auth2 refresh token could not be found
+	*/
+	public static OAuth2RefreshToken fetchByContent(
+		java.lang.String oAuth2RefreshTokenContent, boolean retrieveFromCache) {
+		return getPersistence()
+				   .fetchByContent(oAuth2RefreshTokenContent, retrieveFromCache);
+	}
+
+	/**
+	* Removes the o auth2 refresh token where oAuth2RefreshTokenContent = &#63; from the database.
+	*
+	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
+	* @return the o auth2 refresh token that was removed
+	*/
+	public static OAuth2RefreshToken removeByContent(
+		java.lang.String oAuth2RefreshTokenContent)
+		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException {
+		return getPersistence().removeByContent(oAuth2RefreshTokenContent);
+	}
+
+	/**
+	* Returns the number of o auth2 refresh tokens where oAuth2RefreshTokenContent = &#63;.
+	*
+	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
+	* @return the number of matching o auth2 refresh tokens
+	*/
+	public static int countByContent(java.lang.String oAuth2RefreshTokenContent) {
+		return getPersistence().countByContent(oAuth2RefreshTokenContent);
+	}
+
+	/**
 	* Caches the o auth2 refresh token in the entity cache if it is enabled.
 	*
 	* @param oAuth2RefreshToken the o auth2 refresh token
@@ -487,8 +546,7 @@ public class OAuth2RefreshTokenUtil {
 	* @param oAuth2RefreshTokenId the primary key for the new o auth2 refresh token
 	* @return the new o auth2 refresh token
 	*/
-	public static OAuth2RefreshToken create(
-		java.lang.String oAuth2RefreshTokenId) {
+	public static OAuth2RefreshToken create(long oAuth2RefreshTokenId) {
 		return getPersistence().create(oAuth2RefreshTokenId);
 	}
 
@@ -499,8 +557,7 @@ public class OAuth2RefreshTokenUtil {
 	* @return the o auth2 refresh token that was removed
 	* @throws NoSuchOAuth2RefreshTokenException if a o auth2 refresh token with the primary key could not be found
 	*/
-	public static OAuth2RefreshToken remove(
-		java.lang.String oAuth2RefreshTokenId)
+	public static OAuth2RefreshToken remove(long oAuth2RefreshTokenId)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException {
 		return getPersistence().remove(oAuth2RefreshTokenId);
 	}
@@ -517,8 +574,7 @@ public class OAuth2RefreshTokenUtil {
 	* @return the o auth2 refresh token
 	* @throws NoSuchOAuth2RefreshTokenException if a o auth2 refresh token with the primary key could not be found
 	*/
-	public static OAuth2RefreshToken findByPrimaryKey(
-		java.lang.String oAuth2RefreshTokenId)
+	public static OAuth2RefreshToken findByPrimaryKey(long oAuth2RefreshTokenId)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException {
 		return getPersistence().findByPrimaryKey(oAuth2RefreshTokenId);
 	}
@@ -530,7 +586,7 @@ public class OAuth2RefreshTokenUtil {
 	* @return the o auth2 refresh token, or <code>null</code> if a o auth2 refresh token with the primary key could not be found
 	*/
 	public static OAuth2RefreshToken fetchByPrimaryKey(
-		java.lang.String oAuth2RefreshTokenId) {
+		long oAuth2RefreshTokenId) {
 		return getPersistence().fetchByPrimaryKey(oAuth2RefreshTokenId);
 	}
 

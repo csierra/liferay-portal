@@ -134,12 +134,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 			oAuth2TokenImpl.setOAuth2TokenType(oAuth2TokenType);
 		}
 
-		if (oAuth2RefreshTokenId == null) {
-			oAuth2TokenImpl.setOAuth2RefreshTokenId("");
-		}
-		else {
-			oAuth2TokenImpl.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
-		}
+		oAuth2TokenImpl.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 
 		if (scopes == null) {
 			oAuth2TokenImpl.setScopes("");
@@ -168,7 +163,8 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 
 		oAuth2ApplicationId = objectInput.readLong();
 		oAuth2TokenType = objectInput.readUTF();
-		oAuth2RefreshTokenId = objectInput.readUTF();
+
+		oAuth2RefreshTokenId = objectInput.readLong();
 		scopes = objectInput.readUTF();
 	}
 
@@ -208,12 +204,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 			objectOutput.writeUTF(oAuth2TokenType);
 		}
 
-		if (oAuth2RefreshTokenId == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(oAuth2RefreshTokenId);
-		}
+		objectOutput.writeLong(oAuth2RefreshTokenId);
 
 		if (scopes == null) {
 			objectOutput.writeUTF("");
@@ -232,6 +223,6 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 	public String oAuth2TokenContent;
 	public long oAuth2ApplicationId;
 	public String oAuth2TokenType;
-	public String oAuth2RefreshTokenId;
+	public long oAuth2RefreshTokenId;
 	public String scopes;
 }

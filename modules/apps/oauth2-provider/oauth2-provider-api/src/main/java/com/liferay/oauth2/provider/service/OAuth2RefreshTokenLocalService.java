@@ -16,9 +16,12 @@ package com.liferay.oauth2.provider.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -77,17 +80,10 @@ public interface OAuth2RefreshTokenLocalService extends BaseLocalService,
 	* @return the new o auth2 refresh token
 	*/
 	public OAuth2RefreshToken createOAuth2RefreshToken(
-		java.lang.String oAuth2RefreshTokenId);
+		long oAuth2RefreshTokenId);
 
-	/**
-	* Deletes the o auth2 refresh token from the database. Also notifies the appropriate model listeners.
-	*
-	* @param oAuth2RefreshToken the o auth2 refresh token
-	* @return the o auth2 refresh token that was removed
-	*/
-	@Indexable(type = IndexableType.DELETE)
-	public OAuth2RefreshToken deleteOAuth2RefreshToken(
-		OAuth2RefreshToken oAuth2RefreshToken);
+	public OAuth2RefreshToken createOAuth2RefreshToken(
+		java.lang.String tokenContent);
 
 	/**
 	* Deletes the o auth2 refresh token with the primary key from the database. Also notifies the appropriate model listeners.
@@ -98,7 +94,17 @@ public interface OAuth2RefreshTokenLocalService extends BaseLocalService,
 	*/
 	@Indexable(type = IndexableType.DELETE)
 	public OAuth2RefreshToken deleteOAuth2RefreshToken(
-		java.lang.String oAuth2RefreshTokenId) throws PortalException;
+		long oAuth2RefreshTokenId) throws PortalException;
+
+	/**
+	* Deletes the o auth2 refresh token from the database. Also notifies the appropriate model listeners.
+	*
+	* @param oAuth2RefreshToken the o auth2 refresh token
+	* @return the o auth2 refresh token that was removed
+	*/
+	@Indexable(type = IndexableType.DELETE)
+	public OAuth2RefreshToken deleteOAuth2RefreshToken(
+		OAuth2RefreshToken oAuth2RefreshToken);
 
 	/**
 	* @throws PortalException
@@ -167,12 +173,23 @@ public interface OAuth2RefreshTokenLocalService extends BaseLocalService,
 		Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public OAuth2RefreshToken fetchOAuth2RefreshToken(
-		java.lang.String oAuth2RefreshTokenId);
+	public OAuth2RefreshToken fetchByContent(java.lang.String tokenContent);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public OAuth2RefreshToken fetchOAuth2RefreshToken(long oAuth2RefreshTokenId);
 
 	public Collection<OAuth2RefreshToken> findByApplication(
 		long applicationId, int start, int end,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator);
+
+	public OAuth2RefreshToken findByContent(java.lang.String tokenContent)
+		throws NoSuchOAuth2RefreshTokenException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ActionableDynamicQuery getActionableDynamicQuery();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
 	* Returns the o auth2 refresh token with the primary key.
@@ -182,8 +199,8 @@ public interface OAuth2RefreshTokenLocalService extends BaseLocalService,
 	* @throws PortalException if a o auth2 refresh token with the primary key could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public OAuth2RefreshToken getOAuth2RefreshToken(
-		java.lang.String oAuth2RefreshTokenId) throws PortalException;
+	public OAuth2RefreshToken getOAuth2RefreshToken(long oAuth2RefreshTokenId)
+		throws PortalException;
 
 	/**
 	* Returns a range of all the o auth2 refresh tokens.

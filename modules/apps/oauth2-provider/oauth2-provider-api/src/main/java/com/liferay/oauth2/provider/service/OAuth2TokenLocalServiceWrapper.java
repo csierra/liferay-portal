@@ -220,8 +220,8 @@ public class OAuth2TokenLocalServiceWrapper implements OAuth2TokenLocalService,
 
 	@Override
 	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByRefreshToken(
-		java.lang.String refreshToken) {
-		return _oAuth2TokenLocalService.findByRefreshToken(refreshToken);
+		long oAuth2RefreshTokenId) {
+		return _oAuth2TokenLocalService.findByRefreshToken(oAuth2RefreshTokenId);
 	}
 
 	@Override
