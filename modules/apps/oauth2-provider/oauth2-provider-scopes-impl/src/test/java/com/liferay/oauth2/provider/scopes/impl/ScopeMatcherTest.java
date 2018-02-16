@@ -17,10 +17,8 @@ package com.liferay.oauth2.provider.scopes.impl;
 import com.liferay.oauth2.provider.scopes.impl.scopematcher.ChunkScopeMatcherFactory;
 import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
-import com.liferay.oauth2.provider.scopes.impl.prefixhandler.DefaultPrefixHandlerFactory;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import org.junit.Test;
 
@@ -56,14 +54,18 @@ public class ScopeMatcherTest {
 
 		ScopeMatcher scopeMatcher = ScopeMatcherFactory.STRICT.create("RO2");
 
-		scopeMatcher = scopeMatcher.withMapper(new TestScopeMapper());
+		TestScopeMapper testScopeMapper1 = new TestScopeMapper();
+		
+		scopeMatcher = testScopeMapper1.withMapper(scopeMatcher);
 
 		assertEquals(
 			Arrays.asList("RO"), testScopeFinder.findScopes(scopeMatcher));
 
 		scopeMatcher = ScopeMatcherFactory.STRICT.create("RW2");
 
-		scopeMatcher = scopeMatcher.withMapper(new TestScopeMapper());
+		TestScopeMapper testScopeMapper2 = new TestScopeMapper();
+		
+		scopeMatcher = testScopeMapper2.withMapper(scopeMatcher);
 
 		assertEquals(
 			Arrays.asList("RO", "RW"),
@@ -74,18 +76,15 @@ public class ScopeMatcherTest {
 	public void testFindScopesWithNamespace() {
 		ScopeFinder testScopeFinder = new TestHierarchyScopeFinder();
 
-		PrefixHandlerFactory namespaceAdderFactory =
-			new DefaultPrefixHandlerFactory();
-
-		PrefixHandler namespaceAdder = namespaceAdderFactory.create("TEST");
-
+		PrefixHandler namespaceAdder = (target) -> "TEST/" + target;
+		
 		ScopeMatcher scopeMatcher = "TEST/RO"::equals;
 
 		assertEquals(
 			Arrays.asList("RO"),
 			new ArrayList<>(
 				testScopeFinder.findScopes(
-					scopeMatcher.prepend(namespaceAdder))));
+					namespaceAdder.prepend(scopeMatcher))));
 
 		scopeMatcher = "TEST/RW"::equals;
 
@@ -93,20 +92,16 @@ public class ScopeMatcherTest {
 			Arrays.asList("RO", "RW"),
 			new ArrayList<>(
 				testScopeFinder.findScopes(
-					scopeMatcher.prepend(namespaceAdder))));
+					namespaceAdder.prepend(scopeMatcher))));
 	}
 
 	@Test
 	public void testFindScopesWithMultipleNamespaces() {
 		ScopeFinder testScopeFinder = new TestHierarchyScopeFinder();
 
-		PrefixHandlerFactory namespaceAdderFactory =
-			new DefaultPrefixHandlerFactory();
-
-		PrefixHandler namespaceAdder = namespaceAdderFactory.create("TEST");
-
-		PrefixHandler nestedNamespaceAdder = namespaceAdderFactory.create(
-			"NESTED");
+		PrefixHandler namespaceAdder = (target) -> "TEST/" + target;
+		
+		PrefixHandler nestedNamespaceAdder = (target) -> "NESTED/" + target;
 
 		namespaceAdder = namespaceAdder.append(nestedNamespaceAdder);
 
@@ -114,13 +109,13 @@ public class ScopeMatcherTest {
 
 		assertEquals(
 			Arrays.asList("RO"),
-			testScopeFinder.findScopes(scopeMatcher.prepend(namespaceAdder)));
+			testScopeFinder.findScopes(namespaceAdder.prepend(scopeMatcher)));
 
 		scopeMatcher = "TEST/NESTED/RW"::equals;
 
 		assertEquals(
 			Arrays.asList("RO", "RW"),
-			testScopeFinder.findScopes(scopeMatcher.prepend(namespaceAdder)));
+			testScopeFinder.findScopes(namespaceAdder.prepend(scopeMatcher)));
 	}
 
 	@Test
@@ -142,28 +137,26 @@ public class ScopeMatcherTest {
 		ScopeFinder scopeFinder = new TestTestAllScopeFinder(
 			"everything", "everything.readonly");
 
-		PrefixHandlerFactory namespaceAdderFactory =
-			namespace -> localName -> namespace + "/" + localName;
-
-		PrefixHandler liferayNamespaceAdder =
-			namespaceAdderFactory.create("http://www.liferay.com");
-
+		PrefixHandler liferayNamespaceAdder = (target) -> "http://www.liferay.com/" + target;
+				
+		PrefixHandler apioNamespaceAdder = (target) -> "apio/" + target;
+		
 		PrefixHandler namespaceAdder =
-			liferayNamespaceAdder.append(namespaceAdderFactory.create("apio"));
+			liferayNamespaceAdder.append(apioNamespaceAdder);
 
 		ScopeMatcher scopeMatcher = new ChunkScopeMatcherFactory().create(
 			"http://www.liferay.com/apio/everything");
 
 		assertEquals(
 			Arrays.asList("everything", "everything.readonly"),
-			scopeFinder.findScopes(scopeMatcher.prepend(namespaceAdder)));
+			scopeFinder.findScopes(namespaceAdder.prepend(scopeMatcher)));
 
 		scopeMatcher = new ChunkScopeMatcherFactory().create(
 			"http://www.liferay.com/apio/everything.readonly");
 
 		assertEquals(
 			Arrays.asList("everything.readonly"),
-			scopeFinder.findScopes(scopeMatcher.prepend(namespaceAdder)));
+			scopeFinder.findScopes(namespaceAdder.prepend(scopeMatcher)));
 	}
 
 	@Test
