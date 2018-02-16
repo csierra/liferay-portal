@@ -21,6 +21,9 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Tomas Polesovsky
  */
@@ -56,5 +59,34 @@ public class OAuth2AuthorizePortletDisplayContext {
 
 		return false;
 	}
+
+	public AuthorizationRequestModel getAuthorizationRequestModel() {
+		return _authorizationRequestModel;
+	}
+
+	public OAuth2Application getOAuth2Application() {
+		return _oAuth2Application;
+	}
+
+	public Map<String, String> getOAuth2Parameters() {
+		return _oAuth2Parameters;
+	}
+
+	public void setAuthorizationRequestModel(
+		AuthorizationRequestModel authorizationRequestModel) {
+		_authorizationRequestModel = authorizationRequestModel;
+	}
+
+	public void setOAuth2Parameters(Map<String, String> oAuth2Parameters) {
+		_oAuth2Parameters = oAuth2Parameters;
+	}
+
+	public void setOAuth2Application(OAuth2Application oAuth2Application) {
+		_oAuth2Application = oAuth2Application;
+	}
+
+	private AuthorizationRequestModel _authorizationRequestModel;
+	private OAuth2Application _oAuth2Application = null;
+	private Map<String, String> _oAuth2Parameters = new HashMap<>();
 
 }
