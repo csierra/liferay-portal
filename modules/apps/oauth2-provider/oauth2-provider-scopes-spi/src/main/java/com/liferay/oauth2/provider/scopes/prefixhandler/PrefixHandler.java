@@ -12,8 +12,9 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.spi;
+package com.liferay.oauth2.provider.scopes.prefixhandler;
 
+import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.Collection;
