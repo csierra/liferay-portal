@@ -20,5 +20,5 @@ page import="com.liferay.oauth2.provider.web.internal.display.context.Authorizat
 page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext" %>
 
 <%
-OAuth2AuthorizePortletDisplayContext oAuth2AuthorizePortletDisplayContext = new OAuth2AuthorizePortletDisplayContext();
+OAuth2AuthorizePortletDisplayContext oAuth2AuthorizePortletDisplayContext = (OAuth2AuthorizePortletDisplayContext)request.getAttribute(OAuth2AdminWebKeys.AUTHORIZE_DISPLAY_CONTEXT);
 %>

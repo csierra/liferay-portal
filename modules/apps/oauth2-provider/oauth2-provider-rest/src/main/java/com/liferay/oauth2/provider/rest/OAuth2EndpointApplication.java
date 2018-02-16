@@ -163,8 +163,8 @@ public class OAuth2EndpointApplication extends Application {
 		accessTokenService.setGrantHandlers(_accessTokenGrantHandlers);
 
 		ArrayList<Object> endpoints = new ArrayList<>(_liferayOauth2Endpoints);
-		endpoints.addAll(
-			Arrays.asList(accessTokenService, _authorizationMessageBodyWriter));
+
+		endpoints.add(accessTokenService);
 
 		return new HashSet<>(endpoints);
 	}
@@ -216,9 +216,6 @@ public class OAuth2EndpointApplication extends Application {
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
-
-	@Reference
-	private AuthorizationMessageBodyWriter _authorizationMessageBodyWriter;
 
 	@Reference
 	private Portal _portal;

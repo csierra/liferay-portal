@@ -14,15 +14,21 @@
 
 package com.liferay.oauth2.provider.rest;
 
-import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.URLCodec;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Props;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 
 import com.liferay.portal.kernel.util.Validator;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -36,16 +42,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.Map;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(service = AuthorizationMessageBodyWriter.class)
+@Component(
+	immediate = true,
+	property = "liferay.oauth2.endpoint=true",
+	service = Object.class
+)
 @Produces("text/html")
 @Provider
 public class AuthorizationMessageBodyWriter
 	implements MessageBodyWriter<OAuthAuthorizationData> {
-
 
 	@Override
 	public boolean isWriteable(
@@ -73,50 +84,106 @@ public class AuthorizationMessageBodyWriter
 		OutputStream outputStream)
 		throws IOException, WebApplicationException {
 
-		String portalURL =
-			PortalUtil.getPortalURL(_messageContext.getHttpServletRequest());
+		String redirect = _oAuth2AuthorizePortalScreenURL;
 
-		StringBundler sb = new StringBundler(portalURL);
+		if (!_http.hasDomain(redirect)) {
+			String portalURL =
+				_portal.getPortalURL(_messageContext.getHttpServletRequest());
 
-		sb.append("/group/guest/oauth2-authorize");
+			redirect = portalURL + redirect;
+		}
 
-		sb.append(StringPool.QUESTION);
-		sb.append("reply_to");
-		sb.append(StringPool.EQUAL);
-		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getReplyTo(), true));
-		sb.append(StringPool.AMPERSAND);
-		sb.append("client_id");
-		sb.append(StringPool.EQUAL);
-		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getClientId(), true));
-		sb.append(StringPool.AMPERSAND);
-		sb.append("redirect_uri");
-		sb.append(StringPool.EQUAL);
-		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getRedirectUri(), true));
-		sb.append(StringPool.AMPERSAND);
-		sb.append("session_authenticity_token");
-		sb.append(StringPool.EQUAL);
-		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getAuthenticityToken(), true));
-		sb.append(StringPool.AMPERSAND);
-		sb.append("scope");
-		sb.append(StringPool.EQUAL);
-		sb.append(URLCodec.encodeURL(oAuthAuthorizationData.getProposedScope(), true));
+		redirect = setParameter(
+			redirect, OAuthConstants.CLIENT_ID,
+			oAuthAuthorizationData.getClientId());
 
-		String clientCodeChallenge =
-			oAuthAuthorizationData.getClientCodeChallenge();
+		redirect = setParameter(
+			redirect, OAuthConstants.REDIRECT_URI,
+			oAuthAuthorizationData.getRedirectUri());
 
-		if (Validator.isNotNull(clientCodeChallenge)) {
-			sb.append(StringPool.AMPERSAND);
-			sb.append("code_challenge");
-			sb.append(StringPool.EQUAL);
-			sb.append(URLCodec.encodeURL(
-				clientCodeChallenge, true));
+		redirect = setParameter(
+			redirect, OAuthConstants.STATE,
+			oAuthAuthorizationData.getState());
+
+		redirect = setParameter(
+			redirect, OAuthConstants.SCOPE,
+			oAuthAuthorizationData.getProposedScope());
+
+		redirect = setParameter(
+			redirect, OAuthConstants.CLIENT_AUDIENCE,
+			oAuthAuthorizationData.getAudience());
+
+		redirect = setParameter(
+			redirect, OAuthConstants.NONCE,
+			oAuthAuthorizationData.getNonce());
+
+		redirect = setParameter(
+			redirect, OAuthConstants.AUTHORIZATION_CODE_CHALLENGE,
+			oAuthAuthorizationData.getClientCodeChallenge());
+
+		redirect = setParameter(
+			redirect, OAuthConstants.RESPONSE_TYPE,
+			oAuthAuthorizationData.getResponseType());
+
+		redirect = setParameter(
+			redirect, OAuthConstants.SESSION_AUTHENTICITY_TOKEN,
+			oAuthAuthorizationData.getAuthenticityToken());
+
+		redirect = setParameter(
+			redirect, "reply_to", oAuthAuthorizationData.getReplyTo());
+
+		if (redirect.length() > _invokerFilterUriMaxLength) {
+			redirect = removeParameter(redirect, OAuthConstants.SCOPE);
 		}
 
 		throw new WebApplicationException(
-			Response.status(303).header("Location", sb.toString()).build());
+			Response
+				.status(Response.Status.FOUND)
+				.location(URI.create(redirect))
+				.build());
+	}
+
+	protected String removeParameter(String url, String name) {
+		return _http.removeParameter(url, "oauth2_" + name);
+	}
+
+	protected String setParameter(String url, String name, String value) {
+		if (Validator.isBlank(value)) {
+			return url;
+		}
+
+		return _http.addParameter(url, "oauth2_" + name, value);
+	}
+
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_oAuth2AuthorizePortalScreenURL =
+			MapUtil.getString(
+				properties, "oauth2.authorize.portal.screen.url",
+				_oAuth2AuthorizePortalScreenURL);
+
+		_invokerFilterUriMaxLength =
+			GetterUtil.getInteger(
+				PropsUtil.get(PropsKeys.INVOKER_FILTER_URI_MAX_LENGTH),
+				_invokerFilterUriMaxLength);
+
 	}
 
 	@Context
 	private MessageContext _messageContext;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private Http _http;
+
+	@Reference
+	private Props _props;
+
+	private int _invokerFilterUriMaxLength = 4000;
+
+	private String _oAuth2AuthorizePortalScreenURL =
+		"/group/guest/oauth2-authorize";
 
 }

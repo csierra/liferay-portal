@@ -1,4 +1,4 @@
-<%@ page import="com.liferay.portal.kernel.util.Validator" %><%--
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -15,18 +15,15 @@
 --%>
 
 <%@include file="/authorize/init.jsp"%>
+
 <%
-HttpServletRequest originalServletRequest = PortalUtil.getOriginalServletRequest(request);
-String replyTo = PortalUtil.escapeRedirect(ParamUtil.getString(originalServletRequest, "reply_to"));
-String clientId = ParamUtil.getString(originalServletRequest, "client_id");
-String codeChallenge = ParamUtil.getString(originalServletRequest, "code_challenge");
-String redirectUri = ParamUtil.getString(originalServletRequest, "redirect_uri");
-String scope = ParamUtil.getString(originalServletRequest, "scope");
-String sessionAuthenticityToken	= ParamUtil.getString(originalServletRequest, "session_authenticity_token");
+AuthorizationRequestModel authorizationRequestModel = oAuth2AuthorizePortletDisplayContext.getAuthorizationRequestModel();
 
-OAuth2Application oAuth2Application = OAuth2ApplicationLocalServiceUtil.fetchOAuth2Application(themeDisplay.getCompanyId(), clientId);
+OAuth2Application oAuth2Application = oAuth2AuthorizePortletDisplayContext.getOAuth2Application();
 
-AuthorizationRequestModel authorizationRequestModel = (AuthorizationRequestModel)request.getAttribute(OAuth2AdminWebKeys.AUTHORIZATION_REQUEST_MODEL);
+Map<String, String> oAuth2Parameters = oAuth2AuthorizePortletDisplayContext.getOAuth2Parameters();
+
+String replyTo = PortalUtil.escapeRedirect(oAuth2Parameters.get("reply_to"));
 %>
 <c:choose>
 	<c:when test="<%= oAuth2Application == null %>">
@@ -50,9 +47,9 @@ AuthorizationRequestModel authorizationRequestModel = (AuthorizationRequestModel
 	    </h4>
 	    <div>
 		    <ul>
-		    		<%
+				<%
 				for (String appName : authorizationRequestModel.getApplicationNames()) {
-					%>
+				%>
 					<div>
 					<ul>
 						<li><%= HtmlUtil.escape(appName) %></li>
@@ -66,8 +63,8 @@ AuthorizationRequestModel authorizationRequestModel = (AuthorizationRequestModel
 						%>
 						</ul>
 					</ul>
-					</div>					
-					<%
+					</div>
+				<%
 				}
 			    %>
 		    </ul>
@@ -75,13 +72,17 @@ AuthorizationRequestModel authorizationRequestModel = (AuthorizationRequestModel
 
 	    <div class="closed container-fluid-1280">
 		    <aui:form action="<%= replyTo %>" method="GET" name="fm">
-				<aui:input name="client_id" type="hidden" useNamespace="false" value="<%= clientId %>" />
-				<% if (Validator.isNotNull(codeChallenge)) { %>
-					<aui:input name="code_challenge" type="hidden" useNamespace="false" value="<%= codeChallenge %>" />
-				<% } %>
-			    <aui:input name="redirect_uri" type="hidden" useNamespace="false" value="<%= redirectUri %>" />
-			    <aui:input name="scope" type="hidden" useNamespace="false" value="<%= scope %>" />
-			    <aui:input name="session_authenticity_token" type="hidden" useNamespace="false" value="<%= sessionAuthenticityToken %>" />
+				<%
+					for (String paramName : oAuth2Parameters.keySet()) {
+						if (paramName.equals("reply_to")) {
+							continue;
+						}
+				%>
+					<aui:input name="<%= paramName %>" type="hidden" useNamespace="false" value="<%= oAuth2Parameters.get(paramName) %>" />
+				<%
+					}
+				%>
+
 				<aui:input name="oauthDecision" type="hidden" useNamespace="false" value="deny" />
 
 			    <aui:fieldset>
