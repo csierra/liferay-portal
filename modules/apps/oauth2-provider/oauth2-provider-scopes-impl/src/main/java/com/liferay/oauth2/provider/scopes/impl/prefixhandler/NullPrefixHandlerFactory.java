@@ -14,26 +14,16 @@
 
 package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
 
-
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
+import com.liferay.oauth2.provider.scopes.spi.PropertyGetter;
+import org.osgi.service.component.annotations.Component;
 
-public class DefaultPrefixHandler implements PrefixHandler {
-
-	private String _prefix;
-
-	public DefaultPrefixHandler(String prefix) {
-		_prefix = prefix;
-	}
+@Component(immediate = true)
+public class NullPrefixHandlerFactory implements PrefixHandlerFactory {
 
 	@Override
-	public String addPrefix(String input) {
-		return _prefix + input;
-	}
-
-	@Override
-	public PrefixHandler append(PrefixHandler prefixHandler) {
-		return new DefaultPrefixHandler(
-			_prefix + prefixHandler.addPrefix(StringPool.BLANK));
+	public PrefixHandler mapFrom(PropertyGetter propertyGetter) {
+		return PrefixHandler.NULL_HANDLER;
 	}
 }

@@ -23,7 +23,7 @@ import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
+import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
@@ -91,8 +91,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		ServiceReference<?> serviceReference = tuple.getServiceReference();
 
-		PrefixHandlerMapper prefixHandlerMapper =
-			_scopedPrefixHandlerMappers.getService(companyId, name);
+		PrefixHandlerFactory prefixHandlerMapper =
+			_scopedPrefixHandlerFactories.getService(companyId, name);
 
 		PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
 			serviceReference::getProperty);
@@ -118,8 +118,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		return grants;
 	}
 
-	private ScopedServiceTrackerMap<PrefixHandlerMapper>
-		_scopedPrefixHandlerMappers;
+	private ScopedServiceTrackerMap<PrefixHandlerFactory>
+		_scopedPrefixHandlerFactories;
 	private ScopedServiceTrackerMap<ScopeMapper>
 		_scopedScopeMapper;
 
@@ -155,10 +155,10 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		Collection<String> availableScopes = scopeFinder.findScopes(
 			ScopeMatcher.ALL);
 
-		PrefixHandlerMapper prefixHandlerMapper =
-			_scopedPrefixHandlerMappers.getService(companyId, applicationName);
+		PrefixHandlerFactory prefixHandlerFactory =
+			_scopedPrefixHandlerFactories.getService(companyId, applicationName);
 
-		PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
+		PrefixHandler prefixHandler = prefixHandlerFactory.mapFrom(
 			serviceReference::getProperty);
 
 		ScopeMapper scopeMapper =
@@ -189,9 +189,9 @@ public class ScopeRegistry implements ScopeFinderLocator {
 					bundleContext), Comparator.naturalOrder(),
 				new CacheClearServiceTrackerMapListener());
 
-		_scopedPrefixHandlerMappers = new ScopedServiceTrackerMap<>(
-			bundleContext, PrefixHandlerMapper.class, "osgi.jaxrs.name",
-			() -> _defaultPrefixHandlerMapper, _invocationCache::clear);
+		_scopedPrefixHandlerFactories = new ScopedServiceTrackerMap<>(
+			bundleContext, PrefixHandlerFactory.class, "osgi.jaxrs.name",
+			() -> _defaultPrefixHandlerFactory, _invocationCache::clear);
 
 		_scopedScopeMapper = new ScopedServiceTrackerMap<>(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
@@ -201,7 +201,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	@Deactivate
 	protected void deactivate() {
 		_scopeFinderByNameServiceTrackerMap.close();
-		_scopedPrefixHandlerMappers.close();
+		_scopedPrefixHandlerFactories.close();
 		_scopedScopeMapper.close();
 	}
 
@@ -209,7 +209,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		target = "(default=true)",
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private PrefixHandlerMapper _defaultPrefixHandlerMapper;
+	private PrefixHandlerFactory _defaultPrefixHandlerFactory;
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;

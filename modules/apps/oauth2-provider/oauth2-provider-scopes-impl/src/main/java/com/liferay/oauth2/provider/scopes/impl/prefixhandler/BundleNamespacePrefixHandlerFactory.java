@@ -16,9 +16,9 @@ package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
 
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
 import com.liferay.oauth2.provider.scopes.spi.PropertyGetter;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import org.osgi.framework.Bundle;
@@ -33,11 +33,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Component(immediate = true, property = "default=true")
-public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
-
+@Component(
+	immediate = true, 
+	property = {
+		"default=true", 
+		"separator=" + StringPool.SLASH
+	}
+)
+public class BundleNamespacePrefixHandlerFactory implements PrefixHandlerFactory {
+	
 	private List<String> _excludedScopes = new ArrayList<>();
-
+	private String _separator = StringPool.SLASH;
+	
 	@Override
 	public PrefixHandler mapFrom(PropertyGetter propertyGetter) {
 		long bundleId = Long.parseLong(
@@ -49,15 +56,15 @@ public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
 
 		String applicationName = applicationNameObject.toString();
 
-		PrefixHandler prefixHandler = _namespaceAdderFactory.create(
+		PrefixHandler prefixHandler = create(
 			bundle.getSymbolicName(), applicationName);
 
-		return (input) -> {
-			if (_excludedScopes.contains(input)) {
-				return input;
+		return (target) -> {
+			if (_excludedScopes.contains(target)) {
+				return target;
 			}
 
-			return prefixHandler.addPrefix(input);
+			return prefixHandler.addPrefix(target);
 		};
 	}
 
@@ -74,11 +81,25 @@ public class BundleNamespacePrefixHandlerMapper implements PrefixHandlerMapper {
 			excludedScopesProperty.split(StringPool.COMMA)));
 
 		_excludedScopes.removeIf(Validator::isBlank);
+		
+		Object separatorObject = properties.get("separator");
+
+		if (Validator.isNotNull(separatorObject)) {
+			_separator = separatorObject.toString();
+		}		
 	}
 
 	private BundleContext _bundleContext;
 
-	@Reference
-	PrefixHandlerFactory _namespaceAdderFactory;
+	public PrefixHandler create(String ... prefixes) {
+		StringBundler sb = new StringBundler(prefixes.length * 2);
+
+		for (String namespace : prefixes) {
+			sb.append(namespace);
+			sb.append(_separator);
+		}
+
+		return (target) -> sb.toString() + target;
+	}
 
 }
