@@ -27,28 +27,12 @@ import java.util.stream.Stream;
 public interface PrefixHandlerFactory {
 
 	/**
-	 * Creates a {@link PrefixHandler} using the given prefix.
-	 * @param prefix the prefix for the {@link PrefixHandler}
-	 * @return the {@link PrefixHandler} for the given prefix.
+	 * This method allows to create a {@link PrefixHandler} using the properties
+	 * in the {@link PropertyGetter}
+	 *
+	 * @param propertyGetter the {@link PropertyGetter} to configure the
+	 *                       {@link PrefixHandler}
+	 * @return the {@link PrefixHandler} for the given {@link PropertyGetter}
 	 */
-	public PrefixHandler create(String prefix);
-
-	/**
-	 * Creates a {@link PrefixHandler} given several prefixes. Some
-	 * implementations may provide an optimized version.
-	 * @param prefixes the prefixes for the {@link PrefixHandler}
-	 * @return a {@link PrefixHandler} for all the given prefixes.
-	 */
-	public default PrefixHandler create(String ... prefixes) {
-		Stream<String> stream = Arrays.stream(prefixes);
-
-		return PrefixHandler.merge(
-			stream.map(
-				this::create
-			).collect(
-				Collectors.toList()
-			)
-		);
-	}
-
+	public PrefixHandler mapFrom(PropertyGetter propertyGetter);
 }
