@@ -171,7 +171,11 @@ public class OAuth2EndpointApplication extends Application {
 
 	@Override
 	public Set<Class<?>> getClasses() {
-		return Collections.singleton(OAuthJSONProvider.class);
+		Set<Class<?>> classes = new HashSet<>(_liferayOAuth2Classes);
+
+		classes.add(OAuthJSONProvider.class);
+
+		return classes;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -188,6 +192,20 @@ public class OAuth2EndpointApplication extends Application {
 	
 	public void removeAccessTokenGrantHandler(AccessTokenGrantHandler accessTokenGrantHandler) {
 		_accessTokenGrantHandlers.remove(accessTokenGrantHandler);
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(liferay.oauth2.class=true)",
+		unbind = "removeOAuth2Class"
+	)
+	public void addOAuth2Class(Class<?> cls) {
+		_liferayOAuth2Classes.add(cls);
+	}
+
+	public void removeOAuth2Class(Class<?> cls) {
+		_liferayOAuth2Classes.remove(cls);
 	}
 
 	@Reference(
@@ -211,6 +229,7 @@ public class OAuth2EndpointApplication extends Application {
 	}
 
 	private List<Object> _liferayOauth2Endpoints = new ArrayList<>();
+	private List<Class<?>> _liferayOAuth2Classes = new ArrayList<>();
 
 	private List<AccessTokenGrantHandler> _accessTokenGrantHandlers = new ArrayList<>();
 
