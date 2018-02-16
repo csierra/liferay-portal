@@ -1,4 +1,4 @@
-package com.liferay.oauth2.provider.scopes.spi;
+package com.liferay.oauth2.provider.rest.scopechecker.spi;
 
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 
