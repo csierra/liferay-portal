@@ -14,8 +14,8 @@
 
 package com.liferay.oauth2.provider.rest.requestscopechecker;
 
+import com.liferay.oauth2.apps.api.ScopeChecker;
 import com.liferay.oauth2.provider.rest.scopechecker.spi.RequestScopeChecker;
-import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 
 import org.osgi.service.component.annotations.Component;
 

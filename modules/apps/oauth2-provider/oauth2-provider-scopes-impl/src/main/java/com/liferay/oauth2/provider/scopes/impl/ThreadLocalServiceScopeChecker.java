@@ -14,8 +14,8 @@
 
 package com.liferay.oauth2.provider.scopes.impl;
 
+import com.liferay.oauth2.apps.api.ScopeChecker;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
-import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeContext;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder;
