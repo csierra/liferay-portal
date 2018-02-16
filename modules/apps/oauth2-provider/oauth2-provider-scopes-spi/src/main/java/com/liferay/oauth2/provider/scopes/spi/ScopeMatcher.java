@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import aQute.bnd.annotation.ProviderType;
+
 /**
  * This interface represents the strategy used to match scopes. Some of these
  * strategies may be:
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
  * as many strategies as possible.
  */
 
+@ProviderType
 public interface ScopeMatcher {
 
 	/**
@@ -48,33 +51,6 @@ public interface ScopeMatcher {
 	 */
 	public default Collection<String> filter(Collection<String> names) {
 		return names.stream().filter(this::match).collect(Collectors.toList());
-	}
-
-	/**
-	 * Returns a new {@link ScopeMatcher} that takes into account the effect
-	 * of the given {@link PrefixHandler}. Some implementations might have
-	 * optimization opportunities.
-	 *
-	 * @param prefixHandler the prefix handler that will affect the scope
-	 * matcher.
-	 * @return the new ScopeMatcher that takes into account the
-	 * {@link PrefixHandler}
-	 */
-	public default ScopeMatcher prepend(PrefixHandler prefixHandler) {
-		return localName -> match(prefixHandler.addPrefix(localName));
-	}
-
-	/**
-	 * Returns a new {@link ScopeMatcher} that takes into account the effect
-	 * of the given {@link ScopeMapper}. Some implementations might have
-	 * optimization opportunities.
-	 * @param scopeMapper the scope mapper that affects the scope matcher.
-	 * @return the new {@link ScopeMatcher} that takes into account the given
-	 * {@link ScopeMapper}.
-	 */
-	public default ScopeMatcher withMapper(ScopeMapper scopeMapper) {
-		return localName ->
-			scopeMapper.map(localName).stream().anyMatch(this::match);
 	}
 
 	public default ScopeMatcher and(ScopeMatcher scopeMatcher) {

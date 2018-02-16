@@ -56,6 +56,20 @@ public interface PrefixHandler {
 	}
 
 	/**
+	 * Returns a new {@link ScopeMatcher} that takes into account the effect
+	 * of the given {@link PrefixHandler}. Some implementations might have
+	 * optimization opportunities.
+	 *
+	 * @param ScopeMatcher the scope matcher which should take into account 
+	 * this prefix handler.
+	 * @return the new ScopeMatcher that takes into account the
+	 * {@link PrefixHandler}
+	 */
+	public default ScopeMatcher prepend(ScopeMatcher scopeMatcher) {
+		return localName -> scopeMatcher.match(addPrefix(localName));
+	}	
+	
+	/**
 	 * A {@link PrefixHandler} that does nothing.
 	 */
 	static PrefixHandler NULL_HANDLER = new PrefixHandler() {

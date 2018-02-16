@@ -90,16 +90,6 @@ public class ChunkScopeMatcherFactory implements ScopeMatcherFactory {
 			return true;
 		}
 
-		@Override
-		public ScopeMatcher prepend(PrefixHandler prefixHandler) {
-			String namespace = prefixHandler.addPrefix(StringPool.BLANK);
-
-			if (!_input.startsWith(namespace)) {
-				return ScopeMatcher.NONE;
-			}
-
-			return create(_input.substring(namespace.length()));
-		}
 	}
 
 }
