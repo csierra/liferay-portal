@@ -14,10 +14,10 @@
 
 package com.liferay.oauth2.provider.scopes.impl;
 
-import com.liferay.oauth2.provider.scopes.impl.prefixhandler.DefaultPrefixHandlerFactory;
 import com.liferay.oauth2.provider.scopes.impl.scopematcher.ChunkScopeMatcherFactory;
 import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.portal.kernel.util.StringPool;
 import org.junit.Test;
@@ -73,10 +73,9 @@ public class ChunkScopeMatcherFactoryTest {
 		ScopeMatcher scopeMatcher =
 			chunkScopeMatcherFactory.create("test/everything");
 
-		PrefixHandler namespaceAdder =
-			new DefaultPrefixHandlerFactory().create("test");
+		PrefixHandler namespaceAdder = (target) -> "test/" + target;
 
-		scopeMatcher = scopeMatcher.prepend(namespaceAdder);
+		scopeMatcher = namespaceAdder.prepend(scopeMatcher);
 
 		assertTrue(scopeMatcher.match("everything.readonly"));
 		assertTrue(scopeMatcher.match("everything"));
@@ -93,7 +92,7 @@ public class ChunkScopeMatcherFactoryTest {
 
 		PrefixHandler namespaceAdder = localName -> "test." + localName;
 
-		scopeMatcher = scopeMatcher.prepend(namespaceAdder);
+		scopeMatcher = namespaceAdder.prepend(scopeMatcher);
 
 		assertFalse(scopeMatcher.match("everything.readonly"));
 		assertFalse(scopeMatcher.match("everything"));
@@ -112,7 +111,7 @@ public class ChunkScopeMatcherFactoryTest {
 
 		PrefixHandler namespaceAdder = localName -> "test." + localName;
 
-		scopeMatcher = scopeMatcher.prepend(namespaceAdder);
+		scopeMatcher = namespaceAdder.prepend(scopeMatcher);
 
 		assertTrue(scopeMatcher.match("everything.readonly"));
 		assertTrue(scopeMatcher.match("everything"));
@@ -133,17 +132,19 @@ public class ChunkScopeMatcherFactoryTest {
 
 		PrefixHandler namespaceAdder = localName -> "test." + localName;
 
-		scopeMatcher = scopeMatcher.prepend(namespaceAdder);
+		scopeMatcher = namespaceAdder.prepend(scopeMatcher);
 
-		scopeMatcher = scopeMatcher.withMapper(s -> {
-			switch (s) {
+		ScopeMapper scopeMapper = s -> {
+				switch (s) {
 				case "RW": return Collections.singleton("everything");
 				case "RO": return Collections.singleton("everything.readonly");
 			}
-
+	
 			return Collections.singleton(s);
-		});
-
+		};
+		
+		scopeMatcher = scopeMapper.withMapper(scopeMatcher);
+		
 		assertTrue(scopeMatcher.match("RO"));
 		assertTrue(scopeMatcher.match("RW"));
 
