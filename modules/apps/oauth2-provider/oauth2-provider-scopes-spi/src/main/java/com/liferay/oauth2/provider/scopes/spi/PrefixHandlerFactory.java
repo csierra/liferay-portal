@@ -37,5 +37,5 @@ public interface PrefixHandlerFactory {
 	 *                       {@link PrefixHandler}
 	 * @return the {@link PrefixHandler} for the given {@link PropertyGetter}
 	 */
-	public PrefixHandler mapFrom(PropertyGetter propertyGetter);
+	public PrefixHandler mapFrom(Function<String,Object> serviceProperties);
 }

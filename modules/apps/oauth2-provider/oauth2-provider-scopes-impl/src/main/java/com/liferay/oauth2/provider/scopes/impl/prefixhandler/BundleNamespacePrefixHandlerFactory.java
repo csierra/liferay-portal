@@ -16,7 +16,6 @@ package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
 
 import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
-import com.liferay.oauth2.provider.scopes.spi.PropertyGetter;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -32,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @Component(
 	immediate = true, 
@@ -46,13 +46,13 @@ public class BundleNamespacePrefixHandlerFactory implements PrefixHandlerFactory
 	private String _separator = StringPool.SLASH;
 	
 	@Override
-	public PrefixHandler mapFrom(PropertyGetter propertyGetter) {
+	public PrefixHandler mapFrom(Function<String,Object> serviceProperties) {
 		long bundleId = Long.parseLong(
-			propertyGetter.get("service.bundleid").toString());
+			serviceProperties.apply("service.bundleid").toString());
 
 		Bundle bundle = _bundleContext.getBundle(bundleId);
 
-		Object applicationNameObject = propertyGetter.get("osgi.jaxrs.name");
+		Object applicationNameObject = serviceProperties.apply("osgi.jaxrs.name");
 
 		String applicationName = applicationNameObject.toString();
 

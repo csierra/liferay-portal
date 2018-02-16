@@ -16,14 +16,16 @@ package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
 
 import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
-import com.liferay.oauth2.provider.scopes.spi.PropertyGetter;
+
+import java.util.function.Function;
+
 import org.osgi.service.component.annotations.Component;
 
 @Component(immediate = true)
 public class NullPrefixHandlerFactory implements PrefixHandlerFactory {
 
 	@Override
-	public PrefixHandler mapFrom(PropertyGetter propertyGetter) {
+	public PrefixHandler mapFrom(Function<String,Object>serviceProperties) {
 		return PrefixHandler.NULL_HANDLER;
 	}
 }
