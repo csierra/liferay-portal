@@ -1,8 +1,12 @@
-package com.liferay.oauth2.provider.scopes.spi;
+package com.liferay.oauth2.provider.scopes.scopematcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
+
+import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
+import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
+import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
 
 import aQute.bnd.annotation.ProviderType;
 

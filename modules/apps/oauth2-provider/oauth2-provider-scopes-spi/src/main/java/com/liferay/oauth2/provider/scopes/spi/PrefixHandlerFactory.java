@@ -15,8 +15,11 @@
 package com.liferay.oauth2.provider.scopes.spi;
 
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
 
 /**
  * Interface to create {@link PrefixHandler} using a given prefix.

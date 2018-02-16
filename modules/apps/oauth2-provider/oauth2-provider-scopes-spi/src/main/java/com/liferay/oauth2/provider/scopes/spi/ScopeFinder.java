@@ -6,6 +6,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
+
 /**
  * This class is the entry point to the OAuth2 Scopes framework. Applications
  * will need to register one ScopeFinder, or have one registered on their

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 
 import com.liferay.oauth2.provider.scopes.impl.prefixhandler.DefaultPrefixHandlerFactory;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
+import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
 import org.junit.Test;
 

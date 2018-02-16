@@ -3,6 +3,8 @@ package com.liferay.oauth2.provider.scopes.spi;
 import java.util.Collections;
 import java.util.Set;
 
+import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
+
 public interface ScopeMapper {
 	
 	/**
