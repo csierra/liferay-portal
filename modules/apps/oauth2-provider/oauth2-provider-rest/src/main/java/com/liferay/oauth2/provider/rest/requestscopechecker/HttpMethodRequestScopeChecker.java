@@ -12,10 +12,11 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.requestscopechecker;
+package com.liferay.oauth2.provider.rest.requestscopechecker;
 
+import com.liferay.oauth2.provider.rest.scopechecker.spi.RequestScopeChecker;
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
-import com.liferay.oauth2.provider.scopes.spi.RequestScopeChecker;
+
 import org.osgi.service.component.annotations.Component;
 
 import javax.ws.rs.container.ResourceInfo;

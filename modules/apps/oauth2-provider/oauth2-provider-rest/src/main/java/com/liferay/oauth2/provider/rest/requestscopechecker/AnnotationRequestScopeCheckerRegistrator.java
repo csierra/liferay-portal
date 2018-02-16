@@ -12,9 +12,8 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl.requestscopechecker;
+package com.liferay.oauth2.provider.rest.requestscopechecker;
 
-import com.liferay.oauth2.provider.scopes.spi.RequestScopeChecker;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -27,11 +26,13 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import com.liferay.oauth2.provider.rest.scopechecker.spi.RequestScopeChecker;
+
 import javax.ws.rs.core.Application;
 import java.util.Hashtable;
 
 @Component(immediate = true)
-public class AnnotationRequestScopeCheckerResgistrator {
+public class AnnotationRequestScopeCheckerRegistrator {
 
 	private ServiceTracker<Application, ServiceRegistration<?>>
 		_serviceTracker;
