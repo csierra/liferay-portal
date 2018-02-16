@@ -1,6 +1,6 @@
 package com.liferay.oauth2.provider.rest.scopechecker.spi;
 
-import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
+import com.liferay.oauth2.apps.api.ScopeChecker;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;

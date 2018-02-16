@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.impl;
 
-import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
+import com.liferay.oauth2.apps.api.ScopeChecker;
 
 import java.util.Arrays;
 import java.util.Collection;

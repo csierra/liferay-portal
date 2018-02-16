@@ -1,4 +1,4 @@
-package com.liferay.oauth2.provider.scopes.api;
+package com.liferay.oauth2.apps.api;
 
 import aQute.bnd.annotation.ProviderType;
 
