@@ -66,7 +66,7 @@ public interface PrefixHandler {
 	 * @return the new ScopeMatcher that takes into account the
 	 * {@link PrefixHandler}
 	 */
-	public default ScopeMatcher prepend(ScopeMatcher scopeMatcher) {
+	public default ScopeMatcher applyTo(ScopeMatcher scopeMatcher) {
 		return localName -> scopeMatcher.match(addPrefix(localName));
 	}	
 	

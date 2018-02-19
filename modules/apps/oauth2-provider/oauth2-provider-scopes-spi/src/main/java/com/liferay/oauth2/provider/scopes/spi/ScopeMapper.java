@@ -16,7 +16,7 @@ public interface ScopeMapper {
 	 * @return the new {@link ScopeMatcher} that takes into account the given
 	 * {@link ScopeMapper}.
 	 */
-	public default ScopeMatcher withMapper(ScopeMatcher scopeMatcher) {
+	public default ScopeMatcher applyTo(ScopeMatcher scopeMatcher) {
 		return localName ->
 			map(localName).stream().anyMatch(scopeMatcher::match);
 	}

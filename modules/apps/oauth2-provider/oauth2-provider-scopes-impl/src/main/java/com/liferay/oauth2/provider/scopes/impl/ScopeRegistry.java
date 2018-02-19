@@ -97,12 +97,12 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
 			serviceReference::getProperty);
 
-		scopeMatcher = prefixHandler.prepend(scopeMatcher);
+		scopeMatcher = prefixHandler.applyTo(scopeMatcher);
 
 		ScopeMapper scopeMapper = 
 			_scopedScopeMapper.getService(companyId, name);
 		
-		scopeMatcher = scopeMapper.withMapper(scopeMatcher);
+		scopeMatcher = scopeMapper.applyTo(scopeMatcher);
 
 		ScopeFinder scopeFinder = tuple.getService();
 
