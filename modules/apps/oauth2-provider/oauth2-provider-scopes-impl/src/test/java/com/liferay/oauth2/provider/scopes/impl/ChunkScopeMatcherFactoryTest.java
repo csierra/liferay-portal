@@ -75,7 +75,7 @@ public class ChunkScopeMatcherFactoryTest {
 
 		PrefixHandler namespaceAdder = (target) -> "test/" + target;
 
-		scopeMatcher = namespaceAdder.prepend(scopeMatcher);
+		scopeMatcher = namespaceAdder.applyTo(scopeMatcher);
 
 		assertTrue(scopeMatcher.match("everything.readonly"));
 		assertTrue(scopeMatcher.match("everything"));
@@ -92,7 +92,7 @@ public class ChunkScopeMatcherFactoryTest {
 
 		PrefixHandler namespaceAdder = localName -> "test." + localName;
 
-		scopeMatcher = namespaceAdder.prepend(scopeMatcher);
+		scopeMatcher = namespaceAdder.applyTo(scopeMatcher);
 
 		assertFalse(scopeMatcher.match("everything.readonly"));
 		assertFalse(scopeMatcher.match("everything"));
@@ -111,7 +111,7 @@ public class ChunkScopeMatcherFactoryTest {
 
 		PrefixHandler namespaceAdder = localName -> "test." + localName;
 
-		scopeMatcher = namespaceAdder.prepend(scopeMatcher);
+		scopeMatcher = namespaceAdder.applyTo(scopeMatcher);
 
 		assertTrue(scopeMatcher.match("everything.readonly"));
 		assertTrue(scopeMatcher.match("everything"));
@@ -132,7 +132,7 @@ public class ChunkScopeMatcherFactoryTest {
 
 		PrefixHandler namespaceAdder = localName -> "test." + localName;
 
-		scopeMatcher = namespaceAdder.prepend(scopeMatcher);
+		scopeMatcher = namespaceAdder.applyTo(scopeMatcher);
 
 		ScopeMapper scopeMapper = s -> {
 				switch (s) {
@@ -143,7 +143,7 @@ public class ChunkScopeMatcherFactoryTest {
 			return Collections.singleton(s);
 		};
 		
-		scopeMatcher = scopeMapper.withMapper(scopeMatcher);
+		scopeMatcher = scopeMapper.applyTo(scopeMatcher);
 		
 		assertTrue(scopeMatcher.match("RO"));
 		assertTrue(scopeMatcher.match("RW"));

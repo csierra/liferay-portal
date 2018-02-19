@@ -56,7 +56,7 @@ public class ScopeMatcherTest {
 
 		TestScopeMapper testScopeMapper1 = new TestScopeMapper();
 		
-		scopeMatcher = testScopeMapper1.withMapper(scopeMatcher);
+		scopeMatcher = testScopeMapper1.applyTo(scopeMatcher);
 
 		assertEquals(
 			Arrays.asList("RO"), testScopeFinder.findScopes(scopeMatcher));
@@ -65,7 +65,7 @@ public class ScopeMatcherTest {
 
 		TestScopeMapper testScopeMapper2 = new TestScopeMapper();
 		
-		scopeMatcher = testScopeMapper2.withMapper(scopeMatcher);
+		scopeMatcher = testScopeMapper2.applyTo(scopeMatcher);
 
 		assertEquals(
 			Arrays.asList("RO", "RW"),
@@ -84,7 +84,7 @@ public class ScopeMatcherTest {
 			Arrays.asList("RO"),
 			new ArrayList<>(
 				testScopeFinder.findScopes(
-					namespaceAdder.prepend(scopeMatcher))));
+					namespaceAdder.applyTo(scopeMatcher))));
 
 		scopeMatcher = "TEST/RW"::equals;
 
@@ -92,7 +92,7 @@ public class ScopeMatcherTest {
 			Arrays.asList("RO", "RW"),
 			new ArrayList<>(
 				testScopeFinder.findScopes(
-					namespaceAdder.prepend(scopeMatcher))));
+					namespaceAdder.applyTo(scopeMatcher))));
 	}
 
 	@Test
@@ -109,13 +109,13 @@ public class ScopeMatcherTest {
 
 		assertEquals(
 			Arrays.asList("RO"),
-			testScopeFinder.findScopes(namespaceAdder.prepend(scopeMatcher)));
+			testScopeFinder.findScopes(namespaceAdder.applyTo(scopeMatcher)));
 
 		scopeMatcher = "TEST/NESTED/RW"::equals;
 
 		assertEquals(
 			Arrays.asList("RO", "RW"),
-			testScopeFinder.findScopes(namespaceAdder.prepend(scopeMatcher)));
+			testScopeFinder.findScopes(namespaceAdder.applyTo(scopeMatcher)));
 	}
 
 	@Test
@@ -149,14 +149,14 @@ public class ScopeMatcherTest {
 
 		assertEquals(
 			Arrays.asList("everything", "everything.readonly"),
-			scopeFinder.findScopes(namespaceAdder.prepend(scopeMatcher)));
+			scopeFinder.findScopes(namespaceAdder.applyTo(scopeMatcher)));
 
 		scopeMatcher = new ChunkScopeMatcherFactory().create(
 			"http://www.liferay.com/apio/everything.readonly");
 
 		assertEquals(
 			Arrays.asList("everything.readonly"),
-			scopeFinder.findScopes(namespaceAdder.prepend(scopeMatcher)));
+			scopeFinder.findScopes(namespaceAdder.applyTo(scopeMatcher)));
 	}
 
 	@Test
