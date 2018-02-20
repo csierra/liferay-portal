@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.jsonws;
 
-import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.portal.kernel.log.Log;

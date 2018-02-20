@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.impl.scopematcher;
 
-import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import org.osgi.service.component.annotations.Component;
 

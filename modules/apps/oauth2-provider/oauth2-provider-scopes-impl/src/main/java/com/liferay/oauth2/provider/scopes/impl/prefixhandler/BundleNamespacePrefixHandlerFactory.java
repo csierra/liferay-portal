@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
 
-import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
+import com.liferay.oauth2.provider.scopes.spi.model.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -22,10 +22,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
 import java.util.Arrays;

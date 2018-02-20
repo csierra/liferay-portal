@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.impl.prefixhandler;
 
-import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
+import com.liferay.oauth2.provider.scopes.spi.model.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
 
 import java.util.function.Function;

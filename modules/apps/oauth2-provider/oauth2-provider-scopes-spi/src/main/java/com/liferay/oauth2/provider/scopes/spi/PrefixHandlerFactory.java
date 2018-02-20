@@ -14,9 +14,9 @@
 
 package com.liferay.oauth2.provider.scopes.spi;
 
-import java.util.function.Function;
+import com.liferay.oauth2.provider.scopes.spi.model.PrefixHandler;
 
-import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
+import java.util.function.Function;
 
 /**
  * Interface to create {@link PrefixHandler} using a given prefix.

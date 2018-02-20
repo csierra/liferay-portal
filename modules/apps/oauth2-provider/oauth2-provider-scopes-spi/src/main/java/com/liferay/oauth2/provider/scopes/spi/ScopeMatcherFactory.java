@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.spi;
 
-import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 
 /**
  * Factory that creates {@link ScopeMatcher} for a given input.

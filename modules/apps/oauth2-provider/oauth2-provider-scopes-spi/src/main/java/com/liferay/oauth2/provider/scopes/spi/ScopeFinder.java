@@ -1,12 +1,8 @@
 package com.liferay.oauth2.provider.scopes.spi;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 
-import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
+import java.util.Collection;
 
 /**
  * This class is the entry point to the OAuth2 Scopes framework. Applications

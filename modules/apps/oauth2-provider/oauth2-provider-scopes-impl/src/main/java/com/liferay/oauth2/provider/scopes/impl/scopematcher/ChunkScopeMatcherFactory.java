@@ -14,8 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.impl.scopematcher;
 
-import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
-import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;

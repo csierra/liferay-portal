@@ -14,10 +14,8 @@
 
 package com.liferay.oauth2.provider.scopes.impl.feature;
 
-import com.liferay.oauth2.provider.scopes.impl.scopematcher.ChunkScopeMatcherFactory;
-import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
-import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 
 import java.util.Collection;
 
