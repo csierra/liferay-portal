@@ -48,7 +48,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Component(
 	immediate=true,
-	property = "oauth2.portal.jsonws.application.name=JSONWS"
+	property = "oauth2.portal.jsonws.application.name=JSONWS",
+	service = OAuth2SAPEntryScopesPublisher.class
 )
 public class OAuth2SAPEntryScopesPublisher {
 
@@ -58,15 +59,15 @@ public class OAuth2SAPEntryScopesPublisher {
 
 		_bundleContext = bundleContext;
 
-		_oauth2PortalJSONWSApplicationName = MapUtil.getString(
+		_oAuth2PortalJSONWSApplicationName = MapUtil.getString(
 			properties, "oauth2.portal.jsonws.application.name",
-			_oauth2PortalJSONWSApplicationName);
+			_oAuth2PortalJSONWSApplicationName);
 
 		Dictionary<String, Object> applicationDescriptorProperties =
 			new Hashtable<>();
 
 		applicationDescriptorProperties.put(
-			"osgi.jaxrs.name", _oauth2PortalJSONWSApplicationName);
+			"osgi.jaxrs.name", _oAuth2PortalJSONWSApplicationName);
 
 		_serviceRegistrations.add(
 			bundleContext.registerService(
@@ -101,7 +102,7 @@ public class OAuth2SAPEntryScopesPublisher {
 
 		String key =
 			"oauth2.application.description." +
-				_oauth2PortalJSONWSApplicationName;
+			_oAuth2PortalJSONWSApplicationName;
 
 		return resourceBundle.getString(key);
 	}
@@ -119,6 +120,10 @@ public class OAuth2SAPEntryScopesPublisher {
 		}
 	}
 
+	public String getOAuth2PortalJSONWSApplicationName() {
+		return _oAuth2PortalJSONWSApplicationName;
+	}
+
 	protected void registerSAPEntries(long companyId) {
 		List<SAPEntry> sapEntries =
 			_sapEntryLocalService.getCompanySAPEntries(
@@ -132,7 +137,7 @@ public class OAuth2SAPEntryScopesPublisher {
 	protected void registerSAPEntryScopeDescriptorFinder(long companyId) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 
-		properties.put("osgi.jaxrs.name", _oauth2PortalJSONWSApplicationName);
+		properties.put("osgi.jaxrs.name", _oAuth2PortalJSONWSApplicationName);
 		properties.put("companyId", String.valueOf(companyId));
 
 		_serviceRegistrations.add(
@@ -161,7 +166,7 @@ public class OAuth2SAPEntryScopesPublisher {
 	@Reference
 	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
 
-	private String _oauth2PortalJSONWSApplicationName = "JSONWS";
+	private String _oAuth2PortalJSONWSApplicationName = "JSONWS";
 
 	private List<ServiceRegistration> _serviceRegistrations =
 		new CopyOnWriteArrayList<>();

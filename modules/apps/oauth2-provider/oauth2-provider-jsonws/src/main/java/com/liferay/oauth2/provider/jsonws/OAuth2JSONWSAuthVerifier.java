@@ -106,10 +106,15 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 			Set<String> scopeNames = new HashSet<>();
 
+			String auth2PortalJSONWSApplicationName =
+				_oAuth2SAPEntryScopesPublisher.
+					getOAuth2PortalJSONWSApplicationName();
+
 			for (String accessTokenScope : accessToken.getScopes()) {
 				Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
 					_scopeFinderLocator.locateScopesForApplication(
-						companyId, accessTokenScope, "JSONWS");
+						companyId, accessTokenScope,
+						auth2PortalJSONWSApplicationName);
 				
 				for (LiferayOAuth2Scope liferayOAuth2Scope :
 					liferayOAuth2Scopes) {
@@ -232,6 +237,9 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 	@Reference
 	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
+
+	@Reference
+	private OAuth2SAPEntryScopesPublisher _oAuth2SAPEntryScopesPublisher;
 
 	private ScopedServiceTrackerMap<BearerTokenProvider>
 		_scopedBearerTokenProvider;
