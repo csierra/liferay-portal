@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest.tokenprovider;
 
-import com.liferay.oauth2.provider.rest.tokenprovider.spi.BearerTokenProvider;
+import com.liferay.oauth2.provider.rest.spi.BearerTokenProvider;
 import com.liferay.portal.kernel.util.MapUtil;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.osgi.service.component.annotations.Activate;

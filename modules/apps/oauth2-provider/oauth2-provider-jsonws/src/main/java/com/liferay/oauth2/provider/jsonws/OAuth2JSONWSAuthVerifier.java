@@ -18,7 +18,7 @@ import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
 import com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2Token;
-import com.liferay.oauth2.provider.rest.tokenprovider.spi.BearerTokenProvider;
+import com.liferay.oauth2.provider.rest.spi.BearerTokenProvider;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;

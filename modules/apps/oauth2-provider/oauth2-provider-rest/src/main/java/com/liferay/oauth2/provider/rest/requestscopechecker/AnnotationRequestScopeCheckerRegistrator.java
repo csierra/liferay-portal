@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.liferay.oauth2.provider.rest.scopechecker.spi.RequestScopeChecker;
+import com.liferay.oauth2.provider.rest.spi.RequestScopeChecker;
 
 import javax.ws.rs.core.Application;
 import java.util.Hashtable;

@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest;
 
-import com.liferay.oauth2.provider.rest.tokenprovider.spi.BearerTokenProvider;
+import com.liferay.oauth2.provider.rest.spi.BearerTokenProvider;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;

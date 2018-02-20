@@ -20,7 +20,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
 
 import com.liferay.oauth2.provider.rest.requestscopechecker.HttpMethodRequestScopeChecker;
-import com.liferay.oauth2.provider.rest.scopechecker.spi.RequestScopeChecker;
+import com.liferay.oauth2.provider.rest.spi.RequestScopeChecker;
 
 import org.junit.Before;
 import org.junit.Test;

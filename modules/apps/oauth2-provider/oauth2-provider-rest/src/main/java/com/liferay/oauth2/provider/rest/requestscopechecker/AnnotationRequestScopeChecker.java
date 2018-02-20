@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest.requestscopechecker;
 
-import com.liferay.oauth2.provider.rest.scopechecker.spi.RequestScopeChecker;
+import com.liferay.oauth2.provider.rest.spi.RequestScopeChecker;
 import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 import com.liferay.portal.kernel.util.MapUtil;
