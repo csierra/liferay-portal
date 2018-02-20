@@ -164,6 +164,6 @@ public class OAuth2SAPEntryScopesPublisher {
 	private String _oauth2PortalJSONWSApplicationName = "JSONWS";
 
 	private List<ServiceRegistration> _serviceRegistrations =
-		new CopyOnWriteArrayList();
+		new CopyOnWriteArrayList<>();
 
 }

@@ -95,6 +95,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	@Activate
+	@SuppressWarnings("unchecked")
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
@@ -678,7 +679,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			refreshToken.setAccessTokens(accessTokens);
 			refreshToken.setScopes(
 				convertScopeToPermissions(
-					refreshToken.getClient(), new ArrayList(scopes)));
+					refreshToken.getClient(), new ArrayList<>(scopes)));
 
 			refreshToken.getExtraProperties().put(
 				"companyId", Long.toString(oAuth2RefreshToken.getCompanyId()));
