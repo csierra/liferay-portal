@@ -1,6 +1,5 @@
 package com.liferay.oauth2.provider.scopes.scopematcher;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
