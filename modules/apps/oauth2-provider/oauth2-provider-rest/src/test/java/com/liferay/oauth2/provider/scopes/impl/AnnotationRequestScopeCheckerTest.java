@@ -15,8 +15,8 @@
 package com.liferay.oauth2.provider.scopes.impl;
 
 import com.liferay.oauth2.provider.rest.requestscopechecker.AnnotationRequestScopeChecker;
-import com.liferay.oauth2.apps.api.RequiresScope;
 
+import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

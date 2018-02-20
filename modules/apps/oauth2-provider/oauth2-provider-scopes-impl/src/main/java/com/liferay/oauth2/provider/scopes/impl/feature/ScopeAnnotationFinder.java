@@ -14,13 +14,12 @@
 
 package com.liferay.oauth2.provider.scopes.impl.feature;
 
+import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
-
-import com.liferay.oauth2.apps.api.RequiresScope;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

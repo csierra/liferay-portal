@@ -1,35 +1,44 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
 
-package com.liferay.oauth2.provider.scopes.impl;
+package com.liferay.oauth2.provider.scopes.api;
 
-import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
+import aQute.bnd.annotation.ProviderType;
 
-import java.util.Arrays;
-import java.util.Collection;
+@ProviderType
+public interface ScopeChecker {
 
-public class TestScopeChecker implements ScopeChecker {
+	public boolean hasScope(String scope);
 
-	private Collection<String> _allowedScopes;
+	public default boolean hasAllScopes(String ... scopes) {
+		for (String scope : scopes) {
+			if (!hasScope(scope)) {
+				return false;
+			}
+		}
 
-	public TestScopeChecker(String ... allowedScopes) {
-		_allowedScopes = Arrays.asList(allowedScopes);
+		return true;
 	}
 
-	@Override
-	public boolean hasScope(String scope) {
-		return _allowedScopes.contains(scope);
+	public default boolean hasAnyScope(String ... scopes) {
+		for (String scope : scopes) {
+			if (hasScope(scope)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

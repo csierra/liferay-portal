@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
-import com.liferay.oauth2.apps.api.RequiresScope;
+import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 import com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope;
 
 import java.util.Collection;
