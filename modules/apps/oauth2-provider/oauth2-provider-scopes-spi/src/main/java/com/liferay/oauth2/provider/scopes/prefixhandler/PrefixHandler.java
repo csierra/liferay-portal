@@ -26,18 +26,6 @@ import java.util.Collection;
  */
 public interface PrefixHandler {
 
-	public static PrefixHandler merge(
-		Collection<PrefixHandler> namespaceAdders) {
-
-		PrefixHandler namespaceAdder = NULL_HANDLER;
-
-		for (PrefixHandler na : namespaceAdders) {
-			namespaceAdder = namespaceAdder.append(na);
-		}
-
-		return namespaceAdder;
-	}
-
 	/**
 	 * Adds the prefix to a given input.
 	 * @param input String to be prefixed.
