@@ -18,9 +18,9 @@ import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeMatcherFactoryLocator;
+import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
-import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
@@ -72,7 +72,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		long companyId = company.getCompanyId();
 
 		Collection<String> externalAliases =
-			_scopeFinderLocator.listAliases(companyId);
+			_scopeFinderLocator.listScopesAliases(companyId);
 
 		Map<String, Set<String>> implicationMap = _buildImplicationMap(
 			companyId, externalAliases);

@@ -18,8 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
+import com.liferay.oauth2.apps.api.RequiresScope;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 
 import java.util.Collection;
 import java.util.Set;
@@ -77,7 +77,7 @@ public class Test extends Application {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
 		Collection<LiferayOAuth2Scope> scopes =
-			_scopeFinderLocator.listAliases(companyId).stream().flatMap(
+			_scopeFinderLocator.listScopesAliases(companyId).stream().flatMap(
 				s -> _scopeFinderLocator.locateScopes(companyId, s).stream()
 			).collect(
 				Collectors.toList()

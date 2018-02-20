@@ -19,11 +19,11 @@ import com.liferay.oauth2.provider.scopes.impl.model.LiferayOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeMatcherFactoryLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
+import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
-import com.liferay.oauth2.provider.scopes.spi.ScopeMatcher;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandler;
-import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerMapper;
+import com.liferay.oauth2.provider.scopes.spi.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
@@ -91,16 +91,18 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		ServiceReference<?> serviceReference = tuple.getServiceReference();
 
-		PrefixHandlerMapper prefixHandlerMapper =
-			_scopedPrefixHandlerMappers.getService(companyId, name);
+		PrefixHandlerFactory prefixHandlerMapper =
+			_scopedPrefixHandlerFactories.getService(companyId, name);
 
 		PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
 			serviceReference::getProperty);
 
-		scopeMatcher = scopeMatcher.prepend(prefixHandler);
+		scopeMatcher = prefixHandler.applyTo(scopeMatcher);
 
-		scopeMatcher = scopeMatcher.withMapper(
-			_scopedScopeMapper.getService(companyId, name));
+		ScopeMapper scopeMapper = 
+			_scopedScopeMapper.getService(companyId, name);
+		
+		scopeMatcher = scopeMapper.applyTo(scopeMatcher);
 
 		ScopeFinder scopeFinder = tuple.getService();
 
@@ -118,24 +120,24 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		return grants;
 	}
 
-	private ScopedServiceTrackerMap<PrefixHandlerMapper>
-		_scopedPrefixHandlerMappers;
+	private ScopedServiceTrackerMap<PrefixHandlerFactory>
+		_scopedPrefixHandlerFactories;
 	private ScopedServiceTrackerMap<ScopeMapper>
 		_scopedScopeMapper;
 
-	private Collection<String> _doListAliases(long companyId) {
+	private Collection<String> _doListScopesAliases(long companyId) {
 		Collection<String> scopes = new HashSet<>();
 
 		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
 
 		for (String name : names) {
-			scopes.addAll(listAliasesForApplication(companyId, name));
+			scopes.addAll(listScopesAliasesForApplication(companyId, name));
 		}
 
 		return scopes;
 	}
 
-	private Collection<String> _doListAliasesForApplication(
+	private Collection<String> _doListScopesAliasesForApplication(
 		long companyId, String applicationName) {
 
 		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
@@ -155,10 +157,10 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		Collection<String> availableScopes = scopeFinder.findScopes(
 			ScopeMatcher.ALL);
 
-		PrefixHandlerMapper prefixHandlerMapper =
-			_scopedPrefixHandlerMappers.getService(companyId, applicationName);
+		PrefixHandlerFactory prefixHandlerFactory =
+			_scopedPrefixHandlerFactories.getService(companyId, applicationName);
 
-		PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
+		PrefixHandler prefixHandler = prefixHandlerFactory.mapFrom(
 			serviceReference::getProperty);
 
 		ScopeMapper scopeMapper =
@@ -189,9 +191,9 @@ public class ScopeRegistry implements ScopeFinderLocator {
 					bundleContext), Comparator.naturalOrder(),
 				new CacheClearServiceTrackerMapListener());
 
-		_scopedPrefixHandlerMappers = new ScopedServiceTrackerMap<>(
-			bundleContext, PrefixHandlerMapper.class, "osgi.jaxrs.name",
-			() -> _defaultPrefixHandlerMapper, _invocationCache::clear);
+		_scopedPrefixHandlerFactories = new ScopedServiceTrackerMap<>(
+			bundleContext, PrefixHandlerFactory.class, "osgi.jaxrs.name",
+			() -> _defaultPrefixHandlerFactory, _invocationCache::clear);
 
 		_scopedScopeMapper = new ScopedServiceTrackerMap<>(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
@@ -201,7 +203,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	@Deactivate
 	protected void deactivate() {
 		_scopeFinderByNameServiceTrackerMap.close();
-		_scopedPrefixHandlerMappers.close();
+		_scopedPrefixHandlerFactories.close();
 		_scopedScopeMapper.close();
 	}
 
@@ -209,7 +211,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		target = "(default=true)",
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private PrefixHandlerMapper _defaultPrefixHandlerMapper;
+	private PrefixHandlerFactory _defaultPrefixHandlerFactory;
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
@@ -243,20 +245,20 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	}
 
 	@Override
-	public Collection<String> listAliases(long companyId) {
+	public Collection<String> listScopesAliases(long companyId) {
 		return (Collection<String>)
 			_invocationCache.computeIfAbsent(
-				"listAliases" + companyId, __ -> this._doListAliases(companyId));
+				"listAliases" + companyId, __ -> this._doListScopesAliases(companyId));
 	}
 
 	@Override
-	public Collection<String> listAliasesForApplication(
+	public Collection<String> listScopesAliasesForApplication(
 
 		long companyId, String applicationName) {
 		return (Collection<String>)
 			_invocationCache.computeIfAbsent(
 				"listAliases" + companyId + applicationName,
-				__ -> this._doListAliasesForApplication(
+				__ -> this._doListScopesAliasesForApplication(
 					companyId, applicationName));
 	}
 

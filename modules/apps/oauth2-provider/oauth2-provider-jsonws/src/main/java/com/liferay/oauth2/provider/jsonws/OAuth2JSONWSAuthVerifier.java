@@ -18,9 +18,9 @@ import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
 import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2Token;
+import com.liferay.oauth2.provider.rest.tokenprovider.spi.BearerTokenProvider;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
-import com.liferay.oauth2.provider.scopes.spi.BearerTokenProvider;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2TokenLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -108,18 +108,14 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 			for (String accessTokenScope : accessToken.getScopes()) {
 				Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
-					_scopeFinderLocator.locateScopes(
-						companyId, accessTokenScope);
-
+					_scopeFinderLocator.locateScopesForApplication(
+						companyId, accessTokenScope, "JSONWS");
+				
 				for (LiferayOAuth2Scope liferayOAuth2Scope :
 					liferayOAuth2Scopes) {
 
-					if (liferayOAuth2Scope.getBundle().equals(
-						_bundleContext.getBundle())) {
-
-						scopeNames.add(liferayOAuth2Scope.getScope());
-					}
-				}
+					scopeNames.add(liferayOAuth2Scope.getScope());
+				}				
 			}
 
 			List<SAPEntryScope> sapEntryScopes =

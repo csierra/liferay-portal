@@ -38,8 +38,14 @@ public class DefaultHTTPVerbsScopeMapper implements ScopeMapper {
 			case "OPTIONS":
 				result.add("everything.readonly");
 				break;
-			default:
+			case "PUT":
+			case "POST":
+			case "PATCH":
+			case "DELETE":
 				result.add("everything");
+				break;
+			default:
+				result.add(scope);
 				break;
 		}
 

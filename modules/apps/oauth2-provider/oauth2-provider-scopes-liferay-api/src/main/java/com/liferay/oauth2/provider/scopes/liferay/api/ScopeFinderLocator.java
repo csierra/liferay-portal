@@ -19,7 +19,7 @@ public interface ScopeFinderLocator {
 	 * scope name
 	 */
 	Collection<LiferayOAuth2Scope> locateScopes(
-		long companyId, String scope);
+		long companyId, String scopesAlias);
 
 	/**
 	 * Given a company and a scope name returns a collection of matching
@@ -30,7 +30,7 @@ public interface ScopeFinderLocator {
 	 * scope name
 	 */
 	Collection<LiferayOAuth2Scope> locateScopesForApplication(
-		long companyId, String applicationName, String scope);
+		long companyId, String scopesAlias, String applicationName);
 
 	/**
 	 * Returns a list of the scope names that would be a match if
@@ -39,9 +39,9 @@ public interface ScopeFinderLocator {
 	 * @return a collection of scope names that would be a match for the
 	 * company.
 	 */
-	Collection<String> listAliases(long companyId);
+	Collection<String> listScopesAliases(long companyId);
 
-	Collection<String> listAliasesForApplication(
+	Collection<String> listScopesAliasesForApplication(
 		long companyId, String applicationName);
 
 	/*Map<String, Set<String>> describeScopes(
