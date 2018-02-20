@@ -15,28 +15,18 @@
 package com.liferay.oauth2.provider.rest.requestscopechecker;
 
 import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
+import com.liferay.oauth2.provider.scopes.api.RequiresNoScope;
 import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
-import com.liferay.portal.kernel.util.MapUtil;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 @Component(service = AnnotationRequestScopeChecker.class)
 public class AnnotationRequestScopeChecker
 	implements RequestScopeCheckerFilter {
-
-	private boolean _defaultReturn;
-
-	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_defaultReturn = MapUtil.getBoolean(
-			properties, "default.return", false);
-	}
 
 	@Override
 	public boolean isAllowed(
@@ -44,10 +34,24 @@ public class AnnotationRequestScopeChecker
 
 		Method method = resourceInfo.getResourceMethod();
 
+		RequiresNoScope requiresNoScope = method.getAnnotation(
+			RequiresNoScope.class);
+
+		if (requiresNoScope != null) {
+			return true;
+		}
+
 		RequiresScope annotation = method.getAnnotation(RequiresScope.class);
 
 		if (annotation == null) {
 			Class<?> resourceClass = resourceInfo.getResourceClass();
+
+			requiresNoScope = resourceClass.getAnnotation(
+				RequiresNoScope.class);
+
+			if (requiresNoScope != null) {
+				return true;
+			}
 
 			annotation = resourceClass.getAnnotation(RequiresScope.class);
 		}
@@ -61,7 +65,7 @@ public class AnnotationRequestScopeChecker
 			}
 		}
 
-		return _defaultReturn;
+		return false;
 	}
 
 }
