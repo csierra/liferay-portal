@@ -26,6 +26,6 @@ public class NullPrefixHandlerFactory implements PrefixHandlerFactory {
 
 	@Override
 	public PrefixHandler mapFrom(Function<String,Object>serviceProperties) {
-		return PrefixHandler.NULL_HANDLER;
+		return PrefixHandler.PASSTHROUGH_PREFIXHANDLER;
 	}
 }

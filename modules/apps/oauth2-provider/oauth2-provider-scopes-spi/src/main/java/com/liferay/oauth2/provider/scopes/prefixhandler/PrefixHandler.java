@@ -15,9 +15,6 @@
 package com.liferay.oauth2.provider.scopes.prefixhandler;
 
 import com.liferay.oauth2.provider.scopes.scopematcher.ScopeMatcher;
-import com.liferay.portal.kernel.util.StringPool;
-
-import java.util.Collection;
 
 /**
  * Interface that represents a prefix for the input scopes. This abstraction
@@ -49,7 +46,7 @@ public interface PrefixHandler {
 	 * of the given {@link PrefixHandler}. Some implementations might have
 	 * optimization opportunities.
 	 *
-	 * @param ScopeMatcher the scope matcher which should take into account 
+	 * @param scopeMatcher the scope matcher which should take into account
 	 * this prefix handler.
 	 * @return the new ScopeMatcher that takes into account the
 	 * {@link PrefixHandler}
@@ -59,9 +56,9 @@ public interface PrefixHandler {
 	}	
 	
 	/**
-	 * A {@link PrefixHandler} that does nothing.
+	 * A {@link PrefixHandler} that keeps the input unchanged.
 	 */
-	static PrefixHandler NULL_HANDLER = new PrefixHandler() {
+	static PrefixHandler PASSTHROUGH_PREFIXHANDLER = new PrefixHandler() {
 
 		@Override
 		public String addPrefix(String input) {
@@ -73,7 +70,9 @@ public interface PrefixHandler {
 			return prefixHandler;
 		}
 
+		@Override
+		public ScopeMatcher applyTo(ScopeMatcher scopeMatcher) {
+			return scopeMatcher;
+		}
 	};
-
-
 }
