@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.scopes.impl;
 
 import com.liferay.oauth2.provider.scopes.impl.scopematcher.ChunkScopeMatcherFactory;
+import com.liferay.oauth2.provider.scopes.impl.scopematcher.StrictScopeMatcherFactory;
 import com.liferay.oauth2.provider.scopes.spi.model.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
@@ -52,7 +53,10 @@ public class ScopeMatcherTest {
 	public void testFindScopesWithMapper() {
 		ScopeFinder testScopeFinder = new TestHierarchyScopeFinder();
 
-		ScopeMatcher scopeMatcher = ScopeMatcherFactory.STRICT.create("RO2");
+		ScopeMatcherFactory strictScopeMatcherFactory
+			= new StrictScopeMatcherFactory();
+
+		ScopeMatcher scopeMatcher = strictScopeMatcherFactory.create("RO2");
 
 		TestScopeMapper testScopeMapper1 = new TestScopeMapper();
 		
@@ -61,7 +65,7 @@ public class ScopeMatcherTest {
 		assertEquals(
 			Arrays.asList("RO"), testScopeFinder.findScopes(scopeMatcher));
 
-		scopeMatcher = ScopeMatcherFactory.STRICT.create("RW2");
+		scopeMatcher = strictScopeMatcherFactory.create("RW2");
 
 		TestScopeMapper testScopeMapper2 = new TestScopeMapper();
 		
