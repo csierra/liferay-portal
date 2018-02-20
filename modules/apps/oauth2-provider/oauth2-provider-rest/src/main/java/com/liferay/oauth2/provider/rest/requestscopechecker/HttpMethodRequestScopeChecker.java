@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest.requestscopechecker;
 
-import com.liferay.oauth2.provider.rest.spi.RequestScopeChecker;
+import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
 
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 import org.osgi.service.component.annotations.Component;
@@ -26,7 +26,8 @@ import javax.ws.rs.core.Request;
 	immediate = true,
 	property = "default=true"
 )
-public class HttpMethodRequestScopeChecker implements RequestScopeChecker {
+public class HttpMethodRequestScopeChecker
+	implements RequestScopeCheckerFilter {
 
 	@Override
 	public boolean isAllowed(

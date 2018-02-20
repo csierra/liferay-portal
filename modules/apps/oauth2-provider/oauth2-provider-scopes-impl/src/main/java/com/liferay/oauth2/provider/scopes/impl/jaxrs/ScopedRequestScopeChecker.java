@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.impl.jaxrs;
 
-import com.liferay.oauth2.provider.rest.spi.RequestScopeChecker;
+import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -34,17 +34,17 @@ import java.util.function.Supplier;
 
 public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 
-	private final ScopedServiceTrackerMap<RequestScopeChecker>
+	private final ScopedServiceTrackerMap<RequestScopeCheckerFilter>
 		_scopedServiceTrackerMap;
 	private ScopeChecker _scopeChecker;
 
 	public ScopedRequestScopeChecker(
 		BundleContext bundleContext, ScopeChecker scopeChecker,
-		Supplier<RequestScopeChecker> defaultRequestScopeCheckerSupplier) {
+		Supplier<RequestScopeCheckerFilter> defaultRequestScopeCheckerSupplier) {
 
 		_scopeChecker = scopeChecker;
 		_scopedServiceTrackerMap = new ScopedServiceTrackerMap<>(
-			bundleContext, RequestScopeChecker.class, "osgi.jaxrs.name",
+			bundleContext, RequestScopeCheckerFilter.class, "osgi.jaxrs.name",
 			defaultRequestScopeCheckerSupplier);
 	}
 
@@ -57,7 +57,7 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 
 			Class<? extends Application> clazz = _application.getClass();
 
-			RequestScopeChecker requestScopeChecker =
+			RequestScopeCheckerFilter requestScopeChecker =
 				_scopedServiceTrackerMap.getService(
 					company.getCompanyId(), clazz.getName());
 

@@ -17,7 +17,7 @@ package com.liferay.oauth2.provider.scopes.impl.feature;
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 import com.liferay.oauth2.provider.scopes.impl.jaxrs.CompanyRetrieverContainerRequestFilter;
 import com.liferay.oauth2.provider.scopes.impl.jaxrs.RunnableExecutorContainerResponseFilter;
-import com.liferay.oauth2.provider.rest.spi.RequestScopeChecker;
+import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
 import com.liferay.oauth2.provider.scopes.impl.jaxrs.ScopedRequestScopeChecker;
 import com.liferay.oauth2.provider.scopes.spi.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scopes.spi.ScopeDescriptor;
@@ -392,7 +392,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		policyOption = ReferencePolicyOption.GREEDY,
 		target = "(default=true)"
 	)
-	private RequestScopeChecker defaultRequestScopeChecker;
+	private RequestScopeCheckerFilter defaultRequestScopeChecker;
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,

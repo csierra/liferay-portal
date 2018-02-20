@@ -20,7 +20,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
 
 import com.liferay.oauth2.provider.rest.requestscopechecker.HttpMethodRequestScopeChecker;
-import com.liferay.oauth2.provider.rest.spi.RequestScopeChecker;
+import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -59,5 +59,5 @@ public class HttpMethodRequestScopeCheckerTest extends PowerMockito {
 	}
 
 	protected ResourceInfo resourceInfo;
-	protected RequestScopeChecker methodAllowedChecker;
+	protected RequestScopeCheckerFilter methodAllowedChecker;
 }

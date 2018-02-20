@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest.requestscopechecker;
 
-import com.liferay.oauth2.provider.rest.spi.RequestScopeChecker;
+import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
 import com.liferay.oauth2.provider.scopes.api.RequiresScope;
 import com.liferay.oauth2.provider.scopes.api.ScopeChecker;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -27,7 +27,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 @Component(service = AnnotationRequestScopeChecker.class)
-public class AnnotationRequestScopeChecker implements RequestScopeChecker {
+public class AnnotationRequestScopeChecker
+	implements RequestScopeCheckerFilter {
 
 	private boolean _defaultReturn;
 
