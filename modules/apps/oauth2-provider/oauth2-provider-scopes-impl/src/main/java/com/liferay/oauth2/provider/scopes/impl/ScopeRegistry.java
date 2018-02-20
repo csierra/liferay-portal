@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
 import org.osgi.framework.Bundle;
@@ -227,39 +228,49 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	public Collection<LiferayOAuth2Scope> locateScopes(
 		long companyId, String scope) {
 
-		return (Collection<LiferayOAuth2Scope>)
-			_invocationCache.computeIfAbsent(
-				"locateScopes" + companyId + scope,
-				__ -> this._doLocateScopes(companyId, scope));
+		return readFromCache("locateScopes" + companyId + scope,
+			__ -> this._doLocateScopes(companyId, scope));
 	}
 
 	@Override
 	public Collection<LiferayOAuth2Scope> locateScopesForApplication(
 		long companyId, String applicationName, String scope) {
 
-		return (Collection<LiferayOAuth2Scope>)
-			_invocationCache.computeIfAbsent(
-				"locateScopes" + companyId + applicationName + scope,
-				__ -> this._doLocateScopesForApplication(
-					companyId, applicationName, scope));
+		return readFromCache(
+			"locateScopes" + companyId + applicationName + scope,
+			__ -> this._doLocateScopesForApplication(
+				companyId, applicationName, scope));
 	}
 
 	@Override
 	public Collection<String> listScopesAliases(long companyId) {
-		return (Collection<String>)
-			_invocationCache.computeIfAbsent(
-				"listAliases" + companyId, __ -> this._doListScopesAliases(companyId));
+		return readFromCache(
+			"listAliases" + companyId,
+			__ -> this._doListScopesAliases(companyId));
 	}
 
 	@Override
 	public Collection<String> listScopesAliasesForApplication(
-
 		long companyId, String applicationName) {
-		return (Collection<String>)
-			_invocationCache.computeIfAbsent(
-				"listAliases" + companyId + applicationName,
-				__ -> this._doListScopesAliasesForApplication(
-					companyId, applicationName));
+
+		return readFromCache(
+			"listAliases" + companyId + applicationName,
+			__ -> this._doListScopesAliasesForApplication(
+				companyId, applicationName));
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> T readFromCache(
+		String key, Function<String, T> mappingFunction) {
+
+		T value = (T) _invocationCache.get(key);
+
+		if (value == null) {
+			value = mappingFunction.apply(key);
+			_invocationCache.put(key, value);
+		}
+
+		return value;
 	}
 
 	private static class ScopeFinderServiceTupleServiceTrackerCustomizer
