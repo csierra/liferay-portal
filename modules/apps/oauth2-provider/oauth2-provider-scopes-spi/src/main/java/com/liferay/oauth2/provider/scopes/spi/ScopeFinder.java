@@ -39,36 +39,4 @@ public interface ScopeFinder {
 	 * will associate with the given {@link ScopeMatcher}.
 	 */
 	public Collection<String> findScopes(ScopeMatcher scopeMatcher);
-
-	static ScopeFinder empty(ScopeMatcher matcher) {
-		return __ -> Collections.emptyList();
-	}
-
-	/**
-	 * Default implementation that creates a matcher using the factory returned
-	 * by {@link ScopeFinder#getDefaultScopeMatcherFactory()}
-	 *
-	 * @param scope the incoming query to match against.
-	 * @return a collection of the available scopes that the implementation
-	 * will associate with the given incoming scope.
-	 */
-	public default Collection<String> findScopes(String scope) {
-		ScopeMatcherFactory scopeMatcherFactory =
-			getDefaultScopeMatcherFactory();
-
-		return findScopes(scopeMatcherFactory.create(scope));
-	}
-
-	/**
-	 * Returns the preferred {@link ScopeMatcherFactory} for this particular
-	 * {@link ScopeFinder} implementation. The framework will likely change
-	 * this implementation in order to accomodate the scope resolution to
-	 * different strategies.
-	 * @return the preferred {@link ScopeMatcherFactory} for a given
-	 * implementations. Defaults to {@link ScopeMatcherFactory#STRICT}.
-	 */
-	public default ScopeMatcherFactory getDefaultScopeMatcherFactory() {
-		return ScopeMatcherFactory.STRICT;
-	}
-
 }

@@ -33,9 +33,4 @@ class ScopeListScopeFinder implements ScopeFinder {
 	public Collection<String> findScopes(ScopeMatcher scopeMatcher) {
 		return scopeMatcher.filter(_scopes);
 	}
-
-	@Override
-	public ScopeMatcherFactory getDefaultScopeMatcherFactory() {
-		return new ChunkScopeMatcherFactory();
-	}
 }
