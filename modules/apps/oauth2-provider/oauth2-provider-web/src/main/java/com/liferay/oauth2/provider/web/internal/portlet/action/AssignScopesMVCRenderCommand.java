@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeMatcherFactoryLocator;

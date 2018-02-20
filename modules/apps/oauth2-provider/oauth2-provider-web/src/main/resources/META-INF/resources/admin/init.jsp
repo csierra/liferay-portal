@@ -15,7 +15,7 @@
 --%>
 <%@ include file="/init.jsp" %>
 <%@ page import="com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException" %><%@
-page import="com.liferay.oauth2.provider.model.LiferayOAuth2Scope" %><%@
+page import="com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope" %><%@
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel"%><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext" %><%@

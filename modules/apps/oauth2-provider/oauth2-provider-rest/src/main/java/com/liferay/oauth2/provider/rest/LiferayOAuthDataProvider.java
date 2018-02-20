@@ -19,9 +19,8 @@ import com.liferay.oauth2.provider.configuration.OAuth2ClientCredentialsGrantCon
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.configuration.OAuth2RefreshTokenGrantConfiguration;
 import com.liferay.oauth2.provider.configuration.OAuth2ResourceOwnerGrantConfiguration;
-import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2Token;

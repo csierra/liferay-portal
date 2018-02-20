@@ -15,7 +15,7 @@
 package com.liferay.oauth2.provider.jsonws;
 
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.rest.tokenprovider.spi.BearerTokenProvider;

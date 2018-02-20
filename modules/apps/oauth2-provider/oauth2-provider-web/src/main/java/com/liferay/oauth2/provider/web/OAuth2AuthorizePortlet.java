@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.web;
 
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import java.io.IOException;
 import java.util.Collection;

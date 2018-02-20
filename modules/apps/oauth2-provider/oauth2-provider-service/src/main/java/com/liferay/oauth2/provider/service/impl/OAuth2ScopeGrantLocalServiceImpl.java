@@ -15,18 +15,16 @@
 package com.liferay.oauth2.provider.service.impl;
 
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.model.OAuth2Token;
+import com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.service.base.OAuth2ScopeGrantLocalServiceBaseImpl;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 
 /**
  * The implementation of the o auth2 scope grant local service.

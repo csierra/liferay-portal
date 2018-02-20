@@ -1,7 +1,5 @@
 package com.liferay.oauth2.provider.scopes.liferay.api;
 
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
-
 import java.util.Collection;
 
 /**

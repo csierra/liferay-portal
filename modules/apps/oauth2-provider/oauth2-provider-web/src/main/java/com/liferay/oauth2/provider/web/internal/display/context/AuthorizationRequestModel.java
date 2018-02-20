@@ -1,17 +1,12 @@
 package com.liferay.oauth2.provider.web.internal.display.context;
 
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.liferay.oauth2.provider.model.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.util.ParamUtil;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Stian Sigvartsen
