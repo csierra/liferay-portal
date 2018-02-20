@@ -14,10 +14,7 @@
 
 package com.liferay.oauth2.provider.scopes.spi;
 
-import java.util.Arrays;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.liferay.oauth2.provider.scopes.prefixhandler.PrefixHandler;
 
@@ -31,11 +28,9 @@ public interface PrefixHandlerFactory {
 
 	/**
 	 * This method allows to create a {@link PrefixHandler} using the properties
-	 * in the {@link PropertyGetter}
 	 *
-	 * @param propertyGetter the {@link PropertyGetter} to configure the
-	 *                       {@link PrefixHandler}
-	 * @return the {@link PrefixHandler} for the given {@link PropertyGetter}
+	 * @param propertyAccessor to configure the {@link PrefixHandler} from
+	 * @return the {@link PrefixHandler} initialized from the given properties
 	 */
-	public PrefixHandler mapFrom(Function<String,Object> serviceProperties);
+	public PrefixHandler mapFrom(Function<String, Object> propertyAccessor);
 }
