@@ -197,7 +197,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		_scopedScopeMapper = new ScopedServiceTrackerMap<>(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
-			() -> ScopeMapper.NULL, _invocationCache::clear);
+			() -> ScopeMapper.PASSTHROUGH_SCOPEMAPPER, _invocationCache::clear);
 	}
 
 	@Deactivate

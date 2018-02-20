@@ -20,9 +20,16 @@ public interface ScopeMapper {
 		return localName ->
 			map(localName).stream().anyMatch(scopeMatcher::match);
 	}
-	
+
+	/**
+	 * Renames an application provided scope to new scope names
+	 *
+	 * @param scope application provided scope
+	 * @return set of new names for the scope
+	 */
 	public Set<String> map(String scope);
 
-	public static ScopeMapper NULL = Collections::singleton;
+	public static final ScopeMapper PASSTHROUGH_SCOPEMAPPER =
+		Collections::singleton;
 
 }
