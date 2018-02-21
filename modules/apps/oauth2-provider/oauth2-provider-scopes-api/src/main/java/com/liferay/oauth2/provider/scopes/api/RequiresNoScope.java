@@ -17,6 +17,19 @@ package com.liferay.oauth2.provider.scopes.api;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * This annotation can be used to declare that a method on a JAX-RS resource
+ * does not need any scope to be authorized.
+ *
+ * <p>
+ * If scope annotation checking is enabled and a method has no
+ * {@link RequiresScope} or {@link RequiresNoScope} annotation, request won't be
+ * authorized to execute that method as security precaution.
+ * </p>
+ *
+ * @author Tomas Polesovsky
+ * @see RequiresScope
+ */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiresNoScope {
 

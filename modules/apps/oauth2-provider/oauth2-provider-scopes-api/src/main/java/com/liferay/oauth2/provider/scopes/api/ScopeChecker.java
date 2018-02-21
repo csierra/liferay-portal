@@ -16,12 +16,34 @@ package com.liferay.oauth2.provider.scopes.api;
 
 import aQute.bnd.annotation.ProviderType;
 
-
+/**
+ * Provides a programmatic interface for applications to check scope
+ * authorization in a JAX-RS request.
+ *
+ * @author Carlos Sierra Andrés
+ * @review
+ */
 @ProviderType
 public interface ScopeChecker {
-
+	
+	/**
+	 * Checks if the current request has been authorized for the given scope.
+	 *
+	 * @param scope the scope to check the request for authorization.
+	 * @return <code>true</true> if the request has been authorized the given
+	 * scope. <code>false</code> otherwise.
+	 * @review
+	 */
 	public boolean hasScope(String scope);
-
+	
+	/**
+	 * Checks if the current request has been authorized for all given scopes.
+	 *
+	 * @param scopes the scopes to check the request for authorization
+	 * @return <code>true</true> if the request has been authorized all given
+	 * scopes. <code>false</code> otherwise.
+	 * @review
+	 */
 	public default boolean hasAllScopes(String ... scopes) {
 		for (String scope : scopes) {
 			if (!hasScope(scope)) {
@@ -31,7 +53,17 @@ public interface ScopeChecker {
 
 		return true;
 	}
-
+	
+	/**
+	 * Checks if the current request has been authorized for any of the given
+	 * scopes.
+	 *
+	 * @param scopes the scopes to check the request for authorization
+	 * @return <code>true</true> if the request has been authorized any of the
+	 * given scopes. <code>false</code> otherwise.
+	 * @review
+	 */
+	
 	public default boolean hasAnyScope(String ... scopes) {
 		for (String scope : scopes) {
 			if (hasScope(scope)) {
