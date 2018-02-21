@@ -234,12 +234,12 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 	@Override
 	public Collection<LiferayOAuth2Scope> locateScopesForApplication(
-		long companyId, String applicationName, String scope) {
+		long companyId, String scope, String applicationName) {
 
 		return readFromCache(
 			"locateScopes" + companyId + applicationName + scope,
 			__ -> this._doLocateScopesForApplication(
-				companyId, applicationName, scope));
+				companyId, scope, applicationName));
 	}
 
 	@Override
