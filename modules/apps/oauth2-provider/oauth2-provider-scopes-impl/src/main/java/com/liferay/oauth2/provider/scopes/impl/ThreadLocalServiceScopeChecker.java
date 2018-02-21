@@ -43,7 +43,7 @@ public class ThreadLocalServiceScopeChecker
 		() -> StringPool.BLANK);
 
 	@Override
-	public boolean hasScope(String scope) {
+	public boolean checkScope(String scope) {
 		if (Validator.isNull(scope)) {
 			throw new IllegalArgumentException("Scope can't be null");
 		}
@@ -58,7 +58,7 @@ public class ThreadLocalServiceScopeChecker
 	}
 
 	@Override
-	public boolean hasAllScopes(String... scopes) {
+	public boolean checkAllScopes(String... scopes) {
 		if (Validator.isNull(scopes)) {
 			throw new IllegalArgumentException("Scopes can't be null");
 		}
@@ -88,7 +88,7 @@ public class ThreadLocalServiceScopeChecker
 	}
 
 	@Override
-	public boolean hasAnyScope(String... scopes) {
+	public boolean checkAnyScope(String... scopes) {
 		if (Validator.isNull(scopes)) {
 			throw new IllegalArgumentException("Scopes can't be null");
 		}

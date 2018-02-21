@@ -25,7 +25,7 @@ import aQute.bnd.annotation.ProviderType;
  */
 @ProviderType
 public interface ScopeChecker {
-	
+
 	/**
 	 * Checks if the current request has been authorized for the given scope.
 	 *
@@ -34,8 +34,8 @@ public interface ScopeChecker {
 	 * scope. <code>false</code> otherwise.
 	 * @review
 	 */
-	public boolean hasScope(String scope);
-	
+	public boolean checkScope(String scope);
+
 	/**
 	 * Checks if the current request has been authorized for all given scopes.
 	 *
@@ -44,16 +44,16 @@ public interface ScopeChecker {
 	 * scopes. <code>false</code> otherwise.
 	 * @review
 	 */
-	public default boolean hasAllScopes(String ... scopes) {
+	public default boolean checkAllScopes(String ... scopes) {
 		for (String scope : scopes) {
-			if (!hasScope(scope)) {
+			if (!checkScope(scope)) {
 				return false;
 			}
 		}
 
 		return true;
 	}
-	
+
 	/**
 	 * Checks if the current request has been authorized for any of the given
 	 * scopes.
@@ -63,10 +63,9 @@ public interface ScopeChecker {
 	 * given scopes. <code>false</code> otherwise.
 	 * @review
 	 */
-	
-	public default boolean hasAnyScope(String ... scopes) {
+	public default boolean checkAnyScope(String ... scopes) {
 		for (String scope : scopes) {
-			if (hasScope(scope)) {
+			if (checkScope(scope)) {
 				return true;
 			}
 		}

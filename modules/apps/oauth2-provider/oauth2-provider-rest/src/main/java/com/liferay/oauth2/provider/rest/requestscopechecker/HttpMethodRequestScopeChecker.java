@@ -33,7 +33,7 @@ public class HttpMethodRequestScopeChecker
 	public boolean isAllowed(
 		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo) {
 
-		return scopeChecker.hasScope(request.getMethod());
+		return scopeChecker.checkScope(request.getMethod());
 	}
 
 }

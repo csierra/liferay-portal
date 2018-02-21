@@ -58,10 +58,10 @@ public class AnnotationRequestScopeChecker
 
 		if (annotation != null) {
 			if (annotation.allNeeded()) {
-				return scopeChecker.hasAllScopes(annotation.value());
+				return scopeChecker.checkAllScopes(annotation.value());
 			}
 			else {
-				return scopeChecker.hasAnyScope(annotation.value());
+				return scopeChecker.checkAnyScope(annotation.value());
 			}
 		}
 

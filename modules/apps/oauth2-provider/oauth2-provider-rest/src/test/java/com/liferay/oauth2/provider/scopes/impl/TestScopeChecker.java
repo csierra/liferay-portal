@@ -28,7 +28,7 @@ public class TestScopeChecker implements ScopeChecker {
 	}
 
 	@Override
-	public boolean hasScope(String scope) {
+	public boolean checkScope(String scope) {
 		return _allowedScopes.contains(scope);
 	}
 
