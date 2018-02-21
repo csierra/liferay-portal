@@ -60,29 +60,29 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		new ConcurrentHashMap<>();
 
 	private Collection<LiferayOAuth2Scope> _doLocateScopes(
-		long companyId, String scope) {
+		long companyId, String scopesAlias) {
 
 		Collection<LiferayOAuth2Scope> grants = new ArrayList<>();
 
-		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
+		Set<String> applicationNames = _scopeFinderByNameServiceTrackerMap.keySet();
 
-		for (String name : names) {
-			grants.addAll(locateScopesForApplication(companyId, scope, name));
+		for (String applicationName : applicationNames) {
+			grants.addAll(locateScopesForApplication(companyId, scopesAlias, applicationName));
 		}
 
 		return grants;
 	}
 
 	private Collection<LiferayOAuth2Scope> _doLocateScopesForApplication(
-		long companyId, String scope, String name) {
+		long companyId, String scopesAlias, String applicationName) {
 
 		ScopeMatcherFactory scopeMatcherFactory =
 			_scopeMatcherFactoryLocator.locateScopeMatcherFactory(companyId);
 
-		ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scope);
+		ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scopesAlias);
 
 		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
-			_scopeFinderByNameServiceTrackerMap.getService(name);
+			_scopeFinderByNameServiceTrackerMap.getService(applicationName);
 
 		if (tuples == null || tuples.isEmpty()) {
 			return Collections.emptyList();
@@ -93,7 +93,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		ServiceReference<?> serviceReference = tuple.getServiceReference();
 
 		PrefixHandlerFactory prefixHandlerMapper =
-			_scopedPrefixHandlerFactories.getService(companyId, name);
+			_scopedPrefixHandlerFactories.getService(companyId, applicationName);
 
 		PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
 			serviceReference::getProperty);
@@ -101,7 +101,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		scopeMatcher = prefixHandler.applyTo(scopeMatcher);
 
 		ScopeMapper scopeMapper = 
-			_scopedScopeMapper.getService(companyId, name);
+			_scopedScopeMapper.getService(companyId, applicationName);
 		
 		scopeMatcher = scopeMapper.applyTo(scopeMatcher);
 
@@ -115,7 +115,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		for (String grantedScope : grantedScopes) {
 			Bundle bundle = serviceReference.getBundle();
 
-			grants.add(new LiferayOAuth2ScopeImpl(name, bundle, grantedScope));
+			grants.add(new LiferayOAuth2ScopeImpl(applicationName, bundle, grantedScope));
 		}
 
 		return grants;
@@ -127,15 +127,15 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		_scopedScopeMapper;
 
 	private Collection<String> _doListScopesAliases(long companyId) {
-		Collection<String> scopes = new HashSet<>();
+		Collection<String> scopesAliases = new HashSet<>();
 
-		Set<String> names = _scopeFinderByNameServiceTrackerMap.keySet();
+		Set<String> applicationNames = _scopeFinderByNameServiceTrackerMap.keySet();
 
-		for (String name : names) {
-			scopes.addAll(listScopesAliasesForApplication(companyId, name));
+		for (String applicationName : applicationNames) {
+			scopesAliases.addAll(listScopesAliasesForApplication(companyId, applicationName));
 		}
 
-		return scopes;
+		return scopesAliases;
 	}
 
 	private Collection<String> _doListScopesAliasesForApplication(
@@ -167,7 +167,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		ScopeMapper scopeMapper =
 			_scopedScopeMapper.getService(companyId, applicationName);
 
-		Collection<String> scopes = new ArrayList<>();
+		Collection<String> scopesAliases = new ArrayList<>();
 
 		for (String availableScope : availableScopes) {
 			Set<String> mappedScopes = scopeMapper.map(availableScope);
@@ -175,11 +175,11 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			for (String mappedScope : mappedScopes) {
 				String externalAlias = prefixHandler.addPrefix(mappedScope);
 
-				scopes.add(externalAlias);
+				scopesAliases.add(externalAlias);
 			}
 		}
 
-		return scopes;
+		return scopesAliases;
 	}
 
 	@Activate
@@ -226,20 +226,20 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 	@Override
 	public Collection<LiferayOAuth2Scope> locateScopes(
-		long companyId, String scope) {
+		long companyId, String scopesAlias) {
 
-		return readFromCache("locateScopes" + companyId + scope,
-			__ -> this._doLocateScopes(companyId, scope));
+		return readFromCache("locateScopes" + companyId + scopesAlias,
+			__ -> this._doLocateScopes(companyId, scopesAlias));
 	}
 
 	@Override
 	public Collection<LiferayOAuth2Scope> locateScopesForApplication(
-		long companyId, String scope, String applicationName) {
+		long companyId, String scopesAlias, String applicationName) {
 
 		return readFromCache(
-			"locateScopes" + companyId + applicationName + scope,
+			"locateScopes" + companyId + applicationName + scopesAlias,
 			__ -> this._doLocateScopesForApplication(
-				companyId, scope, applicationName));
+				companyId, scopesAlias, applicationName));
 	}
 
 	@Override
