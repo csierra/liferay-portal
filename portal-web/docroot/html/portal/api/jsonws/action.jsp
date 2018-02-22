@@ -350,6 +350,17 @@ String signature = ParamUtil.getString(request, "signature");
 
 					<%
 					}
+					else if (methodParameterTypeClassName.startsWith("com.")) {
+						String objectMethodParameterName = "+" + methodParameterName;
+
+						int size = 10;
+					%>
+
+						<aui:input id='<%= "field" + i %>' label="<%= methodParameterName %>" name="<%= objectMethodParameterName %>" size="<%= size %>" suffix="<%= methodParameterTypeClassName %>" />
+
+					<%
+
+					}
 					else {
 						int size = 10;
 
