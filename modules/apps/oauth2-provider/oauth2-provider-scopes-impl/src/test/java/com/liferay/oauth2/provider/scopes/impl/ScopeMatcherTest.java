@@ -14,45 +14,22 @@
 
 package com.liferay.oauth2.provider.scopes.impl;
 
-import com.liferay.oauth2.provider.scopes.impl.scopematcher.ChunkScopeMatcherFactory;
 import com.liferay.oauth2.provider.scopes.impl.scopematcher.StrictScopeMatcherFactory;
 import com.liferay.oauth2.provider.scopes.spi.model.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
-import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ScopeMatcherTest {
 
 	@Test
-	public void testFindScopes() {
-		ScopeFinder testScopeFinder = new TestHierarchyScopeFinder();
-
-		assertEquals(
-			Arrays.asList("RO"), testScopeFinder.findScopes("RO"::equals));
-
-		assertEquals(
-			Arrays.asList("RO", "RW"),
-			testScopeFinder.findScopes("RW"::equals));
-	}
-
-	@Test
 	public void testFindScopesWithMapper() {
-		ScopeFinder testScopeFinder = new TestHierarchyScopeFinder();
-
 		ScopeMatcherFactory strictScopeMatcherFactory
 			= new StrictScopeMatcherFactory();
 
@@ -62,8 +39,7 @@ public class ScopeMatcherTest {
 		
 		scopeMatcher = testScopeMapper1.applyTo(scopeMatcher);
 
-		assertEquals(
-			Arrays.asList("RO"), testScopeFinder.findScopes(scopeMatcher));
+		assertTrue(scopeMatcher.match("RO"));
 
 		scopeMatcher = strictScopeMatcherFactory.create("RW2");
 
@@ -71,38 +47,28 @@ public class ScopeMatcherTest {
 		
 		scopeMatcher = testScopeMapper2.applyTo(scopeMatcher);
 
-		assertEquals(
-			Arrays.asList("RO", "RW"),
-			testScopeFinder.findScopes(scopeMatcher));
+		assertTrue(scopeMatcher.match("RW"));
 	}
 
 	@Test
 	public void testFindScopesWithNamespace() {
-		ScopeFinder testScopeFinder = new TestHierarchyScopeFinder();
-
 		PrefixHandler namespaceAdder = (target) -> "TEST/" + target;
 		
 		ScopeMatcher scopeMatcher = "TEST/RO"::equals;
 
-		assertEquals(
-			Arrays.asList("RO"),
-			new ArrayList<>(
-				testScopeFinder.findScopes(
-					namespaceAdder.applyTo(scopeMatcher))));
+		scopeMatcher = namespaceAdder.applyTo(scopeMatcher);
+
+		assertTrue(scopeMatcher.match("RO"));
 
 		scopeMatcher = "TEST/RW"::equals;
 
-		assertEquals(
-			Arrays.asList("RO", "RW"),
-			new ArrayList<>(
-				testScopeFinder.findScopes(
-					namespaceAdder.applyTo(scopeMatcher))));
+		 scopeMatcher = namespaceAdder.applyTo(scopeMatcher);
+
+		 assertTrue(scopeMatcher.match("RW"));
 	}
 
 	@Test
 	public void testFindScopesWithMultipleNamespaces() {
-		ScopeFinder testScopeFinder = new TestHierarchyScopeFinder();
-
 		PrefixHandler namespaceAdder = (target) -> "TEST/" + target;
 		
 		PrefixHandler nestedNamespaceAdder = (target) -> "NESTED/" + target;
@@ -111,105 +77,11 @@ public class ScopeMatcherTest {
 
 		ScopeMatcher scopeMatcher = "TEST/NESTED/RO"::equals;
 
-		assertEquals(
-			Arrays.asList("RO"),
-			testScopeFinder.findScopes(namespaceAdder.applyTo(scopeMatcher)));
+		assertTrue(namespaceAdder.applyTo(scopeMatcher).match("RO"));
 
 		scopeMatcher = "TEST/NESTED/RW"::equals;
 
-		assertEquals(
-			Arrays.asList("RO", "RW"),
-			testScopeFinder.findScopes(namespaceAdder.applyTo(scopeMatcher)));
-	}
-
-	@Test
-	public void testFindScopesWithPrefixMatcher() {
-		ScopeFinder scopeFinder = new TestTestAllScopeFinder(
-			"everything", "everything.readonly");
-
-		assertEquals(
-			Arrays.asList("everything", "everything.readonly"),
-			scopeFinder.findScopes(s -> s.startsWith("everything")));
-
-		assertEquals(
-			Arrays.asList("everything.readonly"),
-			scopeFinder.findScopes(s -> s.startsWith("everything.readonly")));
-	}
-
-	@Test
-	public void testFindScopesWithPrefixMatcherAndNamespace() {
-		ScopeFinder scopeFinder = new TestTestAllScopeFinder(
-			"everything", "everything.readonly");
-
-		PrefixHandler liferayNamespaceAdder = (target) -> "http://www.liferay.com/" + target;
-				
-		PrefixHandler apioNamespaceAdder = (target) -> "apio/" + target;
-		
-		PrefixHandler namespaceAdder =
-			liferayNamespaceAdder.append(apioNamespaceAdder);
-
-		ScopeMatcher scopeMatcher = new ChunkScopeMatcherFactory().create(
-			"http://www.liferay.com/apio/everything");
-
-		assertEquals(
-			Arrays.asList("everything", "everything.readonly"),
-			scopeFinder.findScopes(namespaceAdder.applyTo(scopeMatcher)));
-
-		scopeMatcher = new ChunkScopeMatcherFactory().create(
-			"http://www.liferay.com/apio/everything.readonly");
-
-		assertEquals(
-			Arrays.asList("everything.readonly"),
-			scopeFinder.findScopes(namespaceAdder.applyTo(scopeMatcher)));
-	}
-
-	@Test
-	public void testScopeFinderReturnAll() {
-		String[] strings =
-			{"everything", "everything.readonly", "another"};
-
-		ScopeFinder scopeFinder = new TestTestAllScopeFinder(strings);
-
-		Collection<String> oAuth2Grants = scopeFinder.findScopes(__ -> true);
-
-		List<String> scopes = Arrays.asList(strings);
-
-		assertTrue(scopes.containsAll(oAuth2Grants));
-	}
-
-	public static class TestHierarchyScopeFinder implements ScopeFinder {
-
-		@Override
-		public Collection<String> findScopes(ScopeMatcher scopeMatcher) {
-			Collection<String> strings = new TreeSet<>();
-
-			if (scopeMatcher.match("RO")) {
-				strings.add("RO");
-			}
-			if (scopeMatcher.match("RW")) {
-				strings.addAll(Arrays.asList("RO", "RW"));
-			}
-
-			return new ArrayList<>(strings);
-		}
-	}
-
-	public static class TestTestAllScopeFinder implements ScopeFinder {
-
-		private final Set<String> _scopes;
-
-		public TestTestAllScopeFinder(String ... scopes) {
-			_scopes = new TreeSet<>(Arrays.asList(scopes));
-		}
-
-		@Override
-		public Collection<String> findScopes(ScopeMatcher scopeMatcher) {
-			return _scopes.stream().filter(
-				scopeMatcher::match
-			).collect(
-				Collectors.toList()
-			);
-		}
+		assertTrue(namespaceAdder.applyTo(scopeMatcher).match("RW"));
 	}
 
 	private static class TestScopeMapper implements ScopeMapper {

@@ -2,7 +2,8 @@ package com.liferay.oauth2.provider.scopes.spi;
 
 import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 
-import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is the entry point to the OAuth2 Scopes framework. Applications
@@ -34,5 +35,5 @@ public interface ScopeFinder {
 	 * @return a collection of the available scopes that the implementation
 	 * will associate with the given {@link ScopeMatcher}.
 	 */
-	public Collection<String> findScopes(ScopeMatcher scopeMatcher);
+	public Map<String, Set<String>> findScopes();
 }

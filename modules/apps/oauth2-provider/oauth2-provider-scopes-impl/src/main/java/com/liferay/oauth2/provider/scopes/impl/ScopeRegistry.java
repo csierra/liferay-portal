@@ -37,10 +37,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
 import org.osgi.framework.Bundle;
@@ -103,12 +106,23 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		ScopeMapper scopeMapper = 
 			_scopedScopeMapper.getService(companyId, applicationName);
 		
-		scopeMatcher = scopeMapper.applyTo(scopeMatcher);
+		ScopeMatcher finalScopeMapper = scopeMapper.applyTo(scopeMatcher);
 
 		ScopeFinder scopeFinder = tuple.getService();
 
-		Collection<String> grantedScopes = scopeFinder.findScopes(
-			scopeMatcher);
+		Map<String, Set<String>> scopes = scopeFinder.findScopes();
+
+		Set<Map.Entry<String, Set<String>>> entries = scopes.entrySet();
+
+		Stream<Map.Entry<String, Set<String>>> stream = entries.stream();
+
+		Set<String> grantedScopes = stream.filter(
+			e -> finalScopeMapper.match(e.getKey())
+		).flatMap(
+			e -> e.getValue().stream()
+		).collect(
+			Collectors.toSet()
+		);
 
 		Collection<LiferayOAuth2Scope> grants = new ArrayList<>();
 
@@ -155,11 +169,13 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		ScopeFinder scopeFinder = tuple.getService();
 
-		Collection<String> availableScopes = scopeFinder.findScopes(
-			ScopeMatcher.ALL);
+		Map<String, Set<String>> scopesMap = scopeFinder.findScopes();
+
+		Collection<String> availableScopes = scopesMap.keySet();
 
 		PrefixHandlerFactory prefixHandlerFactory =
-			_scopedPrefixHandlerFactories.getService(companyId, applicationName);
+			_scopedPrefixHandlerFactories.getService(
+				companyId, applicationName);
 
 		PrefixHandler prefixHandler = prefixHandlerFactory.mapFrom(
 			serviceReference::getProperty);

@@ -23,10 +23,15 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Tomas Polesovsky
@@ -43,17 +48,21 @@ public class SAPEntryScopeDescriptorFinder
 	}
 
 	@Override
-	public Collection<String> findScopes(ScopeMatcher scopeMatcher) {
+	public Map<String, Set<String>> findScopes() {
 		List<SAPEntryScope> _sapEntryScopes =
 			_sapEntryScopeRegistry.getSAPEntryScopes(_companyId);
 
-		Set<String> names = new HashSet<>(_sapEntryScopes.size());
+		Collection<String> names = new HashSet<>(_sapEntryScopes.size());
 
 		for (SAPEntryScope sapEntryScope : _sapEntryScopes) {
 			names.add(sapEntryScope.getScopeName());
 		}
 
-		return scopeMatcher.filter(names);
+		Stream<String> stream = names.stream();
+
+		return stream.collect(
+			Collectors.toMap(Function.identity(), Collections::singleton)
+		);
 	}
 
 	@Override

@@ -14,10 +14,14 @@
 
 package com.liferay.oauth2.provider.scopes.impl.feature;
 
-import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeFinder;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 class ScopeListScopeFinder implements ScopeFinder {
 
@@ -28,7 +32,8 @@ class ScopeListScopeFinder implements ScopeFinder {
 	}
 
 	@Override
-	public Collection<String> findScopes(ScopeMatcher scopeMatcher) {
-		return scopeMatcher.filter(_scopes);
+	public Map<String, Set<String>> findScopes() {
+		return _scopes.stream().collect(
+			Collectors.toMap(Function.identity(), Collections::singleton));
 	}
 }
