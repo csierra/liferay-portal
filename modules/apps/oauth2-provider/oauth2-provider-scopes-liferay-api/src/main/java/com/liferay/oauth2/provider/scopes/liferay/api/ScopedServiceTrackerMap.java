@@ -52,7 +52,7 @@ public class ScopedServiceTrackerMap<T> {
 
 		_servicesByKey = ServiceTrackerMapFactory.openMultiValueMap(
 			bundleContext, clazz,
-			"(&(" + property + "=*)(!(companyId=*)))",
+			"(&(" + property + "=*)(|(!(companyId=*))(companyId=0)))",
 			new PropertyServiceReferenceMapper<>(property),
 			new ServiceTrackerMapListenerImpl<>());
 
