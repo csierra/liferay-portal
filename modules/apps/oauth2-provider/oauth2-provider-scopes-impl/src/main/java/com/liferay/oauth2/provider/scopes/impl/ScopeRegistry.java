@@ -222,7 +222,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		_scopedScopeMapper = new ScopedServiceTrackerMap<>(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
-			() -> ScopeMapper.PASSTHROUGH_SCOPEMAPPER, _invocationCache::clear);
+			() -> _defaultScopeMapper, _invocationCache::clear);
 	}
 
 	@Deactivate
@@ -238,6 +238,12 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	)
 	private PrefixHandlerFactory _defaultPrefixHandlerFactory;
 
+	@Reference(
+		target = "(&(default=true)(companyId=0))",
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private ScopeMapper _defaultScopeMapper;
+	
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
 
