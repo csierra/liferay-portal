@@ -537,7 +537,10 @@ String signature = ParamUtil.getString(request, "signature");
 						}
 					);
 
-					var formQueryString = A.IO.prototype._serialize(formEl);
+					formQueryString = A.IO.prototype._serialize(formEl);
+
+					formQueryString = formQueryString.replace(PLUS_ENCODING, "+");
+					formQueryString = formQueryString.replace(MINUS_ENCODING, "-");
 
 					if (multipart) {
 						formQueryString += Object.keys(tplDataTypes.file).map(
@@ -601,10 +604,6 @@ String signature = ParamUtil.getString(request, "signature");
 						REGEX_QUERY_STRING,
 						function(match, key, value) {
 							if (!ignoreFields[key]) {
-								if (!value) {
-									key = '-' + key;
-								}
-
 								if (extraFields[key]) {
 									urlTplData.extraData.push(
 										{
