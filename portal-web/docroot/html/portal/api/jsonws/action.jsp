@@ -337,7 +337,7 @@ String signature = ParamUtil.getString(request, "signature");
 
 					<%
 					}
-					else if (methodParameterTypeClass.equals(boolean.class)) {
+					else if (methodParameterTypeClass.equals(Boolean.class) || methodParameterTypeClass.equals(boolean.class)) {
 					%>
 
 						<aui:field-wrapper label="<%= methodParameterName %>">
