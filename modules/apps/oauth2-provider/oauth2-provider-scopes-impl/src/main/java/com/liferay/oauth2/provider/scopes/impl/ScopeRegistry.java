@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
+import com.liferay.portal.kernel.util.StringPool;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -67,10 +68,13 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		Collection<LiferayOAuth2Scope> grants = new ArrayList<>();
 
-		Set<String> applicationNames = _scopeFinderByNameServiceTrackerMap.keySet();
+		Set<String> applicationNames =
+			_scopeFinderByNameServiceTrackerMap.keySet();
 
 		for (String applicationName : applicationNames) {
-			grants.addAll(locateScopesForApplication(companyId, scopesAlias, applicationName));
+			grants.addAll(
+				locateScopesForApplication(
+					companyId, scopesAlias, applicationName));
 		}
 
 		return grants;
@@ -81,8 +85,6 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		ScopeMatcherFactory scopeMatcherFactory =
 			_scopeMatcherFactoryLocator.locateScopeMatcherFactory(companyId);
-
-		ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scopesAlias);
 
 		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
 			_scopeFinderByNameServiceTrackerMap.getService(applicationName);
@@ -101,12 +103,17 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
 			serviceReference::getProperty);
 
-		scopeMatcher = prefixHandler.applyTo(scopeMatcher);
+		String prefix = prefixHandler.addPrefix(StringPool.BLANK);
 
-		ScopeMapper scopeMapper = 
+		if (!scopesAlias.startsWith(prefix)) {
+			return Collections.emptyList();
+		}
+
+		ScopeMapper scopeMapper =
 			_scopedScopeMapper.getService(companyId, applicationName);
 		
-		ScopeMatcher finalScopeMapper = scopeMapper.applyTo(scopeMatcher);
+		ScopeMatcher scopeMatcher = scopeMapper.applyTo(
+			scopeMatcherFactory.create(scopesAlias.substring(prefix.length())));
 
 		ScopeFinder scopeFinder = tuple.getService();
 
@@ -117,7 +124,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		Stream<Map.Entry<String, Set<String>>> stream = entries.stream();
 
 		Set<String> grantedScopes = stream.filter(
-			e -> finalScopeMapper.match(e.getKey())
+			e -> scopeMatcher.match(e.getKey())
 		).flatMap(
 			e -> e.getValue().stream()
 		).collect(
@@ -129,7 +136,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		for (String grantedScope : grantedScopes) {
 			Bundle bundle = serviceReference.getBundle();
 
-			grants.add(new LiferayOAuth2ScopeImpl(applicationName, bundle, grantedScope));
+			grants.add(new LiferayOAuth2ScopeImpl(
+				applicationName, bundle, grantedScope));
 		}
 
 		return grants;

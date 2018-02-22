@@ -40,20 +40,6 @@ public interface PrefixHandler {
 	}
 
 	/**
-	 * Returns a new {@link ScopeMatcher} that takes into account the effect
-	 * of the given {@link PrefixHandler}. Some implementations might have
-	 * optimization opportunities.
-	 *
-	 * @param scopeMatcher the scope matcher which should take into account
-	 * this prefix handler.
-	 * @return the new ScopeMatcher that takes into account the
-	 * {@link PrefixHandler}
-	 */
-	public default ScopeMatcher applyTo(ScopeMatcher scopeMatcher) {
-		return localName -> scopeMatcher.match(addPrefix(localName));
-	}	
-	
-	/**
 	 * A {@link PrefixHandler} that keeps the input unchanged.
 	 */
 	static PrefixHandler PASSTHROUGH_PREFIXHANDLER = new PrefixHandler() {
@@ -68,9 +54,5 @@ public interface PrefixHandler {
 			return prefixHandler;
 		}
 
-		@Override
-		public ScopeMatcher applyTo(ScopeMatcher scopeMatcher) {
-			return scopeMatcher;
-		}
 	};
 }

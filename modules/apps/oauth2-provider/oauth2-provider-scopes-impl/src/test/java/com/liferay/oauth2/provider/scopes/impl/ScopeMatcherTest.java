@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.scopes.impl;
 
 import com.liferay.oauth2.provider.scopes.impl.scopematcher.StrictScopeMatcherFactory;
-import com.liferay.oauth2.provider.scopes.spi.model.PrefixHandler;
 import com.liferay.oauth2.provider.scopes.spi.model.ScopeMatcher;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMapper;
 import com.liferay.oauth2.provider.scopes.spi.ScopeMatcherFactory;
@@ -50,39 +49,6 @@ public class ScopeMatcherTest {
 		assertTrue(scopeMatcher.match("RW"));
 	}
 
-	@Test
-	public void testFindScopesWithNamespace() {
-		PrefixHandler namespaceAdder = (target) -> "TEST/" + target;
-		
-		ScopeMatcher scopeMatcher = "TEST/RO"::equals;
-
-		scopeMatcher = namespaceAdder.applyTo(scopeMatcher);
-
-		assertTrue(scopeMatcher.match("RO"));
-
-		scopeMatcher = "TEST/RW"::equals;
-
-		 scopeMatcher = namespaceAdder.applyTo(scopeMatcher);
-
-		 assertTrue(scopeMatcher.match("RW"));
-	}
-
-	@Test
-	public void testFindScopesWithMultipleNamespaces() {
-		PrefixHandler namespaceAdder = (target) -> "TEST/" + target;
-		
-		PrefixHandler nestedNamespaceAdder = (target) -> "NESTED/" + target;
-
-		namespaceAdder = namespaceAdder.append(nestedNamespaceAdder);
-
-		ScopeMatcher scopeMatcher = "TEST/NESTED/RO"::equals;
-
-		assertTrue(namespaceAdder.applyTo(scopeMatcher).match("RO"));
-
-		scopeMatcher = "TEST/NESTED/RW"::equals;
-
-		assertTrue(namespaceAdder.applyTo(scopeMatcher).match("RW"));
-	}
 
 	private static class TestScopeMapper implements ScopeMapper {
 
