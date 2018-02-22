@@ -481,6 +481,50 @@ String signature = ParamUtil.getString(request, "signature");
 
 					var formEl = form.getDOM();
 
+					var formQueryString = A.IO.prototype._serialize(formEl);
+
+					var query_elements = formQueryString.split("&");
+
+					var PLUS_ENCODING = "%2B";
+					var MINUS_ENCODING = "%2D";
+
+					for (var i = 0 ; i < query_elements.length ; i++) {
+						var query_map = query_elements[i].split("=");
+
+						var key = query_map[0];
+
+						var plus_bool = ((key.indexOf(PLUS_ENCODING) == 0) || (key.indexOf("+") == 0));
+						var minus_bool = ((key.indexOf(MINUS_ENCODING) == 0) || (key.indexOf("-") == 0));
+
+						if (plus_bool || minus_bool) {
+							var value = "";
+
+							for (var j = 1; j < query_map.length ; j++) {
+								value += query_map[j];
+							}
+
+							if (value.length > 0) {
+								if (!plus_bool) {
+									key = key.replace(MINUS_ENCODING,"-");
+									var node = A.one('[name=' + key + ']');
+
+									key = key.replace("-", "+");
+									node.attr("name", key);
+								}
+							}else{
+								if (plus_bool) {
+									key = key.replace(PLUS_ENCODING,"+");
+									var node = A.one('[name=' + key + ']');
+
+									key = key.replace("+", "-");
+									node.attr("name", key);
+								}
+							}
+						}
+					}
+
+					formEl = form.getDOM();
+
 					Liferay.Service(
 						'<%= jsonWebServiceActionMapping.getPath() %>',
 						formEl,
