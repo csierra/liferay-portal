@@ -504,21 +504,20 @@ String signature = ParamUtil.getString(request, "signature");
 							}
 
 							if (value.length > 0) {
-								if (!plus_bool) {
+								if (minus_bool) {
 									key = key.replace(MINUS_ENCODING,"-");
 									var node = A.one('[name=' + key + ']');
 
 									key = key.replace("-", "+");
 									node.attr("name", key);
 								}
-							}else{
-								if (plus_bool) {
-									key = key.replace(PLUS_ENCODING,"+");
-									var node = A.one('[name=' + key + ']');
+							}
+							else if (plus_bool) {
+								key = key.replace(PLUS_ENCODING,"+");
+								var node = A.one('[name=' + key + ']');
 
-									key = key.replace("+", "-");
-									node.attr("name", key);
-								}
+								key = key.replace("+", "-");
+								node.attr("name", key);
 							}
 						}
 					}
