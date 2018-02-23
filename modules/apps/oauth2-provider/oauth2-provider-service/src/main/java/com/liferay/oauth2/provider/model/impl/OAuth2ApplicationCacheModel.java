@@ -93,7 +93,7 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		sb.append(name);
 		sb.append(", webUrl=");
 		sb.append(webUrl);
-		sb.append(", scopes=");
+		sb.append(", scope=");
 		sb.append(scopes);
 		sb.append("}");
 

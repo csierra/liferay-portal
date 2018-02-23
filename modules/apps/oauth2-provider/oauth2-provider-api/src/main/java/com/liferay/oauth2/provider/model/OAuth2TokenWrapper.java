@@ -253,9 +253,9 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 	}
 
 	/**
-	* Returns the scopes of this o auth2 token.
+	* Returns the scope of this o auth2 token.
 	*
-	* @return the scopes of this o auth2 token
+	* @return the scope of this o auth2 token
 	*/
 	@Override
 	public java.lang.String getScopes() {
@@ -444,9 +444,9 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 	}
 
 	/**
-	* Sets the scopes of this o auth2 token.
+	* Sets the scope of this o auth2 token.
 	*
-	* @param scopes the scopes of this o auth2 token
+	* @param scopes the scope of this o auth2 token
 	*/
 	@Override
 	public void setScopes(java.lang.String scopes) {

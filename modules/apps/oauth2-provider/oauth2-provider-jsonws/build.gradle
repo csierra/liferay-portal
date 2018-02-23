@@ -10,7 +10,7 @@ dependencies {
 	compileOnly group: "org.osgi", name: "org.osgi.core", version: "5.0.0"
 
 	compileOnly project(":apps:oauth2-provider:oauth2-provider-api")
-	compileOnly project(":apps:oauth2-provider:oauth2-provider-scopes-liferay-api")
-	compileOnly project(":apps:oauth2-provider:oauth2-provider-scopes-spi")
+	compileOnly project(":apps:oauth2-provider:oauth2-provider-scope-liferay-api")
+	compileOnly project(":apps:oauth2-provider:oauth2-provider-scope-spi")
 	compileOnly project(":apps:oauth2-provider:oauth2-provider-rest-spi")
 }

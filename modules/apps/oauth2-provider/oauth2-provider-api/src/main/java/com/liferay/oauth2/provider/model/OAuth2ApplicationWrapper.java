@@ -295,9 +295,9 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	}
 
 	/**
-	* Returns the scopes of this o auth2 application.
+	* Returns the scope of this o auth2 application.
 	*
-	* @return the scopes of this o auth2 application
+	* @return the scope of this o auth2 application
 	*/
 	@Override
 	public java.lang.String getScopes() {
@@ -516,9 +516,9 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	}
 
 	/**
-	* Sets the scopes of this o auth2 application.
+	* Sets the scope of this o auth2 application.
 	*
-	* @param scopes the scopes of this o auth2 application
+	* @param scopes the scope of this o auth2 application
 	*/
 	@Override
 	public void setScopes(java.lang.String scopes) {

@@ -20,14 +20,14 @@ import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.configuration.OAuth2RefreshTokenGrantConfiguration;
 import com.liferay.oauth2.provider.configuration.OAuth2ResourceOwnerGrantConfiguration;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
-import com.liferay.oauth2.provider.scopes.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.rest.spi.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.BearerTokenProvider.AccessToken;
-import com.liferay.oauth2.provider.scopes.liferay.api.ScopeFinderLocator;
-import com.liferay.oauth2.provider.scopes.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scope.liferay.api.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
@@ -456,7 +456,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			sb.append(token.getSubject().getId());
 			sb.append(" token for client ");
 			sb.append(token.getClient().getClientId());
-			sb.append(" with granted scopes ");
+			sb.append(" with granted scope ");
 			sb.append(
 				OAuthUtils.convertPermissionsToScopeList(
 					token.getScopes()));
@@ -490,15 +490,15 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			}
 
 			throw new OAuthServiceException(
-				"Unable to grant scopes for token", e);
+				"Unable to grant scope for token", e);
 		}
 		catch (Exception e) {
 			StringBundler sb = new StringBundler(6);
 			sb.append("Unable to save user ");
 			sb.append(token.getSubject().getId());
-			sb.append(" scopes for client ");
+			sb.append(" scope for client ");
 			sb.append(token.getClient().getClientId());
-			sb.append(" with approved scopes ");
+			sb.append(" with approved scope ");
 			sb.append(
 				OAuthUtils.convertPermissionsToScopeList(
 					token.getScopes()));
@@ -506,7 +506,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			_log.error(sb.toString(), e);
 
 			throw new OAuthServiceException(
-				"Unable to grant scopes for token", e);
+				"Unable to grant scope for token", e);
 		}
 	}
 
