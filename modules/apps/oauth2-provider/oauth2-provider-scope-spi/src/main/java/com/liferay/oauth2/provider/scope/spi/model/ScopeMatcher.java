@@ -14,12 +14,11 @@
 
 package com.liferay.oauth2.provider.scope.spi.model;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.util.Collection;
 import java.util.stream.Collectors;
-
-import aQute.bnd.annotation.ProviderType;
-import com.liferay.oauth2.provider.scope.spi.ScopeFinder;
-import com.liferay.oauth2.provider.scope.spi.ScopeMapper;
+import java.util.stream.Stream;
 
 /**
  * This interface represents the strategy used to match scope. Some of these
@@ -34,7 +33,7 @@ import com.liferay.oauth2.provider.scope.spi.ScopeMapper;
  *     general scope. For instance using <i>dot notation</i> we can code that
  *     shorter scope that share a common prefix, for example
  *     <i>everything</i> imply longer scope such as <i>everything.readonly</i>.
- *	   </li>
+ *    </li>
  * </ul>
  *
  * ScopeMatcher might also be combined with {@link PrefixHandler} and
@@ -44,9 +43,34 @@ import com.liferay.oauth2.provider.scope.spi.ScopeMapper;
  * @author Carlos Sierra Andrés
  * @review
  */
-
 @ProviderType
 public interface ScopeMatcher {
+
+	public static ScopeMatcher ALL = __ -> true;
+
+	public static ScopeMatcher NONE = __ -> false;
+
+	public default ScopeMatcher and(ScopeMatcher scopeMatcher) {
+		return localName -> match(localName) && scopeMatcher.match(localName);
+	}
+
+	/**
+	 * Applies the matcher to a collection of scope. Some implementations
+	 * might have optimization opportunities.
+	 *
+	 * @param names the collection of scope to match.
+	 * @return a collection containing those scope that matched.
+	 * @review
+	 */
+	public default Collection<String> filter(Collection<String> names) {
+		Stream<String> stream = names.stream();
+
+		return stream.filter(
+			this::match
+		).collect(
+			Collectors.toList()
+		);
+	}
 
 	/**
 	 * Specifies if a given scope matches according to the {@link ScopeMatcher}.
@@ -58,30 +82,8 @@ public interface ScopeMatcher {
 	 */
 	public boolean match(String name);
 
-	/**
-	 * Applies the matcher to a collection of scope. Some implementations
-	 * might have optimization opportunities.
-	 *
-	 * @param names the collection of scope to match.
-	 * @return a collection containing those scope that matched.
-	 * @review
-	 */
-	public default Collection<String> filter(Collection<String> names) {
-		return names.stream().filter(this::match).collect(Collectors.toList());
-	}
-
-	public default ScopeMatcher and(ScopeMatcher scopeMatcher) {
-		return localName ->
-			match(localName) && scopeMatcher.match(localName);
-	}
-
 	public default ScopeMatcher or(ScopeMatcher scopeMatcher) {
-		return localName ->
-			match(localName) || scopeMatcher.match(localName);
+		return localName -> match(localName) || scopeMatcher.match(localName);
 	}
-
-	public static ScopeMatcher ALL = __ -> true;
-
-	public static ScopeMatcher NONE = __ -> false;
 
 }

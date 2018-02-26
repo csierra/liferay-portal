@@ -24,6 +24,25 @@ package com.liferay.oauth2.provider.scope.spi.model;
 public interface PrefixHandler {
 
 	/**
+	 * A {@link PrefixHandler} that keeps the input unchanged.
+	 * @review
+	 */
+	public static PrefixHandler PASSTHROUGH_PREFIXHANDLER =
+		new PrefixHandler() {
+
+			@Override
+			public String addPrefix(String input) {
+				return input;
+			}
+
+			@Override
+			public PrefixHandler append(PrefixHandler prefixHandler) {
+				return prefixHandler;
+			}
+
+		};
+
+	/**
 	 * Adds the prefix to a given input.
 	 * @param input String to be prefixed.
 	 * @return a new String with the prefix.
@@ -43,21 +62,4 @@ public interface PrefixHandler {
 		return string -> addPrefix(prefixHandler.addPrefix(string));
 	}
 
-	/**
-	 * A {@link PrefixHandler} that keeps the input unchanged.
-	 * @review
-	 */
-	static PrefixHandler PASSTHROUGH_PREFIXHANDLER = new PrefixHandler() {
-
-		@Override
-		public String addPrefix(String input) {
-			return input;
-		}
-
-		@Override
-		public PrefixHandler append(PrefixHandler prefixHandler) {
-			return prefixHandler;
-		}
-
-	};
 }
