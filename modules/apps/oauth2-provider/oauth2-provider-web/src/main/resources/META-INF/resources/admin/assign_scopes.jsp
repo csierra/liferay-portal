@@ -1,5 +1,5 @@
 <%@ page
-	import="com.liferay.oauth2.provider.scope.spi.ApplicationDescriptor" %>
+	import="com.liferay.oauth2.provider.scope.spi.applicationdescriptor.ApplicationDescriptor" %>
 <%@ page
 	import="com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap" %><%--
 /**

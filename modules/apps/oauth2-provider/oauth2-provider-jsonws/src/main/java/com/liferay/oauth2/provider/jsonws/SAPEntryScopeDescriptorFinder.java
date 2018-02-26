@@ -14,23 +14,17 @@
 
 package com.liferay.oauth2.provider.jsonws;
 
-import com.liferay.oauth2.provider.scope.spi.ScopeDescriptor;
-import com.liferay.oauth2.provider.scope.spi.ScopeFinder;
+import com.liferay.oauth2.provider.scope.spi.scopedescriptor.ScopeDescriptor;
+import com.liferay.oauth2.provider.scope.spi.scopefinder.ScopeFinder;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Tomas Polesovsky

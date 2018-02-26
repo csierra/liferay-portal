@@ -15,7 +15,7 @@
 package com.liferay.oauth2.provider.rest;
 
 import com.liferay.oauth2.provider.rest.spi.BearerTokenProvider;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeContext;
+import com.liferay.oauth2.provider.scope.spi.liferay.api.ScopeContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;

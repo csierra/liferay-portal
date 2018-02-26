@@ -14,14 +14,14 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
-import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeDescriptorLocator;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeMatcherFactoryLocator;
-import com.liferay.oauth2.provider.scope.spi.model.ScopeMatcher;
-import com.liferay.oauth2.provider.scope.spi.ApplicationDescriptor;
-import com.liferay.oauth2.provider.scope.spi.ScopeDescriptor;
-import com.liferay.oauth2.provider.scope.spi.ScopeMatcherFactory;
+import com.liferay.oauth2.provider.scope.spi.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.spi.liferay.api.ScopeDescriptorLocator;
+import com.liferay.oauth2.provider.scope.spi.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scope.spi.liferay.api.ScopeMatcherFactoryLocator;
+import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scope.spi.applicationdescriptor.ApplicationDescriptor;
+import com.liferay.oauth2.provider.scope.spi.scopedescriptor.ScopeDescriptor;
+import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel.ApplicationScopeDescriptor;
