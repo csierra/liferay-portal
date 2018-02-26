@@ -359,7 +359,6 @@ String signature = ParamUtil.getString(request, "signature");
 						<aui:input id='<%= "field" + i %>' label="<%= methodParameterName %>" name="<%= objectMethodParameterName %>" size="<%= size %>" suffix="<%= methodParameterTypeClassName %>" />
 
 					<%
-
 					}
 					else {
 						int size = 10;
