@@ -44,7 +44,7 @@ public class BundleNamespacePrefixHandlerFactory implements PrefixHandlerFactory
 	private String _separator = StringPool.SLASH;
 	
 	@Override
-	public PrefixHandler mapFrom(Function<String,Object> serviceProperties) {
+	public PrefixHandler create(Function<String,Object> serviceProperties) {
 		long bundleId = Long.parseLong(
 			serviceProperties.apply("service.bundleid").toString());
 

@@ -40,9 +40,6 @@ import com.liferay.oauth2.provider.scope.spi.ScopeMapper;
  * ScopeMatcher might also be combined with {@link PrefixHandler} and
  * {@link ScopeMapper} to tailor the matching strategy to the framework
  * configuration.
- *
- * {@link ScopeFinder} implementations SHOULD take this into account to support
- * as many strategies as possible.
  */
 
 @ProviderType

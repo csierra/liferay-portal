@@ -2,6 +2,9 @@ package com.liferay.oauth2.provider.scope.spi;
 
 import java.util.Locale;
 
+/**
+ * Represents the localization information for OAuth2 applications
+ */
 public interface ApplicationDescriptor {
 
 	/**

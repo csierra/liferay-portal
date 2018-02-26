@@ -15,9 +15,8 @@
 package com.liferay.oauth2.provider.scope.spi.model;
 
 /**
- * Interface that represents a prefix for the input scope. This abstraction
- * will allow the framework to adapt the applications to different scope
- * naming hopefully without having to change code.
+ * Represents a prefix for the input scope. This abstraction allows the
+ * framework to adapt the applications to different scope naming strategies.
  */
 public interface PrefixHandler {
 

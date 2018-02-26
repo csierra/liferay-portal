@@ -5,6 +5,11 @@ import com.liferay.oauth2.provider.scope.spi.model.ScopeMatcher;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * Represents a transformation between internal scope names to external aliases.
+ *
+ * @author Carlos Sierra Andrés
+ */
 public interface ScopeMapper {
 	
 	/**

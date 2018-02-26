@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -100,7 +99,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		PrefixHandlerFactory prefixHandlerMapper =
 			_scopedPrefixHandlerFactories.getService(companyId, applicationName);
 
-		PrefixHandler prefixHandler = prefixHandlerMapper.mapFrom(
+		PrefixHandler prefixHandler = prefixHandlerMapper.create(
 			serviceReference::getProperty);
 
 		String prefix = prefixHandler.addPrefix(StringPool.BLANK);
@@ -181,7 +180,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			_scopedPrefixHandlerFactories.getService(
 				companyId, applicationName);
 
-		PrefixHandler prefixHandler = prefixHandlerFactory.mapFrom(
+		PrefixHandler prefixHandler = prefixHandlerFactory.create(
 			serviceReference::getProperty);
 
 		ScopeMapper scopeMapper =

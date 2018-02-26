@@ -32,5 +32,5 @@ public interface PrefixHandlerFactory {
 	 * @param propertyAccessor to configure the {@link PrefixHandler} from
 	 * @return the {@link PrefixHandler} initialized from the given properties
 	 */
-	public PrefixHandler mapFrom(Function<String, Object> propertyAccessor);
+	public PrefixHandler create(Function<String, Object> propertyAccessor);
 }

@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
 public class NullPrefixHandlerFactory implements PrefixHandlerFactory {
 
 	@Override
-	public PrefixHandler mapFrom(Function<String,Object>serviceProperties) {
+	public PrefixHandler create(Function<String,Object>serviceProperties) {
 		return PrefixHandler.PASSTHROUGH_PREFIXHANDLER;
 	}
 }
