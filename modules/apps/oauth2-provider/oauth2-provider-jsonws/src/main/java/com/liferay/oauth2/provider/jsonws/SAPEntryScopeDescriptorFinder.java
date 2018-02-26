@@ -47,21 +47,17 @@ public class SAPEntryScopeDescriptorFinder
 	}
 
 	@Override
-	public Map<String, Set<String>> findScopes() {
+	public Collection<String> findScopes() {
 		List<SAPEntryScope> _sapEntryScopes =
 			_sapEntryScopeRegistry.getSAPEntryScopes(_companyId);
 
-		Collection<String> names = new HashSet<>(_sapEntryScopes.size());
+		Collection<String> scopes = new HashSet<>(_sapEntryScopes.size());
 
 		for (SAPEntryScope sapEntryScope : _sapEntryScopes) {
-			names.add(sapEntryScope.getScopeName());
+			scopes.add(sapEntryScope.getScopeName());
 		}
 
-		Stream<String> stream = names.stream();
-
-		return stream.collect(
-			Collectors.toMap(Function.identity(), Collections::singleton)
-		);
+		return scopes;
 	}
 
 	@Override

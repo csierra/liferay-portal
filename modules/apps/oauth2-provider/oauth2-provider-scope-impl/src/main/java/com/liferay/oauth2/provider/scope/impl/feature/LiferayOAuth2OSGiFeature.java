@@ -288,7 +288,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			ServiceRegistration<ScopeFinder> serviceRegistration =
 				bundleContext.registerService(
 					ScopeFinder.class,
-					new ScopeListScopeFinder(
+					new CollectionScopeFinder(
 						Arrays.asList(
 							HttpMethod.DELETE, HttpMethod.GET, HttpMethod.HEAD,
 							HttpMethod.OPTIONS, HttpMethod.POST,
@@ -317,7 +317,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 			ServiceRegistration<ScopeFinder> serviceRegistration =
 				bundleContext.registerService(
-					ScopeFinder.class, new ScopeListScopeFinder(scopes),
+					ScopeFinder.class, new CollectionScopeFinder(scopes),
 					new Hashtable<String, Object>() {{
 						put("osgi.jaxrs.name", applicationClassName);
 					}});

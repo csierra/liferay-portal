@@ -117,16 +117,12 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		ScopeFinder scopeFinder = tuple.getService();
 
-		Map<String, Set<String>> scopes = scopeFinder.findScopes();
+		Collection<String> scopes = scopeFinder.findScopes();
 
-		Set<Map.Entry<String, Set<String>>> entries = scopes.entrySet();
-
-		Stream<Map.Entry<String, Set<String>>> stream = entries.stream();
+		Stream<String> stream = scopes.stream();
 
 		Set<String> grantedScopes = stream.filter(
-			e -> scopeMatcher.match(e.getKey())
-		).flatMap(
-			e -> e.getValue().stream()
+			scopeMatcher::match
 		).collect(
 			Collectors.toSet()
 		);
@@ -151,10 +147,12 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	private Collection<String> _doListScopesAliases(long companyId) {
 		Collection<String> scopesAliases = new HashSet<>();
 
-		Set<String> applicationNames = _scopeFinderByNameServiceTrackerMap.keySet();
+		Set<String> applicationNames =
+			_scopeFinderByNameServiceTrackerMap.keySet();
 
 		for (String applicationName : applicationNames) {
-			scopesAliases.addAll(listScopesAliasesForApplication(companyId, applicationName));
+			scopesAliases.addAll(
+				listScopesAliasesForApplication(companyId, applicationName));
 		}
 
 		return scopesAliases;
@@ -177,9 +175,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		ScopeFinder scopeFinder = tuple.getService();
 
-		Map<String, Set<String>> scopesMap = scopeFinder.findScopes();
-
-		Collection<String> availableScopes = scopesMap.keySet();
+		Collection<String> scopes = scopeFinder.findScopes();
 
 		PrefixHandlerFactory prefixHandlerFactory =
 			_scopedPrefixHandlerFactories.getService(
@@ -193,8 +189,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		Collection<String> scopesAliases = new ArrayList<>();
 
-		for (String availableScope : availableScopes) {
-			Set<String> mappedScopes = scopeMapper.map(availableScope);
+		for (String scope : scopes) {
+			Set<String> mappedScopes = scopeMapper.map(scope);
 
 			for (String mappedScope : mappedScopes) {
 				String externalAlias = prefixHandler.addPrefix(mappedScope);

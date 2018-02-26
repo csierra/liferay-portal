@@ -23,17 +23,17 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-class ScopeListScopeFinder implements ScopeFinder {
+class CollectionScopeFinder implements ScopeFinder {
 
 	private final Collection<String> _scopes;
 
-	public ScopeListScopeFinder(Collection<String> scopes) {
+	public CollectionScopeFinder(Collection<String> scopes) {
 		_scopes = scopes;
 	}
 
 	@Override
-	public Map<String, Set<String>> findScopes() {
-		return _scopes.stream().collect(
-			Collectors.toMap(Function.identity(), Collections::singleton));
+	public Collection<String> findScopes() {
+		return _scopes;
 	}
+
 }
