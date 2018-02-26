@@ -109,20 +109,23 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			return Collections.emptyList();
 		}
 
-		ScopeMapper scopeMapper =
-			_scopedScopeMapper.getService(companyId, applicationName);
-		
-		ScopeMatcher scopeMatcher = scopeMapper.applyTo(
-			scopeMatcherFactory.create(scopesAlias.substring(prefix.length())));
+		scopesAlias = scopesAlias.substring(prefix.length());
 
 		ScopeFinder scopeFinder = _scopedScopeFinders.getService(
 			companyId, applicationName);
 
 		Collection<String> scopes = scopeFinder.findScopes();
 
+		ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scopesAlias);
+
+		ScopeMapper scopeMapper = _scopedScopeMapper.getService(
+			companyId, applicationName);
+
 		Stream<String> stream = scopes.stream();
 
-		Set<String> grantedScopes = stream.filter(
+		Set<String> grantedScopes = stream.flatMap(
+			s -> scopeMapper.map(s).stream()
+		).filter(
 			scopeMatcher::match
 		).collect(
 			Collectors.toSet()
