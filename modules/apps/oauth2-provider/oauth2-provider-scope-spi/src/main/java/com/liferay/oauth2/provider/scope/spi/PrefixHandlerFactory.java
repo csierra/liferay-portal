@@ -23,6 +23,9 @@ import java.util.function.Function;
  * This allows components to switch prefixing strategies using configuration,
  * such as using different characters <i>'_'</i> or <i>'.'</i>, thus keeping
  * the prefixing strategy consistent across components.
+ *
+ * @author Carlos Sierra Andrés
+ * @review
  */
 public interface PrefixHandlerFactory {
 
@@ -31,6 +34,7 @@ public interface PrefixHandlerFactory {
 	 *
 	 * @param propertyAccessor to configure the {@link PrefixHandler} from
 	 * @return the {@link PrefixHandler} initialized from the given properties
+	 * @review
 	 */
 	public PrefixHandler create(Function<String, Object> propertyAccessor);
 }

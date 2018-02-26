@@ -40,6 +40,9 @@ import com.liferay.oauth2.provider.scope.spi.ScopeMapper;
  * ScopeMatcher might also be combined with {@link PrefixHandler} and
  * {@link ScopeMapper} to tailor the matching strategy to the framework
  * configuration.
+ *
+ * @author Carlos Sierra Andrés
+ * @review
  */
 
 @ProviderType
@@ -51,6 +54,7 @@ public interface ScopeMatcher {
 	 * @param name
 	 * @return true if the input scope is a match for the {@link ScopeMatcher},
 	 * false otherwise.
+	 * @review
 	 */
 	public boolean match(String name);
 
@@ -60,6 +64,7 @@ public interface ScopeMatcher {
 	 *
 	 * @param names the collection of scope to match.
 	 * @return a collection containing those scope that matched.
+	 * @review
 	 */
 	public default Collection<String> filter(Collection<String> names) {
 		return names.stream().filter(this::match).collect(Collectors.toList());

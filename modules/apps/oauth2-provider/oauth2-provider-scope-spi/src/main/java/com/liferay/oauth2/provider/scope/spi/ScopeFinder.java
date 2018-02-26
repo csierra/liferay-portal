@@ -8,9 +8,9 @@ import java.util.Collection;
  * behalf, with the property osgi.jaxrs.name. This name must be unique across
  * the instance. The property matches with the mandatory property for
  * OSGi JAX-RS spec.
- * @review
  *
  * @author Carlos Sierra Andrés
+ * @review
  */
 public interface ScopeFinder {
 

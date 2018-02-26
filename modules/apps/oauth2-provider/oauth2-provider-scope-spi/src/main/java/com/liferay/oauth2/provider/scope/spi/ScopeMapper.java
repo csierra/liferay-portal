@@ -9,6 +9,7 @@ import java.util.Set;
  * Represents a transformation between internal scope names to external aliases.
  *
  * @author Carlos Sierra Andrés
+ * @review
  */
 public interface ScopeMapper {
 	
@@ -20,6 +21,7 @@ public interface ScopeMapper {
 	 * scope mapper.
 	 * @return the new {@link ScopeMatcher} that takes into account the given
 	 * {@link ScopeMapper}.
+	 * @review
 	 */
 	public default ScopeMatcher applyTo(ScopeMatcher scopeMatcher) {
 		return localName ->
@@ -31,6 +33,7 @@ public interface ScopeMapper {
 	 *
 	 * @param scope application provided scope
 	 * @return set of new names for the scope
+	 * @review
 	 */
 	public Set<String> map(String scope);
 
