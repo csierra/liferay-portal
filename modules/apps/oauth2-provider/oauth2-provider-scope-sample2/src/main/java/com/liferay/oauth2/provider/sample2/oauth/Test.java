@@ -18,9 +18,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
-import com.liferay.oauth2.provider.scope.spi.RequiresNoScope;
-import com.liferay.oauth2.provider.scope.spi.RequiresScope;
-import com.liferay.oauth2.provider.scope.spi.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.RequiresNoScope;
+import com.liferay.oauth2.provider.scope.RequiresScope;
+import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
 
 import java.util.Collection;
 import java.util.Set;
@@ -31,7 +31,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
 
-import com.liferay.oauth2.provider.scope.spi.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import org.osgi.framework.Bundle;

@@ -1,27 +1,34 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.spi;
+package com.liferay.oauth2.provider.scope.impl.feature;
 
-import com.liferay.oauth2.provider.scope.ScopeChecker;
+import com.liferay.oauth2.provider.scope.spi.scopefinder.ScopeFinder;
 
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Request;
+import java.util.Collection;
 
-public interface RequestScopeCheckerFilter {
+class CollectionScopeFinder implements ScopeFinder {
 
-	public boolean isAllowed(
-		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo);
+	private final Collection<String> _scopes;
+
+	public CollectionScopeFinder(Collection<String> scopes) {
+		_scopes = scopes;
+	}
+
+	@Override
+	public Collection<String> findScopes() {
+		return _scopes;
+	}
 
 }

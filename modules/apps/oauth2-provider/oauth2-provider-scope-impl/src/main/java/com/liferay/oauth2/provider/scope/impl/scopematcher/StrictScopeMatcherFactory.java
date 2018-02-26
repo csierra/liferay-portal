@@ -12,16 +12,23 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.spi;
+package com.liferay.oauth2.provider.scope.impl.scopematcher;
 
-import com.liferay.oauth2.provider.scope.ScopeChecker;
+import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcherFactory;
+import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcher;
+import org.osgi.service.component.annotations.Component;
 
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Request;
+/**
+ * @author Tomas Polesovsky
+ */
+@Component(
+	immediate = true,
+	property = "type=strict"
+)
+public class StrictScopeMatcherFactory implements ScopeMatcherFactory {
 
-public interface RequestScopeCheckerFilter {
-
-	public boolean isAllowed(
-		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo);
-
+	@Override
+	public ScopeMatcher create(String input) {
+		return input::equals;
+	}
 }

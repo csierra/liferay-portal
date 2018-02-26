@@ -14,10 +14,10 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
-import com.liferay.oauth2.provider.scope.spi.liferay.api.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.scope.spi.liferay.api.ScopeDescriptorLocator;
-import com.liferay.oauth2.provider.scope.spi.liferay.api.ScopeFinderLocator;
-import com.liferay.oauth2.provider.scope.spi.liferay.api.ScopeMatcherFactoryLocator;
+import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.api.ScopeDescriptorLocator;
+import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scope.liferay.api.ScopeMatcherFactoryLocator;
 import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scope.spi.applicationdescriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scopedescriptor.ScopeDescriptor;

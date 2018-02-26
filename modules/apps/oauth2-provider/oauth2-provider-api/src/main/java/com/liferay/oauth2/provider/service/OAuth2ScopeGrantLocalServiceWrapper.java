@@ -16,7 +16,7 @@ package com.liferay.oauth2.provider.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.oauth2.provider.scope.spi.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**

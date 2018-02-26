@@ -18,7 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
-import com.liferay.oauth2.provider.scope.spi.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK;
 
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;

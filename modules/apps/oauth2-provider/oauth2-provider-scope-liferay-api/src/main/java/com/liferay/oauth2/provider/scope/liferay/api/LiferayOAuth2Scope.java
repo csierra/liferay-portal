@@ -12,16 +12,20 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.spi;
+package com.liferay.oauth2.provider.scope.liferay.api;
 
-import com.liferay.oauth2.provider.scope.ScopeChecker;
+import org.osgi.framework.Bundle;
 
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Request;
+/**
+ * Interface representing the whole information for a scope in a Liferay
+ * environment. An external scope name will match several scope internally.
+ */
+public interface LiferayOAuth2Scope {
 
-public interface RequestScopeCheckerFilter {
+	public Bundle getBundle();
 
-	public boolean isAllowed(
-		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo);
+	public String getApplicationName();
+
+	public String getScope();
 
 }
