@@ -24,7 +24,10 @@ import javax.ws.rs.core.Request;
 
 @Component(
 	immediate = true,
-	property = "default=true"
+	property = {
+		"default=true",
+		"type=http.method"
+	}
 )
 public class HttpMethodRequestScopeChecker
 	implements RequestScopeCheckerFilter {

@@ -24,7 +24,9 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
 import java.lang.reflect.Method;
 
-@Component(service = AnnotationRequestScopeChecker.class)
+@Component(
+	property = "type=annotation"
+)
 public class AnnotationRequestScopeChecker
 	implements RequestScopeCheckerFilter {
 

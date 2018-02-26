@@ -99,7 +99,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		context.register(
 			new ScopedRequestScopeChecker(
 				_bundleContext, _scopeChecker,
-				() -> defaultRequestScopeChecker),
+				() -> _defaultRequestScopeChecker),
 			Priorities.AUTHORIZATION - 8);
 
 		context.register(
@@ -315,14 +315,28 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					ScopeAnnotationFinder.find(resourceClass, bus));
 			}
 
-			ServiceRegistration<ScopeFinder> serviceRegistration =
+			Hashtable<String, Object> properties =
+				new Hashtable<String, Object>() {{
+					put("osgi.jaxrs.name", applicationClassName);
+				}};
+
+			ServiceRegistration<ScopeFinder> scopeFinderRegistration =
 				bundleContext.registerService(
 					ScopeFinder.class, new CollectionScopeFinder(scopes),
-					new Hashtable<String, Object>() {{
-						put("osgi.jaxrs.name", applicationClassName);
-					}});
+					properties);
 
-			endpoint.addCleanupHook(serviceRegistration::unregister);
+			ServiceRegistration<RequestScopeCheckerFilter>
+				requestScopeCheckerFilterRegistration =
+				bundleContext.registerService(
+					RequestScopeCheckerFilter.class,
+					_annotationRequestScopeChecker, properties);
+
+			endpoint.addCleanupHook(
+				() -> {
+					scopeFinderRegistration.unregister();
+
+					requestScopeCheckerFilterRegistration.unregister();
+				});
 		}
 
 		private class AplicationDescriptorsImpl
@@ -390,9 +404,15 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 	@Reference(
 		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(type=annotation)"
+	)
+	private RequestScopeCheckerFilter _annotationRequestScopeChecker;
+
+	@Reference(
+		policyOption = ReferencePolicyOption.GREEDY,
 		target = "(default=true)"
 	)
-	private RequestScopeCheckerFilter defaultRequestScopeChecker;
+	private RequestScopeCheckerFilter _defaultRequestScopeChecker;
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,

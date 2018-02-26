@@ -61,6 +61,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 	private ConcurrentMap<String, Object> _invocationCache =
 		new ConcurrentHashMap<>();
+	private ScopedServiceTrackerMap<ScopeFinder> _scopedScopeFinders;
 
 	private Collection<LiferayOAuth2Scope> _doLocateScopes(
 		long companyId, String scopesAlias) {
@@ -114,7 +115,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		ScopeMatcher scopeMatcher = scopeMapper.applyTo(
 			scopeMatcherFactory.create(scopesAlias.substring(prefix.length())));
 
-		ScopeFinder scopeFinder = tuple.getService();
+		ScopeFinder scopeFinder = _scopedScopeFinders.getService(
+			companyId, applicationName);
 
 		Collection<String> scopes = scopeFinder.findScopes();
 
@@ -172,7 +174,8 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		ServiceReference<?> serviceReference =
 			tuple.getServiceReference();
 
-		ScopeFinder scopeFinder = tuple.getService();
+		ScopeFinder scopeFinder = _scopedScopeFinders.getService(
+			companyId, applicationName);
 
 		Collection<String> scopes = scopeFinder.findScopes();
 
@@ -210,6 +213,10 @@ public class ScopeRegistry implements ScopeFinderLocator {
 				new ScopeFinderServiceTupleServiceTrackerCustomizer(
 					bundleContext), Comparator.naturalOrder(),
 				new CacheClearServiceTrackerMapListener());
+
+		_scopedScopeFinders = new ScopedServiceTrackerMap<>(
+			bundleContext, ScopeFinder.class, "osgi.jaxrs.name", null,
+			_invocationCache::clear);
 
 		_scopedPrefixHandlerFactories = new ScopedServiceTrackerMap<>(
 			bundleContext, PrefixHandlerFactory.class, "osgi.jaxrs.name",
