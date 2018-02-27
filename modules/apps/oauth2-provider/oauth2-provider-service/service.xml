@@ -12,20 +12,23 @@
 		<!-- Audit fields -->
 
 		<column name="companyId" type="long" />
-		<column name="userId" type="long" />
-		<column name="userName" type="String" />
 		<column name="createDate" type="Date" />
 		<column name="modifiedDate" type="Date" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
 
 		<!-- Other fields -->
 
+		<column name="allowedGrantTypes" type="String" />
+		<column name="clientConfidential" type="Boolean" />
 		<column name="clientId" type="String" />
 		<column name="clientSecret" type="String" />
-		<column name="redirectUri" type="String" />
-		<column name="clientConfidential" type="Boolean" />
 		<column name="description" type="String" />
+		<column name="homePageURL" type="String" />
+		<column name="iconFileEntryId" type="long" />
 		<column name="name" type="String" />
-		<column name="webUrl" type="String" />
+		<column name="privacyPolicyURL" type="String" />
+		<column name="redirectURIs" type="String" />
 		<column name="scopes" type="String" />
 
 		<finder name="C" return-type="Collection">
