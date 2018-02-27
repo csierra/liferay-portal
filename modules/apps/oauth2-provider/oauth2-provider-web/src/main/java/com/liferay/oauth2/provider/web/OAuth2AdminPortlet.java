@@ -28,8 +28,13 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 
+import com.liferay.portal.kernel.util.StringUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Stian Sigvartsen
@@ -74,40 +79,53 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			OAuth2Application.class.getName(), request);
 
-		long userId = serviceContext.getUserId();
-
 		long oAuth2ApplicationId = ParamUtil.getLong(
-			request, "oAuth2ApplicationId", -1);
+			request, "oAuth2ApplicationId", 0);
 
-		boolean clientConfidential = ParamUtil.get(request, "clientConfidential", false);
+		boolean clientConfidential = ParamUtil.get(
+			request, "clientConfidential", false);
 				
-		String oAuth2ClientId = ParamUtil.get(
+		String clientId = ParamUtil.get(
 			request, "clientId", StringPool.BLANK);
 
-		String oAuth2ClientSecret = ParamUtil.get(
+		String clientSecret = ParamUtil.get(
 			request, "clientSecret", StringPool.BLANK);
 
-		String oAuth2RedirectURI = ParamUtil.get(request, "redirectUri", StringPool.BLANK);
-		
 		String name = ParamUtil.get(request, "name", StringPool.BLANK);
 
 		String description = ParamUtil.get(
 			request, "description", StringPool.BLANK);
 
-		String webURL = ParamUtil.get(request, "webUrl", StringPool.BLANK);
-				
+		String homePageURL = ParamUtil.get(
+			request, "homePageURL", StringPool.BLANK);
+
+		List<String> allowedGrantTypesList = Arrays.asList(
+			ParamUtil.getParameterValues(
+				request, "allowedGrantTypes", new String[0]));
+
+		String privacyPolicyURL = ParamUtil.get(
+			request, "privacyPolicyURL", StringPool.BLANK);
+
+		List<String> redirectURIsList = Arrays.asList(
+			StringUtil.splitLines(
+				ParamUtil.get(request, "redirectURIs", StringPool.BLANK)));
+
+		List<String> scopesList = Collections.emptyList();
+		long iconFileEntryId = 0;
+
 		try {
-			if (oAuth2ApplicationId <= 0) {
+			if (oAuth2ApplicationId == 0) {
 				_oAuth2ApplicationService.addOAuth2Application(
-					userId, name, description, webURL, clientConfidential,
-					oAuth2ClientId, oAuth2ClientSecret, oAuth2RedirectURI, 
-					serviceContext);
+					allowedGrantTypesList, clientConfidential, clientId,
+					clientSecret, description, homePageURL, iconFileEntryId,
+					name, privacyPolicyURL, redirectURIsList, scopesList, serviceContext);
 			}
 			else {
 				_oAuth2ApplicationService.updateOAuth2Application(
-					userId, oAuth2ApplicationId, name, description, webURL, 
-					clientConfidential, oAuth2ClientId, oAuth2ClientSecret, 
-					oAuth2RedirectURI, serviceContext);
+					oAuth2ApplicationId, allowedGrantTypesList, clientConfidential,
+					clientId, clientSecret, description, homePageURL,
+					iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+					scopesList, serviceContext);
 			}
 		}
 		catch (PortalException pe) {

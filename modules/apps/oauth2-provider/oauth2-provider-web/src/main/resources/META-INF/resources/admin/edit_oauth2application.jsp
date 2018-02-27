@@ -49,13 +49,21 @@ if (oAuth2ApplicationId > -1) {
 			/>
 
 			<aui:fieldset label="details">
-				<aui:input name="name" />
+				<aui:input name="name" required="true" />
+				<aui:input name="iconFileEntryId" helpMessage="Here should be upload dialog" />
 				<aui:input name="description" type="textarea" />
-				<aui:input name="webUrl" />
-				<aui:input name="clientConfidential" type="checkbox"  value='<%= oAuth2Application == null ? "" : oAuth2Application.getClientConfidential() %>' />
-				<aui:input name="clientId" value='<%= oAuth2Application == null ? "" : oAuth2Application.getClientId() %>' />
-				<aui:input name="clientSecret" value='<%= oAuth2Application == null ? "" : oAuth2Application.getClientSecret() %>' />
-				<aui:input name="redirectUri" value='<%= oAuth2Application == null ? "" : oAuth2Application.getRedirectUri() %>' />
+				<aui:input name="homePageURL" />
+				<aui:input name="privacyPolicyURL" />
+				<aui:input name="clientConfidential" type="checkbox" value="<%= oAuth2Application == null ? true : oAuth2Application.getClientConfidential() %>"/>
+				<aui:input name="clientId" required="true" />
+				<aui:input name="clientSecret" />
+				<aui:input label="redirect-uris" name="redirectURIs" helpMessage="redirect-uris-help" />
+				<aui:fieldset label="allowed-grant-types">
+					<aui:input name="allowedGrantTypes" type="checkbox" label="authorization_code-grant" value="authorization_code" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains("authorization_code") %>" />
+					<aui:input name="allowedGrantTypes" type="checkbox" label="client_credentials-grant" value="client_credentials" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains("client_credentials") %>" />
+					<aui:input name="allowedGrantTypes" type="checkbox" label="password-grant" value="password" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains("password") %>" />
+					<aui:input name="allowedGrantTypes" type="checkbox" label="refresh_token-grant" value="refresh_token" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains("refresh_token") %>" />
+				</aui:fieldset>
 			</aui:fieldset>
 		</aui:fieldset-group>
 
