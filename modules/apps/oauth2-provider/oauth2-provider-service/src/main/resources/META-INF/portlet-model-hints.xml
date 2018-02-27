@@ -13,11 +13,19 @@
 		<field name="clientId" type="String" />
 		<field name="clientSecret" type="String" />
 		<field name="description" type="String" />
-		<field name="homePageURL" type="String" />
+		<field name="homePageURL" type="String">
+			<hint-collection name="URL" />
+			<validator name="url" />
+		</field>
 		<field name="iconFileEntryId" type="long" />
 		<field name="name" type="String" />
-		<field name="privacyPolicyURL" type="String" />
-		<field name="redirectURIs" type="String" />
+		<field name="privacyPolicyURL" type="String">
+			<hint-collection name="URL" />
+			<validator name="url" />
+		</field>
+		<field name="redirectURIs" type="String">
+			<hint-collection name="TEXTAREA" />
+		</field>
 		<field name="scopes" type="String">
 			<hint-collection name="CLOB" />
 		</field>
