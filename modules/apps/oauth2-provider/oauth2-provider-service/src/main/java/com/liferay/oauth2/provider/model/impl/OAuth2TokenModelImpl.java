@@ -74,7 +74,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 			{ "oAuth2ApplicationId", Types.BIGINT },
 			{ "oAuth2TokenType", Types.VARCHAR },
 			{ "oAuth2RefreshTokenId", Types.BIGINT },
-			{ "scope", Types.CLOB }
+			{ "scopes", Types.CLOB }
 		};
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
 
@@ -92,7 +92,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		TABLE_COLUMNS_MAP.put("scopes", Types.CLOB);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2Token (oAuth2TokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,oAuth2TokenContent TEXT null,oAuth2ApplicationId LONG,oAuth2TokenType VARCHAR(75) null,oAuth2RefreshTokenId LONG,scope TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2Token (oAuth2TokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,oAuth2TokenContent TEXT null,oAuth2ApplicationId LONG,oAuth2TokenType VARCHAR(75) null,oAuth2RefreshTokenId LONG,scopes TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2Token";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2Token.oAuth2TokenId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2Token.oAuth2TokenId ASC";
@@ -633,7 +633,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		sb.append(getOAuth2TokenType());
 		sb.append(", oAuth2RefreshTokenId=");
 		sb.append(getOAuth2RefreshTokenId());
-		sb.append(", scope=");
+		sb.append(", scopes=");
 		sb.append(getScopes());
 		sb.append("}");
 
@@ -689,7 +689,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		sb.append(getOAuth2RefreshTokenId());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>scope</column-name><column-value><![CDATA[");
+			"<column><column-name>scopes</column-name><column-value><![CDATA[");
 		sb.append(getScopes());
 		sb.append("]]></column-value></column>");
 

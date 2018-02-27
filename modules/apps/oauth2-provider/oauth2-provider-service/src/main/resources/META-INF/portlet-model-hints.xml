@@ -4,17 +4,20 @@
 	<model name="com.liferay.oauth2.provider.model.OAuth2Application">
 		<field name="oAuth2ApplicationId" type="long" />
 		<field name="companyId" type="long" />
-		<field name="userId" type="long" />
-		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="allowedGrantTypes" type="String" />
+		<field name="clientConfidential" type="Boolean" />
 		<field name="clientId" type="String" />
 		<field name="clientSecret" type="String" />
-		<field name="redirectUri" type="String" />
-		<field name="clientConfidential" type="Boolean" />
 		<field name="description" type="String" />
+		<field name="homePageURL" type="String" />
+		<field name="iconFileEntryId" type="long" />
 		<field name="name" type="String" />
-		<field name="webUrl" type="String" />
+		<field name="privacyPolicyURL" type="String" />
+		<field name="redirectURIs" type="String" />
 		<field name="scopes" type="String">
 			<hint-collection name="CLOB" />
 		</field>

@@ -58,11 +58,14 @@ public interface OAuth2ApplicationService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2ApplicationServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public OAuth2Application addOAuth2Application(long userId,
-		java.lang.String name, java.lang.String description,
-		java.lang.String webURL, boolean oAuth2ClientConfidential,
-		java.lang.String oAuth2ClientId, java.lang.String oAuth2ClientSecret,
-		java.lang.String oAuth2RedirectURI, ServiceContext serviceContext)
+	public OAuth2Application addOAuth2Application(
+		List<java.lang.String> allowedGrantTypesList,
+		boolean clientConfidential, java.lang.String clientId,
+		java.lang.String clientSecret, java.lang.String description,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
+		List<java.lang.String> redirectURIsList,
+		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;
 
 	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
@@ -96,12 +99,14 @@ public interface OAuth2ApplicationService extends BaseService {
 	*/
 	public java.lang.String getOSGiServiceIdentifier();
 
-	public OAuth2Application updateOAuth2Application(long userId,
-		long oAuth2ApplicationId, java.lang.String name,
-		java.lang.String description, java.lang.String webURL,
-		boolean oAuth2ClientConfidential, java.lang.String oAuth2ClientId,
-		java.lang.String oAuth2ClientSecret,
-		java.lang.String oAuth2RedirectURI, ServiceContext serviceContext)
+	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
+		List<java.lang.String> allowedGrantTypesList,
+		boolean clientConfidential, java.lang.String clientId,
+		java.lang.String clientSecret, java.lang.String description,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
+		List<java.lang.String> redirectURIsList,
+		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;
 
 	public OAuth2Application updateScopes(long oAuth2ApplicationId,

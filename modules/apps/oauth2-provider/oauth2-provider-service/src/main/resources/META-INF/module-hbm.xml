@@ -11,17 +11,20 @@
 			<generator class="assigned" />
 		</id>
 		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
-		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
-		<property name="userName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="createDate" type="org.hibernate.type.TimestampType" />
 		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
+		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="allowedGrantTypes" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="clientConfidential" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="clientId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="clientSecret" type="com.liferay.portal.dao.orm.hibernate.StringType" />
-		<property name="redirectUri" type="com.liferay.portal.dao.orm.hibernate.StringType" />
-		<property name="clientConfidential" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="homePageURL" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="iconFileEntryId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
-		<property name="webUrl" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="privacyPolicyURL" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="redirectURIs" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="scopes" type="com.liferay.portal.dao.orm.hibernate.StringClobType" />
 	</class>
 	<class name="com.liferay.oauth2.provider.model.impl.OAuth2RefreshTokenImpl" table="OAuth2RefreshToken">

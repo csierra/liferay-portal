@@ -35,15 +35,19 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
-		long userId, java.lang.String name, java.lang.String description,
-		java.lang.String webURL, boolean oAuth2ClientConfidential,
-		java.lang.String oAuth2ClientId, java.lang.String oAuth2ClientSecret,
-		java.lang.String oAuth2RedirectURI,
+		java.util.List<java.lang.String> allowedGrantTypesList,
+		boolean clientConfidential, java.lang.String clientId,
+		java.lang.String clientSecret, java.lang.String description,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
+		java.util.List<java.lang.String> redirectURIsList,
+		java.util.List<java.lang.String> scopesList,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2ApplicationService.addOAuth2Application(userId, name,
-			description, webURL, oAuth2ClientConfidential, oAuth2ClientId,
-			oAuth2ClientSecret, oAuth2RedirectURI, serviceContext);
+		return _oAuth2ApplicationService.addOAuth2Application(allowedGrantTypesList,
+			clientConfidential, clientId, clientSecret, description,
+			homePageURL, iconFileEntryId, name, privacyPolicyURL,
+			redirectURIsList, scopesList, serviceContext);
 	}
 
 	@Override
@@ -102,17 +106,20 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
-		long userId, long oAuth2ApplicationId, java.lang.String name,
-		java.lang.String description, java.lang.String webURL,
-		boolean oAuth2ClientConfidential, java.lang.String oAuth2ClientId,
-		java.lang.String oAuth2ClientSecret,
-		java.lang.String oAuth2RedirectURI,
+		long oAuth2ApplicationId,
+		java.util.List<java.lang.String> allowedGrantTypesList,
+		boolean clientConfidential, java.lang.String clientId,
+		java.lang.String clientSecret, java.lang.String description,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
+		java.util.List<java.lang.String> redirectURIsList,
+		java.util.List<java.lang.String> scopesList,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2ApplicationService.updateOAuth2Application(userId,
-			oAuth2ApplicationId, name, description, webURL,
-			oAuth2ClientConfidential, oAuth2ClientId, oAuth2ClientSecret,
-			oAuth2RedirectURI, serviceContext);
+		return _oAuth2ApplicationService.updateOAuth2Application(oAuth2ApplicationId,
+			allowedGrantTypesList, clientConfidential, clientId, clientSecret,
+			description, homePageURL, iconFileEntryId, name, privacyPolicyURL,
+			redirectURIsList, scopesList, serviceContext);
 	}
 
 	@Override

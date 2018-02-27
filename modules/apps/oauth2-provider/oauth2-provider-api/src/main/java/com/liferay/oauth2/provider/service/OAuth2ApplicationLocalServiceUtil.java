@@ -48,16 +48,21 @@ public class OAuth2ApplicationLocalServiceUtil {
 	* Never reference this class directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
 	*/
 	public static com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
-		long userId, java.lang.String name, java.lang.String description,
-		java.lang.String webURL, boolean oAuth2ClientConfidential,
-		java.lang.String oAuth2ClientId, java.lang.String oAuth2ClientSecret,
-		java.lang.String oAuth2RedirectURI,
+		long companyId, long userId, java.lang.String userName,
+		java.util.List<java.lang.String> allowedGrantTypesList,
+		boolean clientConfidential, java.lang.String clientId,
+		java.lang.String clientSecret, java.lang.String description,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
+		java.util.List<java.lang.String> redirectURIsList,
+		java.util.List<java.lang.String> scopesList,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .addOAuth2Application(userId, name, description, webURL,
-			oAuth2ClientConfidential, oAuth2ClientId, oAuth2ClientSecret,
-			oAuth2RedirectURI, serviceContext);
+				   .addOAuth2Application(companyId, userId, userName,
+			allowedGrantTypesList, clientConfidential, clientId, clientSecret,
+			description, homePageURL, iconFileEntryId, name, privacyPolicyURL,
+			redirectURIsList, scopesList, serviceContext);
 	}
 
 	/**
@@ -271,17 +276,21 @@ public class OAuth2ApplicationLocalServiceUtil {
 	}
 
 	public static com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
-		long userId, long oAuth2ApplicationId, java.lang.String name,
-		java.lang.String description, java.lang.String webURL,
-		boolean oAuth2ClientConfidential, java.lang.String oAuth2ClientId,
-		java.lang.String oAuth2ClientSecret,
-		java.lang.String oAuth2RedirectURI,
+		long oAuth2ApplicationId,
+		java.util.List<java.lang.String> allowedGrantTypesList,
+		boolean clientConfidential, java.lang.String clientId,
+		java.lang.String clientSecret, java.lang.String description,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
+		java.util.List<java.lang.String> redirectURIsList,
+		java.util.List<java.lang.String> scopesList,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .updateOAuth2Application(userId, oAuth2ApplicationId, name,
-			description, webURL, oAuth2ClientConfidential, oAuth2ClientId,
-			oAuth2ClientSecret, oAuth2RedirectURI, serviceContext);
+				   .updateOAuth2Application(oAuth2ApplicationId,
+			allowedGrantTypesList, clientConfidential, clientId, clientSecret,
+			description, homePageURL, iconFileEntryId, name, privacyPolicyURL,
+			redirectURIsList, scopesList, serviceContext);
 	}
 
 	/**

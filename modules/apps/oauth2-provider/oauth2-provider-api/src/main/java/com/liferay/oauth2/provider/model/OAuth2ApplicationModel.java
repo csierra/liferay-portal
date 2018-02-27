@@ -96,6 +96,38 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	public void setCompanyId(long companyId);
 
 	/**
+	 * Returns the create date of this o auth2 application.
+	 *
+	 * @return the create date of this o auth2 application
+	 */
+	@Override
+	public Date getCreateDate();
+
+	/**
+	 * Sets the create date of this o auth2 application.
+	 *
+	 * @param createDate the create date of this o auth2 application
+	 */
+	@Override
+	public void setCreateDate(Date createDate);
+
+	/**
+	 * Returns the modified date of this o auth2 application.
+	 *
+	 * @return the modified date of this o auth2 application
+	 */
+	@Override
+	public Date getModifiedDate();
+
+	/**
+	 * Sets the modified date of this o auth2 application.
+	 *
+	 * @param modifiedDate the modified date of this o auth2 application
+	 */
+	@Override
+	public void setModifiedDate(Date modifiedDate);
+
+	/**
 	 * Returns the user ID of this o auth2 application.
 	 *
 	 * @return the user ID of this o auth2 application
@@ -145,36 +177,33 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	public void setUserName(String userName);
 
 	/**
-	 * Returns the create date of this o auth2 application.
+	 * Returns the allowed grant types of this o auth2 application.
 	 *
-	 * @return the create date of this o auth2 application
+	 * @return the allowed grant types of this o auth2 application
 	 */
-	@Override
-	public Date getCreateDate();
+	@AutoEscape
+	public String getAllowedGrantTypes();
 
 	/**
-	 * Sets the create date of this o auth2 application.
+	 * Sets the allowed grant types of this o auth2 application.
 	 *
-	 * @param createDate the create date of this o auth2 application
+	 * @param allowedGrantTypes the allowed grant types of this o auth2 application
 	 */
-	@Override
-	public void setCreateDate(Date createDate);
+	public void setAllowedGrantTypes(String allowedGrantTypes);
 
 	/**
-	 * Returns the modified date of this o auth2 application.
+	 * Returns the client confidential of this o auth2 application.
 	 *
-	 * @return the modified date of this o auth2 application
+	 * @return the client confidential of this o auth2 application
 	 */
-	@Override
-	public Date getModifiedDate();
+	public Boolean getClientConfidential();
 
 	/**
-	 * Sets the modified date of this o auth2 application.
+	 * Sets the client confidential of this o auth2 application.
 	 *
-	 * @param modifiedDate the modified date of this o auth2 application
+	 * @param clientConfidential the client confidential of this o auth2 application
 	 */
-	@Override
-	public void setModifiedDate(Date modifiedDate);
+	public void setClientConfidential(Boolean clientConfidential);
 
 	/**
 	 * Returns the client ID of this o auth2 application.
@@ -207,35 +236,6 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	public void setClientSecret(String clientSecret);
 
 	/**
-	 * Returns the redirect uri of this o auth2 application.
-	 *
-	 * @return the redirect uri of this o auth2 application
-	 */
-	@AutoEscape
-	public String getRedirectUri();
-
-	/**
-	 * Sets the redirect uri of this o auth2 application.
-	 *
-	 * @param redirectUri the redirect uri of this o auth2 application
-	 */
-	public void setRedirectUri(String redirectUri);
-
-	/**
-	 * Returns the client confidential of this o auth2 application.
-	 *
-	 * @return the client confidential of this o auth2 application
-	 */
-	public Boolean getClientConfidential();
-
-	/**
-	 * Sets the client confidential of this o auth2 application.
-	 *
-	 * @param clientConfidential the client confidential of this o auth2 application
-	 */
-	public void setClientConfidential(Boolean clientConfidential);
-
-	/**
 	 * Returns the description of this o auth2 application.
 	 *
 	 * @return the description of this o auth2 application
@@ -249,6 +249,35 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	 * @param description the description of this o auth2 application
 	 */
 	public void setDescription(String description);
+
+	/**
+	 * Returns the home page url of this o auth2 application.
+	 *
+	 * @return the home page url of this o auth2 application
+	 */
+	@AutoEscape
+	public String getHomePageURL();
+
+	/**
+	 * Sets the home page url of this o auth2 application.
+	 *
+	 * @param homePageURL the home page url of this o auth2 application
+	 */
+	public void setHomePageURL(String homePageURL);
+
+	/**
+	 * Returns the icon file entry ID of this o auth2 application.
+	 *
+	 * @return the icon file entry ID of this o auth2 application
+	 */
+	public long getIconFileEntryId();
+
+	/**
+	 * Sets the icon file entry ID of this o auth2 application.
+	 *
+	 * @param iconFileEntryId the icon file entry ID of this o auth2 application
+	 */
+	public void setIconFileEntryId(long iconFileEntryId);
 
 	/**
 	 * Returns the name of this o auth2 application.
@@ -266,32 +295,47 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	public void setName(String name);
 
 	/**
-	 * Returns the web url of this o auth2 application.
+	 * Returns the privacy policy url of this o auth2 application.
 	 *
-	 * @return the web url of this o auth2 application
+	 * @return the privacy policy url of this o auth2 application
 	 */
 	@AutoEscape
-	public String getWebUrl();
+	public String getPrivacyPolicyURL();
 
 	/**
-	 * Sets the web url of this o auth2 application.
+	 * Sets the privacy policy url of this o auth2 application.
 	 *
-	 * @param webUrl the web url of this o auth2 application
+	 * @param privacyPolicyURL the privacy policy url of this o auth2 application
 	 */
-	public void setWebUrl(String webUrl);
+	public void setPrivacyPolicyURL(String privacyPolicyURL);
 
 	/**
-	 * Returns the scope of this o auth2 application.
+	 * Returns the redirect ur is of this o auth2 application.
 	 *
-	 * @return the scope of this o auth2 application
+	 * @return the redirect ur is of this o auth2 application
+	 */
+	@AutoEscape
+	public String getRedirectURIs();
+
+	/**
+	 * Sets the redirect ur is of this o auth2 application.
+	 *
+	 * @param redirectURIs the redirect ur is of this o auth2 application
+	 */
+	public void setRedirectURIs(String redirectURIs);
+
+	/**
+	 * Returns the scopes of this o auth2 application.
+	 *
+	 * @return the scopes of this o auth2 application
 	 */
 	@AutoEscape
 	public String getScopes();
 
 	/**
-	 * Sets the scope of this o auth2 application.
+	 * Sets the scopes of this o auth2 application.
 	 *
-	 * @param scopes the scope of this o auth2 application
+	 * @param scopes the scopes of this o auth2 application
 	 */
 	public void setScopes(String scopes);
 

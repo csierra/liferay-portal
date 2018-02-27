@@ -68,11 +68,15 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 	*
 	* Never reference this class directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
 	*/
-	public OAuth2Application addOAuth2Application(long userId,
-		java.lang.String name, java.lang.String description,
-		java.lang.String webURL, boolean oAuth2ClientConfidential,
-		java.lang.String oAuth2ClientId, java.lang.String oAuth2ClientSecret,
-		java.lang.String oAuth2RedirectURI, ServiceContext serviceContext)
+	public OAuth2Application addOAuth2Application(long companyId, long userId,
+		java.lang.String userName,
+		List<java.lang.String> allowedGrantTypesList,
+		boolean clientConfidential, java.lang.String clientId,
+		java.lang.String clientSecret, java.lang.String description,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
+		List<java.lang.String> redirectURIsList,
+		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -242,12 +246,14 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
-	public OAuth2Application updateOAuth2Application(long userId,
-		long oAuth2ApplicationId, java.lang.String name,
-		java.lang.String description, java.lang.String webURL,
-		boolean oAuth2ClientConfidential, java.lang.String oAuth2ClientId,
-		java.lang.String oAuth2ClientSecret,
-		java.lang.String oAuth2RedirectURI, ServiceContext serviceContext)
+	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
+		List<java.lang.String> allowedGrantTypesList,
+		boolean clientConfidential, java.lang.String clientId,
+		java.lang.String clientSecret, java.lang.String description,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
+		List<java.lang.String> redirectURIsList,
+		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**

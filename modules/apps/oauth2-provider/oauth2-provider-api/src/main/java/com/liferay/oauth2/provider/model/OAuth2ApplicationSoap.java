@@ -36,17 +36,20 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 		soapModel.setOAuth2ApplicationId(model.getOAuth2ApplicationId());
 		soapModel.setCompanyId(model.getCompanyId());
-		soapModel.setUserId(model.getUserId());
-		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
+		soapModel.setUserId(model.getUserId());
+		soapModel.setUserName(model.getUserName());
+		soapModel.setAllowedGrantTypes(model.getAllowedGrantTypes());
+		soapModel.setClientConfidential(model.getClientConfidential());
 		soapModel.setClientId(model.getClientId());
 		soapModel.setClientSecret(model.getClientSecret());
-		soapModel.setRedirectUri(model.getRedirectUri());
-		soapModel.setClientConfidential(model.getClientConfidential());
 		soapModel.setDescription(model.getDescription());
+		soapModel.setHomePageURL(model.getHomePageURL());
+		soapModel.setIconFileEntryId(model.getIconFileEntryId());
 		soapModel.setName(model.getName());
-		soapModel.setWebUrl(model.getWebUrl());
+		soapModel.setPrivacyPolicyURL(model.getPrivacyPolicyURL());
+		soapModel.setRedirectURIs(model.getRedirectURIs());
 		soapModel.setScopes(model.getScopes());
 
 		return soapModel;
@@ -119,6 +122,22 @@ public class OAuth2ApplicationSoap implements Serializable {
 		_companyId = companyId;
 	}
 
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
+	public Date getModifiedDate() {
+		return _modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		_modifiedDate = modifiedDate;
+	}
+
 	public long getUserId() {
 		return _userId;
 	}
@@ -135,20 +154,20 @@ public class OAuth2ApplicationSoap implements Serializable {
 		_userName = userName;
 	}
 
-	public Date getCreateDate() {
-		return _createDate;
+	public String getAllowedGrantTypes() {
+		return _allowedGrantTypes;
 	}
 
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
+	public void setAllowedGrantTypes(String allowedGrantTypes) {
+		_allowedGrantTypes = allowedGrantTypes;
 	}
 
-	public Date getModifiedDate() {
-		return _modifiedDate;
+	public Boolean getClientConfidential() {
+		return _clientConfidential;
 	}
 
-	public void setModifiedDate(Date modifiedDate) {
-		_modifiedDate = modifiedDate;
+	public void setClientConfidential(Boolean clientConfidential) {
+		_clientConfidential = clientConfidential;
 	}
 
 	public String getClientId() {
@@ -167,28 +186,28 @@ public class OAuth2ApplicationSoap implements Serializable {
 		_clientSecret = clientSecret;
 	}
 
-	public String getRedirectUri() {
-		return _redirectUri;
-	}
-
-	public void setRedirectUri(String redirectUri) {
-		_redirectUri = redirectUri;
-	}
-
-	public Boolean getClientConfidential() {
-		return _clientConfidential;
-	}
-
-	public void setClientConfidential(Boolean clientConfidential) {
-		_clientConfidential = clientConfidential;
-	}
-
 	public String getDescription() {
 		return _description;
 	}
 
 	public void setDescription(String description) {
 		_description = description;
+	}
+
+	public String getHomePageURL() {
+		return _homePageURL;
+	}
+
+	public void setHomePageURL(String homePageURL) {
+		_homePageURL = homePageURL;
+	}
+
+	public long getIconFileEntryId() {
+		return _iconFileEntryId;
+	}
+
+	public void setIconFileEntryId(long iconFileEntryId) {
+		_iconFileEntryId = iconFileEntryId;
 	}
 
 	public String getName() {
@@ -199,12 +218,20 @@ public class OAuth2ApplicationSoap implements Serializable {
 		_name = name;
 	}
 
-	public String getWebUrl() {
-		return _webUrl;
+	public String getPrivacyPolicyURL() {
+		return _privacyPolicyURL;
 	}
 
-	public void setWebUrl(String webUrl) {
-		_webUrl = webUrl;
+	public void setPrivacyPolicyURL(String privacyPolicyURL) {
+		_privacyPolicyURL = privacyPolicyURL;
+	}
+
+	public String getRedirectURIs() {
+		return _redirectURIs;
+	}
+
+	public void setRedirectURIs(String redirectURIs) {
+		_redirectURIs = redirectURIs;
 	}
 
 	public String getScopes() {
@@ -217,16 +244,19 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 	private long _oAuth2ApplicationId;
 	private long _companyId;
-	private long _userId;
-	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
+	private long _userId;
+	private String _userName;
+	private String _allowedGrantTypes;
+	private Boolean _clientConfidential;
 	private String _clientId;
 	private String _clientSecret;
-	private String _redirectUri;
-	private Boolean _clientConfidential;
 	private String _description;
+	private String _homePageURL;
+	private long _iconFileEntryId;
 	private String _name;
-	private String _webUrl;
+	private String _privacyPolicyURL;
+	private String _redirectURIs;
 	private String _scopes;
 }

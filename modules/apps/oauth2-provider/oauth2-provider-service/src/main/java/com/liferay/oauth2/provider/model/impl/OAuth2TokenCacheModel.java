@@ -87,7 +87,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		sb.append(oAuth2TokenType);
 		sb.append(", oAuth2RefreshTokenId=");
 		sb.append(oAuth2RefreshTokenId);
-		sb.append(", scope=");
+		sb.append(", scopes=");
 		sb.append(scopes);
 		sb.append("}");
 

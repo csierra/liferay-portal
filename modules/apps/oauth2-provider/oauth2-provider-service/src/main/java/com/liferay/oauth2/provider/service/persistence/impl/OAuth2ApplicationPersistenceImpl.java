@@ -1573,17 +1573,20 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 		oAuth2ApplicationImpl.setOAuth2ApplicationId(oAuth2Application.getOAuth2ApplicationId());
 		oAuth2ApplicationImpl.setCompanyId(oAuth2Application.getCompanyId());
-		oAuth2ApplicationImpl.setUserId(oAuth2Application.getUserId());
-		oAuth2ApplicationImpl.setUserName(oAuth2Application.getUserName());
 		oAuth2ApplicationImpl.setCreateDate(oAuth2Application.getCreateDate());
 		oAuth2ApplicationImpl.setModifiedDate(oAuth2Application.getModifiedDate());
+		oAuth2ApplicationImpl.setUserId(oAuth2Application.getUserId());
+		oAuth2ApplicationImpl.setUserName(oAuth2Application.getUserName());
+		oAuth2ApplicationImpl.setAllowedGrantTypes(oAuth2Application.getAllowedGrantTypes());
+		oAuth2ApplicationImpl.setClientConfidential(oAuth2Application.getClientConfidential());
 		oAuth2ApplicationImpl.setClientId(oAuth2Application.getClientId());
 		oAuth2ApplicationImpl.setClientSecret(oAuth2Application.getClientSecret());
-		oAuth2ApplicationImpl.setRedirectUri(oAuth2Application.getRedirectUri());
-		oAuth2ApplicationImpl.setClientConfidential(oAuth2Application.getClientConfidential());
 		oAuth2ApplicationImpl.setDescription(oAuth2Application.getDescription());
+		oAuth2ApplicationImpl.setHomePageURL(oAuth2Application.getHomePageURL());
+		oAuth2ApplicationImpl.setIconFileEntryId(oAuth2Application.getIconFileEntryId());
 		oAuth2ApplicationImpl.setName(oAuth2Application.getName());
-		oAuth2ApplicationImpl.setWebUrl(oAuth2Application.getWebUrl());
+		oAuth2ApplicationImpl.setPrivacyPolicyURL(oAuth2Application.getPrivacyPolicyURL());
+		oAuth2ApplicationImpl.setRedirectURIs(oAuth2Application.getRedirectURIs());
 		oAuth2ApplicationImpl.setScopes(oAuth2Application.getScopes());
 
 		return oAuth2ApplicationImpl;

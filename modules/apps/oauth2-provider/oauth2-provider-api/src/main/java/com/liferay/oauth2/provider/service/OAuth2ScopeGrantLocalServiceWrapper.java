@@ -16,7 +16,6 @@ package com.liferay.oauth2.provider.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**
@@ -262,7 +261,7 @@ public class OAuth2ScopeGrantLocalServiceWrapper
 	@Override
 	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> grantScopesToToken(
 		java.lang.String tokenString,
-		java.util.Collection<LiferayOAuth2Scope> scopes)
+		java.util.Collection<com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope> scopes)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException {
 		return _oAuth2ScopeGrantLocalService.grantScopesToToken(tokenString,
 			scopes);
