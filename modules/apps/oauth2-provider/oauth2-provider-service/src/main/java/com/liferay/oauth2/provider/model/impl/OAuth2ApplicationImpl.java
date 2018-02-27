@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -43,17 +44,39 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	}
 
 	@Override
+	public List<String> getAllowedGrantTypesList(){
+		return Arrays.asList(StringUtil.split(getAllowedGrantTypes()));
+	}
+
+	@Override
+	public List<String> getRedirectURIsList(){
+		return Arrays.asList(
+			StringUtil.split(getRedirectURIs(), StringPool.NEW_LINE));
+	}
+
+	@Override
 	public List<String> getScopesList() {
 		return Arrays.asList(StringUtil.split(getScopes(), StringPool.SPACE));
 	}
 
 	@Override
-	public void setScopesList(List<String> scopesList) {
-		Stream<String> stream = scopesList.stream();
+	public void setAllowedGrantTypesList(List<String> allowedGrantTypesList) {
+		String allowedGrantTypes = StringUtil.merge(allowedGrantTypesList);
 
-		String scopes = stream.distinct().collect(
-			Collectors.joining(StringPool.SPACE)
-		);
+		setAllowedGrantTypes(allowedGrantTypes);
+	}
+
+	@Override
+	public void setRedirectURIsList(List<String> redirectURIsList) {
+		String redirectURIs = StringUtil.merge(
+			redirectURIsList, StringPool.NEW_LINE);
+
+		setRedirectURIs(redirectURIs);
+	}
+
+	@Override
+	public void setScopesList(List<String> scopesList) {
+		String scopes = StringUtil.merge(scopesList, StringPool.SPACE);
 
 		setScopes(scopes);
 	}

@@ -24,6 +24,7 @@ import com.liferay.oauth2.provider.service.base.OAuth2ApplicationServiceBaseImpl
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -57,18 +58,22 @@ public class OAuth2ApplicationServiceImpl
 
 	@Override
 	public OAuth2Application addOAuth2Application(
-			long userId, String name, String description, String webURL,
-			boolean oAuth2ClientConfidential, String oAuth2ClientId,
-			String oAuth2ClientSecret, String oAuth2RedirectURI,
-			ServiceContext serviceContext)
+			List<String> allowedGrantTypesList, boolean clientConfidential,
+			String clientId, String clientSecret, String description,
+			String homePageURL, long iconFileEntryId, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
+			List<String> scopesList, ServiceContext serviceContext)
 		throws PortalException {
 
 		check(OAuth2ProviderActionKeys.ACTION_ADD_APPLICATION);
 
+		User user = getUser();
+
 		return oAuth2ApplicationLocalService.addOAuth2Application(
-			userId, name, description, webURL, oAuth2ClientConfidential,
-			oAuth2ClientId, oAuth2ClientSecret, oAuth2RedirectURI,
-			serviceContext);
+			user.getCompanyId(), user.getUserId(), user.getFullName(),
+			allowedGrantTypesList, clientConfidential, clientId, clientSecret,
+			description, homePageURL, iconFileEntryId, name, privacyPolicyURL,
+			redirectURIsList, scopesList, serviceContext);
 	}
 
 	@Override
@@ -145,10 +150,11 @@ public class OAuth2ApplicationServiceImpl
 
 	@Override
 	public OAuth2Application updateOAuth2Application(
-			long userId, long oAuth2ApplicationId, String name,
-			String description, String webURL, boolean oAuth2ClientConfidential,
-			String oAuth2ClientId, String oAuth2ClientSecret,
-			String oAuth2RedirectURI, ServiceContext serviceContext)
+			long oAuth2ApplicationId, List<String> allowedGrantTypesList,
+			boolean clientConfidential, String clientId, String clientSecret,
+			String description, String homePageURL, long iconFileEntryId,
+			String name, String privacyPolicyURL, List<String> redirectURIsList,
+			List<String> scopesList, ServiceContext serviceContext)
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
@@ -158,9 +164,10 @@ public class OAuth2ApplicationServiceImpl
 		check(oAuth2Application, ActionKeys.UPDATE);
 
 		return oAuth2ApplicationLocalService.updateOAuth2Application(
-			userId, oAuth2ApplicationId, name, description, webURL,
-			oAuth2ClientConfidential, oAuth2ClientId, oAuth2ClientSecret,
-			oAuth2RedirectURI, serviceContext);
+			oAuth2ApplicationId, allowedGrantTypesList, clientConfidential,
+			clientId, clientSecret, description, homePageURL, iconFileEntryId,
+			name, privacyPolicyURL, redirectURIsList, scopesList,
+			serviceContext);
 	}
 
 	@Override

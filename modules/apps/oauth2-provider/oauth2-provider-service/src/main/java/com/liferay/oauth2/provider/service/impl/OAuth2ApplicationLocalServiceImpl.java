@@ -51,15 +51,19 @@ public class OAuth2ApplicationLocalServiceImpl
 	 *
 	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
 	 */
+
+	@Override
 	public OAuth2Application addOAuth2Application(
-			long userId, String name, String description, String webURL,
-			boolean oAuth2ClientConfidential, String oAuth2ClientId, 
-			String oAuth2ClientSecret, String oAuth2RedirectURI, 
-			ServiceContext serviceContext)
+			long companyId, long userId,
+			String userName, List<String> allowedGrantTypesList,
+			boolean clientConfidential, String clientId, String clientSecret,
+			String description, String homePageURL, long iconFileEntryId,
+			String name, String privacyPolicyURL, List<String> redirectURIsList,
+			List<String> scopesList, ServiceContext serviceContext)
 		throws PortalException {
 
 		if (oAuth2ApplicationPersistence.fetchByC_CI(
-				serviceContext.getCompanyId(), oAuth2ClientId) != null) {
+				serviceContext.getCompanyId(), clientId) != null) {
 
 			throw new DuplicateOAuth2ClientIdException();
 		}
@@ -72,16 +76,22 @@ public class OAuth2ApplicationLocalServiceImpl
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationPersistence.create(oAuth2ApplicationId);
 
-		oAuth2Application.setUserId(userId);
-		oAuth2Application.setName(name);
-		oAuth2Application.setDescription(description);
-		oAuth2Application.setWebUrl(webURL);
-		oAuth2Application.setClientConfidential(oAuth2ClientConfidential);
-		oAuth2Application.setClientId(oAuth2ClientId);
-		oAuth2Application.setClientSecret(oAuth2ClientSecret);
-		oAuth2Application.setRedirectUri(oAuth2RedirectURI);
+		oAuth2Application.setCompanyId(companyId);
 		oAuth2Application.setCreateDate(now);
 		oAuth2Application.setModifiedDate(now);
+		oAuth2Application.setUserId(userId);
+		oAuth2Application.setUserName(userName);
+		oAuth2Application.setAllowedGrantTypesList(allowedGrantTypesList);
+		oAuth2Application.setClientConfidential(clientConfidential);
+		oAuth2Application.setClientId(clientId);
+		oAuth2Application.setClientSecret(clientSecret);
+		oAuth2Application.setDescription(description);
+		oAuth2Application.setHomePageURL(homePageURL);
+		oAuth2Application.setIconFileEntryId(iconFileEntryId);
+		oAuth2Application.setName(name);
+		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
+		oAuth2Application.setRedirectURIsList(redirectURIsList);
+		oAuth2Application.setScopesList(scopesList);
 
 		// Resources
 
@@ -126,12 +136,14 @@ public class OAuth2ApplicationLocalServiceImpl
 		return super.deleteOAuth2Application(oAuth2ApplicationId);
 	}
 
+	@Override
 	public OAuth2Application fetchOAuth2Application(
 		long companyId, String clientId) {
 
 		return oAuth2ApplicationPersistence.fetchByC_CI(companyId, clientId);
 	}
 
+	@Override
 	public OAuth2Application getOAuth2Application(
 			long companyId, String clientId)
 		throws NoSuchOAuth2ApplicationException {
@@ -139,11 +151,13 @@ public class OAuth2ApplicationLocalServiceImpl
 		return oAuth2ApplicationPersistence.findByC_CI(companyId, clientId);
 	}
 
+	@Override
 	public OAuth2Application updateOAuth2Application(
-			long userId, long oAuth2ApplicationId, String name, 
-			String description, String webURL, boolean oAuth2ClientConfidential,  
-			String oAuth2ClientId, String oAuth2ClientSecret, 
-			String oAuth2RedirectURI, ServiceContext serviceContext)
+			long oAuth2ApplicationId, List<String>  allowedGrantTypesList,
+			boolean clientConfidential, String clientId, String clientSecret,
+			String description, String homePageURL, long iconFileEntryId,
+			String name, String privacyPolicyURL, List<String> redirectURIsList,
+			List<String> scopesList, ServiceContext serviceContext)
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
@@ -151,18 +165,24 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		Date now = new Date();
 
-		oAuth2Application.setName(name);
-		oAuth2Application.setDescription(description);
-		oAuth2Application.setWebUrl(webURL);
-		oAuth2Application.setClientConfidential(oAuth2ClientConfidential);
-		oAuth2Application.setClientId(oAuth2ClientId);
-		oAuth2Application.setClientSecret(oAuth2ClientSecret);
-		oAuth2Application.setRedirectUri(oAuth2RedirectURI);
 		oAuth2Application.setModifiedDate(now);
+
+		oAuth2Application.setAllowedGrantTypesList(allowedGrantTypesList);
+		oAuth2Application.setClientConfidential(clientConfidential);
+		oAuth2Application.setClientId(clientId);
+		oAuth2Application.setClientSecret(clientSecret);
+		oAuth2Application.setDescription(description);
+		oAuth2Application.setHomePageURL(homePageURL);
+		oAuth2Application.setIconFileEntryId(iconFileEntryId);
+		oAuth2Application.setName(name);
+		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
+		oAuth2Application.setRedirectURIsList(redirectURIsList);
+		oAuth2Application.setScopesList(scopesList);
 
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 
+	@Override
 	public OAuth2Application updateScopes(
 			long oAuth2ApplicationId, List<String> scopes)
 		throws NoSuchOAuth2ApplicationException {
