@@ -56,7 +56,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@Component(immediate=true)
+@Component(
+	immediate=true,
+	property = {
+		"oauth2.allow.token.introspection.endpoint=true",
+		"oauth2.allow.token.introspection.endpoint.public.clients=true"
+	}
+)
 public class OAuth2TokenIntrospectionServiceRegistrator {
 
 	private ServiceRegistration<Object> _endpointServiceRegistration;
@@ -70,8 +76,13 @@ public class OAuth2TokenIntrospectionServiceRegistrator {
 			properties, "oauth2.allow.token.introspection.endpoint", true);
 
 		if (enabled) {
+			boolean publicClientsEnabled = MapUtil.getBoolean(
+				properties,
+				"oauth2.allow.token.introspection.endpoint.public.clients",
+				true);
+
 			OAuth2TokenIntrospectionService oAuth2TokenIntrospectionService =
-				new OAuth2TokenIntrospectionService();
+				new OAuth2TokenIntrospectionService(publicClientsEnabled);
 
 			oAuth2TokenIntrospectionService.setDataProvider(
 				_liferayOAuthDataProvider);
@@ -110,6 +121,10 @@ public class OAuth2TokenIntrospectionServiceRegistrator {
 
 	@Path("introspect")
 	public class OAuth2TokenIntrospectionService extends AbstractTokenService {
+
+		public OAuth2TokenIntrospectionService(boolean publicClientsEnabled) {
+			setCanSupportPublicClients(publicClientsEnabled);
+		}
 
 		@POST
 		@Produces({MediaType.APPLICATION_JSON})
