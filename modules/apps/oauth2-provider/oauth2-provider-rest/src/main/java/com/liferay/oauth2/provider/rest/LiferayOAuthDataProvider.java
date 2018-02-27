@@ -753,16 +753,25 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			clientSecret,
 			oAuth2Application.getClientConfidential(),
 			oAuth2Application.getName(),
-			oAuth2Application.getWebUrl());
-	
+			oAuth2Application.getHomePageURL());
+
+		List<String> allowedGrantTypes =
+			oAuth2Application.getAllowedGrantTypesList();
+
+		// CXF considers no allowed grant types as allow all!
+		if (allowedGrantTypes.isEmpty()) {
+			allowedGrantTypes.add(StringPool.BLANK);
+		}
+
+		client.setAllowedGrantTypes(allowedGrantTypes);
+
 		client.setApplicationDescription(
 			oAuth2Application.getDescription());
 
 		client.setRegisteredScopes(
 			OAuthUtils.parseScope(oAuth2Application.getScopes()));
 
-		client.setRedirectUris(
-			Collections.singletonList(oAuth2Application.getRedirectUri()));
+		client.setRedirectUris(oAuth2Application.getRedirectURIsList());
 
 		client.setSubject(populateUserSubject(
 			oAuth2Application.getCompanyId(), oAuth2Application.getUserId(),
@@ -773,7 +782,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		client.getProperties().put("companyId", Long.toString(companyId));
 
 		try {
-			setAllowedGrantTypesForClient(companyId, client);
+			filterEnabledAllowedGrantTypes(companyId, client);
 		} 
 		catch (ConfigurationException e) {
 			throw new SystemException(e);
@@ -782,54 +791,51 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		return client;
 	}
 	
-	protected void setAllowedGrantTypesForClient(long companyId, Client client)
+	protected void filterEnabledAllowedGrantTypes(long companyId, Client client)
 		throws ConfigurationException {
 
 		boolean authorizationCodeGrantEnabled = 
 			_oAuth2Configuration.allowAuthorizationCodeGrant() 
 				&& _configurationProvider.getCompanyConfiguration(
-					OAuth2AuthorizationCodeGrantConfiguration.class, 
-					companyId).enabled();
+					OAuth2AuthorizationCodeGrantConfiguration.class, companyId)
+				.enabled();
 		
 		boolean clientCredentialsGrantEnabled = 
 			_oAuth2Configuration.allowClientCredentialsGrant() 
 				&& _configurationProvider.getCompanyConfiguration(
-					OAuth2ClientCredentialsGrantConfiguration.class, 
-					companyId).enabled();
+					OAuth2ClientCredentialsGrantConfiguration.class, companyId)
+				.enabled();
 		
 		boolean resourceOwnerPasswordCredentialGrantEnabled = 
 			_oAuth2Configuration.allowResourceOwnerPasswordCredentialsGrant() 
 				&& _configurationProvider.getCompanyConfiguration(
-					OAuth2ResourceOwnerGrantConfiguration.class, companyId).enabled();
+					OAuth2ResourceOwnerGrantConfiguration.class, companyId)
+				.enabled();
 		
 		boolean refreshTokenGrantEnabled = 
 			_oAuth2Configuration.allowRefreshTokenGrant() 
 				&& _configurationProvider.getCompanyConfiguration(
-					OAuth2RefreshTokenGrantConfiguration.class, companyId).enabled();
+					OAuth2RefreshTokenGrantConfiguration.class, companyId)
+				.enabled();
 
-		List<String> allowedGrantTypes = new ArrayList<>(4);
+		List<String> allowedGrantTypes = client.getAllowedGrantTypes();
 		
-		if (authorizationCodeGrantEnabled) {
-			allowedGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
+		if (!authorizationCodeGrantEnabled) {
+			allowedGrantTypes.remove(OAuthConstants.AUTHORIZATION_CODE_GRANT);
 		}
 		
-		if (clientCredentialsGrantEnabled) {
-			allowedGrantTypes.add(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
+		if (!clientCredentialsGrantEnabled) {
+			allowedGrantTypes.remove(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
 		}
 		
-		if (resourceOwnerPasswordCredentialGrantEnabled) {
-			allowedGrantTypes.add(OAuthConstants.RESOURCE_OWNER_GRANT );
+		if (!resourceOwnerPasswordCredentialGrantEnabled) {
+			allowedGrantTypes.remove(OAuthConstants.RESOURCE_OWNER_GRANT);
 		}
 		
-		if (refreshTokenGrantEnabled) {
-			allowedGrantTypes.add(OAuthConstants.REFRESH_TOKEN_GRANT );
+		if (!refreshTokenGrantEnabled) {
+			allowedGrantTypes.remove(OAuthConstants.REFRESH_TOKEN_GRANT);
 		}
-		
-		// CXF considers no allowed grant types as allow all!
-		if (allowedGrantTypes.isEmpty()) {
-			allowedGrantTypes.add(StringPool.BLANK);
-		}
-		
+
 		client.setAllowedGrantTypes(allowedGrantTypes);
 	}
 
