@@ -237,7 +237,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 						ScopeDescriptor.class.getName(),
 						ApplicationDescriptor.class.getName()
 					},
-					new AplicationDescriptorsImpl(
+					new ApplicationDescriptorsImpl(
 						serviceTracker, applicationClassName),
 					new Hashtable<String, Object>() {{
 						put("osgi.jaxrs.name", applicationClassName);
@@ -339,14 +339,14 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				});
 		}
 
-		private class AplicationDescriptorsImpl
+		private class ApplicationDescriptorsImpl
 			implements ScopeDescriptor, ApplicationDescriptor {
 
 			private final ServiceTracker<?, ResourceBundleLoader>
 				_serviceTracker;
 			private String _applicationClassName;
 
-			public AplicationDescriptorsImpl(
+			public ApplicationDescriptorsImpl(
 				ServiceTracker<?, ResourceBundleLoader> serviceTracker,
 				String applicationClassName) {
 

@@ -97,10 +97,10 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		ServiceReference<?> serviceReference = tuple.getServiceReference();
 
-		PrefixHandlerFactory prefixHandlerMapper =
+		PrefixHandlerFactory prefixHandlerFactory =
 			_scopedPrefixHandlerFactories.getService(companyId, applicationName);
 
-		PrefixHandler prefixHandler = prefixHandlerMapper.create(
+		PrefixHandler prefixHandler = prefixHandlerFactory.create(
 			serviceReference::getProperty);
 
 		String prefix = prefixHandler.addPrefix(StringPool.BLANK);
