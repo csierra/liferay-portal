@@ -53,6 +53,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -227,7 +228,9 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		_scopedScopeMapper = new ScopedServiceTrackerMap<>(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
-			() -> _defaultScopeMapper, _invocationCache::clear);
+			() -> (_defaultScopeMapper != null ? 
+				_defaultScopeMapper : ScopeMapper.PASSTHROUGH_SCOPEMAPPER), 
+			_invocationCache::clear);
 	}
 
 	@Deactivate
@@ -244,8 +247,9 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	private PrefixHandlerFactory _defaultPrefixHandlerFactory;
 
 	@Reference(
-		target = "(&(default=true)(companyId=0))",
-		policyOption = ReferencePolicyOption.GREEDY
+		target = "(default=true)",
+		policyOption = ReferencePolicyOption.GREEDY,
+		cardinality = ReferenceCardinality.OPTIONAL
 	)
 	private ScopeMapper _defaultScopeMapper;
 	

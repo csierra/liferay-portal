@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.internal.configuration;
 
-import com.liferay.oauth2.provider.configuration.DefaultScopeMapperConfiguration;
+import com.liferay.oauth2.provider.configuration.DefaultConfigurableScopeMapperRegistratorConfiguration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
 
 import org.osgi.service.component.annotations.Component;
@@ -28,7 +28,7 @@ public class DefaultScopeMapperBeanDeclaration
 
 	@Override
 	public Class<?> getConfigurationBeanClass() {
-		return DefaultScopeMapperConfiguration.class;
+		return DefaultConfigurableScopeMapperRegistratorConfiguration.class;
 	}
 
 }

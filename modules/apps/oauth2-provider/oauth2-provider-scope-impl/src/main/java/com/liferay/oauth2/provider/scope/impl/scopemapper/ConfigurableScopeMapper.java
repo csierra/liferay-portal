@@ -14,12 +14,12 @@
 
 package com.liferay.oauth2.provider.scope.impl.scopemapper;
 
-import com.liferay.oauth2.provider.configuration.DefaultScopeMapperConfiguration;
 import com.liferay.oauth2.provider.scope.spi.scopemapper.ScopeMapper;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,47 +29,36 @@ import java.util.Set;
 
 @Component(
 	immediate = true,
-	configurationPid = "com.liferay.oauth2.provider.configuration.DefaultScopeMapperConfiguration",
-	property = {
-		"default=true",
-		"companyId=0"
-	}
+	configurationPid = "com.liferay.oauth2.provider.configuration.ConfigurableScopeMapper",
+	configurationPolicy = ConfigurationPolicy.REQUIRE
 )
-public class DefaultScopeMapper implements ScopeMapper {
+public class ConfigurableScopeMapper implements ScopeMapper {
 
 	private Map<String,Set<String>> _map = new HashMap<>();
+	
+	public ConfigurableScopeMapper() {
+		this(new String[0], false);
+	}
+	
+	public ConfigurableScopeMapper(String[] mappings, boolean passthrough) {
+		_init(mappings, passthrough);
+	}
 	
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		
-		DefaultScopeMapperConfiguration configuration = 
-			ConfigurableUtil.createConfigurable(
-				DefaultScopeMapperConfiguration.class, properties);
+		Object mappings = properties.get("mapping");
 		
-		_passtrough = configuration.passthrough();
-
-		String[] mappings = configuration.mapping();
-		
-		if (mappings == null) {
+		if (mappings == null || !(mappings instanceof String[])) {
 			return;
-		} 
-		
-		for (String mapping : mappings) {
-			String[] mappingParts = mapping.split("=");
-			for (String mappingInput : mappingParts[0].split(",")) {
-				
-				if (mappingParts.length < 2) {
-					continue;
-				}
-				
-				Set<String> mappingOutput = 
-					_map.computeIfAbsent(mappingInput, __ -> new HashSet<>());
-				
-				mappingOutput.addAll(Arrays.asList(mappingParts[1].split(",")));
-			}		
 		}
-	}
 
+		boolean passthrough = 
+			GetterUtil.getBoolean(
+				properties.get("passthrough"));
+		
+		_init((String[])mappings, passthrough);
+	}
 	
 	@Override
 	public Set<String> map(String scope) {
@@ -93,5 +82,25 @@ public class DefaultScopeMapper implements ScopeMapper {
 		return result;
 	}
 	
+	private void _init(String[] mappings, boolean passthrough) {
+		
+		_passtrough = passthrough;
+		
+		for (String mapping : mappings) {
+			String[] mappingParts = mapping.split("=");
+			for (String mappingInput : mappingParts[0].split(",")) {
+				
+				if (mappingParts.length < 2) {
+					continue;
+				}
+				
+				Set<String> mappingOutput = 
+					_map.computeIfAbsent(mappingInput, __ -> new HashSet<>());
+				
+				mappingOutput.addAll(Arrays.asList(mappingParts[1].split(",")));
+			}		
+		}
+	}
+
 	private boolean _passtrough;	
 }
