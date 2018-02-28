@@ -41,6 +41,7 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 		soapModel.setLifeTime(model.getLifeTime());
 		soapModel.setOAuth2RefreshTokenContent(model.getOAuth2RefreshTokenContent());
 		soapModel.setOAuth2ApplicationId(model.getOAuth2ApplicationId());
+		soapModel.setScopes(model.getScopes());
 
 		return soapModel;
 	}
@@ -160,6 +161,14 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 		_oAuth2ApplicationId = oAuth2ApplicationId;
 	}
 
+	public String getScopes() {
+		return _scopes;
+	}
+
+	public void setScopes(String scopes) {
+		_scopes = scopes;
+	}
+
 	private long _oAuth2RefreshTokenId;
 	private long _companyId;
 	private long _userId;
@@ -168,4 +177,5 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 	private long _lifeTime;
 	private String _oAuth2RefreshTokenContent;
 	private long _oAuth2ApplicationId;
+	private String _scopes;
 }

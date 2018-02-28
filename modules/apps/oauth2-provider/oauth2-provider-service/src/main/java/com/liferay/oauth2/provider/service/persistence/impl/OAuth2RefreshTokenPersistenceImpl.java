@@ -1808,6 +1808,7 @@ public class OAuth2RefreshTokenPersistenceImpl extends BasePersistenceImpl<OAuth
 		oAuth2RefreshTokenImpl.setLifeTime(oAuth2RefreshToken.getLifeTime());
 		oAuth2RefreshTokenImpl.setOAuth2RefreshTokenContent(oAuth2RefreshToken.getOAuth2RefreshTokenContent());
 		oAuth2RefreshTokenImpl.setOAuth2ApplicationId(oAuth2RefreshToken.getOAuth2ApplicationId());
+		oAuth2RefreshTokenImpl.setScopes(oAuth2RefreshToken.getScopes());
 
 		return oAuth2RefreshTokenImpl;
 	}

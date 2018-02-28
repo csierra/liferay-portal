@@ -71,7 +71,8 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 			{ "createDate", Types.TIMESTAMP },
 			{ "lifeTime", Types.BIGINT },
 			{ "oAuth2RefreshTokenContent", Types.CLOB },
-			{ "oAuth2ApplicationId", Types.BIGINT }
+			{ "oAuth2ApplicationId", Types.BIGINT },
+			{ "scopes", Types.CLOB }
 		};
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
 
@@ -84,9 +85,10 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		TABLE_COLUMNS_MAP.put("lifeTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("oAuth2RefreshTokenContent", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("oAuth2ApplicationId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("scopes", Types.CLOB);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2RefreshToken (oAuth2RefreshTokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,oAuth2RefreshTokenContent TEXT null,oAuth2ApplicationId LONG)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2RefreshToken (oAuth2RefreshTokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,oAuth2RefreshTokenContent TEXT null,oAuth2ApplicationId LONG,scopes TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2RefreshToken";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2RefreshToken.oAuth2RefreshTokenId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2RefreshToken.oAuth2RefreshTokenId ASC";
@@ -155,6 +157,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		attributes.put("oAuth2RefreshTokenContent",
 			getOAuth2RefreshTokenContent());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
+		attributes.put("scopes", getScopes());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -211,6 +214,12 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 		if (oAuth2ApplicationId != null) {
 			setOAuth2ApplicationId(oAuth2ApplicationId);
+		}
+
+		String scopes = (String)attributes.get("scopes");
+
+		if (scopes != null) {
+			setScopes(scopes);
 		}
 	}
 
@@ -352,6 +361,21 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		return _originalOAuth2ApplicationId;
 	}
 
+	@Override
+	public String getScopes() {
+		if (_scopes == null) {
+			return "";
+		}
+		else {
+			return _scopes;
+		}
+	}
+
+	@Override
+	public void setScopes(String scopes) {
+		_scopes = scopes;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -391,6 +415,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		oAuth2RefreshTokenImpl.setLifeTime(getLifeTime());
 		oAuth2RefreshTokenImpl.setOAuth2RefreshTokenContent(getOAuth2RefreshTokenContent());
 		oAuth2RefreshTokenImpl.setOAuth2ApplicationId(getOAuth2ApplicationId());
+		oAuth2RefreshTokenImpl.setScopes(getScopes());
 
 		oAuth2RefreshTokenImpl.resetOriginalValues();
 
@@ -504,12 +529,20 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 		oAuth2RefreshTokenCacheModel.oAuth2ApplicationId = getOAuth2ApplicationId();
 
+		oAuth2RefreshTokenCacheModel.scopes = getScopes();
+
+		String scopes = oAuth2RefreshTokenCacheModel.scopes;
+
+		if ((scopes != null) && (scopes.length() == 0)) {
+			oAuth2RefreshTokenCacheModel.scopes = null;
+		}
+
 		return oAuth2RefreshTokenCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("{oAuth2RefreshTokenId=");
 		sb.append(getOAuth2RefreshTokenId());
@@ -527,6 +560,8 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		sb.append(getOAuth2RefreshTokenContent());
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(getOAuth2ApplicationId());
+		sb.append(", scopes=");
+		sb.append(getScopes());
 		sb.append("}");
 
 		return sb.toString();
@@ -534,7 +569,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(28);
+		StringBundler sb = new StringBundler(31);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.oauth2.provider.model.OAuth2RefreshToken");
@@ -572,6 +607,10 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 			"<column><column-name>oAuth2ApplicationId</column-name><column-value><![CDATA[");
 		sb.append(getOAuth2ApplicationId());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>scopes</column-name><column-value><![CDATA[");
+		sb.append(getScopes());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -594,6 +633,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 	private long _oAuth2ApplicationId;
 	private long _originalOAuth2ApplicationId;
 	private boolean _setOriginalOAuth2ApplicationId;
+	private String _scopes;
 	private long _columnBitmask;
 	private OAuth2RefreshToken _escapedModel;
 }
