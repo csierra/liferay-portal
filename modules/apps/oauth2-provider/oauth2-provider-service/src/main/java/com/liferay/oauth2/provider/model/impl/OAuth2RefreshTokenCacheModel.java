@@ -65,7 +65,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("{oAuth2RefreshTokenId=");
 		sb.append(oAuth2RefreshTokenId);
@@ -83,6 +83,8 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		sb.append(oAuth2RefreshTokenContent);
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(oAuth2ApplicationId);
+		sb.append(", scopes=");
+		sb.append(scopes);
 		sb.append("}");
 
 		return sb.toString();
@@ -121,6 +123,13 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 		oAuth2RefreshTokenImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
 
+		if (scopes == null) {
+			oAuth2RefreshTokenImpl.setScopes("");
+		}
+		else {
+			oAuth2RefreshTokenImpl.setScopes(scopes);
+		}
+
 		oAuth2RefreshTokenImpl.resetOriginalValues();
 
 		return oAuth2RefreshTokenImpl;
@@ -140,6 +149,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		oAuth2RefreshTokenContent = objectInput.readUTF();
 
 		oAuth2ApplicationId = objectInput.readLong();
+		scopes = objectInput.readUTF();
 	}
 
 	@Override
@@ -170,6 +180,13 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		}
 
 		objectOutput.writeLong(oAuth2ApplicationId);
+
+		if (scopes == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(scopes);
+		}
 	}
 
 	public long oAuth2RefreshTokenId;
@@ -180,4 +197,5 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 	public long lifeTime;
 	public String oAuth2RefreshTokenContent;
 	public long oAuth2ApplicationId;
+	public String scopes;
 }

@@ -10,11 +10,11 @@ create table OAuth2Application (
 	clientId VARCHAR(75) null,
 	clientSecret VARCHAR(75) null,
 	description VARCHAR(75) null,
-	homePageURL VARCHAR(75) null,
+	homePageURL STRING null,
 	iconFileEntryId LONG,
 	name VARCHAR(75) null,
-	privacyPolicyURL VARCHAR(75) null,
-	redirectURIs VARCHAR(75) null,
+	privacyPolicyURL STRING null,
+	redirectURIs STRING null,
 	scopes TEXT null
 );
 
@@ -26,7 +26,8 @@ create table OAuth2RefreshToken (
 	createDate DATE null,
 	lifeTime LONG,
 	oAuth2RefreshTokenContent TEXT null,
-	oAuth2ApplicationId LONG
+	oAuth2ApplicationId LONG,
+	scopes TEXT null
 );
 
 create table OAuth2ScopeGrant (

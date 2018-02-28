@@ -194,6 +194,21 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	 */
 	public void setOAuth2ApplicationId(long oAuth2ApplicationId);
 
+	/**
+	 * Returns the scopes of this o auth2 refresh token.
+	 *
+	 * @return the scopes of this o auth2 refresh token
+	 */
+	@AutoEscape
+	public String getScopes();
+
+	/**
+	 * Sets the scopes of this o auth2 refresh token.
+	 *
+	 * @param scopes the scopes of this o auth2 refresh token
+	 */
+	public void setScopes(String scopes);
+
 	@Override
 	public boolean isNew();
 
