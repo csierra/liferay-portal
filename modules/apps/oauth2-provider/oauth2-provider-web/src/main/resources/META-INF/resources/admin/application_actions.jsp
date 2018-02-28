@@ -37,7 +37,7 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
 
 			<portlet:param name="mvcPath"
-				value="/admin/edit_oauth2application.jsp"
+				value="/admin/edit_application.jsp"
 			/>
 
 			<portlet:param name="redirect"
