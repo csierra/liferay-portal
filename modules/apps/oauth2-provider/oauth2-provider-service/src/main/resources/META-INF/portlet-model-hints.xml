@@ -41,6 +41,9 @@
 			<hint-collection name="CLOB" />
 		</field>
 		<field name="oAuth2ApplicationId" type="long" />
+		<field name="scopes" type="String">
+			<hint-collection name="CLOB" />
+		</field>
 	</model>
 	<model name="com.liferay.oauth2.provider.model.OAuth2ScopeGrant">
 		<field name="applicationName" type="String" />

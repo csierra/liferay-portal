@@ -49,11 +49,7 @@ public class OAuth2TokenImpl extends OAuth2TokenBaseImpl {
 
 	@Override
 	public void setScopesList(List<String> scopesList) {
-		Stream<String> stream = scopesList.stream();
-
-		String scopes = stream.distinct().collect(
-			Collectors.joining(StringPool.SPACE)
-		);
+		String scopes = StringUtil.merge(scopesList, StringPool.SPACE);
 
 		setScopes(scopes);
 	}

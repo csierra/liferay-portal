@@ -100,6 +100,7 @@
 
 		<column name="oAuth2RefreshTokenContent" type="String" />
 		<column name="oAuth2ApplicationId" type="long" />
+		<column name="scopes" type="String" />
 
 		<finder name="A" return-type="Collection">
 			<finder-column name="oAuth2ApplicationId" />
