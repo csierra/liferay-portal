@@ -19,6 +19,9 @@
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
+portletDisplay.setShowBackIcon(true);
+portletDisplay.setURLBack(redirect);
+
 long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", -1);
 
 OAuth2Application oAuth2Application = null;
@@ -27,12 +30,9 @@ if (oAuth2ApplicationId > -1) {
 		oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
 }
 
-	portletDisplay.setShowBackIcon(true);
-	portletDisplay.setURLBack(redirect);
+String headerTitle = (oAuth2Application == null) ? LanguageUtil.get(request, "add-o-auth2-application") : LanguageUtil.format(request, "edit-x", oAuth2Application.getName(), false);
 
-	String headerTitle = (oAuth2Application == null) ? LanguageUtil.get(request, "add-o-auth2-application") : LanguageUtil.format(request, "edit-x", oAuth2Application.getName(), false);
-
-	renderResponse.setTitle(headerTitle);
+renderResponse.setTitle(headerTitle);
 %>
 
 <div class="container-fluid-1280">
