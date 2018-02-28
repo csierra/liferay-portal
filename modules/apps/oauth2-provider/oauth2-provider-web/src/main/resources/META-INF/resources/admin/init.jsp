@@ -15,6 +15,8 @@
 --%>
 <%@ include file="/init.jsp" %>
 <%@ page import="com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException" %><%@
+page import="com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalServiceUtil" %><%@
+page import="com.liferay.oauth2.provider.service.OAuth2TokenLocalServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope" %><%@
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel"%><%@
@@ -23,6 +25,8 @@ page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.security.auth.PrincipalException" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %>
+
+<%@ page import="java.util.ArrayList" %>
 
 <%
 OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = new OAuth2AdminPortletDisplayContext();

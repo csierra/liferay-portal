@@ -18,7 +18,7 @@
 
 <aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
 	<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
-		<aui:nav-item label="OAuth2 Applications" selected="<%= true %>" />
+		<aui:nav-item label="oauth2-applications" selected="<%= true %>" />
 	</aui:nav>
 </aui:nav-bar>
 

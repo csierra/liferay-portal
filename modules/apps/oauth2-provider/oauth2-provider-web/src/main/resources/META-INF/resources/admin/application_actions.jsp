@@ -67,6 +67,14 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 		<liferay-ui:icon-delete url="<%= deleteURL.toString() %>" />
 	</c:if>
 
+	<portlet:renderURL var="applicationAuthorizationsURL">
+		<portlet:param name="mvcPath" value="/admin/application_authorizations.jsp" />
+		<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
+		<portlet:param name="redirect" value="<%= currentURL %>" />
+	</portlet:renderURL>
+
+	<liferay-ui:icon message="granted-authorizations" url="<%= applicationAuthorizationsURL.toString() %>" />
+
 	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasPermissionsPermission(oauth2application) %>">
 		<liferay-security:permissionsURL
 			modelResource="<%= OAuth2Application.class.getName() %>"
