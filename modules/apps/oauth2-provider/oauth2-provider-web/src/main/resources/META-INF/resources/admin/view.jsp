@@ -39,7 +39,7 @@
 	
 	        <liferay-ui:search-container-column-jsp
 	            align="right" 
-	            path="/admin/oauth2application_actions.jsp" />
+	            path="/admin/application_actions.jsp" />
 	
 	    </liferay-ui:search-container-row>
 	
@@ -51,7 +51,7 @@
 
 	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasAddApplicationPermission() %>">
 		<portlet:renderURL var="addOAuth2ApplicationURL">
-			<portlet:param name="mvcPath" value="/admin/edit_oauth2application.jsp" />
+			<portlet:param name="mvcPath" value="/admin/edit_application.jsp" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 		</portlet:renderURL>
 
