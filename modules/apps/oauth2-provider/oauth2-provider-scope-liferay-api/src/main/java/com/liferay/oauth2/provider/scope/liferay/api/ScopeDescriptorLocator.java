@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scope.liferay.api;
 
-import com.liferay.oauth2.provider.scope.spi.scopedescriptor.ScopeDescriptor;
+import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 
 public interface ScopeDescriptorLocator {
 

@@ -12,29 +12,26 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.spi.scopedescriptor;
+package com.liferay.oauth2.provider.scope.spi.scope.matcher;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.Locale;
-
 /**
- * Represents localization information for the scopes of OAuth2 applications.
+ * Factory that creates {@link ScopeMatcher} for a given input.
+ * This allow for components to switch matching strategies using configuration.
  *
  * @author Carlos Sierra Andrés
  * @review
  */
 @ProviderType
-public interface ScopeDescriptor {
+public interface ScopeMatcherFactory {
 
 	/**
-	 * Localize a scope for a given locale.
-	 *
-	 * @param scope the scope to be described.
-	 * @param locale the locale requested for the description.
-	 * @return a description for the scope in the requested locale.
+	 * Creates a {@link ScopeMatcher} for the given input.
+	 * @param input the input the matcher will match against.
+	 * @return the ScopeMatcher that will match against the input.
 	 * @review
 	 */
-	public String describeScope(String scope, Locale locale);
+	public ScopeMatcher create(String input);
 
 }

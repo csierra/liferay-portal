@@ -14,8 +14,8 @@
 
 package com.liferay.oauth2.provider.scope.impl.scopematcher;
 
-import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcher;
-import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcherFactory;
+import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;

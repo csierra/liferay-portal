@@ -14,17 +14,17 @@
 
 package com.liferay.oauth2.provider.scope.impl;
 
-import com.liferay.oauth2.provider.scope.spi.scopefinder.ScopeFinder;
-import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcherFactory;
+import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
+import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.impl.model.LiferayOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scope.liferay.api.ScopeMatcherFactoryLocator;
 import com.liferay.oauth2.provider.scope.liferay.api.ScopedServiceTrackerMap;
-import com.liferay.oauth2.provider.scope.spi.prefixhandler.PrefixHandler;
-import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcher;
-import com.liferay.oauth2.provider.scope.spi.scopemapper.ScopeMapper;
-import com.liferay.oauth2.provider.scope.spi.prefixhandler.PrefixHandlerFactory;
+import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
+import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
+import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;

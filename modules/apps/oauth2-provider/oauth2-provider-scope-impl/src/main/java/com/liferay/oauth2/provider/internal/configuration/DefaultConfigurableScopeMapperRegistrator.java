@@ -11,7 +11,7 @@ import org.osgi.service.component.annotations.Deactivate;
 
 import com.liferay.oauth2.provider.configuration.DefaultConfigurableScopeMapperRegistratorConfiguration;
 import com.liferay.oauth2.provider.scope.impl.scopemapper.ConfigurableScopeMapper;
-import com.liferay.oauth2.provider.scope.spi.scopemapper.ScopeMapper;
+import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 

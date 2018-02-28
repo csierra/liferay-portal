@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scope.impl.feature;
 
-import com.liferay.oauth2.provider.scope.spi.scopefinder.ScopeFinder;
+import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 
 import java.util.Collection;
 

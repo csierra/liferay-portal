@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scope.liferay.api;
 
-import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcherFactory;
+import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 
 public interface ScopeMatcherFactoryLocator {
 

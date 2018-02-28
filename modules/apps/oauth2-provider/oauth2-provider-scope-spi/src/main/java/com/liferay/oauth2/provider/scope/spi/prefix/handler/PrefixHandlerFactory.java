@@ -12,26 +12,31 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.spi.scopematcher;
+package com.liferay.oauth2.provider.scope.spi.prefix.handler;
 
 import aQute.bnd.annotation.ProviderType;
 
+import java.util.function.Function;
+
 /**
- * Factory that creates {@link ScopeMatcher} for a given input.
- * This allow for components to switch matching strategies using configuration.
+ * Interface to create {@link PrefixHandler} using a given prefix.
+ * This allows components to switch prefixing strategies using configuration,
+ * such as using different characters <i>'_'</i> or <i>'.'</i>, thus keeping
+ * the prefixing strategy consistent across components.
  *
  * @author Carlos Sierra Andrés
  * @review
  */
 @ProviderType
-public interface ScopeMatcherFactory {
+public interface PrefixHandlerFactory {
 
 	/**
-	 * Creates a {@link ScopeMatcher} for the given input.
-	 * @param input the input the matcher will match against.
-	 * @return the ScopeMatcher that will match against the input.
+	 * This method allows to create a {@link PrefixHandler} using the properties
+	 *
+	 * @param propertyAccessor to configure the {@link PrefixHandler} from
+	 * @return the {@link PrefixHandler} initialized from the given properties
 	 * @review
 	 */
-	public ScopeMatcher create(String input);
+	public PrefixHandler create(Function<String, Object> propertyAccessor);
 
 }

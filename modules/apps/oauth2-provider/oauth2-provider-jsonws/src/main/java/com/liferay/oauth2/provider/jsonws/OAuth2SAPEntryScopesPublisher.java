@@ -14,9 +14,9 @@
 
 package com.liferay.oauth2.provider.jsonws;
 
-import com.liferay.oauth2.provider.scope.spi.applicationdescriptor.ApplicationDescriptor;
-import com.liferay.oauth2.provider.scope.spi.scopedescriptor.ScopeDescriptor;
-import com.liferay.oauth2.provider.scope.spi.scopefinder.ScopeFinder;
+import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
+import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
+import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;

@@ -12,32 +12,28 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.spi.scopemapper;
+package com.liferay.oauth2.provider.scope.spi.application.descriptor;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.Locale;
 
 /**
- * Represents a transformation between internal scope names to external aliases.
+ * Represents the localization information for OAuth2 applications.
  *
  * @author Carlos Sierra Andrés
  * @review
  */
 @ProviderType
-public interface ScopeMapper {
-
-	public static final ScopeMapper PASSTHROUGH_SCOPEMAPPER =
-		Collections::singleton;
+public interface ApplicationDescriptor {
 
 	/**
-	 * Renames an application provided scope to new scope names
+	 * Localize an application for a given locale.
 	 *
-	 * @param scope application provided scope
-	 * @return set of new names for the scope
+	 * @param locale the locale requested for the description.
+	 * @return a description for the applicationName in the requested locale.
 	 * @review
 	 */
-	public Set<String> map(String scope);
+	public String describeApplication(Locale locale);
 
 }

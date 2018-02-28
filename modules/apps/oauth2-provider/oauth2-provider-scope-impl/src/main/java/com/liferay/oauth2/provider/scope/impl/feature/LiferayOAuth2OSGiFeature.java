@@ -15,10 +15,10 @@
 package com.liferay.oauth2.provider.scope.impl.feature;
 
 import com.liferay.oauth2.provider.scope.ScopeChecker;
-import com.liferay.oauth2.provider.scope.spi.applicationdescriptor.ApplicationDescriptor;
+import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.ScopedRequestScopeChecker;
-import com.liferay.oauth2.provider.scope.spi.scopedescriptor.ScopeDescriptor;
-import com.liferay.oauth2.provider.scope.spi.scopefinder.ScopeFinder;
+import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
+import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.CompanyRetrieverContainerRequestFilter;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.RunnableExecutorContainerResponseFilter;
 import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;

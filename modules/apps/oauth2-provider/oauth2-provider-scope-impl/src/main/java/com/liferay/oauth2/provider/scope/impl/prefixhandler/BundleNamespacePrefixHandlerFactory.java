@@ -14,8 +14,8 @@
 
 package com.liferay.oauth2.provider.scope.impl.prefixhandler;
 
-import com.liferay.oauth2.provider.scope.spi.prefixhandler.PrefixHandler;
-import com.liferay.oauth2.provider.scope.spi.prefixhandler.PrefixHandlerFactory;
+import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
+import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;

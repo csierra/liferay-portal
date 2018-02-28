@@ -12,31 +12,29 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.spi.prefixhandler;
+package com.liferay.oauth2.provider.scope.spi.scope.descriptor;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.function.Function;
+import java.util.Locale;
 
 /**
- * Interface to create {@link PrefixHandler} using a given prefix.
- * This allows components to switch prefixing strategies using configuration,
- * such as using different characters <i>'_'</i> or <i>'.'</i>, thus keeping
- * the prefixing strategy consistent across components.
+ * Represents localization information for the scopes of OAuth2 applications.
  *
  * @author Carlos Sierra Andrés
  * @review
  */
 @ProviderType
-public interface PrefixHandlerFactory {
+public interface ScopeDescriptor {
 
 	/**
-	 * This method allows to create a {@link PrefixHandler} using the properties
+	 * Localize a scope for a given locale.
 	 *
-	 * @param propertyAccessor to configure the {@link PrefixHandler} from
-	 * @return the {@link PrefixHandler} initialized from the given properties
+	 * @param scope the scope to be described.
+	 * @param locale the locale requested for the description.
+	 * @return a description for the scope in the requested locale.
 	 * @review
 	 */
-	public PrefixHandler create(Function<String, Object> propertyAccessor);
+	public String describeScope(String scope, Locale locale);
 
 }

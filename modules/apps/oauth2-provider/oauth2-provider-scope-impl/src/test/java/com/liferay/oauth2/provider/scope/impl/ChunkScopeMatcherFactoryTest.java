@@ -15,8 +15,8 @@
 package com.liferay.oauth2.provider.scope.impl;
 
 import com.liferay.oauth2.provider.scope.impl.scopematcher.ChunkScopeMatcherFactory;
-import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcherFactory;
-import com.liferay.oauth2.provider.scope.spi.scopematcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
+import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

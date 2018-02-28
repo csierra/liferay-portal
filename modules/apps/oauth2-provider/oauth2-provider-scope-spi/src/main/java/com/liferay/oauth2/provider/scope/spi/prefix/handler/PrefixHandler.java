@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.spi.prefixhandler;
+package com.liferay.oauth2.provider.scope.spi.prefix.handler;
 
 import aQute.bnd.annotation.ProviderType;
 
