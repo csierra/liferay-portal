@@ -247,8 +247,18 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
 		}
 
-		return super.refreshAccessToken(client, refreshTokenKey,
-			restrictedScopes);
+		OAuth2RefreshToken oAuth2RefreshToken =
+			_oAuth2RefreshTokenLocalService.fetchByContent(
+				refreshTokenKey);
+
+		if (oAuth2RefreshToken == null) {
+			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
+		}
+
+		restrictedScopes = oAuth2RefreshToken.getScopesList();
+
+		return super.refreshAccessToken(
+			client, refreshTokenKey, restrictedScopes);
 	}
 
 	@Override
@@ -545,8 +555,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		}
 
 		try {
-			_oAuth2RefreshTokenLocalService.updateOAuth2RefreshToken(
-				oAuth2RefreshToken);
+			oAuth2RefreshToken =
+				_oAuth2RefreshTokenLocalService.updateOAuth2RefreshToken(
+					oAuth2RefreshToken);
 		}
 		catch (Exception e) {
 			StringBundler sb = new StringBundler();
@@ -560,6 +571,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			throw new OAuthServiceException(
 				"Unable to save refresh token", e);
 		}
+
+		Set<String> authorizedScopes = new HashSet<>();
 
 		List<String> accessTokens = refreshToken.getAccessTokens();
 
@@ -577,6 +590,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				continue;
 			}
 
+			authorizedScopes.addAll(oAuth2Token.getScopesList());
+
 			oAuth2Token.setOAuth2RefreshTokenId(
 				oAuth2RefreshToken.getOAuth2RefreshTokenId());
 
@@ -588,6 +603,29 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 					"Unable to update access token " +
 						"with refresh token reference"
 					, e);
+
+				throw new OAuthServiceException(
+					"Unable to save refresh token", e);
+			}
+		}
+
+		if (authorizedScopes != null) {
+			oAuth2RefreshToken.setScopesList(new ArrayList(authorizedScopes));
+
+			try {
+				_oAuth2RefreshTokenLocalService.updateOAuth2RefreshToken(
+					oAuth2RefreshToken);
+			}
+			catch (Exception e) {
+				StringBundler sb = new StringBundler();
+				sb.append("Unable to save refresh token for client ");
+				sb.append(refreshToken.getClient().getClientId());
+				sb.append(" for user ");
+				sb.append(oAuth2RefreshToken.getUserId());
+				sb.append(" with scopes ");
+				sb.append(authorizedScopes);
+
+				_log.error(sb.toString(), e);
 
 				throw new OAuthServiceException(
 					"Unable to save refresh token", e);
