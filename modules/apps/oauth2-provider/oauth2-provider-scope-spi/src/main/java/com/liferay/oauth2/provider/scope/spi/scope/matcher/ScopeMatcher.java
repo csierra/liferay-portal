@@ -25,20 +25,19 @@ import java.util.stream.Stream;
  * strategies may be:
  *
  * <ul>
- *     <li>NONE: no scope will match</li>
- *     <li>ALL: all scope will match</li>
  *     <li>STRICT: only scope matching a particular string or strings
  *     will match</li>
  *     <li>HIERARCHICAL: scope following some naming rules might match more
- *     general scope. For instance using <i>dot notation</i> we can code that
- *     shorter scope that share a common prefix, for example
- *     <i>everything</i> imply longer scope such as <i>everything.readonly</i>.
+ *     general scope. Hierarchy can be described for instance using
+ *     <i>dot notation</i>. In such scenario <i>everything</i> can also imply
+ *     longer scope such as <i>everything.readonly</i>.
  *    </li>
  * </ul>
  *
- * ScopeMatcher might also be combined with {@link PrefixHandler} and
- * {@link ScopeMapper} to tailor the matching strategy to the framework
- * configuration.
+ * ScopeMatcher is used together with
+ * {@link com.liferay.oauth2.provider.scope.spi.prefixhandler.PrefixHandler}
+ * and {@link com.liferay.oauth2.provider.scope.spi.scopemapper.ScopeMapper}
+ * to tailor the matching strategy to the framework configuration.
  *
  * @author Carlos Sierra Andrés
  * @review
@@ -46,13 +45,7 @@ import java.util.stream.Stream;
 @ProviderType
 public interface ScopeMatcher {
 
-	public static ScopeMatcher ALL = __ -> true;
-
 	public static ScopeMatcher NONE = __ -> false;
-
-	public default ScopeMatcher and(ScopeMatcher scopeMatcher) {
-		return localName -> match(localName) && scopeMatcher.match(localName);
-	}
 
 	/**
 	 * Applies the matcher to a collection of scope. Some implementations
@@ -81,9 +74,5 @@ public interface ScopeMatcher {
 	 * @review
 	 */
 	public boolean match(String name);
-
-	public default ScopeMatcher or(ScopeMatcher scopeMatcher) {
-		return localName -> match(localName) || scopeMatcher.match(localName);
-	}
 
 }
