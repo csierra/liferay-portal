@@ -17,4 +17,57 @@
 				OAuth2Token.oAuth2TokenContent = ?
 		]]>
 	</sql>
+	<sql id="com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationFinder.findAuthorizations">
+		<![CDATA[
+		SELECT
+			OAuth2Authorization.accessTokenExpiresDate,
+			OAuth2Authorization.companyId,
+			OAuth2Authorization.createDate,
+			OAuth2Authorization.oAuth2ApplicationId,
+			OAuth2Authorization.oAuth2RefreshTokenId,
+			OAuth2Authorization.oAuth2TokenId,
+			OAuth2Authorization.refreshTokenExpiresDate,
+			OAuth2Authorization.remoteIPInfo,
+			OAuth2Authorization.scopes,
+			OAuth2Authorization.userId,
+			OAuth2Authorization.userName
+		FROM (
+			SELECT
+				token.createDate accessTokenExpiresDate,
+				token.companyId,
+				token.createDate,
+				token.oAuth2ApplicationId,
+				token.oAuth2RefreshTokenId,
+				token.oAuth2TokenId,
+				refreshToken.createDate refreshTokenExpiresDate,
+				token.remoteIPInfo,
+				token.scopes,
+				token.userId,
+				token.userName
+			FROM
+				OAuth2Token token
+			LEFT JOIN
+				OAuth2RefreshToken refreshToken ON
+					token.oAuth2RefreshTokenId = refreshToken.oAuth2RefreshTokenId
+			UNION SELECT
+				token.createDate accessTokenExpiresDate,
+				refreshToken.companyId,
+				refreshToken.createDate,
+				refreshToken.oAuth2ApplicationId,
+				refreshToken.oAuth2RefreshTokenId,
+				token.oAuth2TokenId,
+				refreshToken.createDate refreshTokenExpiresDate,
+				refreshToken.remoteIPInfo,
+				refreshToken.scopes,
+				refreshToken.userId,
+				refreshToken.userName
+			FROM
+				OAuth2Token token
+			RIGHT JOIN
+				OAuth2RefreshToken refreshToken ON
+					token.oAuth2RefreshTokenId = refreshToken.oAuth2RefreshTokenId
+			) OAuth2Authorization
+		]]>
+	</sql>
+
 </custom-sql>
