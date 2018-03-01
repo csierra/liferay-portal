@@ -46,10 +46,31 @@
 				token.userName
 			FROM
 				OAuth2Token token
+			JOIN
+				OAuth2RefreshToken refreshToken ON
+					token.oAuth2RefreshTokenId = refreshToken.oAuth2RefreshTokenId
+			UNION
+			SELECT
+				token.expirationDate accessTokenExpirationDate,
+				token.companyId,
+				token.createDate,
+				token.oAuth2ApplicationId,
+				token.oAuth2RefreshTokenId,
+				token.oAuth2TokenId,
+				refreshToken.expirationDate refreshTokenExpirationDate,
+				token.remoteIPInfo,
+				token.scopes,
+				token.userId,
+				token.userName
+			FROM
+				OAuth2Token token
 			LEFT JOIN
 				OAuth2RefreshToken refreshToken ON
 					token.oAuth2RefreshTokenId = refreshToken.oAuth2RefreshTokenId
-			UNION SELECT
+			WHERE
+				refreshToken.oAuth2RefreshTokenId is null
+			UNION
+			SELECT
 				token.expirationDate accessTokenExpirationDate,
 				refreshToken.companyId,
 				refreshToken.createDate,
@@ -66,6 +87,8 @@
 			RIGHT JOIN
 				OAuth2RefreshToken refreshToken ON
 					token.oAuth2RefreshTokenId = refreshToken.oAuth2RefreshTokenId
+			WHERE
+				token.oAuth2TokenId is null
 			) OAuth2Authorization
 		]]>
 	</sql>
