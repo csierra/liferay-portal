@@ -9,11 +9,13 @@
 				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
 				<action-key>CONFIGURATION</action-key>
 				<action-key>VIEW</action-key>
+				<action-key>VIEW_GRANTED_AUTHORIZATIONS</action-key>
 			</supports>
 			<guest-unsupported>
 				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
 				<action-key>CONFIGURATION</action-key>
 				<action-key>VIEW</action-key>
+				<action-key>VIEW_GRANTED_AUTHORIZATIONS</action-key>
 			</guest-unsupported>
 		</permissions>
 	</portlet-resource>

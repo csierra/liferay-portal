@@ -17,9 +17,15 @@ package com.liferay.oauth2.provider.web.internal.display.context;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
+import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminActionKeys;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 
 /**
  * @author Tomas Polesovsky
@@ -47,6 +53,22 @@ public class OAuth2AdminPortletDisplayContext {
 
 	public boolean hasViewPermission(OAuth2Application oAuth2Application) {
 		return hasPermission(oAuth2Application, ActionKeys.VIEW);
+	}
+
+	public boolean hasViewGrantedAuthorizationsPermission() {
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		try {
+			return PortletPermissionUtil.contains(permissionChecker,
+				OAuth2AdminPortletKeys.OAUTH2_ADMIN,
+				OAuth2AdminActionKeys.VIEW_GRANTED_AUTHORIZATIONS);
+		}
+		catch (PortalException e) {
+			_log.error(e);
+
+			return false;
+		}
 	}
 
 	public boolean hasDeletePermission(OAuth2Application oAuth2Application) {
@@ -83,4 +105,6 @@ public class OAuth2AdminPortletDisplayContext {
 		return false;
 	}
 
+	private static Log _log = LogFactoryUtil.getLog(
+		OAuth2AdminPortletDisplayContext.class);
 }

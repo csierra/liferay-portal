@@ -1,5 +1,4 @@
-<%@ page
-	import="com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil" %><%--
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -43,7 +42,7 @@
 
 			<liferay-ui:search-container-column-text
 				name="granted-authorizations"
-				value="<%= OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2Application.getOAuth2ApplicationId())%>" />
+				value="<%= String.valueOf(OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2Application.getOAuth2ApplicationId())) %>" />
 
 	        <liferay-ui:search-container-column-jsp
 	            align="right" 
