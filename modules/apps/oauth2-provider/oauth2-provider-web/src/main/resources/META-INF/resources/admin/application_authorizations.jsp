@@ -1,7 +1,3 @@
-<%@ page
-	import="com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.kernel.dao.search.SearchContainer" %>
-
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -32,6 +28,10 @@ long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", 0);
 OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
 
 renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new String[]{oAuth2Application.getName()}));
+
+if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) {
+	return;
+}
 %>
 
 <div class="container-fluid-1280">
