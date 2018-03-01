@@ -155,18 +155,7 @@ public class OAuth2EndpointApplication extends Application {
 
 	@Override
 	public Set<Object> getSingletons() {
-		AccessTokenService accessTokenService = new AccessTokenService();
-
-		accessTokenService.setBlockUnsecureRequests(true);
-		accessTokenService.setCanSupportPublicClients(true);
-		accessTokenService.setDataProvider(_liferayOAuthDataProvider);
-		accessTokenService.setGrantHandlers(_accessTokenGrantHandlers);
-
-		ArrayList<Object> endpoints = new ArrayList<>(_liferayOauth2Endpoints);
-
-		endpoints.add(accessTokenService);
-
-		return new HashSet<>(endpoints);
+		return new HashSet<>(_liferayOauth2Endpoints);
 	}
 
 	@Override
@@ -180,19 +169,6 @@ public class OAuth2EndpointApplication extends Application {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2EndpointApplication.class);
-
-	@Reference(
-		cardinality = ReferenceCardinality.AT_LEAST_ONE,
-		policyOption = ReferencePolicyOption.GREEDY,
-		unbind = "removeAccessTokenGrantHandler"
-	)
-	public void addAccessTokenGrantHandler(AccessTokenGrantHandler accessTokenGrantHandler) {
-		_accessTokenGrantHandlers.add(accessTokenGrantHandler);
-	}
-	
-	public void removeAccessTokenGrantHandler(AccessTokenGrantHandler accessTokenGrantHandler) {
-		_accessTokenGrantHandlers.remove(accessTokenGrantHandler);
-	}
 
 	@Reference(
 		cardinality = ReferenceCardinality.MULTIPLE,
@@ -230,8 +206,6 @@ public class OAuth2EndpointApplication extends Application {
 
 	private List<Object> _liferayOauth2Endpoints = new ArrayList<>();
 	private List<Class<?>> _liferayOAuth2Classes = new ArrayList<>();
-
-	private List<AccessTokenGrantHandler> _accessTokenGrantHandlers = new ArrayList<>();
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;

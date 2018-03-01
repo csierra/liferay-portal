@@ -83,6 +83,11 @@ import java.util.Set;
 )
 public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvider {
 
+	public static final String CLIENT_REMOTE_ADDR_PROPERTY =
+		"CLIENT_REMOTE_ADDR_ADDRESS";
+	public static final String CLIENT_REMOTE_HOST_PROPERTY =
+		"CLIENT_REMOTE_HOST";
+
 	private PortalCache<String, ServerAuthorizationCodeGrant>
 		_codeGrantsPortalCache;
 
@@ -422,11 +427,12 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	private void _transactionalSaveAccessToken(ServerAccessToken token) {
+		Client client = token.getClient();
+
 		OAuth2Token oAuth2Token = _oAuth2TokenLocalService.createOAuth2Token(
 			token.getTokenKey());
 
-		OAuth2Application oAuth2Application =
-			resolveOAuth2Application(token.getClient());
+		OAuth2Application oAuth2Application = resolveOAuth2Application(client);
 
 		long companyId = oAuth2Application.getCompanyId();
 
@@ -435,6 +441,13 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		oAuth2Token.setLifeTime(token.getExpiresIn());
 		oAuth2Token.setOAuth2ApplicationId(
 			oAuth2Application.getOAuth2ApplicationId());
+
+		Map<String, String> clientProperties = client.getProperties();
+
+		String remoteAddr = clientProperties.get(CLIENT_REMOTE_ADDR_PROPERTY);
+		String remoteHost = clientProperties.get(CLIENT_REMOTE_HOST_PROPERTY);
+
+		oAuth2Token.setRemoteIPInfo(remoteAddr + ", " + remoteHost);
 
 		OAuth2RefreshToken oAuth2RefreshToken =
 			_oAuth2RefreshTokenLocalService.fetchByContent(
@@ -465,7 +478,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			sb.append("Unable to save user ");
 			sb.append(token.getSubject().getId());
 			sb.append(" token for client ");
-			sb.append(token.getClient().getClientId());
+			sb.append(client.getClientId());
 			sb.append(" with granted scope ");
 			sb.append(
 				OAuthUtils.convertPermissionsToScopeList(
@@ -507,7 +520,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			sb.append("Unable to save user ");
 			sb.append(token.getSubject().getId());
 			sb.append(" scope for client ");
-			sb.append(token.getClient().getClientId());
+			sb.append(client.getClientId());
 			sb.append(" with approved scope ");
 			sb.append(
 				OAuthUtils.convertPermissionsToScopeList(
@@ -532,8 +545,10 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	private void _transactionalSaveRefreshToken(RefreshToken refreshToken) {
+		Client client = refreshToken.getClient();
+
 		OAuth2Application oAuth2Application =
-			resolveOAuth2Application(refreshToken.getClient());
+			resolveOAuth2Application(client);
 		
 		OAuth2RefreshToken oAuth2RefreshToken =
 			_oAuth2RefreshTokenLocalService.createOAuth2RefreshToken(
@@ -546,6 +561,13 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		oAuth2RefreshToken.setLifeTime(refreshToken.getExpiresIn());
 		oAuth2RefreshToken.setOAuth2ApplicationId(
 			oAuth2Application.getOAuth2ApplicationId());
+
+		Map<String, String> clientProperties = client.getProperties();
+
+		String remoteAddr = clientProperties.get(CLIENT_REMOTE_ADDR_PROPERTY);
+		String remoteHost = clientProperties.get(CLIENT_REMOTE_HOST_PROPERTY);
+
+		oAuth2RefreshToken.setRemoteIPInfo(remoteAddr + ", " + remoteHost);
 
 		UserSubject subject = refreshToken.getSubject();
 
@@ -562,7 +584,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		catch (Exception e) {
 			StringBundler sb = new StringBundler();
 			sb.append("Unable to save refresh token for client ");
-			sb.append(refreshToken.getClient().getClientId());
+			sb.append(client.getClientId());
 			sb.append(" for user ");
 			sb.append(oAuth2RefreshToken.getUserId());
 
@@ -584,7 +606,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"No access token found for refresh token for client "
-							+ refreshToken.getClient().getClientId());
+							+ client.getClientId());
 				}
 
 				continue;
@@ -619,7 +641,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			catch (Exception e) {
 				StringBundler sb = new StringBundler();
 				sb.append("Unable to save refresh token for client ");
-				sb.append(refreshToken.getClient().getClientId());
+				sb.append(client.getClientId());
 				sb.append(" for user ");
 				sb.append(oAuth2RefreshToken.getUserId());
 				sb.append(" with scopes ");
