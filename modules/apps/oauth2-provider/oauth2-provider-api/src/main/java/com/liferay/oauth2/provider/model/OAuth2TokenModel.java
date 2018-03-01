@@ -165,6 +165,21 @@ public interface OAuth2TokenModel extends BaseModel<OAuth2Token>, ShardedModel {
 	public void setLifeTime(long lifeTime);
 
 	/**
+	 * Returns the remote ip info of this o auth2 token.
+	 *
+	 * @return the remote ip info of this o auth2 token
+	 */
+	@AutoEscape
+	public String getRemoteIPInfo();
+
+	/**
+	 * Sets the remote ip info of this o auth2 token.
+	 *
+	 * @param remoteIPInfo the remote ip info of this o auth2 token
+	 */
+	public void setRemoteIPInfo(String remoteIPInfo);
+
+	/**
 	 * Returns the o auth2 token content of this o auth2 token.
 	 *
 	 * @return the o auth2 token content of this o auth2 token

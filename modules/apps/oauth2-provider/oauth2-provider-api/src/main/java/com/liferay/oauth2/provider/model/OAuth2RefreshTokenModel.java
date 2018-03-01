@@ -166,6 +166,21 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	public void setLifeTime(long lifeTime);
 
 	/**
+	 * Returns the remote ip info of this o auth2 refresh token.
+	 *
+	 * @return the remote ip info of this o auth2 refresh token
+	 */
+	@AutoEscape
+	public String getRemoteIPInfo();
+
+	/**
+	 * Sets the remote ip info of this o auth2 refresh token.
+	 *
+	 * @param remoteIPInfo the remote ip info of this o auth2 refresh token
+	 */
+	public void setRemoteIPInfo(String remoteIPInfo);
+
+	/**
 	 * Returns the o auth2 refresh token content of this o auth2 refresh token.
 	 *
 	 * @return the o auth2 refresh token content of this o auth2 refresh token
