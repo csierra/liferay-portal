@@ -138,7 +138,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 			
 				boolean matched = 
 					matchCache.computeIfAbsent(
-						mappedScope, (input) -> scopeMatcher.match(input));
+						mappedScope, scopeMatcher::match);
 				
 				if (matched) {
 					locatedScopes.add(
