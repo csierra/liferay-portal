@@ -1,4 +1,5 @@
-<%--
+<%@ page
+	import="com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -31,12 +32,19 @@
 	            themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>" />
 	
 	    <liferay-ui:search-container-row
-	        className="com.liferay.oauth2.provider.model.OAuth2Application" modelVar="oAuth2Application">
-	
-	        <liferay-ui:search-container-column-text property="name" />
+	        className="com.liferay.oauth2.provider.model.OAuth2Application"
+			modelVar="oAuth2Application">
+
+	        <liferay-ui:search-container-column-text
+				property="name" />
 	        
-	        <liferay-ui:search-container-column-text property="description" />
-	
+	        <liferay-ui:search-container-column-text
+				property="description" />
+
+			<liferay-ui:search-container-column-text
+				name="granted-authorizations"
+				value="<%= OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2Application.getOAuth2ApplicationId())%>" />
+
 	        <liferay-ui:search-container-column-jsp
 	            align="right" 
 	            path="/admin/application_actions.jsp" />

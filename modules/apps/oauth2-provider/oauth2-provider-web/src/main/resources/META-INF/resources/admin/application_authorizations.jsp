@@ -1,3 +1,7 @@
+<%@ page
+	import="com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil" %>
+<%@ page import="com.liferay.portal.kernel.dao.search.SearchContainer" %>
+
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -31,76 +35,56 @@ renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new Str
 %>
 
 <div class="container-fluid-1280">
-	<liferay-ui:header title="<%= LanguageUtil.format(request, "x-authorizations", new String[]{oAuth2Application.getName()}) %>" />
+	<liferay-portlet:renderURL varImpl="applicationAuthorizationsURL">
+		<portlet:param name="mvcPath" value="/admin/application_authorizations.jsp" />
+		<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2ApplicationId) %>" />
+		<portlet:param name="redirect" value="<%= redirect %>" />
+	</liferay-portlet:renderURL>
 
-	<liferay-ui:tabs cssClass="navbar-no-collapse panel panel-default" names="by-access-token,by-refresh-token" refresh="<%= false %>" type="tabs nav-tabs-default ">
-		<liferay-ui:section>
-			<liferay-ui:search-container>
-				<liferay-ui:search-container-results
-					results="<%= new ArrayList(OAuth2TokenLocalServiceUtil.findByApplicationId(
-						oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator())) %>" />
+	<liferay-ui:search-container
+		iteratorURL="<%= applicationAuthorizationsURL %>"
+		total="<%= OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId) %>" >
 
-				<liferay-ui:search-container-row
-					className="com.liferay.oauth2.provider.model.OAuth2Token" modelVar="oAuth2Token">
+		<liferay-ui:search-container-results
+			results="<%= OAuth2AuthorizationLocalServiceUtil.findByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>"/>
 
-					<liferay-ui:search-container-column-text property="userId" />
+		<liferay-ui:search-container-row
+			className="com.liferay.oauth2.provider.model.OAuth2Authorization" modelVar="oAuth2Authorization">
 
-					<liferay-ui:search-container-column-text property="userName" />
+			<liferay-ui:search-container-column-text
+				property="userId" />
 
-					<liferay-ui:search-container-column-date property="createDate" />
+			<liferay-ui:search-container-column-text
+				property="userName" />
 
-					<liferay-ui:search-container-column-text property="lifeTime" />
+			<liferay-ui:search-container-column-date
+				property="createDate" />
 
-					<liferay-ui:search-container-column-text property="remoteIPInfo" />
+			<liferay-ui:search-container-column-text
+				property="accessTokenExpiresDate" />
 
-					<liferay-ui:search-container-column-text name="scopes">
+			<liferay-ui:search-container-column-text
+				property="refreshTokenExpiresDate" />
 
-						<%= String.valueOf(oAuth2Token.getScopesList().size()) %>
+			<liferay-ui:search-container-column-text
+				property="remoteIPInfo" />
 
-						<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Token.getScopes()) %>" />
+			<liferay-ui:search-container-column-text
+				name="scopes">
 
-					</liferay-ui:search-container-column-text>
+				<%= String.valueOf(oAuth2Authorization.getScopesList().size()) %>
 
-				</liferay-ui:search-container-row>
+				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Authorization.getScopes()) %>" />
 
-				<liferay-ui:search-iterator
-					markupView="lexicon"
-					searchContainer="<%= searchContainer %>"/>
-			</liferay-ui:search-container>
-		</liferay-ui:section>
-		<liferay-ui:section>
-			<liferay-ui:search-container>
-				<liferay-ui:search-container-results
-					results="<%= new ArrayList(OAuth2RefreshTokenLocalServiceUtil.findByApplication(
-						oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator())) %>" />
+			</liferay-ui:search-container-column-text>
 
-				<liferay-ui:search-container-row
-					className="com.liferay.oauth2.provider.model.OAuth2RefreshToken" modelVar="oAuth2RefreshToken">
+		</liferay-ui:search-container-row>
 
-					<liferay-ui:search-container-column-text property="userId" />
+		<liferay-ui:search-iterator
+			markupView="lexicon"
+			searchContainer="<%= searchContainer %>"/>
 
-					<liferay-ui:search-container-column-text property="userName" />
+	</liferay-ui:search-container>
 
-					<liferay-ui:search-container-column-date property="createDate" />
-
-					<liferay-ui:search-container-column-text property="lifeTime" />
-
-					<liferay-ui:search-container-column-text property="remoteIPInfo" />
-
-					<liferay-ui:search-container-column-text name="scopes">
-
-						<%= String.valueOf(oAuth2RefreshToken.getScopesList().size()) %>
-
-						<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2RefreshToken.getScopes()) %>" />
-
-					</liferay-ui:search-container-column-text>
-				</liferay-ui:search-container-row>
-
-				<liferay-ui:search-iterator
-					markupView="lexicon"
-					searchContainer="<%= searchContainer %>"/>
-			</liferay-ui:search-container>
-		</liferay-ui:section>
-	</liferay-ui:tabs>
 </div>
 
