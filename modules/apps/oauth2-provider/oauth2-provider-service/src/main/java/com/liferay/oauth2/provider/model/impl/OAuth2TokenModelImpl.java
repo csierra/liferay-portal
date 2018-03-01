@@ -70,6 +70,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
 			{ "lifeTime", Types.BIGINT },
+			{ "remoteIPInfo", Types.VARCHAR },
 			{ "oAuth2TokenContent", Types.CLOB },
 			{ "oAuth2ApplicationId", Types.BIGINT },
 			{ "oAuth2TokenType", Types.VARCHAR },
@@ -85,6 +86,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("lifeTime", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("remoteIPInfo", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("oAuth2TokenContent", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("oAuth2ApplicationId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("oAuth2TokenType", Types.VARCHAR);
@@ -92,7 +94,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		TABLE_COLUMNS_MAP.put("scopes", Types.CLOB);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2Token (oAuth2TokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,oAuth2TokenContent TEXT null,oAuth2ApplicationId LONG,oAuth2TokenType VARCHAR(75) null,oAuth2RefreshTokenId LONG,scopes TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2Token (oAuth2TokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,remoteIPInfo VARCHAR(75) null,oAuth2TokenContent TEXT null,oAuth2ApplicationId LONG,oAuth2TokenType VARCHAR(75) null,oAuth2RefreshTokenId LONG,scopes TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2Token";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2Token.oAuth2TokenId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2Token.oAuth2TokenId ASC";
@@ -159,6 +161,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("lifeTime", getLifeTime());
+		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("oAuth2TokenContent", getOAuth2TokenContent());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
 		attributes.put("oAuth2TokenType", getOAuth2TokenType());
@@ -207,6 +210,12 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 		if (lifeTime != null) {
 			setLifeTime(lifeTime);
+		}
+
+		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
+
+		if (remoteIPInfo != null) {
+			setRemoteIPInfo(remoteIPInfo);
 		}
 
 		String oAuth2TokenContent = (String)attributes.get("oAuth2TokenContent");
@@ -329,6 +338,21 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	@Override
 	public void setLifeTime(long lifeTime) {
 		_lifeTime = lifeTime;
+	}
+
+	@Override
+	public String getRemoteIPInfo() {
+		if (_remoteIPInfo == null) {
+			return "";
+		}
+		else {
+			return _remoteIPInfo;
+		}
+	}
+
+	@Override
+	public void setRemoteIPInfo(String remoteIPInfo) {
+		_remoteIPInfo = remoteIPInfo;
 	}
 
 	@Override
@@ -467,6 +491,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		oAuth2TokenImpl.setUserName(getUserName());
 		oAuth2TokenImpl.setCreateDate(getCreateDate());
 		oAuth2TokenImpl.setLifeTime(getLifeTime());
+		oAuth2TokenImpl.setRemoteIPInfo(getRemoteIPInfo());
 		oAuth2TokenImpl.setOAuth2TokenContent(getOAuth2TokenContent());
 		oAuth2TokenImpl.setOAuth2ApplicationId(getOAuth2ApplicationId());
 		oAuth2TokenImpl.setOAuth2TokenType(getOAuth2TokenType());
@@ -578,6 +603,14 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 		oAuth2TokenCacheModel.lifeTime = getLifeTime();
 
+		oAuth2TokenCacheModel.remoteIPInfo = getRemoteIPInfo();
+
+		String remoteIPInfo = oAuth2TokenCacheModel.remoteIPInfo;
+
+		if ((remoteIPInfo != null) && (remoteIPInfo.length() == 0)) {
+			oAuth2TokenCacheModel.remoteIPInfo = null;
+		}
+
 		oAuth2TokenCacheModel.oAuth2TokenContent = getOAuth2TokenContent();
 
 		String oAuth2TokenContent = oAuth2TokenCacheModel.oAuth2TokenContent;
@@ -611,7 +644,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{oAuth2TokenId=");
 		sb.append(getOAuth2TokenId());
@@ -625,6 +658,8 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		sb.append(getCreateDate());
 		sb.append(", lifeTime=");
 		sb.append(getLifeTime());
+		sb.append(", remoteIPInfo=");
+		sb.append(getRemoteIPInfo());
 		sb.append(", oAuth2TokenContent=");
 		sb.append(getOAuth2TokenContent());
 		sb.append(", oAuth2ApplicationId=");
@@ -642,7 +677,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(40);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.oauth2.provider.model.OAuth2Token");
@@ -671,6 +706,10 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		sb.append(
 			"<column><column-name>lifeTime</column-name><column-value><![CDATA[");
 		sb.append(getLifeTime());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>remoteIPInfo</column-name><column-value><![CDATA[");
+		sb.append(getRemoteIPInfo());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>oAuth2TokenContent</column-name><column-value><![CDATA[");
@@ -709,6 +748,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	private String _originalUserName;
 	private Date _createDate;
 	private long _lifeTime;
+	private String _remoteIPInfo;
 	private String _oAuth2TokenContent;
 	private String _originalOAuth2TokenContent;
 	private long _oAuth2ApplicationId;

@@ -65,7 +65,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{oAuth2TokenId=");
 		sb.append(oAuth2TokenId);
@@ -79,6 +79,8 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		sb.append(createDate);
 		sb.append(", lifeTime=");
 		sb.append(lifeTime);
+		sb.append(", remoteIPInfo=");
+		sb.append(remoteIPInfo);
 		sb.append(", oAuth2TokenContent=");
 		sb.append(oAuth2TokenContent);
 		sb.append(", oAuth2ApplicationId=");
@@ -117,6 +119,13 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		}
 
 		oAuth2TokenImpl.setLifeTime(lifeTime);
+
+		if (remoteIPInfo == null) {
+			oAuth2TokenImpl.setRemoteIPInfo("");
+		}
+		else {
+			oAuth2TokenImpl.setRemoteIPInfo(remoteIPInfo);
+		}
 
 		if (oAuth2TokenContent == null) {
 			oAuth2TokenImpl.setOAuth2TokenContent("");
@@ -159,6 +168,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		createDate = objectInput.readLong();
 
 		lifeTime = objectInput.readLong();
+		remoteIPInfo = objectInput.readUTF();
 		oAuth2TokenContent = objectInput.readUTF();
 
 		oAuth2ApplicationId = objectInput.readLong();
@@ -187,6 +197,13 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 		objectOutput.writeLong(createDate);
 
 		objectOutput.writeLong(lifeTime);
+
+		if (remoteIPInfo == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(remoteIPInfo);
+		}
 
 		if (oAuth2TokenContent == null) {
 			objectOutput.writeUTF("");
@@ -220,6 +237,7 @@ public class OAuth2TokenCacheModel implements CacheModel<OAuth2Token>,
 	public String userName;
 	public long createDate;
 	public long lifeTime;
+	public String remoteIPInfo;
 	public String oAuth2TokenContent;
 	public long oAuth2ApplicationId;
 	public String oAuth2TokenType;

@@ -70,6 +70,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
 			{ "lifeTime", Types.BIGINT },
+			{ "remoteIPInfo", Types.VARCHAR },
 			{ "oAuth2RefreshTokenContent", Types.CLOB },
 			{ "oAuth2ApplicationId", Types.BIGINT },
 			{ "scopes", Types.CLOB }
@@ -83,12 +84,13 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("lifeTime", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("remoteIPInfo", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("oAuth2RefreshTokenContent", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("oAuth2ApplicationId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("scopes", Types.CLOB);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2RefreshToken (oAuth2RefreshTokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,oAuth2RefreshTokenContent TEXT null,oAuth2ApplicationId LONG,scopes TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2RefreshToken (oAuth2RefreshTokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,remoteIPInfo VARCHAR(75) null,oAuth2RefreshTokenContent TEXT null,oAuth2ApplicationId LONG,scopes TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2RefreshToken";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2RefreshToken.oAuth2RefreshTokenId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2RefreshToken.oAuth2RefreshTokenId ASC";
@@ -154,6 +156,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("lifeTime", getLifeTime());
+		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("oAuth2RefreshTokenContent",
 			getOAuth2RefreshTokenContent());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
@@ -201,6 +204,12 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 		if (lifeTime != null) {
 			setLifeTime(lifeTime);
+		}
+
+		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
+
+		if (remoteIPInfo != null) {
+			setRemoteIPInfo(remoteIPInfo);
 		}
 
 		String oAuth2RefreshTokenContent = (String)attributes.get(
@@ -315,6 +324,21 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 	}
 
 	@Override
+	public String getRemoteIPInfo() {
+		if (_remoteIPInfo == null) {
+			return "";
+		}
+		else {
+			return _remoteIPInfo;
+		}
+	}
+
+	@Override
+	public void setRemoteIPInfo(String remoteIPInfo) {
+		_remoteIPInfo = remoteIPInfo;
+	}
+
+	@Override
 	public String getOAuth2RefreshTokenContent() {
 		if (_oAuth2RefreshTokenContent == null) {
 			return "";
@@ -413,6 +437,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		oAuth2RefreshTokenImpl.setUserName(getUserName());
 		oAuth2RefreshTokenImpl.setCreateDate(getCreateDate());
 		oAuth2RefreshTokenImpl.setLifeTime(getLifeTime());
+		oAuth2RefreshTokenImpl.setRemoteIPInfo(getRemoteIPInfo());
 		oAuth2RefreshTokenImpl.setOAuth2RefreshTokenContent(getOAuth2RefreshTokenContent());
 		oAuth2RefreshTokenImpl.setOAuth2ApplicationId(getOAuth2ApplicationId());
 		oAuth2RefreshTokenImpl.setScopes(getScopes());
@@ -518,6 +543,14 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 		oAuth2RefreshTokenCacheModel.lifeTime = getLifeTime();
 
+		oAuth2RefreshTokenCacheModel.remoteIPInfo = getRemoteIPInfo();
+
+		String remoteIPInfo = oAuth2RefreshTokenCacheModel.remoteIPInfo;
+
+		if ((remoteIPInfo != null) && (remoteIPInfo.length() == 0)) {
+			oAuth2RefreshTokenCacheModel.remoteIPInfo = null;
+		}
+
 		oAuth2RefreshTokenCacheModel.oAuth2RefreshTokenContent = getOAuth2RefreshTokenContent();
 
 		String oAuth2RefreshTokenContent = oAuth2RefreshTokenCacheModel.oAuth2RefreshTokenContent;
@@ -542,7 +575,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{oAuth2RefreshTokenId=");
 		sb.append(getOAuth2RefreshTokenId());
@@ -556,6 +589,8 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		sb.append(getCreateDate());
 		sb.append(", lifeTime=");
 		sb.append(getLifeTime());
+		sb.append(", remoteIPInfo=");
+		sb.append(getRemoteIPInfo());
 		sb.append(", oAuth2RefreshTokenContent=");
 		sb.append(getOAuth2RefreshTokenContent());
 		sb.append(", oAuth2ApplicationId=");
@@ -569,7 +604,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(34);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.oauth2.provider.model.OAuth2RefreshToken");
@@ -600,6 +635,10 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		sb.append(getLifeTime());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>remoteIPInfo</column-name><column-value><![CDATA[");
+		sb.append(getRemoteIPInfo());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>oAuth2RefreshTokenContent</column-name><column-value><![CDATA[");
 		sb.append(getOAuth2RefreshTokenContent());
 		sb.append("]]></column-value></column>");
@@ -628,6 +667,7 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 	private String _originalUserName;
 	private Date _createDate;
 	private long _lifeTime;
+	private String _remoteIPInfo;
 	private String _oAuth2RefreshTokenContent;
 	private String _originalOAuth2RefreshTokenContent;
 	private long _oAuth2ApplicationId;

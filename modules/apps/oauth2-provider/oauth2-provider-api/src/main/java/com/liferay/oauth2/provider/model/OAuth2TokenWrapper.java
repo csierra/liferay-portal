@@ -64,6 +64,7 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("lifeTime", getLifeTime());
+		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("oAuth2TokenContent", getOAuth2TokenContent());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
 		attributes.put("oAuth2TokenType", getOAuth2TokenType());
@@ -109,6 +110,12 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 
 		if (lifeTime != null) {
 			setLifeTime(lifeTime);
+		}
+
+		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
+
+		if (remoteIPInfo != null) {
+			setRemoteIPInfo(remoteIPInfo);
 		}
 
 		String oAuth2TokenContent = (String)attributes.get("oAuth2TokenContent");
@@ -250,6 +257,16 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 	@Override
 	public Serializable getPrimaryKeyObj() {
 		return _oAuth2Token.getPrimaryKeyObj();
+	}
+
+	/**
+	* Returns the remote ip info of this o auth2 token.
+	*
+	* @return the remote ip info of this o auth2 token
+	*/
+	@Override
+	public java.lang.String getRemoteIPInfo() {
+		return _oAuth2Token.getRemoteIPInfo();
 	}
 
 	/**
@@ -441,6 +458,16 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 	@Override
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_oAuth2Token.setPrimaryKeyObj(primaryKeyObj);
+	}
+
+	/**
+	* Sets the remote ip info of this o auth2 token.
+	*
+	* @param remoteIPInfo the remote ip info of this o auth2 token
+	*/
+	@Override
+	public void setRemoteIPInfo(java.lang.String remoteIPInfo) {
+		_oAuth2Token.setRemoteIPInfo(remoteIPInfo);
 	}
 
 	/**

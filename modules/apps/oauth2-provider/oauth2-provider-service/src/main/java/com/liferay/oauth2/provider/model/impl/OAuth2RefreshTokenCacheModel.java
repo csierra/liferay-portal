@@ -65,7 +65,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{oAuth2RefreshTokenId=");
 		sb.append(oAuth2RefreshTokenId);
@@ -79,6 +79,8 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		sb.append(createDate);
 		sb.append(", lifeTime=");
 		sb.append(lifeTime);
+		sb.append(", remoteIPInfo=");
+		sb.append(remoteIPInfo);
 		sb.append(", oAuth2RefreshTokenContent=");
 		sb.append(oAuth2RefreshTokenContent);
 		sb.append(", oAuth2ApplicationId=");
@@ -114,6 +116,13 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 		oAuth2RefreshTokenImpl.setLifeTime(lifeTime);
 
+		if (remoteIPInfo == null) {
+			oAuth2RefreshTokenImpl.setRemoteIPInfo("");
+		}
+		else {
+			oAuth2RefreshTokenImpl.setRemoteIPInfo(remoteIPInfo);
+		}
+
 		if (oAuth2RefreshTokenContent == null) {
 			oAuth2RefreshTokenImpl.setOAuth2RefreshTokenContent("");
 		}
@@ -146,6 +155,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		createDate = objectInput.readLong();
 
 		lifeTime = objectInput.readLong();
+		remoteIPInfo = objectInput.readUTF();
 		oAuth2RefreshTokenContent = objectInput.readUTF();
 
 		oAuth2ApplicationId = objectInput.readLong();
@@ -172,6 +182,13 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 		objectOutput.writeLong(lifeTime);
 
+		if (remoteIPInfo == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(remoteIPInfo);
+		}
+
 		if (oAuth2RefreshTokenContent == null) {
 			objectOutput.writeUTF("");
 		}
@@ -195,6 +212,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 	public String userName;
 	public long createDate;
 	public long lifeTime;
+	public String remoteIPInfo;
 	public String oAuth2RefreshTokenContent;
 	public long oAuth2ApplicationId;
 	public String scopes;

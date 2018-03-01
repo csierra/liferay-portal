@@ -25,6 +25,7 @@ create table OAuth2RefreshToken (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	lifeTime LONG,
+	remoteIPInfo VARCHAR(75) null,
 	oAuth2RefreshTokenContent TEXT null,
 	oAuth2ApplicationId LONG,
 	scopes TEXT null
@@ -47,6 +48,7 @@ create table OAuth2Token (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	lifeTime LONG,
+	remoteIPInfo VARCHAR(75) null,
 	oAuth2TokenContent TEXT null,
 	oAuth2ApplicationId LONG,
 	oAuth2TokenType VARCHAR(75) null,
