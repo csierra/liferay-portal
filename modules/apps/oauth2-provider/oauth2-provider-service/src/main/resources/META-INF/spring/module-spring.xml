@@ -4,6 +4,8 @@
 	<bean class="com.liferay.oauth2.provider.service.impl.OAuth2ApplicationLocalServiceImpl" id="com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService" />
 	<bean class="com.liferay.oauth2.provider.service.impl.OAuth2ApplicationServiceImpl" id="com.liferay.oauth2.provider.service.OAuth2ApplicationService" />
 	<bean class="com.liferay.oauth2.provider.service.persistence.impl.OAuth2ApplicationPersistenceImpl" id="com.liferay.oauth2.provider.service.persistence.OAuth2ApplicationPersistence" parent="basePersistence" />
+	<bean class="com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationLocalServiceImpl" id="com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService" />
+	<bean class="com.liferay.oauth2.provider.service.persistence.impl.OAuth2AuthorizationFinderImpl" id="com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationFinder" parent="basePersistence" />
 	<bean class="com.liferay.oauth2.provider.service.impl.OAuth2RefreshTokenLocalServiceImpl" id="com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService" />
 	<bean class="com.liferay.oauth2.provider.service.persistence.impl.OAuth2RefreshTokenPersistenceImpl" id="com.liferay.oauth2.provider.service.persistence.OAuth2RefreshTokenPersistence" parent="basePersistence" />
 	<bean class="com.liferay.oauth2.provider.service.impl.OAuth2ScopeGrantLocalServiceImpl" id="com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService" />
