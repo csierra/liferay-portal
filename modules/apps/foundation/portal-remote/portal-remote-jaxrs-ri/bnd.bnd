@@ -1,0 +1,56 @@
+Bundle-ClassPath:\
+	.,\
+	lib/component-dsl.jar,\
+	lib/cxf-core.jar,\
+	lib/cxf-rt-databinding-jaxb.jar,\
+	lib/cxf-rt-frontend-jaxrs.jar,\
+	lib/cxf-rt-rs-client.jar,\
+	lib/cxf-rt-rs-extension-providers.jar,\
+	lib/cxf-rt-transports-http.jar,\
+	lib/cxf-tools-common.jar,\
+	lib/jettison.jar,\
+	lib/org.osgi.util.function-1.1.0-20180228.161251-428.jar,\
+	lib/org.osgi.util.promise-1.1.0-20180228.161253-427.jar,\
+	lib/xmlschema-core.jar
+
+Import-Package:\
+    !com.sun.*,\
+    !com.ctc.wstx.*,\
+    !javax.cache.*,\
+    !javax.imageio.*,\
+    !javax.jws.*,\
+    !javax.security.*,\
+    !javax.tools.*,\
+    !javax.validation.*,\
+    !javax.wsdl.*,\
+    !net.sf.cglib.proxy.*,\
+    !org.apache.abdera.*,\
+    !org.apache.aries.*,\
+    !org.apache.cxf.*,\
+    !org.apache.log4j.*,\
+    !org.apache.neethi.*,\
+    !org.apache.velocity.*,\
+    !org.apache.xerces.*,\
+    !org.apache.xml.resolver.*,\
+    !org.apache.xmlbeans.*,\
+    !org.codehaus.stax2.*,\
+    !org.dom4j.*,\
+    !org.junit.*,\
+    !org.jvnet.fastinfoset.*,\
+    !org.jvnet.staxex.*,\
+    !org.ietf.jgss.*,\
+    !org.objectweb.asm.*,\
+    !org.osgi.service.blueprint.*,\
+    !org.osgi.service.http,\
+    !org.relaxng.datatype.*,\
+    !org.slf4j.spi.*,\
+    !org.springframework.*,\
+    *
+
+Bundle-Name: Liferay Portal Remote JAXRS RI
+Bundle-SymbolicName: com.liferay.portal.remote.jaxrs.ri
+Bundle-Version: 1.0.0
+Liferay-Releng-Module-Group-Description:
+Liferay-Releng-Module-Group-Title: Remote Service Engines
+
+-includeresource: @org.apache.aries.jax.rs.whiteboard*.jar
