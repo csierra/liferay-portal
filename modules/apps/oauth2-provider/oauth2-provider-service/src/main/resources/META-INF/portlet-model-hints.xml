@@ -36,7 +36,7 @@
 		<field name="userId" type="long" />
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
-		<field name="lifeTime" type="long" />
+		<field name="expirationDate" type="Date" />
 		<field name="remoteIPInfo" type="String" />
 		<field name="oAuth2RefreshTokenContent" type="String">
 			<hint-collection name="CLOB" />
@@ -60,7 +60,7 @@
 		<field name="userId" type="long" />
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
-		<field name="lifeTime" type="long" />
+		<field name="expirationDate" type="Date" />
 		<field name="remoteIPInfo" type="String" />
 		<field name="oAuth2TokenContent" type="String">
 			<hint-collection name="CLOB" />

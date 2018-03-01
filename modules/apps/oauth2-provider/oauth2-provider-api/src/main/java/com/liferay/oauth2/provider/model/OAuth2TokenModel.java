@@ -151,18 +151,18 @@ public interface OAuth2TokenModel extends BaseModel<OAuth2Token>, ShardedModel {
 	public void setCreateDate(Date createDate);
 
 	/**
-	 * Returns the life time of this o auth2 token.
+	 * Returns the expiration date of this o auth2 token.
 	 *
-	 * @return the life time of this o auth2 token
+	 * @return the expiration date of this o auth2 token
 	 */
-	public long getLifeTime();
+	public Date getExpirationDate();
 
 	/**
-	 * Sets the life time of this o auth2 token.
+	 * Sets the expiration date of this o auth2 token.
 	 *
-	 * @param lifeTime the life time of this o auth2 token
+	 * @param expirationDate the expiration date of this o auth2 token
 	 */
-	public void setLifeTime(long lifeTime);
+	public void setExpirationDate(Date expirationDate);
 
 	/**
 	 * Returns the remote ip info of this o auth2 token.

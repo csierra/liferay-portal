@@ -38,7 +38,7 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 		soapModel.setUserId(model.getUserId());
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
-		soapModel.setLifeTime(model.getLifeTime());
+		soapModel.setExpirationDate(model.getExpirationDate());
 		soapModel.setRemoteIPInfo(model.getRemoteIPInfo());
 		soapModel.setOAuth2RefreshTokenContent(model.getOAuth2RefreshTokenContent());
 		soapModel.setOAuth2ApplicationId(model.getOAuth2ApplicationId());
@@ -138,12 +138,12 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 		_createDate = createDate;
 	}
 
-	public long getLifeTime() {
-		return _lifeTime;
+	public Date getExpirationDate() {
+		return _expirationDate;
 	}
 
-	public void setLifeTime(long lifeTime) {
-		_lifeTime = lifeTime;
+	public void setExpirationDate(Date expirationDate) {
+		_expirationDate = expirationDate;
 	}
 
 	public String getRemoteIPInfo() {
@@ -183,7 +183,7 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 	private long _userId;
 	private String _userName;
 	private Date _createDate;
-	private long _lifeTime;
+	private Date _expirationDate;
 	private String _remoteIPInfo;
 	private String _oAuth2RefreshTokenContent;
 	private long _oAuth2ApplicationId;

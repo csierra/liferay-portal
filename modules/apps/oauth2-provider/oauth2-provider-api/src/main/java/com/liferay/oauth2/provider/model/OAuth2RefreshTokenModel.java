@@ -152,18 +152,18 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	public void setCreateDate(Date createDate);
 
 	/**
-	 * Returns the life time of this o auth2 refresh token.
+	 * Returns the expiration date of this o auth2 refresh token.
 	 *
-	 * @return the life time of this o auth2 refresh token
+	 * @return the expiration date of this o auth2 refresh token
 	 */
-	public long getLifeTime();
+	public Date getExpirationDate();
 
 	/**
-	 * Sets the life time of this o auth2 refresh token.
+	 * Sets the expiration date of this o auth2 refresh token.
 	 *
-	 * @param lifeTime the life time of this o auth2 refresh token
+	 * @param expirationDate the expiration date of this o auth2 refresh token
 	 */
-	public void setLifeTime(long lifeTime);
+	public void setExpirationDate(Date expirationDate);
 
 	/**
 	 * Returns the remote ip info of this o auth2 refresh token.

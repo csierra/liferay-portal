@@ -2318,7 +2318,7 @@ public class OAuth2TokenPersistenceImpl extends BasePersistenceImpl<OAuth2Token>
 		oAuth2TokenImpl.setUserId(oAuth2Token.getUserId());
 		oAuth2TokenImpl.setUserName(oAuth2Token.getUserName());
 		oAuth2TokenImpl.setCreateDate(oAuth2Token.getCreateDate());
-		oAuth2TokenImpl.setLifeTime(oAuth2Token.getLifeTime());
+		oAuth2TokenImpl.setExpirationDate(oAuth2Token.getExpirationDate());
 		oAuth2TokenImpl.setRemoteIPInfo(oAuth2Token.getRemoteIPInfo());
 		oAuth2TokenImpl.setOAuth2TokenContent(oAuth2Token.getOAuth2TokenContent());
 		oAuth2TokenImpl.setOAuth2ApplicationId(oAuth2Token.getOAuth2ApplicationId());

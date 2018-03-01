@@ -63,7 +63,7 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
-		attributes.put("lifeTime", getLifeTime());
+		attributes.put("expirationDate", getExpirationDate());
 		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("oAuth2RefreshTokenContent",
 			getOAuth2RefreshTokenContent());
@@ -105,10 +105,10 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 			setCreateDate(createDate);
 		}
 
-		Long lifeTime = (Long)attributes.get("lifeTime");
+		Date expirationDate = (Date)attributes.get("expirationDate");
 
-		if (lifeTime != null) {
-			setLifeTime(lifeTime);
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
 		}
 
 		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
@@ -173,13 +173,13 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 	}
 
 	/**
-	* Returns the life time of this o auth2 refresh token.
+	* Returns the expiration date of this o auth2 refresh token.
 	*
-	* @return the life time of this o auth2 refresh token
+	* @return the expiration date of this o auth2 refresh token
 	*/
 	@Override
-	public long getLifeTime() {
-		return _oAuth2RefreshToken.getLifeTime();
+	public Date getExpirationDate() {
+		return _oAuth2RefreshToken.getExpirationDate();
 	}
 
 	/**
@@ -349,13 +349,13 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 	}
 
 	/**
-	* Sets the life time of this o auth2 refresh token.
+	* Sets the expiration date of this o auth2 refresh token.
 	*
-	* @param lifeTime the life time of this o auth2 refresh token
+	* @param expirationDate the expiration date of this o auth2 refresh token
 	*/
 	@Override
-	public void setLifeTime(long lifeTime) {
-		_oAuth2RefreshToken.setLifeTime(lifeTime);
+	public void setExpirationDate(Date expirationDate) {
+		_oAuth2RefreshToken.setExpirationDate(expirationDate);
 	}
 
 	@Override

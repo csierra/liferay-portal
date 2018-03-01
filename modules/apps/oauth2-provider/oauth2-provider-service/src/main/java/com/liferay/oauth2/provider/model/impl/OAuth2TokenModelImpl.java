@@ -69,7 +69,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 			{ "userId", Types.BIGINT },
 			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
-			{ "lifeTime", Types.BIGINT },
+			{ "expirationDate", Types.TIMESTAMP },
 			{ "remoteIPInfo", Types.VARCHAR },
 			{ "oAuth2TokenContent", Types.CLOB },
 			{ "oAuth2ApplicationId", Types.BIGINT },
@@ -85,7 +85,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
-		TABLE_COLUMNS_MAP.put("lifeTime", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("expirationDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("remoteIPInfo", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("oAuth2TokenContent", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("oAuth2ApplicationId", Types.BIGINT);
@@ -94,7 +94,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		TABLE_COLUMNS_MAP.put("scopes", Types.CLOB);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2Token (oAuth2TokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,lifeTime LONG,remoteIPInfo VARCHAR(75) null,oAuth2TokenContent TEXT null,oAuth2ApplicationId LONG,oAuth2TokenType VARCHAR(75) null,oAuth2RefreshTokenId LONG,scopes TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2Token (oAuth2TokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,expirationDate DATE null,remoteIPInfo VARCHAR(75) null,oAuth2TokenContent TEXT null,oAuth2ApplicationId LONG,oAuth2TokenType VARCHAR(75) null,oAuth2RefreshTokenId LONG,scopes TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2Token";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2Token.oAuth2TokenId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2Token.oAuth2TokenId ASC";
@@ -160,7 +160,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
-		attributes.put("lifeTime", getLifeTime());
+		attributes.put("expirationDate", getExpirationDate());
 		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("oAuth2TokenContent", getOAuth2TokenContent());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
@@ -206,10 +206,10 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 			setCreateDate(createDate);
 		}
 
-		Long lifeTime = (Long)attributes.get("lifeTime");
+		Date expirationDate = (Date)attributes.get("expirationDate");
 
-		if (lifeTime != null) {
-			setLifeTime(lifeTime);
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
 		}
 
 		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
@@ -331,13 +331,13 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	}
 
 	@Override
-	public long getLifeTime() {
-		return _lifeTime;
+	public Date getExpirationDate() {
+		return _expirationDate;
 	}
 
 	@Override
-	public void setLifeTime(long lifeTime) {
-		_lifeTime = lifeTime;
+	public void setExpirationDate(Date expirationDate) {
+		_expirationDate = expirationDate;
 	}
 
 	@Override
@@ -490,7 +490,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		oAuth2TokenImpl.setUserId(getUserId());
 		oAuth2TokenImpl.setUserName(getUserName());
 		oAuth2TokenImpl.setCreateDate(getCreateDate());
-		oAuth2TokenImpl.setLifeTime(getLifeTime());
+		oAuth2TokenImpl.setExpirationDate(getExpirationDate());
 		oAuth2TokenImpl.setRemoteIPInfo(getRemoteIPInfo());
 		oAuth2TokenImpl.setOAuth2TokenContent(getOAuth2TokenContent());
 		oAuth2TokenImpl.setOAuth2ApplicationId(getOAuth2ApplicationId());
@@ -601,7 +601,14 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 			oAuth2TokenCacheModel.createDate = Long.MIN_VALUE;
 		}
 
-		oAuth2TokenCacheModel.lifeTime = getLifeTime();
+		Date expirationDate = getExpirationDate();
+
+		if (expirationDate != null) {
+			oAuth2TokenCacheModel.expirationDate = expirationDate.getTime();
+		}
+		else {
+			oAuth2TokenCacheModel.expirationDate = Long.MIN_VALUE;
+		}
 
 		oAuth2TokenCacheModel.remoteIPInfo = getRemoteIPInfo();
 
@@ -656,8 +663,8 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		sb.append(getUserName());
 		sb.append(", createDate=");
 		sb.append(getCreateDate());
-		sb.append(", lifeTime=");
-		sb.append(getLifeTime());
+		sb.append(", expirationDate=");
+		sb.append(getExpirationDate());
 		sb.append(", remoteIPInfo=");
 		sb.append(getRemoteIPInfo());
 		sb.append(", oAuth2TokenContent=");
@@ -704,8 +711,8 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 		sb.append(getCreateDate());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>lifeTime</column-name><column-value><![CDATA[");
-		sb.append(getLifeTime());
+			"<column><column-name>expirationDate</column-name><column-value><![CDATA[");
+		sb.append(getExpirationDate());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>remoteIPInfo</column-name><column-value><![CDATA[");
@@ -747,7 +754,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	private String _userName;
 	private String _originalUserName;
 	private Date _createDate;
-	private long _lifeTime;
+	private Date _expirationDate;
 	private String _remoteIPInfo;
 	private String _oAuth2TokenContent;
 	private String _originalOAuth2TokenContent;

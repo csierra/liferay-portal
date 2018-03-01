@@ -63,7 +63,7 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
-		attributes.put("lifeTime", getLifeTime());
+		attributes.put("expirationDate", getExpirationDate());
 		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("oAuth2TokenContent", getOAuth2TokenContent());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
@@ -106,10 +106,10 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 			setCreateDate(createDate);
 		}
 
-		Long lifeTime = (Long)attributes.get("lifeTime");
+		Date expirationDate = (Date)attributes.get("expirationDate");
 
-		if (lifeTime != null) {
-			setLifeTime(lifeTime);
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
 		}
 
 		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
@@ -185,13 +185,13 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 	}
 
 	/**
-	* Returns the life time of this o auth2 token.
+	* Returns the expiration date of this o auth2 token.
 	*
-	* @return the life time of this o auth2 token
+	* @return the expiration date of this o auth2 token
 	*/
 	@Override
-	public long getLifeTime() {
-		return _oAuth2Token.getLifeTime();
+	public Date getExpirationDate() {
+		return _oAuth2Token.getExpirationDate();
 	}
 
 	/**
@@ -381,13 +381,13 @@ public class OAuth2TokenWrapper implements OAuth2Token,
 	}
 
 	/**
-	* Sets the life time of this o auth2 token.
+	* Sets the expiration date of this o auth2 token.
 	*
-	* @param lifeTime the life time of this o auth2 token
+	* @param expirationDate the expiration date of this o auth2 token
 	*/
 	@Override
-	public void setLifeTime(long lifeTime) {
-		_oAuth2Token.setLifeTime(lifeTime);
+	public void setExpirationDate(Date expirationDate) {
+		_oAuth2Token.setExpirationDate(expirationDate);
 	}
 
 	@Override

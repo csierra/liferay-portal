@@ -77,8 +77,8 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		sb.append(userName);
 		sb.append(", createDate=");
 		sb.append(createDate);
-		sb.append(", lifeTime=");
-		sb.append(lifeTime);
+		sb.append(", expirationDate=");
+		sb.append(expirationDate);
 		sb.append(", remoteIPInfo=");
 		sb.append(remoteIPInfo);
 		sb.append(", oAuth2RefreshTokenContent=");
@@ -114,7 +114,12 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 			oAuth2RefreshTokenImpl.setCreateDate(new Date(createDate));
 		}
 
-		oAuth2RefreshTokenImpl.setLifeTime(lifeTime);
+		if (expirationDate == Long.MIN_VALUE) {
+			oAuth2RefreshTokenImpl.setExpirationDate(null);
+		}
+		else {
+			oAuth2RefreshTokenImpl.setExpirationDate(new Date(expirationDate));
+		}
 
 		if (remoteIPInfo == null) {
 			oAuth2RefreshTokenImpl.setRemoteIPInfo("");
@@ -153,8 +158,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
-
-		lifeTime = objectInput.readLong();
+		expirationDate = objectInput.readLong();
 		remoteIPInfo = objectInput.readUTF();
 		oAuth2RefreshTokenContent = objectInput.readUTF();
 
@@ -179,8 +183,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		}
 
 		objectOutput.writeLong(createDate);
-
-		objectOutput.writeLong(lifeTime);
+		objectOutput.writeLong(expirationDate);
 
 		if (remoteIPInfo == null) {
 			objectOutput.writeUTF("");
@@ -211,7 +214,7 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 	public long userId;
 	public String userName;
 	public long createDate;
-	public long lifeTime;
+	public long expirationDate;
 	public String remoteIPInfo;
 	public String oAuth2RefreshTokenContent;
 	public long oAuth2ApplicationId;
