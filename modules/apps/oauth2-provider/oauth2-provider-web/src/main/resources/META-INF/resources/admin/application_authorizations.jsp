@@ -60,10 +60,10 @@ if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) 
 			<liferay-ui:search-container-column-date
 				property="createDate" />
 
-			<liferay-ui:search-container-column-text
+			<liferay-ui:search-container-column-date
 				property="accessTokenExpirationDate" />
 
-			<liferay-ui:search-container-column-text
+			<liferay-ui:search-container-column-date
 				property="refreshTokenExpirationDate" />
 
 			<liferay-ui:search-container-column-text
