@@ -188,16 +188,20 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 			_oAuth2ApplicationLocalService.getOAuth2Application(
 				oAuth2Token.getOAuth2ApplicationId());
 
+		long issuedAtSeconds = oAuth2Token.getCreateDate().getTime() / 1000;
+		long expiresSeconds = oAuth2Token.getExpirationDate().getTime() / 1000;
+		long lifeTime = expiresSeconds - issuedAtSeconds;
+
 		BearerTokenProvider.AccessToken accessToken =
 			new BearerTokenProvider.AccessToken(
 				oAuth2Application,
 				new ArrayList<>(),
 				StringPool.BLANK,
-				oAuth2Token.getLifeTime(),
+				lifeTime,
 				new HashMap<>(),
 				StringPool.BLANK,
 				StringPool.BLANK,
-				oAuth2Token.getCreateDate().getTime(),
+				issuedAtSeconds,
 				StringPool.BLANK,
 				StringPool.BLANK,
 				new HashMap<>(),

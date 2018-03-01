@@ -61,10 +61,10 @@ if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) 
 				property="createDate" />
 
 			<liferay-ui:search-container-column-text
-				property="accessTokenExpiresDate" />
+				property="accessTokenExpirationDate" />
 
 			<liferay-ui:search-container-column-text
-				property="refreshTokenExpiresDate" />
+				property="refreshTokenExpirationDate" />
 
 			<liferay-ui:search-container-column-text
 				property="remoteIPInfo" />

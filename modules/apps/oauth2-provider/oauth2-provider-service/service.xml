@@ -58,7 +58,7 @@
 		<column name="userId" type="long" />
 		<column name="userName" type="String" />
 		<column name="createDate" type="Date" />
-		<column name="lifeTime" type="long" />
+		<column name="expirationDate" type="Date" />
 		<column name="remoteIPInfo" type="String" />
 
 		<!-- Other fields -->
@@ -97,7 +97,7 @@
 		<column name="userId" type="long" />
 		<column name="userName" type="String" />
 		<column name="createDate" type="Date" />
-		<column name="lifeTime" type="long" />
+		<column name="expirationDate" type="Date" />
 		<column name="remoteIPInfo" type="String" />
 
 		<!-- Other fields -->

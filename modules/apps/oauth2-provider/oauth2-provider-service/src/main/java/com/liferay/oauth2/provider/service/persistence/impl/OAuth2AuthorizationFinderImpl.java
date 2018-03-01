@@ -145,13 +145,13 @@ public class OAuth2AuthorizationFinderImpl
 
 				int i = 0;
 
-				oAuth2Authorization.setAccessTokenExpiresDate(_date(row[i++]));
+				oAuth2Authorization.setAccessTokenExpirationDate(_date(row[i++]));
 				oAuth2Authorization.setCompanyId(_long(row[i++]));
 				oAuth2Authorization.setCreateDate(_date(row[i++]));
 				oAuth2Authorization.setoAuth2ApplicationId(_long(row[i++]));
 				oAuth2Authorization.setoAuth2RefreshTokenId(_long(row[i++]));
 				oAuth2Authorization.setoAuth2TokenId(_long(row[i++]));
-				oAuth2Authorization.setRefreshTokenExpiresDate(_date(row[i++]));
+				oAuth2Authorization.setRefreshTokenExpirationDate(_date(row[i++]));
 				oAuth2Authorization.setRemoteIPInfo(_string(row[i++]));
 				oAuth2Authorization.setScopes(_string(row[i++]));
 				oAuth2Authorization.setUserId(_long(row[i++]));

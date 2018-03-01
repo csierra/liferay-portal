@@ -14,7 +14,6 @@
 
 package com.liferay.oauth2.provider.model;
 
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -27,12 +26,12 @@ import java.util.List;
  */
 public class OAuth2Authorization extends OAuth2AuthorizationModel {
 
-	public Date getAccessTokenExpiresDate() {
-		return _accessTokenExpiresDate;
+	public Date getAccessTokenExpirationDate() {
+		return _accessTokenExpirationDate;
 	}
 
-	public void setAccessTokenExpiresDate(Date accessTokenExpiresDate) {
-		_accessTokenExpiresDate = accessTokenExpiresDate;
+	public void setAccessTokenExpirationDate(Date accessTokenExpirationDate) {
+		_accessTokenExpirationDate = accessTokenExpirationDate;
 	}
 
 	public long getCompanyId() {
@@ -75,12 +74,12 @@ public class OAuth2Authorization extends OAuth2AuthorizationModel {
 		_oAuth2TokenId = oAuth2TokenId;
 	}
 
-	public Date getRefreshTokenExpiresDate() {
-		return _refreshTokenExpiresDate;
+	public Date getRefreshTokenExpirationDate() {
+		return _refreshTokenExpirationDate;
 	}
 
-	public void setRefreshTokenExpiresDate(Date refreshTokenExpiresDate) {
-		_refreshTokenExpiresDate = refreshTokenExpiresDate;
+	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate) {
+		_refreshTokenExpirationDate = refreshTokenExpirationDate;
 	}
 
 	public String getRemoteIPInfo() {
@@ -125,13 +124,13 @@ public class OAuth2Authorization extends OAuth2AuthorizationModel {
 		_userName = userName;
 	}
 
-	private Date _accessTokenExpiresDate;
+	private Date _accessTokenExpirationDate;
 	private long _companyId;
 	private Date _createDate;
 	private long _oAuth2ApplicationId;
 	private long _oAuth2RefreshTokenId;
 	private long _oAuth2TokenId;
-	private Date _refreshTokenExpiresDate;
+	private Date _refreshTokenExpirationDate;
 	private String _remoteIPInfo;
 	private String _scopes;
 	private long _userId;
