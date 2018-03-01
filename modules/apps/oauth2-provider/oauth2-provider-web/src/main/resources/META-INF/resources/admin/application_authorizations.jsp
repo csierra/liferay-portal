@@ -51,6 +51,8 @@ renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new Str
 
 					<liferay-ui:search-container-column-text property="lifeTime" />
 
+					<liferay-ui:search-container-column-text property="remoteIPInfo" />
+
 					<liferay-ui:search-container-column-text name="scopes">
 
 						<%= String.valueOf(oAuth2Token.getScopesList().size()) %>
@@ -58,6 +60,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new Str
 						<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Token.getScopes()) %>" />
 
 					</liferay-ui:search-container-column-text>
+
 				</liferay-ui:search-container-row>
 
 				<liferay-ui:search-iterator
@@ -81,6 +84,8 @@ renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new Str
 					<liferay-ui:search-container-column-date property="createDate" />
 
 					<liferay-ui:search-container-column-text property="lifeTime" />
+
+					<liferay-ui:search-container-column-text property="remoteIPInfo" />
 
 					<liferay-ui:search-container-column-text name="scopes">
 
