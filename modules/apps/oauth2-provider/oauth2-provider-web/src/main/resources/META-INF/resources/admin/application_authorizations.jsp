@@ -44,7 +44,7 @@ if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) 
 	</liferay-portlet:renderURL>
 
 	<liferay-ui:search-container
-		emptyResultsMessage="there-are-no-authorizations-yet"
+		emptyResultsMessage="no-devices-were-found"
 		iteratorURL="<%= applicationAuthorizationsURL %>"
 		total="<%= OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId) %>">
 
@@ -52,7 +52,9 @@ if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) 
 			results="<%= OAuth2AuthorizationLocalServiceUtil.findByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>"/>
 
 		<liferay-ui:search-container-row
-			className="com.liferay.oauth2.provider.model.OAuth2Authorization" modelVar="oAuth2Authorization">
+			className="com.liferay.oauth2.provider.model.OAuth2Authorization"
+			escapedModel="true"
+			modelVar="oAuth2Authorization">
 
 			<liferay-ui:search-container-column-text
 				property="userId" />

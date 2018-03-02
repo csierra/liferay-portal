@@ -25,13 +25,16 @@
 <div class="closed container-fluid-1280">
 
 	<liferay-ui:search-container
-	    total="<%= OAuth2ApplicationServiceUtil.getOAuth2ApplicationsCount(themeDisplay.getCompanyId()) %>">
+		emptyResultsMessage="no-applications-were-found"
+		total="<%= OAuth2ApplicationServiceUtil.getOAuth2ApplicationsCount(themeDisplay.getCompanyId()) %>">
+
 	    <liferay-ui:search-container-results
 	        results="<%= OAuth2ApplicationServiceUtil.getOAuth2Applications(
 	            themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>" />
 	
 	    <liferay-ui:search-container-row
 	        className="com.liferay.oauth2.provider.model.OAuth2Application"
+			escapedModel="true"
 			modelVar="oAuth2Application">
 
 	        <liferay-ui:search-container-column-text
@@ -43,6 +46,15 @@
 			<liferay-ui:search-container-column-text
 				name="granted-authorizations"
 				value="<%= String.valueOf(OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2Application.getOAuth2ApplicationId())) %>" />
+
+			<liferay-ui:search-container-column-text
+				name="scopes">
+
+				<%= String.valueOf(oAuth2Application.getScopesList().size()) %>
+
+				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Application.getScopes()) %>" />
+
+			</liferay-ui:search-container-column-text>
 
 	        <liferay-ui:search-container-column-jsp
 	            align="right" 

@@ -15,9 +15,12 @@
 package com.liferay.oauth2.provider.model;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
@@ -136,12 +139,76 @@ public class OAuth2AuthorizationModel implements BaseModel<OAuth2Authorization> 
 
 	@Override
 	public OAuth2Authorization toEscapedModel() {
-		return null;
+		final OAuth2Authorization parent = (OAuth2Authorization)this;
+
+		OAuth2Authorization escapedModel = new OAuth2Authorization(){
+			@Override
+			public Date getAccessTokenExpirationDate() {
+				return parent.getAccessTokenExpirationDate();
+			}
+
+			@Override
+			public long getCompanyId() {
+				return parent.getCompanyId();
+			}
+
+			@Override
+			public Date getCreateDate() {
+				return parent.getCreateDate();
+			}
+
+			@Override
+			public long getoAuth2ApplicationId() {
+				return parent.getoAuth2ApplicationId();
+			}
+
+			@Override
+			public long getoAuth2RefreshTokenId() {
+				return parent.getoAuth2RefreshTokenId();
+			}
+
+			@Override
+			public long getoAuth2TokenId() {
+				return parent.getoAuth2TokenId();
+			}
+
+			@Override
+			public Date getRefreshTokenExpirationDate() {
+				return parent.getRefreshTokenExpirationDate();
+			}
+
+			@Override
+			public String getRemoteIPInfo() {
+				return HtmlUtil.escape(parent.getRemoteIPInfo());
+			}
+
+			@Override
+			public String getScopes() {
+				return HtmlUtil.escape(parent.getScopes());
+			}
+
+			@Override
+			public List<String> getScopesList() {
+				return parent.getScopesList();
+			}
+
+			@Override
+			public long getUserId() {
+				return parent.getUserId();
+			}
+
+			@Override
+			public String getUserName() {
+				return HtmlUtil.escape(parent.getUserName());
+			}
+		};
+
+		return escapedModel;
 	}
 
 	@Override
 	public OAuth2Authorization toUnescapedModel() {
-		return null;
+		return (OAuth2Authorization)this;
 	}
 
 	@Override
