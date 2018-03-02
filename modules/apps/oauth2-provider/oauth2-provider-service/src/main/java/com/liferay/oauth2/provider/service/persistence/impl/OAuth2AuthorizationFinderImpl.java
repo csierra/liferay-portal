@@ -28,10 +28,13 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 
 import java.math.BigInteger;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tomas Polesovsky
@@ -168,6 +171,26 @@ public class OAuth2AuthorizationFinderImpl
 		finally {
 			closeSession(session);
 		}
+	}
+
+	protected Map<String, Integer> getTableColumnsMap() {
+		return TABLE_COLUMNS_MAP;
+	}
+
+	protected static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
+
+	static {
+		TABLE_COLUMNS_MAP.put("accessTokenExpirationDate", Types.DATE);
+		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("createDate", Types.DATE);
+		TABLE_COLUMNS_MAP.put("oAuth2ApplicationId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("oAuth2RefreshTokenId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("oAuth2TokenId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("refreshTokenExpirationDate", Types.DATE);
+		TABLE_COLUMNS_MAP.put("remoteIPInfo", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("scopes", Types.CLOB);
+		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("userName",  Types.VARCHAR);
 	}
 
 	private static final Date _date(Object o) {

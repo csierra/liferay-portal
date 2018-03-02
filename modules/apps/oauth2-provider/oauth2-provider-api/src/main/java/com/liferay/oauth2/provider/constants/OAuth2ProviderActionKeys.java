@@ -19,8 +19,10 @@ package com.liferay.oauth2.provider.constants;
  */
 public class OAuth2ProviderActionKeys {
 
-	public static String ACTION_ADD_APPLICATION = "ADD_APPLICATION";
+	public static final String ACTION_ADD_APPLICATION = "ADD_APPLICATION";
 
-	public static String ACTION_CREATE_TOKEN = "CREATE_TOKEN";
+	public static final String ACTION_CREATE_TOKEN = "CREATE_TOKEN";
+
+	public static final String ACTION_REVOKE_TOKEN = "REVOKE_TOKEN";
 
 }

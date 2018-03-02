@@ -16,7 +16,9 @@ package com.liferay.oauth2.provider.service.impl;
 
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
+import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.base.OAuth2RefreshTokenLocalServiceBaseImpl;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.Collection;
@@ -53,6 +55,23 @@ public class OAuth2RefreshTokenLocalServiceImpl
 		return updateOAuth2RefreshToken(oAuth2RefreshToken);
 	}
 
+	@Override
+	public OAuth2RefreshToken deleteOAuth2RefreshToken(
+			long oAuth2RefreshTokenId)
+		throws PortalException {
+
+		Collection<OAuth2Token> oAuth2Tokens =
+			oAuth2TokenLocalService.findByRefreshToken(oAuth2RefreshTokenId);
+
+		for (OAuth2Token oAuth2Token : oAuth2Tokens) {
+			oAuth2Token.setOAuth2RefreshTokenId(0);
+
+			oAuth2TokenLocalService.updateOAuth2Token(oAuth2Token);
+		}
+
+		return super.deleteOAuth2RefreshToken(oAuth2RefreshTokenId);
+	}
+
 	public OAuth2RefreshToken fetchByContent(String tokenContent) {
 		return oAuth2RefreshTokenPersistence.fetchByContent(tokenContent);
 	}
@@ -66,6 +85,7 @@ public class OAuth2RefreshTokenLocalServiceImpl
 			applicationId, start, end, orderByComparator);
 	}
 
+	@Override
 	public OAuth2RefreshToken findByContent(String tokenContent)
 		throws NoSuchOAuth2RefreshTokenException {
 

@@ -15,8 +15,10 @@
 package com.liferay.oauth2.provider.service.impl;
 
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
+import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.base.OAuth2TokenLocalServiceBaseImpl;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.Collection;
@@ -85,4 +87,17 @@ public class OAuth2TokenLocalServiceImpl extends OAuth2TokenLocalServiceBaseImpl
 		return updateOAuth2Token(oAuth2Token);
 	}
 
+	@Override
+	public OAuth2Token deleteOAuth2Token(long oAuth2TokenId)
+		throws PortalException {
+
+		Collection<OAuth2ScopeGrant> grants =
+			oAuth2ScopeGrantLocalService.findByToken(oAuth2TokenId);
+
+		for (OAuth2ScopeGrant grant : grants) {
+			oAuth2ScopeGrantLocalService.deleteOAuth2ScopeGrant(grant);
+		}
+
+		return super.deleteOAuth2Token(oAuth2TokenId);
+	}
 }

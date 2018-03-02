@@ -3,7 +3,10 @@
 
 <service-builder auto-import-default-references="false" auto-namespace-tables="false" package-path="com.liferay.oauth2.provider">
 	<namespace>OAuthTwo</namespace>
-	<entity local-service="true" name="OAuth2Authorization" remote-service="false">
+	<entity local-service="true" name="OAuth2Authorization"  remote-service="true" json-enabled="false">
+		<reference entity="OAuth2Application" package-path="com.liferay.oauth2.provider" />
+		<reference entity="OAuth2RefreshToken" package-path="com.liferay.oauth2.provider" />
+		<reference entity="OAuth2Token" package-path="com.liferay.oauth2.provider" />
 	</entity>
 	<entity local-service="true" name="OAuth2Application" remote-service="true">
 
@@ -47,7 +50,7 @@
 		<reference entity="OAuth2Token" package-path="com.liferay.oauth2.provider" />
 		<reference entity="Resource" package-path="com.liferay.portal" />
 	</entity>
-	<entity name="OAuth2Token" local-service="true" remote-service="false">
+	<entity name="OAuth2Token" local-service="true" remote-service="true" json-enabled="false">
 		<!-- PK fields -->
 
 		<column name="oAuth2TokenId" primary="true" type="long" />
@@ -85,8 +88,9 @@
 
 		<reference entity="OAuth2Application" package-path="com.liferay.oauth2.provider" />
 		<reference entity="OAuth2RefreshToken" package-path="com.liferay.oauth2.provider" />
+		<reference entity="OAuth2ScopeGrant" package-path="com.liferay.oauth2.provider" />
 	</entity>
-	<entity name="OAuth2RefreshToken" local-service="true" remote-service="false">
+	<entity name="OAuth2RefreshToken" local-service="true" remote-service="true" json-enabled="false">
 		<!-- PK fields -->
 
 		<column name="oAuth2RefreshTokenId" primary="true" type="long" />

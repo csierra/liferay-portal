@@ -16,6 +16,10 @@ package com.liferay.oauth2.provider.web;
 
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
+import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
+import com.liferay.oauth2.provider.service.OAuth2RefreshTokenService;
+import com.liferay.oauth2.provider.service.OAuth2TokenService;
+import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -138,7 +142,46 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		}
 	}
 
+	public void revokeAuthorizationTokens(
+			ActionRequest request, ActionResponse response)
+		throws PortalException {
+
+		long oAuth2TokenId = ParamUtil.getLong(request, "oAuth2TokenId", 0);
+
+		long oAuth2RefreshTokenId = ParamUtil.getLong(
+			request, "oAuth2RefreshTokenId", 0);
+
+		_oAuth2AuthorizationService.revokeAuthorization(
+			oAuth2TokenId, oAuth2RefreshTokenId);
+	}
+
+	public void deleteAccessToken(
+			ActionRequest request, ActionResponse response)
+		throws PortalException {
+
+		long oAuth2TokenId = ParamUtil.getLong(request, "oAuth2TokenId", 0);
+
+		_oAuth2TokenService.deleteAccessToken(oAuth2TokenId);
+	}
+
+	public void deleteRefreshToken(
+			ActionRequest request, ActionResponse response)
+		throws PortalException {
+
+		long oAuth2RefreshTokenId = ParamUtil.getLong(
+			request, "oAuth2RefreshTokenId", 0);
+
+		_oAuth2RefreshTokenService.deleteOAuth2RefreshToken(
+			oAuth2RefreshTokenId);
+	}
+
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;
+	@Reference
+	private OAuth2RefreshTokenService _oAuth2RefreshTokenService;
+	@Reference
+	private OAuth2AuthorizationService _oAuth2AuthorizationService;
+	@Reference
+	private OAuth2TokenService _oAuth2TokenService;
 
 }

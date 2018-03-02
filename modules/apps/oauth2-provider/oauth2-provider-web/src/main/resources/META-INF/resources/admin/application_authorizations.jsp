@@ -27,6 +27,8 @@ long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", 0);
 
 OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
 
+request.setAttribute("application_authorizations.jsp-oAuth2Application", oAuth2Application);
+
 renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new String[]{oAuth2Application.getName()}));
 
 if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) {
@@ -42,8 +44,9 @@ if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) 
 	</liferay-portlet:renderURL>
 
 	<liferay-ui:search-container
+		emptyResultsMessage="there-are-no-authorizations-yet"
 		iteratorURL="<%= applicationAuthorizationsURL %>"
-		total="<%= OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId) %>" >
+		total="<%= OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId) %>">
 
 		<liferay-ui:search-container-results
 			results="<%= OAuth2AuthorizationLocalServiceUtil.findByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>"/>
@@ -77,6 +80,10 @@ if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) 
 				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Authorization.getScopes()) %>" />
 
 			</liferay-ui:search-container-column-text>
+
+			<liferay-ui:search-container-column-jsp
+				align="right"
+				path="/admin/application_authorization_actions.jsp" />
 
 		</liferay-ui:search-container-row>
 

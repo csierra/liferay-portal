@@ -39,9 +39,11 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
@@ -468,8 +470,16 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		UserSubject subject = token.getSubject();
 
 		if (subject != null) {
-			oAuth2Token.setUserId(Long.parseLong(subject.getId()));
-			oAuth2Token.setUserName(subject.getLogin());
+			try {
+				long userId = Long.parseLong(subject.getId());
+				User user = _userLocalService.getUser(userId);
+				oAuth2Token.setUserId(userId);
+				oAuth2Token.setUserName(user.getFullName());
+			}
+			catch (Exception e) {
+				_log.error("Unable to load user " + subject.getId(), e);
+				throw new RuntimeException(e);
+			}
 		}
 
 		try {
@@ -577,8 +587,16 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		UserSubject subject = refreshToken.getSubject();
 
 		if (subject != null) {
-			oAuth2RefreshToken.setUserId(Long.parseLong(subject.getId()));
-			oAuth2RefreshToken.setUserName(subject.getLogin());
+			try {
+				long userId = Long.parseLong(subject.getId());
+				User user = _userLocalService.getUser(userId);
+				oAuth2RefreshToken.setUserId(userId);
+				oAuth2RefreshToken.setUserName(user.getFullName());
+			}
+			catch (Exception e) {
+				_log.error("Unable to load user " + subject.getId(), e);
+				throw new RuntimeException(e);
+			}
 		}
 
 		try {
@@ -663,9 +681,11 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	@Override
 	protected void doRevokeAccessToken(ServerAccessToken accessToken) {
 		try {
+			OAuth2Token oAuth2Token = _oAuth2TokenLocalService.findByContent(
+				accessToken.getTokenKey());
+
 			_oAuth2TokenLocalService.deleteOAuth2Token(
-				_oAuth2TokenLocalService.findByContent(
-					accessToken.getTokenKey()));
+				oAuth2Token.getOAuth2TokenId());
 		}
 		catch (PortalException e) {
 			_log.error(
@@ -687,7 +707,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 			if (oAuth2RefreshToken != null) {
 				_oAuth2RefreshTokenLocalService.deleteOAuth2RefreshToken(
-					oAuth2RefreshToken);
+					oAuth2RefreshToken.getOAuth2RefreshTokenId());
 			}
 		}
 		catch (PortalException e) {
@@ -1046,6 +1066,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 	@Reference
 	private ScopeFinderLocator _scopeFinderLocator;

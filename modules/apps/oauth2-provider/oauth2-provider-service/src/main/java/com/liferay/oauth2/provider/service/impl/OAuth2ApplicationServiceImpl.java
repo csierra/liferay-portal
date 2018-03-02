@@ -185,8 +185,8 @@ public class OAuth2ApplicationServiceImpl
 			oAuth2ApplicationId, scopes);
 	}
 
-
-	protected void check(String action) throws PrincipalException {
+	@Override
+	public void check(String action) throws PrincipalException {
 		PermissionChecker permissionChecker = getPermissionChecker();
 
 		if (!permissionChecker.hasPermission(
@@ -198,7 +198,8 @@ public class OAuth2ApplicationServiceImpl
 		}
 	}
 
-	protected void check(OAuth2Application oAuth2Application, String action)
+	@Override
+	public void check(OAuth2Application oAuth2Application, String action)
 		throws PrincipalException {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
