@@ -50,12 +50,27 @@ public class OAuth2AuthorizationLocalServiceImpl
 	}
 
 	@Override
+	public int countByUserId(long companyId, long userId) {
+		return oAuth2AuthorizationFinder.countByUserId(
+			companyId, userId);
+	}
+
+	@Override
 	public List<OAuth2Authorization> findByApplicationId(
 		long companyId, long applicationId, int start, int end,
 		OrderByComparator<OAuth2Authorization> orderByComparator) {
 
 		return oAuth2AuthorizationFinder.findByApplicationId(
 			companyId, applicationId, start, end, orderByComparator);
+	}
+
+	@Override
+	public List<OAuth2Authorization> findByUserId(
+		long companyId, long userId, int start, int end,
+		OrderByComparator<OAuth2Authorization> orderByComparator) {
+
+		return oAuth2AuthorizationFinder.findByUserId(
+			companyId, userId, start, end, orderByComparator);
 	}
 
 	@Override

@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 
+import java.util.Objects;
+
 /**
  * The implementation of the o auth2 token remote service.
  *
@@ -45,18 +47,21 @@ public class OAuth2TokenServiceImpl extends OAuth2TokenServiceBaseImpl {
 	 */
 
 	@Override
-	public OAuth2Token deleteAccessToken(long oAuth2TokenId)
+	public OAuth2Token deleteOAuth2Token(long oAuth2TokenId)
 		throws PortalException {
 
 		OAuth2Token oAuth2Token = oAuth2TokenLocalService.getOAuth2Token(
 			oAuth2TokenId);
 
-		OAuth2Application oAuth2Application =
-			oAuth2ApplicationService.getOAuth2Application(
-				oAuth2Token.getOAuth2ApplicationId());
+		if (!Objects.equals(getUserId(), oAuth2Token.getUserId())) {
+			OAuth2Application oAuth2Application =
+				oAuth2ApplicationService.getOAuth2Application(
+					oAuth2Token.getOAuth2ApplicationId());
 
-		oAuth2ApplicationService.check(oAuth2Application,
-			OAuth2ProviderActionKeys.ACTION_REVOKE_TOKEN);
+			oAuth2ApplicationService.check(
+				oAuth2Application,
+				OAuth2ProviderActionKeys.ACTION_REVOKE_TOKEN);
+		}
 
 		return oAuth2TokenLocalService.deleteOAuth2Token(oAuth2TokenId);
 	}

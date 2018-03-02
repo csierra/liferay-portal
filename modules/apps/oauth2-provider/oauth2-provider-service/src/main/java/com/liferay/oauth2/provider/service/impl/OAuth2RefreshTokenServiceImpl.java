@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 
+import java.util.Objects;
+
 /**
  * The implementation of the o auth2 refresh token remote service.
  *
@@ -54,12 +56,14 @@ public class OAuth2RefreshTokenServiceImpl
 			oAuth2RefreshTokenLocalService.getOAuth2RefreshToken(
 				oAuth2RefreshTokenId);
 
-		OAuth2Application oAuth2Application =
-			oAuth2ApplicationService.getOAuth2Application(
-				oAuth2RefreshToken.getOAuth2ApplicationId());
+		if (!Objects.equals(getUserId(), oAuth2RefreshToken.getUserId())) {
+			OAuth2Application oAuth2Application =
+				oAuth2ApplicationService.getOAuth2Application(
+					oAuth2RefreshToken.getOAuth2ApplicationId());
 
-		oAuth2ApplicationService.check(oAuth2Application,
-			OAuth2ProviderActionKeys.ACTION_REVOKE_TOKEN);
+			oAuth2ApplicationService.check(oAuth2Application,
+				OAuth2ProviderActionKeys.ACTION_REVOKE_TOKEN);
+		}
 
 		return oAuth2RefreshTokenLocalService.
 			deleteOAuth2RefreshToken(oAuth2RefreshTokenId);

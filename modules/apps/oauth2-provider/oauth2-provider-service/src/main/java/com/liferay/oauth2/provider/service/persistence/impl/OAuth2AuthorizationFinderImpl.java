@@ -94,6 +94,53 @@ public class OAuth2AuthorizationFinderImpl
 	}
 
 	@Override
+	public int countByUserId(long companyId, long userId) {
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			StringBundler query = new StringBundler(4);
+
+			query.append("SELECT count(*) AS " + COUNT_COLUMN_NAME + " FROM (");
+
+			query.append(
+				CustomSQLUtil.get(getClass(), FIND_ALL_AUTHORIZATIONS));
+
+			query.append(_FIND_BY_USER_ID_FILTER);
+
+			query.append(") TEMP_TABLE");
+
+			SQLQuery q = session.createSQLQuery(query.toString());
+
+			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(userId);
+			qPos.add(companyId);
+
+			Iterator<Long> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				Long count = itr.next();
+
+				if (count != null) {
+					return count.intValue();
+				}
+			}
+
+			return 0;
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	@Override
 	public List<OAuth2Authorization> findByApplicationId(
 		long companyId, long applicationId, int start, int end,
 		OrderByComparator<OAuth2Authorization> orderByComparator) {
@@ -132,6 +179,87 @@ public class OAuth2AuthorizationFinderImpl
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			qPos.add(applicationId);
+			qPos.add(companyId);
+
+			List<OAuth2Authorization> result = new ArrayList<>();
+
+			Iterator<Object[]> iterator =
+				(Iterator<Object[]>)QueryUtil.iterate(
+					q, getDialect(), start, end);
+
+			while (iterator.hasNext()) {
+				Object[] row = iterator.next();
+
+				OAuth2Authorization oAuth2Authorization =
+					new OAuth2Authorization();
+
+				int i = 0;
+
+				oAuth2Authorization.setAccessTokenExpirationDate(_date(row[i++]));
+				oAuth2Authorization.setCompanyId(_long(row[i++]));
+				oAuth2Authorization.setCreateDate(_date(row[i++]));
+				oAuth2Authorization.setoAuth2ApplicationId(_long(row[i++]));
+				oAuth2Authorization.setoAuth2RefreshTokenId(_long(row[i++]));
+				oAuth2Authorization.setoAuth2TokenId(_long(row[i++]));
+				oAuth2Authorization.setRefreshTokenExpirationDate(_date(row[i++]));
+				oAuth2Authorization.setRemoteIPInfo(_string(row[i++]));
+				oAuth2Authorization.setScopes(_string(row[i++]));
+				oAuth2Authorization.setUserId(_long(row[i++]));
+				oAuth2Authorization.setUserName(_string(row[i++]));
+
+				result.add(oAuth2Authorization);
+			}
+
+			return result;
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+
+	@Override
+	public List<OAuth2Authorization> findByUserId(
+		long companyId, long userId, int start, int end,
+		OrderByComparator<OAuth2Authorization> orderByComparator) {
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			int length = 2;
+
+			if (orderByComparator != null) {
+				length += orderByComparator.getOrderByFields().length * 2;
+			}
+			else {
+				length += 1;
+			}
+
+			StringBundler query = new StringBundler(length);
+
+			query.append(
+				CustomSQLUtil.get(getClass(), FIND_ALL_AUTHORIZATIONS));
+
+			query.append(_FIND_BY_USER_ID_FILTER);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				query.append(_ORDER_BY_CREATE_DATE_DESC);
+			}
+
+			SQLQuery q = session.createSQLQuery(query.toString());
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(userId);
 			qPos.add(companyId);
 
 			List<OAuth2Authorization> result = new ArrayList<>();
@@ -216,5 +344,8 @@ public class OAuth2AuthorizationFinderImpl
 	private static final String _ORDER_BY_ENTITY_ALIAS = "OAuth2Authorization.";
 	private static final String _FIND_BY_APPLICATION_ID_FILTER =
 		" WHERE OAuth2Authorization.oAuth2ApplicationId = ?" +
+		" AND OAuth2Authorization.companyId = ?";
+	private static final String _FIND_BY_USER_ID_FILTER =
+		" WHERE OAuth2Authorization.userId = ?" +
 		" AND OAuth2Authorization.companyId = ?";
 }
