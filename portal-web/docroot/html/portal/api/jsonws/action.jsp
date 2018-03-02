@@ -350,7 +350,21 @@ String signature = ParamUtil.getString(request, "signature");
 
 					<%
 					}
-					else if (methodParameterTypeClassName.startsWith("com.")) {
+					else if (
+						!methodParameterTypeClass.isArray() &&
+						!methodParameterTypeClass.isPrimitive() &&
+						!methodParameterTypeClass.equals(Boolean.class) &&
+						!methodParameterTypeClass.equals(Byte.class) &&
+						!methodParameterTypeClass.equals(Character.class) &&
+						!methodParameterTypeClass.equals(Double.class) &&
+						!methodParameterTypeClass.equals(Float.class) &&
+						!methodParameterTypeClass.equals(Integer.class) &&
+						!methodParameterTypeClass.equals(Long.class) &&
+						!methodParameterTypeClass.equals(Short.class) &&
+						!methodParameterTypeClass.equals(Void.class) &&
+						!methodParameterTypeClass.equals(String.class) &&
+						!methodParameterTypeClass.equals(File.class)) {
+
 						String objectMethodParameterName = "+" + methodParameterName;
 
 						int size = 10;
