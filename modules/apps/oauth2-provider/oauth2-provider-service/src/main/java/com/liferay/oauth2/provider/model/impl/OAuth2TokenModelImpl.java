@@ -21,6 +21,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.model.OAuth2TokenModel;
+import com.liferay.oauth2.provider.model.OAuth2TokenSoap;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -37,8 +38,10 @@ import java.io.Serializable;
 
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -115,6 +118,56 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	public static final long OAUTH2TOKENCONTENT_COLUMN_BITMASK = 4L;
 	public static final long USERNAME_COLUMN_BITMASK = 8L;
 	public static final long OAUTH2TOKENID_COLUMN_BITMASK = 16L;
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 */
+	public static OAuth2Token toModel(OAuth2TokenSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		OAuth2Token model = new OAuth2TokenImpl();
+
+		model.setOAuth2TokenId(soapModel.getOAuth2TokenId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setExpirationDate(soapModel.getExpirationDate());
+		model.setRemoteIPInfo(soapModel.getRemoteIPInfo());
+		model.setOAuth2TokenContent(soapModel.getOAuth2TokenContent());
+		model.setOAuth2ApplicationId(soapModel.getOAuth2ApplicationId());
+		model.setOAuth2TokenType(soapModel.getOAuth2TokenType());
+		model.setOAuth2RefreshTokenId(soapModel.getOAuth2RefreshTokenId());
+		model.setScopes(soapModel.getScopes());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 */
+	public static List<OAuth2Token> toModels(OAuth2TokenSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<OAuth2Token> models = new ArrayList<OAuth2Token>(soapModels.length);
+
+		for (OAuth2TokenSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.oauth2.provider.service.util.ServiceProps.get(
 				"lock.expiration.time.com.liferay.oauth2.provider.model.OAuth2Token"));
 

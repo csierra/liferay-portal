@@ -223,5 +223,30 @@ public class OAuth2ApplicationServiceSoap {
 		}
 	}
 
+	public static void check(java.lang.String action) throws RemoteException {
+		try {
+			OAuth2ApplicationServiceUtil.check(action);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void check(
+		com.liferay.oauth2.provider.model.OAuth2ApplicationSoap oAuth2Application,
+		java.lang.String action) throws RemoteException {
+		try {
+			OAuth2ApplicationServiceUtil.check(com.liferay.oauth2.provider.model.impl.OAuth2ApplicationModelImpl.toModel(
+					oAuth2Application), action);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(OAuth2ApplicationServiceSoap.class);
 }

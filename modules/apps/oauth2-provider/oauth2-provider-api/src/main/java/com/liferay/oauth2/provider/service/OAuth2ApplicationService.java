@@ -68,6 +68,11 @@ public interface OAuth2ApplicationService extends BaseService {
 		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;
 
+	public void check(OAuth2Application oAuth2Application,
+		java.lang.String action) throws PrincipalException;
+
+	public void check(java.lang.String action) throws PrincipalException;
+
 	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
 		throws PortalException;
 

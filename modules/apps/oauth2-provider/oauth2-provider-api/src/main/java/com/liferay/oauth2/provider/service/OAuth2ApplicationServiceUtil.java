@@ -58,6 +58,18 @@ public class OAuth2ApplicationServiceUtil {
 			redirectURIsList, scopesList, serviceContext);
 	}
 
+	public static void check(
+		com.liferay.oauth2.provider.model.OAuth2Application oAuth2Application,
+		java.lang.String action)
+		throws com.liferay.portal.kernel.security.auth.PrincipalException {
+		getService().check(oAuth2Application, action);
+	}
+
+	public static void check(java.lang.String action)
+		throws com.liferay.portal.kernel.security.auth.PrincipalException {
+		getService().check(action);
+	}
+
 	public static com.liferay.oauth2.provider.model.OAuth2Application deleteOAuth2Application(
 		long oAuth2ApplicationId)
 		throws com.liferay.portal.kernel.exception.PortalException {

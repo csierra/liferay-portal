@@ -20,6 +20,8 @@ import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.OAuth2TokenLocalService;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ApplicationPersistence;
 import com.liferay.oauth2.provider.service.persistence.OAuth2RefreshTokenPersistence;
+import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder;
+import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPersistence;
 import com.liferay.oauth2.provider.service.persistence.OAuth2TokenPersistence;
 
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -447,6 +449,63 @@ public abstract class OAuth2TokenLocalServiceBaseImpl
 		this.oAuth2RefreshTokenPersistence = oAuth2RefreshTokenPersistence;
 	}
 
+	/**
+	 * Returns the o auth2 scope grant local service.
+	 *
+	 * @return the o auth2 scope grant local service
+	 */
+	public com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService getOAuth2ScopeGrantLocalService() {
+		return oAuth2ScopeGrantLocalService;
+	}
+
+	/**
+	 * Sets the o auth2 scope grant local service.
+	 *
+	 * @param oAuth2ScopeGrantLocalService the o auth2 scope grant local service
+	 */
+	public void setOAuth2ScopeGrantLocalService(
+		com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService) {
+		this.oAuth2ScopeGrantLocalService = oAuth2ScopeGrantLocalService;
+	}
+
+	/**
+	 * Returns the o auth2 scope grant persistence.
+	 *
+	 * @return the o auth2 scope grant persistence
+	 */
+	public OAuth2ScopeGrantPersistence getOAuth2ScopeGrantPersistence() {
+		return oAuth2ScopeGrantPersistence;
+	}
+
+	/**
+	 * Sets the o auth2 scope grant persistence.
+	 *
+	 * @param oAuth2ScopeGrantPersistence the o auth2 scope grant persistence
+	 */
+	public void setOAuth2ScopeGrantPersistence(
+		OAuth2ScopeGrantPersistence oAuth2ScopeGrantPersistence) {
+		this.oAuth2ScopeGrantPersistence = oAuth2ScopeGrantPersistence;
+	}
+
+	/**
+	 * Returns the o auth2 scope grant finder.
+	 *
+	 * @return the o auth2 scope grant finder
+	 */
+	public OAuth2ScopeGrantFinder getOAuth2ScopeGrantFinder() {
+		return oAuth2ScopeGrantFinder;
+	}
+
+	/**
+	 * Sets the o auth2 scope grant finder.
+	 *
+	 * @param oAuth2ScopeGrantFinder the o auth2 scope grant finder
+	 */
+	public void setOAuth2ScopeGrantFinder(
+		OAuth2ScopeGrantFinder oAuth2ScopeGrantFinder) {
+		this.oAuth2ScopeGrantFinder = oAuth2ScopeGrantFinder;
+	}
+
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register("com.liferay.oauth2.provider.model.OAuth2Token",
 			oAuth2TokenLocalService);
@@ -513,6 +572,12 @@ public abstract class OAuth2TokenLocalServiceBaseImpl
 	protected com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService oAuth2RefreshTokenLocalService;
 	@BeanReference(type = OAuth2RefreshTokenPersistence.class)
 	protected OAuth2RefreshTokenPersistence oAuth2RefreshTokenPersistence;
+	@BeanReference(type = com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService.class)
+	protected com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService;
+	@BeanReference(type = OAuth2ScopeGrantPersistence.class)
+	protected OAuth2ScopeGrantPersistence oAuth2ScopeGrantPersistence;
+	@BeanReference(type = OAuth2ScopeGrantFinder.class)
+	protected OAuth2ScopeGrantFinder oAuth2ScopeGrantFinder;
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

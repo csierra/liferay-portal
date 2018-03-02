@@ -366,6 +366,62 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
+	public static void check(HttpPrincipal httpPrincipal,
+		java.lang.String action)
+		throws com.liferay.portal.kernel.security.auth.PrincipalException {
+		try {
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"check", _checkParameterTypes9);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey, action);
+
+			try {
+				TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.security.auth.PrincipalException) {
+					throw (com.liferay.portal.kernel.security.auth.PrincipalException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
+	public static void check(HttpPrincipal httpPrincipal,
+		com.liferay.oauth2.provider.model.OAuth2Application oAuth2Application,
+		java.lang.String action)
+		throws com.liferay.portal.kernel.security.auth.PrincipalException {
+		try {
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"check", _checkParameterTypes10);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					oAuth2Application, action);
+
+			try {
+				TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.security.auth.PrincipalException) {
+					throw (com.liferay.portal.kernel.security.auth.PrincipalException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(OAuth2ApplicationServiceHttp.class);
 	private static final Class<?>[] _addOAuth2ApplicationParameterTypes0 = new Class[] {
 			java.util.List.class, boolean.class, java.lang.String.class,
@@ -403,5 +459,12 @@ public class OAuth2ApplicationServiceHttp {
 		};
 	private static final Class<?>[] _updateScopesParameterTypes8 = new Class[] {
 			long.class, java.util.List.class
+		};
+	private static final Class<?>[] _checkParameterTypes9 = new Class[] {
+			java.lang.String.class
+		};
+	private static final Class<?>[] _checkParameterTypes10 = new Class[] {
+			com.liferay.oauth2.provider.model.OAuth2Application.class,
+			java.lang.String.class
 		};
 }

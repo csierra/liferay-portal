@@ -62,6 +62,13 @@ public class OAuth2AuthorizationLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
+	public static boolean revokeAuthorization(long oAuth2TokenId,
+		long oAuth2RefreshTokenId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .revokeAuthorization(oAuth2TokenId, oAuth2RefreshTokenId);
+	}
+
 	public static OAuth2AuthorizationLocalService getService() {
 		return _serviceTracker.getService();
 	}

@@ -16,43 +16,39 @@ package com.liferay.oauth2.provider.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.oauth2.provider.model.OAuth2Authorization;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.service.BaseLocalService;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
+import com.liferay.portal.kernel.security.access.control.AccessControlled;
+import com.liferay.portal.kernel.service.BaseService;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.kernel.util.OrderByComparator;
-
-import java.util.List;
 
 /**
- * Provides the local service interface for OAuth2Authorization. Methods of this
- * service will not have security checks based on the propagated JAAS
- * credentials because this service can only be accessed from within the same
- * VM.
+ * Provides the remote service interface for OAuth2Authorization. Methods of this
+ * service are expected to have security checks based on the propagated JAAS
+ * credentials because this service can be accessed remotely.
  *
  * @author Brian Wing Shun Chan
- * @see OAuth2AuthorizationLocalServiceUtil
- * @see com.liferay.oauth2.provider.service.base.OAuth2AuthorizationLocalServiceBaseImpl
- * @see com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationLocalServiceImpl
+ * @see OAuth2AuthorizationServiceUtil
+ * @see com.liferay.oauth2.provider.service.base.OAuth2AuthorizationServiceBaseImpl
+ * @see com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationServiceImpl
  * @generated
  */
+@AccessControlled
+@JSONWebService
+@OSGiBeanProperties(property =  {
+	"json.web.service.context.name=oauthtwo", "json.web.service.context.path=OAuth2Authorization"}, service = OAuth2AuthorizationService.class)
 @ProviderType
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface OAuth2AuthorizationLocalService extends BaseLocalService {
+public interface OAuth2AuthorizationService extends BaseService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public int countByApplicationId(long companyId, long applicationId);
-
-	public List<OAuth2Authorization> findByApplicationId(long companyId,
-		long applicationId, int start, int end,
-		OrderByComparator<OAuth2Authorization> orderByComparator);
 
 	/**
 	* Returns the OSGi service identifier.
