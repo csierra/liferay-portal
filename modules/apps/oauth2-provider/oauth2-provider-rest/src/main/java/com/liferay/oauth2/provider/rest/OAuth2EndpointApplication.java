@@ -53,7 +53,6 @@ import java.util.Set;
 	property = "osgi.jaxrs.application.base=/oauth2",
 	service = Application.class
 )
-@JaxrsApplicationBase("/oauth2")
 public class OAuth2EndpointApplication extends Application {
 
 	@Override
