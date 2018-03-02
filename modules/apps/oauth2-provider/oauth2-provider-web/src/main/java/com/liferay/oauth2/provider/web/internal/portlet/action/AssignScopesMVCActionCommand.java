@@ -14,10 +14,8 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
-import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
-import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
+import com.liferay.oauth2.provider.web.OAuth2ProviderPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -37,7 +35,7 @@ import java.util.List;
  */
 @Component(
 	property = {
-		"javax.portlet.name=" + OAuth2AdminPortletKeys.OAUTH2_ADMIN,
+		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
 		"mvc.command.name=/admin/assign_scopes"
 	}
 )

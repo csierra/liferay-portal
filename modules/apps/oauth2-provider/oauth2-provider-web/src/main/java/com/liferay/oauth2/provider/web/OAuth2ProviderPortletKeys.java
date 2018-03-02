@@ -17,9 +17,12 @@ package com.liferay.oauth2.provider.web;
 /**
  * @author Stian Sigvartsen
  */
-public class OAuth2AdminPortletKeys {
+public class OAuth2ProviderPortletKeys {
 
-	public static final String OAUTH2_ADMIN =
+	public static final String OAUTH2_ADMIN_PORTLET =
 		"com_liferay_oauth2_provider_portlet_OAuth2AdminPortlet";
+
+	public static final String OAUTH2_DEVICES_PORTLET =
+		"com_liferay_oauth2_provider_portlet_OAuth2DevicesPortlet";
 
 }

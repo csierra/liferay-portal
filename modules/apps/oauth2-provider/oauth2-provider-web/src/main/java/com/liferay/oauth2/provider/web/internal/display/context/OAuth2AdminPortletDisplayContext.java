@@ -17,13 +17,11 @@ package com.liferay.oauth2.provider.web.internal.display.context;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.model.OAuth2Authorization;
-import com.liferay.oauth2.provider.web.OAuth2AdminPortletKeys;
+import com.liferay.oauth2.provider.web.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminActionKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -63,7 +61,7 @@ public class OAuth2AdminPortletDisplayContext {
 
 		try {
 			return PortletPermissionUtil.contains(permissionChecker,
-				OAuth2AdminPortletKeys.OAUTH2_ADMIN,
+				OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
 				OAuth2AdminActionKeys.VIEW_GRANTED_AUTHORIZATIONS);
 		}
 		catch (PortalException e) {

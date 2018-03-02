@@ -19,7 +19,6 @@ import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenService;
 import com.liferay.oauth2.provider.service.OAuth2TokenService;
-import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -51,9 +50,9 @@ import java.util.List;
 		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"javax.portlet.display-name=OAuth2 Admin",
 		"javax.portlet.init-param.portlet-title-based-navigation=true",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/admin/",
 		"javax.portlet.init-param.view-template=/admin/view.jsp",
-		"javax.portlet.name=" + OAuth2AdminPortletKeys.OAUTH2_ADMIN,
+		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
 		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class
@@ -84,7 +83,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			OAuth2Application.class.getName(), request);
 
 		long oAuth2ApplicationId = ParamUtil.getLong(
-			request, "oAuth2ApplicationId", 0);
+			request, "oAuth2ApplicationId");
 
 		boolean clientConfidential = ParamUtil.get(
 			request, "clientConfidential", false);
@@ -146,10 +145,10 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			ActionRequest request, ActionResponse response)
 		throws PortalException {
 
-		long oAuth2TokenId = ParamUtil.getLong(request, "oAuth2TokenId", 0);
+		long oAuth2TokenId = ParamUtil.getLong(request, "oAuth2TokenId");
 
 		long oAuth2RefreshTokenId = ParamUtil.getLong(
-			request, "oAuth2RefreshTokenId", 0);
+			request, "oAuth2RefreshTokenId");
 
 		_oAuth2AuthorizationService.revokeAuthorization(
 			oAuth2TokenId, oAuth2RefreshTokenId);
@@ -159,9 +158,9 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			ActionRequest request, ActionResponse response)
 		throws PortalException {
 
-		long oAuth2TokenId = ParamUtil.getLong(request, "oAuth2TokenId", 0);
+		long oAuth2TokenId = ParamUtil.getLong(request, "oAuth2TokenId");
 
-		_oAuth2TokenService.deleteAccessToken(oAuth2TokenId);
+		_oAuth2TokenService.deleteOAuth2Token(oAuth2TokenId);
 	}
 
 	public void deleteRefreshToken(
@@ -169,7 +168,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		throws PortalException {
 
 		long oAuth2RefreshTokenId = ParamUtil.getLong(
-			request, "oAuth2RefreshTokenId", 0);
+			request, "oAuth2RefreshTokenId");
 
 		_oAuth2RefreshTokenService.deleteOAuth2RefreshToken(
 			oAuth2RefreshTokenId);

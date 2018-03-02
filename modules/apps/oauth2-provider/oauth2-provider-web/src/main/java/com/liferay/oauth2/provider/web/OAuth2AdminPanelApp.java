@@ -37,12 +37,12 @@ public class OAuth2AdminPanelApp extends BasePanelApp {
 
 	@Override
 	public String getPortletId() {
-		return OAuth2AdminPortletKeys.OAUTH2_ADMIN;
+		return OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET;
 	}
 
 	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + OAuth2AdminPortletKeys.OAUTH2_ADMIN + ")",
+		target = "(javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET + ")",
 		unbind = "-"
 	)
 	public void setPortlet(Portlet portlet) {
