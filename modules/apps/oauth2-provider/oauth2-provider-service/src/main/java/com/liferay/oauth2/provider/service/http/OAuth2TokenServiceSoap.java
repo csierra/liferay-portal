@@ -65,10 +65,10 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class OAuth2TokenServiceSoap {
-	public static com.liferay.oauth2.provider.model.OAuth2TokenSoap deleteAccessToken(
+	public static com.liferay.oauth2.provider.model.OAuth2TokenSoap deleteOAuth2Token(
 		long oAuth2TokenId) throws RemoteException {
 		try {
-			com.liferay.oauth2.provider.model.OAuth2Token returnValue = OAuth2TokenServiceUtil.deleteAccessToken(oAuth2TokenId);
+			com.liferay.oauth2.provider.model.OAuth2Token returnValue = OAuth2TokenServiceUtil.deleteOAuth2Token(oAuth2TokenId);
 
 			return com.liferay.oauth2.provider.model.OAuth2TokenSoap.toSoapModel(returnValue);
 		}

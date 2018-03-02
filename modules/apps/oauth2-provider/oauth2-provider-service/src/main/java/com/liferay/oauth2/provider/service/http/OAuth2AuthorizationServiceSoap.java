@@ -54,6 +54,37 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class OAuth2AuthorizationServiceSoap {
+	public static int countByUserId() throws RemoteException {
+		try {
+			int returnValue = OAuth2AuthorizationServiceUtil.countByUserId();
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.oauth2.provider.model.OAuth2AuthorizationSoap[] findByUserId(
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> returnValue =
+				OAuth2AuthorizationServiceUtil.findByUserId(start, end,
+					orderByComparator);
+
+			return com.liferay.oauth2.provider.model.OAuth2AuthorizationSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static boolean revokeAuthorization(long oAuth2TokenId,
 		long oAuth2RefreshTokenId) throws RemoteException {
 		try {

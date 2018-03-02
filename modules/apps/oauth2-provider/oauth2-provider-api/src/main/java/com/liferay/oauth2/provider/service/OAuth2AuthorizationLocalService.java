@@ -50,8 +50,14 @@ public interface OAuth2AuthorizationLocalService extends BaseLocalService {
 	 */
 	public int countByApplicationId(long companyId, long applicationId);
 
+	public int countByUserId(long companyId, long userId);
+
 	public List<OAuth2Authorization> findByApplicationId(long companyId,
 		long applicationId, int start, int end,
+		OrderByComparator<OAuth2Authorization> orderByComparator);
+
+	public List<OAuth2Authorization> findByUserId(long companyId, long userId,
+		int start, int end,
 		OrderByComparator<OAuth2Authorization> orderByComparator);
 
 	/**

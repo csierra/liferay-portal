@@ -24,7 +24,13 @@ import aQute.bnd.annotation.ProviderType;
 public interface OAuth2AuthorizationFinder {
 	public int countByApplicationId(long companyId, long applicationId);
 
+	public int countByUserId(long companyId, long userId);
+
 	public java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> findByApplicationId(
 		long companyId, long applicationId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator);
+
+	public java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> findByUserId(
+		long companyId, long userId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator);
 }
