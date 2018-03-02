@@ -124,6 +124,12 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 					name, privacyPolicyURL, redirectURIsList, scopesList, serviceContext);
 			}
 			else {
+				OAuth2Application oAuth2Application =
+					_oAuth2ApplicationService.getOAuth2Application(
+						oAuth2ApplicationId);
+
+				scopesList = oAuth2Application.getScopesList();
+
 				_oAuth2ApplicationService.updateOAuth2Application(
 					oAuth2ApplicationId, allowedGrantTypesList, clientConfidential,
 					clientId, clientSecret, description, homePageURL,
