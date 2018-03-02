@@ -756,18 +756,17 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 					oAuth2RefreshToken.getOAuth2RefreshTokenId());
 
 			List<String> accessTokens = new ArrayList<>(oAuth2Tokens.size());
-			Set<String> scopes = new HashSet<>();
 
 			for (OAuth2Token oAuth2Token : oAuth2Tokens) {
 				accessTokens.add(oAuth2Token.getOAuth2TokenContent());
-
-				scopes.addAll(oAuth2Token.getScopesList());
 			}
 
 			refreshToken.setAccessTokens(accessTokens);
+
 			refreshToken.setScopes(
 				convertScopeToPermissions(
-					refreshToken.getClient(), new ArrayList<>(scopes)));
+					refreshToken.getClient(),
+					oAuth2RefreshToken.getScopesList()));
 
 			refreshToken.getExtraProperties().put(
 				"companyId", Long.toString(oAuth2RefreshToken.getCompanyId()));
@@ -1010,7 +1009,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	@Override
 	public List<OAuthPermission> convertScopeToPermissions(
-		Client cliaent, List<String> requestedScopes) {
+		Client client, List<String> requestedScopes) {
 
 		List<String> invisibleToClientScopes = getInvisibleToClientScopes();
 
