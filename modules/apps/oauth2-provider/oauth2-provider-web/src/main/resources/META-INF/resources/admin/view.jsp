@@ -16,21 +16,59 @@
 
 <%@include file="/admin/init.jsp"%>
 
+<%
+String orderByCol = ParamUtil.getString(request, "orderByCol", "name");
+String orderByType = ParamUtil.getString(request, "orderByType", "asc");
+%>
+
 <aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
 	<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
 		<aui:nav-item label="oauth2-applications" selected="<%= true %>" />
 	</aui:nav>
 </aui:nav-bar>
 
-<div class="closed container-fluid-1280">
+<liferay-portlet:renderURL varImpl="portletURL" />
 
+<liferay-frontend:management-bar>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+			selectedDisplayStyle="list"
+		/>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= orderByCol %>"
+			orderByType="<%= orderByType %>"
+			orderColumns='<%= new String[] {"name"} %>'
+			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+		/>
+	</liferay-frontend:management-bar-filters>
+</liferay-frontend:management-bar>
+
+<div class="closed container-fluid-1280">
 	<liferay-ui:search-container
 		emptyResultsMessage="no-applications-were-found"
 		total="<%= OAuth2ApplicationServiceUtil.getOAuth2ApplicationsCount(themeDisplay.getCompanyId()) %>">
 
+		<%
+			OrderByComparator orderByComparator = null;
+
+			if (orderByCol.equals("name")) {
+				orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Application", "name", orderByType.equals("asc"));
+			}
+		%>
+
 	    <liferay-ui:search-container-results
 	        results="<%= OAuth2ApplicationServiceUtil.getOAuth2Applications(
-	            themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>" />
+	            themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>" />
 	
 	    <liferay-ui:search-container-row
 	        className="com.liferay.oauth2.provider.model.OAuth2Application"

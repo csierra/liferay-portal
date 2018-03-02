@@ -34,22 +34,56 @@ renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new Str
 if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) {
 	return;
 }
+
+String orderByCol = ParamUtil.getString(request, "orderByCol", "createDate");
+String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 %>
+<liferay-portlet:renderURL varImpl="portletURL">
+	<portlet:param name="mvcPath" value="/admin/application_authorizations.jsp" />
+	<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2ApplicationId) %>" />
+	<portlet:param name="redirect" value="<%= redirect %>" />
+</liferay-portlet:renderURL>
+
+<liferay-frontend:management-bar>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+			selectedDisplayStyle="list"
+		/>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= orderByCol %>"
+			orderByType="<%= orderByType %>"
+			orderColumns='<%= new String[] {"createDate"} %>'
+			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+		/>
+	</liferay-frontend:management-bar-filters>
+</liferay-frontend:management-bar>
 
 <div class="container-fluid-1280">
-	<liferay-portlet:renderURL varImpl="applicationAuthorizationsURL">
-		<portlet:param name="mvcPath" value="/admin/application_authorizations.jsp" />
-		<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2ApplicationId) %>" />
-		<portlet:param name="redirect" value="<%= redirect %>" />
-	</liferay-portlet:renderURL>
-
 	<liferay-ui:search-container
 		emptyResultsMessage="no-devices-were-found"
-		iteratorURL="<%= applicationAuthorizationsURL %>"
+		iteratorURL="<%= portletURL %>"
 		total="<%= OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId) %>">
 
+		<%
+			OrderByComparator orderByComparator = null;
+
+			if (orderByCol.equals("createDate")) {
+				orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("asc"));
+			}
+		%>
+
 		<liferay-ui:search-container-results
-			results="<%= OAuth2AuthorizationLocalServiceUtil.findByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>"/>
+			results="<%= OAuth2AuthorizationLocalServiceUtil.findByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.oauth2.provider.model.OAuth2Authorization"

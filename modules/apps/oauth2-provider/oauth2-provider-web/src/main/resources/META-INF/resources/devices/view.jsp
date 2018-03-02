@@ -1,4 +1,4 @@
-<%@ page import="com.liferay.portal.kernel.exception.PortalException" %><%--
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -15,17 +15,56 @@
 --%>
 
 <%@ include file="/devices/init.jsp" %>
+<%
+String orderByCol = ParamUtil.getString(request, "orderByCol", "createDate");
+String orderByType = ParamUtil.getString(request, "orderByType", "asc");
+
+%>
+<liferay-portlet:renderURL varImpl="portletURL" />
+
+<liferay-frontend:management-bar>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+			selectedDisplayStyle="list"
+		/>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= orderByCol %>"
+			orderByType="<%= orderByType %>"
+			orderColumns='<%= new String[] {"createDate", "application-name"} %>'
+			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+		/>
+	</liferay-frontend:management-bar-filters>
+</liferay-frontend:management-bar>
 
 <div class="container-fluid-1280">
-	<liferay-portlet:renderURL varImpl="devicesURL" />
-
 	<liferay-ui:search-container
 		emptyResultsMessage="no-devices-were-found"
-		iteratorURL="<%= devicesURL %>"
+		iteratorURL="<%= portletURL %>"
 		total="<%= OAuth2AuthorizationServiceUtil.countByUserId() %>">
 
+		<%
+			OrderByComparator orderByComparator = null;
+
+			if (orderByCol.equals("createDate")) {
+				orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("asc"));
+			}
+			else if (orderByCol.equals("application-name")) {
+				orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "oAuth2ApplicationId", orderByType.equals("asc"));
+			}
+		%>
+
 		<liferay-ui:search-container-results
-			results="<%= OAuth2AuthorizationServiceUtil.findByUserId(searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>"/>
+			results="<%= OAuth2AuthorizationServiceUtil.findByUserId(searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.oauth2.provider.model.OAuth2Authorization"
