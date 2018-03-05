@@ -85,7 +85,7 @@ renderResponse.setTitle(headerTitle);
 
 		<aui:button-row>
 			<aui:button cssClass="btn-lg" type="submit" />
-			<aui:button cssClass="btn-lg" onClick="<%= portletDisplay.getURLBack() %>" type="cancel" />
+			<aui:button cssClass="btn-lg" href="<%= portletDisplay.getURLBack() %>" type="cancel" />
 		</aui:button-row>
 	</aui:form>
 </div>

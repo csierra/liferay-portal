@@ -78,7 +78,7 @@ String replyTo = PortalUtil.escapeRedirect(oAuth2Parameters.get("reply_to"));
 							continue;
 						}
 				%>
-					<aui:input name="<%= paramName %>" type="hidden" useNamespace="false" value="<%= oAuth2Parameters.get(paramName) %>" />
+					<aui:input name="<%= HtmlUtil.escapeAttribute(paramName) %>" type="hidden" useNamespace="false" value="<%= oAuth2Parameters.get(paramName) %>" />
 				<%
 					}
 				%>

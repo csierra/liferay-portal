@@ -83,7 +83,7 @@ List<String> assignedScopes = oAuth2Application.getScopesList();
 			%>
 				<div class="row">
 				<div class="col-lg-12">
-					<aui:input checked="<%= assignedScopes.contains(alias) %>" label="<%= HtmlUtil.escape(alias) %>" localizeLabel="false" name="<%= "scope_" + alias %>" type="checkbox" />
+					<aui:input checked="<%= assignedScopes.contains(alias) %>" label="<%= HtmlUtil.escape(alias) %>" localizeLabel="false" name="<%= "scope_" + HtmlUtil.escapeAttribute(alias) %>" type="checkbox" />
 				</div>
 				</div>
 			<%
@@ -96,7 +96,7 @@ List<String> assignedScopes = oAuth2Application.getScopesList();
 							<%							
 							for (String internalScope : authorizationRequestModel.getApplicationInternalScopes(appName)) {
 								%>
-									<li><%=appName%> -> <%=internalScope%></li>
+									<li><%=HtmlUtil.escape(appName)%> -> <%=HtmlUtil.escape(internalScope)%></li>
 								<%
 							}								
 							%>
@@ -144,7 +144,7 @@ List<String> assignedScopes = oAuth2Application.getScopesList();
 
 		<aui:button-row>
 			<aui:button cssClass="btn-lg" type="submit" />
-			<aui:button cssClass="btn-lg" onClick="<%= portletDisplay.getURLBack() %>" type="cancel" />
+			<aui:button cssClass="btn-lg" href="<%= portletDisplay.getURLBack() %>" type="cancel" />
 		</aui:button-row>
 	</aui:form>
 </div>

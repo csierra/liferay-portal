@@ -15,4 +15,6 @@ dependencies {
 	compileOnly project(":apps:oauth2-provider:oauth2-provider-scope-liferay-api")
 
 	provided group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "2.0.0"
+	provided group: "com.liferay", name: "com.liferay.frontend.taglib", version: "2.0.0"
+	provided group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "2.0.0"
 }
