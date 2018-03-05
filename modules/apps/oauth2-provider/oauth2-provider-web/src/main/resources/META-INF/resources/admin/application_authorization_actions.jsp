@@ -29,7 +29,6 @@ long oAuth2RefreshTokenId = oAuth2Authorization.getoAuth2RefreshTokenId();
 %>
 
 <c:if test="<%= oAuth2AdminPortletDisplayContext.hasRevokeTokenPermission(oAuth2Application) %>">
-
 	<liferay-ui:icon-menu
 		direction="left-side"
 		icon="<%= StringPool.BLANK %>"
@@ -37,40 +36,15 @@ long oAuth2RefreshTokenId = oAuth2Authorization.getoAuth2RefreshTokenId();
 		message="<%= StringPool.BLANK %>"
 		showWhenSingleIcon="<%= true %>"
 	>
-		<c:if test="<%= oAuth2TokenId > 0 && oAuth2RefreshTokenId > 0 %>">
-			<portlet:actionURL name="revokeAuthorizationTokens" var="revokeURL">
-				<portlet:param name="oAuth2TokenId" value="<%= String.valueOf(oAuth2TokenId) %>" />
-				<portlet:param name="oAuth2RefreshTokenId" value="<%= String.valueOf(oAuth2RefreshTokenId) %>" />
-				<portlet:param name="redirect" value="<%= currentURL %>" />
-			</portlet:actionURL>
+		<portlet:actionURL name="revokeAuthorizationTokens" var="revokeURL">
+			<portlet:param name="oAuth2TokenId" value="<%= String.valueOf(oAuth2TokenId) %>" />
+			<portlet:param name="oAuth2RefreshTokenId" value="<%= String.valueOf(oAuth2RefreshTokenId) %>" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+		</portlet:actionURL>
 
-			<liferay-ui:icon
-				message="revoke-authorization"
-				url="<%= revokeURL.toString() %>" />
+		<liferay-ui:icon
+			message="revoke-authorization"
+			url="<%= revokeURL.toString() %>" />
 
-			<div class="separator"><!-- --></div>
-		</c:if>
-
-		<c:if test="<%= oAuth2TokenId > 0 %>">
-			<portlet:actionURL name="deleteAccessToken" var="deleteTokenURL">
-				<portlet:param name="oAuth2TokenId" value="<%= String.valueOf(oAuth2TokenId) %>" />
-				<portlet:param name="redirect" value="<%= currentURL %>" />
-			</portlet:actionURL>
-
-			<liferay-ui:icon
-				message="delete-access-token"
-				url="<%= deleteTokenURL.toString() %>" />
-		</c:if>
-
-		<c:if test="<%= oAuth2RefreshTokenId > 0 %>">
-			<portlet:actionURL name="deleteRefreshToken" var="deleteTokenURL">
-				<portlet:param name="oAuth2RefreshTokenId" value="<%= String.valueOf(oAuth2RefreshTokenId) %>" />
-				<portlet:param name="redirect" value="<%= currentURL %>" />
-			</portlet:actionURL>
-
-			<liferay-ui:icon
-				message="delete-refresh-token"
-				url="<%= deleteTokenURL.toString() %>" />
-		</c:if>
 	</liferay-ui:icon-menu>
 </c:if>

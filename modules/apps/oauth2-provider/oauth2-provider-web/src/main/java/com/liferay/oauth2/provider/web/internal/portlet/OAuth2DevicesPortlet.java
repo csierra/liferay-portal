@@ -61,26 +61,6 @@ public class OAuth2DevicesPortlet extends MVCPortlet {
 			oAuth2TokenId, oAuth2RefreshTokenId);
 	}
 
-	public void deleteAccessToken(
-		ActionRequest request, ActionResponse response)
-		throws PortalException {
-
-		long oAuth2TokenId = ParamUtil.getLong(request, "oAuth2TokenId");
-
-		_oAuth2TokenService.deleteOAuth2Token(oAuth2TokenId);
-	}
-
-	public void deleteRefreshToken(
-		ActionRequest request, ActionResponse response)
-		throws PortalException {
-
-		long oAuth2RefreshTokenId = ParamUtil.getLong(
-			request, "oAuth2RefreshTokenId");
-
-		_oAuth2RefreshTokenService.deleteOAuth2RefreshToken(
-			oAuth2RefreshTokenId);
-	}
-
 	@Reference
 	private OAuth2AuthorizationService _oAuth2AuthorizationService;
 	@Reference
