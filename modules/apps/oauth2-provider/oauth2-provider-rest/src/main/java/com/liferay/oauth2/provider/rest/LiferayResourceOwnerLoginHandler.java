@@ -20,11 +20,10 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.Authenticator;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManager;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
 import org.osgi.service.component.annotations.Component;
@@ -39,9 +38,11 @@ public class LiferayResourceOwnerLoginHandler
 	implements ResourceOwnerLoginHandler {
 
 	@Override
-	public UserSubject createSubject(String login, String password) {
+	public UserSubject createSubject(
+		Client client, String login, String password) {
+
 		try {
-			User user = authenticateUser(login, password);
+			User user = authenticateUser(client, login, password);
 
 			UserSubject userSubject = new UserSubject(
 				user.getLogin(), Long.toString(user.getUserId()));
@@ -56,7 +57,9 @@ public class LiferayResourceOwnerLoginHandler
 		}
 	}
 
-	public User authenticateUser(String login, String password) {
+	public User authenticateUser(
+		Client client, String login,
+		String password) {
 		Long companyId = CompanyThreadLocal.getCompanyId();
 
 		Company company = _companyLocalService.fetchCompany(companyId);

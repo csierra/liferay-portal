@@ -41,15 +41,15 @@ import org.osgi.service.component.annotations.Reference;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-@ApplicationPath("/sample2")
 @Component(
 	immediate = true,
 	property = {
 		"oauth2.scopechecker.type=annotations",
-		"requires.oauth2=true"
+		"osgi.jaxrs.name=Sample.Test2",
+		"osgi.jaxrs.application.base=/api/sample2",
+		"osgi.jaxrs.extension.select=(liferay.extension=OAuth2)"
 	},
 	service = Application.class
-
 )
 public class Test extends Application {
 

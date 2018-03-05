@@ -109,11 +109,11 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 			if (_liferayLoginHandler instanceof LiferayResourceOwnerLoginHandler) {
 				user =
 					((LiferayResourceOwnerLoginHandler)_liferayLoginHandler).
-						authenticateUser(userName, password);
+						authenticateUser(client, userName, password);
 			}
 			else {
 				UserSubject userSubject = _liferayLoginHandler.createSubject(
-					userName, password);
+					client, userName, password);
 
 				String subjectId = userSubject.getId();
 

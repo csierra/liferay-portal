@@ -23,13 +23,13 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 
 import com.liferay.portal.kernel.util.Validator;
-import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -87,8 +87,7 @@ public class AuthorizationMessageBodyWriter
 		String redirect = _oAuth2AuthorizePortalScreenURL;
 
 		if (!_http.hasDomain(redirect)) {
-			String portalURL =
-				_portal.getPortalURL(_messageContext.getHttpServletRequest());
+			String portalURL = _portal.getPortalURL(_httpServletRequest);
 
 			redirect = portalURL + redirect;
 		}
@@ -170,7 +169,7 @@ public class AuthorizationMessageBodyWriter
 	}
 
 	@Context
-	private MessageContext _messageContext;
+	private HttpServletRequest _httpServletRequest;
 
 	@Reference
 	private Portal _portal;
