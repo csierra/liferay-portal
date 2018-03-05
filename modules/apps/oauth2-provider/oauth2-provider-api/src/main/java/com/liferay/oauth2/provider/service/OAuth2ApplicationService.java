@@ -32,6 +32,8 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
+import java.io.InputStream;
+
 import java.util.List;
 
 /**
@@ -103,6 +105,9 @@ public interface OAuth2ApplicationService extends BaseService {
 	* @return the OSGi service identifier
 	*/
 	public java.lang.String getOSGiServiceIdentifier();
+
+	public OAuth2Application updateIcon(long oAuth2ApplicationId,
+		InputStream inputStream) throws PortalException;
 
 	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
 		List<java.lang.String> allowedGrantTypesList,

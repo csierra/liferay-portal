@@ -119,6 +119,14 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 	}
 
 	@Override
+	public com.liferay.oauth2.provider.model.OAuth2Application updateIcon(
+		long oAuth2ApplicationId, java.io.InputStream inputStream)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2ApplicationService.updateIcon(oAuth2ApplicationId,
+			inputStream);
+	}
+
+	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
 		long oAuth2ApplicationId,
 		java.util.List<java.lang.String> allowedGrantTypesList,

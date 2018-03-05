@@ -333,13 +333,46 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateIcon(
+		HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
+		java.io.InputStream inputStream)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		try {
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"updateIcon", _updateIconParameterTypes8);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					oAuth2ApplicationId, inputStream);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return (com.liferay.oauth2.provider.model.OAuth2Application)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopes(
 		HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
 		java.util.List<java.lang.String> scopes)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
-					"updateScopes", _updateScopesParameterTypes8);
+					"updateScopes", _updateScopesParameterTypes9);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					oAuth2ApplicationId, scopes);
@@ -371,7 +404,7 @@ public class OAuth2ApplicationServiceHttp {
 		throws com.liferay.portal.kernel.security.auth.PrincipalException {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
-					"check", _checkParameterTypes9);
+					"check", _checkParameterTypes10);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, action);
 
@@ -399,7 +432,7 @@ public class OAuth2ApplicationServiceHttp {
 		throws com.liferay.portal.kernel.security.auth.PrincipalException {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
-					"check", _checkParameterTypes10);
+					"check", _checkParameterTypes11);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					oAuth2Application, action);
@@ -457,13 +490,16 @@ public class OAuth2ApplicationServiceHttp {
 			java.util.List.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _updateScopesParameterTypes8 = new Class[] {
+	private static final Class<?>[] _updateIconParameterTypes8 = new Class[] {
+			long.class, java.io.InputStream.class
+		};
+	private static final Class<?>[] _updateScopesParameterTypes9 = new Class[] {
 			long.class, java.util.List.class
 		};
-	private static final Class<?>[] _checkParameterTypes9 = new Class[] {
+	private static final Class<?>[] _checkParameterTypes10 = new Class[] {
 			java.lang.String.class
 		};
-	private static final Class<?>[] _checkParameterTypes10 = new Class[] {
+	private static final Class<?>[] _checkParameterTypes11 = new Class[] {
 			com.liferay.oauth2.provider.model.OAuth2Application.class,
 			java.lang.String.class
 		};

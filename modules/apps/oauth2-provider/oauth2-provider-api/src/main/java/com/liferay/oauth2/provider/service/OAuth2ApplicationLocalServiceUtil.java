@@ -275,6 +275,12 @@ public class OAuth2ApplicationLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateIcon(
+		long oAuth2ApplicationId, java.io.InputStream inputStream)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().updateIcon(oAuth2ApplicationId, inputStream);
+	}
+
 	public static com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
 		long oAuth2ApplicationId,
 		java.util.List<java.lang.String> allowedGrantTypesList,
