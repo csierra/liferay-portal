@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
 
-package com.liferay.oauth2.provider.web;
+package com.liferay.oauth2.provider.web.internal.portlet;
 
 import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.scope.liferay.api.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
+import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext;
@@ -60,7 +61,7 @@ import javax.servlet.http.HttpServletRequest;
 		"javax.portlet.init-param.portlet-title-based-navigation=true",
 		"javax.portlet.init-param.template-path=/authorize/",
 		"javax.portlet.init-param.view-template=/authorize/authorize.jsp",
-		"javax.portlet.name=com.liferay.oauth2.provider.web.OAuth2AuthorizePortlet",
+		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_AUTHORIZE_PORTLET,
 		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class

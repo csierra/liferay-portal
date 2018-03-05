@@ -3,7 +3,7 @@
 
 <resource-action-mapping>
 	<portlet-resource>
-		<portlet-name>com_liferay_oauth2_provider_portlet_OAuth2AdminPortlet</portlet-name>
+		<portlet-name>com_liferay_oauth2_provider_web_internal_portlet_OAuth2AdminPortlet</portlet-name>
 		<permissions>
 			<supports>
 				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
@@ -20,7 +20,7 @@
 		</permissions>
 	</portlet-resource>
 	<portlet-resource>
-		<portlet-name>com.liferay.oauth2.provider.web.OAuth2AuthorizePortlet</portlet-name>
+		<portlet-name>com_liferay_oauth2_provider_web_internal_portlet_OAuth2AuthorizePortlet</portlet-name>
 		<permissions>
 			<supports>
 				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
@@ -30,6 +30,21 @@
 			<site-member-defaults>
 				<action-key>VIEW</action-key>
 			</site-member-defaults>
+			<guest-unsupported>
+				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
+				<action-key>CONFIGURATION</action-key>
+				<action-key>VIEW</action-key>
+			</guest-unsupported>
+		</permissions>
+	</portlet-resource>
+	<portlet-resource>
+		<portlet-name>com_liferay_oauth2_provider_web_internal_portlet_OAuth2DevicesPortlet</portlet-name>
+		<permissions>
+			<supports>
+				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
+				<action-key>CONFIGURATION</action-key>
+				<action-key>VIEW</action-key>
+			</supports>
 			<guest-unsupported>
 				<action-key>ACCESS_IN_CONTROL_PANEL</action-key>
 				<action-key>CONFIGURATION</action-key>

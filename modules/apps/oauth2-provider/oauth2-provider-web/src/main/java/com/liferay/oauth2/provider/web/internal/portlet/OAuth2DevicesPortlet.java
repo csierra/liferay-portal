@@ -12,11 +12,12 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.web;
+package com.liferay.oauth2.provider.web.internal.portlet;
 
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenService;
 import com.liferay.oauth2.provider.service.OAuth2TokenService;
+import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.ParamUtil;

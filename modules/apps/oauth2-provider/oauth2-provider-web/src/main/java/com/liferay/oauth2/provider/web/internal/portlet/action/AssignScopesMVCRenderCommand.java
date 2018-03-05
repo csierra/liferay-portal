@@ -22,7 +22,7 @@ import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
-import com.liferay.oauth2.provider.web.OAuth2ProviderPortletKeys;
+import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel.ApplicationScopeDescriptor;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
