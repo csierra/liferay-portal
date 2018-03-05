@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -168,6 +169,21 @@ public class OAuth2ApplicationServiceImpl
 			clientId, clientSecret, description, homePageURL, iconFileEntryId,
 			name, privacyPolicyURL, redirectURIsList, scopesList,
 			serviceContext);
+	}
+
+	@Override
+	public OAuth2Application updateIcon(
+			long oAuth2ApplicationId, InputStream inputStream)
+		throws PortalException {
+
+		OAuth2Application oAuth2Application =
+			oAuth2ApplicationLocalService.getOAuth2Application(
+				oAuth2ApplicationId);
+
+		check(oAuth2Application, ActionKeys.UPDATE);
+
+		return oAuth2ApplicationLocalService.updateIcon(
+			oAuth2ApplicationId, inputStream);
 	}
 
 	@Override

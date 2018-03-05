@@ -17,7 +17,10 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 <%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2ApplicationServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.model.OAuth2Application" %><%@
+page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %><%@
+page import="com.liferay.document.library.kernel.util.DLUtil" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
+page import="com.liferay.portal.kernel.repository.model.FileEntry" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
 page import="java.util.List" %><%@

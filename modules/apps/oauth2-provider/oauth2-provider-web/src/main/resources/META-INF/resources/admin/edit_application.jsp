@@ -49,8 +49,24 @@ renderResponse.setTitle(headerTitle);
 			/>
 
 			<aui:fieldset label="details">
-				<aui:input name="name" required="true" />
-				<aui:input name="iconFileEntryId" helpMessage="Here should be upload dialog" />
+				<aui:field-wrapper>
+					<aui:input name="name" required="true" />
+					<c:if test="<%= oAuth2Application != null && oAuth2Application.getIconFileEntryId() > 0%>">
+						<aui:input label="icon" name="icon" type="file" inlineField="true"/>
+						<%
+							String thumbnailURL = StringPool.BLANK;
+
+							try {
+								FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(oAuth2Application.getIconFileEntryId());
+								thumbnailURL = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
+							}
+							catch (PortalException e) {
+								// user has no longer access to the application
+							}
+						%>
+						<img src="<%= thumbnailURL %>" width="64" />
+					</c:if>
+				</aui:field-wrapper>
 				<aui:input name="description" type="textarea" />
 				<aui:input name="homePageURL" />
 				<aui:input name="privacyPolicyURL" />

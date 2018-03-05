@@ -19,6 +19,8 @@ package com.liferay.oauth2.provider.constants;
  */
 public class OAuth2ProviderConstants {
 
-	public static String RESOURCE_NAME = "com.liferay.oauth2.provider";
+	public static final String RESOURCE_NAME = "com.liferay.oauth2.provider";
+
+	public static final String SERVICE_NAME = "com.liferay.oauth2.provider";
 
 }

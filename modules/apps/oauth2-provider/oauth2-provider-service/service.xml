@@ -48,7 +48,9 @@
 		<reference entity="OAuth2RefreshToken" package-path="com.liferay.oauth2.provider" />
 		<reference entity="OAuth2ScopeGrant" package-path="com.liferay.oauth2.provider" />
 		<reference entity="OAuth2Token" package-path="com.liferay.oauth2.provider" />
+		<reference entity="Group" package-path="com.liferay.portal" />
 		<reference entity="Resource" package-path="com.liferay.portal" />
+		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>
 	<entity name="OAuth2Token" local-service="true" remote-service="true" json-enabled="false">
 		<!-- PK fields -->

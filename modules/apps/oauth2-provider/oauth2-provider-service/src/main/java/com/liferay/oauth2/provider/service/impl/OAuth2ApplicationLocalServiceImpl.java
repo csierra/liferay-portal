@@ -14,6 +14,8 @@
 
 package com.liferay.oauth2.provider.service.impl;
 
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -23,8 +25,16 @@ import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationLocalServiceBaseImpl;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Repository;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.ContentTypes;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -180,6 +190,56 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setScopesList(scopesList);
 
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
+	}
+
+	@Override
+	public OAuth2Application updateIcon(
+			long oAuth2ApplicationId, InputStream inputStream)
+		throws PortalException {
+
+		OAuth2Application oAuth2Application =
+			getOAuth2Application(oAuth2ApplicationId);
+
+		long oldIconFileEntryId = oAuth2Application.getIconFileEntryId();
+
+		long companyId = oAuth2Application.getCompanyId();
+
+		Group group = groupLocalService.getCompanyGroup(companyId);
+		long defaultUserId = userLocalService.getDefaultUserId(companyId);
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setAddGuestPermissions(true);
+
+		Repository repository = PortletFileRepositoryUtil.addPortletRepository(
+			group.getGroupId(), OAuth2ProviderConstants.SERVICE_NAME,
+			serviceContext);
+
+		Folder folder = PortletFileRepositoryUtil.addPortletFolder(
+			defaultUserId, repository.getRepositoryId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "icons",
+			serviceContext);
+
+		String fileName = PortletFileRepositoryUtil.getUniqueFileName(
+			group.getGroupId(), folder.getFolderId(),
+			oAuth2Application.getClientId());
+
+		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
+			group.getGroupId(), oAuth2Application.getUserId(),
+			OAuth2Application.class.getName(),
+			oAuth2ApplicationId, OAuth2ProviderConstants.SERVICE_NAME,
+			folder.getFolderId(), inputStream, fileName, null, false);
+
+		oAuth2Application.setIconFileEntryId(fileEntry.getFileEntryId());
+
+		oAuth2Application = updateOAuth2Application(oAuth2Application);
+
+		if (oldIconFileEntryId > 0) {
+			PortletFileRepositoryUtil.deletePortletFileEntry(
+				oldIconFileEntryId);
+		}
+
+		return oAuth2Application;
 	}
 
 	@Override

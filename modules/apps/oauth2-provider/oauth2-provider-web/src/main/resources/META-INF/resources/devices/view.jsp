@@ -74,17 +74,26 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 			<%
 				String applicationDescription = StringPool.BLANK;
 				String applicationName = StringPool.BLANK;
+				String thumbnailURL = StringPool.BLANK;
 
 				try {
 					OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2Authorization.getoAuth2ApplicationId());
 					applicationDescription = oAuth2Application.getDescription();
 					applicationName = oAuth2Application.getName();
+
+					if (oAuth2Application.getIconFileEntryId() > 0) {
+						FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(oAuth2Application.getIconFileEntryId());
+						thumbnailURL = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
+					}
 				}
 				catch (PortalException e) {
 					// user has no longer access to the application
 				}
 
 			%>
+			<liferay-ui:search-container-column-image name="icon"
+				src="<%= thumbnailURL %>" />
+
 			<liferay-ui:search-container-column-text
 				name="application-name" value="<%= HtmlUtil.escape(applicationName) %>"/>
 

@@ -75,7 +75,26 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 			escapedModel="true"
 			modelVar="oAuth2Application">
 
-	        <liferay-ui:search-container-column-text
+
+			<%
+				String thumbnailURL = StringPool.BLANK;
+
+				try {
+					if (oAuth2Application.getIconFileEntryId() > 0) {
+						FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(oAuth2Application.getIconFileEntryId());
+						thumbnailURL = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
+					}
+				}
+				catch (PortalException e) {
+					// user has no longer access to the application
+				}
+
+			%>
+			<liferay-ui:search-container-column-image
+				name="icon"
+				src="<%= thumbnailURL %>" />
+
+			<liferay-ui:search-container-column-text
 				property="name" />
 	        
 	        <liferay-ui:search-container-column-text

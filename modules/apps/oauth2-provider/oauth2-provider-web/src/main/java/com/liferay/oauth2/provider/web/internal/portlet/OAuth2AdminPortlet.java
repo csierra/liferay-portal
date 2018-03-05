@@ -21,11 +21,15 @@ import com.liferay.oauth2.provider.service.OAuth2RefreshTokenService;
 import com.liferay.oauth2.provider.service.OAuth2TokenService;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringPool;
 
 import javax.portlet.ActionRequest;
@@ -36,6 +40,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -117,32 +123,54 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		List<String> scopesList = Collections.emptyList();
 		long iconFileEntryId = 0;
 
+		OAuth2Application oAuth2Application = null;
 		try {
 			if (oAuth2ApplicationId == 0) {
-				_oAuth2ApplicationService.addOAuth2Application(
-					allowedGrantTypesList, clientConfidential, clientId,
-					clientSecret, description, homePageURL, iconFileEntryId,
-					name, privacyPolicyURL, redirectURIsList, scopesList, serviceContext);
+				oAuth2Application =
+					_oAuth2ApplicationService.addOAuth2Application(
+						allowedGrantTypesList, clientConfidential, clientId,
+						clientSecret, description, homePageURL, iconFileEntryId,
+						name, privacyPolicyURL, redirectURIsList, scopesList,
+						serviceContext);
 			}
 			else {
-				OAuth2Application oAuth2Application =
+				oAuth2Application =
 					_oAuth2ApplicationService.getOAuth2Application(
 						oAuth2ApplicationId);
 
+				iconFileEntryId = oAuth2Application.getIconFileEntryId();
 				scopesList = oAuth2Application.getScopesList();
 
-				_oAuth2ApplicationService.updateOAuth2Application(
-					oAuth2ApplicationId, allowedGrantTypesList, clientConfidential,
-					clientId, clientSecret, description, homePageURL,
-					iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
-					scopesList, serviceContext);
+				oAuth2Application =
+					_oAuth2ApplicationService.updateOAuth2Application(
+						oAuth2ApplicationId, allowedGrantTypesList,
+						clientConfidential, clientId, clientSecret, description,
+						homePageURL, iconFileEntryId, name, privacyPolicyURL,
+						redirectURIsList, scopesList, serviceContext);
+			}
+
+			UploadPortletRequest uploadPortletRequest =
+				_portal.getUploadPortletRequest(request);
+
+			String sourceFileName = uploadPortletRequest.getFileName("icon");
+
+			if (sourceFileName != null) {
+				try (InputStream inputStream =
+						 uploadPortletRequest.getFileAsStream("icon")) {
+
+					_oAuth2ApplicationService.updateIcon(
+						oAuth2Application.getOAuth2ApplicationId(),
+						inputStream);
+				}
 			}
 		}
-		catch (PortalException pe) {
-			response.setRenderParameter(
-				"mvcPath", "/admin/edit_oauth2application.jsp");
+		catch (PortalException | IOException pe) {
+			_log.error(pe);
 
-			Class<? extends PortalException> peClass = pe.getClass();
+			response.setRenderParameter(
+				"mvcPath", "/admin/edit_application.jsp");
+
+			Class<?> peClass = pe.getClass();
 
 			SessionErrors.add(request, peClass.getName());
 		}
@@ -161,6 +189,9 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			oAuth2TokenId, oAuth2RefreshTokenId);
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		OAuth2AdminPortlet.class);
+
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;
 	@Reference
@@ -169,5 +200,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 	private OAuth2AuthorizationService _oAuth2AuthorizationService;
 	@Reference
 	private OAuth2TokenService _oAuth2TokenService;
+	@Reference
+	private Portal _portal;
 
 }
