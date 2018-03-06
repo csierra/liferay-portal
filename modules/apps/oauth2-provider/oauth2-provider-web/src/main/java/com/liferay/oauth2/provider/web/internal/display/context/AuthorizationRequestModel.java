@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 
 /**

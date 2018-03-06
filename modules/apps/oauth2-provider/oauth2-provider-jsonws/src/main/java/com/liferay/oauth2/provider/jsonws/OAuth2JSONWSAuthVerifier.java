@@ -15,12 +15,13 @@
 package com.liferay.oauth2.provider.jsonws;
 
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
-import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.rest.spi.BearerTokenProvider;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2TokenLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -64,9 +65,9 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	public void activate(BundleContext bundleContext){
 		_bundleContext = bundleContext;
 
-		_scopedBearerTokenProvider = new ScopedServiceTrackerMap<>(
-			bundleContext, BearerTokenProvider.class, "liferay.oauth2.client.id",
-			() -> _defaultBearerTokenProvider);
+		_scopedBearerTokenProvider = _scopedServiceTrackerMapFactory.create(
+			bundleContext, BearerTokenProvider.class,
+			"liferay.oauth2.client.id", () -> _defaultBearerTokenProvider);
 	}
 
 	@Override
@@ -231,7 +232,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private volatile ScopeFinderLocator _scopeFinderLocator;
+	private volatile ScopeLocator _scopeFinderLocator;
 
 	@Reference
 	private OAuth2TokenLocalService _oAuth2TokenLocalService;
@@ -245,7 +246,10 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	@Reference
 	private OAuth2SAPEntryScopesPublisher _oAuth2SAPEntryScopesPublisher;
 
-	private ScopedServiceTrackerMap<BearerTokenProvider>
+	@Reference
+	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
+
+	private ScopedServiceTrackerMap<com.liferay.oauth2.provider.rest.spi.BearerTokenProvider>
 		_scopedBearerTokenProvider;
 
 }

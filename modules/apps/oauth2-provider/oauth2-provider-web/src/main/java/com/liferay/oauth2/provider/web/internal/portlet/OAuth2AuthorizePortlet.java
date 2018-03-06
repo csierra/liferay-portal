@@ -14,10 +14,10 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet;
 
-import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeDescriptorLocator;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
+import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
@@ -186,7 +186,7 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 	private OAuth2ApplicationService _oAuth2ApplicationService;
 	
 	@Reference
-	private ScopeFinderLocator _scopeFinderLocator;
+	private ScopeLocator _scopeFinderLocator;
 
 	@Reference
 	ScopeDescriptorLocator _scopeDescriptorLocator;

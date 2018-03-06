@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scope.impl.feature;
 
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeContext;
+import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 

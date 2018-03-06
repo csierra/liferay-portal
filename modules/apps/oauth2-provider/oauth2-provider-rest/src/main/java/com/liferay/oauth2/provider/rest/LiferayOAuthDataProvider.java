@@ -20,14 +20,15 @@ import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.configuration.OAuth2RefreshTokenGrantConfiguration;
 import com.liferay.oauth2.provider.configuration.OAuth2ResourceOwnerGrantConfiguration;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
-import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.rest.spi.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.BearerTokenProvider.AccessToken;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
@@ -93,7 +94,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	private PortalCache<String, ServerAuthorizationCodeGrant>
 		_codeGrantsPortalCache;
 
-	private ScopedServiceTrackerMap<BearerTokenProvider>
+	private ScopedServiceTrackerMap<com.liferay.oauth2.provider.rest.spi.BearerTokenProvider>
 		_scopedBearerTokenProvider;
 
 	public LiferayOAuthDataProvider() {
@@ -114,9 +115,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		_codeGrantsPortalCache = (PortalCache<String, ServerAuthorizationCodeGrant>)
 			_multiVMPool.getPortalCache("oauth2-provider-code-grants");
 
-		_scopedBearerTokenProvider = new ScopedServiceTrackerMap<>(
-			bundleContext, BearerTokenProvider.class, "liferay.oauth2.client.id",
-			() -> _defaultBearerTokenProvider);
+		_scopedBearerTokenProvider = _scopedServiceTrackerMapFactory.create(
+			bundleContext, BearerTokenProvider.class,
+			"liferay.oauth2.client.id", () -> _defaultBearerTokenProvider);
 	}
 
 	@Override
@@ -1070,7 +1071,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	private UserLocalService _userLocalService;
 
 	@Reference
-	private ScopeFinderLocator _scopeFinderLocator;
+	private ScopeLocator _scopeFinderLocator;
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
@@ -1082,4 +1083,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		target = "(name=default)"
 	)
 	private BearerTokenProvider _defaultBearerTokenProvider;
+
+	@Reference
+	ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 }

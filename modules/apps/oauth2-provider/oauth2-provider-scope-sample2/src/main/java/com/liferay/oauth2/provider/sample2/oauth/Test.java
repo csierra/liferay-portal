@@ -20,7 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
 import com.liferay.oauth2.provider.scope.RequiresNoScope;
 import com.liferay.oauth2.provider.scope.RequiresScope;
-import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 
 import java.util.Collection;
 import java.util.Set;
@@ -31,7 +31,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
 
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
+import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import org.osgi.framework.Bundle;
@@ -79,7 +79,7 @@ public class Test extends Application {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
 		Collection<LiferayOAuth2Scope> scopes =
-			_scopeFinderLocator.listScopesAliases(companyId).stream().flatMap(
+			_scopeFinderLocator.locateScopeAliases(companyId).stream().flatMap(
 				s -> _scopeFinderLocator.locateScopes(companyId, s).stream()
 			).collect(
 				Collectors.toList()
@@ -102,7 +102,7 @@ public class Test extends Application {
 	}
 
 	@Reference
-	private ScopeFinderLocator _scopeFinderLocator;
+	private ScopeLocator _scopeFinderLocator;
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

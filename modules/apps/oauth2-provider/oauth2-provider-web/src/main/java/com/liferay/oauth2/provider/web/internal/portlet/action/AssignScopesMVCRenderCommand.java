@@ -14,10 +14,10 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
-import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeDescriptorLocator;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeMatcherFactoryLocator;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
+import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
+import com.liferay.oauth2.provider.scope.liferay.ScopeMatcherFactoryLocator;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
@@ -72,7 +72,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		long companyId = company.getCompanyId();
 
 		Collection<String> externalAliases =
-			_scopeFinderLocator.listScopesAliases(companyId);
+			_scopeFinderLocator.locateScopeAliases(companyId);
 
 		Map<String, Set<String>> implicationMap = _buildImplicationMap(
 			companyId, externalAliases);
@@ -157,7 +157,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 
 	@Reference
-	private ScopeFinderLocator _scopeFinderLocator;
+	private ScopeLocator _scopeFinderLocator;
 
 
 	@Reference

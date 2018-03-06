@@ -12,20 +12,29 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.liferay.api;
+package com.liferay.oauth2.provider.scope.liferay;
+
+import com.liferay.portal.kernel.model.Company;
 
 import org.osgi.framework.Bundle;
 
 /**
- * Interface representing the whole information for a scope in a Liferay
- * environment. An external scope name will match several scope internally.
+ * This interface represents the context associated to the scope.
+ * This scope, together with the scope name, will univocally identify
+ * a checking point in a Liferay environment.
+ *
+ * @author Carlos Sierra Andrés
  */
-public interface LiferayOAuth2Scope {
+public interface ScopeContext {
 
-	public Bundle getBundle();
+	public void clear();
 
-	public String getApplicationName();
+	public void setApplicationName(String applicationName);
 
-	public String getScope();
+	public void setBundle(Bundle bundle);
+
+	public void setCompany(Company company);
+
+	public void setTokenString(String tokenString);
 
 }

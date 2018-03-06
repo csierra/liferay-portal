@@ -16,11 +16,10 @@ package com.liferay.oauth2.provider.scope.impl.jaxrs;
 
 import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.PortalUtil;
-import org.osgi.framework.BundleContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -30,7 +29,6 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.function.Supplier;
 
 public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 
@@ -39,13 +37,12 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 	private ScopeChecker _scopeChecker;
 
 	public ScopedRequestScopeChecker(
-		BundleContext bundleContext, ScopeChecker scopeChecker,
-		Supplier<RequestScopeCheckerFilter> defaultRequestScopeCheckerSupplier) {
+		ScopedServiceTrackerMap<RequestScopeCheckerFilter>
+			scopedServiceTrackerMap, ScopeChecker scopeChecker) {
+		_scopedServiceTrackerMap = scopedServiceTrackerMap;
 
 		_scopeChecker = scopeChecker;
-		_scopedServiceTrackerMap = new ScopedServiceTrackerMap<>(
-			bundleContext, RequestScopeCheckerFilter.class, "osgi.jaxrs.name",
-			defaultRequestScopeCheckerSupplier);
+
 	}
 
 	@Override

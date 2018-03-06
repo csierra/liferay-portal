@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.scope.impl.feature;
 
 import com.liferay.oauth2.provider.scope.ScopeChecker;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.ScopedRequestScopeChecker;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
@@ -22,7 +23,7 @@ import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.CompanyRetrieverContainerRequestFilter;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.RunnableExecutorContainerResponseFilter;
 import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeContext;
+import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
@@ -99,8 +100,10 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 		context.register(
 			new ScopedRequestScopeChecker(
-				_bundleContext, _scopeChecker,
-				() -> _defaultRequestScopeChecker),
+				_scopedServiceTrackerMapFactory.create(
+					_bundleContext, RequestScopeCheckerFilter.class,
+					"osgi.jaxrs.name", () -> _defaultRequestScopeChecker),
+				_scopeChecker),
 			Priorities.AUTHORIZATION - 8);
 
 		context.register(
@@ -428,6 +431,9 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		target = "(default=true)"
 	)
 	private volatile ScopeDescriptor _defaultScopeDescriptor;
+
+	@Reference
+	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 
 	private static ThreadLocal<Boolean> _initializedThreadLocal =
 		ThreadLocal.withInitial(() -> Boolean.FALSE);

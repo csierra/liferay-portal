@@ -16,7 +16,7 @@ package com.liferay.oauth2.provider.scope.impl;
 
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeContext;
+import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.StringPool;
@@ -122,11 +122,6 @@ public class ThreadLocalServiceScopeChecker
 	@Override
 	public void setApplicationName(String applicationName) {
 		_applicationName.set(applicationName);
-	}
-
-	@Override
-	public String getTokenString() {
-		return _tokenString.get();
 	}
 
 	@Override

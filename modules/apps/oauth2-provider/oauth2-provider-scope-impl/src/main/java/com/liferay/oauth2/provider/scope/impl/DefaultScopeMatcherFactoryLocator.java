@@ -15,7 +15,7 @@
 package com.liferay.oauth2.provider.scope.impl;
 
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeMatcherFactoryLocator;
+import com.liferay.oauth2.provider.scope.liferay.ScopeMatcherFactoryLocator;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import org.osgi.framework.BundleContext;

@@ -27,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -39,10 +41,9 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import com.liferay.oauth2.provider.scope.impl.model.LiferayOAuth2ScopeImpl;
-import com.liferay.oauth2.provider.scope.liferay.api.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeFinderLocator;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopeMatcherFactoryLocator;
-import com.liferay.oauth2.provider.scope.liferay.api.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
+import com.liferay.oauth2.provider.scope.liferay.ScopeMatcherFactoryLocator;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
@@ -55,10 +56,9 @@ import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReference
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
-import com.liferay.portal.kernel.util.StringPool;
 
-@Component(immediate = true, service = ScopeFinderLocator.class)
-public class ScopeRegistry implements ScopeFinderLocator {
+@Component(immediate = true, service = ScopeLocator.class)
+public class ScopeRegistry implements ScopeLocator {
 
 	private ConcurrentMap<String, Object> _invocationCache =
 		new ConcurrentHashMap<>();
@@ -156,7 +156,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 
 		for (String applicationName : applicationNames) {
 			scopesAliases.addAll(
-				listScopesAliasesForApplication(companyId, applicationName));
+				locateScopeAliasesForApplication(companyId, applicationName));
 		}
 
 		return scopesAliases;
@@ -217,11 +217,11 @@ public class ScopeRegistry implements ScopeFinderLocator {
 					bundleContext), Comparator.naturalOrder(),
 				new CacheClearServiceTrackerMapListener());
 
-		_scopedScopeFinders = new ScopedServiceTrackerMap<>(
+		_scopedScopeFinders = _scopedServiceTrackerMapFactory.create(
 			bundleContext, ScopeFinder.class, "osgi.jaxrs.name", null,
 			_invocationCache::clear);
 
-		_scopedPrefixHandlerFactories = new ScopedServiceTrackerMap<>(
+		_scopedPrefixHandlerFactories = _scopedServiceTrackerMapFactory.create(
 			bundleContext, PrefixHandlerFactory.class, "osgi.jaxrs.name",
 			() -> (_defaultPrefixHandlerFactory != null ? 
 				_defaultPrefixHandlerFactory : 
@@ -229,7 +229,7 @@ public class ScopeRegistry implements ScopeFinderLocator {
 						PrefixHandler.PASSTHROUGH_PREFIXHANDLER),
 			_invocationCache::clear);
 
-		_scopedScopeMapper = new ScopedServiceTrackerMap<>(
+		_scopedScopeMapper = _scopedServiceTrackerMapFactory.create(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
 			() -> (_defaultScopeMapper != null ? 
 				_defaultScopeMapper : ScopeMapper.PASSTHROUGH_SCOPEMAPPER), 
@@ -256,6 +256,9 @@ public class ScopeRegistry implements ScopeFinderLocator {
 		cardinality = ReferenceCardinality.OPTIONAL
 	)
 	private ScopeMapper _defaultScopeMapper;
+
+	@Reference
+	ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 	
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
@@ -286,14 +289,14 @@ public class ScopeRegistry implements ScopeFinderLocator {
 	}
 
 	@Override
-	public Collection<String> listScopesAliases(long companyId) {
+	public Collection<String> locateScopeAliases(long companyId) {
 		return readFromCache(
 			"listAliases" + companyId,
 			__ -> this._doListScopesAliases(companyId));
 	}
 
 	@Override
-	public Collection<String> listScopesAliasesForApplication(
+	public Collection<String> locateScopeAliasesForApplication(
 		long companyId, String applicationName) {
 
 		return readFromCache(
