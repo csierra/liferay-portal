@@ -33,10 +33,11 @@ public interface PrefixHandlerFactory {
 	/**
 	 * This method allows to create a {@link PrefixHandler} using the properties
 	 *
-	 * @param propertyAccessor to configure the {@link PrefixHandler} from
+	 * @param propertyAccessorFunction to configure the {@link PrefixHandler} from
 	 * @return the {@link PrefixHandler} initialized from the given properties
 	 * @review
 	 */
-	public PrefixHandler create(Function<String, Object> propertyAccessor);
+	public PrefixHandler create(
+		Function<String, Object> propertyAccessorFunction);
 
 }
