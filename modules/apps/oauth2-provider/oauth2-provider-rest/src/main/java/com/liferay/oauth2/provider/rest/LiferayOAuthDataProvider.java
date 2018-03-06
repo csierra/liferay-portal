@@ -17,12 +17,12 @@ package com.liferay.oauth2.provider.rest;
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
-import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider.AccessToken;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
@@ -1076,5 +1076,5 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	private BearerTokenProvider _defaultBearerTokenProvider;
 
 	@Reference
-	ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
+	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 }
