@@ -94,7 +94,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	private PortalCache<String, ServerAuthorizationCodeGrant>
 		_codeGrantsPortalCache;
 
-	private ScopedServiceTrackerMap<com.liferay.oauth2.provider.rest.spi.BearerTokenProvider>
+	private ScopedServiceTrackerMap<BearerTokenProvider>
 		_scopedBearerTokenProvider;
 
 	public LiferayOAuthDataProvider() {

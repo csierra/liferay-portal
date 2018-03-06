@@ -249,7 +249,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	@Reference
 	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 
-	private ScopedServiceTrackerMap<com.liferay.oauth2.provider.rest.spi.BearerTokenProvider>
+	private ScopedServiceTrackerMap<BearerTokenProvider>
 		_scopedBearerTokenProvider;
 
 }
