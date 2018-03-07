@@ -77,7 +77,7 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 				return authVerifierResult;
 			}
 
-			_scopeContext.setTokenString(accessToken.getTokenKey());
+			_scopeContext.setAccessToken(accessToken.getTokenKey());
 
 			ServiceAccessPolicyThreadLocal.addActiveServiceAccessPolicyName(
 				_serviceAccessPolicyManager.getDefaultUserServiceAccessPolicyName(

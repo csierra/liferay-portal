@@ -30,7 +30,7 @@ import javax.ws.rs.core.Context;
 public class CompanyRetrieverContainerRequestFilter
 	implements ContainerRequestFilter {
 
-	public CompanyRetrieverContainerRequestFilter(Consumer<Company> consumer) {
+	public CompanyRetrieverContainerRequestFilter(Consumer<Long> consumer) {
 		_consumer = consumer;
 	}
 
@@ -38,15 +38,10 @@ public class CompanyRetrieverContainerRequestFilter
 	public void filter(ContainerRequestContext requestContext)
 		throws IOException {
 
-		try {
-			_consumer.accept(PortalUtil.getCompany(_httpServletRequest));
-		}
-		catch (PortalException pe) {
-			pe.printStackTrace();
-		}
+		_consumer.accept(PortalUtil.getCompanyId(_httpServletRequest));
 	}
 
-	private Consumer<Company> _consumer;
+	private Consumer<Long> _consumer;
 
 	@Context
 	private HttpServletRequest _httpServletRequest;

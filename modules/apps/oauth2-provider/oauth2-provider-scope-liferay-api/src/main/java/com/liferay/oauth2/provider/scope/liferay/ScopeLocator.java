@@ -17,8 +17,11 @@ package com.liferay.oauth2.provider.scope.liferay;
 import java.util.Collection;
 
 /**
- * This interface allows to access the ScopeFinders with <i>per-company</i>
- * configurations in a Liferay environment.
+ * This interface allows to list scope aliases and matching
+ * {@link LiferayOAuth2Scope}s based on a portal instance configuration of
+ * OAuth2 Framework.<br />
+ * Scope alias can match multiple {@link LiferayOAuth2Scope}s based on
+ * particular portal instance configuration of OAuth2 Framework.
  *
  * @author Carlos Sierra Andrés
  * @review
@@ -26,46 +29,51 @@ import java.util.Collection;
 public interface ScopeLocator {
 
 	/**
-	 * Returns a list of the scope aliases that would be a match if
-	 * requested for a company.
-	 * @param company the company to list the scope names
-	 * @return a collection of scope aliases that would be a match for the
-	 * company.
+	 * Returns a list of scope aliases available for the given portal instance.
+	 * <br />
+	 *
+	 * @param companyId the portal instance context
+	 * @return a non-null collection of scope aliases from the portal instance
 	 * @review
 	 */
 	public Collection<String> locateScopeAliases(long companyId);
 
 	/**
-	 * Returns a list of the scope aliases that would be a match if
-	 * requested for an application.
-	 * @param company the application to list the scope aliases
-	 * @return a collection of scope aliases that would be a match for the
-	 * company.
+	 * Returns a list of scope aliases available for the given portal instance,
+	 * filtered by application name.
+	 *
+	 * @param companyId the portal instance context
+	 * @param applicationName name of application exporting the scopes
+	 * @return a non-null collection of scope aliases from the portal instance
+	 * filtered by {@code applicationName}
 	 * @review
 	 */
 	public Collection<String> locateScopeAliasesForApplication(
 		long companyId, String applicationName);
 
 	/**
-	 * returns a collection of matching scope according to the configuration
-	 * for that company.
-	 * @param company the company for which the scopes are to be located
-	 * @param scope the requested scope
-	 * @return a collection of matching scopes for the given company and
-	 * scope name
+	 * Returns a collection of scopes matching {@code scopesAlias} in the given
+	 * portal instance.
+
+	 * @param companyId the company for which the scopes are to be located
+	 * @param scopesAlias the scope alias the scopes are mapped to
+	 * @return a collection of one or more matching scopes for the given company
+	 * and scope alias
 	 * @review
 	 */
 	public Collection<LiferayOAuth2Scope> locateScopes(
 		long companyId, String scopesAlias);
 
 	/**
-	 * returns a collection of matching scope according to the configuration
-	 * for that application.
+	 * Returns a collection of scopes matching {@code scopesAlias} in the given
+	 * portal instance filtered by {@code applicationName}.
+	 *
+	 * @param companyId the company for which the scopes are to be located
+	 * @param scopesAlias the scope alias the scopes are mapped to
 	 * @param applicationName the application for which the scopes are to be
 	 * located
-	 * @param scope the requested scope
-	 * @return a collection of matching scopes for the given application and
-	 * scope name
+	 * @return a collection of one or more matching scopes for the given company
+	 * and scope alias, filtered by {@code applicationName}
 	 * @review
 	 */
 	public Collection<LiferayOAuth2Scope> locateScopesForApplication(

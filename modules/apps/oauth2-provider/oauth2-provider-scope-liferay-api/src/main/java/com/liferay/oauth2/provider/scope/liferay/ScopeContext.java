@@ -14,27 +14,47 @@
 
 package com.liferay.oauth2.provider.scope.liferay;
 
-import com.liferay.portal.kernel.model.Company;
-
 import org.osgi.framework.Bundle;
 
 /**
- * This interface represents the context associated to the scope.
- * This scope, together with the scope name, will univocally identify
- * a checking point in a Liferay environment.
+ * This interface represents the context surrounding per-request scope check
+ * security procedure.
  *
  * @author Carlos Sierra Andrés
+ * @review
  */
 public interface ScopeContext {
 
+	/**
+	 * Reset state of the context
+	 */
 	public void clear();
 
+	/**
+	 * Sets application name into the context to be used during security check
+	 * @param applicationName
+	 * @review
+	 */
 	public void setApplicationName(String applicationName);
 
+	/**
+	 * Sets OSGi bundle into the context to be used during security check
+	 * @param bundle
+	 * @review
+	 */
 	public void setBundle(Bundle bundle);
 
-	public void setCompany(Company company);
+	/**
+	 * Sets request companyId into the context to be used during security check
+	 * @param companyId
+	 */
+	public void setCompanyId(long companyId);
 
-	public void setTokenString(String tokenString);
+	/**
+	 * Sets access token string into the context to be used during security
+	 * check
+	 * @param accessToken
+	 */
+	public void setAccessToken(String accessToken);
 
 }

@@ -18,7 +18,6 @@ import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import org.osgi.framework.Bundle;
@@ -37,7 +36,7 @@ public class ThreadLocalServiceScopeChecker
 		() -> StringPool.BLANK);
 	ThreadLocal<String> _applicationName = ThreadLocal.withInitial(
 		() -> StringPool.BLANK);
-	ThreadLocal<String> _tokenString = ThreadLocal.withInitial(
+	ThreadLocal<String> _accessToken = ThreadLocal.withInitial(
 		() -> StringPool.BLANK);
 
 	@Override
@@ -49,7 +48,7 @@ public class ThreadLocalServiceScopeChecker
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
 			_oAuth2ScopeGrantLocalService.findByA_BSN_C_T(
 				_applicationName.get(), _bundleSymbolicName.get(),
-				_companyIdThreadLocal.get(), _tokenString.get());
+				_companyIdThreadLocal.get(), _accessToken.get());
 
 		return oAuth2ScopeGrants.stream().anyMatch(
 			o -> scope.equals(o.getOAuth2ScopeName()));
@@ -64,7 +63,7 @@ public class ThreadLocalServiceScopeChecker
 			new ArrayList<>(
 				_oAuth2ScopeGrantLocalService.findByA_BSN_C_T(
 					_applicationName.get(), _bundleSymbolicName.get(),
-					_companyIdThreadLocal.get(), _tokenString.get()));
+					_companyIdThreadLocal.get(), _accessToken.get()));
 
 		if (scopes.length > oAuth2ScopeGrants.size()) {
 			return false;
@@ -93,7 +92,7 @@ public class ThreadLocalServiceScopeChecker
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
 			_oAuth2ScopeGrantLocalService.findByA_BSN_C_T(
 				_applicationName.get(), _bundleSymbolicName.get(),
-				_companyIdThreadLocal.get(), _tokenString.get());
+				_companyIdThreadLocal.get(), _accessToken.get());
 
 		for (String scope : scopes) {
 			if (Validator.isNull(scope)) {
@@ -110,8 +109,8 @@ public class ThreadLocalServiceScopeChecker
 	}
 
 	@Override
-	public void setCompany(Company company) {
-		_companyIdThreadLocal.set(company.getCompanyId());
+	public void setCompanyId(long companyId) {
+		_companyIdThreadLocal.set(companyId);
 	}
 
 	@Override
@@ -125,8 +124,8 @@ public class ThreadLocalServiceScopeChecker
 	}
 
 	@Override
-	public void setTokenString(String tokenString) {
-		_tokenString.set(tokenString);
+	public void setAccessToken(String accessToken) {
+		_accessToken.set(accessToken);
 	}
 
 	@Override
@@ -134,7 +133,7 @@ public class ThreadLocalServiceScopeChecker
 		_applicationName.remove();
 		_bundleSymbolicName.remove();
 		_companyIdThreadLocal.remove();
-		_tokenString.remove();
+		_accessToken.remove();
 	}
 
 	@Reference

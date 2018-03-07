@@ -91,7 +91,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 	public boolean configure(FeatureContext context) {
 		context.register(
 			new CompanyRetrieverContainerRequestFilter(
-				_scopeContext::setCompany),
+				_scopeContext::setCompanyId),
 			Priorities.AUTHORIZATION - 10);
 
 		context.register(
