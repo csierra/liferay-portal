@@ -27,6 +27,7 @@ import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.servlet.filters.authverifier.AuthVerifierFilter;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -37,8 +38,10 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 
+import javax.servlet.Filter;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.DynamicFeature;
@@ -67,7 +70,7 @@ import java.util.ResourceBundle;
 	}
 )
 @Provider
-public class LiferayOAuth2OSGiFeatureRegistrator implements Feature {
+public class LiferayOAuth2OSGiFeature implements Feature {
 
 	private BundleContext _bundleContext;
 	private Bundle _bundle;
@@ -137,7 +140,7 @@ public class LiferayOAuth2OSGiFeatureRegistrator implements Feature {
 
 		context.register(
 			new CompanyRetrieverContainerRequestFilter(
-				_scopeContext::setCompany),
+				_scopeContext::setCompanyId),
 			Priorities.AUTHORIZATION - 10);
 
 		context.register(
@@ -197,6 +200,8 @@ public class LiferayOAuth2OSGiFeatureRegistrator implements Feature {
 		}
 
 		registerDescriptors(applicationName);
+
+		registerAuthVerifierFilter("context.for" + applicationName);
 
 		return true;
 	}
@@ -297,7 +302,25 @@ public class LiferayOAuth2OSGiFeatureRegistrator implements Feature {
 	}
 
 	private void registerAuthVerifierFilter(String contextSelect) {
+		Dictionary<String, Object> properties = new Hashtable<>();
 
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+			contextSelect);
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_NAME,
+			AuthVerifierFilter.class.getName());
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_PATTERN, "/*");
+		properties.put(
+			HttpWhiteboardConstants.
+				HTTP_WHITEBOARD_FILTER_INIT_PARAM_PREFIX +
+					"authVerifierProperties",
+			"auth.verifier.OAuth2RestAuthVerifier.urls.includes=*");
+
+		_serviceRegistrations.add(
+			_bundleContext.registerService(
+				Filter.class, new AuthVerifierFilter(), properties));
 	}
 
 
