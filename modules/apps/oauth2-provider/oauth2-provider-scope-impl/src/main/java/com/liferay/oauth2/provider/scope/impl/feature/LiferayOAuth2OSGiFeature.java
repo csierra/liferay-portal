@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -67,7 +68,8 @@ import java.util.ResourceBundle;
 		"osgi.jaxrs.name=Liferay.OAuth2",
 		"osgi.jaxrs.application.select=(osgi.jaxrs.extension.select=\\(liferay.extension=OAuth2\\))",
 		"liferay.extension=OAuth2"
-	}
+	},
+	scope = ServiceScope.PROTOTYPE
 )
 @Provider
 public class LiferayOAuth2OSGiFeature implements Feature {
@@ -295,7 +297,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					LocaleUtil.toLanguageId(locale));
 
 			String key = "oauth2.application.description." +
-						 _applicationClassName;
+				 _applicationClassName;
 
 			return resourceBundle.getString(key);
 		}

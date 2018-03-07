@@ -1,3 +1,39 @@
 Bundle-Name: Liferay Portal Remote JAXRS Whiteboard RI
 Bundle-SymbolicName: com.liferay.portal.remote.jaxrs.ri
 Bundle-Version: 1.0.0
+Export-Package:\
+	org.apache.cxf;version="3.2.2",\
+	org.apache.cxf.attachment;version="3.2.2",\
+	org.apache.cxf.common.classloader;version="3.2.2",\
+	org.apache.cxf.common.logging;version="3.2.2",\
+	org.apache.cxf.common.security;version="3.2.2",\
+	org.apache.cxf.common.util;version="3.2.2",\
+	org.apache.cxf.configuration.security;version="3.2.2",\
+	org.apache.cxf.endpoint;version="3.2.2",\
+	org.apache.cxf.helpers;version="3.2.2",\
+	org.apache.cxf.interceptor;version="3.2.2",\
+	org.apache.cxf.interceptor.security;version="3.2.2",\
+	org.apache.cxf.io;version="3.2.2",\
+	org.apache.cxf.jaxrs;version="3.2.2",\
+	org.apache.cxf.jaxrs.ext;version="3.2.2",\
+	org.apache.cxf.jaxrs.impl;version="3.2.2",\
+	org.apache.cxf.jaxrs.json.basic;version="3.2.2",\
+	org.apache.cxf.jaxrs.model;version="3.2.2",\
+	org.apache.cxf.jaxrs.provider;version="3.2.2",\
+	org.apache.cxf.jaxrs.utils;version="3.2.2",\
+	org.apache.cxf.jaxrs.utils.multipart;version="3.2.2",\
+	org.apache.cxf.message;version="3.2.2",\
+	org.apache.cxf.phase;version="3.2.2",\
+	org.apache.cxf.resource;version="3.2.2",\
+	org.apache.cxf.security;version="3.2.2",\
+	org.apache.cxf.security.transport;version="3.2.2",\
+	org.apache.cxf.service.model;version="3.2.2",\
+	org.apache.cxf.staxutils;version="3.2.2",\
+	org.apache.cxf.staxutils.transform;version="3.2.2",\
+	org.apache.cxf.transport.http.auth;version="3.2.2",\
+	org.apache.cxf.helpers;version="3.2.2",\
+	org.apache.cxf.helpers;version="3.2.2",\
+	org.apache.cxf.helpers;version="3.2.2",\
+	org.apache.cxf.common.util;version="3.2.2"
+Fragment-Host: org.apache.aries.jax.rs.whiteboard
+-fixupmessages: Exporting an empty package...;is:=ignore
