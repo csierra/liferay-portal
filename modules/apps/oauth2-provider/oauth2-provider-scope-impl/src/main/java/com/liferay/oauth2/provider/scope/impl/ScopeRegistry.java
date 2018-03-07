@@ -43,7 +43,6 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import com.liferay.oauth2.provider.scope.impl.model.LiferayOAuth2ScopeImpl;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
-import com.liferay.oauth2.provider.scope.liferay.ScopeMatcherFactoryLocator;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
@@ -63,6 +62,8 @@ public class ScopeRegistry implements ScopeLocator {
 	private ConcurrentMap<String, Object> _invocationCache =
 		new ConcurrentHashMap<>();
 	private ScopedServiceTrackerMap<ScopeFinder> _scopedScopeFinders;
+	private ServiceTrackerMap<String, ScopeMatcherFactory>
+		_scopedScopeMatcherFactories;
 
 	private Collection<LiferayOAuth2Scope> _doLocateScopes(
 		long companyId, String scopesAlias) {
@@ -85,7 +86,11 @@ public class ScopeRegistry implements ScopeLocator {
 		long companyId, String scopesAlias, String applicationName) {
 
 		ScopeMatcherFactory scopeMatcherFactory =
-			_scopeMatcherFactoryLocator.locateScopeMatcherFactory(companyId);
+			_scopedScopeMatcherFactories.getService(Long.toString(companyId));
+
+		if (scopeMatcherFactory == null) {
+			scopeMatcherFactory = _defaultScopeMatcherFactory;
+		}
 
 		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
 			_scopeFinderByNameServiceTrackerMap.getService(applicationName);
@@ -234,6 +239,10 @@ public class ScopeRegistry implements ScopeLocator {
 			() -> (_defaultScopeMapper != null ? 
 				_defaultScopeMapper : ScopeMapper.PASSTHROUGH_SCOPEMAPPER), 
 			_invocationCache::clear);
+
+		_scopedScopeMatcherFactories =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, ScopeMatcherFactory.class, "company.id");
 	}
 
 	@Deactivate
@@ -263,12 +272,12 @@ public class ScopeRegistry implements ScopeLocator {
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
 
-	@Reference
-	private ScopeMatcherFactoryLocator _scopeMatcherFactoryLocator;
-
 	private ServiceTrackerMap<
 		String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
 			_scopeFinderByNameServiceTrackerMap;
+
+	@Reference(name = "default")
+	private ScopeMatcherFactory _defaultScopeMatcherFactory;
 
 	@Override
 	public Collection<LiferayOAuth2Scope> locateScopes(

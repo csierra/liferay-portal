@@ -54,7 +54,6 @@ public interface ScopeLocator {
 	/**
 	 * Returns a collection of scopes matching {@code scopesAlias} in the given
 	 * portal instance.
-
 	 * @param companyId the company for which the scopes are to be located
 	 * @param scopesAlias the scope alias the scopes are mapped to
 	 * @return a collection of one or more matching scopes for the given company

@@ -31,6 +31,13 @@ public interface ScopeContext {
 	public void clear();
 
 	/**
+	 * Sets access token string into the context to be used during security
+	 * check
+	 * @param accessToken
+	 */
+	public void setAccessToken(String accessToken);
+
+	/**
 	 * Sets application name into the context to be used during security check
 	 * @param applicationName
 	 * @review
@@ -49,12 +56,5 @@ public interface ScopeContext {
 	 * @param companyId
 	 */
 	public void setCompanyId(long companyId);
-
-	/**
-	 * Sets access token string into the context to be used during security
-	 * check
-	 * @param accessToken
-	 */
-	public void setAccessToken(String accessToken);
 
 }

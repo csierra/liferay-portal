@@ -33,19 +33,6 @@ public class DefaultScopeDescriptorLocator implements ScopeDescriptorLocator {
 		_scopeDescriptorsByApplicationName;
 
 	@Override
-	public ScopeDescriptor locateScopeDescriptorForCompany(long companyId) {
-
-		ScopeDescriptor scopeDescriptor =
-			_scopeDescriptorsByCompany.getService(Long.toString(companyId));
-
-		if (scopeDescriptor == null) {
-			return _defaultScopeDescriptor;
-		}
-
-		return scopeDescriptor;
-	}
-
-	@Override
 	public ScopeDescriptor locateScopeDescriptorForApplication(
 		String applicationName) {
 

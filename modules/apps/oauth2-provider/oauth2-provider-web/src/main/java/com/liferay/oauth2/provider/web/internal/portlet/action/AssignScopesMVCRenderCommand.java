@@ -17,11 +17,8 @@ package com.liferay.oauth2.provider.web.internal.portlet.action;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
-import com.liferay.oauth2.provider.scope.liferay.ScopeMatcherFactoryLocator;
-import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
-import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel.ApplicationScopeDescriptor;
@@ -43,9 +40,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys.SCOPES;
 
@@ -73,9 +68,6 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 		Collection<String> externalAliases =
 			_scopeFinderLocator.locateScopeAliases(companyId);
-
-		Map<String, Set<String>> implicationMap = _buildImplicationMap(
-			companyId, externalAliases);
 
 		Map<String, AuthorizationRequestModel> aliasedScopes = new HashMap<>();
 		
@@ -112,29 +104,6 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		return "/admin/assign_scopes.jsp";
 	}
 
-	private Map<String, Set<String>> _buildImplicationMap(
-		long companyId, Collection<String> aliases) {
-
-		ScopeMatcherFactory scopeMatcherFactory =
-			_scopeMatcherFactoryLocator.locateScopeMatcherFactory(companyId);
-
-		HashMap<String, Set<String>> implications = new HashMap<>();
-
-		for (String alias : aliases) {
-			ScopeMatcher scopeMatcher = scopeMatcherFactory.create(alias);
-
-			Set<String> filtered = new HashSet<>(scopeMatcher.filter(aliases));
-
-			filtered.remove(alias);
-
-			if (!filtered.isEmpty()) {
-				implications.put(alias, filtered);
-			}
-		}
-
-		return implications;
-	}
-
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_applicationDescriptors = ServiceTrackerMapFactory.openSingleValueMap(
@@ -159,8 +128,5 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 	@Reference
 	private ScopeLocator _scopeFinderLocator;
 
-
-	@Reference
-	ScopeMatcherFactoryLocator _scopeMatcherFactoryLocator;
 
 }

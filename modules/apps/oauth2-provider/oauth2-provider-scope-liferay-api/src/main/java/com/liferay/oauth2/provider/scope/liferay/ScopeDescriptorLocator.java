@@ -24,6 +24,4 @@ public interface ScopeDescriptorLocator {
 	public ScopeDescriptor locateScopeDescriptorForApplication(
 		String applicationName);
 
-	public ScopeDescriptor locateScopeDescriptorForCompany(long companyId);
-
 }
