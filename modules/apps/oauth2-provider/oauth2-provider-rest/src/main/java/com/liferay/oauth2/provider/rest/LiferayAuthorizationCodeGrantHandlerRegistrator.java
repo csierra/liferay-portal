@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,22 +50,33 @@ import java.util.Objects;
 )
 public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
+	public static final String AUTHORIZATION_CODE_PKCE_GRANT =
+		"authorization_code_pkce";
+
 	private ServiceRegistration<AccessTokenGrantHandler>
 		_grantHandlerServiceRegistration;
 	private ServiceRegistration<Object> _endpointServiceRegistration;
+
+	private boolean _enabled;
+	private boolean _pkceEnabled;
 
 	@Activate
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		boolean enabled = MapUtil.getBoolean(
+		_enabled = MapUtil.getBoolean(
 				properties, "oauth2.allow.authorization.code.grant", true);
 
-		if (enabled) {
+		_pkceEnabled = MapUtil.getBoolean(
+				properties, "oauth2.allow.authorization.code.pkce.grant", true);
+
+		if (_enabled || _pkceEnabled) {
 			AuthorizationCodeGrantService authorizationCodeGrantService =
 				new AuthorizationCodeGrantService();
 
-			authorizationCodeGrantService.setCanSupportPublicClients(true);
+			authorizationCodeGrantService.setCanSupportPublicClients(
+				_pkceEnabled);
+
 			authorizationCodeGrantService.setDataProvider(
 				_liferayOAuthDataProvider);
 
@@ -85,7 +97,7 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 				_liferayOAuthDataProvider);
 
 			authorizationCodeGrantHandler.setExpectCodeVerifierForPublicClients(
-				true);
+				_pkceEnabled);
 
 			authorizationCodeGrantHandler.setCodeVerifierTransformer(
 				new DigestCodeVerifier());
@@ -155,6 +167,20 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 				_log.debug("Client authentication doesn't mach code's client");
 			}
 
+			return false;
+		}
+
+		if (!client.isConfidential()) {
+			if (!_pkceEnabled) {
+				return false;
+			}
+
+			List<String> allowedGrantTypes = client.getAllowedGrantTypes();
+			if (!allowedGrantTypes.contains(AUTHORIZATION_CODE_PKCE_GRANT)) {
+				return false;
+			}
+		}
+		else if (!_enabled) {
 			return false;
 		}
 

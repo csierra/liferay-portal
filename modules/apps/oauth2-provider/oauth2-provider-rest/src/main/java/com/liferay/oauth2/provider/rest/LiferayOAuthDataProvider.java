@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.rest;
 
 import com.liferay.oauth2.provider.configuration.OAuth2AuthorizationCodeGrantConfiguration;
+import com.liferay.oauth2.provider.configuration.OAuth2AuthorizationCodePKCEGrantConfiguration;
 import com.liferay.oauth2.provider.configuration.OAuth2ClientCredentialsGrantConfiguration;
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.configuration.OAuth2RefreshTokenGrantConfiguration;
@@ -879,47 +880,60 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		return client;
 	}
 	
+
 	protected void filterEnabledAllowedGrantTypes(long companyId, Client client)
 		throws ConfigurationException {
 
-		boolean authorizationCodeGrantEnabled = 
-			_oAuth2Configuration.allowAuthorizationCodeGrant() 
+		boolean authorizationCodeGrantEnabled =
+			_oAuth2Configuration.allowAuthorizationCodeGrant()
 				&& _configurationProvider.getCompanyConfiguration(
 					OAuth2AuthorizationCodeGrantConfiguration.class, companyId)
 				.enabled();
-		
-		boolean clientCredentialsGrantEnabled = 
-			_oAuth2Configuration.allowClientCredentialsGrant() 
+
+		boolean authorizationCodeGrantPKCEEnabled =
+			_oAuth2Configuration.allowAuthorizationCodeGPKCEGrant()
+				&& _configurationProvider.getCompanyConfiguration(
+					OAuth2AuthorizationCodePKCEGrantConfiguration.class,
+					companyId).enabled();
+
+		boolean clientCredentialsGrantEnabled =
+			_oAuth2Configuration.allowClientCredentialsGrant()
 				&& _configurationProvider.getCompanyConfiguration(
 					OAuth2ClientCredentialsGrantConfiguration.class, companyId)
 				.enabled();
-		
-		boolean resourceOwnerPasswordCredentialGrantEnabled = 
-			_oAuth2Configuration.allowResourceOwnerPasswordCredentialsGrant() 
+
+		boolean resourceOwnerPasswordCredentialGrantEnabled =
+			_oAuth2Configuration.allowResourceOwnerPasswordCredentialsGrant()
 				&& _configurationProvider.getCompanyConfiguration(
 					OAuth2ResourceOwnerGrantConfiguration.class, companyId)
 				.enabled();
-		
-		boolean refreshTokenGrantEnabled = 
-			_oAuth2Configuration.allowRefreshTokenGrant() 
+
+		boolean refreshTokenGrantEnabled =
+			_oAuth2Configuration.allowRefreshTokenGrant()
 				&& _configurationProvider.getCompanyConfiguration(
 					OAuth2RefreshTokenGrantConfiguration.class, companyId)
 				.enabled();
 
 		List<String> allowedGrantTypes = client.getAllowedGrantTypes();
-		
+
 		if (!authorizationCodeGrantEnabled) {
 			allowedGrantTypes.remove(OAuthConstants.AUTHORIZATION_CODE_GRANT);
 		}
-		
+
+		if (!authorizationCodeGrantPKCEEnabled) {
+			allowedGrantTypes.remove(
+				LiferayAuthorizationCodeGrantHandlerRegistrator.
+					AUTHORIZATION_CODE_PKCE_GRANT);
+		}
+
 		if (!clientCredentialsGrantEnabled) {
 			allowedGrantTypes.remove(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
 		}
-		
+
 		if (!resourceOwnerPasswordCredentialGrantEnabled) {
 			allowedGrantTypes.remove(OAuthConstants.RESOURCE_OWNER_GRANT);
 		}
-		
+
 		if (!refreshTokenGrantEnabled) {
 			allowedGrantTypes.remove(OAuthConstants.REFRESH_TOKEN_GRANT);
 		}

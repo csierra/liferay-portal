@@ -20,6 +20,12 @@ public interface OAuth2Configuration {
 	public boolean allowAuthorizationCodeGrant();
 
 	@Meta.AD(
+		deflt = "true", id = "oauth2.allow.authorization.code.pkce.grant",
+		name = "oauth2-allow-authorization-code-pkce-grant", required = false
+	)
+	public boolean allowAuthorizationCodeGPKCEGrant();
+
+	@Meta.AD(
 		deflt = "true",
 		id = "oauth2.allow.resource.owner.password.credentials.grant",
 		name = "oauth2-allow-resource-owner-password-credentials-grant",
