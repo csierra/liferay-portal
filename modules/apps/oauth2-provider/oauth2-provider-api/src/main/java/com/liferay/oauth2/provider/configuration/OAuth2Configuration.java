@@ -23,7 +23,7 @@ public interface OAuth2Configuration {
 		deflt = "true", id = "oauth2.allow.authorization.code.pkce.grant",
 		name = "oauth2-allow-authorization-code-pkce-grant", required = false
 	)
-	public boolean allowAuthorizationCodeGPKCEGrant();
+	public boolean allowAuthorizationCodePKCEGrant();
 
 	@Meta.AD(
 		deflt = "true",

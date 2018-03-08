@@ -913,7 +913,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				.enabled();
 
 		boolean authorizationCodeGrantPKCEEnabled =
-			_oAuth2Configuration.allowAuthorizationCodeGPKCEGrant()
+			_oAuth2Configuration.allowAuthorizationCodePKCEGrant()
 				&& _configurationProvider.getCompanyConfiguration(
 					OAuth2AuthorizationCodePKCEGrantConfiguration.class,
 					companyId).enabled();
