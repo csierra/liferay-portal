@@ -49,10 +49,10 @@ renderResponse.setTitle(headerTitle);
 			/>
 
 			<aui:fieldset label="details">
+				<aui:input name="name" required="true" />
 				<aui:field-wrapper>
-					<aui:input name="name" required="true" />
+					<aui:input label="icon" name="icon" type="file" inlineField="true"/>
 					<c:if test="<%= oAuth2Application != null && oAuth2Application.getIconFileEntryId() > 0%>">
-						<aui:input label="icon" name="icon" type="file" inlineField="true"/>
 						<%
 							String thumbnailURL = StringPool.BLANK;
 
