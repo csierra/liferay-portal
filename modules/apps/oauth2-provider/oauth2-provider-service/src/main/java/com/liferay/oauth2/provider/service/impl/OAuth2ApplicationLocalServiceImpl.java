@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.service.impl;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
+import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -27,12 +28,10 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.ContentTypes;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -65,7 +64,7 @@ public class OAuth2ApplicationLocalServiceImpl
 	@Override
 	public OAuth2Application addOAuth2Application(
 			long companyId, long userId,
-			String userName, List<String> allowedGrantTypesList,
+			String userName, List<GrantType> allowedGrantTypesList,
 			boolean clientConfidential, String clientId, String clientSecret,
 			String description, String homePageURL, long iconFileEntryId,
 			String name, String privacyPolicyURL, List<String> redirectURIsList,
@@ -163,7 +162,7 @@ public class OAuth2ApplicationLocalServiceImpl
 
 	@Override
 	public OAuth2Application updateOAuth2Application(
-			long oAuth2ApplicationId, List<String>  allowedGrantTypesList,
+			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
 			boolean clientConfidential, String clientId, String clientSecret,
 			String description, String homePageURL, long iconFileEntryId,
 			String name, String privacyPolicyURL, List<String> redirectURIsList,

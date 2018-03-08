@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet;
 
+import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
@@ -42,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -109,9 +111,19 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		String homePageURL = ParamUtil.get(
 			request, "homePageURL", StringPool.BLANK);
 
-		List<String> allowedGrantTypesList = Arrays.asList(
-			ParamUtil.getParameterValues(
-				request, "allowedGrantTypes", new String[0]));
+		List<String> allowedGrantTypeNames =
+			new ArrayList(Arrays.asList(ParamUtil.getParameterValues(
+				request, "allowedGrantTypeNames",
+				new String[]{Boolean.FALSE.toString()})));
+
+		allowedGrantTypeNames.remove(Boolean.FALSE.toString());
+
+		List<GrantType> allowedGrantTypes = new ArrayList<>(
+			allowedGrantTypeNames.size());
+
+		for (String allowedGrantTypeName : allowedGrantTypeNames) {
+			allowedGrantTypes.add(GrantType.valueOf(allowedGrantTypeName));
+		}
 
 		String privacyPolicyURL = ParamUtil.get(
 			request, "privacyPolicyURL", StringPool.BLANK);
@@ -128,7 +140,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			if (oAuth2ApplicationId == 0) {
 				oAuth2Application =
 					_oAuth2ApplicationService.addOAuth2Application(
-						allowedGrantTypesList, clientConfidential, clientId,
+						allowedGrantTypes, clientConfidential, clientId,
 						clientSecret, description, homePageURL, iconFileEntryId,
 						name, privacyPolicyURL, redirectURIsList, scopesList,
 						serviceContext);
@@ -143,7 +155,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 				oAuth2Application =
 					_oAuth2ApplicationService.updateOAuth2Application(
-						oAuth2ApplicationId, allowedGrantTypesList,
+						oAuth2ApplicationId, allowedGrantTypes,
 						clientConfidential, clientId, clientSecret, description,
 						homePageURL, iconFileEntryId, name, privacyPolicyURL,
 						redirectURIsList, scopesList, serviceContext);

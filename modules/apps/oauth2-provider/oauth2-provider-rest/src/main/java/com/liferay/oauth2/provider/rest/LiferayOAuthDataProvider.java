@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.configuration.OAuth2ClientCredentialsGrantCon
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.configuration.OAuth2RefreshTokenGrantConfiguration;
 import com.liferay.oauth2.provider.configuration.OAuth2ResourceOwnerGrantConfiguration;
+import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -110,7 +111,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		_codeGrantsPortalCache = (PortalCache<String, ServerAuthorizationCodeGrant>)
 			_multiVMPool.getPortalCache("oauth2-provider-code-grants");
-		_oAuth2Configuration = 
+		_oAuth2Configuration =
 			ConfigurableUtil.createConfigurable(
 				OAuth2Configuration.class, properties);
 		_codeGrantsPortalCache = (PortalCache<String, ServerAuthorizationCodeGrant>)
@@ -563,7 +564,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		OAuth2Application oAuth2Application =
 			resolveOAuth2Application(client);
-		
+
 		OAuth2RefreshToken oAuth2RefreshToken =
 			_oAuth2RefreshTokenLocalService.createOAuth2RefreshToken(
 				refreshToken.getTokenKey());
@@ -735,7 +736,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				return null;
 			}
 
-			OAuth2Application oAuth2Application = 
+			OAuth2Application oAuth2Application =
 				_oAuth2ApplicationLocalService.getOAuth2Application(
 					oAuth2RefreshToken.getOAuth2ApplicationId());
 
@@ -844,15 +845,37 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			oAuth2Application.getName(),
 			oAuth2Application.getHomePageURL());
 
-		List<String> allowedGrantTypes =
+		List<GrantType> allowedGrantTypes =
 			oAuth2Application.getAllowedGrantTypesList();
 
-		// CXF considers no allowed grant types as allow all!
-		if (allowedGrantTypes.isEmpty()) {
-			allowedGrantTypes.add(StringPool.BLANK);
+		List<String> clientGrantTypes = client.getAllowedGrantTypes();
+
+		for (GrantType allowedGrantType : allowedGrantTypes) {
+			if (allowedGrantType == GrantType.AUTHORIZATION_CODE) {
+				clientGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
+			}
+			else if (allowedGrantType == GrantType.AUTHORIZATION_CODE_PKCE) {
+				clientGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
+				clientGrantTypes.add(
+					LiferayAuthorizationCodeGrantHandlerRegistrator.
+						AUTHORIZATION_CODE_PKCE_GRANT);
+			}
+			else if (allowedGrantType == GrantType.CLIENT_CREDENTIALS) {
+				clientGrantTypes.add(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
+			}
+			else if (allowedGrantType == GrantType.RESOURCE_OWNER_PASSWORD) {
+				clientGrantTypes.add(OAuthConstants.RESOURCE_OWNER_GRANT);
+			}
+			else if (allowedGrantType == GrantType.REFRESH_TOKEN) {
+				clientGrantTypes.add(OAuthConstants.REFRESH_TOKEN_GRANT);
+			}
 		}
 
-		client.setAllowedGrantTypes(allowedGrantTypes);
+		// CXF considers no allowed grant types as allow all!
+
+		if (clientGrantTypes.isEmpty()) {
+			clientGrantTypes.add(StringPool.BLANK);
+		}
 
 		client.setApplicationDescription(
 			oAuth2Application.getDescription());
@@ -872,14 +895,13 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		try {
 			filterEnabledAllowedGrantTypes(companyId, client);
-		} 
+		}
 		catch (ConfigurationException e) {
 			throw new SystemException(e);
 		}
 
 		return client;
 	}
-	
 
 	protected void filterEnabledAllowedGrantTypes(long companyId, Client client)
 		throws ConfigurationException {

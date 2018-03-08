@@ -15,7 +15,7 @@
 package com.liferay.oauth2.provider.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
-import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -44,8 +44,17 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	}
 
 	@Override
-	public List<String> getAllowedGrantTypesList(){
-		return Arrays.asList(StringUtil.split(getAllowedGrantTypes()));
+	public List<GrantType> getAllowedGrantTypesList(){
+		Stream<String> stream =
+			Arrays.stream(StringUtil.split(getAllowedGrantTypes()));
+
+		List<GrantType> oAuth2ProviderGrantTypes = stream.map(
+			GrantType::valueOf
+		).collect(
+			Collectors.toList()
+		);
+
+		return oAuth2ProviderGrantTypes;
 	}
 
 	@Override
@@ -60,8 +69,16 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	}
 
 	@Override
-	public void setAllowedGrantTypesList(List<String> allowedGrantTypesList) {
-		String allowedGrantTypes = StringUtil.merge(allowedGrantTypesList);
+	public void setAllowedGrantTypesList(
+		List<GrantType> allowedGrantTypesList) {
+
+		Stream<GrantType> stream = allowedGrantTypesList.stream();
+
+		String allowedGrantTypes = stream.map(
+			GrantType::toString
+		).collect(
+			Collectors.joining(StringPool.COMMA)
+		);
 
 		setAllowedGrantTypes(allowedGrantTypes);
 	}

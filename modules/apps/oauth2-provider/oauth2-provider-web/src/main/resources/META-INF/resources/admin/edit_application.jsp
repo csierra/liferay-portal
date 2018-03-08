@@ -1,4 +1,4 @@
-<%--
+<%@ page import="com.liferay.oauth2.provider.constants.GrantType" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -75,11 +75,14 @@ renderResponse.setTitle(headerTitle);
 				<aui:input name="clientSecret" />
 				<aui:input label="redirect-uris" name="redirectURIs" helpMessage="redirect-uris-help" />
 				<aui:fieldset label="allowed-grant-types">
-					<aui:input name="allowedGrantTypes" type="checkbox" label="authorization_code-grant" value="authorization_code" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains("authorization_code") %>" />
-					<aui:input name="allowedGrantTypes" type="checkbox" label="authorization_code_pkce-grant" value="authorization_code_pkce" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains("authorization_code_pkce") %>" />
-					<aui:input name="allowedGrantTypes" type="checkbox" label="client_credentials-grant" value="client_credentials" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains("client_credentials") %>" />
-					<aui:input name="allowedGrantTypes" type="checkbox" label="password-grant" value="password" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains("password") %>" />
-					<aui:input name="allowedGrantTypes" type="checkbox" label="refresh_token-grant" value="refresh_token" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains("refresh_token") %>" />
+					<%
+						for (GrantType grantType : GrantType.values()) {
+							String grantTypeName = grantType.name();
+					%>
+						<aui:input name="allowedGrantTypeNames" type="checkbox" label="<%= grantTypeName + "-grant" %>" value="<%= grantTypeName %>" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains(grantType) %>" />
+					<%
+						}
+					%>
 				</aui:fieldset>
 			</aui:fieldset>
 		</aui:fieldset-group>

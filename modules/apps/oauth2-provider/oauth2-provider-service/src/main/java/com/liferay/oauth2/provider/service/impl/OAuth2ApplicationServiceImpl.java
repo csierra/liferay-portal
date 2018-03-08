@@ -16,13 +16,10 @@ package com.liferay.oauth2.provider.service.impl;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
+import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.model.OAuth2Token;
-import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationServiceBaseImpl;
-import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -32,7 +29,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,11 +55,11 @@ public class OAuth2ApplicationServiceImpl
 
 	@Override
 	public OAuth2Application addOAuth2Application(
-			List<String> allowedGrantTypesList, boolean clientConfidential,
-			String clientId, String clientSecret, String description,
-			String homePageURL, long iconFileEntryId, String name,
-			String privacyPolicyURL, List<String> redirectURIsList,
-			List<String> scopesList, ServiceContext serviceContext)
+		List<GrantType> allowedGrantTypesList,
+		boolean clientConfidential, String clientId, String clientSecret,
+		String description, String homePageURL, long iconFileEntryId,
+		String name, String privacyPolicyURL, List<String> redirectURIsList,
+		List<String> scopesList, ServiceContext serviceContext)
 		throws PortalException {
 
 		check(OAuth2ProviderActionKeys.ACTION_ADD_APPLICATION);
@@ -151,7 +147,8 @@ public class OAuth2ApplicationServiceImpl
 
 	@Override
 	public OAuth2Application updateOAuth2Application(
-			long oAuth2ApplicationId, List<String> allowedGrantTypesList,
+			long oAuth2ApplicationId,
+			List<GrantType> allowedGrantTypesList,
 			boolean clientConfidential, String clientId, String clientSecret,
 			String description, String homePageURL, long iconFileEntryId,
 			String name, String privacyPolicyURL, List<String> redirectURIsList,
