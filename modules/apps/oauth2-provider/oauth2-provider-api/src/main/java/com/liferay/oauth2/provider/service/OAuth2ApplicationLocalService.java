@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 
@@ -66,12 +67,11 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 
 	/**
 	* NOTE FOR DEVELOPERS:
-	*
+	* <p>
 	* Never reference this class directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
 	*/
 	public OAuth2Application addOAuth2Application(long companyId, long userId,
-		java.lang.String userName,
-		List<java.lang.String> allowedGrantTypesList,
+		java.lang.String userName, List<GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
 		java.lang.String homePageURL, long iconFileEntryId,
@@ -251,11 +251,11 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 		InputStream inputStream) throws PortalException;
 
 	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
-		List<java.lang.String> allowedGrantTypesList,
-		boolean clientConfidential, java.lang.String clientId,
-		java.lang.String clientSecret, java.lang.String description,
-		java.lang.String homePageURL, long iconFileEntryId,
-		java.lang.String name, java.lang.String privacyPolicyURL,
+		List<GrantType> allowedGrantTypesList, boolean clientConfidential,
+		java.lang.String clientId, java.lang.String clientSecret,
+		java.lang.String description, java.lang.String homePageURL,
+		long iconFileEntryId, java.lang.String name,
+		java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
 		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;

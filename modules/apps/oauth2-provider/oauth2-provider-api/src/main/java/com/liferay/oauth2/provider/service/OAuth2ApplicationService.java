@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 
@@ -61,11 +62,11 @@ public interface OAuth2ApplicationService extends BaseService {
 	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2ApplicationServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public OAuth2Application addOAuth2Application(
-		List<java.lang.String> allowedGrantTypesList,
-		boolean clientConfidential, java.lang.String clientId,
-		java.lang.String clientSecret, java.lang.String description,
-		java.lang.String homePageURL, long iconFileEntryId,
-		java.lang.String name, java.lang.String privacyPolicyURL,
+		List<GrantType> allowedGrantTypesList, boolean clientConfidential,
+		java.lang.String clientId, java.lang.String clientSecret,
+		java.lang.String description, java.lang.String homePageURL,
+		long iconFileEntryId, java.lang.String name,
+		java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
 		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;
@@ -110,11 +111,11 @@ public interface OAuth2ApplicationService extends BaseService {
 		InputStream inputStream) throws PortalException;
 
 	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
-		List<java.lang.String> allowedGrantTypesList,
-		boolean clientConfidential, java.lang.String clientId,
-		java.lang.String clientSecret, java.lang.String description,
-		java.lang.String homePageURL, long iconFileEntryId,
-		java.lang.String name, java.lang.String privacyPolicyURL,
+		List<GrantType> allowedGrantTypesList, boolean clientConfidential,
+		java.lang.String clientId, java.lang.String clientSecret,
+		java.lang.String description, java.lang.String homePageURL,
+		long iconFileEntryId, java.lang.String name,
+		java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
 		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;

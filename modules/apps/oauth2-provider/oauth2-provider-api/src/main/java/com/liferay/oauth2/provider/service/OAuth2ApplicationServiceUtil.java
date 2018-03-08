@@ -42,7 +42,7 @@ public class OAuth2ApplicationServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2ApplicationServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
-		java.util.List<java.lang.String> allowedGrantTypesList,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
 		java.lang.String homePageURL, long iconFileEntryId,
@@ -124,7 +124,7 @@ public class OAuth2ApplicationServiceUtil {
 
 	public static com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
 		long oAuth2ApplicationId,
-		java.util.List<java.lang.String> allowedGrantTypesList,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
 		java.lang.String homePageURL, long iconFileEntryId,

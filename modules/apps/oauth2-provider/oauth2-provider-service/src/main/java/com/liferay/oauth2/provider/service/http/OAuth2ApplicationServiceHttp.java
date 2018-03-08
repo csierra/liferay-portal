@@ -57,7 +57,7 @@ import com.liferay.portal.kernel.util.MethodKey;
 public class OAuth2ApplicationServiceHttp {
 	public static com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
 		HttpPrincipal httpPrincipal,
-		java.util.List<java.lang.String> allowedGrantTypesList,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
 		java.lang.String homePageURL, long iconFileEntryId,
@@ -291,7 +291,7 @@ public class OAuth2ApplicationServiceHttp {
 
 	public static com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
 		HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
-		java.util.List<java.lang.String> allowedGrantTypesList,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
 		java.lang.String homePageURL, long iconFileEntryId,

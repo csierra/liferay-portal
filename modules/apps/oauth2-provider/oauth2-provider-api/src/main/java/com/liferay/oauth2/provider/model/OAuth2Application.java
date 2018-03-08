@@ -55,14 +55,14 @@ public interface OAuth2Application extends OAuth2ApplicationModel, PersistedMode
 			}
 		};
 
-	public java.util.List<java.lang.String> getAllowedGrantTypesList();
+	public java.util.List<com.liferay.oauth2.provider.constants.GrantType> getAllowedGrantTypesList();
 
 	public java.util.List<java.lang.String> getRedirectURIsList();
 
 	public java.util.List<java.lang.String> getScopesList();
 
 	public void setAllowedGrantTypesList(
-		java.util.List<java.lang.String> allowedGrantTypesList);
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList);
 
 	public void setRedirectURIsList(
 		java.util.List<java.lang.String> redirectURIsList);

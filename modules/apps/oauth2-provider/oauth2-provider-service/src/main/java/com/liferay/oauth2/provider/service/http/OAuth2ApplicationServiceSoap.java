@@ -66,7 +66,7 @@ import java.rmi.RemoteException;
 @ProviderType
 public class OAuth2ApplicationServiceSoap {
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap addOAuth2Application(
-		java.util.List<java.lang.String> allowedGrantTypesList,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
 		java.lang.String homePageURL, long iconFileEntryId,
@@ -182,7 +182,7 @@ public class OAuth2ApplicationServiceSoap {
 
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap updateOAuth2Application(
 		long oAuth2ApplicationId,
-		java.util.List<java.lang.String> allowedGrantTypesList,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
 		java.lang.String homePageURL, long iconFileEntryId,

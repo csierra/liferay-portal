@@ -36,13 +36,13 @@ public class OAuth2ApplicationLocalServiceWrapper
 
 	/**
 	* NOTE FOR DEVELOPERS:
-	*
+	* <p>
 	* Never reference this class directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
 	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
 		long companyId, long userId, java.lang.String userName,
-		java.util.List<java.lang.String> allowedGrantTypesList,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
 		java.lang.String homePageURL, long iconFileEntryId,
@@ -303,7 +303,7 @@ public class OAuth2ApplicationLocalServiceWrapper
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
 		long oAuth2ApplicationId,
-		java.util.List<java.lang.String> allowedGrantTypesList,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
 		java.lang.String homePageURL, long iconFileEntryId,

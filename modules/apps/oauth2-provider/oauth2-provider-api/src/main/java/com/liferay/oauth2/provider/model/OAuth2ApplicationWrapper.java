@@ -206,7 +206,7 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	}
 
 	@Override
-	public java.util.List<java.lang.String> getAllowedGrantTypesList() {
+	public java.util.List<com.liferay.oauth2.provider.constants.GrantType> getAllowedGrantTypesList() {
 		return _oAuth2Application.getAllowedGrantTypesList();
 	}
 
@@ -447,7 +447,7 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 
 	@Override
 	public void setAllowedGrantTypesList(
-		java.util.List<java.lang.String> allowedGrantTypesList) {
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList) {
 		_oAuth2Application.setAllowedGrantTypesList(allowedGrantTypesList);
 	}
 
