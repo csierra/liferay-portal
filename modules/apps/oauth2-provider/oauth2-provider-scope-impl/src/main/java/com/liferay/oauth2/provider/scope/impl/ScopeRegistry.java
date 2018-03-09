@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -85,13 +86,11 @@ public class ScopeRegistry implements ScopeLocator {
 	private Collection<LiferayOAuth2Scope> _doLocateScopesForApplication(
 		long companyId, String scopesAlias, String applicationName) {
 
-		ScopeMatcherFactory scopeMatcherFactory =
-			_scopedScopeMatcherFactories.getService(Long.toString(companyId));
-
-		if (scopeMatcherFactory == null) {
-			scopeMatcherFactory = _defaultScopeMatcherFactory;
-		}
-
+		ScopeMatcherFactory scopeMatcherFactory = 
+			Optional.ofNullable(
+				_scopedScopeMatcherFactories.getService(Long.toString(companyId))
+			).orElse(_defaultScopeMatcherFactory);
+		
 		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
 			_scopeFinderByNameServiceTrackerMap.getService(applicationName);
 
@@ -121,8 +120,6 @@ public class ScopeRegistry implements ScopeLocator {
 		ScopeMapper scopeMapper = _scopedScopeMapper.getService(
 			companyId, applicationName);
 
-		ScopeMatcher scopeMatcher = scopeMatcherFactory.create(scopesAlias);
-
 		Map<String, Boolean> matchCache = new HashMap<>();
 		Collection<LiferayOAuth2Scope> locatedScopes = 
 			new ArrayList<>(scopes.size());
@@ -134,8 +131,11 @@ public class ScopeRegistry implements ScopeLocator {
 				boolean matched = 
 					matchCache.computeIfAbsent(
 						mappedScope, 
-						(input) -> 
-							scopeMatcher.match(prefixHandler.addPrefix(input)));
+						input -> 
+							scopeMatchesScopesAlias(
+								input, scopeMatcherFactory, 
+								prefixHandler, scopesAlias)
+					);
 				
 				if (matched) {
 					locatedScopes.add(
@@ -146,6 +146,29 @@ public class ScopeRegistry implements ScopeLocator {
 		}
 
 		return locatedScopes;
+	}
+
+	private Boolean scopeMatchesScopesAlias(
+			String scope, ScopeMatcherFactory scopeMatcherFactory,
+			PrefixHandler prefixHandler, String scopesAlias) {
+		
+		String prefixedMappedScope = 
+			prefixHandler.addPrefix(scope);
+		
+		String prefix = 
+			prefixedMappedScope.substring(
+				0, prefixedMappedScope.length() - scope.length());
+
+		if (!scopesAlias.startsWith(prefix)) {
+			return false;
+		}
+		
+		scopesAlias = scopesAlias.substring(prefix.length());
+		
+		ScopeMatcher scopeMatcher = 
+			scopeMatcherFactory.create(scopesAlias);
+			
+		return scopeMatcher.match(scope);
 	}
 
 	private ScopedServiceTrackerMap<PrefixHandlerFactory>
