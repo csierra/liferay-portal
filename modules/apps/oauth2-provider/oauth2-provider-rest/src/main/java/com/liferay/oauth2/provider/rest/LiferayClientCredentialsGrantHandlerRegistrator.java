@@ -39,7 +39,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 @Component(
-	configurationPid = "com.liferay.oauth2.configuration.OAuth2Configuration",
+	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2Configuration",
 	immediate = true
 )
 public class LiferayClientCredentialsGrantHandlerRegistrator {

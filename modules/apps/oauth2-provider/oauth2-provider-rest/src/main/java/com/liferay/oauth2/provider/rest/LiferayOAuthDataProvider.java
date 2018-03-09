@@ -84,7 +84,7 @@ import java.util.Set;
 
 @Component(
 	service = LiferayOAuthDataProvider.class,
-	configurationPid = "com.liferay.oauth2.configuration.OAuth2Configuration"
+	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2Configuration"
 )
 public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvider {
 

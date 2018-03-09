@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Component(
-	configurationPid = "com.liferay.oauth2.configuration.OAuth2Configuration",
+	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2Configuration",
 	immediate = true
 )
 public class LiferayAuthorizationCodeGrantHandlerRegistrator {
