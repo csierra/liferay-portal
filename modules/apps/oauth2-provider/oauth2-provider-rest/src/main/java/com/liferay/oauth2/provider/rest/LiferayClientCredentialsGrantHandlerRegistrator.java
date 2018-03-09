@@ -14,6 +14,8 @@
 
 package com.liferay.oauth2.provider.rest;
 
+import com.liferay.oauth2.provider.configuration.OAuth2AuthorizationCodeGrantConfiguration;
+import com.liferay.oauth2.provider.configuration.OAuth2ClientCredentialsGrantConfiguration;
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -21,6 +23,8 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -105,6 +109,16 @@ public class LiferayClientCredentialsGrantHandlerRegistrator {
 			return false;
 		}
 
+		if (!isClientCredentialsEnabled(oAuth2Application.getCompanyId())) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Client credentials grant is disabled in " +
+						oAuth2Application.getCompanyId());
+			}
+
+			return false;
+		}
+
 		if (permissionChecker.hasOwnerPermission(
 			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
 			oAuth2Application.getOAuth2ApplicationId(),
@@ -132,9 +146,36 @@ public class LiferayClientCredentialsGrantHandlerRegistrator {
 		return false;
 	}
 
+	protected boolean isClientCredentialsEnabled(long companyId) {
+		try {
+			OAuth2ClientCredentialsGrantConfiguration
+				oAuth2ClientCredentialsGrantConfiguration =
+				_configurationProvider.getCompanyConfiguration(
+					OAuth2ClientCredentialsGrantConfiguration.class,
+					companyId);
+
+			if (!oAuth2ClientCredentialsGrantConfiguration.enabled()) {
+				return false;
+			}
+		}
+		catch (ConfigurationException e) {
+			_log.error(
+				"Unable to load OAuth2ClientCredentialsGrantConfiguration" +
+					" for " + companyId,
+				e);
+
+			return false;
+		}
+
+		return true;
+	}
+
 	private static Log _log =
 		LogFactoryUtil.getLog(
 			LiferayClientCredentialsGrantHandlerRegistrator.class);
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;

@@ -851,23 +851,40 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		List<String> clientGrantTypes = client.getAllowedGrantTypes();
 
 		for (GrantType allowedGrantType : allowedGrantTypes) {
-			if (allowedGrantType == GrantType.AUTHORIZATION_CODE) {
+			if (_oAuth2Configuration.allowAuthorizationCodeGrant() &&
+					(allowedGrantType == GrantType.AUTHORIZATION_CODE)) {
+
 				clientGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
 			}
-			else if (allowedGrantType == GrantType.AUTHORIZATION_CODE_PKCE) {
+			else if (_oAuth2Configuration.allowAuthorizationCodePKCEGrant() &&
+					 (allowedGrantType == GrantType.AUTHORIZATION_CODE_PKCE)) {
+
 				clientGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
 				clientGrantTypes.add(
 					LiferayAuthorizationCodeGrantHandlerRegistrator.
 						AUTHORIZATION_CODE_PKCE_GRANT);
 			}
-			else if (allowedGrantType == GrantType.CLIENT_CREDENTIALS) {
+			else if (_oAuth2Configuration.allowClientCredentialsGrant() &&
+					 (allowedGrantType == GrantType.CLIENT_CREDENTIALS)) {
+
 				clientGrantTypes.add(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
 			}
-			else if (allowedGrantType == GrantType.RESOURCE_OWNER_PASSWORD) {
+			else if (
+				_oAuth2Configuration.
+					allowResourceOwnerPasswordCredentialsGrant() &&
+				(allowedGrantType == GrantType.RESOURCE_OWNER_PASSWORD)) {
+
 				clientGrantTypes.add(OAuthConstants.RESOURCE_OWNER_GRANT);
 			}
-			else if (allowedGrantType == GrantType.REFRESH_TOKEN) {
+			else if (_oAuth2Configuration.allowRefreshTokenGrant() &&
+					 (allowedGrantType == GrantType.REFRESH_TOKEN)) {
+
 				clientGrantTypes.add(OAuthConstants.REFRESH_TOKEN_GRANT);
+			} else {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Unknown or disabled grant type " + allowedGrantType);
+				}
 			}
 		}
 
@@ -893,74 +910,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		client.getProperties().put("companyId", Long.toString(companyId));
 
-		try {
-			filterEnabledAllowedGrantTypes(companyId, client);
-		}
-		catch (ConfigurationException e) {
-			throw new SystemException(e);
-		}
-
 		return client;
-	}
-
-	protected void filterEnabledAllowedGrantTypes(long companyId, Client client)
-		throws ConfigurationException {
-
-		boolean authorizationCodeGrantEnabled =
-			_oAuth2Configuration.allowAuthorizationCodeGrant()
-				&& _configurationProvider.getCompanyConfiguration(
-					OAuth2AuthorizationCodeGrantConfiguration.class, companyId)
-				.enabled();
-
-		boolean authorizationCodeGrantPKCEEnabled =
-			_oAuth2Configuration.allowAuthorizationCodePKCEGrant()
-				&& _configurationProvider.getCompanyConfiguration(
-					OAuth2AuthorizationCodePKCEGrantConfiguration.class,
-					companyId).enabled();
-
-		boolean clientCredentialsGrantEnabled =
-			_oAuth2Configuration.allowClientCredentialsGrant()
-				&& _configurationProvider.getCompanyConfiguration(
-					OAuth2ClientCredentialsGrantConfiguration.class, companyId)
-				.enabled();
-
-		boolean resourceOwnerPasswordCredentialGrantEnabled =
-			_oAuth2Configuration.allowResourceOwnerPasswordCredentialsGrant()
-				&& _configurationProvider.getCompanyConfiguration(
-					OAuth2ResourceOwnerGrantConfiguration.class, companyId)
-				.enabled();
-
-		boolean refreshTokenGrantEnabled =
-			_oAuth2Configuration.allowRefreshTokenGrant()
-				&& _configurationProvider.getCompanyConfiguration(
-					OAuth2RefreshTokenGrantConfiguration.class, companyId)
-				.enabled();
-
-		List<String> allowedGrantTypes = client.getAllowedGrantTypes();
-
-		if (!authorizationCodeGrantEnabled) {
-			allowedGrantTypes.remove(OAuthConstants.AUTHORIZATION_CODE_GRANT);
-		}
-
-		if (!authorizationCodeGrantPKCEEnabled) {
-			allowedGrantTypes.remove(
-				LiferayAuthorizationCodeGrantHandlerRegistrator.
-					AUTHORIZATION_CODE_PKCE_GRANT);
-		}
-
-		if (!clientCredentialsGrantEnabled) {
-			allowedGrantTypes.remove(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
-		}
-
-		if (!resourceOwnerPasswordCredentialGrantEnabled) {
-			allowedGrantTypes.remove(OAuthConstants.RESOURCE_OWNER_GRANT);
-		}
-
-		if (!refreshTokenGrantEnabled) {
-			allowedGrantTypes.remove(OAuthConstants.REFRESH_TOKEN_GRANT);
-		}
-
-		client.setAllowedGrantTypes(allowedGrantTypes);
 	}
 
 	protected ServerAccessToken populateToken(OAuth2Token oAuth2Token) {
