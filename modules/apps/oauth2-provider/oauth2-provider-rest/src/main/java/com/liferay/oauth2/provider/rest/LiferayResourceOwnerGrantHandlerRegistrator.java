@@ -14,8 +14,10 @@
 
 package com.liferay.oauth2.provider.rest;
 
+import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -53,10 +55,11 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		boolean enabled = MapUtil.getBoolean(
-				properties, "oauth2.allow.resource.owner.password.credentials.grant", true);
+		OAuth2Configuration oAuth2Configuration =
+			ConfigurableUtil.createConfigurable(
+				OAuth2Configuration.class, properties);
 
-		if (enabled) {
+		if (oAuth2Configuration.allowResourceOwnerPasswordCredentialsGrant()) {
 			ResourceOwnerGrantHandler resourceOwnerGrantHandler =
 				new ResourceOwnerGrantHandler();
 

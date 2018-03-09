@@ -14,8 +14,10 @@
 
 package com.liferay.oauth2.provider.rest;
 
+import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -57,25 +59,24 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		_grantHandlerServiceRegistration;
 	private ServiceRegistration<Object> _endpointServiceRegistration;
 
-	private boolean _enabled;
-	private boolean _pkceEnabled;
+	private OAuth2Configuration _oAuth2Configuration;
 
 	@Activate
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		_enabled = MapUtil.getBoolean(
-				properties, "oauth2.allow.authorization.code.grant", true);
+		_oAuth2Configuration =
+			ConfigurableUtil.createConfigurable(
+				OAuth2Configuration.class, properties);
 
-		_pkceEnabled = MapUtil.getBoolean(
-				properties, "oauth2.allow.authorization.code.pkce.grant", true);
+		if (_oAuth2Configuration.allowAuthorizationCodeGrant() ||
+			_oAuth2Configuration.allowAuthorizationCodePKCEGrant()) {
 
-		if (_enabled || _pkceEnabled) {
 			AuthorizationCodeGrantService authorizationCodeGrantService =
 				new AuthorizationCodeGrantService();
 
 			authorizationCodeGrantService.setCanSupportPublicClients(
-				_pkceEnabled);
+				_oAuth2Configuration.allowAuthorizationCodePKCEGrant());
 
 			authorizationCodeGrantService.setDataProvider(
 				_liferayOAuthDataProvider);
@@ -97,7 +98,7 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 				_liferayOAuthDataProvider);
 
 			authorizationCodeGrantHandler.setExpectCodeVerifierForPublicClients(
-				_pkceEnabled);
+				_oAuth2Configuration.allowAuthorizationCodePKCEGrant());
 
 			authorizationCodeGrantHandler.setCodeVerifierTransformer(
 				new DigestCodeVerifier());
@@ -171,16 +172,17 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		}
 
 		if (!client.isConfidential()) {
-			if (!_pkceEnabled) {
+			if (!_oAuth2Configuration.allowAuthorizationCodePKCEGrant()) {
 				return false;
 			}
 
 			List<String> allowedGrantTypes = client.getAllowedGrantTypes();
+
 			if (!allowedGrantTypes.contains(AUTHORIZATION_CODE_PKCE_GRANT)) {
 				return false;
 			}
 		}
-		else if (!_enabled) {
+		else if (!_oAuth2Configuration.allowAuthorizationCodeGrant()) {
 			return false;
 		}
 
