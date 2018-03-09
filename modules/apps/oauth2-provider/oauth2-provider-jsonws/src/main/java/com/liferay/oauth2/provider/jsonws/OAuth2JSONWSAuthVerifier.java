@@ -113,7 +113,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 			for (String accessTokenScope : accessToken.getScopes()) {
 				Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
-					_scopeFinderLocator.locateScopesForApplication(
+					_scopeFinderLocator.getLiferayOAuth2Scopes(
 						companyId, accessTokenScope,
 						auth2PortalJSONWSApplicationName);
 				

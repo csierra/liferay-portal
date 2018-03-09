@@ -513,7 +513,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		for (String scope : scopeList) {
 			liferayScopes.addAll(
-				_scopeFinderLocator.locateScopes(companyId, scope));
+				_scopeFinderLocator.getLiferayOAuth2Scopes(companyId, scope));
 		}
 
 		try {

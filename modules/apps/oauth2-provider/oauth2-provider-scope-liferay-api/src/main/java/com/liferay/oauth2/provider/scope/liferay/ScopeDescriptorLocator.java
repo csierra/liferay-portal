@@ -21,7 +21,6 @@ import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
  */
 public interface ScopeDescriptorLocator {
 
-	public ScopeDescriptor locateScopeDescriptorForApplication(
-		String applicationName);
+	public ScopeDescriptor getScopeDescriptor(String applicationName);
 
 }

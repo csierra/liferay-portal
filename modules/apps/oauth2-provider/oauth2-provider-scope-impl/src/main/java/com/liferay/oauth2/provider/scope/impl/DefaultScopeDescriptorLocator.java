@@ -33,8 +33,7 @@ public class DefaultScopeDescriptorLocator implements ScopeDescriptorLocator {
 		_scopeDescriptorsByApplicationName;
 
 	@Override
-	public ScopeDescriptor locateScopeDescriptorForApplication(
-		String applicationName) {
+	public ScopeDescriptor getScopeDescriptor(String applicationName) {
 
 		ScopeDescriptor scopeDescriptor =
 			_scopeDescriptorsByApplicationName.getService(applicationName);

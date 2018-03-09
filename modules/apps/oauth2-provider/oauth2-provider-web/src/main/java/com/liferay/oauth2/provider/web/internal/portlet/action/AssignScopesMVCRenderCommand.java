@@ -67,14 +67,14 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		long companyId = company.getCompanyId();
 
 		Collection<String> externalAliases =
-			_scopeFinderLocator.locateScopeAliases(companyId);
+			_scopeFinderLocator.getScopeAliases(companyId);
 
 		Map<String, AuthorizationRequestModel> aliasedScopes = new HashMap<>();
 		
 		ApplicationScopeDescriptor applicationScopeDescriptor =
 			(cid, applicationName, scope) -> {
 				ScopeDescriptor scopeDescriptor =
-					_scopeDescriptorLocator.locateScopeDescriptorForApplication(
+					_scopeDescriptorLocator.getScopeDescriptor(
 						applicationName);
 
 				return scopeDescriptor.describeScope(
@@ -90,7 +90,8 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 						applicationScopeDescriptor));
 
 			Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
-				_scopeFinderLocator.locateScopes(companyId, externalAlias);
+				_scopeFinderLocator.getLiferayOAuth2Scopes(
+					companyId, externalAlias);
 
 			for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
 				authorizationRequestModel.addLiferayOAuth2Scope(liferayOAuth2Scope);

@@ -35,6 +35,6 @@ public interface ScopedServiceTrackerMapFactory {
 
 	public <T> ScopedServiceTrackerMap<T> create(
 		BundleContext bundleContext, Class<T> clazz, String property,
-		Supplier<T> defaultServiceSupplier, Runnable onChange);
+		Supplier<T> defaultServiceSupplier, Runnable onChangeRunnable);
 
 }

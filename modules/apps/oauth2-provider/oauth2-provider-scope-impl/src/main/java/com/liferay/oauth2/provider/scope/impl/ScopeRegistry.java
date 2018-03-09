@@ -75,7 +75,7 @@ public class ScopeRegistry implements ScopeLocator {
 
 		for (String applicationName : applicationNames) {
 			grants.addAll(
-				locateScopesForApplication(
+				getLiferayOAuth2Scopes(
 					companyId, scopesAlias, applicationName));
 		}
 
@@ -161,7 +161,7 @@ public class ScopeRegistry implements ScopeLocator {
 
 		for (String applicationName : applicationNames) {
 			scopesAliases.addAll(
-				locateScopeAliasesForApplication(companyId, applicationName));
+				getScopeAliases(companyId, applicationName));
 		}
 
 		return scopesAliases;
@@ -280,7 +280,7 @@ public class ScopeRegistry implements ScopeLocator {
 	private ScopeMatcherFactory _defaultScopeMatcherFactory;
 
 	@Override
-	public Collection<LiferayOAuth2Scope> locateScopes(
+	public Collection<LiferayOAuth2Scope> getLiferayOAuth2Scopes(
 		long companyId, String scopesAlias) {
 
 		return readFromCache("locateScopes" + companyId + scopesAlias,
@@ -288,7 +288,7 @@ public class ScopeRegistry implements ScopeLocator {
 	}
 
 	@Override
-	public Collection<LiferayOAuth2Scope> locateScopesForApplication(
+	public Collection<LiferayOAuth2Scope> getLiferayOAuth2Scopes(
 		long companyId, String scopesAlias, String applicationName) {
 
 		return readFromCache(
@@ -298,14 +298,14 @@ public class ScopeRegistry implements ScopeLocator {
 	}
 
 	@Override
-	public Collection<String> locateScopeAliases(long companyId) {
+	public Collection<String> getScopeAliases(long companyId) {
 		return readFromCache(
 			"listAliases" + companyId,
 			__ -> this._doListScopesAliases(companyId));
 	}
 
 	@Override
-	public Collection<String> locateScopeAliasesForApplication(
+	public Collection<String> getScopeAliases(
 		long companyId, String applicationName) {
 
 		return readFromCache(

@@ -131,9 +131,7 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 			applicationScopeDescriptor =
 			(__, applicationName, internalScope) -> {
 				ScopeDescriptor scopeDescriptor =
-					_scopeDescriptorLocator.
-						locateScopeDescriptorForApplication(
-							applicationName);
+					_scopeDescriptorLocator.getScopeDescriptor(applicationName);
 
 				return scopeDescriptor.describeScope(
 					internalScope, locale);
@@ -172,7 +170,7 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 			}
 
 			Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
-				_scopeFinderLocator.locateScopes(
+				_scopeFinderLocator.getLiferayOAuth2Scopes(
 					companyId, requestedScope);
 
 			for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
