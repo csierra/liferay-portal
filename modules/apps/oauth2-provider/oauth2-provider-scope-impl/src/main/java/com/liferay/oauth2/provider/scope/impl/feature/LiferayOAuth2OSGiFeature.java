@@ -14,14 +14,11 @@
 
 package com.liferay.oauth2.provider.scope.impl.feature;
 
-import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.CompanyRetrieverContainerRequestFilter;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.RunnableExecutorContainerResponseFilter;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
-import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
-import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
@@ -41,9 +38,7 @@ import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 
 import javax.servlet.Filter;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
@@ -51,10 +46,8 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
@@ -90,29 +83,6 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 	private Collection<ServiceTracker<?, ?>> _serviceTrackers =
 		new ArrayList<>();
 
-	protected void processRequestOperationStrategy(
-		Dictionary<String, Object> serviceProperties) {
-
-		_serviceRegistrations.add(
-			_bundleContext.registerService(
-				ScopeFinder.class,
-				new CollectionScopeFinder(
-					Arrays.asList(
-						HttpMethod.DELETE, HttpMethod.GET, HttpMethod.HEAD,
-						HttpMethod.OPTIONS, HttpMethod.POST, HttpMethod.PUT)),
-				serviceProperties));
-	}
-
-	protected void processAnnotationStrategy(
-		Dictionary<String, Object> serviceProperties,
-		Collection<String> scopes) {
-
-		_serviceRegistrations.add(
-			_bundleContext.registerService(
-				ScopeFinder.class, new CollectionScopeFinder(scopes),
-				serviceProperties));
-	}
-
 	@Override
 	public boolean configure(FeatureContext context) {
 		Configuration configuration = context.getConfiguration();
@@ -147,48 +117,8 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			Priorities.AUTHORIZATION - 9);
 
 		context.register(
-			new RunnableExecutorContainerResponseFilter(
-				_scopeContext::clear),
+			new RunnableExecutorContainerResponseFilter(_scopeContext::clear),
 			Priorities.AUTHORIZATION - 8);
-
-		Dictionary<String, Object> serviceProperties =
-			new Hashtable<>();
-		for (String property : applicationProperties.keySet()) {
-			if (property.startsWith("service.")) {
-				continue;
-			}
-			serviceProperties.put(
-				property, applicationProperties.get(property));
-		}
-
-		Object oauth2ScopeCheckerTypeObject =
-			applicationProperties.get("oauth2.scopechecker.type");
-
-		String oauth2ScopeCheckerType;
-
-		if (oauth2ScopeCheckerTypeObject == null) {
-			oauth2ScopeCheckerType = "request.operation";
-		}
-		else {
-			oauth2ScopeCheckerType =
-				oauth2ScopeCheckerTypeObject.toString();
-		}
-
-		if (oauth2ScopeCheckerType.equals("request.operation")) {
-			processRequestOperationStrategy(serviceProperties);
-		}
-
-		if (oauth2ScopeCheckerType.equals("annotations")) {
-			HashSet<String> scopes = new HashSet<>();
-
-			context.register(
-				(DynamicFeature) (resourceInfo, __) ->
-					scopes.addAll(
-						ScopeAnnotationFinder.find(
-							resourceInfo.getResourceClass())));
-
-			processAnnotationStrategy(serviceProperties, scopes);
-		}
 
 		registerDescriptors(applicationName);
 
@@ -323,9 +253,6 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private ScopeContext _scopeContext;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
-	private ScopeChecker _scopeChecker;
-
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY,
@@ -333,6 +260,4 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 	)
 	private volatile ScopeDescriptor _defaultScopeDescriptor;
 
-	@Reference
-	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 }
