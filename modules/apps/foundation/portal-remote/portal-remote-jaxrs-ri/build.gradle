@@ -1,5 +1,5 @@
 dependencies {
-	provided group: "org.apache.aries.jax.rs", name: "org.apache.aries.jax.rs.whiteboard", version: "0.0.1-20180305.164322-65"
+	provided group: "org.apache.aries.jax.rs", name: "org.apache.aries.jax.rs.whiteboard", version: "0.0.1-20180309.152155-66"
 	provided group: "org.apache.aries.spec", name: "org.apache.aries.javax.jax.rs-api", version: "0.0.1-20180226.141959-28"
 	provided group: "org.osgi", name: "org.osgi.util.promise", version: "1.1.0-20180228.161253-427"
 	provided group: "org.osgi", name: "org.osgi.util.function", version: "1.1.0-20180228.161251-428"
