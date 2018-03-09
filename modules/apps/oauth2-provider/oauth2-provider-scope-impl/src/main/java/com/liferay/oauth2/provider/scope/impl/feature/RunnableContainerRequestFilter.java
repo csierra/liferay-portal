@@ -14,47 +14,24 @@
 
 package com.liferay.oauth2.provider.scope.impl.feature;
 
-import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
-
 import java.io.IOException;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+class RunnableContainerRequestFilter implements ContainerRequestFilter {
 
-/**
- * @author Carlos Sierra Andrés
- */
-public class ScopeContextContainerRequestFilter
-	implements ContainerRequestFilter {
-
-	public ScopeContextContainerRequestFilter(ScopeContext scopeContext) {
-		_scopeContext = scopeContext;
+	public RunnableContainerRequestFilter(Runnable runnable) {
+		_runnable = runnable;
 	}
 
 	@Override
 	public void filter(ContainerRequestContext requestContext)
 		throws IOException {
 
-		Class<? extends Application> clazz = _application.getClass();
-
-		Bundle bundle = FrameworkUtil.getBundle(clazz);
-
-		if (bundle == null) {
-			return;
-		}
-
-		_scopeContext.setBundle(bundle);
-		_scopeContext.setApplicationName(clazz.getName());
+		_runnable.run();
 	}
 
-	@Context
-	private Application _application;
-
-	private final ScopeContext _scopeContext;
+	private final Runnable _runnable;
 
 }

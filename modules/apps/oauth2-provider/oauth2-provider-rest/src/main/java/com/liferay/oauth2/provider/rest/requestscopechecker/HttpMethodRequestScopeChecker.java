@@ -14,29 +14,42 @@
 
 package com.liferay.oauth2.provider.rest.requestscopechecker;
 
-import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.RequestScopeCheckerFilter;
-
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 
-import javax.ws.rs.container.ResourceInfo;
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 
 @Component(
-	immediate = true,
 	property = {
-		"default=true",
-		"type=http.method"
-	}
+		"osgi.jaxrs.extension=true",
+		"osgi.jaxrs.name=Liferay.OAuth2.HTTP.method.request.checker",
+		"osgi.jaxrs.extension.select=(liferay.extension=OAuth2)",
+		"osgi.jaxrs.application.select=(&(osgi.jaxrs.extension.select=\\(liferay.extension\\=OAuth2\\))(|(!(oauth2.scopechecker.type=*))(oauth2.scopechecker.type=http.method)))"
+	},
+	scope = ServiceScope.PROTOTYPE
 )
-public class HttpMethodRequestScopeChecker
-	implements RequestScopeCheckerFilter {
+@Priority(Priorities.AUTHORIZATION - 8)
+public class HttpMethodRequestScopeChecker implements ContainerRequestFilter {
 
 	@Override
-	public boolean isAllowed(
-		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo) {
+	public void filter(ContainerRequestContext requestContext)
+		throws IOException {
 
-		return scopeChecker.checkScope(request.getMethod());
+		Request request = requestContext.getRequest();
+
+		if (!_scopeChecker.checkScope(request.getMethod())) {
+			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
+		}
 	}
+
+	@Reference ScopeChecker _scopeChecker;
 
 }

@@ -14,60 +14,83 @@
 
 package com.liferay.oauth2.provider.rest.requestscopechecker;
 
-import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.RequestScopeCheckerFilter;
 import com.liferay.oauth2.provider.scope.RequiresNoScope;
 import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import java.lang.reflect.Method;
 
 @Component(
-	property = "type=annotation"
+	property = {
+		"osgi.jaxrs.extension=true",
+		"osgi.jaxrs.name=Liferay.OAuth2.annotations.checker",
+		"osgi.jaxrs.extension.select=(liferay.extension=OAuth2)",
+		"osgi.jaxrs.application.select=(&(osgi.jaxrs.extension.select=\\(liferay.extension=OAuth2\\))(oauth2.scopechecker.type=annotations))"
+	},
+	scope = ServiceScope.PROTOTYPE
 )
-public class AnnotationRequestScopeChecker
-	implements RequestScopeCheckerFilter {
+@Priority(Priorities.AUTHORIZATION - 8)
+public class AnnotationRequestScopeChecker implements ContainerRequestFilter {
 
 	@Override
-	public boolean isAllowed(
-		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo) {
-
-		Method method = resourceInfo.getResourceMethod();
+	public void filter(ContainerRequestContext requestContext) {
+		Method method = _resourceInfo.getResourceMethod();
 
 		RequiresNoScope requiresNoScope = method.getAnnotation(
 			RequiresNoScope.class);
 
 		if (requiresNoScope != null) {
-			return true;
+			return;
 		}
 
 		RequiresScope annotation = method.getAnnotation(RequiresScope.class);
 
 		if (annotation == null) {
-			Class<?> resourceClass = resourceInfo.getResourceClass();
+			Class<?> resourceClass = _resourceInfo.getResourceClass();
 
 			requiresNoScope = resourceClass.getAnnotation(
 				RequiresNoScope.class);
 
 			if (requiresNoScope != null) {
-				return true;
+				return;
 			}
 
 			annotation = resourceClass.getAnnotation(RequiresScope.class);
 		}
 
+		boolean allowed = false;
+
 		if (annotation != null) {
 			if (annotation.allNeeded()) {
-				return scopeChecker.checkAllScopes(annotation.value());
+				allowed = _scopeChecker.checkAllScopes(annotation.value());
 			}
 			else {
-				return scopeChecker.checkAnyScope(annotation.value());
+				allowed = _scopeChecker.checkAnyScope(annotation.value());
 			}
+
 		}
 
-		return false;
+		if (annotation == null || !allowed) {
+			requestContext.abortWith(
+				Response.status(Response.Status.FORBIDDEN).build());
+		}
+
 	}
+
+	@Context
+	private ResourceInfo _resourceInfo;
+
+	@Reference
+	private ScopeChecker _scopeChecker;
 
 }

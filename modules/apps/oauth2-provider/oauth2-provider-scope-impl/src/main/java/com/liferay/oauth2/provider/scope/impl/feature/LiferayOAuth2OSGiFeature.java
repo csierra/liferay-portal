@@ -17,13 +17,11 @@ package com.liferay.oauth2.provider.scope.impl.feature;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.CompanyRetrieverContainerRequestFilter;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.RunnableExecutorContainerResponseFilter;
-import com.liferay.oauth2.provider.scope.impl.jaxrs.ScopedRequestScopeChecker;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
-import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
@@ -113,12 +111,6 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			_bundleContext.registerService(
 				ScopeFinder.class, new CollectionScopeFinder(scopes),
 				serviceProperties));
-
-		_serviceRegistrations.add(
-			_bundleContext.registerService(
-				RequestScopeCheckerFilter.class,
-				_annotationRequestScopeChecker,
-				serviceProperties));
 	}
 
 	@Override
@@ -146,21 +138,28 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			Priorities.AUTHORIZATION - 10);
 
 		context.register(
-			new ScopeContextContainerRequestFilter(_scopeContext),
+			new RunnableContainerRequestFilter(
+				() -> {
+					_scopeContext.setBundle(_bundle);
+					_scopeContext.setApplicationName(applicationName);
+				}
+			),
 			Priorities.AUTHORIZATION - 9);
-
-		context.register(
-			new ScopedRequestScopeChecker(
-				_scopedServiceTrackerMapFactory.create(
-					_bundleContext, RequestScopeCheckerFilter.class,
-					applicationName, () -> _defaultRequestScopeChecker),
-				_scopeChecker),
-			Priorities.AUTHORIZATION - 8);
 
 		context.register(
 			new RunnableExecutorContainerResponseFilter(
 				_scopeContext::clear),
 			Priorities.AUTHORIZATION - 8);
+
+		Dictionary<String, Object> serviceProperties =
+			new Hashtable<>();
+		for (String property : applicationProperties.keySet()) {
+			if (property.startsWith("service.")) {
+				continue;
+			}
+			serviceProperties.put(
+				property, applicationProperties.get(property));
+		}
 
 		Object oauth2ScopeCheckerTypeObject =
 			applicationProperties.get("oauth2.scopechecker.type");
@@ -173,16 +172,6 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		else {
 			oauth2ScopeCheckerType =
 				oauth2ScopeCheckerTypeObject.toString();
-		}
-
-		Dictionary<String, Object> serviceProperties =
-			new Hashtable<>();
-		for (String property : applicationProperties.keySet()) {
-			if (property.startsWith("service.")) {
-				continue;
-			}
-			serviceProperties.put(
-				property, applicationProperties.get(property));
 		}
 
 		if (oauth2ScopeCheckerType.equals("request.operation")) {
@@ -203,7 +192,9 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 		registerDescriptors(applicationName);
 
-		registerAuthVerifierFilter("context.for" + applicationName);
+		registerAuthVerifierFilter(
+			"(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME +
+				"=context.for" + applicationName + ")");
 
 		return true;
 	}
@@ -234,11 +225,15 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 	}
 
 	@Deactivate
-	private void deactivate() {
+	protected void deactivate() {
 		for (ServiceRegistration<?> serviceRegistration :
 			_serviceRegistrations) {
 
-			serviceRegistration.unregister();
+			try {
+				serviceRegistration.unregister();
+			}
+			catch (Exception e) {
+			}
 		}
 		for (ServiceTracker<?, ?> serviceTracker : _serviceTrackers) {
 			serviceTracker.close();
@@ -315,10 +310,9 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_PATTERN, "/*");
 		properties.put(
-			HttpWhiteboardConstants.
-				HTTP_WHITEBOARD_FILTER_INIT_PARAM_PREFIX +
-					"authVerifierProperties",
-			"auth.verifier.OAuth2RestAuthVerifier.urls.includes=*");
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_INIT_PARAM_PREFIX +
+				"auth.verifier.OAuth2RestAuthVerifier.urls.includes",
+			"*");
 
 		_serviceRegistrations.add(
 			_bundleContext.registerService(
@@ -331,18 +325,6 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private ScopeChecker _scopeChecker;
-
-	@Reference(
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(type=annotation)"
-	)
-	private RequestScopeCheckerFilter _annotationRequestScopeChecker;
-
-	@Reference(
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(default=true)"
-	)
-	private RequestScopeCheckerFilter _defaultRequestScopeChecker;
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,

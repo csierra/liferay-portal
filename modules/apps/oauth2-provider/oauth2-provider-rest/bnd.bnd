@@ -28,6 +28,7 @@ Import-Package:\
 
 -includeresource:\
  	@cxf-rt-rs-extension-providers*.jar,\
+ 	@cxf-rt-rs-json-basic*.jar,\
  	@cxf-rt-security*.jar,\
  	@cxf-rt-rs-security-oauth2*.jar,\
  	@cxf-rt-rs-security-jose*.jar,\
