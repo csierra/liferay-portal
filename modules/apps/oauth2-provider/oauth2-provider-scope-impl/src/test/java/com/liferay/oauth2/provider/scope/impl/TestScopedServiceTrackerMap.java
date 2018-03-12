@@ -32,6 +32,7 @@ public class TestScopedServiceTrackerMap<T> {
 
 	public T getService(long companyId, String key) {
 		String companyIdString = Long.toString(companyId);
+
 		T services = _servicesByCompanyAndKey.get(
 			String.join("-", companyIdString, key));
 
@@ -56,6 +57,7 @@ public class TestScopedServiceTrackerMap<T> {
 
 	public void setService(long companyId, String key, T service) {
 		String companyIdString = Long.toString(companyId);
+
 		String companyIdKeyString = String.join("-", companyIdString, key);
 
 		_servicesByCompanyAndKey.put(companyIdKeyString, service);
@@ -68,7 +70,7 @@ public class TestScopedServiceTrackerMap<T> {
 	}
 
 	public void setService(Long companyId, String key, T service) {
-		if (companyId == null && key != null) {
+		if ((companyId == null) && (key != null)) {
 			setService(key, service);
 		}
 		else if (key == null) {
