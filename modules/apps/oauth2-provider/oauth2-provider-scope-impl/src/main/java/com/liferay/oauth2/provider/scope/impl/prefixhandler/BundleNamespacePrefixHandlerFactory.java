@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,11 +43,9 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
  * @author Stian Sigvartsen
  */
 @Component(
-	immediate = true,
-	configurationPid = "com.liferay.oauth2.provider.configuration." +
-		"BundleNamespacePrefixHandlerFactory",
-	property = {"separator=" + StringPool.SLASH},
-	configurationPolicy = ConfigurationPolicy.REQUIRE
+	configurationPid = "com.liferay.oauth2.provider.configuration.BundleNamespacePrefixHandlerFactory",
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
+	property = {"separator=" + StringPool.SLASH}
 )
 public class BundleNamespacePrefixHandlerFactory
 	implements PrefixHandlerFactory {
@@ -100,21 +97,20 @@ public class BundleNamespacePrefixHandlerFactory
 				StringPool.SPACE, "\n");
 
 			Properties modifiers = new Properties();
+
 			try {
 				modifiers.load(new StringReader(propertiesFormat));
 			}
 			catch (IOException ioe) {
-	}
+			}
 
-			parts.add(
-				GetterUtil.getString(
-					modifiers.getProperty("default"), StringPool.BLANK));
+			parts.add(GetterUtil.getString(modifiers.getProperty("default")));
 		}
 
 		PrefixHandler prefixHandler = create(
 			parts.toArray(_EMPTY_STRING_ARRAY));
 
-		return (target) -> {
+		return target -> {
 			if (_excludedScope.contains(target)) {
 				return target;
 			}
@@ -131,7 +127,7 @@ public class BundleNamespacePrefixHandlerFactory
 			sb.append(_separator);
 		}
 
-		return (target) -> sb.toString() + target;
+		return target -> sb.toString() + target;
 	}
 
 	@Activate
@@ -151,9 +147,7 @@ public class BundleNamespacePrefixHandlerFactory
 			serviceProperties = (String[])servicePropertyObject;
 		}
 		else if (servicePropertyObject != null) {
-			serviceProperties = Collections.singletonList(
-					servicePropertyObject.toString()).toArray(
-						_EMPTY_STRING_ARRAY);
+			serviceProperties = new String[] {servicePropertyObject.toString()};
 		}
 		else {
 			serviceProperties = _EMPTY_STRING_ARRAY;
@@ -182,8 +176,8 @@ public class BundleNamespacePrefixHandlerFactory
 
 		_bundleContext = bundleContext;
 
-		_excludedScope.addAll(
-			Arrays.asList(excludedScopeProperty.split(StringPool.COMMA)));
+		Collections.addAll(
+			_excludedScope, excludedScopeProperty.split(StringPool.COMMA));
 
 		_excludedScope.removeIf(Validator::isBlank);
 
@@ -195,7 +189,7 @@ public class BundleNamespacePrefixHandlerFactory
 		_includeBundleSymbolicName = includeBundleSymbolicName;
 	}
 
-	private String[] _EMPTY_STRING_ARRAY = new String[0];
+	private static final String[] _EMPTY_STRING_ARRAY = new String[0];
 
 	private BundleContext _bundleContext;
 	private List<String> _excludedScope = new ArrayList<>();
