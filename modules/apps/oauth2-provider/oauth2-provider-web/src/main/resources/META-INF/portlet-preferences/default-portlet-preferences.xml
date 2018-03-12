@@ -5,4 +5,8 @@
 		<name>oAuth2Features</name>
 		<value>token-introspection</value>
 	</preference>
+	<preference>
+		<name>oAuth2Grants</name>
+		<value></value>
+	</preference>
 </portlet-preferences>

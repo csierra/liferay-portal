@@ -14,13 +14,17 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet;
 
+import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenService;
 import com.liferay.oauth2.provider.service.OAuth2TokenService;
+import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
+import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -36,10 +40,14 @@ import com.liferay.portal.kernel.util.StringPool;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
+import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -49,11 +57,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
 
 /**
  * @author Stian Sigvartsen
  */
 @Component(
+	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2Configuration",
 	immediate = true,
 	property = {
 		"com.liferay.portlet.display-category=category.hidden",
@@ -69,6 +80,21 @@ import java.util.List;
 	service = Portlet.class
 )
 public class OAuth2AdminPortlet extends MVCPortlet {
+
+	@Override
+	public void render(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
+
+		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
+			new OAuth2AdminPortletDisplayContext(_oAuth2Configuration);
+
+		renderRequest.setAttribute(
+			OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT,
+			oAuth2AdminPortletDisplayContext);
+
+		super.render(renderRequest, renderResponse);
+	}
 
 	public void deleteOAuth2Application(
 			ActionRequest request, ActionResponse response)
@@ -126,15 +152,19 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		String homePageURL = ParamUtil.get(
 			request, "homePageURL", StringPool.BLANK);
 
-		String[] oAuth2Grants = StringUtil.split(portletPreferences.getValue(
-			"oAuth2Grants", StringPool.BLANK));
+		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
+			new OAuth2AdminPortletDisplayContext(_oAuth2Configuration);
+
+		List<GrantType> oAuth2Grants =
+			oAuth2AdminPortletDisplayContext.getOAuth2Grants(
+				portletPreferences);
 
 		List<GrantType> allowedGrantTypes = new ArrayList<>(
-			oAuth2Grants.length);
+			oAuth2Grants.size());
 
-		for(String oAuth2Grant : oAuth2Grants) {
-			if (ParamUtil.getBoolean(request, "grant-" + oAuth2Grant, false)) {
-				allowedGrantTypes.add(GrantType.valueOf(oAuth2Grant));
+		for(GrantType grantType : oAuth2Grants) {
+			if (ParamUtil.getBoolean(request, "grant-" + grantType.name())) {
+				allowedGrantTypes.add(grantType);
 			}
 		}
 
@@ -215,8 +245,18 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			oAuth2TokenId, oAuth2RefreshTokenId);
 	}
 
+
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_oAuth2Configuration =
+			ConfigurableUtil.createConfigurable(
+				OAuth2Configuration.class, properties);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortlet.class);
+
+	private OAuth2Configuration _oAuth2Configuration;
 
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;
@@ -228,5 +268,6 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 	private OAuth2TokenService _oAuth2TokenService;
 	@Reference
 	private Portal _portal;
+
 
 }

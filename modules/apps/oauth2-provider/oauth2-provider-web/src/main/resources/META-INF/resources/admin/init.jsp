@@ -31,5 +31,5 @@ page import="com.liferay.portal.kernel.util.StringPool" %>
 <%@ page import="java.util.ArrayList" %>
 
 <%
-OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = new OAuth2AdminPortletDisplayContext();
+OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = (OAuth2AdminPortletDisplayContext)request.getAttribute(OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT);
 %>

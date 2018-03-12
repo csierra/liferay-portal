@@ -14,6 +14,8 @@
 
 package com.liferay.oauth2.provider.web.internal.display.context;
 
+import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
+import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -26,11 +28,61 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+
+import javax.portlet.PortletPreferences;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Tomas Polesovsky
  */
 public class OAuth2AdminPortletDisplayContext {
+
+	public OAuth2AdminPortletDisplayContext(
+		OAuth2Configuration oAuth2Configuration) {
+
+		_oAuth2Configuration = oAuth2Configuration;
+	}
+
+	public List<GrantType> getOAuth2Grants(
+		PortletPreferences portletPreferences) {
+
+		String[] oAuth2Grants = StringUtil.split(
+			portletPreferences.getValue("oAuth2Grants", StringPool.BLANK));
+
+		List<GrantType> result = new ArrayList<>();
+
+		for (String oAuth2Grant : oAuth2Grants) {
+			result.add(GrantType.valueOf(oAuth2Grant));
+		}
+
+		if (result.isEmpty()) {
+			result.addAll(Arrays.asList(GrantType.values()));
+		}
+
+		if (!_oAuth2Configuration.allowAuthorizationCodeGrant()) {
+			result.remove(GrantType.AUTHORIZATION_CODE);
+		}
+		if (!_oAuth2Configuration.allowAuthorizationCodePKCEGrant()) {
+			result.remove(GrantType.AUTHORIZATION_CODE_PKCE);
+		}
+		if (!_oAuth2Configuration.allowClientCredentialsGrant()) {
+			result.remove(GrantType.CLIENT_CREDENTIALS);
+		}
+		if (!_oAuth2Configuration.allowRefreshTokenGrant()) {
+			result.remove(GrantType.REFRESH_TOKEN);
+		}
+		if (!_oAuth2Configuration.
+			allowResourceOwnerPasswordCredentialsGrant()) {
+
+			result.remove(GrantType.RESOURCE_OWNER_PASSWORD);
+		}
+
+		return result;
+	}
 
 	public boolean hasAddApplicationPermission() {
 		PermissionChecker permissionChecker =
@@ -111,6 +163,8 @@ public class OAuth2AdminPortletDisplayContext {
 
 		return false;
 	}
+
+	private OAuth2Configuration _oAuth2Configuration;
 
 	private static Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortletDisplayContext.class);
