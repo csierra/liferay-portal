@@ -19,9 +19,9 @@ import org.osgi.service.component.annotations.Deactivate;
  * @author Stian Sigvartsen
  */
 @Component(
-	immediate = true,
-	configurationPid = "com.liferay.oauth2.provider.configuration."
-			+ "DefaultBundleNamespacePrefixHandlerFactoryRegistratorConfiguration"
+	configurationPid = "com.liferay.oauth2.provider.configuration." +
+		"DefaultBundleNamespacePrefixHandlerFactoryRegistratorConfiguration",
+	immediate = true
 )
 public class DefaultBundleNamespacePrefixHandlerFactoryRegistrator {
 
