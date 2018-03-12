@@ -27,6 +27,8 @@ import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -76,6 +78,9 @@ import org.osgi.util.tracker.ServiceTracker;
 @Provider
 public class LiferayOAuth2OSGiFeature implements Feature {
 
+	public static final String APPLICATION_CLASS_NAME =
+		Application.class.getName();
+
 	public LiferayOAuth2OSGiFeature() {
 		_factoryBeanListener = new ScopeFinderFactoryBeanListener();
 	}
@@ -114,9 +119,9 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 	}
 
 	@Reference(
-		unbind = "restoreBus", cardinality = ReferenceCardinality.MULTIPLE,
+		cardinality = ReferenceCardinality.MULTIPLE,
 		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
+		policyOption = ReferencePolicyOption.GREEDY, unbind = "restoreBus"
 	)
 	protected void modifyBus(Bus bus) {
 		FactoryBeanListenerManager factoryBeanListenerManager =
@@ -253,17 +258,15 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 						serviceProperties);
 				}
 
-				if (oauth2ScopeCheckerType.equals("annotations"))
+				if (oauth2ScopeCheckerType.equals("annotations")) {
 					processAnnotationStrategy(
 						bundleContext, (JAXRSServiceFactoryBean)factory,
 						endpoint, applicationClassName, serviceProperties);
+				}
 
-				registerDescriptors(endpoint, bundle, applicationClassName);
+				_registerDescriptors(endpoint, bundle, applicationClassName);
 			}
 		}
-
-		public final String APPLICATION_CLASS_NAME =
-			Application.class.getName();
 
 		protected ServiceReference<?> findReference(
 			BundleContext bundleContext, Application application) {
@@ -316,9 +319,9 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 			ServiceRegistration<RequestScopeCheckerFilter>
 				requestScopeCheckerFilterRegistration =
-				bundleContext.registerService(
-					RequestScopeCheckerFilter.class,
-					_annotationRequestScopeChecker, serviceProperties);
+					bundleContext.registerService(
+						RequestScopeCheckerFilter.class,
+						_annotationRequestScopeChecker, serviceProperties);
 
 			endpoint.addCleanupHook(
 				() -> {
@@ -346,17 +349,22 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			endpoint.addCleanupHook(serviceRegistration::unregister);
 		}
 
-		private void registerDescriptors(
+		private void _registerDescriptors(
 			Endpoint endpoint, Bundle bundle, String applicationClassName) {
 
 			String bundleSymbolicName = bundle.getSymbolicName();
 
+			StringBundler sb = new StringBundler(6);
+
+			sb.append("(&(objectClass=");
+			sb.append(ResourceBundleLoader.class.getName());
+			sb.append(")(bundle.symbolic.name=");
+			sb.append(bundleSymbolicName);
+			sb.append(")(resource.bundle.base.name=content.Language))");
+
 			ServiceTracker<ResourceBundleLoader, ResourceBundleLoader>
 				serviceTracker = ServiceTrackerFactory.open(
-					_bundleContext,
-					"(&(objectClass=" + ResourceBundleLoader.class.getName() +
-					")(bundle.symbolic.name=" + bundleSymbolicName + ")" +
-					"(resource.bundle.base.name=content.Language))");
+					_bundleContext, sb.toString());
 
 			ServiceRegistration<?> serviceRegistration =
 				_bundleContext.registerService(
@@ -366,9 +374,11 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					},
 					new ApplicationDescriptorsImpl(
 						serviceTracker, applicationClassName),
-					new Hashtable<String, Object>() { {
-						put("osgi.jaxrs.name", applicationClassName);
-					}});
+					new Hashtable<String, Object>() {
+						{
+							put("osgi.jaxrs.name", applicationClassName);
+						}
+					});
 
 			endpoint.addCleanupHook(
 				() -> {
@@ -398,10 +408,10 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					resourceBundleLoader.loadResourceBundle(
 						LocaleUtil.toLanguageId(locale));
 
-				String key = "oauth2.application.description." +
-					_applicationClassName;
+				String key =
+					"oauth2.application.description." + _applicationClassName;
 
-				return resourceBundle.getString(key);
+				return ResourceBundleUtil.getString(resourceBundle, key);
 			}
 
 			@Override
@@ -423,7 +433,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					return _defaultScopeDescriptor.describeScope(scope, locale);
 				}
 
-				return resourceBundle.getString(key);
+				return ResourceBundleUtil.getString(resourceBundle, key);
 			}
 
 			private final String _applicationClassName;
