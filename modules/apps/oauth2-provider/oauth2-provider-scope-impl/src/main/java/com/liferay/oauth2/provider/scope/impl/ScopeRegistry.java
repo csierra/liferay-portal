@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -85,10 +84,12 @@ public class ScopeRegistry implements ScopeLocator {
 	private Collection<LiferayOAuth2Scope> _doLocateScopesForApplication(
 		long companyId, String scopesAlias, String applicationName) {
 
-		ScopeMatcherFactory scopeMatcherFactory = 
-			Optional.ofNullable(
-				_scopedScopeMatcherFactories.getService(Long.toString(companyId))
-			).orElse(_defaultScopeMatcherFactory);
+		ScopeMatcherFactory scopeMatcherFactory =
+			_scopedScopeMatcherFactories.getService(Long.toString(companyId));
+
+		if (scopeMatcherFactory == null) {
+			scopeMatcherFactory = _defaultScopeMatcherFactory;
+		}
 		
 		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
 			_scopeFinderByNameServiceTrackerMap.getService(applicationName);
