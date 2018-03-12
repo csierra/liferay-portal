@@ -170,8 +170,45 @@ public class ScopeRegistry implements ScopeLocator {
 		return scopeMatcher.match(scope);
 	}
 
+	protected void setScopedPrefixHandlerFactories(
+		ScopedServiceTrackerMap<PrefixHandlerFactory>
+			scopedPrefixHandlerFactories) {
+
+		_scopedPrefixHandlerFactories = scopedPrefixHandlerFactories;
+	}
+
+	protected void setScopedScopeFinders(
+		ScopedServiceTrackerMap<ScopeFinder> scopedScopeFinders) {
+
+		_scopedScopeFinders = scopedScopeFinders;
+	}
+
 	private ScopedServiceTrackerMap<PrefixHandlerFactory>
 		_scopedPrefixHandlerFactories;
+
+
+	public void setScopedScopeMatcherFactories(
+		ServiceTrackerMap<String, ScopeMatcherFactory>
+			scopedScopeMatcherFactories) {
+
+		_scopedScopeMatcherFactories = scopedScopeMatcherFactories;
+	}
+
+	public void setScopedScopeMapper(
+		ScopedServiceTrackerMap<ScopeMapper> scopedScopeMapper) {
+
+		_scopedScopeMapper = scopedScopeMapper;
+	}
+
+	public void setScopeFinderByNameServiceTrackerMap(
+		ServiceTrackerMap
+			<String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
+				scopeFinderByNameServiceTrackerMap) {
+
+		_scopeFinderByNameServiceTrackerMap =
+			scopeFinderByNameServiceTrackerMap;
+	}
+
 	private ScopedServiceTrackerMap<ScopeMapper>
 		_scopedScopeMapper;
 
@@ -236,35 +273,35 @@ public class ScopeRegistry implements ScopeLocator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_scopeFinderByNameServiceTrackerMap =
+		setScopeFinderByNameServiceTrackerMap(
 			ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, ScopeFinder.class, "(osgi.jaxrs.name=*)",
 				new PropertyServiceReferenceMapper<>("osgi.jaxrs.name"),
 				new ScopeFinderServiceTupleServiceTrackerCustomizer(
 					bundleContext), Comparator.naturalOrder(),
-				new CacheClearServiceTrackerMapListener());
+				new CacheClearServiceTrackerMapListener()));
 
-		_scopedScopeFinders = _scopedServiceTrackerMapFactory.create(
+		setScopedScopeFinders(_scopedServiceTrackerMapFactory.create(
 			bundleContext, ScopeFinder.class, "osgi.jaxrs.name", null,
-			_invocationCache::clear);
+			_invocationCache::clear));
 
-		_scopedPrefixHandlerFactories = _scopedServiceTrackerMapFactory.create(
+		setScopedPrefixHandlerFactories(_scopedServiceTrackerMapFactory.create(
 			bundleContext, PrefixHandlerFactory.class, "osgi.jaxrs.name",
 			() -> (_defaultPrefixHandlerFactory != null ? 
 				_defaultPrefixHandlerFactory : 
 					(propertyAccessor) -> 
 						PrefixHandler.PASSTHROUGH_PREFIXHANDLER),
-			_invocationCache::clear);
+			_invocationCache::clear));
 
-		_scopedScopeMapper = _scopedServiceTrackerMapFactory.create(
+		setScopedScopeMapper(_scopedServiceTrackerMapFactory.create(
 			bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
 			() -> (_defaultScopeMapper != null ? 
 				_defaultScopeMapper : ScopeMapper.PASSTHROUGH_SCOPEMAPPER), 
-			_invocationCache::clear);
+			_invocationCache::clear));
 
-		_scopedScopeMatcherFactories =
+		setScopedScopeMatcherFactories(
 			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, ScopeMatcherFactory.class, "company.id");
+				bundleContext, ScopeMatcherFactory.class, "company.id"));
 	}
 
 	@Deactivate
@@ -279,6 +316,12 @@ public class ScopeRegistry implements ScopeLocator {
 		policyOption = ReferencePolicyOption.GREEDY,
 		cardinality = ReferenceCardinality.OPTIONAL
 	)
+	protected void setDefaultPrefixHandlerFactory(
+		PrefixHandlerFactory prefixHandlerFactory) {
+
+		_defaultPrefixHandlerFactory = prefixHandlerFactory;
+	}
+
 	private PrefixHandlerFactory _defaultPrefixHandlerFactory;
 
 	@Reference(
@@ -286,16 +329,32 @@ public class ScopeRegistry implements ScopeLocator {
 		policyOption = ReferencePolicyOption.GREEDY,
 		cardinality = ReferenceCardinality.OPTIONAL
 	)
+	protected void setDefaultScopeMapper(ScopeMapper scopeMapper) {
+		_defaultScopeMapper = scopeMapper;
+	}
+
 	private ScopeMapper _defaultScopeMapper;
 
 	@Reference
-	ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
+	protected void setScopedServiceTrackerMapFactory(
+		ScopedServiceTrackerMapFactory scopedServiceTrackerMapFactory) {
+
+		_scopedServiceTrackerMapFactory = scopedServiceTrackerMapFactory;
+	}
+
+	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 	
 	private ServiceTrackerMap<
 		String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
 			_scopeFinderByNameServiceTrackerMap;
 
 	@Reference(name = "default")
+	protected void setDefaultScopeMatcherFactory(
+		ScopeMatcherFactory scopeMatcherFactory) {
+
+		_defaultScopeMatcherFactory = scopeMatcherFactory;
+	}
+
 	private ScopeMatcherFactory _defaultScopeMatcherFactory;
 
 	@Override
