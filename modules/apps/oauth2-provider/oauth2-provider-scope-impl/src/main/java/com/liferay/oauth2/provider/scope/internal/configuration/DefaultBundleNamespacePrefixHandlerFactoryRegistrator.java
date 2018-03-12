@@ -1,4 +1,4 @@
-package com.liferay.oauth2.provider.internal.configuration;
+package com.liferay.oauth2.provider.scope.internal.configuration;
 
 import com.liferay.oauth2.provider.configuration.DefaultBundleNamespacePrefixHandlerFactoryRegistratorConfiguration;
 import com.liferay.oauth2.provider.scope.impl.prefixhandler.BundleNamespacePrefixHandlerFactory;

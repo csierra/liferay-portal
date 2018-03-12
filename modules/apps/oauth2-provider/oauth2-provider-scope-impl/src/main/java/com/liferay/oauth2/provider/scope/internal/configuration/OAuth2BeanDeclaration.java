@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.internal.configuration;
+package com.liferay.oauth2.provider.scope.internal.configuration;
 
-import com.liferay.oauth2.provider.configuration.DefaultBundleNamespacePrefixHandlerFactoryRegistratorConfiguration;
+import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
 
 import org.osgi.service.component.annotations.Component;
@@ -23,12 +23,11 @@ import org.osgi.service.component.annotations.Component;
  * @author Stian Sigvartsen
  */
 @Component(immediate = true, service = ConfigurationBeanDeclaration.class)
-public class DefaultBundleNamespacePrefixHandlerFactoryBeanDeclaration
-	implements ConfigurationBeanDeclaration {
+public class OAuth2BeanDeclaration implements ConfigurationBeanDeclaration {
 
 	@Override
 	public Class<?> getConfigurationBeanClass() {
-		return DefaultBundleNamespacePrefixHandlerFactoryRegistratorConfiguration.class;
+		return OAuth2Configuration.class;
 	}
 
 }
