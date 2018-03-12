@@ -39,7 +39,7 @@ public class LiferayOAuth2ScopeImpl implements LiferayOAuth2Scope {
 			return true;
 		}
 
-		if (o == null || getClass() != o.getClass()) {
+		if ((o == null) || (getClass() != o.getClass())) {
 			return false;
 		}
 
