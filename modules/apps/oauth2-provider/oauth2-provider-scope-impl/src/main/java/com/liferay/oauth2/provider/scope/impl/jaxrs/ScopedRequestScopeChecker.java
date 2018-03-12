@@ -75,17 +75,17 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 		}
 	}
 
+	@Context
+	private Application _application;
+
+	@Context
+	private HttpServletRequest _httpServletRequest;
+
+	@Context
+	private ResourceInfo _resourceInfo;
+
 	private final ScopeChecker _scopeChecker;
 	private final ScopedServiceTrackerMap<RequestScopeCheckerFilter>
 		_scopedServiceTrackerMap;
-
-	@Context
-	Application _application;
-
-	@Context
-	HttpServletRequest _httpServletRequest;
-
-	@Context
-	ResourceInfo _resourceInfo;
 
 }
