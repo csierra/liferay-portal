@@ -36,7 +36,7 @@ public class OAuth2ApplicationLocalServiceWrapper
 
 	/**
 	* NOTE FOR DEVELOPERS:
-	* <p>
+	*
 	* Never reference this class directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
 	*/
 	@Override
@@ -45,6 +45,7 @@ public class OAuth2ApplicationLocalServiceWrapper
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
+		java.util.List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
@@ -53,8 +54,9 @@ public class OAuth2ApplicationLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _oAuth2ApplicationLocalService.addOAuth2Application(companyId,
 			userId, userName, allowedGrantTypesList, clientConfidential,
-			clientId, clientSecret, description, homePageURL, iconFileEntryId,
-			name, privacyPolicyURL, redirectURIsList, scopesList, serviceContext);
+			clientId, clientSecret, description, featuresList, homePageURL,
+			iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+			scopesList, serviceContext);
 	}
 
 	/**
@@ -306,6 +308,7 @@ public class OAuth2ApplicationLocalServiceWrapper
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
+		java.util.List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
@@ -314,8 +317,8 @@ public class OAuth2ApplicationLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _oAuth2ApplicationLocalService.updateOAuth2Application(oAuth2ApplicationId,
 			allowedGrantTypesList, clientConfidential, clientId, clientSecret,
-			description, homePageURL, iconFileEntryId, name, privacyPolicyURL,
-			redirectURIsList, scopesList, serviceContext);
+			description, featuresList, homePageURL, iconFileEntryId, name,
+			privacyPolicyURL, redirectURIsList, scopesList, serviceContext);
 	}
 
 	/**

@@ -339,6 +339,21 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	 */
 	public void setScopes(String scopes);
 
+	/**
+	 * Returns the features of this o auth2 application.
+	 *
+	 * @return the features of this o auth2 application
+	 */
+	@AutoEscape
+	public String getFeatures();
+
+	/**
+	 * Sets the features of this o auth2 application.
+	 *
+	 * @param features the features of this o auth2 application
+	 */
+	public void setFeatures(String features);
+
 	@Override
 	public boolean isNew();
 

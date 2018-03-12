@@ -1588,6 +1588,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		oAuth2ApplicationImpl.setPrivacyPolicyURL(oAuth2Application.getPrivacyPolicyURL());
 		oAuth2ApplicationImpl.setRedirectURIs(oAuth2Application.getRedirectURIs());
 		oAuth2ApplicationImpl.setScopes(oAuth2Application.getScopes());
+		oAuth2ApplicationImpl.setFeatures(oAuth2Application.getFeatures());
 
 		return oAuth2ApplicationImpl;
 	}

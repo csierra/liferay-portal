@@ -69,6 +69,7 @@ public class OAuth2ApplicationServiceSoap {
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
+		java.util.List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
@@ -78,8 +79,9 @@ public class OAuth2ApplicationServiceSoap {
 		try {
 			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.addOAuth2Application(allowedGrantTypesList,
 					clientConfidential, clientId, clientSecret, description,
-					homePageURL, iconFileEntryId, name, privacyPolicyURL,
-					redirectURIsList, scopesList, serviceContext);
+					featuresList, homePageURL, iconFileEntryId, name,
+					privacyPolicyURL, redirectURIsList, scopesList,
+					serviceContext);
 
 			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
 		}
@@ -185,6 +187,7 @@ public class OAuth2ApplicationServiceSoap {
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
+		java.util.List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
@@ -194,9 +197,9 @@ public class OAuth2ApplicationServiceSoap {
 		try {
 			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.updateOAuth2Application(oAuth2ApplicationId,
 					allowedGrantTypesList, clientConfidential, clientId,
-					clientSecret, description, homePageURL, iconFileEntryId,
-					name, privacyPolicyURL, redirectURIsList, scopesList,
-					serviceContext);
+					clientSecret, description, featuresList, homePageURL,
+					iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+					scopesList, serviceContext);
 
 			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
 		}

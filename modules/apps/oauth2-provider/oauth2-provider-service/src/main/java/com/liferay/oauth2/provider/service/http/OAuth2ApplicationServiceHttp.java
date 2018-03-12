@@ -60,6 +60,7 @@ public class OAuth2ApplicationServiceHttp {
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
+		java.util.List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
@@ -72,9 +73,9 @@ public class OAuth2ApplicationServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					allowedGrantTypesList, clientConfidential, clientId,
-					clientSecret, description, homePageURL, iconFileEntryId,
-					name, privacyPolicyURL, redirectURIsList, scopesList,
-					serviceContext);
+					clientSecret, description, featuresList, homePageURL,
+					iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+					scopesList, serviceContext);
 
 			Object returnObj = null;
 
@@ -294,6 +295,7 @@ public class OAuth2ApplicationServiceHttp {
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
+		java.util.List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
@@ -308,8 +310,9 @@ public class OAuth2ApplicationServiceHttp {
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					oAuth2ApplicationId, allowedGrantTypesList,
 					clientConfidential, clientId, clientSecret, description,
-					homePageURL, iconFileEntryId, name, privacyPolicyURL,
-					redirectURIsList, scopesList, serviceContext);
+					featuresList, homePageURL, iconFileEntryId, name,
+					privacyPolicyURL, redirectURIsList, scopesList,
+					serviceContext);
 
 			Object returnObj = null;
 
@@ -458,7 +461,7 @@ public class OAuth2ApplicationServiceHttp {
 	private static Log _log = LogFactoryUtil.getLog(OAuth2ApplicationServiceHttp.class);
 	private static final Class<?>[] _addOAuth2ApplicationParameterTypes0 = new Class[] {
 			java.util.List.class, boolean.class, java.lang.String.class,
-			java.lang.String.class, java.lang.String.class,
+			java.lang.String.class, java.lang.String.class, java.util.List.class,
 			java.lang.String.class, long.class, java.lang.String.class,
 			java.lang.String.class, java.util.List.class, java.util.List.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
@@ -485,9 +488,9 @@ public class OAuth2ApplicationServiceHttp {
 	private static final Class<?>[] _updateOAuth2ApplicationParameterTypes7 = new Class[] {
 			long.class, java.util.List.class, boolean.class,
 			java.lang.String.class, java.lang.String.class,
-			java.lang.String.class, java.lang.String.class, long.class,
-			java.lang.String.class, java.lang.String.class, java.util.List.class,
-			java.util.List.class,
+			java.lang.String.class, java.util.List.class, java.lang.String.class,
+			long.class, java.lang.String.class, java.lang.String.class,
+			java.util.List.class, java.util.List.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _updateIconParameterTypes8 = new Class[] {

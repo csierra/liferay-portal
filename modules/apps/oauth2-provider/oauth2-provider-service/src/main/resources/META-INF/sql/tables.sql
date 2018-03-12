@@ -15,7 +15,8 @@ create table OAuth2Application (
 	name VARCHAR(75) null,
 	privacyPolicyURL STRING null,
 	redirectURIs STRING null,
-	scopes TEXT null
+	scopes TEXT null,
+	features STRING null
 );
 
 create table OAuth2RefreshToken (

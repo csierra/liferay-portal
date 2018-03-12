@@ -44,7 +44,7 @@ public class OAuth2ApplicationLocalServiceUtil {
 
 	/**
 	* NOTE FOR DEVELOPERS:
-	* <p>
+	*
 	* Never reference this class directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
 	*/
 	public static com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
@@ -52,6 +52,7 @@ public class OAuth2ApplicationLocalServiceUtil {
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
+		java.util.List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
@@ -61,8 +62,8 @@ public class OAuth2ApplicationLocalServiceUtil {
 		return getService()
 				   .addOAuth2Application(companyId, userId, userName,
 			allowedGrantTypesList, clientConfidential, clientId, clientSecret,
-			description, homePageURL, iconFileEntryId, name, privacyPolicyURL,
-			redirectURIsList, scopesList, serviceContext);
+			description, featuresList, homePageURL, iconFileEntryId, name,
+			privacyPolicyURL, redirectURIsList, scopesList, serviceContext);
 	}
 
 	/**
@@ -286,6 +287,7 @@ public class OAuth2ApplicationLocalServiceUtil {
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
+		java.util.List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
@@ -295,8 +297,8 @@ public class OAuth2ApplicationLocalServiceUtil {
 		return getService()
 				   .updateOAuth2Application(oAuth2ApplicationId,
 			allowedGrantTypesList, clientConfidential, clientId, clientSecret,
-			description, homePageURL, iconFileEntryId, name, privacyPolicyURL,
-			redirectURIsList, scopesList, serviceContext);
+			description, featuresList, homePageURL, iconFileEntryId, name,
+			privacyPolicyURL, redirectURIsList, scopesList, serviceContext);
 	}
 
 	/**

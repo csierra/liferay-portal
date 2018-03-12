@@ -67,15 +67,16 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 
 	/**
 	* NOTE FOR DEVELOPERS:
-	* <p>
+	*
 	* Never reference this class directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
 	*/
 	public OAuth2Application addOAuth2Application(long companyId, long userId,
 		java.lang.String userName, List<GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
 		java.lang.String clientSecret, java.lang.String description,
-		java.lang.String homePageURL, long iconFileEntryId,
-		java.lang.String name, java.lang.String privacyPolicyURL,
+		List<java.lang.String> featuresList, java.lang.String homePageURL,
+		long iconFileEntryId, java.lang.String name,
+		java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
 		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;
@@ -253,9 +254,9 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
 		List<GrantType> allowedGrantTypesList, boolean clientConfidential,
 		java.lang.String clientId, java.lang.String clientSecret,
-		java.lang.String description, java.lang.String homePageURL,
-		long iconFileEntryId, java.lang.String name,
-		java.lang.String privacyPolicyURL,
+		java.lang.String description, List<java.lang.String> featuresList,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
 		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;

@@ -26,6 +26,7 @@
 		<property name="privacyPolicyURL" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="redirectURIs" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="scopes" type="com.liferay.portal.dao.orm.hibernate.StringClobType" />
+		<property name="features" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.liferay.oauth2.provider.model.impl.OAuth2RefreshTokenImpl" table="OAuth2RefreshToken">
 		<id access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor" name="oAuth2RefreshTokenId" type="long">

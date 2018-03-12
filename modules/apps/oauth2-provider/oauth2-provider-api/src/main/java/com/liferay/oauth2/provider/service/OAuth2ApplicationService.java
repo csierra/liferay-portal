@@ -64,9 +64,9 @@ public interface OAuth2ApplicationService extends BaseService {
 	public OAuth2Application addOAuth2Application(
 		List<GrantType> allowedGrantTypesList, boolean clientConfidential,
 		java.lang.String clientId, java.lang.String clientSecret,
-		java.lang.String description, java.lang.String homePageURL,
-		long iconFileEntryId, java.lang.String name,
-		java.lang.String privacyPolicyURL,
+		java.lang.String description, List<java.lang.String> featuresList,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
 		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;
@@ -113,9 +113,9 @@ public interface OAuth2ApplicationService extends BaseService {
 	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
 		List<GrantType> allowedGrantTypesList, boolean clientConfidential,
 		java.lang.String clientId, java.lang.String clientSecret,
-		java.lang.String description, java.lang.String homePageURL,
-		long iconFileEntryId, java.lang.String name,
-		java.lang.String privacyPolicyURL,
+		java.lang.String description, List<java.lang.String> featuresList,
+		java.lang.String homePageURL, long iconFileEntryId,
+		java.lang.String name, java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
 		List<java.lang.String> scopesList, ServiceContext serviceContext)
 		throws PortalException;

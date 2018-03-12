@@ -75,6 +75,7 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 		attributes.put("privacyPolicyURL", getPrivacyPolicyURL());
 		attributes.put("redirectURIs", getRedirectURIs());
 		attributes.put("scopes", getScopes());
+		attributes.put("features", getFeatures());
 
 		return attributes;
 	}
@@ -183,6 +184,12 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 		if (scopes != null) {
 			setScopes(scopes);
 		}
+
+		String features = (String)attributes.get("features");
+
+		if (features != null) {
+			setFeatures(features);
+		}
 	}
 
 	@Override
@@ -273,6 +280,21 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return _oAuth2Application.getExpandoBridge();
+	}
+
+	/**
+	* Returns the features of this o auth2 application.
+	*
+	* @return the features of this o auth2 application
+	*/
+	@Override
+	public java.lang.String getFeatures() {
+		return _oAuth2Application.getFeatures();
+	}
+
+	@Override
+	public java.util.List<java.lang.String> getFeaturesList() {
+		return _oAuth2Application.getFeaturesList();
 	}
 
 	/**
@@ -530,6 +552,21 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_oAuth2Application.setExpandoBridgeAttributes(serviceContext);
+	}
+
+	/**
+	* Sets the features of this o auth2 application.
+	*
+	* @param features the features of this o auth2 application
+	*/
+	@Override
+	public void setFeatures(java.lang.String features) {
+		_oAuth2Application.setFeatures(features);
+	}
+
+	@Override
+	public void setFeaturesList(java.util.List<java.lang.String> featuresList) {
+		_oAuth2Application.setFeaturesList(featuresList);
 	}
 
 	/**

@@ -85,7 +85,8 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 			{ "name", Types.VARCHAR },
 			{ "privacyPolicyURL", Types.VARCHAR },
 			{ "redirectURIs", Types.VARCHAR },
-			{ "scopes", Types.CLOB }
+			{ "scopes", Types.CLOB },
+			{ "features", Types.VARCHAR }
 		};
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
 
@@ -107,9 +108,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		TABLE_COLUMNS_MAP.put("privacyPolicyURL", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("redirectURIs", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("scopes", Types.CLOB);
+		TABLE_COLUMNS_MAP.put("features", Types.VARCHAR);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,createDate DATE null,modifiedDate DATE null,userId LONG,userName VARCHAR(75) null,allowedGrantTypes VARCHAR(75) null,clientConfidential BOOLEAN,clientId VARCHAR(75) null,clientSecret VARCHAR(75) null,description VARCHAR(75) null,homePageURL STRING null,iconFileEntryId LONG,name VARCHAR(75) null,privacyPolicyURL STRING null,redirectURIs STRING null,scopes TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,createDate DATE null,modifiedDate DATE null,userId LONG,userName VARCHAR(75) null,allowedGrantTypes VARCHAR(75) null,clientConfidential BOOLEAN,clientId VARCHAR(75) null,clientSecret VARCHAR(75) null,description VARCHAR(75) null,homePageURL STRING null,iconFileEntryId LONG,name VARCHAR(75) null,privacyPolicyURL STRING null,redirectURIs STRING null,scopes TEXT null,features STRING null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2Application";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2Application.oAuth2ApplicationId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2Application.oAuth2ApplicationId ASC";
@@ -159,6 +161,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		model.setPrivacyPolicyURL(soapModel.getPrivacyPolicyURL());
 		model.setRedirectURIs(soapModel.getRedirectURIs());
 		model.setScopes(soapModel.getScopes());
+		model.setFeatures(soapModel.getFeatures());
 
 		return model;
 	}
@@ -241,6 +244,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		attributes.put("privacyPolicyURL", getPrivacyPolicyURL());
 		attributes.put("redirectURIs", getRedirectURIs());
 		attributes.put("scopes", getScopes());
+		attributes.put("features", getFeatures());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -351,6 +355,12 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 		if (scopes != null) {
 			setScopes(scopes);
+		}
+
+		String features = (String)attributes.get("features");
+
+		if (features != null) {
+			setFeatures(features);
 		}
 	}
 
@@ -635,6 +645,22 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		_scopes = scopes;
 	}
 
+	@JSON
+	@Override
+	public String getFeatures() {
+		if (_features == null) {
+			return "";
+		}
+		else {
+			return _features;
+		}
+	}
+
+	@Override
+	public void setFeatures(String features) {
+		_features = features;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -683,6 +709,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		oAuth2ApplicationImpl.setPrivacyPolicyURL(getPrivacyPolicyURL());
 		oAuth2ApplicationImpl.setRedirectURIs(getRedirectURIs());
 		oAuth2ApplicationImpl.setScopes(getScopes());
+		oAuth2ApplicationImpl.setFeatures(getFeatures());
 
 		oAuth2ApplicationImpl.resetOriginalValues();
 
@@ -868,12 +895,20 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 			oAuth2ApplicationCacheModel.scopes = null;
 		}
 
+		oAuth2ApplicationCacheModel.features = getFeatures();
+
+		String features = oAuth2ApplicationCacheModel.features;
+
+		if ((features != null) && (features.length() == 0)) {
+			oAuth2ApplicationCacheModel.features = null;
+		}
+
 		return oAuth2ApplicationCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(35);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("{oAuth2ApplicationId=");
 		sb.append(getOAuth2ApplicationId());
@@ -909,6 +944,8 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		sb.append(getRedirectURIs());
 		sb.append(", scopes=");
 		sb.append(getScopes());
+		sb.append(", features=");
+		sb.append(getFeatures());
 		sb.append("}");
 
 		return sb.toString();
@@ -916,7 +953,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(58);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.oauth2.provider.model.OAuth2Application");
@@ -990,6 +1027,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 			"<column><column-name>scopes</column-name><column-value><![CDATA[");
 		sb.append(getScopes());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>features</column-name><column-value><![CDATA[");
+		sb.append(getFeatures());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1021,6 +1062,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 	private String _privacyPolicyURL;
 	private String _redirectURIs;
 	private String _scopes;
+	private String _features;
 	private long _columnBitmask;
 	private OAuth2Application _escapedModel;
 }

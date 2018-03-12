@@ -51,6 +51,7 @@ public class OAuth2ApplicationSoap implements Serializable {
 		soapModel.setPrivacyPolicyURL(model.getPrivacyPolicyURL());
 		soapModel.setRedirectURIs(model.getRedirectURIs());
 		soapModel.setScopes(model.getScopes());
+		soapModel.setFeatures(model.getFeatures());
 
 		return soapModel;
 	}
@@ -242,6 +243,14 @@ public class OAuth2ApplicationSoap implements Serializable {
 		_scopes = scopes;
 	}
 
+	public String getFeatures() {
+		return _features;
+	}
+
+	public void setFeatures(String features) {
+		_features = features;
+	}
+
 	private long _oAuth2ApplicationId;
 	private long _companyId;
 	private Date _createDate;
@@ -259,4 +268,5 @@ public class OAuth2ApplicationSoap implements Serializable {
 	private String _privacyPolicyURL;
 	private String _redirectURIs;
 	private String _scopes;
+	private String _features;
 }
