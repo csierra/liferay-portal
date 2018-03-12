@@ -19,8 +19,8 @@ import org.osgi.service.component.annotations.Deactivate;
  * @author Stian Sigvartsen
  */
 @Component(
-	immediate = true,
-	configurationPid = "com.liferay.oauth2.provider.configuration.DefaultConfigurableScopeMapperRegistratorConfiguration"
+	configurationPid = "com.liferay.oauth2.provider.configuration.DefaultConfigurableScopeMapperRegistratorConfiguration",
+	immediate = true
 )
 public class DefaultConfigurableScopeMapperRegistrator {
 
@@ -31,11 +31,13 @@ public class DefaultConfigurableScopeMapperRegistrator {
 		boolean enabled = GetterUtil.getBoolean(
 			properties.get("enabled"), true);
 
+		Class<DefaultConfigurableScopeMapperRegistratorConfiguration> clazz =
+			DefaultConfigurableScopeMapperRegistratorConfiguration.class;
+
 		if (enabled) {
-			DefaultConfigurableScopeMapperRegistratorConfiguration configuration =
-				ConfigurableUtil.createConfigurable(
-					DefaultConfigurableScopeMapperRegistratorConfiguration.class,
-					properties);
+			DefaultConfigurableScopeMapperRegistratorConfiguration
+				configuration = ConfigurableUtil.createConfigurable(
+					clazz, properties);
 
 			Hashtable<String, Object> scopeMapperProperties = new Hashtable<>();
 
