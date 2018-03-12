@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.service.component.annotations.Component;
@@ -34,14 +35,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = {ScopeChecker.class, ScopeContext.class})
 public class ThreadLocalServiceScopeChecker
 	implements ScopeChecker, ScopeContext {
-
-	ThreadLocal<Long> _companyIdThreadLocal = ThreadLocal.withInitial(() -> 0L);
-	ThreadLocal<String> _bundleSymbolicName = ThreadLocal.withInitial(
-		() -> StringPool.BLANK);
-	ThreadLocal<String> _applicationName = ThreadLocal.withInitial(
-		() -> StringPool.BLANK);
-	ThreadLocal<String> _accessToken = ThreadLocal.withInitial(
-		() -> StringPool.BLANK);
 
 	@Override
 	public boolean checkAllScopes(String... scopes) {
@@ -111,8 +104,9 @@ public class ThreadLocalServiceScopeChecker
 				_applicationName.get(), _bundleSymbolicName.get(),
 				_companyIdThreadLocal.get(), _accessToken.get());
 
-		return oAuth2ScopeGrants.stream().anyMatch(
-			o -> scope.equals(o.getOAuth2ScopeName()));
+		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
+
+		return stream.anyMatch(o -> scope.equals(o.getOAuth2ScopeName()));
 	}
 
 	@Override
@@ -143,7 +137,16 @@ public class ThreadLocalServiceScopeChecker
 		_companyIdThreadLocal.set(companyId);
 	}
 
+	private final ThreadLocal<String> _accessToken = ThreadLocal.withInitial(
+		() -> StringPool.BLANK);
+	private final ThreadLocal<String> _applicationName =
+		ThreadLocal.withInitial(() -> StringPool.BLANK);
+	private final ThreadLocal<String> _bundleSymbolicName =
+		ThreadLocal.withInitial(() -> StringPool.BLANK);
+	private final ThreadLocal<Long> _companyIdThreadLocal =
+		ThreadLocal.withInitial(() -> 0L);
+
 	@Reference
-	OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
+	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
 
 }
