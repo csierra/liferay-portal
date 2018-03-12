@@ -286,8 +286,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		ScopeFinder service = () -> scopesSet1;
 		
-		Set<String> matchScopes = 
-			new HashSet<>(Arrays.asList(new String[] {"everything.readonly"}));
+		Set<String> matchScopes = Collections.singleton("everything.readonly");
 		
 		ScopeMatcherFactory explicitScopeMatcherFactory = 
 			(scopeAlias) -> 
