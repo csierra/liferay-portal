@@ -14,13 +14,11 @@
 
 package com.liferay.oauth2.provider.scope.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import com.liferay.oauth2.provider.scope.impl.scopematcher.ChunkScopeMatcherFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -36,8 +34,8 @@ public class ChunkScopeMatcherFactoryTest {
 		ScopeMatcher scopeMatcher = chunkScopeMatcherFactory.create(
 			"everything.readonly");
 
-		assertTrue(scopeMatcher.match("everything.readonly"));
-		assertFalse(scopeMatcher.match("everything"));
+		Assert.assertTrue(scopeMatcher.match("everything.readonly"));
+		Assert.assertFalse(scopeMatcher.match("everything"));
 	}
 
 	@Test
@@ -48,8 +46,8 @@ public class ChunkScopeMatcherFactoryTest {
 		ScopeMatcher scopeMatcher = chunkScopeMatcherFactory.create(
 			"everything");
 
-		assertTrue(scopeMatcher.match("everything.readonly"));
-		assertTrue(scopeMatcher.match("everything"));
+		Assert.assertTrue(scopeMatcher.match("everything.readonly"));
+		Assert.assertTrue(scopeMatcher.match("everything"));
 	}
 
 	@Test
@@ -60,8 +58,8 @@ public class ChunkScopeMatcherFactoryTest {
 		ScopeMatcher scopeMatcher = chunkScopeMatcherFactory.create(
 			"everything");
 
-		assertFalse(scopeMatcher.match("everything2.readonly"));
-		assertFalse(scopeMatcher.match("everything2"));
+		Assert.assertFalse(scopeMatcher.match("everything2.readonly"));
+		Assert.assertFalse(scopeMatcher.match("everything2"));
 	}
 
 }
