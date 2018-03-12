@@ -18,8 +18,8 @@ import com.liferay.oauth2.provider.scope.RequiresScope;
 
 import java.lang.reflect.Method;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,7 +29,11 @@ import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
-class ScopeAnnotationFinder {
+/**
+ * @author Carlos Sierra Andrés
+ * @review
+ */
+public class ScopeAnnotationFinder {
 
 	public static Collection<String> find(Class<?> clazz, Bus bus) {
 		ClassResourceInfo classResourceInfo =
@@ -38,12 +42,12 @@ class ScopeAnnotationFinder {
 
 		Set<String> scopes = new HashSet<>();
 
-		doFind(new HashSet<>(), scopes, true, classResourceInfo);
+		_find(new HashSet<>(), scopes, true, classResourceInfo);
 
 		return scopes;
 	}
 
-	private static void doFind(
+	private static void _find(
 		Set<ClassResourceInfo> visited, Set<String> accum, boolean recurse,
 		ClassResourceInfo classResourceInfo) {
 
@@ -55,7 +59,7 @@ class ScopeAnnotationFinder {
 			RequiresScope.class);
 
 		if (declaredAnnotation != null) {
-			accum.addAll(Arrays.asList(declaredAnnotation.value()));
+			Collections.addAll(accum, declaredAnnotation.value());
 		}
 
 		MethodDispatcher methodDispatcher =
@@ -65,15 +69,15 @@ class ScopeAnnotationFinder {
 			methodDispatcher.getOperationResourceInfos();
 
 		for (OperationResourceInfo operationResourceInfo :
-			operationResourceInfos) {
+				operationResourceInfos) {
 
-			doFind(visited, accum, recurse, operationResourceInfo);
+			_find(visited, accum, recurse, operationResourceInfo);
 		}
 
 		visited.remove(classResourceInfo);
 	}
 
-	private static void doFind(
+	private static void _find(
 		Set<ClassResourceInfo> visited, Set<String> accum, boolean recurse,
 		OperationResourceInfo operationResourceInfo) {
 
@@ -83,22 +87,21 @@ class ScopeAnnotationFinder {
 			annotatedMethod.getDeclaredAnnotation(RequiresScope.class);
 
 		if (declaredAnnotation != null) {
-			accum.addAll(Arrays.asList(declaredAnnotation.value()));
+			Collections.addAll(accum, declaredAnnotation.value());
 		}
 
 		if (operationResourceInfo.isSubResourceLocator()) {
 			ClassResourceInfo classResourceInfo =
 				operationResourceInfo.getClassResourceInfo();
 
-			Class<?> returnType =
-				operationResourceInfo.getAnnotatedMethod().getReturnType();
+			Class<?> returnType = annotatedMethod.getReturnType();
 
-			ClassResourceInfo subResource = classResourceInfo.getSubResource(
+			ClassResourceInfo subresource = classResourceInfo.getSubResource(
 				returnType, returnType);
 
-			if (subResource != null) {
+			if (subresource != null) {
 				if (recurse) {
-					doFind(visited, accum, false, subResource);
+					_find(visited, accum, false, subresource);
 				}
 			}
 		}
