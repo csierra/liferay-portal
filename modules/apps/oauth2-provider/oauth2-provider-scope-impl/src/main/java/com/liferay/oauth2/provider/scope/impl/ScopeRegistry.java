@@ -87,10 +87,15 @@ public class ScopeRegistry implements ScopeLocator {
 		ScopeMatcherFactory scopeMatcherFactory =
 			_scopedScopeMatcherFactories.getService(Long.toString(companyId));
 
+		ScopeMatcherFactory finalScopeMatcherFactory;
+
 		if (scopeMatcherFactory == null) {
-			scopeMatcherFactory = _defaultScopeMatcherFactory;
+			finalScopeMatcherFactory = _defaultScopeMatcherFactory;
 		}
-		
+		else {
+			finalScopeMatcherFactory = scopeMatcherFactory;
+		}
+
 		List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
 			_scopeFinderByNameServiceTrackerMap.getService(applicationName);
 
@@ -133,7 +138,7 @@ public class ScopeRegistry implements ScopeLocator {
 						mappedScope, 
 						input -> 
 							scopeMatchesScopesAlias(
-								input, scopeMatcherFactory, 
+								input, finalScopeMatcherFactory,
 								prefixHandler, scopesAlias)
 					);
 				
