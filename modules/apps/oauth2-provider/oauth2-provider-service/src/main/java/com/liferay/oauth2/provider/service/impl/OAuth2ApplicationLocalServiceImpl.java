@@ -78,9 +78,10 @@ public class OAuth2ApplicationLocalServiceImpl
 			long companyId, long userId,
 			String userName, List<GrantType> allowedGrantTypesList,
 			boolean clientConfidential, String clientId, String clientSecret,
-			String description, String homePageURL, long iconFileEntryId,
-			String name, String privacyPolicyURL, List<String> redirectURIsList,
-			List<String> scopesList, ServiceContext serviceContext)
+			String description, List<String> featuresList, String homePageURL,
+			long iconFileEntryId, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, List<String> scopesList,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		if (allowedGrantTypesList == null) {
@@ -122,6 +123,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setClientId(clientId);
 		oAuth2Application.setClientSecret(clientSecret);
 		oAuth2Application.setDescription(description);
+		oAuth2Application.setFeaturesList(featuresList);
 		oAuth2Application.setHomePageURL(homePageURL);
 		oAuth2Application.setIconFileEntryId(iconFileEntryId);
 		oAuth2Application.setName(name);
@@ -191,9 +193,10 @@ public class OAuth2ApplicationLocalServiceImpl
 	public OAuth2Application updateOAuth2Application(
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
 			boolean clientConfidential, String clientId, String clientSecret,
-			String description, String homePageURL, long iconFileEntryId,
-			String name, String privacyPolicyURL, List<String> redirectURIsList,
-			List<String> scopesList, ServiceContext serviceContext)
+			String description, List<String> featuresList, String homePageURL,
+			long iconFileEntryId, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, List<String> scopesList,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
@@ -213,6 +216,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setClientId(clientId);
 		oAuth2Application.setClientSecret(clientSecret);
 		oAuth2Application.setDescription(description);
+		oAuth2Application.setFeaturesList(featuresList);
 		oAuth2Application.setHomePageURL(homePageURL);
 		oAuth2Application.setIconFileEntryId(iconFileEntryId);
 		oAuth2Application.setName(name);

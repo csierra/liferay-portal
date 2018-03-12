@@ -36,8 +36,10 @@ import com.liferay.portal.kernel.util.StringPool;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
+import javax.portlet.PortletPreferences;
 
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -55,13 +57,13 @@ import java.util.List;
 	immediate = true,
 	property = {
 		"com.liferay.portlet.display-category=category.hidden",
-		"com.liferay.portlet.preferences-owned-by-group=true",
-		"com.liferay.portlet.preferences-unique-per-layout=false",
+		"com.liferay.portlet.preferences-company-wide=true",
 		"javax.portlet.display-name=OAuth2 Admin",
 		"javax.portlet.init-param.portlet-title-based-navigation=true",
 		"javax.portlet.init-param.template-path=/admin/",
 		"javax.portlet.init-param.view-template=/admin/view.jsp",
 		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
+		"javax.portlet.preferences=classpath:/META-INF/portlet-preferences/default-portlet-preferences.xml",
 		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class
@@ -105,6 +107,19 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 		String name = ParamUtil.get(request, "name", StringPool.BLANK);
 
+		PortletPreferences portletPreferences = request.getPreferences();
+
+		String[] oAuth2Features = StringUtil.split(portletPreferences.getValue(
+			"oAuth2Features", StringPool.BLANK));
+
+		List<String> featuresList = new ArrayList<>(oAuth2Features.length);
+
+		for(String feature : oAuth2Features) {
+			if (ParamUtil.getBoolean(request, "feature-" + feature, false)) {
+				featuresList.add(feature);
+			}
+		}
+
 		String description = ParamUtil.get(
 			request, "description", StringPool.BLANK);
 
@@ -141,9 +156,9 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				oAuth2Application =
 					_oAuth2ApplicationService.addOAuth2Application(
 						allowedGrantTypes, clientConfidential, clientId,
-						clientSecret, description, homePageURL, iconFileEntryId,
-						name, privacyPolicyURL, redirectURIsList, scopesList,
-						serviceContext);
+						clientSecret, description, featuresList, homePageURL,
+						iconFileEntryId, name, privacyPolicyURL,
+						redirectURIsList, scopesList, serviceContext);
 			}
 			else {
 				oAuth2Application =
@@ -157,8 +172,9 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 					_oAuth2ApplicationService.updateOAuth2Application(
 						oAuth2ApplicationId, allowedGrantTypes,
 						clientConfidential, clientId, clientSecret, description,
-						homePageURL, iconFileEntryId, name, privacyPolicyURL,
-						redirectURIsList, scopesList, serviceContext);
+						featuresList, homePageURL, iconFileEntryId, name,
+						privacyPolicyURL, redirectURIsList, scopesList,
+						serviceContext);
 			}
 
 			UploadPortletRequest uploadPortletRequest =

@@ -58,6 +58,11 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	}
 
 	@Override
+	public List<String> getFeaturesList() {
+		return Arrays.asList(StringUtil.split(getFeatures()));
+	}
+
+	@Override
 	public List<String> getRedirectURIsList(){
 		return Arrays.asList(
 			StringUtil.split(getRedirectURIs(), StringPool.NEW_LINE));
@@ -81,6 +86,13 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 		);
 
 		setAllowedGrantTypes(allowedGrantTypes);
+	}
+
+	@Override
+	public void setFeaturesList(List<String> featuresList) {
+		String features = StringUtil.merge(featuresList);
+
+		setFeatures(features);
 	}
 
 	@Override

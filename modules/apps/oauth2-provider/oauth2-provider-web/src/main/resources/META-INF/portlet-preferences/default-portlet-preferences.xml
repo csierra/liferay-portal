@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<portlet-preferences>
+	<preference>
+		<name>oAuth2Features</name>
+		<value></value>
+	</preference>
+</portlet-preferences>

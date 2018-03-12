@@ -35,6 +35,7 @@
 		<column name="privacyPolicyURL" type="String" />
 		<column name="redirectURIs" type="String" />
 		<column name="scopes" type="String" />
+		<column name="features" type="String" />
 
 		<finder name="C" return-type="Collection">
 			<finder-column name="companyId" />

@@ -1,4 +1,5 @@
-<%@ page import="com.liferay.oauth2.provider.constants.GrantType" %><%--
+<%@ page import="com.liferay.oauth2.provider.constants.GrantType" %>
+<%@ page import="com.liferay.portal.kernel.util.StringUtil" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -79,7 +80,19 @@ renderResponse.setTitle(headerTitle);
 						for (GrantType grantType : GrantType.values()) {
 							String grantTypeName = grantType.name();
 					%>
-						<aui:input name="allowedGrantTypeNames" type="checkbox" label="<%= grantTypeName + "-grant" %>" value="<%= grantTypeName %>" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains(grantType) %>" />
+					<aui:input name="allowedGrantTypeNames" type="checkbox" label="<%= grantTypeName + "-grant" %>" value="<%= grantTypeName %>" checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains(grantType) %>" />
+					<%
+						}
+					%>
+				</aui:fieldset>
+				<aui:fieldset label="supported-features">
+					<%
+						String[] oAuth2Features = StringUtil.split(portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
+
+						for (String oAuth2Feature : oAuth2Features) {
+							String escapedOAuth2Feature = HtmlUtil.escapeAttribute(oAuth2Feature);
+					%>
+					<aui:input name="<%= "feature-" + escapedOAuth2Feature %>" type="checkbox" label="<%= escapedOAuth2Feature %>" value="true" checked="<%= oAuth2Application != null && oAuth2Application.getFeaturesList().contains(oAuth2Feature) %>" />
 					<%
 						}
 					%>

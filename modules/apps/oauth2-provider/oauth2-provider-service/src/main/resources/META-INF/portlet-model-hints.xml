@@ -29,6 +29,9 @@
 		<field name="scopes" type="String">
 			<hint-collection name="CLOB" />
 		</field>
+		<field name="features" type="String">
+			<hint-collection name="TEXTAREA" />
+		</field>
 	</model>
 	<model name="com.liferay.oauth2.provider.model.OAuth2RefreshToken">
 		<field name="oAuth2RefreshTokenId" type="long" />

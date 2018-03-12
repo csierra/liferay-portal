@@ -92,6 +92,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		"CLIENT_REMOTE_ADDR_ADDRESS";
 	public static final String CLIENT_REMOTE_HOST_PROPERTY =
 		"CLIENT_REMOTE_HOST";
+	public static final String FEATURE_PREFIX_PROPERTY = "FEATURE-";
+	public static final String FEATURES_PROPERTY = "FEATURES";
 
 	private PortalCache<String, ServerAuthorizationCodeGrant>
 		_codeGrantsPortalCache;
@@ -908,7 +910,16 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		long companyId = oAuth2Application.getCompanyId();
 
-		client.getProperties().put("companyId", Long.toString(companyId));
+		Map<String, String> clientProperties = client.getProperties();
+
+		clientProperties.put("companyId", Long.toString(companyId));
+
+		clientProperties.put(
+			FEATURES_PROPERTY, oAuth2Application.getFeatures());
+
+		for (String feature : oAuth2Application.getFeaturesList()) {
+			clientProperties.put(FEATURE_PREFIX_PROPERTY + feature, feature);
+		}
 
 		return client;
 	}
