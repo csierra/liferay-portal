@@ -126,18 +126,16 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		String homePageURL = ParamUtil.get(
 			request, "homePageURL", StringPool.BLANK);
 
-		List<String> allowedGrantTypeNames =
-			new ArrayList(Arrays.asList(ParamUtil.getParameterValues(
-				request, "allowedGrantTypeNames",
-				new String[]{Boolean.FALSE.toString()})));
-
-		allowedGrantTypeNames.remove(Boolean.FALSE.toString());
+		String[] oAuth2Grants = StringUtil.split(portletPreferences.getValue(
+			"oAuth2Grants", StringPool.BLANK));
 
 		List<GrantType> allowedGrantTypes = new ArrayList<>(
-			allowedGrantTypeNames.size());
+			oAuth2Grants.length);
 
-		for (String allowedGrantTypeName : allowedGrantTypeNames) {
-			allowedGrantTypes.add(GrantType.valueOf(allowedGrantTypeName));
+		for(String oAuth2Grant : oAuth2Grants) {
+			if (ParamUtil.getBoolean(request, "grant-" + oAuth2Grant, false)) {
+				allowedGrantTypes.add(GrantType.valueOf(oAuth2Grant));
+			}
 		}
 
 		String privacyPolicyURL = ParamUtil.get(
@@ -182,7 +180,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 			String sourceFileName = uploadPortletRequest.getFileName("icon");
 
-			if (sourceFileName != null) {
+			if (!Validator.isBlank(sourceFileName)) {
 				try (InputStream inputStream =
 						 uploadPortletRequest.getFileAsStream("icon")) {
 
