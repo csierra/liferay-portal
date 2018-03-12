@@ -15,14 +15,16 @@
 package com.liferay.oauth2.provider.scope.impl.feature;
 
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+
+import java.io.IOException;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
-import java.io.IOException;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 class ScopeContextContainerRequestFilter implements ContainerRequestFilter {
 
@@ -47,5 +49,6 @@ class ScopeContextContainerRequestFilter implements ContainerRequestFilter {
 	@Context
 	private Application _application;
 
-	private ScopeContext _scopeContext;
+	private final ScopeContext _scopeContext;
+
 }

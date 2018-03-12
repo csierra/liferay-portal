@@ -14,34 +14,30 @@
 
 package com.liferay.oauth2.provider.scope.impl.feature;
 
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
+
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.Provider;
-
 @Component(
-	property = {
-		"osgi.jaxrs.extension=true",
-		"osgi.jaxrs.name=Test.Feature"
-	},
+	property = {"osgi.jaxrs.extension=true", "osgi.jaxrs.name=Test.Feature"},
 	scope = ServiceScope.PROTOTYPE
 )
 public class TestFeature implements Feature {
-
-	@Activate
-	protected void activate(ComponentContext componentContext) {
-		System.out.println("BUNDLE!!!!:" + componentContext.getUsingBundle());
-	}
 
 	@Override
 	public boolean configure(FeatureContext context) {
 		System.out.println("CONFIGURE!!!!");
 
 		return false;
+	}
+
+	@Activate
+	protected void activate(ComponentContext componentContext) {
+		System.out.println("BUNDLE!!!!:" + componentContext.getUsingBundle());
 	}
 
 }

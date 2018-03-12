@@ -14,11 +14,10 @@
 
 package com.liferay.oauth2.provider.scope.impl.jaxrs;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.IOException;
+
 import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +40,7 @@ public class CompanyRetrieverContainerRequestFilter
 		_consumer.accept(PortalUtil.getCompanyId(_httpServletRequest));
 	}
 
-	private Consumer<Long> _consumer;
+	private final Consumer<Long> _consumer;
 
 	@Context
 	private HttpServletRequest _httpServletRequest;

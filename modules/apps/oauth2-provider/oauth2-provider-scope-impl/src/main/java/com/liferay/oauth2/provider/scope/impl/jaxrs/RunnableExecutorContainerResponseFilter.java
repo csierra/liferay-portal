@@ -14,17 +14,16 @@
 
 package com.liferay.oauth2.provider.scope.impl.jaxrs;
 
+import java.io.IOException;
+
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
-import java.io.IOException;
 
 public class RunnableExecutorContainerResponseFilter
-	implements ContainerResponseFilter{
+	implements ContainerResponseFilter {
 
-	public RunnableExecutorContainerResponseFilter(
-		Runnable action) {
-
+	public RunnableExecutorContainerResponseFilter(Runnable action) {
 		_action = action;
 	}
 
@@ -37,5 +36,6 @@ public class RunnableExecutorContainerResponseFilter
 		_action.run();
 	}
 
-	private Runnable _action;
+	private final Runnable _action;
+
 }

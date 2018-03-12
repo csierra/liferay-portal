@@ -21,28 +21,26 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.PortalUtil;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 
 public class ScopedRequestScopeChecker implements ContainerRequestFilter {
-
-	private final ScopedServiceTrackerMap<RequestScopeCheckerFilter>
-		_scopedServiceTrackerMap;
-	private ScopeChecker _scopeChecker;
 
 	public ScopedRequestScopeChecker(
 		ScopedServiceTrackerMap<RequestScopeCheckerFilter>
 			scopedServiceTrackerMap, ScopeChecker scopeChecker) {
+
 		_scopedServiceTrackerMap = scopedServiceTrackerMap;
 
 		_scopeChecker = scopeChecker;
-
 	}
 
 	@Override
@@ -59,20 +57,24 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 					company.getCompanyId(), clazz.getName());
 
 			if (!requestScopeChecker.isAllowed(
-				_scopeChecker, requestContext.getRequest(), _resourceInfo)) {
+					_scopeChecker, requestContext.getRequest(),
+					_resourceInfo)) {
 
 				requestContext.abortWith(Response.status(403).build());
 
 				return;
 			}
 		}
-		catch (PortalException e) {
+		catch (PortalException pe) {
 			requestContext.abortWith(Response.status(500).build());
 
 			return;
 		}
-
 	}
+
+	private final ScopeChecker _scopeChecker;
+	private final ScopedServiceTrackerMap<RequestScopeCheckerFilter>
+		_scopedServiceTrackerMap;
 
 	@Context
 	Application _application;
@@ -82,4 +84,5 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 
 	@Context
 	ResourceInfo _resourceInfo;
+
 }

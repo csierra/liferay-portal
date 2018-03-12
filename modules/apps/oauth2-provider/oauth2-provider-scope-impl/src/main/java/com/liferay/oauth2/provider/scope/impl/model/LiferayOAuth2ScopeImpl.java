@@ -15,9 +15,10 @@
 package com.liferay.oauth2.provider.scope.impl.model;
 
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
-import org.osgi.framework.Bundle;
 
 import java.util.Objects;
+
+import org.osgi.framework.Bundle;
 
 public class LiferayOAuth2ScopeImpl implements LiferayOAuth2Scope {
 
@@ -30,8 +31,25 @@ public class LiferayOAuth2ScopeImpl implements LiferayOAuth2Scope {
 	}
 
 	@Override
-	public Bundle getBundle() {
-		return _bundle;
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		LiferayOAuth2ScopeImpl that = (LiferayOAuth2ScopeImpl)o;
+
+		if (Objects.equals(_applicationName, that._applicationName) &&
+			Objects.equals(_bundle, that._bundle) &&
+			Objects.equals(_scope, that._scope)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -40,23 +58,13 @@ public class LiferayOAuth2ScopeImpl implements LiferayOAuth2Scope {
 	}
 
 	@Override
-	public String getScope() {
-		return _scope;
+	public Bundle getBundle() {
+		return _bundle;
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		LiferayOAuth2ScopeImpl that = (LiferayOAuth2ScopeImpl) o;
-
-		return Objects.equals(_applicationName, that._applicationName) &&
-			   Objects.equals(_bundle, that._bundle) &&
-			   Objects.equals(_scope, that._scope);
+	public String getScope() {
+		return _scope;
 	}
 
 	@Override

@@ -14,7 +14,6 @@
 
 package com.liferay.oauth2.provider.scope.impl.jaxrs;
 
-
 import java.io.IOException;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -34,6 +33,6 @@ public class RunnableExecutorContainerRequestFilter
 		_action.run();
 	}
 
-	private Runnable _action;
+	private final Runnable _action;
 
 }

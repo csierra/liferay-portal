@@ -15,17 +15,19 @@
 package com.liferay.oauth2.provider.scope.impl.feature;
 
 import com.liferay.oauth2.provider.scope.RequiresScope;
+
+import java.lang.reflect.Method;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 class ScopeAnnotationFinder {
 
@@ -42,15 +44,15 @@ class ScopeAnnotationFinder {
 	}
 
 	private static void doFind(
-		Set<ClassResourceInfo> visited, Set<String> accum,
-		boolean recurse, ClassResourceInfo classResourceInfo) {
+		Set<ClassResourceInfo> visited, Set<String> accum, boolean recurse,
+		ClassResourceInfo classResourceInfo) {
 
 		visited.add(classResourceInfo);
 
 		Class<?> resourceClass = classResourceInfo.getResourceClass();
 
-		RequiresScope declaredAnnotation =
-			resourceClass.getDeclaredAnnotation(RequiresScope.class);
+		RequiresScope declaredAnnotation = resourceClass.getDeclaredAnnotation(
+			RequiresScope.class);
 
 		if (declaredAnnotation != null) {
 			accum.addAll(Arrays.asList(declaredAnnotation.value()));
@@ -72,8 +74,8 @@ class ScopeAnnotationFinder {
 	}
 
 	private static void doFind(
-		Set<ClassResourceInfo> visited, Set<String> accum,
-		boolean recurse, OperationResourceInfo operationResourceInfo) {
+		Set<ClassResourceInfo> visited, Set<String> accum, boolean recurse,
+		OperationResourceInfo operationResourceInfo) {
 
 		Method annotatedMethod = operationResourceInfo.getAnnotatedMethod();
 
@@ -91,9 +93,8 @@ class ScopeAnnotationFinder {
 			Class<?> returnType =
 				operationResourceInfo.getAnnotatedMethod().getReturnType();
 
-			ClassResourceInfo subResource =
-				classResourceInfo.getSubResource(
-					returnType, returnType);
+			ClassResourceInfo subResource = classResourceInfo.getSubResource(
+				returnType, returnType);
 
 			if (subResource != null) {
 				if (recurse) {

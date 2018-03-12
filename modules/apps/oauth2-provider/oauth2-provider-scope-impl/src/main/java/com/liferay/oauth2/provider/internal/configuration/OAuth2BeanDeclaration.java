@@ -23,8 +23,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Stian Sigvartsen
  */
 @Component(immediate = true, service = ConfigurationBeanDeclaration.class)
-public class OAuth2BeanDeclaration
-	implements ConfigurationBeanDeclaration {
+public class OAuth2BeanDeclaration implements ConfigurationBeanDeclaration {
 
 	@Override
 	public Class<?> getConfigurationBeanClass() {

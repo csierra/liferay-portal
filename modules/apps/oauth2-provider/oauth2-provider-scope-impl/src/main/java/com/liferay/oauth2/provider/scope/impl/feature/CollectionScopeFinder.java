@@ -20,8 +20,6 @@ import java.util.Collection;
 
 class CollectionScopeFinder implements ScopeFinder {
 
-	private final Collection<String> _scopes;
-
 	public CollectionScopeFinder(Collection<String> scopes) {
 		_scopes = scopes;
 	}
@@ -30,5 +28,7 @@ class CollectionScopeFinder implements ScopeFinder {
 	public Collection<String> findScopes() {
 		return _scopes;
 	}
+
+	private final Collection<String> _scopes;
 
 }

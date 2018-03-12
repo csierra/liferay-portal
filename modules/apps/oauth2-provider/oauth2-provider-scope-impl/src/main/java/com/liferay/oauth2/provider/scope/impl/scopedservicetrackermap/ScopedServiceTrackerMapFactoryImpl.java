@@ -21,15 +21,16 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Component;
 
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Component;
+
 @Component
-public class ScopedServiceTrackerMapFactoryImpl implements
-	ScopedServiceTrackerMapFactory {
+public class ScopedServiceTrackerMapFactoryImpl
+	implements ScopedServiceTrackerMapFactory {
 
 	@Override
 	public <T> ScopedServiceTrackerMap<T> create(
@@ -42,9 +43,6 @@ public class ScopedServiceTrackerMapFactoryImpl implements
 
 	private static class ScopedServiceTrackerMapImpl<T>
 		implements ScopedServiceTrackerMap<T> {
-
-		private Supplier<T> _defaultServiceSupplier;
-		private Runnable _onChange;
 
 		public ScopedServiceTrackerMapImpl(
 			BundleContext bundleContext, Class<T> clazz, String property,
@@ -69,12 +67,11 @@ public class ScopedServiceTrackerMapFactoryImpl implements
 					bundleContext, clazz,
 					"(&(companyId=*)(" + property + "=*))",
 					(serviceReference, emitter) -> {
-						ServiceReferenceMapper<String, T>
-							companyMapper = new PropertyServiceReferenceMapper<>(
-								"companyId");
-						ServiceReferenceMapper<String, T>
-							nameMapper = new PropertyServiceReferenceMapper<>(
-								property);
+						ServiceReferenceMapper<String, T> companyMapper =
+								new PropertyServiceReferenceMapper<>(
+									"companyId");
+						ServiceReferenceMapper<String, T> nameMapper =
+							new PropertyServiceReferenceMapper<>(property);
 
 						companyMapper.map(
 							serviceReference,
@@ -84,6 +81,13 @@ public class ScopedServiceTrackerMapFactoryImpl implements
 									String.join("-", key1, key2))));
 					},
 					new ServiceTrackerMapListenerImpl<>());
+		}
+
+		@Override
+		public void close() {
+			_servicesByCompany.close();
+			_servicesByCompanyAndKey.close();
+			_servicesByKey.close();
 		}
 
 		@Override
@@ -111,24 +115,20 @@ public class ScopedServiceTrackerMapFactoryImpl implements
 			return _defaultServiceSupplier.get();
 		}
 
-		@Override
-		public void close() {
-			_servicesByCompany.close();
-			_servicesByCompanyAndKey.close();
-			_servicesByKey.close();
-		}
-
-		private ServiceTrackerMap<String, List<T>> _servicesByCompany;
-		private ServiceTrackerMap<String, List<T>> _servicesByCompanyAndKey;
-		private ServiceTrackerMap<String, List<T>> _servicesByKey;
+		private final Supplier<T> _defaultServiceSupplier;
+		private final Runnable _onChange;
+		private final ServiceTrackerMap<String, List<T>> _servicesByCompany;
+		private final ServiceTrackerMap<String, List<T>>
+			_servicesByCompanyAndKey;
+		private final ServiceTrackerMap<String, List<T>> _servicesByKey;
 
 		private class ServiceTrackerMapListenerImpl<T>
 			implements ServiceTrackerMapListener<String, T, List<T>> {
+
 			@Override
 			public void keyEmitted(
 				ServiceTrackerMap<String, List<T>> serviceTrackerMap,
-				String key,
-				T service, List<T> content) {
+				String key, T service, List<T> content) {
 
 				_onChange.run();
 			}
@@ -136,11 +136,13 @@ public class ScopedServiceTrackerMapFactoryImpl implements
 			@Override
 			public void keyRemoved(
 				ServiceTrackerMap<String, List<T>> serviceTrackerMap,
-				String key,
-				T service, List<T> content) {
+				String key, T service, List<T> content) {
 
 				_onChange.run();
 			}
+
 		}
+
 	}
+
 }

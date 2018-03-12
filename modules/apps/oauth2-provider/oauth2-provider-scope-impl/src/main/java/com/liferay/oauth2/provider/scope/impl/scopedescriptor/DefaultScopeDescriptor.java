@@ -16,18 +16,16 @@ package com.liferay.oauth2.provider.scope.impl.scopedescriptor;
 
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-@Component(
-	immediate = true,
-	property = "default=true"
-)
+@Component(immediate = true, property = "default=true")
 public class DefaultScopeDescriptor implements ScopeDescriptor {
 
 	@Override
@@ -50,4 +48,5 @@ public class DefaultScopeDescriptor implements ScopeDescriptor {
 		target = "(bundle.symbolic.name=com.liferay.oauth2.provider.scope.impl)"
 	)
 	private volatile ResourceBundleLoader _resourceBundleLoader;
+
 }

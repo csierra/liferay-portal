@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.internal.configuration;
 
 import com.liferay.oauth2.provider.configuration.OAuth2AuthorizationCodePKCEGrantConfiguration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
+
 import org.osgi.service.component.annotations.Component;
 
 /**

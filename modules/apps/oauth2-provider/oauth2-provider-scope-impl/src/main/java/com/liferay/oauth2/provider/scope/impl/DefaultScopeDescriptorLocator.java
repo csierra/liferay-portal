@@ -18,6 +18,7 @@ import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -27,14 +28,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component
 public class DefaultScopeDescriptorLocator implements ScopeDescriptorLocator {
 
-	private ServiceTrackerMap<String, ScopeDescriptor>
-		_scopeDescriptorsByCompany;
-	private ServiceTrackerMap<String, ScopeDescriptor>
-		_scopeDescriptorsByApplicationName;
-
 	@Override
 	public ScopeDescriptor getScopeDescriptor(String applicationName) {
-
 		ScopeDescriptor scopeDescriptor =
 			_scopeDescriptorsByApplicationName.getService(applicationName);
 
@@ -62,6 +57,12 @@ public class DefaultScopeDescriptorLocator implements ScopeDescriptorLocator {
 		_scopeDescriptorsByCompany.close();
 	}
 
+	private ServiceTrackerMap<String, ScopeDescriptor>
+		_scopeDescriptorsByApplicationName;
+	private ServiceTrackerMap<String, ScopeDescriptor>
+		_scopeDescriptorsByCompany;
+
 	@Reference(target = "(default=true)")
 	ScopeDescriptor _defaultScopeDescriptor;
+
 }

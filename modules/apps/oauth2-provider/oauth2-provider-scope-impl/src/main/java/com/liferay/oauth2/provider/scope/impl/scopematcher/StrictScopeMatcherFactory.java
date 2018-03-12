@@ -14,21 +14,20 @@
 
 package com.liferay.oauth2.provider.scope.impl.scopematcher;
 
-import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
+import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
+
 import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Tomas Polesovsky
  */
-@Component(
-	immediate = true,
-	property = "type=strict"
-)
+@Component(immediate = true, property = "type=strict")
 public class StrictScopeMatcherFactory implements ScopeMatcherFactory {
 
 	@Override
 	public ScopeMatcher create(String input) {
 		return input::equals;
 	}
+
 }

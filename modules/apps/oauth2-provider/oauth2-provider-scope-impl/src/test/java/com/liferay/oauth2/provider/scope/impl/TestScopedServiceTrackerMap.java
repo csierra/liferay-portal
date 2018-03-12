@@ -19,45 +19,12 @@ import java.util.Map;
 
 public class TestScopedServiceTrackerMap<T> {
 
-	private T _defaultService;
-
 	public TestScopedServiceTrackerMap(T defaultService) {
-
 		_defaultService = defaultService;
 
 		_servicesByCompany = new HashMap<>();
 		_servicesByKey = new HashMap<>();
 		_servicesByCompanyAndKey = new HashMap<>();
-	}
-
-	public void setService(long companyId, T service) {
-		String companyIdString = Long.toString(companyId);
-		
-		_servicesByCompany.put(companyIdString, service);
-	}
-	
-	public void setService(String key, T service) {
-		_servicesByKey.put(key, service);
-	}
-	
-	public void setService(long companyId, String key, T service) {
-		String companyIdString = Long.toString(companyId);
-		String companyIdKeyString = String.join("-", companyIdString, key);
-		
-		_servicesByCompanyAndKey.put(companyIdKeyString, service);
-	}
-	
-	public void setService(Long companyId, String key, T service) {
-		
-		if (companyId == null && key != null) {
-			setService(key, service);
-		}
-		else if (key == null) {
-			setService(companyId.longValue(), service);
-		}
-		else {
-			setService(companyId.longValue(), key, service);
-		}
 	}
 
 	public T getService(long companyId, String key) {
@@ -84,7 +51,38 @@ public class TestScopedServiceTrackerMap<T> {
 		return _defaultService;
 	}
 
-	private Map<String, T> _servicesByCompany;
-	private Map<String, T> _servicesByCompanyAndKey;
-	private Map<String, T> _servicesByKey;
+	public void setService(long companyId, String key, T service) {
+		String companyIdString = Long.toString(companyId);
+		String companyIdKeyString = String.join("-", companyIdString, key);
+
+		_servicesByCompanyAndKey.put(companyIdKeyString, service);
+	}
+
+	public void setService(long companyId, T service) {
+		String companyIdString = Long.toString(companyId);
+
+		_servicesByCompany.put(companyIdString, service);
+	}
+
+	public void setService(Long companyId, String key, T service) {
+		if (companyId == null && key != null) {
+			setService(key, service);
+		}
+		else if (key == null) {
+			setService(companyId.longValue(), service);
+		}
+		else {
+			setService(companyId.longValue(), key, service);
+		}
+	}
+
+	public void setService(String key, T service) {
+		_servicesByKey.put(key, service);
+	}
+
+	private final T _defaultService;
+	private final Map<String, T> _servicesByCompany;
+	private final Map<String, T> _servicesByCompanyAndKey;
+	private final Map<String, T> _servicesByKey;
+
 }

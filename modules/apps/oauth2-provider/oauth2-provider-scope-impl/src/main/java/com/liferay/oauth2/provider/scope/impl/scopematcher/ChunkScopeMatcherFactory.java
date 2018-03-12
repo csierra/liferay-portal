@@ -19,22 +19,28 @@ import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.impl.scope.ChunkScopeMatcherFactory",
-	property = {
-		"default=true",
-		"type=chunks",
-		"separator=" + StringPool.PERIOD
-	}
+	property = {"default=true", "separator=" + StringPool.PERIOD, "type=chunks"}
 )
 public class ChunkScopeMatcherFactory implements ScopeMatcherFactory {
 
-	private String _separator = StringPool.PERIOD;
+	@Override
+	public ScopeMatcher create(String input) {
+		String[] inputParts = StringUtil.split(input, _separator);
+
+		if (inputParts.length == 0) {
+			return ScopeMatcher.NONE;
+		}
+
+		return new ChunkScopeMatcher(input, inputParts);
+	}
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
@@ -48,25 +54,9 @@ public class ChunkScopeMatcherFactory implements ScopeMatcherFactory {
 		}
 	}
 
-	@Override
-	public ScopeMatcher create(String input) {
-		String[] inputParts = StringUtil.split(input, _separator);
-
-		if (inputParts.length == 0) {
-			return ScopeMatcher.NONE;
-		}
-
-		return new ChunkScopeMatcher(input, inputParts);
-	}
+	private String _separator = StringPool.PERIOD;
 
 	private class ChunkScopeMatcher implements ScopeMatcher {
-		private String _input;
-		private final String[] _inputParts;
-
-		private ChunkScopeMatcher(String input, String[] inputParts) {
-			_input = input;
-			_inputParts = inputParts;
-		}
 
 		@Override
 		public boolean match(String name) {
@@ -88,6 +78,14 @@ public class ChunkScopeMatcherFactory implements ScopeMatcherFactory {
 
 			return true;
 		}
+
+		private ChunkScopeMatcher(String input, String[] inputParts) {
+			_input = input;
+			_inputParts = inputParts;
+		}
+
+		private final String _input;
+		private final String[] _inputParts;
 
 	}
 
