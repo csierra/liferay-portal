@@ -71,8 +71,7 @@ public class ScopedServiceTrackerMapFactoryImpl
 					"(&(companyId=*)(" + property + "=*))",
 					(serviceReference, emitter) -> {
 						ServiceReferenceMapper<String, T> companyMapper =
-								new PropertyServiceReferenceMapper<>(
-									"companyId");
+							new PropertyServiceReferenceMapper<>("companyId");
 						ServiceReferenceMapper<String, T> nameMapper =
 							new PropertyServiceReferenceMapper<>(property);
 
@@ -96,22 +95,23 @@ public class ScopedServiceTrackerMapFactoryImpl
 		@Override
 		public T getService(long companyId, String key) {
 			String companyIdString = Long.toString(companyId);
+
 			List<T> services = _servicesByCompanyAndKey.getService(
 				String.join("-", companyIdString, key));
 
-			if (services != null && !services.isEmpty()) {
+			if ((services != null) && !services.isEmpty()) {
 				return services.get(0);
 			}
 
 			services = _servicesByKey.getService(key);
 
-			if (services != null && !services.isEmpty()) {
+			if ((services != null) && !services.isEmpty()) {
 				return services.get(0);
 			}
 
 			services = _servicesByCompany.getService(companyIdString);
 
-			if (services != null && !services.isEmpty()) {
+			if ((services != null) && !services.isEmpty()) {
 				return services.get(0);
 			}
 
