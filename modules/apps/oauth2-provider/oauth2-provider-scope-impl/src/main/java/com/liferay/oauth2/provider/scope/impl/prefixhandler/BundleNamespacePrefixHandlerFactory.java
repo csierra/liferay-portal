@@ -40,8 +40,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 @Component(
-	public BundleNamespacePrefixHandlerFactory() {
-	}
 	immediate = true,
 	configurationPid = "com.liferay.oauth2.provider.configuration." +
 		"BundleNamespacePrefixHandlerFactory",
