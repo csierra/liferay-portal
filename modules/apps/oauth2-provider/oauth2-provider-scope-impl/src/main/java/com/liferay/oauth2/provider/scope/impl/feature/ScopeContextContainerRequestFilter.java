@@ -40,14 +40,16 @@ public class ScopeContextContainerRequestFilter
 	public void filter(ContainerRequestContext requestContext)
 		throws IOException {
 
-		Bundle bundle = FrameworkUtil.getBundle(_application.getClass());
+		Class<? extends Application> clazz = _application.getClass();
+
+		Bundle bundle = FrameworkUtil.getBundle(clazz);
 
 		if (bundle == null) {
 			return;
 		}
 
 		_scopeContext.setBundle(bundle);
-		_scopeContext.setApplicationName(_application.getClass().getName());
+		_scopeContext.setApplicationName(clazz.getName());
 	}
 
 	@Context
