@@ -14,7 +14,21 @@
  */
 --%>
 <%@ include file="/init.jsp" %>
-<%@ page import="com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException" %><%@
+<%@ page import="com.liferay.oauth2.provider.constants.GrantType" %><%@
+page import="com.liferay.oauth2.provider.exception.UnsupportedGrantTypeForClientException" %><%@
+page import="com.liferay.oauth2.provider.exception.ApplicationNameException" %><%@
+page import="com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException" %><%@
+page import="com.liferay.oauth2.provider.exception.EmptyClientSecretException" %><%@
+page import="com.liferay.oauth2.provider.exception.InvalidHomePageURLException" %><%@
+page import="com.liferay.oauth2.provider.exception.InvalidHomePageURLSchemeException" %><%@
+page import="com.liferay.oauth2.provider.exception.InvalidPrivacyPolicyURLException" %><%@
+page import="com.liferay.oauth2.provider.exception.InvalidPrivacyPolicyURLSchemeException" %><%@
+page import="com.liferay.oauth2.provider.exception.InvalidRedirectURIException" %><%@
+page import="com.liferay.oauth2.provider.exception.InvalidRedirectURIFragmentException" %><%@
+page import="com.liferay.oauth2.provider.exception.InvalidRedirectURIPathException" %><%@
+page import="com.liferay.oauth2.provider.exception.InvalidRedirectURISchemeException" %><%@
+page import="com.liferay.oauth2.provider.exception.MissingRedirectURIException" %><%@
+page import="com.liferay.oauth2.provider.exception.NonEmptyClientSecretException" %><%@
 page import="com.liferay.oauth2.provider.model.OAuth2Authorization" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalServiceUtil" %><%@
@@ -26,7 +40,8 @@ page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2Admi
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.security.auth.PrincipalException" %><%@
-page import="com.liferay.portal.kernel.util.StringPool" %>
+page import="com.liferay.portal.kernel.util.StringPool" %><%@
+page import="com.liferay.portal.kernel.util.StringUtil" %>
 
 <%@ page import="java.util.ArrayList" %>
 

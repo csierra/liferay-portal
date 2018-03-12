@@ -17,8 +17,21 @@ package com.liferay.oauth2.provider.service.impl;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.constants.GrantType;
+import com.liferay.oauth2.provider.exception.ApplicationNameException;
 import com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException;
+import com.liferay.oauth2.provider.exception.EmptyClientSecretException;
+import com.liferay.oauth2.provider.exception.InvalidHomePageURLException;
+import com.liferay.oauth2.provider.exception.InvalidHomePageURLSchemeException;
+import com.liferay.oauth2.provider.exception.InvalidPrivacyPolicyURLException;
+import com.liferay.oauth2.provider.exception.InvalidPrivacyPolicyURLSchemeException;
+import com.liferay.oauth2.provider.exception.InvalidRedirectURIException;
+import com.liferay.oauth2.provider.exception.InvalidRedirectURIFragmentException;
+import com.liferay.oauth2.provider.exception.InvalidRedirectURIPathException;
+import com.liferay.oauth2.provider.exception.InvalidRedirectURISchemeException;
+import com.liferay.oauth2.provider.exception.MissingRedirectURIException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
+import com.liferay.oauth2.provider.exception.NonEmptyClientSecretException;
+import com.liferay.oauth2.provider.exception.UnsupportedGrantTypeForClientException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
@@ -316,14 +329,16 @@ public class OAuth2ApplicationLocalServiceImpl
 		if (clientConfidential) {
 			for (GrantType grantType : allowedGrantTypesList) {
 				if (!grantType.isSupportsConfidentialClients()) {
-					throw new PortalException(grantType.name());
+					throw new UnsupportedGrantTypeForClientException(
+						grantType.name());
 				}
 			}
 		}
 		else {
 			for (GrantType grantType : allowedGrantTypesList) {
 				if (!grantType.isSupportsPublicClients()) {
-					throw new PortalException(grantType.name());
+					throw new UnsupportedGrantTypeForClientException(
+						grantType.name());
 				}
 			}
 		}
@@ -339,23 +354,27 @@ public class OAuth2ApplicationLocalServiceImpl
 		}
 
 		if (Validator.isBlank(clientSecret) && clientConfidential) {
-			throw new PortalException("clientSecret");
+			throw new EmptyClientSecretException();
+		}
+
+		if (!Validator.isBlank(clientSecret) && !clientConfidential) {
+			throw new NonEmptyClientSecretException();
 		}
 
 		if (!Validator.isBlank(homePageURL)) {
 			if (!StringUtil.startsWith(homePageURL, Http.HTTP_WITH_SLASH) &&
 				!StringUtil.startsWith(homePageURL, Http.HTTPS_WITH_SLASH)) {
 
-				throw new PortalException("homePageURL");
+				throw new InvalidHomePageURLSchemeException();
 			}
 
 			if (!Validator.isUri(homePageURL)) {
-				throw new PortalException("homePageURL");
+				throw new InvalidHomePageURLException();
 			}
 		}
 
 		if (Validator.isBlank(name)) {
-			throw new PortalException("name");
+			throw new ApplicationNameException();
 		}
 
 		if (!Validator.isBlank(privacyPolicyURL)) {
@@ -364,18 +383,18 @@ public class OAuth2ApplicationLocalServiceImpl
 				!StringUtil.startsWith(
 					privacyPolicyURL, Http.HTTPS_WITH_SLASH)) {
 
-				throw new PortalException("privacyPolicyURL");
+				throw new InvalidPrivacyPolicyURLSchemeException();
 			}
 
 			if (!Validator.isUri(privacyPolicyURL)) {
-				throw new PortalException("privacyPolicyURL");
+				throw new InvalidPrivacyPolicyURLException();
 			}
 		}
 
 		if (redirectURIsList.isEmpty()) {
 			for (GrantType grantType : allowedGrantTypesList) {
 				if (grantType.isRequiresRedirectURI()) {
-					throw new PortalException(grantType.name());
+					throw new MissingRedirectURIException(grantType.name());
 				}
 			}
 		}
@@ -385,13 +404,13 @@ public class OAuth2ApplicationLocalServiceImpl
 				URI uri = new URI(redirectURI);
 
 				if (uri.getFragment() != null) {
-					throw new PortalException(redirectURI);
+					throw new InvalidRedirectURIFragmentException(redirectURI);
 				}
 
 				String scheme = uri.getScheme();
 
 				if (scheme == null) {
-					throw new PortalException(redirectURI);
+					throw new InvalidRedirectURISchemeException(redirectURI);
 				}
 
 				scheme = scheme.toLowerCase();
@@ -400,18 +419,18 @@ public class OAuth2ApplicationLocalServiceImpl
 					!Objects.equals(scheme, Http.HTTPS) &&
 					_IANA_REGISTERED_URI_SCHEMES.contains(scheme)) {
 
-					throw new PortalException(redirectURI);
+					throw new InvalidRedirectURISchemeException(redirectURI);
 				}
 
 				String path = uri.getPath();
 				String normalizedPath = HttpUtil.normalizePath(path);
 
 				if (!Objects.equals(path, normalizedPath)) {
-					throw new PortalException(redirectURI);
+					throw new InvalidRedirectURIPathException(redirectURI);
 				}
 			}
 			catch (URISyntaxException e) {
-				throw new PortalException(redirectURI, e);
+				throw new InvalidRedirectURIException(redirectURI, e);
 			}
 		}
 	}

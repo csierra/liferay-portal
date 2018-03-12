@@ -220,15 +220,24 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				}
 			}
 		}
-		catch (PortalException | IOException pe) {
-			_log.error(pe);
+		catch (IOException ioe) {
+			_log.error(ioe);
 
 			response.setRenderParameter(
 				"mvcPath", "/admin/edit_application.jsp");
 
+		}
+		catch (PortalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe);
+			}
+
 			Class<?> peClass = pe.getClass();
 
-			SessionErrors.add(request, peClass.getName());
+			SessionErrors.add(request, peClass.getName(), pe);
+
+			response.setRenderParameter(
+				"mvcPath", "/admin/edit_application.jsp");
 		}
 	}
 

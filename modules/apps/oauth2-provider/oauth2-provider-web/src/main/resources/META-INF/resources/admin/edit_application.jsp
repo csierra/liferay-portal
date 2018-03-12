@@ -1,6 +1,4 @@
-<%@ page import="com.liferay.oauth2.provider.constants.GrantType" %>
-<%@ page import="com.liferay.portal.kernel.util.StringUtil" %>
-<%@ page import="java.util.Arrays" %><%--
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -41,7 +39,36 @@ renderResponse.setTitle(headerTitle);
 	<portlet:actionURL name='<%= oAuth2Application == null ? "updateOAuth2Application" : "updateOAuth2Application" %>' var="editOAuth2ApplicationURL" />
 
 	<aui:form action="<%= editOAuth2ApplicationURL %>" name="fm">
-		<liferay-ui:error exception="<%= DuplicateOAuth2ClientIdException.class %>" message="client-id-already-exists" />
+		<liferay-ui:error exception="<%= ApplicationNameException.class %>" message="missing-application-name" focusField="name"/>
+		<liferay-ui:error exception="<%= DuplicateOAuth2ClientIdException.class %>" message="client-id-already-exists" focusField="clientId"/>
+		<liferay-ui:error exception="<%= EmptyClientSecretException.class %>" message="client-secret-is-missing" focusField="clientSecret"/>
+		<liferay-ui:error exception="<%= InvalidHomePageURLException.class %>" message="home-page-url-is-invalid" focusField="homePageURL"/>
+		<liferay-ui:error exception="<%= InvalidHomePageURLSchemeException.class %>" message="home-page-url-scheme-is-invalid" focusField="homePageURL"/>
+		<liferay-ui:error exception="<%= InvalidPrivacyPolicyURLException.class %>" message="privacy-policy-url-is-invalid" focusField="privacyPolicyURL">
+			<liferay-ui:message key="redirect-uri-is-missing-for-grant-type-x" arguments="<%= HtmlUtil.escape(((MissingRedirectURIException)errorException).getMessage()) %>" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= InvalidPrivacyPolicyURLSchemeException.class %>" focusField="privacyPolicyURL">
+			<liferay-ui:message key="privacy-policy-url-scheme-is-invalid" arguments="<%= HtmlUtil.escape(((MissingRedirectURIException)errorException).getMessage()) %>" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= InvalidRedirectURIException.class %>" focusField="redirectURIs">
+			<liferay-ui:message key="redirect-uri-x-is-invalid" arguments="<%= HtmlUtil.escape(((InvalidRedirectURIException)errorException).getMessage()) %>" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= InvalidRedirectURIFragmentException.class %>" focusField="redirectURIs">
+			<liferay-ui:message key="redirect-uri-x-fragment-is-invalid" arguments="<%= HtmlUtil.escape(((InvalidRedirectURIFragmentException)errorException).getMessage()) %>" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= InvalidRedirectURIPathException.class %>" focusField="redirectURIs">
+			<liferay-ui:message key="redirect-uri-x-path-is-invalid" arguments="<%= HtmlUtil.escape(((InvalidRedirectURIPathException)errorException).getMessage()) %>" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= InvalidRedirectURISchemeException.class %>" focusField="redirectURIs">
+			<liferay-ui:message key="redirect-uri-x-scheme-is-invalid" arguments="<%= HtmlUtil.escape(((InvalidRedirectURISchemeException)errorException).getMessage()) %>" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= MissingRedirectURIException.class %>" focusField="redirectURIs">
+			<liferay-ui:message key="redirect-uri-is-missing-for-grant-type-x" arguments="<%= HtmlUtil.escape(((MissingRedirectURIException)errorException).getMessage()) %>" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= NonEmptyClientSecretException.class %>" message="client-secret-must-be-empty" focusField="clientSecret"/>
+		<liferay-ui:error exception="<%= UnsupportedGrantTypeForClientException.class %>" focusField="clientConfidential">
+			<liferay-ui:message key="grant-type-x-is-unsupported-for-this-client-type" arguments="<%= HtmlUtil.escape(((UnsupportedGrantTypeForClientException)errorException).getMessage()) %>" />
+		</liferay-ui:error>
 
 		<aui:model-context bean="<%= oAuth2Application %>" model="<%= OAuth2Application.class %>" />
 
@@ -50,7 +77,7 @@ renderResponse.setTitle(headerTitle);
 				value='<%= oAuth2Application == null ? "" : oAuth2Application.getOAuth2ApplicationId() %>'
 			/>
 
-			<aui:fieldset label="details">
+			<aui:fieldset>
 				<aui:input name="name" required="true" />
 				<aui:field-wrapper>
 					<aui:input label="icon" name="icon" type="file" inlineField="true"/>

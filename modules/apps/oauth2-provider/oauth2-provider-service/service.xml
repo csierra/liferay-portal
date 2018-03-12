@@ -161,5 +161,19 @@
 		<reference entity="OAuth2Token" package-path="com.liferay.oauth2.provider" />
 	</entity>
 	<exceptions>
-		<exception>DuplicateOAuth2ClientId</exception></exceptions>
+		<exception>ApplicationName</exception>
+		<exception>DuplicateOAuth2ClientId</exception>
+		<exception>EmptyClientSecret</exception>
+		<exception>InvalidHomePageURL</exception>
+		<exception>InvalidHomePageURLScheme</exception>
+		<exception>InvalidPrivacyPolicyURL</exception>
+		<exception>InvalidPrivacyPolicyURLScheme</exception>
+		<exception>InvalidRedirectURI</exception>
+		<exception>InvalidRedirectURIFragment</exception>
+		<exception>InvalidRedirectURIPath</exception>
+		<exception>InvalidRedirectURIScheme</exception>
+		<exception>MissingRedirectURI</exception>
+		<exception>NonEmptyClientSecret</exception>
+		<exception>UnsupportedGrantTypeForClient</exception>
+	</exceptions>
 </service-builder>
