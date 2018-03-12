@@ -15,26 +15,26 @@ package com.liferay.oauth2.provider.exception;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.exception.NoSuchModelException;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @ProviderType
-public class NoSuchOAuth2ApplicationException extends NoSuchModelException {
+public class InvalidHomePageURLSchemeException extends PortalException {
 
-	public NoSuchOAuth2ApplicationException() {
+	public InvalidHomePageURLSchemeException() {
 	}
 
-	public NoSuchOAuth2ApplicationException(String msg) {
+	public InvalidHomePageURLSchemeException(String msg) {
 		super(msg);
 	}
 
-	public NoSuchOAuth2ApplicationException(String msg, Throwable cause) {
+	public InvalidHomePageURLSchemeException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
-	public NoSuchOAuth2ApplicationException(Throwable cause) {
+	public InvalidHomePageURLSchemeException(Throwable cause) {
 		super(cause);
 	}
 

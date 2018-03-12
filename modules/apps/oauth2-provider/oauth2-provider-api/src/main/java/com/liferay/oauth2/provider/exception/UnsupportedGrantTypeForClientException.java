@@ -15,26 +15,26 @@ package com.liferay.oauth2.provider.exception;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.exception.NoSuchModelException;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @ProviderType
-public class NoSuchOAuth2ApplicationException extends NoSuchModelException {
+public class UnsupportedGrantTypeForClientException extends PortalException {
 
-	public NoSuchOAuth2ApplicationException() {
+	public UnsupportedGrantTypeForClientException() {
 	}
 
-	public NoSuchOAuth2ApplicationException(String msg) {
+	public UnsupportedGrantTypeForClientException(String msg) {
 		super(msg);
 	}
 
-	public NoSuchOAuth2ApplicationException(String msg, Throwable cause) {
+	public UnsupportedGrantTypeForClientException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
-	public NoSuchOAuth2ApplicationException(Throwable cause) {
+	public UnsupportedGrantTypeForClientException(Throwable cause) {
 		super(cause);
 	}
 

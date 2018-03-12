@@ -15,26 +15,26 @@ package com.liferay.oauth2.provider.exception;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.exception.NoSuchModelException;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @ProviderType
-public class NoSuchOAuth2ApplicationException extends NoSuchModelException {
+public class InvalidRedirectURIFragmentException extends PortalException {
 
-	public NoSuchOAuth2ApplicationException() {
+	public InvalidRedirectURIFragmentException() {
 	}
 
-	public NoSuchOAuth2ApplicationException(String msg) {
+	public InvalidRedirectURIFragmentException(String msg) {
 		super(msg);
 	}
 
-	public NoSuchOAuth2ApplicationException(String msg, Throwable cause) {
+	public InvalidRedirectURIFragmentException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
-	public NoSuchOAuth2ApplicationException(Throwable cause) {
+	public InvalidRedirectURIFragmentException(Throwable cause) {
 		super(cause);
 	}
 
