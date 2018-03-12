@@ -49,13 +49,9 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 public class BundleNamespacePrefixHandlerFactory
 	implements PrefixHandlerFactory {
 
-	private List<String> _excludedScope = new ArrayList<>();
-
 	public BundleNamespacePrefixHandlerFactory(
 		BundleContext bundleContext, boolean includeBundleSymbolName,
-
-	String[] serviceProperties,
-		String excludedScope, String separator) {
+		String[] serviceProperties, String excludedScope, String separator) {
 
 		_init(
 			bundleContext, includeBundleSymbolName, serviceProperties,
@@ -177,10 +173,8 @@ public class BundleNamespacePrefixHandlerFactory
 
 	private void _init(
 		BundleContext bundleContext, boolean includeBundleSymbolicName,
-
-	String[] serviceProperties, String excludedScopeProperty,
-
-	String separator) {
+		String[] serviceProperties, String excludedScopeProperty,
+		String separator) {
 
 		_bundleContext = bundleContext;
 
@@ -200,6 +194,7 @@ public class BundleNamespacePrefixHandlerFactory
 	private String[] _EMPTY_STRING_ARRAY = new String[0];
 
 	private BundleContext _bundleContext;
+	private List<String> _excludedScope = new ArrayList<>();
 	private boolean _includeBundleSymbolicName;
 	private String _separator = StringPool.SLASH;
 	private String[] _serviceProperties;
