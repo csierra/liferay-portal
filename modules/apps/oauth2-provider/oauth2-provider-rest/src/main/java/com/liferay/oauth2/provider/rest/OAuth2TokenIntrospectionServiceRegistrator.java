@@ -65,6 +65,8 @@ import java.util.Objects;
 )
 public class OAuth2TokenIntrospectionServiceRegistrator {
 
+	public static final String TOKEN_INTROSPECTION_FEATURE = "token-introspection";
+
 	private ServiceRegistration<Object> _endpointServiceRegistration;
 	private ServiceRegistration<Class> _classServiceRegistration;
 
@@ -249,6 +251,16 @@ public class OAuth2TokenIntrospectionServiceRegistrator {
 
 			if (!_clientsMatch(
 				authenticatedClient, serverAccessToken.getClient())) {
+
+				return false;
+			}
+
+			Map<String, String> clientProperties =
+				authenticatedClient.getProperties();
+
+			if (!clientProperties.containsKey(
+				LiferayOAuthDataProvider.FEATURE_PREFIX_PROPERTY +
+					TOKEN_INTROSPECTION_FEATURE)) {
 
 				return false;
 			}
