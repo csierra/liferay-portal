@@ -292,9 +292,6 @@ public class ScopeRegistry implements ScopeLocator {
 	@Reference
 	ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 	
-	@Reference
-	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
-
 	private ServiceTrackerMap<
 		String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
 			_scopeFinderByNameServiceTrackerMap;
