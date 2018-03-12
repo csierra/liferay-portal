@@ -17,7 +17,7 @@ package com.liferay.oauth2.provider.scope.impl.scopemapper;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.portal.kernel.util.GetterUtil;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,9 +31,8 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
  * @author Stian Sigvartsen
  */
 @Component(
-	immediate = true,
 	configurationPid = "com.liferay.oauth2.provider.configuration.ConfigurableScopeMapper",
-	configurationPolicy = ConfigurationPolicy.REQUIRE
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true
 )
 public class ConfigurableScopeMapper implements ScopeMapper {
 
@@ -69,7 +68,7 @@ public class ConfigurableScopeMapper implements ScopeMapper {
 	protected void activate(Map<String, Object> properties) {
 		Object mappings = properties.get("mapping");
 
-		if (mappings == null || !(mappings instanceof String[])) {
+		if ((mappings == null) || !(mappings instanceof String[])) {
 			return;
 		}
 
@@ -93,7 +92,7 @@ public class ConfigurableScopeMapper implements ScopeMapper {
 				Set<String> mappingOutput = _map.computeIfAbsent(
 					mappingInput, __ -> new HashSet<>());
 
-				mappingOutput.addAll(Arrays.asList(mappingParts[1].split(",")));
+				Collections.addAll(mappingOutput, mappingParts[1].split(","));
 			}
 		}
 	}
