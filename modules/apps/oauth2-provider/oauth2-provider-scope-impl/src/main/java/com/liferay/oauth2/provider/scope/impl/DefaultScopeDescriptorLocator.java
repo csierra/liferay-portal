@@ -60,12 +60,12 @@ public class DefaultScopeDescriptorLocator implements ScopeDescriptorLocator {
 		_scopeDescriptorsByCompany.close();
 	}
 
+	@Reference(target = "(default=true)")
+	private ScopeDescriptor _defaultScopeDescriptor;
+
 	private ServiceTrackerMap<String, ScopeDescriptor>
 		_scopeDescriptorsByApplicationName;
 	private ServiceTrackerMap<String, ScopeDescriptor>
 		_scopeDescriptorsByCompany;
-
-	@Reference(target = "(default=true)")
-	ScopeDescriptor _defaultScopeDescriptor;
 
 }
