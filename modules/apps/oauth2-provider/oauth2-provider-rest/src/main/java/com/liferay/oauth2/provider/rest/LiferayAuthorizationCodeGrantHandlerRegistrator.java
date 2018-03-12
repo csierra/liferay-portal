@@ -14,8 +14,6 @@
 
 package com.liferay.oauth2.provider.rest;
 
-import com.liferay.oauth2.provider.configuration.OAuth2AuthorizationCodeGrantConfiguration;
-import com.liferay.oauth2.provider.configuration.OAuth2AuthorizationCodePKCEGrantConfiguration;
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -23,12 +21,9 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.MapUtil;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth2.grants.code.DigestCodeVerifier;
@@ -36,6 +31,7 @@ import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGran
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -182,7 +178,7 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		long companyId = oAuth2Application.getCompanyId();
 
 		if (client.isConfidential()) {
-			if (!isAuthorizationCodeEnabled(companyId)){
+			if (!_oAuth2Configuration.allowAuthorizationCodeGrant()){
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Auhotization code grant is disabled in " + companyId);
@@ -190,9 +186,23 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 				return false;
 			}
+
+			List<String> allowedGrantTypes = client.getAllowedGrantTypes();
+
+			if (!allowedGrantTypes.contains(
+				OAuthConstants.AUTHORIZATION_CODE_GRANT)) {
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Client is not allowed to use " +
+						OAuthConstants.AUTHORIZATION_CODE_GRANT + " grant");
+				}
+
+				return false;
+			}
 		}
 		else {
-			if (!isAuthorizationCodePKCEEnabled(companyId)){
+			if (!_oAuth2Configuration.allowAuthorizationCodePKCEGrant()){
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"PKCE grant is disabled in " + companyId);
@@ -272,61 +282,9 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		}
 	}
 
-	protected boolean isAuthorizationCodeEnabled(long companyId) {
-		try {
-			OAuth2AuthorizationCodeGrantConfiguration
-				oAuth2AuthorizationCodeGrantConfiguration =
-				_configurationProvider.getCompanyConfiguration(
-					OAuth2AuthorizationCodeGrantConfiguration.class,
-					companyId);
-
-			if (!oAuth2AuthorizationCodeGrantConfiguration.enabled()) {
-				return false;
-			}
-		}
-		catch (ConfigurationException e) {
-			_log.error(
-				"Unable to load OAuth2AuthorizationCodeGrantConfiguration" +
-					" for " + companyId,
-				e);
-
-			return false;
-		}
-
-		return true;
-	}
-
-	protected boolean isAuthorizationCodePKCEEnabled(long companyId) {
-		try {
-			OAuth2AuthorizationCodePKCEGrantConfiguration
-				oAuth2AuthorizationCodePKCEGrantConfiguration =
-				_configurationProvider.getCompanyConfiguration(
-					OAuth2AuthorizationCodePKCEGrantConfiguration.class,
-					companyId);
-
-			if (!oAuth2AuthorizationCodePKCEGrantConfiguration.enabled()) {
-				return false;
-			}
-		}
-		catch (ConfigurationException e) {
-			_log.error(
-				"Unable to load " +
-					"OAuth2AuthorizationCodePKCEGrantConfiguration for " +
-						companyId,
-				e);
-
-			return false;
-		}
-
-		return true;
-	}
-
 	private static Log _log =
 		LogFactoryUtil.getLog(
 			LiferayAuthorizationCodeGrantHandlerRegistrator.class);
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;

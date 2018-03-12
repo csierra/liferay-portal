@@ -14,12 +14,7 @@
 
 package com.liferay.oauth2.provider.rest;
 
-import com.liferay.oauth2.provider.configuration.OAuth2AuthorizationCodeGrantConfiguration;
-import com.liferay.oauth2.provider.configuration.OAuth2AuthorizationCodePKCEGrantConfiguration;
-import com.liferay.oauth2.provider.configuration.OAuth2ClientCredentialsGrantConfiguration;
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
-import com.liferay.oauth2.provider.configuration.OAuth2RefreshTokenGrantConfiguration;
-import com.liferay.oauth2.provider.configuration.OAuth2ResourceOwnerGrantConfiguration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
@@ -43,7 +38,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;

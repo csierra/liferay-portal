@@ -15,15 +15,12 @@
 package com.liferay.oauth2.provider.rest;
 
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
-import com.liferay.oauth2.provider.configuration.OAuth2RefreshTokenGrantConfiguration;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -158,16 +155,6 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 			_liferayOAuthDataProvider.resolveOAuth2Application(
 				refreshToken.getClient());
 
-		if (!isRefreshTokenEnabled(oAuth2Application.getCompanyId())) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Refresh Token grant is disabled in " +
-						oAuth2Application.getCompanyId());
-			}
-
-			return false;
-		}
-
 		String subjectId = refreshToken.getSubject().getId();
 
 		long userId = Long.parseLong(subjectId);
@@ -216,36 +203,9 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 		return false;
 	}
 
-	protected boolean isRefreshTokenEnabled(long companyId) {
-		try {
-			OAuth2RefreshTokenGrantConfiguration
-				oAuth2RefreshTokenGrantConfiguration =
-				_configurationProvider.getCompanyConfiguration(
-					OAuth2RefreshTokenGrantConfiguration.class,
-					companyId);
-
-			if (!oAuth2RefreshTokenGrantConfiguration.enabled()) {
-				return false;
-			}
-		}
-		catch (ConfigurationException e) {
-			_log.error(
-				"Unable to load OAuth2RefreshTokenGrantConfiguration" +
-					" for " + companyId,
-				e);
-
-			return false;
-		}
-
-		return true;
-	}
-
 	private static Log _log =
 		LogFactoryUtil.getLog(
 			LiferayClientCredentialsGrantHandlerRegistrator.class);
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
