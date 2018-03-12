@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.scope.impl.scopedescriptor;
 
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -42,7 +43,7 @@ public class DefaultScopeDescriptor implements ScopeDescriptor {
 			return scope;
 		}
 
-		return resourceBundle.getString(scope);
+		return ResourceBundleUtil.getString(resourceBundle, scope);
 	}
 
 	@Reference(
