@@ -25,6 +25,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component(immediate = true, property = "default=true")
 public class DefaultScopeDescriptor implements ScopeDescriptor {
 

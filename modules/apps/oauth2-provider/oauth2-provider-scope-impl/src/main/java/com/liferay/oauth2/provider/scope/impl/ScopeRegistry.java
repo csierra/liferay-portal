@@ -55,6 +55,9 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component(immediate = true, service = ScopeLocator.class)
 public class ScopeRegistry implements ScopeLocator {
 

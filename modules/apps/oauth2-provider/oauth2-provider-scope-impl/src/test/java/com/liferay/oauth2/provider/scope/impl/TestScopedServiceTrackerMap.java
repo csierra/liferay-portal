@@ -17,6 +17,9 @@ package com.liferay.oauth2.provider.scope.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Stian Sigvartsen
+ */
 public class TestScopedServiceTrackerMap<T> {
 
 	public TestScopedServiceTrackerMap(T defaultService) {

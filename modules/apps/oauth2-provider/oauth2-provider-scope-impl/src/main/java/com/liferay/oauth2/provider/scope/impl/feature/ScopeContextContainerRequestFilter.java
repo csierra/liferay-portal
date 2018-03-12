@@ -26,7 +26,11 @@ import javax.ws.rs.core.Context;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
-class ScopeContextContainerRequestFilter implements ContainerRequestFilter {
+/**
+ * @author Carlos Sierra Andrés
+ */
+public class ScopeContextContainerRequestFilter
+	implements ContainerRequestFilter {
 
 	public ScopeContextContainerRequestFilter(ScopeContext scopeContext) {
 		_scopeContext = scopeContext;

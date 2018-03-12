@@ -28,6 +28,9 @@ import java.util.function.Supplier;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Component;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component
 public class ScopedServiceTrackerMapFactoryImpl
 	implements ScopedServiceTrackerMapFactory {

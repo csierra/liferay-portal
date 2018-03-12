@@ -28,6 +28,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component(service = {ScopeChecker.class, ScopeContext.class})
 public class ThreadLocalServiceScopeChecker
 	implements ScopeChecker, ScopeContext {

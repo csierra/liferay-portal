@@ -23,6 +23,9 @@ import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 
 import org.junit.Test;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 public class ChunkScopeMatcherFactoryTest {
 
 	@Test

@@ -39,6 +39,10 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 
+/**
+ * @author Carlos Sierra Andrés
+ * @author Stian Sigvartsen
+ */
 @Component(
 	immediate = true,
 	configurationPid = "com.liferay.oauth2.provider.configuration." +

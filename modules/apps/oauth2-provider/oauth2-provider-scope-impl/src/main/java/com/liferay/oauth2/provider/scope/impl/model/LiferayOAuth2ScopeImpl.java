@@ -20,6 +20,9 @@ import java.util.Objects;
 
 import org.osgi.framework.Bundle;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 public class LiferayOAuth2ScopeImpl implements LiferayOAuth2Scope {
 
 	public LiferayOAuth2ScopeImpl(

@@ -19,6 +19,9 @@ import java.io.IOException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 public class RunnableExecutorContainerRequestFilter
 	implements ContainerRequestFilter {
 

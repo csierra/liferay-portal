@@ -69,6 +69,9 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.util.tracker.ServiceTracker;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component(immediate = true, property = {"liferay.extension=OAuth2"})
 @Provider
 public class LiferayOAuth2OSGiFeature implements Feature {

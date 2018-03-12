@@ -18,7 +18,10 @@ import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 
 import java.util.Collection;
 
-class CollectionScopeFinder implements ScopeFinder {
+/**
+ * @author Carlos Sierra Andrés
+ */
+public class CollectionScopeFinder implements ScopeFinder {
 
 	public CollectionScopeFinder(Collection<String> scopes) {
 		_scopes = scopes;

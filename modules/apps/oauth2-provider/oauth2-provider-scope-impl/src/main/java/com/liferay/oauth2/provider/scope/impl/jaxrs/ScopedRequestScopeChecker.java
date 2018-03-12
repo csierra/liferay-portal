@@ -32,6 +32,9 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 
 	public ScopedRequestScopeChecker(

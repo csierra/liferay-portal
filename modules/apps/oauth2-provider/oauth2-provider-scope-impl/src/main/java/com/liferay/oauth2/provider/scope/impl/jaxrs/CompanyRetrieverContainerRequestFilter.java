@@ -26,6 +26,9 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 public class CompanyRetrieverContainerRequestFilter
 	implements ContainerRequestFilter {
 

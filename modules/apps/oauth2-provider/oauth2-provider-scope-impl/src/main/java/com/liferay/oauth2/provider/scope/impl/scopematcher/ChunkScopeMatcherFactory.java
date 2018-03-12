@@ -25,6 +25,9 @@ import java.util.Map;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.impl.scope.ChunkScopeMatcherFactory",
 	property = {"default=true", "separator=" + StringPool.PERIOD, "type=chunks"}

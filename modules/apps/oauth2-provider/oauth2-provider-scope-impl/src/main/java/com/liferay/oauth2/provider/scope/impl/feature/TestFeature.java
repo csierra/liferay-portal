@@ -22,6 +22,9 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component(
 	property = {"osgi.jaxrs.extension=true", "osgi.jaxrs.name=Test.Feature"},
 	scope = ServiceScope.PROTOTYPE

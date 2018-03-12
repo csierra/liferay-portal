@@ -58,6 +58,9 @@ import org.osgi.framework.ServiceReference;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+/**
+ * @author Stian Sigvartsen
+ */
 @RunWith(PowerMockRunner.class)
 public class ScopeRegistryTest extends PowerMockito {
 
