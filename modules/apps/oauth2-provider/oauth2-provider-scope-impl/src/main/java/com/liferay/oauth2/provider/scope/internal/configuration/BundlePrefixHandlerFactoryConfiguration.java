@@ -22,53 +22,58 @@ import com.liferay.portal.kernel.util.StringPool;
  * @author Tomas Polesovsky
  */
 @ExtendedObjectClassDefinition(
-	category = "foundation", factoryInstanceLabelAttribute = "configurationName"
+	category = "foundation", factoryInstanceLabelAttribute = "configuration.name"
 )
 @Meta.OCD(
 	id = "com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration",
 	factory = true,
-	localization = "content/Language", name = "oauth2-BundlePrefixHandlerFactoryConfiguration-name"
+	localization = "content/Language", name = "oauth2-bundle-prefix-handler-factory-configuration-name"
 )
 public interface BundlePrefixHandlerFactoryConfiguration {
 
 	@Meta.AD(
-		deflt = "",
-		required = false
+		deflt = "", id = "configuration.name",
+		name = "configuration-name",
+		description = "configuration-name-description", required = false
 	)
 	public String configurationName();
 
 	@Meta.AD(
-		deflt = "",
-		required = false
+		deflt = "", id = "companyId", name = "company-id",
+		description = "company-id-description", required = false
 	)
 	public String companyId();
 
 	@Meta.AD(
-		deflt = "false", id="default",
+		deflt = "false", id = "default",
+		name = "default-system-prefixhandlerfactory",
+		description = "default-system-prefixhandlerfactory-description",
 		required = false
 	)
 	public boolean defaultSystemPrefixHandlerFactory();
 
 	@Meta.AD(
-		deflt = "true",
-		required = false
+		deflt = "true", id = "include.bundle.symbolic.name",
+		name = "include-bundle-symbolic-name", description = "include-bundle-symbolic-name-description", required = false
 	)
 	public boolean includeBundleSymbolicName();
 
 	@Meta.AD(
-		deflt = "", id = "exclued.scopes",
-		required = false
+		deflt = "", id = "excluded.scopes", name = "excluded-scopes",
+		description = "excluded-scopes-description", required = false
 	)
 	public String[] excludedScopes();
 
 	@Meta.AD(
-		deflt = "osgi.jaxrs.name",
-		required = false
+		deflt = "osgi.jaxrs.name", id = "service.properties",
+		name = "service-properties",
+		description = "service-properties-description", required = false
 	)
 	public String[] serviceProperties();
 
 	@Meta.AD(
-		deflt = StringPool.SLASH, required = false
+		deflt = StringPool.SLASH, id="separator", name="separator",
+		description = "separator-description", required = false
 	)
 	public String separator();
 
