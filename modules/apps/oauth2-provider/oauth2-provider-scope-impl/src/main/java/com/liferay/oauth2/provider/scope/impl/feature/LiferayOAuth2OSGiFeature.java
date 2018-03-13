@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scope.impl.feature;
 
-import com.liferay.oauth2.provider.rest.spi.RequestScopeCheckerFilter;
+import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.RequestScopeCheckerFilter;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.CompanyRetrieverContainerRequestFilter;
 import com.liferay.oauth2.provider.scope.impl.jaxrs.RunnableExecutorContainerResponseFilter;
