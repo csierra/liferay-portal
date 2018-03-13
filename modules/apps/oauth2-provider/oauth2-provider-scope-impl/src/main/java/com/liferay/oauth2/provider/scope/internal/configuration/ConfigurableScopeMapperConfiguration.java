@@ -40,10 +40,10 @@ public interface ConfigurableScopeMapperConfiguration {
 	public String configurationName();
 
 	@Meta.AD(
-		deflt = "", description = "company-id-description", id = "companyId",
-		name = "company-id", required = false
+		deflt = "", description = "osgi-jaxrs-name-description",
+		id = "osgi.jaxrs.name", name = "osgi-jaxrs-name", required = false
 	)
-	public String companyId();
+	public String osgiJAXRSName();
 
 	@Meta.AD(
 		deflt = "false", description = "default-system-scopemapper-description",
