@@ -14,16 +14,11 @@
 
 package com.liferay.oauth2.provider.scope.impl;
 
-import static org.hamcrest.CoreMatchers.*;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
 
 import com.liferay.oauth2.provider.scope.impl.scopematcher.StrictScopeMatcherFactory;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
@@ -44,13 +39,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import org.osgi.framework.ServiceReference;
@@ -64,108 +59,81 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 public class ScopeRegistryTest extends PowerMockito {
 
-	private final long _companyId = 1;
-	private final String _applicationName = "com.liferay.test1";
-
-	protected final Set<String> scopesSet1 = new HashSet<>(
-		Arrays.asList(new String[] {"everything", "everything.readonly"}));
-
-	protected final Set<String> scopedSet2 = new HashSet<>(
-		Arrays.asList(new String[] {"GET", "POST"}));
-
-	@Before
-	public void setUp()
-		throws IllegalArgumentException, IllegalAccessException {}
-
-	private interface CompanyAndKeyRegistrator<T> {
-
-		public void register(Long companyId, String key, T service);
-	}
-
-	private interface CompanyAndKeyConfigurator<T> {
-
-		public void configure(CompanyAndKeyRegistrator<T> registrator);
-	}
-
-	private interface KeyRegistrator<T> {
-
-		public void register(String key, T service);
-	}
-
-	private interface KeyConfigurator<T> {
-
-		public void configure(KeyRegistrator<T> registrator);
-	}
-
 	@Test
 	public void testPrefixHandlerFactoryByNameAndCompany() throws Exception {
-	String applicationName2 = "com.liferay.test2";
+		String applicationName2 = "com.liferay.test2";
 
-		PrefixHandler defaultPrefixHandler = (target) -> "default/" + target;
+		PrefixHandler defaultPrefixHandler = target -> "default/" + target;
 
 		ScopeFinder scopeFinder = () -> scopesSet1;
 
-		ScopeRegistry scopeRegistry = new Builder()
-			.withPrefixHandlerFactories(
-				(propertyAccessor) -> defaultPrefixHandler, (registrator) -> {})
-			.withScopeFinders((registrator) -> {
-					registrator.register(
-						_companyId, _applicationName, scopeFinder);
-					registrator.register(
-						_companyId, applicationName2, scopeFinder);
-				})
-			.build();
+		Builder builder = new Builder();
+
+		ScopeRegistry scopeRegistry = builder.withPrefixHandlerFactories(
+			propertyAccessor -> defaultPrefixHandler,
+			registrator -> {
+			}
+		).withScopeFinders(
+			registrator -> {
+				registrator.register(
+					_COMPANY_ID, _APPLICATION_NAME, scopeFinder);
+				registrator.register(
+					_COMPANY_ID, applicationName2, scopeFinder);
+			}
+		).build();
 
 		Collection<String> application1ScopeAliases =
-			scopeRegistry.getScopeAliases(_companyId, _applicationName);
+			scopeRegistry.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
 
 		Collection<String> application2ScopeAliases =
-			scopeRegistry.getScopeAliases(_companyId, applicationName2);
+			scopeRegistry.getScopeAliases(_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
-			assertThat(
+			Assert.assertThat(
 				application1ScopeAliases,
 				hasItem(defaultPrefixHandler.addPrefix(scope)));
 
-			assertThat(
+			Assert.assertThat(
 				application2ScopeAliases,
 				hasItem(defaultPrefixHandler.addPrefix(scope)));
 		}
 
-		PrefixHandler appPrefixHandler = (target) -> "app/" + target;
-		PrefixHandler companyPrefixHandler = (target) -> "company/" + target;
+		PrefixHandler appPrefixHandler = target -> "app/" + target;
+		PrefixHandler companyPrefixHandler = target -> "company/" + target;
 
-		scopeRegistry = new Builder()
-			.withPrefixHandlerFactories(
-				(propertyAccessor) -> defaultPrefixHandler,
-				(registrator) -> {
-					registrator.register(
-						null, _applicationName,
-						(propertyAccessor) -> appPrefixHandler);
-					registrator.register(
-						_companyId, null,
-						(propertyAccessor) -> companyPrefixHandler);
-				})
-			.withScopeFinders((registrator) -> {
-					registrator.register(
-						_companyId, _applicationName, scopeFinder);
-					registrator.register(
-						_companyId, applicationName2, scopeFinder);
-				})
-			.build();
+		builder = new Builder();
+
+		scopeRegistry = builder.withPrefixHandlerFactories(
+			propertyAccessor -> defaultPrefixHandler,
+			registrator -> {
+				registrator.register(
+					null, _APPLICATION_NAME,
+					propertyAccessor -> appPrefixHandler);
+				registrator.register(
+					_COMPANY_ID, null,
+					propertyAccessor -> companyPrefixHandler);
+			}
+		).withScopeFinders(
+			registrator -> {
+				registrator.register(
+					_COMPANY_ID, _APPLICATION_NAME, scopeFinder);
+				registrator.register(
+					_COMPANY_ID, applicationName2, scopeFinder);
+			}
+		).build();
 
 		application1ScopeAliases = scopeRegistry.getScopeAliases(
-			_companyId, _applicationName);
+			_COMPANY_ID, _APPLICATION_NAME);
 
 		application2ScopeAliases = scopeRegistry.getScopeAliases(
-			_companyId, applicationName2);
+			_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
-			assertThat(
-					application1ScopeAliases,
+			Assert.assertThat(
+				application1ScopeAliases,
 				hasItem(appPrefixHandler.addPrefix(scope)));
 
-			assertThat(
+			Assert.assertThat(
 				application2ScopeAliases,
 				hasItem(companyPrefixHandler.addPrefix(scope)));
 		}
@@ -173,102 +141,108 @@ public class ScopeRegistryTest extends PowerMockito {
 
 	@Test
 	public void testScopeFinderByName() throws Exception {
-
 		String applicationName2 = "com.liferay.test2";
-	ScopeFinder application1ScopeFinder = () -> scopesSet1;
+		ScopeFinder application1ScopeFinder = () -> scopesSet1;
 		ScopeFinder application2ScopeFinder = () -> scopedSet2;
 
-		ScopeRegistry scopeRegistry = new Builder()
-			.withScopeFinders((registrator) -> {
-					registrator.register(
-						_companyId, _applicationName, application1ScopeFinder);
-					registrator.register(
-						_companyId, applicationName2, application2ScopeFinder);
-				})
-			.build();
+		Builder builder = new Builder();
+
+		ScopeRegistry scopeRegistry = builder.withScopeFinders(
+			registrator -> {
+				registrator.register(
+					_COMPANY_ID, _APPLICATION_NAME, application1ScopeFinder);
+				registrator.register(
+					_COMPANY_ID, applicationName2, application2ScopeFinder);
+			}
+		).build();
 
 		Collection<String> application1ScopeAliases =
-			scopeRegistry.getScopeAliases(_companyId, _applicationName);
+			scopeRegistry.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
 
 		Collection<String> application2ScopesAliasesDefault =
-			scopeRegistry.getScopeAliases(_companyId, applicationName2);
+			scopeRegistry.getScopeAliases(_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
-			assertThat(application1ScopeAliases, hasItem(scope));
+			Assert.assertThat(application1ScopeAliases, hasItem(scope));
 		}
 
 		for (String scope : scopedSet2) {
-			assertThat(application2ScopesAliasesDefault, hasItem(scope));
+			Assert.assertThat(application2ScopesAliasesDefault, hasItem(scope));
 		}
 
-		assertNotEquals(
+		Assert.assertNotEquals(
 			application1ScopeAliases, application2ScopesAliasesDefault);
 	}
 
 	@Test
 	public void testScopeMapperByNameAndCompany() throws Exception {
-
 		String applicationName2 = "com.liferay.test2";
 
 		ScopeMapper defaultScopeMapper = ScopeMapper.PASSTHROUGH_SCOPEMAPPER;
 
 		ScopeFinder scopeFinder = () -> scopesSet1;
 
-		ScopeRegistry scopeRegistry = new Builder()
-			.withScopeMappers(defaultScopeMapper, (registrator) -> {})
-			.withScopeFinders((registrator) -> {
-					registrator.register(
-						_companyId, _applicationName, scopeFinder);
-					registrator.register(
-						_companyId, applicationName2, scopeFinder);
-				})
-			.build();
+		Builder builder = new Builder();
+
+		ScopeRegistry scopeRegistry = builder.withScopeMappers(
+			defaultScopeMapper,
+			registrator -> {
+			}
+		).withScopeFinders(
+			registrator -> {
+				registrator.register(
+					_COMPANY_ID, _APPLICATION_NAME, scopeFinder);
+				registrator.register(
+					_COMPANY_ID, applicationName2, scopeFinder);
+			}
+		).build();
 
 		Collection<String> application1ScopeAliases =
-			scopeRegistry.getScopeAliases(_companyId, _applicationName);
+			scopeRegistry.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
 
 		Collection<String> application2ScopeAliases =
-			scopeRegistry.getScopeAliases(_companyId, applicationName2);
+			scopeRegistry.getScopeAliases(_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
-			assertThat(application1ScopeAliases, hasItem(scope));
+			Assert.assertThat(application1ScopeAliases, hasItem(scope));
 
-			assertThat(application2ScopeAliases, hasItem(scope));
+			Assert.assertThat(application2ScopeAliases, hasItem(scope));
 		}
 
 		ScopeMapper appScopeMapper =
-			(scope) -> Collections.singleton("app/" + scope);
+			scope -> Collections.singleton("app/" + scope);
 		ScopeMapper companyScopeMapper =
-			(scope) -> Collections.singleton("company/" + scope);
+			scope -> Collections.singleton("company/" + scope);
 
-		scopeRegistry = new Builder()
-			.withScopeMappers(
-				defaultScopeMapper,
-				(registrator) -> {
-					registrator.register(
-						null, _applicationName, appScopeMapper);
-					registrator.register(_companyId, null, companyScopeMapper);
-				})
-			.withScopeFinders((registrator) -> {
-					registrator.register(
-						_companyId, _applicationName, scopeFinder);
-					registrator.register(
-						_companyId, applicationName2, scopeFinder);
-				})
-			.build();
+		builder = new Builder();
+
+		scopeRegistry = builder.withScopeMappers(
+			defaultScopeMapper,
+			registrator -> {
+				registrator.register(null, _APPLICATION_NAME, appScopeMapper);
+				registrator.register(_COMPANY_ID, null, companyScopeMapper);
+			}
+		).withScopeFinders(
+			registrator -> {
+				registrator.register(
+					_COMPANY_ID, _APPLICATION_NAME, scopeFinder);
+				registrator.register(
+					_COMPANY_ID, applicationName2, scopeFinder);
+			}
+		).build();
 
 		Collection<String> application1ScopesAliases =
-			scopeRegistry.getScopeAliases(_companyId, _applicationName);
+			scopeRegistry.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
 
 		Collection<String> application2ScopesAliases =
-			scopeRegistry.getScopeAliases(_companyId, applicationName2);
+			scopeRegistry.getScopeAliases(_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
-			assertThat(
+			Assert.assertThat(
 				application1ScopesAliases,
 				hasItems(appScopeMapper.map(scope).toArray(new String[0])));
 
-			assertThat(
+			Assert.assertThat(
 				application2ScopesAliases,
 				hasItems(companyScopeMapper.map(scope).toArray(new String[0])));
 		}
@@ -276,7 +250,6 @@ public class ScopeRegistryTest extends PowerMockito {
 
 	@Test
 	public void testScopeMatcherByCompany() throws Exception {
-
 		String applicationName2 = "com.liferay.test2";
 
 		ScopeFinder service = () -> scopesSet1;
@@ -284,37 +257,37 @@ public class ScopeRegistryTest extends PowerMockito {
 		Set<String> matchScopes = Collections.singleton("everything.readonly");
 
 		ScopeMatcherFactory explicitScopeMatcherFactory =
-			(scopeAlias) ->
-				(scope) ->
+			scopeAlias ->
+				scope ->
 					scope.equals(scopeAlias) && matchScopes.contains(scope);
 
-		ScopeRegistry scopeRegistry = new Builder()
-			.withScopeFinders((registrator) -> {
-				registrator.register(_companyId, _applicationName, service);
-					registrator.register(_companyId, applicationName2, service);
-				})
-			.withScopeMatcherFactories(
-				(scopeAlias) -> scopeAlias::equals,
-				(registrator) -> {
-					registrator.register(
-						Long.toString(_companyId), explicitScopeMatcherFactory);
-				})
-			.build();
+		Builder builder = new Builder();
+
+		ScopeRegistry scopeRegistry = builder.withScopeFinders(
+			registrator -> {
+				registrator.register(_COMPANY_ID, _APPLICATION_NAME, service);
+				registrator.register(_COMPANY_ID, applicationName2, service);
+			}
+		).withScopeMatcherFactories(
+			scopeAlias -> scopeAlias::equals,
+			registrator -> registrator.register(
+				Long.toString(_COMPANY_ID), explicitScopeMatcherFactory)
+		).build();
 
 		Collection<LiferayOAuth2Scope> matchedLiferayOAuth2Scopes =
 			scopeRegistry.getLiferayOAuth2Scopes(
-				_companyId, "everything", _applicationName);
+				_COMPANY_ID, "everything", _APPLICATION_NAME);
 
 		Set<String> matchedScopes = _getScopes(matchedLiferayOAuth2Scopes);
 
-		assertFalse(matchedScopes.contains("everything"));
+		Assert.assertFalse(matchedScopes.contains("everything"));
 
 		matchedLiferayOAuth2Scopes = scopeRegistry.getLiferayOAuth2Scopes(
-			_companyId, "everything.readonly", _applicationName);
+			_COMPANY_ID, "everything.readonly", _APPLICATION_NAME);
 
 		matchedScopes = _getScopes(matchedLiferayOAuth2Scopes);
 
-		assertTrue(matchedScopes.contains("everything.readonly"));
+		Assert.assertTrue(matchedScopes.contains("everything.readonly"));
 	}
 
 	@Test
@@ -322,161 +295,112 @@ public class ScopeRegistryTest extends PowerMockito {
 		throws Exception {
 
 		PrefixHandlerFactory testPrefixHandlerFactory =
-			(propertyAccessor) -> (target) -> "test/" + target;
+			propertyAccessor -> target -> "test/" + target;
 
 		final ScopeMatcherFactory scopeMatcherFactory = Mockito.spy(
 			new StrictScopeMatcherFactory());
 
-		ScopeRegistry scopeRegistry = new Builder()
-			.withPrefixHandlerFactories(
-				(propertyAccessor) -> PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
-				(registrator) -> {
-					registrator.register(
-						_companyId, _applicationName, testPrefixHandlerFactory);
-				})
-			.withScopeMatcherFactories(
-				(scopeAlias) -> scopeAlias::equals,
-				(registrator) -> {
-					registrator.register(
-						Long.toString(_companyId), scopeMatcherFactory);
-				})
-			.withScopeFinders((registrator) -> {
+		Builder builder = new Builder();
+
+		ScopeRegistry scopeRegistry = builder.withPrefixHandlerFactories(
+			propertyAccessor -> PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
+			registrator -> {
 				registrator.register(
-					_companyId, _applicationName, () -> scopesSet1);
-				})
-			.build();
+					_COMPANY_ID, _APPLICATION_NAME, testPrefixHandlerFactory);
+			}
+		).withScopeMatcherFactories(
+			scopeAlias -> scopeAlias::equals,
+			registrator -> {
+				registrator.register(
+					Long.toString(_COMPANY_ID), scopeMatcherFactory);
+			}
+		).withScopeFinders(
+			registrator -> {
+				registrator.register(
+					_COMPANY_ID, _APPLICATION_NAME, () -> scopesSet1);
+			}
+		).build();
 
 		Collection<LiferayOAuth2Scope> matchedLiferayOAuth2Scopes =
 			scopeRegistry.getLiferayOAuth2Scopes(
-				_companyId, "test/everything", _applicationName);
+				_COMPANY_ID, "test/everything", _APPLICATION_NAME);
 
-		Mockito.verify(scopeMatcherFactory, atLeast(1)).create("everything");
+		Mockito.verify(
+			scopeMatcherFactory, Mockito.atLeast(1)
+		).create(
+			"everything"
+		);
 
 		Set<String> matchedScopes = _getScopes(matchedLiferayOAuth2Scopes);
 
-		assertTrue(matchedScopes.contains("everything"));
+		Assert.assertTrue(matchedScopes.contains("everything"));
 	}
+
+	protected final Set<String> scopedSet2 = new HashSet<>(
+		Arrays.asList(new String[] {"GET", "POST"}));
+	protected final Set<String> scopesSet1 = new HashSet<>(
+		Arrays.asList(new String[] {"everything", "everything.readonly"}));
 
 	private Set<String> _getScopes(
 		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes) {
 
-		return liferayOAuth2Scopes.stream().flatMap(
-			liferayOAuth2Scope ->
-				Collections.singleton(liferayOAuth2Scope.getScope()).stream()
+		Stream<LiferayOAuth2Scope> stream = liferayOAuth2Scopes.stream();
+
+		return stream.flatMap(
+			liferayOAuth2Scope -> Collections.singleton(
+				liferayOAuth2Scope.getScope()).stream()
 		).collect(
 			Collectors.toSet()
 		);
 	}
 
+	private static final String _APPLICATION_NAME = "com.liferay.test1";
+
+	private static final long _COMPANY_ID = 1;
+
 	private class Builder {
 
-		private boolean _prefixHandlerFactoriesInitialized = false;
-		private boolean _scopeFindersInitialized = false;
-		private boolean _scopeMappersInitialized = false;
-		private boolean _scopeMatcherFactoriesInitialized = false;
+		public ScopeRegistry build() throws IllegalAccessException {
+			if (!_scopeMatcherFactoriesInitialized) {
+				withScopeMatcherFactories(
+					scopeAlias -> scopeAlias::equals,
+					registrator -> {
+					});
+			}
 
-		private ScopeRegistry _scopeRegistry = new ScopeRegistry();
+			if (!_prefixHandlerFactoriesInitialized) {
+				withPrefixHandlerFactories(
+					propertyAccessor ->
+						PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
+					registrator -> {
+					});
+			}
 
-		public Builder withScopeFinders(
-				CompanyAndKeyConfigurator<ScopeFinder> configurator)
-			throws IllegalAccessException, IllegalArgumentException {
+			if (!_scopeMappersInitialized) {
+				withScopeMappers(
+					ScopeMapper.PASSTHROUGH_SCOPEMAPPER,
+					registrator -> {
+					});
+			}
 
-			ServiceTrackerMap<String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
-				scopeFinderByNameServiceTrackerMap = Mockito.mock(
-					ServiceTrackerMap.class);
+			if (!_scopeFindersInitialized) {
+				withScopeFinders(
+					registrator -> {
+					});
+			}
 
-			_scopeRegistry.setScopeFinderByNameServiceTrackerMap(
-				scopeFinderByNameServiceTrackerMap);
-
-			ScopedServiceTrackerMap<ScopeFinder> scopedScopeFinder =
-				Mockito.mock(ScopedServiceTrackerMap.class);
-
-			_scopeRegistry.setScopedScopeFinders(scopedScopeFinder);
-
-			configurator.configure((companyId, applicationName, service) -> {
-				List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
-					new ArrayList<>();
-
-				ServiceReference<?> serviceReference = Mockito.mock(
-					ServiceReference.class);
-
-				tuples.add(
-					new ServiceReferenceServiceTuple(
-						serviceReference, service));
-
-				tuples.add(
-					new ServiceReferenceServiceTuple(
-						serviceReference, service));
-
-				when(
-					scopeFinderByNameServiceTrackerMap.getService(applicationName)
-				).thenReturn(
-					tuples
-				);
-
-				when(
-					scopedScopeFinder.getService(companyId, applicationName)
-				).thenReturn(
-					service
-				);
-			});
-
-			_scopeFindersInitialized = true;
-
-			return this;
-		}
-
-		public Builder withScopeMappers(
-			ScopeMapper defaultScopeMapper,
-			CompanyAndKeyConfigurator<ScopeMapper> configurator) throws IllegalAccessException {
-
-			ScopedServiceTrackerMap<ScopeMapper> scopedScopeMapper =
-				prepareScopeServiceTrackerMapMock(
-					defaultScopeMapper, configurator);
-
-			_scopeRegistry.setDefaultScopeMapper(defaultScopeMapper);
-
-			_scopeRegistry.setScopedScopeMapper(scopedScopeMapper);
-
-			_scopeMappersInitialized = true;
-
-			return this;
-		}
-
-		public Builder withScopeMatcherFactories(
-			ScopeMatcherFactory defaultScopeMatcherFactory,
-			KeyConfigurator<ScopeMatcherFactory> configurator) throws IllegalAccessException, IllegalArgumentException {
-
-			ServiceTrackerMap<String, ScopeMatcherFactory>
-				scopeMatcherFactoriesServiceTrackerMap = Mockito.mock(
-					ServiceTrackerMap.class);
-
-			_scopeRegistry.setDefaultScopeMatcherFactory(
-				defaultScopeMatcherFactory);
-
-			_scopeRegistry.setScopedScopeMatcherFactories(
-				scopeMatcherFactoriesServiceTrackerMap);
-
-			configurator.configure((companyId, service) -> {
-				when(
-					scopeMatcherFactoriesServiceTrackerMap.getService(companyId)
-				).thenReturn(
-					service
-				);
-			});
-
-			_scopeMatcherFactoriesInitialized = true;
-
-			return this;
+			return _scopeRegistry;
 		}
 
 		public Builder withPrefixHandlerFactories(
-			PrefixHandlerFactory defaultPrefixHandlerFactory,
-			CompanyAndKeyConfigurator<PrefixHandlerFactory> configurator) throws IllegalAccessException {
+				PrefixHandlerFactory defaultPrefixHandlerFactory,
+				CompanyAndKeyConfigurator<PrefixHandlerFactory> configurator)
+			throws IllegalAccessException {
 
-			ScopedServiceTrackerMap<PrefixHandlerFactory> scopedPrefixHandlerFactories =
-				prepareScopeServiceTrackerMapMock(
-					defaultPrefixHandlerFactory, configurator);
+			ScopedServiceTrackerMap<PrefixHandlerFactory>
+				scopedPrefixHandlerFactories =
+					_prepareScopeServiceTrackerMapMock(
+						defaultPrefixHandlerFactory, configurator);
 
 			_scopeRegistry.setDefaultPrefixHandlerFactory(
 				defaultPrefixHandlerFactory);
@@ -489,33 +413,109 @@ public class ScopeRegistryTest extends PowerMockito {
 			return this;
 		}
 
-		public ScopeRegistry build() throws IllegalAccessException {
+		public Builder withScopeFinders(
+				CompanyAndKeyConfigurator<ScopeFinder> configurator)
+			throws IllegalAccessException, IllegalArgumentException {
 
-			if (!_scopeMatcherFactoriesInitialized) {
-				withScopeMatcherFactories(
-					(scopeAlias) -> scopeAlias::equals, (registrator) -> {});
-			}
+			ServiceTrackerMap
+				<String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
+					scopeFinderByNameServiceTrackerMap = Mockito.mock(
+						ServiceTrackerMap.class);
 
-			if (!_prefixHandlerFactoriesInitialized) {
-				withPrefixHandlerFactories(
-					(propertyAccessor) -> PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
-					(registrator -> {}));
-			}
+			_scopeRegistry.setScopeFinderByNameServiceTrackerMap(
+				scopeFinderByNameServiceTrackerMap);
 
-			if (!_scopeMappersInitialized) {
-				withScopeMappers(
-					ScopeMapper.PASSTHROUGH_SCOPEMAPPER, (registrator -> {}));
-			}
+			ScopedServiceTrackerMap<ScopeFinder> scopedScopeFinder =
+				Mockito.mock(ScopedServiceTrackerMap.class);
 
-			if (!_scopeFindersInitialized) {
-				withScopeFinders((registrator) -> {});
-			}
+			_scopeRegistry.setScopedScopeFinders(scopedScopeFinder);
 
-			return _scopeRegistry;
+			configurator.configure(
+				(companyId, applicationName, service) -> {
+					List<ServiceReferenceServiceTuple<?, ScopeFinder>> tuples =
+						new ArrayList<>();
+
+					ServiceReference<?> serviceReference = Mockito.mock(
+						ServiceReference.class);
+
+					tuples.add(
+						new ServiceReferenceServiceTuple(
+							serviceReference, service));
+
+					tuples.add(
+						new ServiceReferenceServiceTuple(
+							serviceReference, service));
+
+					when(
+						scopeFinderByNameServiceTrackerMap.getService(
+							applicationName)
+					).thenReturn(
+						tuples
+					);
+
+					when(
+						scopedScopeFinder.getService(companyId, applicationName)
+					).thenReturn(
+						service
+					);
+				});
+
+			_scopeFindersInitialized = true;
+
+			return this;
 		}
 
-		private <T> ScopedServiceTrackerMap<T> prepareScopeServiceTrackerMapMock(
-			T defaultService, CompanyAndKeyConfigurator<T> configurator) {
+		public Builder withScopeMappers(
+				ScopeMapper defaultScopeMapper,
+				CompanyAndKeyConfigurator<ScopeMapper> configurator)
+			throws IllegalAccessException {
+
+			ScopedServiceTrackerMap<ScopeMapper> scopedScopeMapper =
+				_prepareScopeServiceTrackerMapMock(
+					defaultScopeMapper, configurator);
+
+			_scopeRegistry.setDefaultScopeMapper(defaultScopeMapper);
+
+			_scopeRegistry.setScopedScopeMapper(scopedScopeMapper);
+
+			_scopeMappersInitialized = true;
+
+			return this;
+		}
+
+		public Builder withScopeMatcherFactories(
+				ScopeMatcherFactory defaultScopeMatcherFactory,
+				KeyConfigurator<ScopeMatcherFactory> configurator)
+			throws IllegalAccessException, IllegalArgumentException {
+
+			ServiceTrackerMap<String, ScopeMatcherFactory>
+				scopeMatcherFactoriesServiceTrackerMap = Mockito.mock(
+					ServiceTrackerMap.class);
+
+			_scopeRegistry.setDefaultScopeMatcherFactory(
+				defaultScopeMatcherFactory);
+
+			_scopeRegistry.setScopedScopeMatcherFactories(
+				scopeMatcherFactoriesServiceTrackerMap);
+
+			configurator.configure(
+				(companyId, service) -> {
+					when(
+						scopeMatcherFactoriesServiceTrackerMap.getService(
+							companyId)
+					).thenReturn(
+						service
+					);
+				});
+
+			_scopeMatcherFactoriesInitialized = true;
+
+			return this;
+		}
+
+		private <T> ScopedServiceTrackerMap<T>
+			_prepareScopeServiceTrackerMapMock(
+				T defaultService, CompanyAndKeyConfigurator<T> configurator) {
 
 			ScopedServiceTrackerMap<T> scopedServiceTrackerMap = Mockito.mock(
 				ScopedServiceTrackerMap.class);
@@ -523,18 +523,11 @@ public class ScopeRegistryTest extends PowerMockito {
 			TestScopedServiceTrackerMap<T> testScopedServiceTrackerMap =
 				new TestScopedServiceTrackerMap<>(defaultService);
 
-			Answer<PrefixHandlerFactory> answer = new Answer() {
+			Answer<T> answer = invocation -> {
+				long companyId = invocation.getArgumentAt(0, Long.class);
+				String key = invocation.getArgumentAt(1, String.class);
 
-				public Object answer(InvocationOnMock invocation)
-			throws Throwable {
-
-					long companyId = invocation.getArgumentAt(0, Long.class);
-					String key = invocation.getArgumentAt(1, String.class);
-
-					return testScopedServiceTrackerMap.getService(
-			companyId, key);
-				}
-
+				return testScopedServiceTrackerMap.getService(companyId, key);
 			};
 
 			when(
@@ -543,13 +536,40 @@ public class ScopeRegistryTest extends PowerMockito {
 				answer
 			);
 
-			configurator.configure((companyId, applicationName, service) -> {
-				testScopedServiceTrackerMap.setService(
-					companyId, applicationName, service);
-			});
+			configurator.configure(testScopedServiceTrackerMap::setService);
 
 			return scopedServiceTrackerMap;
 		}
+
+		private boolean _prefixHandlerFactoriesInitialized;
+		private boolean _scopeFindersInitialized;
+		private boolean _scopeMappersInitialized;
+		private boolean _scopeMatcherFactoriesInitialized;
+		private final ScopeRegistry _scopeRegistry = new ScopeRegistry();
+
+	}
+
+	private interface CompanyAndKeyConfigurator<T> {
+
+		public void configure(CompanyAndKeyRegistrator<T> registrator);
+
+	}
+
+	private interface CompanyAndKeyRegistrator<T> {
+
+		public void register(Long companyId, String key, T service);
+
+	}
+
+	private interface KeyConfigurator<T> {
+
+		public void configure(KeyRegistrator<T> registrator);
+
+	}
+
+	private interface KeyRegistrator<T> {
+
+		public void register(String key, T service);
 
 	}
 

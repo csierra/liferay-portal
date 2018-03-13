@@ -48,8 +48,9 @@ public class DefaultBundlePrefixHandlerFactoryRegistrator {
 		if (enabled) {
 			DefaultBundlePrefixHandlerFactoryRegistratorConfiguration
 				configuration = ConfigurableUtil.createConfigurable(
-				DefaultBundlePrefixHandlerFactoryRegistratorConfiguration.class,
-				properties);
+					DefaultBundlePrefixHandlerFactoryRegistratorConfiguration.
+						class,
+					properties);
 
 			Hashtable<String, Object> prefixHandlerFactoryProperties =
 				new Hashtable<>();

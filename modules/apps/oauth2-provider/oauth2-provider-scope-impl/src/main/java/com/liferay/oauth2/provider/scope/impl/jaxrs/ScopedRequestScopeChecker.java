@@ -69,7 +69,13 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 			}
 		}
 		catch (PortalException pe) {
-			requestContext.abortWith(Response.status(500).build());
+			Response.ResponseBuilder builder = Response.status(500);
+
+			Response response = builder.entity(
+				pe.getMessage()
+			).build();
+
+			requestContext.abortWith(response);
 
 			return;
 		}
