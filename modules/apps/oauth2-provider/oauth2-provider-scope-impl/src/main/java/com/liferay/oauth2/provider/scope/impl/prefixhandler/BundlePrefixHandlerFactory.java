@@ -132,7 +132,7 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 
 		_bundleContext = bundleContext;
 
-		_excludedScope =  new ArrayList<>();
+		_excludedScope = new ArrayList<>();
 
 		Collections.addAll(
 			_excludedScope,

@@ -17,6 +17,10 @@ package com.liferay.oauth2.provider.scope.impl.scopemapper;
 import com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,10 +28,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -64,9 +64,10 @@ public class ConfigurableScopeMapper implements ScopeMapper {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		ConfigurableScopeMapperConfiguration configurableScopeMapperConfiguration =
-			ConfigurableUtil.createConfigurable(
-				ConfigurableScopeMapperConfiguration.class, properties);
+		ConfigurableScopeMapperConfiguration
+			configurableScopeMapperConfiguration =
+				ConfigurableUtil.createConfigurable(
+					ConfigurableScopeMapperConfiguration.class, properties);
 
 		_passtrough = configurableScopeMapperConfiguration.passthrough();
 
@@ -76,9 +77,10 @@ public class ConfigurableScopeMapper implements ScopeMapper {
 			if (mappingParts.length != 2) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"Invalid ConfigurableScopeMapperConfiguration mapping "
-							+ mapping);
+						"Invalid ConfigurableScopeMapperConfiguration " +
+							"mapping " + mapping);
 				}
+
 				continue;
 			}
 
@@ -97,7 +99,7 @@ public class ConfigurableScopeMapper implements ScopeMapper {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ConfigurableScopeMapper.class);
 
-	private Map<String, Set<String>> _mapping = new HashMap<>();
+	private final Map<String, Set<String>> _mapping = new HashMap<>();
 	private boolean _passtrough;
 
 }

@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.scope.internal.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
+
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.util.StringPool;
 
@@ -22,58 +23,61 @@ import com.liferay.portal.kernel.util.StringPool;
  * @author Tomas Polesovsky
  */
 @ExtendedObjectClassDefinition(
-	category = "foundation", factoryInstanceLabelAttribute = "configuration.name"
+	category = "foundation",
+	factoryInstanceLabelAttribute = "configuration.name"
 )
 @Meta.OCD(
-	id = "com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration",
 	factory = true,
-	localization = "content/Language", name = "oauth2-bundle-prefix-handler-factory-configuration-name"
+	id = "com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration",
+	localization = "content/Language",
+	name = "oauth2-bundle-prefix-handler-factory-configuration-name"
 )
 public interface BundlePrefixHandlerFactoryConfiguration {
 
 	@Meta.AD(
-		deflt = "", id = "configuration.name",
-		name = "configuration-name",
-		description = "configuration-name-description", required = false
+		deflt = "", description = "configuration-name-description",
+		id = "configuration.name", name = "configuration-name", required = false
 	)
 	public String configurationName();
 
 	@Meta.AD(
-		deflt = "", id = "companyId", name = "company-id",
-		description = "company-id-description", required = false
+		deflt = "", description = "company-id-description", id = "companyId",
+		name = "company-id", required = false
 	)
 	public String companyId();
 
 	@Meta.AD(
-		deflt = "false", id = "default",
-		name = "default-system-prefixhandlerfactory",
+		deflt = "false",
 		description = "default-system-prefixhandlerfactory-description",
+		id = "default", name = "default-system-prefixhandlerfactory",
 		required = false
 	)
 	public boolean defaultSystemPrefixHandlerFactory();
 
 	@Meta.AD(
-		deflt = "true", id = "include.bundle.symbolic.name",
-		name = "include-bundle-symbolic-name", description = "include-bundle-symbolic-name-description", required = false
+		deflt = "true",
+		description = "include-bundle-symbolic-name-description",
+		id = "include.bundle.symbolic.name",
+		name = "include-bundle-symbolic-name", required = false
 	)
 	public boolean includeBundleSymbolicName();
 
 	@Meta.AD(
-		deflt = "", id = "excluded.scopes", name = "excluded-scopes",
-		description = "excluded-scopes-description", required = false
+		deflt = "", description = "excluded-scopes-description",
+		id = "excluded.scopes", name = "excluded-scopes", required = false
 	)
 	public String[] excludedScopes();
 
 	@Meta.AD(
-		deflt = "osgi.jaxrs.name", id = "service.properties",
-		name = "service-properties",
-		description = "service-properties-description", required = false
+		deflt = "osgi.jaxrs.name",
+		description = "service-properties-description",
+		id = "service.properties", name = "service-properties", required = false
 	)
 	public String[] serviceProperties();
 
 	@Meta.AD(
-		deflt = StringPool.SLASH, id="separator", name="separator",
-		description = "separator-description", required = false
+		deflt = StringPool.SLASH, description = "separator-description",
+		id = "separator", name = "separator", required = false
 	)
 	public String separator();
 
