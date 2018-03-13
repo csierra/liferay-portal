@@ -48,7 +48,7 @@ public interface ConfigurableScopeMapperConfiguration {
 	public boolean defaultSystemScopeMapper();
 
 	@Meta.AD(
-		deflt = "GET\\,HEAD\\,OPTIONS\\=everything.readonly," +
+		deflt = "GET\\,HEAD\\,OPTIONS=everything.readonly," +
 			"PUT\\,POST\\,PATCH\\,DELETE=everything\\,everything.writeonly",
 		id = "mapping", name="mapping", description = "mapping-description",
 		required = false
