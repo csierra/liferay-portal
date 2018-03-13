@@ -14,21 +14,22 @@
 
 package com.liferay.oauth2.provider.scope.internal.configuration;
 
-import com.liferay.oauth2.provider.configuration.DefaultConfigurableScopeMapperRegistratorConfiguration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
-
 import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Stian Sigvartsen
  */
 @Component(immediate = true, service = ConfigurationBeanDeclaration.class)
-public class DefaultScopeMapperBeanDeclaration
+public class ConfigurableScopeMapperBeanDeclaration
 	implements ConfigurationBeanDeclaration {
+
+	public static final Class<?> CLAZZ =
+		ConfigurableScopeMapperConfiguration.class;
 
 	@Override
 	public Class<?> getConfigurationBeanClass() {
-		return DefaultConfigurableScopeMapperRegistratorConfiguration.class;
+		return CLAZZ;
 	}
 
 }
