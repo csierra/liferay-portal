@@ -34,9 +34,21 @@ public interface BearerTokenProvider {
 		return true;
 	}
 
+	/**
+	 * Will be called when an access token is constructed to provide an
+	 * opportunity to modify it before it is saved or returned to a client
+	 *
+	 * @param accessToken
+	 */
 	public default void onBeforeCreate(AccessToken accessToken) {
 	}
 
+	/**
+	 * Will be called when a refresh token is constructed to provide an
+	 * opportunity to modify it before it is saved or returned to a client
+	 *
+	 * @param refreshToken
+	 */
 	public default void onBeforeCreate(RefreshToken refreshToken) {
 	}
 
