@@ -15,15 +15,13 @@
 package com.liferay.oauth2.provider.model;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +29,8 @@ import java.util.Map;
 /**
  * @author Tomas Polesovsky
  */
-public class OAuth2AuthorizationModel implements BaseModel<OAuth2Authorization> {
+public class OAuth2AuthorizationModel
+	implements BaseModel<OAuth2Authorization> {
 
 	@Override
 	public Object clone() {
@@ -39,7 +38,17 @@ public class OAuth2AuthorizationModel implements BaseModel<OAuth2Authorization> 
 	}
 
 	@Override
+	public int compareTo(OAuth2Authorization o) {
+		return 0;
+	}
+
+	@Override
 	public ExpandoBridge getExpandoBridge() {
+		return null;
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
 		return null;
 	}
 
@@ -50,11 +59,6 @@ public class OAuth2AuthorizationModel implements BaseModel<OAuth2Authorization> 
 
 	@Override
 	public String getModelClassName() {
-		return null;
-	}
-
-	@Override
-	public Map<String, Object> getModelAttributes() {
 		return null;
 	}
 
@@ -90,46 +94,34 @@ public class OAuth2AuthorizationModel implements BaseModel<OAuth2Authorization> 
 
 	@Override
 	public void resetOriginalValues() {
-
 	}
 
 	@Override
 	public void setCachedModel(boolean cachedModel) {
-
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		BaseModel<?> baseModel) {
-
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		ExpandoBridge expandoBridge) {
-
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		ServiceContext serviceContext) {
-
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 	}
 
 	@Override
-	public void setModelAttributes(
-		Map<String, Object> attributes) {
-
+	public void setModelAttributes(Map<String, Object> attributes) {
 	}
 
 	@Override
 	public void setNew(boolean n) {
-
 	}
 
 	@Override
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-
 	}
 
 	@Override
@@ -141,7 +133,8 @@ public class OAuth2AuthorizationModel implements BaseModel<OAuth2Authorization> 
 	public OAuth2Authorization toEscapedModel() {
 		final OAuth2Authorization parent = (OAuth2Authorization)this;
 
-		OAuth2Authorization escapedModel = new OAuth2Authorization(){
+		OAuth2Authorization escapedModel = new OAuth2Authorization() {
+
 			@Override
 			public Date getAccessTokenExpirationDate() {
 				return parent.getAccessTokenExpirationDate();
@@ -201,6 +194,7 @@ public class OAuth2AuthorizationModel implements BaseModel<OAuth2Authorization> 
 			public String getUserName() {
 				return HtmlUtil.escape(parent.getUserName());
 			}
+
 		};
 
 		return escapedModel;
@@ -216,9 +210,4 @@ public class OAuth2AuthorizationModel implements BaseModel<OAuth2Authorization> 
 		return toString();
 	}
 
-	@Override
-	public int compareTo(OAuth2Authorization o) {
-		return 0;
-	}
 }
-

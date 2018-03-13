@@ -15,23 +15,18 @@
 package com.liferay.oauth2.provider.constants;
 
 /**
+ * This enum represents all supported OAuth2 Grant flows that are used and
+ * validated by the framework.
+ *
  * @author Tomas Polesovsky
  */
 public enum GrantType {
+
 	AUTHORIZATION_CODE(true, true, false),
 	AUTHORIZATION_CODE_PKCE(true, false, true),
 	CLIENT_CREDENTIALS(false, true, false),
 	RESOURCE_OWNER_PASSWORD(false, true, true),
 	REFRESH_TOKEN(false, true, true);
-
-	GrantType(
-		boolean requiresRedirectURI, boolean supportsConfidentialClients,
-		boolean supportsPublicClients) {
-
-		_requiresRedirectURI = requiresRedirectURI;
-		_supportsConfidentialClients = supportsConfidentialClients;
-		_supportsPublicClients = supportsPublicClients;
-	}
 
 	public boolean isRequiresRedirectURI() {
 		return _requiresRedirectURI;
@@ -45,7 +40,17 @@ public enum GrantType {
 		return _supportsPublicClients;
 	}
 
-	private boolean _requiresRedirectURI;
-	private boolean _supportsConfidentialClients;
-	private boolean _supportsPublicClients;
+	private GrantType(
+		boolean requiresRedirectURI, boolean supportsConfidentialClients,
+		boolean supportsPublicClients) {
+
+		_requiresRedirectURI = requiresRedirectURI;
+		_supportsConfidentialClients = supportsConfidentialClients;
+		_supportsPublicClients = supportsPublicClients;
+	}
+
+	private final boolean _requiresRedirectURI;
+	private final boolean _supportsConfidentialClients;
+	private final boolean _supportsPublicClients;
+
 }

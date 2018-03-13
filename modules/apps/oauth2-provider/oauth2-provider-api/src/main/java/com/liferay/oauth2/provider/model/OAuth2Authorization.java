@@ -30,76 +30,84 @@ public class OAuth2Authorization extends OAuth2AuthorizationModel {
 		return _accessTokenExpirationDate;
 	}
 
-	public void setAccessTokenExpirationDate(Date accessTokenExpirationDate) {
-		_accessTokenExpirationDate = accessTokenExpirationDate;
-	}
-
 	public long getCompanyId() {
 		return _companyId;
-	}
-
-	public void setCompanyId(long companyId) {
-		_companyId = companyId;
 	}
 
 	public Date getCreateDate() {
 		return _createDate;
 	}
 
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
-
 	public long getoAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
-	}
-
-	public void setoAuth2ApplicationId(long oAuth2ApplicationId) {
-		_oAuth2ApplicationId = oAuth2ApplicationId;
 	}
 
 	public long getoAuth2RefreshTokenId() {
 		return _oAuth2RefreshTokenId;
 	}
 
-	public void setoAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
-		_oAuth2RefreshTokenId = oAuth2RefreshTokenId;
-	}
-
 	public long getoAuth2TokenId() {
 		return _oAuth2TokenId;
-	}
-
-	public void setoAuth2TokenId(long oAuth2TokenId) {
-		_oAuth2TokenId = oAuth2TokenId;
 	}
 
 	public Date getRefreshTokenExpirationDate() {
 		return _refreshTokenExpirationDate;
 	}
 
-	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate) {
-		_refreshTokenExpirationDate = refreshTokenExpirationDate;
-	}
-
 	public String getRemoteIPInfo() {
 		return _remoteIPInfo;
-	}
-
-	public void setRemoteIPInfo(String remoteIPInfo) {
-		_remoteIPInfo = remoteIPInfo;
 	}
 
 	public String getScopes() {
 		return _scopes;
 	}
 
-	public void setScopes(String scopes) {
-		_scopes = scopes;
-	}
-
 	public List<String> getScopesList() {
 		return Arrays.asList(StringUtil.split(getScopes(), StringPool.SPACE));
+	}
+
+	public long getUserId() {
+		return _userId;
+	}
+
+	public String getUserName() {
+		return _userName;
+	}
+
+	public void setAccessTokenExpirationDate(Date accessTokenExpirationDate) {
+		_accessTokenExpirationDate = accessTokenExpirationDate;
+	}
+
+	public void setCompanyId(long companyId) {
+		_companyId = companyId;
+	}
+
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
+	public void setoAuth2ApplicationId(long oAuth2ApplicationId) {
+		_oAuth2ApplicationId = oAuth2ApplicationId;
+	}
+
+	public void setoAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
+		_oAuth2RefreshTokenId = oAuth2RefreshTokenId;
+	}
+
+	public void setoAuth2TokenId(long oAuth2TokenId) {
+		_oAuth2TokenId = oAuth2TokenId;
+	}
+
+	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate) {
+		_refreshTokenExpirationDate = refreshTokenExpirationDate;
+	}
+
+	public void setRemoteIPInfo(String remoteIPInfo) {
+		_remoteIPInfo = remoteIPInfo;
+	}
+
+	public void setScopes(String scopes) {
+		_scopes = scopes;
 	}
 
 	public void setScopesList(List<String> scopesList) {
@@ -108,16 +116,8 @@ public class OAuth2Authorization extends OAuth2AuthorizationModel {
 		setScopes(scopes);
 	}
 
-	public long getUserId() {
-		return _userId;
-	}
-
 	public void setUserId(long userId) {
 		_userId = userId;
-	}
-
-	public String getUserName() {
-		return _userName;
 	}
 
 	public void setUserName(String userName) {
@@ -135,5 +135,5 @@ public class OAuth2Authorization extends OAuth2AuthorizationModel {
 	private String _scopes;
 	private long _userId;
 	private String _userName;
-}
 
+}
