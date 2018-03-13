@@ -43,7 +43,7 @@ public interface ConfigurableScopeMapperConfiguration {
 		deflt = "false", id="default",
 		required = false
 	)
-	public boolean defaultScopeMapper();
+	public boolean defaultSystemScopeMapper();
 
 	@Meta.AD(
 		deflt = "GET\\,HEAD\\,OPTIONS\\=everything.readonly," +

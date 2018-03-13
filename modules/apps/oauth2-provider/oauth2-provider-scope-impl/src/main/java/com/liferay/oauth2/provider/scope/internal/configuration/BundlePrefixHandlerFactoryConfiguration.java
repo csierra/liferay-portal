@@ -47,7 +47,7 @@ public interface BundlePrefixHandlerFactoryConfiguration {
 		deflt = "false", id="default",
 		required = false
 	)
-	public boolean defaultPrefixHandlerFactory();
+	public boolean defaultSystemPrefixHandlerFactory();
 
 	@Meta.AD(
 		deflt = "true",
