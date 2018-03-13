@@ -354,7 +354,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 			String bundleSymbolicName = bundle.getSymbolicName();
 
-			StringBundler sb = new StringBundler(6);
+			StringBundler sb = new StringBundler(5);
 
 			sb.append("(&(objectClass=");
 			sb.append(ResourceBundleLoader.class.getName());

@@ -9,10 +9,10 @@ import com.liferay.portal.kernel.util.StringPool;
 	category = "foundation"
 )
 @Meta.OCD(
-	id = "com.liferay.oauth2.provider.configuration.DefaultBundleNamespacePrefixHandlerFactoryRegistratorConfiguration",
-	localization = "content/Language", name = "oauth2-default-bundlenamespace-prefixhandlerfactory-configuration-name"
+	id = "com.liferay.oauth2.provider.configuration.DefaultBundlePrefixHandlerFactoryRegistratorConfiguration",
+	localization = "content/Language", name = "oauth2-default-bundlen-prefixhandlerfactory-configuration-name"
 )
-public interface DefaultBundleNamespacePrefixHandlerFactoryRegistratorConfiguration {
+public interface DefaultBundlePrefixHandlerFactoryRegistratorConfiguration {
 
 	@Meta.AD(
 		deflt = "osgi.jaxrs.name",

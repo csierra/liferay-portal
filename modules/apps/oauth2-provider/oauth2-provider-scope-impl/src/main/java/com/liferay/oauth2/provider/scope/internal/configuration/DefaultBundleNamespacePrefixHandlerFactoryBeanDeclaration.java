@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.scope.internal.configuration;
 
-import com.liferay.oauth2.provider.configuration.DefaultBundleNamespacePrefixHandlerFactoryRegistratorConfiguration;
+import com.liferay.oauth2.provider.configuration.DefaultBundlePrefixHandlerFactoryRegistratorConfiguration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
 
 import org.osgi.service.component.annotations.Component;
@@ -26,9 +26,12 @@ import org.osgi.service.component.annotations.Component;
 public class DefaultBundleNamespacePrefixHandlerFactoryBeanDeclaration
 	implements ConfigurationBeanDeclaration {
 
+	public static final Class<?> CLAZZ =
+		DefaultBundlePrefixHandlerFactoryRegistratorConfiguration.class;
+
 	@Override
 	public Class<?> getConfigurationBeanClass() {
-		return DefaultBundleNamespacePrefixHandlerFactoryRegistratorConfiguration.class;
+		return CLAZZ;
 	}
 
 }
