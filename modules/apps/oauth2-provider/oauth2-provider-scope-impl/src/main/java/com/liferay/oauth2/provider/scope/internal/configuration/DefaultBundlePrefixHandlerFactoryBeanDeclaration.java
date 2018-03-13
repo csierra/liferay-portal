@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Stian Sigvartsen
  */
 @Component(immediate = true, service = ConfigurationBeanDeclaration.class)
-public class DefaultBundleNamespacePrefixHandlerFactoryBeanDeclaration
+public class DefaultBundlePrefixHandlerFactoryBeanDeclaration
 	implements ConfigurationBeanDeclaration {
 
 	public static final Class<?> CLAZZ =

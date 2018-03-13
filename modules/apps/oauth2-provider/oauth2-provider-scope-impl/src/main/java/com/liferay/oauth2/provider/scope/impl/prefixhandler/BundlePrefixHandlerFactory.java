@@ -47,10 +47,9 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
 	property = {"separator=" + StringPool.SLASH}
 )
-public class BundleNamespacePrefixHandlerFactory
-	implements PrefixHandlerFactory {
+public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 
-	public BundleNamespacePrefixHandlerFactory(
+	public BundlePrefixHandlerFactory(
 		BundleContext bundleContext, boolean includeBundleSymbolName,
 		String[] serviceProperties, String excludedScope, String separator) {
 

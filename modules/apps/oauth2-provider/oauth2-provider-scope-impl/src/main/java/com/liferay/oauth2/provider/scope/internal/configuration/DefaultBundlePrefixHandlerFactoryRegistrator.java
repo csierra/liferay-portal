@@ -15,7 +15,7 @@
 package com.liferay.oauth2.provider.scope.internal.configuration;
 
 import com.liferay.oauth2.provider.configuration.DefaultBundlePrefixHandlerFactoryRegistratorConfiguration;
-import com.liferay.oauth2.provider.scope.impl.prefixhandler.BundleNamespacePrefixHandlerFactory;
+import com.liferay.oauth2.provider.scope.impl.prefixhandler.BundlePrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -61,7 +61,7 @@ public class DefaultBundlePrefixHandlerFactoryRegistrator {
 			_defaultPrefixHandlerFactoryServiceRegistration =
 				bundleContext.registerService(
 					PrefixHandlerFactory.class,
-					new BundleNamespacePrefixHandlerFactory(
+					new BundlePrefixHandlerFactory(
 						bundleContext,
 						configuration.includeBundleSymbolicName(),
 						configuration.serviceProperty(),
