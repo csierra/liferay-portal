@@ -18,42 +18,46 @@ import aQute.bnd.annotation.metatype.Meta;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 
 @ExtendedObjectClassDefinition(
-	category = "foundation", factoryInstanceLabelAttribute = "configurationName"
+	category = "foundation", factoryInstanceLabelAttribute = "configuration.name"
 )
 @Meta.OCD(
 	id = "com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration",
 	factory = true, localization = "content/Language",
-	name = "oauth2-default-configurable-scopemapper-configuration-name"
+	name = "oauth2-configurable-scopemapper-configuration-name"
 )
 public interface ConfigurableScopeMapperConfiguration {
 
 	@Meta.AD(
-		deflt = "",
-		required = false
+		deflt = "", id = "configuration.name",
+		name = "configuration-name",
+		description = "configuration-name-description", required = false
 	)
 	public String configurationName();
 
 	@Meta.AD(
-		deflt = "",
-		required = false
+		deflt = "", id = "companyId", name = "company-id",
+		description = "company-id-description", required = false
 	)
 	public String companyId();
 
+
 	@Meta.AD(
-		deflt = "false", id="default",
-		required = false
+		deflt = "false", id="default", name = "default-system-scopemapper",
+		description = "default-system-scopemapper-description", required = false
 	)
 	public boolean defaultSystemScopeMapper();
 
 	@Meta.AD(
 		deflt = "GET\\,HEAD\\,OPTIONS\\=everything.readonly," +
 			"PUT\\,POST\\,PATCH\\,DELETE=everything\\,everything.writeonly",
+		id = "mapping", name="mapping", description = "mapping-description",
 		required = false
 	)
 	public String[] mapping();
 
 	@Meta.AD(
-		deflt = "false", required = false
+		deflt = "false", id="passthrough", name="passthrough",
+		description = "passthrough-description", required = false
 	)
 	public boolean passthrough();
 }
