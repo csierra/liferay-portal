@@ -14,20 +14,18 @@
 
 package com.liferay.oauth2.provider.scope.internal.configuration;
 
-import com.liferay.oauth2.provider.configuration.DefaultBundlePrefixHandlerFactoryRegistratorConfiguration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
-
 import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Stian Sigvartsen
  */
 @Component(immediate = true, service = ConfigurationBeanDeclaration.class)
-public class DefaultBundlePrefixHandlerFactoryBeanDeclaration
+public class BundlePrefixHandlerFactoryBeanDeclaration
 	implements ConfigurationBeanDeclaration {
 
 	public static final Class<?> CLAZZ =
-		DefaultBundlePrefixHandlerFactoryRegistratorConfiguration.class;
+		BundlePrefixHandlerFactoryConfiguration.class;
 
 	@Override
 	public Class<?> getConfigurationBeanClass() {
