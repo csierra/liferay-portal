@@ -15,6 +15,9 @@
 package com.liferay.oauth2.provider.constants;
 
 /**
+ * This enum represents all supported OAuth2 Grant flows that are used and
+ * validated by the framework.
+ *
  * @author Tomas Polesovsky
  */
 public enum GrantType {
