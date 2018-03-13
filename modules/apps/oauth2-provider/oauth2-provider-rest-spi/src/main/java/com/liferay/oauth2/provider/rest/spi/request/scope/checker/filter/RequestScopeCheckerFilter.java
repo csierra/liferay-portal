@@ -19,6 +19,14 @@ import com.liferay.oauth2.provider.scope.ScopeChecker;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
 
+/**
+ * Responsible for checking if a given JAX-RS request is allowed.
+ * Can use the provided ScopeChecker to check if particular application
+ * provided scopes have been granted
+ *
+ * @author Carlos Sierra Andrés
+ * @review
+ */
 public interface RequestScopeCheckerFilter {
 
 	public boolean isAllowed(

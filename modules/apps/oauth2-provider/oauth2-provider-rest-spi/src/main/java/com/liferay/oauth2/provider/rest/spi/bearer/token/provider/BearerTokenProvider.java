@@ -19,6 +19,13 @@ import com.liferay.oauth2.provider.model.OAuth2Application;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * For manipulating an access token to meet specific bearer token
+ * implementation detail
+ *
+ * @author Tomas Polesovsky
+ * @review
+ */
 public interface BearerTokenProvider {
 
 	public default void createAccessToken(AccessToken accessToken) {
