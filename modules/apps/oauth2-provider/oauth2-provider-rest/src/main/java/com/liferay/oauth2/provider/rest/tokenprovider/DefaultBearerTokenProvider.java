@@ -36,7 +36,7 @@ import java.util.Map;
 public class DefaultBearerTokenProvider implements BearerTokenProvider {
 
 	@Override
-	public void createAccessToken(AccessToken accessToken) {
+	public void enrichAccessToken(AccessToken accessToken) {
 		String tokenKey = OAuthUtils.generateRandomTokenKey(
 			_accessTokenKeyByteSize);
 
@@ -45,7 +45,7 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 	}
 
 	@Override
-	public void createRefreshToken(RefreshToken refreshToken) {
+	public void enrichRefreshToken(RefreshToken refreshToken) {
 		String tokenKey = OAuthUtils.generateRandomTokenKey(
 			_accessTokenKeyByteSize);
 

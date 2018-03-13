@@ -28,10 +28,10 @@ import java.util.Map;
  */
 public interface BearerTokenProvider {
 
-	public default void createAccessToken(AccessToken accessToken) {
+	public default void enrichAccessToken(AccessToken accessToken) {
 	}
 
-	public default void createRefreshToken(RefreshToken refreshToken) {
+	public default void enrichRefreshToken(RefreshToken refreshToken) {
 	}
 
 	public boolean isValid(AccessToken accessToken);

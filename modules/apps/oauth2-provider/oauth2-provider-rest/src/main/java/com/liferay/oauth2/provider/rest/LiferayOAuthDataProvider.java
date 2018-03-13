@@ -170,7 +170,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			accessToken.getOAuth2Application().getCompanyId(),
 			accessToken.getOAuth2Application().getClientId());
 
-		tokenProvider.createAccessToken(accessToken);
+		tokenProvider.enrichAccessToken(accessToken);
 
 		serverAccessToken.setAudiences(accessToken.getAudiences());
 		serverAccessToken.setClientCodeVerifier(
@@ -281,7 +281,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			refreshToken.getOAuth2Application().getCompanyId(),
 			refreshToken.getOAuth2Application().getClientId());
 
-		tokenProvider.createRefreshToken(refreshToken);
+		tokenProvider.enrichRefreshToken(refreshToken);
 
 		cxfRefreshToken.setAudiences(refreshToken.getAudiences());
 		cxfRefreshToken.setClientCodeVerifier(refreshToken.getClientCodeVerifier());
@@ -337,7 +337,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			accessToken.getOAuth2Application().getCompanyId(),
 			accessToken.getOAuth2Application().getClientId());
 
-		tokenProvider.createAccessToken(accessToken);
+		tokenProvider.enrichAccessToken(accessToken);
 
 		serverAccessToken.setAudiences(accessToken.getAudiences());
 		serverAccessToken.setClientCodeVerifier(
