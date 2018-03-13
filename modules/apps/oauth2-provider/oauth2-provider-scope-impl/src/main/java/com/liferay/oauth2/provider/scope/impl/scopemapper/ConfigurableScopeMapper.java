@@ -14,8 +14,9 @@
 
 package com.liferay.oauth2.provider.scope.impl.scopemapper;
 
+import com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +24,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -31,22 +36,15 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
  * @author Stian Sigvartsen
  */
 @Component(
-	configurationPid = "com.liferay.oauth2.provider.configuration.ConfigurableScopeMapper",
-	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true
+	configurationPid = "com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	property = {"default=true"}
 )
 public class ConfigurableScopeMapper implements ScopeMapper {
 
-	public ConfigurableScopeMapper() {
-		this(new String[0], false);
-	}
-
-	public ConfigurableScopeMapper(String[] mappings, boolean passthrough) {
-		_init(mappings, passthrough);
-	}
-
 	@Override
 	public Set<String> map(String scope) {
-		Set<String> mappedScopes = _map.get(scope);
+		Set<String> mappedScopes = _mapping.get(scope);
 
 		Set<String> result = new HashSet<>();
 
@@ -66,38 +64,40 @@ public class ConfigurableScopeMapper implements ScopeMapper {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		Object mappings = properties.get("mapping");
+		ConfigurableScopeMapperConfiguration configurableScopeMapperConfiguration =
+			ConfigurableUtil.createConfigurable(
+				ConfigurableScopeMapperConfiguration.class, properties);
 
-		if ((mappings == null) || !(mappings instanceof String[])) {
-			return;
-		}
+		_passtrough = configurableScopeMapperConfiguration.passthrough();
 
-		boolean passthrough = GetterUtil.getBoolean(
-			properties.get("passthrough"));
+		for (String mapping : configurableScopeMapperConfiguration.mapping()) {
+			String[] mappingParts = StringUtil.split(mapping, StringPool.EQUAL);
 
-		_init((String[])mappings, passthrough);
-	}
-
-	private void _init(String[] mappings, boolean passthrough) {
-		_passtrough = passthrough;
-
-		for (String mapping : mappings) {
-			String[] mappingParts = mapping.split("=");
-
-			for (String mappingInput : mappingParts[0].split(",")) {
-				if (mappingParts.length < 2) {
-					continue;
+			if (mappingParts.length != 2) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Invalid ConfigurableScopeMapperConfiguration mapping "
+							+ mapping);
 				}
+				continue;
+			}
 
-				Set<String> mappingOutput = _map.computeIfAbsent(
-					mappingInput, __ -> new HashSet<>());
+			String[] keys = StringUtil.split(mappingParts[0]);
+			String[] values = StringUtil.split(mappingParts[1]);
 
-				Collections.addAll(mappingOutput, mappingParts[1].split(","));
+			for (String key : keys) {
+				Set<String> keyValuesSet = _mapping.computeIfAbsent(
+					key, __ -> new HashSet<>());
+
+				Collections.addAll(keyValuesSet, values);
 			}
 		}
 	}
 
-	private Map<String, Set<String>> _map = new HashMap<>();
+	private static final Log _log = LogFactoryUtil.getLog(
+		ConfigurableScopeMapper.class);
+
+	private Map<String, Set<String>> _mapping = new HashMap<>();
 	private boolean _passtrough;
 
 }
