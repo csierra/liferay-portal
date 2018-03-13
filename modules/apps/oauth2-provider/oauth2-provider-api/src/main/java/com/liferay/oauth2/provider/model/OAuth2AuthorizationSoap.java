@@ -14,11 +14,6 @@
 
 package com.liferay.oauth2.provider.model;
 
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
-
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,8 +21,10 @@ import java.util.List;
  */
 public class OAuth2AuthorizationSoap extends OAuth2AuthorizationModel {
 
-	public static OAuth2AuthorizationSoap[] toSoapModels(List<OAuth2Authorization> returnValue) {
+	public static OAuth2AuthorizationSoap[] toSoapModels(
+		List<OAuth2Authorization> returnValue) {
+
 		return new OAuth2AuthorizationSoap[0];
 	}
-}
 
+}
