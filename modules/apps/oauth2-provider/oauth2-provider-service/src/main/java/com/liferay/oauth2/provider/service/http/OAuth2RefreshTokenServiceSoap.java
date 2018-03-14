@@ -65,6 +65,11 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class OAuth2RefreshTokenServiceSoap {
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2RefreshTokenServiceUtil} to access the o auth2 refresh token remote service.
+	*/
 	public static com.liferay.oauth2.provider.model.OAuth2RefreshTokenSoap deleteOAuth2RefreshToken(
 		long oAuth2RefreshTokenId) throws RemoteException {
 		try {

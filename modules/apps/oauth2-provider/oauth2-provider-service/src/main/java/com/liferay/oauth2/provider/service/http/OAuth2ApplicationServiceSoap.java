@@ -65,6 +65,11 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class OAuth2ApplicationServiceSoap {
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service.
+	*/
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap addOAuth2Application(
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,
@@ -92,6 +97,45 @@ public class OAuth2ApplicationServiceSoap {
 		}
 	}
 
+	public static void check(
+		com.liferay.oauth2.provider.model.OAuth2ApplicationSoap oAuth2Application,
+		java.lang.String action) throws RemoteException {
+		try {
+			OAuth2ApplicationServiceUtil.check(com.liferay.oauth2.provider.model.impl.OAuth2ApplicationModelImpl.toModel(
+					oAuth2Application), action);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void check(java.lang.String action) throws RemoteException {
+		try {
+			OAuth2ApplicationServiceUtil.check(action);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap deleteOAuth2Application(
+		long oAuth2ApplicationId) throws RemoteException {
+		try {
+			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.deleteOAuth2Application(oAuth2ApplicationId);
+
+			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap fetchOAuth2Application(
 		long companyId, java.lang.String clientId) throws RemoteException {
 		try {
@@ -108,10 +152,9 @@ public class OAuth2ApplicationServiceSoap {
 	}
 
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap getOAuth2Application(
-		long companyId, java.lang.String clientId) throws RemoteException {
+		long oAuth2ApplicationId) throws RemoteException {
 		try {
-			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.getOAuth2Application(companyId,
-					clientId);
+			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
 
 			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
 		}
@@ -123,9 +166,10 @@ public class OAuth2ApplicationServiceSoap {
 	}
 
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap getOAuth2Application(
-		long oAuth2ApplicationId) throws RemoteException {
+		long companyId, java.lang.String clientId) throws RemoteException {
 		try {
-			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
+			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.getOAuth2Application(companyId,
+					clientId);
 
 			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
 		}
@@ -160,20 +204,6 @@ public class OAuth2ApplicationServiceSoap {
 			int returnValue = OAuth2ApplicationServiceUtil.getOAuth2ApplicationsCount(companyId);
 
 			return returnValue;
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap deleteOAuth2Application(
-		long oAuth2ApplicationId) throws RemoteException {
-		try {
-			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.deleteOAuth2Application(oAuth2ApplicationId);
-
-			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -218,31 +248,6 @@ public class OAuth2ApplicationServiceSoap {
 					scopes);
 
 			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static void check(java.lang.String action) throws RemoteException {
-		try {
-			OAuth2ApplicationServiceUtil.check(action);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static void check(
-		com.liferay.oauth2.provider.model.OAuth2ApplicationSoap oAuth2Application,
-		java.lang.String action) throws RemoteException {
-		try {
-			OAuth2ApplicationServiceUtil.check(com.liferay.oauth2.provider.model.impl.OAuth2ApplicationModelImpl.toModel(
-					oAuth2Application), action);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

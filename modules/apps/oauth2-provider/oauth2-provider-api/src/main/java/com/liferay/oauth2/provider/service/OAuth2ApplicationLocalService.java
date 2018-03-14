@@ -64,12 +64,6 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2ApplicationLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
-	*/
 	public OAuth2Application addOAuth2Application(long companyId, long userId,
 		java.lang.String userName, List<GrantType> allowedGrantTypesList,
 		boolean clientConfidential, java.lang.String clientId,

@@ -85,11 +85,6 @@ public class OAuth2TokenLocalServiceImpl
 		return oAuth2TokenPersistence.findByContent(oAuth2TokenContent);
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2TokenLocalServiceUtil} to access the o auth2 token local service.
-	 */
 	@Override
 	public Collection<OAuth2Token> findByRefreshToken(
 		long oAuth2RefreshTokenId) {

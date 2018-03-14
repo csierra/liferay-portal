@@ -82,6 +82,11 @@ public interface OAuth2RefreshTokenLocalService extends BaseLocalService,
 	public OAuth2RefreshToken createOAuth2RefreshToken(
 		long oAuth2RefreshTokenId);
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2RefreshTokenLocalServiceUtil} to access the o auth2 refresh token local service.
+	*/
 	public OAuth2RefreshToken createOAuth2RefreshToken(
 		java.lang.String tokenContent);
 

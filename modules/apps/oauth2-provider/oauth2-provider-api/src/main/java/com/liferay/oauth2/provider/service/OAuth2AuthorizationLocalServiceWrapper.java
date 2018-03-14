@@ -34,6 +34,11 @@ public class OAuth2AuthorizationLocalServiceWrapper
 		_oAuth2AuthorizationLocalService = oAuth2AuthorizationLocalService;
 	}
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service.
+	*/
 	@Override
 	public int countByApplicationId(long companyId, long applicationId) {
 		return _oAuth2AuthorizationLocalService.countByApplicationId(companyId,

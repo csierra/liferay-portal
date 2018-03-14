@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.service.persistence.impl;
 
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
+import com.liferay.oauth2.provider.model.impl.OAuth2AuthorizationImpl;
 import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationFinder;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQLUtil;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
@@ -193,7 +194,7 @@ public class OAuth2AuthorizationFinderImpl
 				Object[] row = iterator.next();
 
 				OAuth2Authorization oAuth2Authorization =
-					new OAuth2Authorization();
+					new OAuth2AuthorizationImpl();
 
 				int i = 0;
 
@@ -201,9 +202,9 @@ public class OAuth2AuthorizationFinderImpl
 					_date(row[i++]));
 				oAuth2Authorization.setCompanyId(_long(row[i++]));
 				oAuth2Authorization.setCreateDate(_date(row[i++]));
-				oAuth2Authorization.setoAuth2ApplicationId(_long(row[i++]));
-				oAuth2Authorization.setoAuth2RefreshTokenId(_long(row[i++]));
-				oAuth2Authorization.setoAuth2TokenId(_long(row[i++]));
+				oAuth2Authorization.setOAuth2ApplicationId(_long(row[i++]));
+				oAuth2Authorization.setOAuth2RefreshTokenId(_long(row[i++]));
+				oAuth2Authorization.setOAuth2TokenId(_long(row[i++]));
 				oAuth2Authorization.setRefreshTokenExpirationDate(
 					_date(row[i++]));
 				oAuth2Authorization.setRemoteIPInfo(_string(row[i++]));
@@ -274,7 +275,7 @@ public class OAuth2AuthorizationFinderImpl
 				Object[] row = iterator.next();
 
 				OAuth2Authorization oAuth2Authorization =
-					new OAuth2Authorization();
+					new OAuth2AuthorizationImpl();
 
 				int i = 0;
 
@@ -282,9 +283,9 @@ public class OAuth2AuthorizationFinderImpl
 					_date(row[i++]));
 				oAuth2Authorization.setCompanyId(_long(row[i++]));
 				oAuth2Authorization.setCreateDate(_date(row[i++]));
-				oAuth2Authorization.setoAuth2ApplicationId(_long(row[i++]));
-				oAuth2Authorization.setoAuth2RefreshTokenId(_long(row[i++]));
-				oAuth2Authorization.setoAuth2TokenId(_long(row[i++]));
+				oAuth2Authorization.setOAuth2ApplicationId(_long(row[i++]));
+				oAuth2Authorization.setOAuth2RefreshTokenId(_long(row[i++]));
+				oAuth2Authorization.setOAuth2TokenId(_long(row[i++]));
 				oAuth2Authorization.setRefreshTokenExpirationDate(
 					_date(row[i++]));
 				oAuth2Authorization.setRemoteIPInfo(_string(row[i++]));

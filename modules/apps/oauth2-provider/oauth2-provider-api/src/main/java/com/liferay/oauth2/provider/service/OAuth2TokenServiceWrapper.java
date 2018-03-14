@@ -32,6 +32,11 @@ public class OAuth2TokenServiceWrapper implements OAuth2TokenService,
 		_oAuth2TokenService = oAuth2TokenService;
 	}
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2TokenServiceUtil} to access the o auth2 token remote service.
+	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Token deleteOAuth2Token(
 		long oAuth2TokenId)

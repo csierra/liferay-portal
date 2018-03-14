@@ -34,6 +34,11 @@ public class OAuth2RefreshTokenServiceWrapper
 		_oAuth2RefreshTokenService = oAuth2RefreshTokenService;
 	}
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2RefreshTokenServiceUtil} to access the o auth2 refresh token remote service.
+	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2RefreshToken deleteOAuth2RefreshToken(
 		long oAuth2RefreshTokenId)

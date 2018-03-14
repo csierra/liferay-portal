@@ -33,6 +33,11 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 		_oAuth2ApplicationService = oAuth2ApplicationService;
 	}
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service.
+	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,

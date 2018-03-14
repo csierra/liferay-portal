@@ -67,27 +67,11 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * The implementation of the o auth2 application local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService} interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
  * @author Brian Wing Shun Chan
- * @see OAuth2ApplicationLocalServiceBaseImpl
- * @see com.liferay.oauth2.provider.service.OAuth2ApplicationLocalServiceUtil
  */
 public class OAuth2ApplicationLocalServiceImpl
 	extends OAuth2ApplicationLocalServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
-	 */
 	@Override
 	public OAuth2Application addOAuth2Application(
 			long companyId, long userId, String userName,

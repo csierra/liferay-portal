@@ -34,11 +34,6 @@ public class OAuth2ApplicationLocalServiceWrapper
 		_oAuth2ApplicationLocalService = oAuth2ApplicationLocalService;
 	}
 
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service.
-	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
 		long companyId, long userId, java.lang.String userName,

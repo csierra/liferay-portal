@@ -41,6 +41,12 @@ public class OAuth2AuthorizationLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service.
+	*/
 	public static int countByApplicationId(long companyId, long applicationId) {
 		return getService().countByApplicationId(companyId, applicationId);
 	}

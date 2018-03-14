@@ -14,126 +14,60 @@
 
 package com.liferay.oauth2.provider.model;
 
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
-
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
  * @author Tomas Polesovsky
  */
-public class OAuth2Authorization extends OAuth2AuthorizationModel {
+public interface OAuth2Authorization extends OAuth2AuthorizationModel {
 
-	public Date getAccessTokenExpirationDate() {
-		return _accessTokenExpirationDate;
-	}
+	public Date getAccessTokenExpirationDate();
 
-	public long getCompanyId() {
-		return _companyId;
-	}
+	public long getCompanyId();
 
-	public Date getCreateDate() {
-		return _createDate;
-	}
+	public Date getCreateDate();
 
-	public long getoAuth2ApplicationId() {
-		return _oAuth2ApplicationId;
-	}
+	public long getOAuth2ApplicationId();
 
-	public long getoAuth2RefreshTokenId() {
-		return _oAuth2RefreshTokenId;
-	}
+	public long getOAuth2RefreshTokenId();
 
-	public long getoAuth2TokenId() {
-		return _oAuth2TokenId;
-	}
+	public long getOAuth2TokenId();
 
-	public Date getRefreshTokenExpirationDate() {
-		return _refreshTokenExpirationDate;
-	}
+	public Date getRefreshTokenExpirationDate();
 
-	public String getRemoteIPInfo() {
-		return _remoteIPInfo;
-	}
+	public String getRemoteIPInfo();
 
-	public String getScopes() {
-		return _scopes;
-	}
+	public String getScopes();
 
-	public List<String> getScopesList() {
-		return Arrays.asList(StringUtil.split(getScopes(), StringPool.SPACE));
-	}
+	public List<String> getScopesList();
 
-	public long getUserId() {
-		return _userId;
-	}
+	public long getUserId();
 
-	public String getUserName() {
-		return _userName;
-	}
+	public String getUserName();
 
-	public void setAccessTokenExpirationDate(Date accessTokenExpirationDate) {
-		_accessTokenExpirationDate = accessTokenExpirationDate;
-	}
+	public void setAccessTokenExpirationDate(Date accessTokenExpirationDate);
 
-	public void setCompanyId(long companyId) {
-		_companyId = companyId;
-	}
+	public void setCompanyId(long companyId);
 
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
+	public void setCreateDate(Date createDate);
 
-	public void setoAuth2ApplicationId(long oAuth2ApplicationId) {
-		_oAuth2ApplicationId = oAuth2ApplicationId;
-	}
+	public void setOAuth2ApplicationId(long oAuth2ApplicationId);
 
-	public void setoAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
-		_oAuth2RefreshTokenId = oAuth2RefreshTokenId;
-	}
+	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId);
 
-	public void setoAuth2TokenId(long oAuth2TokenId) {
-		_oAuth2TokenId = oAuth2TokenId;
-	}
+	public void setOAuth2TokenId(long oAuth2TokenId);
 
-	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate) {
-		_refreshTokenExpirationDate = refreshTokenExpirationDate;
-	}
+	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate);
 
-	public void setRemoteIPInfo(String remoteIPInfo) {
-		_remoteIPInfo = remoteIPInfo;
-	}
+	public void setRemoteIPInfo(String remoteIPInfo);
 
-	public void setScopes(String scopes) {
-		_scopes = scopes;
-	}
+	public void setScopes(String scopes);
 
-	public void setScopesList(List<String> scopesList) {
-		String scopes = StringUtil.merge(scopesList, StringPool.SPACE);
+	public void setScopesList(List<String> scopesList);
 
-		setScopes(scopes);
-	}
+	public void setUserId(long userId);
 
-	public void setUserId(long userId) {
-		_userId = userId;
-	}
-
-	public void setUserName(String userName) {
-		_userName = userName;
-	}
-
-	private Date _accessTokenExpirationDate;
-	private long _companyId;
-	private Date _createDate;
-	private long _oAuth2ApplicationId;
-	private long _oAuth2RefreshTokenId;
-	private long _oAuth2TokenId;
-	private Date _refreshTokenExpirationDate;
-	private String _remoteIPInfo;
-	private String _scopes;
-	private long _userId;
-	private String _userName;
+	public void setUserName(String userName);
 
 }
