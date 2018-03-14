@@ -48,6 +48,12 @@ public interface OAuth2AuthorizationLocalService extends BaseLocalService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service.
+	*/
 	public int countByApplicationId(long companyId, long applicationId);
 
 	public int countByUserId(long companyId, long userId);

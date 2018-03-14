@@ -246,6 +246,11 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2ScopeGrantLocalServiceUtil} to access the o auth2 scope grant local service.
+	*/
 	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> grantScopesToToken(
 		java.lang.String tokenString,
 		java.util.Collection<com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope> scopes)

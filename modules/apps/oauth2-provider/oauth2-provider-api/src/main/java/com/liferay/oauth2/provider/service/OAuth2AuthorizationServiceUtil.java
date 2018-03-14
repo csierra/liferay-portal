@@ -41,6 +41,12 @@ public class OAuth2AuthorizationServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service.
+	*/
 	public static int countByUserId()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().countByUserId();

@@ -51,6 +51,12 @@ public interface OAuth2RefreshTokenService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2RefreshTokenServiceUtil} to access the o auth2 refresh token remote service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2RefreshTokenServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2RefreshTokenServiceUtil} to access the o auth2 refresh token remote service.
+	*/
 	public OAuth2RefreshToken deleteOAuth2RefreshToken(
 		long oAuth2RefreshTokenId) throws PortalException;
 

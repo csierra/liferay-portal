@@ -224,6 +224,11 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2ScopeGrantLocalServiceUtil} to access the o auth2 scope grant local service.
+	*/
 	public Collection<OAuth2ScopeGrant> grantScopesToToken(
 		java.lang.String tokenString, Collection<LiferayOAuth2Scope> scopes)
 		throws NoSuchOAuth2TokenException;

@@ -14,12 +14,14 @@
 
 package com.liferay.oauth2.provider.model;
 
+import java.io.Serializable;
+
 import java.util.List;
 
 /**
  * @author Tomas Polesovsky
  */
-public class OAuth2AuthorizationSoap extends OAuth2AuthorizationModel {
+public class OAuth2AuthorizationSoap implements Serializable {
 
 	public static OAuth2AuthorizationSoap[] toSoapModels(
 		List<OAuth2Authorization> returnValue) {

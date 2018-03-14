@@ -41,6 +41,12 @@ public class OAuth2TokenServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2TokenServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2TokenServiceUtil} to access the o auth2 token remote service.
+	*/
 	public static com.liferay.oauth2.provider.model.OAuth2Token deleteOAuth2Token(
 		long oAuth2TokenId)
 		throws com.liferay.portal.kernel.exception.PortalException {

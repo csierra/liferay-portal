@@ -34,6 +34,11 @@ public class OAuth2AuthorizationServiceWrapper
 		_oAuth2AuthorizationService = oAuth2AuthorizationService;
 	}
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service.
+	*/
 	@Override
 	public int countByUserId()
 		throws com.liferay.portal.kernel.exception.PortalException {

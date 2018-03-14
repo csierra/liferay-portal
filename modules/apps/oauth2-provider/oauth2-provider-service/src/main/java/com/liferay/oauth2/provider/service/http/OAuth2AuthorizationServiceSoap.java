@@ -54,6 +54,11 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class OAuth2AuthorizationServiceSoap {
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service.
+	*/
 	public static int countByUserId() throws RemoteException {
 		try {
 			int returnValue = OAuth2AuthorizationServiceUtil.countByUserId();
