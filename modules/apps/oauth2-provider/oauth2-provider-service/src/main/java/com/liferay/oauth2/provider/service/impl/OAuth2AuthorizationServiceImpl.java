@@ -46,12 +46,12 @@ import java.util.Objects;
 @JSONWebService(mode = JSONWebServiceMode.IGNORE)
 public class OAuth2AuthorizationServiceImpl
 	extends OAuth2AuthorizationServiceBaseImpl {
-	/*
+
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service.
 	 */
-
 	public int countByUserId() throws PortalException {
 		User user = getUser();
 

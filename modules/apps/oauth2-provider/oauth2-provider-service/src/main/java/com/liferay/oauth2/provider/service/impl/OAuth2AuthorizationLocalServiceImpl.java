@@ -37,12 +37,12 @@ import java.util.List;
  */
 public class OAuth2AuthorizationLocalServiceImpl
 	extends OAuth2AuthorizationLocalServiceBaseImpl {
-	/*
+
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service.
 	 */
-
 	@Override
 	public int countByApplicationId(long companyId, long applicationId) {
 		return oAuth2AuthorizationFinder.countByApplicationId(
@@ -51,8 +51,7 @@ public class OAuth2AuthorizationLocalServiceImpl
 
 	@Override
 	public int countByUserId(long companyId, long userId) {
-		return oAuth2AuthorizationFinder.countByUserId(
-			companyId, userId);
+		return oAuth2AuthorizationFinder.countByUserId(companyId, userId);
 	}
 
 	@Override
@@ -89,4 +88,5 @@ public class OAuth2AuthorizationLocalServiceImpl
 
 		return true;
 	}
+
 }

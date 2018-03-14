@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -35,7 +36,8 @@ import java.util.stream.Stream;
  */
 @ProviderType
 public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
-	/*
+
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. All methods that expect a o auth2 application model instance should use the {@link com.liferay.oauth2.provider.model.OAuth2Application} interface instead.
@@ -44,9 +46,9 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	}
 
 	@Override
-	public List<GrantType> getAllowedGrantTypesList(){
-		Stream<String> stream =
-			Arrays.stream(StringUtil.split(getAllowedGrantTypes()));
+	public List<GrantType> getAllowedGrantTypesList() {
+		Stream<String> stream = Arrays.stream(
+			StringUtil.split(getAllowedGrantTypes()));
 
 		List<GrantType> oAuth2ProviderGrantTypes = stream.map(
 			GrantType::valueOf
@@ -63,7 +65,7 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	}
 
 	@Override
-	public List<String> getRedirectURIsList(){
+	public List<String> getRedirectURIsList() {
 		return Arrays.asList(
 			StringUtil.split(getRedirectURIs(), StringPool.NEW_LINE));
 	}
@@ -109,4 +111,5 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 
 		setScopes(scopes);
 	}
+
 }

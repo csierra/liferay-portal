@@ -190,11 +190,6 @@ public class OAuth2TokenLocalServiceUtil {
 		return getService().fetchOAuth2Token(oAuth2TokenId);
 	}
 
-	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByApplicationAndUserName(
-		long applicationId, java.lang.String username) {
-		return getService().findByApplicationAndUserName(applicationId, username);
-	}
-
 	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByApplicationId(
 		long applicationId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Token> orderByComparator) {

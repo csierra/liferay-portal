@@ -1,6 +1,5 @@
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
 
 buildService {
 	apiDir = "../oauth2-provider-api/src/main/java"
@@ -13,7 +12,6 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.portal.spring.extender", version: "2.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "2.6.0"
 	compileOnly group: "org.osgi", name: "org.osgi.core", version: "5.0.0"
-
 	compileOnly project(":apps:oauth2-provider:oauth2-provider-api")
 	compileOnly project(":apps:oauth2-provider:oauth2-provider-scope-liferay-api")
 }

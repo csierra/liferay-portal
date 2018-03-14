@@ -174,9 +174,6 @@ public interface OAuth2TokenLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public OAuth2Token fetchOAuth2Token(long oAuth2TokenId);
 
-	public Collection<OAuth2Token> findByApplicationAndUserName(
-		long applicationId, java.lang.String username);
-
 	public Collection<OAuth2Token> findByApplicationId(long applicationId,
 		int start, int end, OrderByComparator<OAuth2Token> orderByComparator);
 
