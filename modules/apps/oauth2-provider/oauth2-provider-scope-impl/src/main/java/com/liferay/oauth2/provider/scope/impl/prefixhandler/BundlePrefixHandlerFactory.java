@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
@@ -14,10 +14,11 @@
 
 package com.liferay.oauth2.provider.scope.impl.prefixhandler;
 
+import com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -26,7 +27,6 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,25 +39,16 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 
+/**
+ * @author Carlos Sierra Andrés
+ * @author Stian Sigvartsen
+ */
 @Component(
-	immediate = true,
-	configurationPid = "com.liferay.oauth2.provider.configuration.BundlePrefixHandlerFactory",
-	property = "separator=" + StringPool.SLASH,
-	configurationPolicy = ConfigurationPolicy.REQUIRE
+	configurationPid = "com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	property = {"default=true"}
 )
 public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
-
-	public BundlePrefixHandlerFactory() {
-	}
-
-	public BundlePrefixHandlerFactory(
-		BundleContext bundleContext, boolean includeBundleSymbolName,
-		String[] serviceProperties, String excludedScope, String separator) {
-
-		_init(
-			bundleContext, includeBundleSymbolName, serviceProperties,
-			excludedScope, separator);
-	}
 
 	@Override
 	public PrefixHandler create(Function<String, Object> serviceProperties) {
@@ -132,76 +123,41 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 			sb.append(_separator);
 		}
 
-		return (target) -> sb.toString() + target;
+		return target -> sb.toString() + target;
 	}
 
 	@Activate
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		boolean includeBundleSymbolicName = MapUtil.getBoolean(
-			properties, "includeBundleSymbolicName");
-
-		String excludedScopesProperty = MapUtil.getString(
-			properties, "excluded.scope");
-
-		Object servicePropertyObject = properties.get("serviceProperty");
-		String[] serviceProperties;
-
-		if (servicePropertyObject instanceof String[]) {
-			serviceProperties = (String[])servicePropertyObject;
-		}
-		else if (servicePropertyObject != null) {
-			serviceProperties = Collections.singletonList(
-					servicePropertyObject.toString()
-			).toArray(
-				_EMPTY_STRING_ARRAY
-			);
-		}
-		else {
-			serviceProperties = _EMPTY_STRING_ARRAY;
-		}
-
-		Object separatorObject = properties.get("separator");
-
-		String separator;
-
-		if (Validator.isNotNull(separatorObject)) {
-			separator = separatorObject.toString();
-		}
-		else {
-			separator = null;
-		}
-
-		_init(
-			bundleContext, includeBundleSymbolicName, serviceProperties,
-			excludedScopesProperty, separator);
-	}
-
-	private void _init(
-		BundleContext bundleContext, boolean includeBundleSymbolicName,
-		String[] serviceProperties, String excludedScopeProperty,
-		String separator) {
+		BundlePrefixHandlerFactoryConfiguration
+			bundlePrefixHandlerFactoryConfiguration =
+				ConfigurableUtil.createConfigurable(
+					BundlePrefixHandlerFactoryConfiguration.class, properties);
 
 		_bundleContext = bundleContext;
 
-		_excludedScope.addAll(
-			Arrays.asList(excludedScopeProperty.split(StringPool.COMMA)));
+		_excludedScope = new ArrayList<>();
+
+		Collections.addAll(
+			_excludedScope,
+			bundlePrefixHandlerFactoryConfiguration.excludedScopes());
 
 		_excludedScope.removeIf(Validator::isBlank);
 
-		if (Validator.isNotNull(separator)) {
-			_separator = separator;
-		}
+		_includeBundleSymbolicName =
+			bundlePrefixHandlerFactoryConfiguration.includeBundleSymbolicName();
 
-		_serviceProperties = serviceProperties;
-		_includeBundleSymbolicName = includeBundleSymbolicName;
+		_separator = bundlePrefixHandlerFactoryConfiguration.separator();
+
+		_serviceProperties =
+			bundlePrefixHandlerFactoryConfiguration.serviceProperties();
 	}
 
-	private String[] _EMPTY_STRING_ARRAY = new String[0];
+	private static final String[] _EMPTY_STRING_ARRAY = new String[0];
 
 	private BundleContext _bundleContext;
-	private List<String> _excludedScope = new ArrayList<>();
+	private List<String> _excludedScope;
 	private boolean _includeBundleSymbolicName;
 	private String _separator = StringPool.SLASH;
 	private String[] _serviceProperties;

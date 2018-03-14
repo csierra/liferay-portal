@@ -21,6 +21,7 @@ import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationD
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.servlet.filters.authverifier.AuthVerifierFilter;
@@ -57,6 +58,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component(
 	property = {
 		"liferay.extension=OAuth2",
@@ -85,8 +89,8 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				"osgi.jaxrs.name", applicationClass.getName());
 		}
 
-		String applicationName = applicationProperties.get(
-			"osgi.jaxrs.name").toString();
+		String applicationName = MapUtil.getString(
+			applicationProperties, "osgi.jaxrs.name");
 
 		context.register(
 			new CompanyRetrieverContainerRequestFilter(
@@ -105,9 +109,9 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			new RunnableExecutorContainerResponseFilter(_scopeContext::clear),
 			Priorities.AUTHORIZATION - 8);
 
-		registerDescriptors(applicationName);
+		_registerDescriptors(applicationName);
 
-		registerAuthVerifierFilter(
+		_registerAuthVerifierFilter(
 			"(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME +
 				"=context.for" + applicationName + ")");
 
@@ -124,7 +128,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 	@Deactivate
 	protected void deactivate() {
 		for (ServiceRegistration<?> serviceRegistration :
-			_serviceRegistrations) {
+				_serviceRegistrations) {
 
 			try {
 				serviceRegistration.unregister();
@@ -138,7 +142,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		}
 	}
 
-	private void registerAuthVerifierFilter(String contextSelect) {
+	private void _registerAuthVerifierFilter(String contextSelect) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put(
@@ -159,15 +163,15 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				Filter.class, new AuthVerifierFilter(), properties));
 	}
 
-	private void registerDescriptors(String applicationName) {
+	private void _registerDescriptors(String applicationName) {
 		String bundleSymbolicName = _bundle.getSymbolicName();
 
 		ServiceTracker<ResourceBundleLoader, ResourceBundleLoader>
 			serviceTracker = ServiceTrackerFactory.open(
-			_bundleContext,
-			"(&(objectClass=" + ResourceBundleLoader.class.getName() +
-			")(bundle.symbolic.name=" + bundleSymbolicName + ")" +
-			"(resource.bundle.base.name=content.Language))");
+				_bundleContext,
+				"(&(objectClass=" + ResourceBundleLoader.class.getName() +
+					")(bundle.symbolic.name=" + bundleSymbolicName + ")" +
+						"(resource.bundle.base.name=content.Language))");
 
 		_serviceTrackers.add(serviceTracker);
 
