@@ -116,8 +116,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	public static final long OAUTH2APPLICATIONID_COLUMN_BITMASK = 1L;
 	public static final long OAUTH2REFRESHTOKENID_COLUMN_BITMASK = 2L;
 	public static final long OAUTH2TOKENCONTENT_COLUMN_BITMASK = 4L;
-	public static final long USERNAME_COLUMN_BITMASK = 8L;
-	public static final long OAUTH2TOKENID_COLUMN_BITMASK = 16L;
+	public static final long OAUTH2TOKENID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -360,17 +359,7 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 
 	@Override
 	public void setUserName(String userName) {
-		_columnBitmask |= USERNAME_COLUMN_BITMASK;
-
-		if (_originalUserName == null) {
-			_originalUserName = _userName;
-		}
-
 		_userName = userName;
-	}
-
-	public String getOriginalUserName() {
-		return GetterUtil.getString(_originalUserName);
 	}
 
 	@Override
@@ -612,8 +601,6 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	public void resetOriginalValues() {
 		OAuth2TokenModelImpl oAuth2TokenModelImpl = this;
 
-		oAuth2TokenModelImpl._originalUserName = oAuth2TokenModelImpl._userName;
-
 		oAuth2TokenModelImpl._originalOAuth2TokenContent = oAuth2TokenModelImpl._oAuth2TokenContent;
 
 		oAuth2TokenModelImpl._originalOAuth2ApplicationId = oAuth2TokenModelImpl._oAuth2ApplicationId;
@@ -805,7 +792,6 @@ public class OAuth2TokenModelImpl extends BaseModelImpl<OAuth2Token>
 	private long _companyId;
 	private long _userId;
 	private String _userName;
-	private String _originalUserName;
 	private Date _createDate;
 	private Date _expirationDate;
 	private String _remoteIPInfo;

@@ -41,12 +41,12 @@ import java.util.Objects;
 @JSONWebService(mode = JSONWebServiceMode.IGNORE)
 public class OAuth2RefreshTokenServiceImpl
 	extends OAuth2RefreshTokenServiceBaseImpl {
-	/*
+
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2RefreshTokenServiceUtil} to access the o auth2 refresh token remote service.
 	 */
-
 	@Override
 	public OAuth2RefreshToken deleteOAuth2RefreshToken(
 			long oAuth2RefreshTokenId)
@@ -61,11 +61,13 @@ public class OAuth2RefreshTokenServiceImpl
 				oAuth2ApplicationService.getOAuth2Application(
 					oAuth2RefreshToken.getOAuth2ApplicationId());
 
-			oAuth2ApplicationService.check(oAuth2Application,
+			oAuth2ApplicationService.check(
+				oAuth2Application,
 				OAuth2ProviderActionKeys.ACTION_REVOKE_TOKEN);
 		}
 
-		return oAuth2RefreshTokenLocalService.
-			deleteOAuth2RefreshToken(oAuth2RefreshTokenId);
+		return oAuth2RefreshTokenLocalService.deleteOAuth2RefreshToken(
+			oAuth2RefreshTokenId);
 	}
+
 }

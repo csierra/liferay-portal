@@ -197,13 +197,6 @@ public class OAuth2TokenLocalServiceWrapper implements OAuth2TokenLocalService,
 	}
 
 	@Override
-	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByApplicationAndUserName(
-		long applicationId, java.lang.String username) {
-		return _oAuth2TokenLocalService.findByApplicationAndUserName(applicationId,
-			username);
-	}
-
-	@Override
 	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2Token> findByApplicationId(
 		long applicationId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Token> orderByComparator) {

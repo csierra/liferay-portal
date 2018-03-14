@@ -14,9 +14,9 @@
 
 package com.liferay.oauth2.provider.service.impl;
 
+import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
-import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationServiceBaseImpl;
@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.io.InputStream;
+
 import java.util.List;
 
 /**
@@ -47,20 +48,19 @@ import java.util.List;
  */
 public class OAuth2ApplicationServiceImpl
 	extends OAuth2ApplicationServiceBaseImpl {
-	/*
+
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2ApplicationServiceUtil} to access the o auth2 application remote service.
 	 */
-
 	@Override
 	public OAuth2Application addOAuth2Application(
-			List<GrantType> allowedGrantTypesList,
-			boolean clientConfidential, String clientId, String clientSecret,
-			String description, List<String> featuresList, String homePageURL,
-			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, List<String> scopesList,
-			ServiceContext serviceContext)
+			List<GrantType> allowedGrantTypesList, boolean clientConfidential,
+			String clientId, String clientSecret, String description,
+			List<String> featuresList, String homePageURL, long iconFileEntryId,
+			String name, String privacyPolicyURL, List<String> redirectURIsList,
+			List<String> scopesList, ServiceContext serviceContext)
 		throws PortalException {
 
 		check(OAuth2ProviderActionKeys.ACTION_ADD_APPLICATION);
@@ -75,7 +75,63 @@ public class OAuth2ApplicationServiceImpl
 	}
 
 	@Override
-	public OAuth2Application fetchOAuth2Application(long companyId, String clientId)
+	public void check(OAuth2Application oAuth2Application, String action)
+		throws PrincipalException {
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		if (permissionChecker.hasOwnerPermission(
+				oAuth2Application.getCompanyId(),
+				OAuth2Application.class.getName(),
+				oAuth2Application.getOAuth2ApplicationId(),
+				oAuth2Application.getUserId(), action)) {
+
+			return;
+		}
+
+		if (!permissionChecker.hasPermission(
+				0, OAuth2Application.class.getName(),
+				oAuth2Application.getOAuth2ApplicationId(), action)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, OAuth2Application.class.getName(),
+				oAuth2Application.getOAuth2ApplicationId(), action);
+		}
+	}
+
+	@Override
+	public void check(String action) throws PrincipalException {
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		if (!permissionChecker.hasPermission(
+				0, OAuth2ProviderConstants.RESOURCE_NAME, 0, action)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, OAuth2ProviderConstants.RESOURCE_NAME, 0,
+				action);
+		}
+	}
+
+	@Override
+	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
+		throws PortalException {
+
+		OAuth2Application oAuth2Application =
+			oAuth2ApplicationLocalService.getOAuth2Application(
+				oAuth2ApplicationId);
+
+		check(oAuth2Application, ActionKeys.DELETE);
+
+		oAuth2Application =
+			oAuth2ApplicationLocalService.deleteOAuth2Application(
+				oAuth2ApplicationId);
+
+		return oAuth2Application;
+	}
+
+	@Override
+	public OAuth2Application fetchOAuth2Application(
+			long companyId, String clientId)
 		throws PrincipalException {
 
 		OAuth2Application oAuth2Application =
@@ -90,12 +146,12 @@ public class OAuth2ApplicationServiceImpl
 	}
 
 	@Override
-	public OAuth2Application getOAuth2Application(long companyId, String clientId)
-		throws NoSuchOAuth2ApplicationException, PrincipalException {
+	public OAuth2Application getOAuth2Application(long oAuth2ApplicationId)
+		throws PortalException {
 
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationLocalService.getOAuth2Application(
-				companyId, clientId);
+				oAuth2ApplicationId);
 
 		check(oAuth2Application, ActionKeys.VIEW);
 
@@ -103,12 +159,13 @@ public class OAuth2ApplicationServiceImpl
 	}
 
 	@Override
-	public OAuth2Application getOAuth2Application(long oAuth2ApplicationId)
-		throws PortalException {
+	public OAuth2Application getOAuth2Application(
+			long companyId, String clientId)
+		throws NoSuchOAuth2ApplicationException, PrincipalException {
 
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationLocalService.getOAuth2Application(
-				oAuth2ApplicationId);
+				companyId, clientId);
 
 		check(oAuth2Application, ActionKeys.VIEW);
 
@@ -130,20 +187,18 @@ public class OAuth2ApplicationServiceImpl
 	}
 
 	@Override
-	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
+	public OAuth2Application updateIcon(
+			long oAuth2ApplicationId, InputStream inputStream)
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationLocalService.getOAuth2Application(
 				oAuth2ApplicationId);
 
-		check(oAuth2Application, ActionKeys.DELETE);
+		check(oAuth2Application, ActionKeys.UPDATE);
 
-		oAuth2Application =
-			oAuth2ApplicationLocalService.deleteOAuth2Application(
-				oAuth2ApplicationId);
-
-		return oAuth2Application;
+		return oAuth2ApplicationLocalService.updateIcon(
+			oAuth2ApplicationId, inputStream);
 	}
 
 	@Override
@@ -170,21 +225,6 @@ public class OAuth2ApplicationServiceImpl
 	}
 
 	@Override
-	public OAuth2Application updateIcon(
-			long oAuth2ApplicationId, InputStream inputStream)
-		throws PortalException {
-
-		OAuth2Application oAuth2Application =
-			oAuth2ApplicationLocalService.getOAuth2Application(
-				oAuth2ApplicationId);
-
-		check(oAuth2Application, ActionKeys.UPDATE);
-
-		return oAuth2ApplicationLocalService.updateIcon(
-			oAuth2ApplicationId, inputStream);
-	}
-
-	@Override
 	public OAuth2Application updateScopes(
 			long oAuth2ApplicationId, List<String> scopes)
 		throws PortalException {
@@ -197,43 +237,6 @@ public class OAuth2ApplicationServiceImpl
 
 		return oAuth2ApplicationLocalService.updateScopes(
 			oAuth2ApplicationId, scopes);
-	}
-
-	@Override
-	public void check(String action) throws PrincipalException {
-		PermissionChecker permissionChecker = getPermissionChecker();
-
-		if (!permissionChecker.hasPermission(
-			0, OAuth2ProviderConstants.RESOURCE_NAME, 0, action)) {
-
-			throw new PrincipalException.MustHavePermission(
-				permissionChecker, OAuth2ProviderConstants.RESOURCE_NAME, 0,
-				action);
-		}
-	}
-
-	@Override
-	public void check(OAuth2Application oAuth2Application, String action)
-		throws PrincipalException {
-
-		PermissionChecker permissionChecker = getPermissionChecker();
-
-		if (permissionChecker.hasOwnerPermission(
-			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(),
-			oAuth2Application.getUserId(), action)) {
-
-			return;
-		}
-
-		if (!permissionChecker.hasPermission(
-			0, OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(), action)) {
-
-			throw new PrincipalException.MustHavePermission(
-				permissionChecker, OAuth2Application.class.getName(),
-				oAuth2Application.getOAuth2ApplicationId(), action);
-		}
 	}
 
 }

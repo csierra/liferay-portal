@@ -37,50 +37,13 @@ import java.util.Collection;
  * @see OAuth2TokenLocalServiceBaseImpl
  * @see com.liferay.oauth2.provider.service.OAuth2TokenLocalServiceUtil
  */
-public class OAuth2TokenLocalServiceImpl extends OAuth2TokenLocalServiceBaseImpl {
-	/*
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2TokenLocalServiceUtil} to access the o auth2 token local service.
-	 */
-
-	@Override
-	public Collection<OAuth2Token> findByApplicationAndUserName(
-		long applicationId, String username) {
-
-		return oAuth2TokenPersistence.findByA_U(applicationId, username);
-	}
-
-	@Override
-	public Collection<OAuth2Token> findByRefreshToken(long oAuth2RefreshTokenId) {
-		return oAuth2TokenPersistence.findByRefreshToken(oAuth2RefreshTokenId);
-	}
-
-	@Override
-	public Collection<OAuth2Token> findByApplicationId(
-		long applicationId, int start, int end,
-		OrderByComparator<OAuth2Token> orderByComparator) {
-
-		return oAuth2TokenPersistence.findByA(
-			applicationId, start, end, orderByComparator);
-	}
-
-	@Override
-	public OAuth2Token fetchByContent(String oAuth2TokenContent) {
-		return oAuth2TokenPersistence.fetchByContent(oAuth2TokenContent);
-	}
-
-	@Override
-	public OAuth2Token findByContent(String oAuth2TokenContent)
-		throws NoSuchOAuth2TokenException {
-
-		return oAuth2TokenPersistence.findByContent(oAuth2TokenContent);
-	}
+public class OAuth2TokenLocalServiceImpl
+	extends OAuth2TokenLocalServiceBaseImpl {
 
 	@Override
 	public OAuth2Token createOAuth2Token(String tokenContent) {
-		OAuth2Token oAuth2Token =
-			createOAuth2Token(counterLocalService.increment());
+		OAuth2Token oAuth2Token = createOAuth2Token(
+			counterLocalService.increment());
 
 		oAuth2Token.setOAuth2TokenContent(tokenContent);
 
@@ -100,4 +63,38 @@ public class OAuth2TokenLocalServiceImpl extends OAuth2TokenLocalServiceBaseImpl
 
 		return super.deleteOAuth2Token(oAuth2TokenId);
 	}
+
+	@Override
+	public OAuth2Token fetchByContent(String oAuth2TokenContent) {
+		return oAuth2TokenPersistence.fetchByContent(oAuth2TokenContent);
+	}
+
+	@Override
+	public Collection<OAuth2Token> findByApplicationId(
+		long applicationId, int start, int end,
+		OrderByComparator<OAuth2Token> orderByComparator) {
+
+		return oAuth2TokenPersistence.findByA(
+			applicationId, start, end, orderByComparator);
+	}
+
+	@Override
+	public OAuth2Token findByContent(String oAuth2TokenContent)
+		throws NoSuchOAuth2TokenException {
+
+		return oAuth2TokenPersistence.findByContent(oAuth2TokenContent);
+	}
+
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2TokenLocalServiceUtil} to access the o auth2 token local service.
+	 */
+	@Override
+	public Collection<OAuth2Token> findByRefreshToken(
+		long oAuth2RefreshTokenId) {
+
+		return oAuth2TokenPersistence.findByRefreshToken(oAuth2RefreshTokenId);
+	}
+
 }

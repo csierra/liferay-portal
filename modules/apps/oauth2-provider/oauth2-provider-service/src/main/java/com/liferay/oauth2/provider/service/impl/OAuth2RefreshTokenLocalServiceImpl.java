@@ -39,16 +39,16 @@ import java.util.Collection;
  */
 public class OAuth2RefreshTokenLocalServiceImpl
 	extends OAuth2RefreshTokenLocalServiceBaseImpl {
-	/*
+
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalServiceUtil} to access the o auth2 refresh token local service.
 	 */
-
 	@Override
 	public OAuth2RefreshToken createOAuth2RefreshToken(String tokenContent) {
-		OAuth2RefreshToken oAuth2RefreshToken =
-			createOAuth2RefreshToken(counterLocalService.increment());
+		OAuth2RefreshToken oAuth2RefreshToken = createOAuth2RefreshToken(
+			counterLocalService.increment());
 
 		oAuth2RefreshToken.setOAuth2RefreshTokenContent(tokenContent);
 

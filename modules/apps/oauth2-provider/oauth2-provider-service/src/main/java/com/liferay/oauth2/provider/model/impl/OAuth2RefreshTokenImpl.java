@@ -15,13 +15,12 @@
 package com.liferay.oauth2.provider.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * The extended model implementation for the OAuth2RefreshToken service. Represents a row in the &quot;OAuth2RefreshToken&quot; database table, with each column mapped to a property of this class.
@@ -34,7 +33,8 @@ import java.util.stream.Stream;
  */
 @ProviderType
 public class OAuth2RefreshTokenImpl extends OAuth2RefreshTokenBaseImpl {
-	/*
+
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. All methods that expect a o auth2 refresh token model instance should use the {@link com.liferay.oauth2.provider.model.OAuth2RefreshToken} interface instead.
@@ -53,4 +53,5 @@ public class OAuth2RefreshTokenImpl extends OAuth2RefreshTokenBaseImpl {
 
 		setScopes(scopes);
 	}
+
 }
