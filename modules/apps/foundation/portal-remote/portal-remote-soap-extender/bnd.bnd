@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Remote SOAP Extender
 Bundle-SymbolicName: com.liferay.portal.remote.soap.extender
-Bundle-Version: 2.0.13
+Bundle-Version: 3.0.0
 Export-Package:\
 	com.liferay.portal.remote.soap.extender,\
 	com.liferay.portal.remote.soap.extender.configuration
@@ -14,6 +14,10 @@ Import-Package:\
 	!org.apache.abdera.*,\
 	!org.apache.aries.*,\
 	!org.apache.cxf.aegis.*,\
+	!org.apache.cxf.bus.blueprint.*,\
+	!org.apache.cxf.bus.spring.*,\
+	!org.apache.cxf.configuration.blueprint.*,\
+	!org.apache.cxf.configuration.spring.*,\
 	!org.apache.cxf.ws.policy.*,\
 	!org.apache.neethi.*,\
 	!org.apache.velocity.*,\
