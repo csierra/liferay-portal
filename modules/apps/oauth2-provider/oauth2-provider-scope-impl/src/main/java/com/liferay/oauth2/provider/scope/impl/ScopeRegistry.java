@@ -65,7 +65,7 @@ public class ScopeRegistry implements ScopeLocator {
 		long companyId, String scopesAlias) {
 
 		return readFromCache("locateScopes" + companyId + scopesAlias,
-			__ -> this._doLocateScopes(companyId, scopesAlias));
+			__ -> _doLocateScopes(companyId, scopesAlias));
 	}
 
 	@Override
@@ -74,15 +74,14 @@ public class ScopeRegistry implements ScopeLocator {
 
 		return readFromCache(
 			"locateScopes" + companyId + applicationName + scopesAlias,
-			__ -> this._doLocateScopesForApplication(
+			__ -> _doLocateScopesForApplication(
 				companyId, scopesAlias, applicationName));
 	}
 
 	@Override
 	public Collection<String> getScopeAliases(long companyId) {
 		return readFromCache(
-			"listAliases" + companyId,
-			__ -> this._doListScopesAliases(companyId));
+			"listAliases" + companyId, __ -> _doListScopesAliases(companyId));
 	}
 
 	@Override
@@ -91,7 +90,7 @@ public class ScopeRegistry implements ScopeLocator {
 
 		return readFromCache(
 			"listAliases" + companyId + applicationName,
-			__ -> this._doListScopesAliasesForApplication(
+			__ -> _doListScopesAliasesForApplication(
 				companyId, applicationName));
 	}
 
@@ -334,7 +333,6 @@ public class ScopeRegistry implements ScopeLocator {
 	private final ConcurrentMap<String, Object> _invocationCache =
 		new ConcurrentHashMap<>();
 
-	@Reference
 	@Reference
 	ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 

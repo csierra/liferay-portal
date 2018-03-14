@@ -41,23 +41,16 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 @Component(
 	immediate = true,
-	configurationPid = "com.liferay.oauth2.provider.configuration." +
-		"BundleNamespacePrefixHandlerFactory",
-	property = {"separator=" + StringPool.SLASH},
+	configurationPid = "com.liferay.oauth2.provider.configuration.BundlePrefixHandlerFactory",
+	property = "separator=" + StringPool.SLASH,
 	configurationPolicy = ConfigurationPolicy.REQUIRE
 )
-public class BundleNamespacePrefixHandlerFactory
-	implements PrefixHandlerFactory {
+public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 
-	private List<String> _excludedScope = new ArrayList<>();
-	private String _separator = StringPool.SLASH;
-	private String[] _serviceProperties;
-	private boolean _includeBundleSymbolicName;
-
-	public BundleNamespacePrefixHandlerFactory() {
+	public BundlePrefixHandlerFactory() {
 	}
 
-	public BundleNamespacePrefixHandlerFactory(
+	public BundlePrefixHandlerFactory(
 		BundleContext bundleContext, boolean includeBundleSymbolName,
 		String[] serviceProperties, String excludedScope, String separator) {
 
@@ -66,29 +59,8 @@ public class BundleNamespacePrefixHandlerFactory
 			excludedScope, separator);
 	}
 
-	private void _init(
-		BundleContext bundleContext, boolean includeBundleSymbolicName,
-		String[] serviceProperties, String excludedScopeProperty,
-		String separator) {
-
-		_bundleContext = bundleContext;
-
-		_excludedScope.addAll(
-			Arrays.asList(excludedScopeProperty.split(StringPool.COMMA)));
-
-		_excludedScope.removeIf(Validator::isBlank);
-
-		if (Validator.isNotNull(separator)) {
-			_separator = separator;
-		}
-
-		_serviceProperties = serviceProperties;
-		_includeBundleSymbolicName = includeBundleSymbolicName;
-	}
-
 	@Override
 	public PrefixHandler create(Function<String, Object> serviceProperties) {
-
 		ArrayList<String> parts = new ArrayList<>(
 			_serviceProperties.length + 1);
 
@@ -130,21 +102,20 @@ public class BundleNamespacePrefixHandlerFactory
 				StringPool.SPACE, "\n");
 
 			Properties modifiers = new Properties();
+
 			try {
 				modifiers.load(new StringReader(propertiesFormat));
 			}
 			catch (IOException ioe) {
-	}
+			}
 
-			parts.add(
-				GetterUtil.getString(
-					modifiers.getProperty("default"), StringPool.BLANK));
+			parts.add(GetterUtil.getString(modifiers.getProperty("default")));
 		}
 
 		PrefixHandler prefixHandler = create(
 			parts.toArray(_EMPTY_STRING_ARRAY));
 
-		return (target) -> {
+		return target -> {
 			if (_excludedScope.contains(target)) {
 				return target;
 			}
@@ -153,7 +124,16 @@ public class BundleNamespacePrefixHandlerFactory
 		};
 	}
 
-	private String[] _EMPTY_STRING_ARRAY = new String[0];
+	public PrefixHandler create(String... prefixes) {
+		StringBundler sb = new StringBundler(prefixes.length * 2);
+
+		for (String namespace : prefixes) {
+			sb.append(namespace);
+			sb.append(_separator);
+		}
+
+		return (target) -> sb.toString() + target;
+	}
 
 	@Activate
 	protected void activate(
@@ -173,8 +153,10 @@ public class BundleNamespacePrefixHandlerFactory
 		}
 		else if (servicePropertyObject != null) {
 			serviceProperties = Collections.singletonList(
-					servicePropertyObject.toString()).toArray(
-						_EMPTY_STRING_ARRAY);
+					servicePropertyObject.toString()
+			).toArray(
+				_EMPTY_STRING_ARRAY
+			);
 		}
 		else {
 			serviceProperties = _EMPTY_STRING_ARRAY;
@@ -196,17 +178,32 @@ public class BundleNamespacePrefixHandlerFactory
 			excludedScopesProperty, separator);
 	}
 
-	private BundleContext _bundleContext;
+	private void _init(
+		BundleContext bundleContext, boolean includeBundleSymbolicName,
+		String[] serviceProperties, String excludedScopeProperty,
+		String separator) {
 
-	public PrefixHandler create(String... prefixes) {
-		StringBundler sb = new StringBundler(prefixes.length * 2);
+		_bundleContext = bundleContext;
 
-		for (String namespace : prefixes) {
-			sb.append(namespace);
-			sb.append(_separator);
+		_excludedScope.addAll(
+			Arrays.asList(excludedScopeProperty.split(StringPool.COMMA)));
+
+		_excludedScope.removeIf(Validator::isBlank);
+
+		if (Validator.isNotNull(separator)) {
+			_separator = separator;
 		}
 
-		return (target) -> sb.toString() + target;
+		_serviceProperties = serviceProperties;
+		_includeBundleSymbolicName = includeBundleSymbolicName;
 	}
+
+	private String[] _EMPTY_STRING_ARRAY = new String[0];
+
+	private BundleContext _bundleContext;
+	private List<String> _excludedScope = new ArrayList<>();
+	private boolean _includeBundleSymbolicName;
+	private String _separator = StringPool.SLASH;
+	private String[] _serviceProperties;
 
 }
