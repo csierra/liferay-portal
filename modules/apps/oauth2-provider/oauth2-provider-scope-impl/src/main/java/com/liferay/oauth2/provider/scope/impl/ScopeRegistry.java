@@ -182,7 +182,7 @@ public class ScopeRegistry implements ScopeLocator {
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policyOption = ReferencePolicyOption.GREEDY, target = "(default=true)",
+		policyOption = ReferencePolicyOption.GREEDY, target = "(osgi.jaxrs.name=Default)",
 		unbind = "-"
 	)
 	protected void setDefaultPrefixHandlerFactory(
@@ -193,7 +193,7 @@ public class ScopeRegistry implements ScopeLocator {
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policyOption = ReferencePolicyOption.GREEDY, target = "(default=true)",
+		policyOption = ReferencePolicyOption.GREEDY, target = "(osgi.jaxrs.name=Default)",
 		unbind = "-"
 	)
 	protected void setDefaultScopeMapper(ScopeMapper scopeMapper) {

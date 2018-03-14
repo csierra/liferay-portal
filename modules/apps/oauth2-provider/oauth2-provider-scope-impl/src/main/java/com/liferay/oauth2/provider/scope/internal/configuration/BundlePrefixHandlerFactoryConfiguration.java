@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.util.StringPool;
  */
 @ExtendedObjectClassDefinition(
 	category = "foundation",
-	factoryInstanceLabelAttribute = "configuration.name"
+	factoryInstanceLabelAttribute = "osgi.jaxrs.name"
 )
 @Meta.OCD(
 	factory = true,
@@ -35,24 +35,10 @@ import com.liferay.portal.kernel.util.StringPool;
 public interface BundlePrefixHandlerFactoryConfiguration {
 
 	@Meta.AD(
-		deflt = "", description = "configuration-name-description",
-		id = "configuration.name", name = "configuration-name", required = false
-	)
-	public String configurationName();
-
-	@Meta.AD(
-		deflt = "", description = "osgi-jaxrs-name-description",
+		deflt = "Default", description = "osgi-jaxrs-name-description",
 		id = "osgi.jaxrs.name", name = "osgi-jaxrs-name", required = false
 	)
 	public String osgiJAXRSName();
-
-	@Meta.AD(
-		deflt = "false",
-		description = "default-system-prefixhandlerfactory-description",
-		id = "default", name = "default-system-prefixhandlerfactory",
-		required = false
-	)
-	public boolean defaultSystemPrefixHandlerFactory();
 
 	@Meta.AD(
 		deflt = "true",

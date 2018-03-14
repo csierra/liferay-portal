@@ -23,7 +23,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  */
 @ExtendedObjectClassDefinition(
 	category = "foundation",
-	factoryInstanceLabelAttribute = "configuration.name"
+	factoryInstanceLabelAttribute = "osgi.jaxrs.name"
 )
 @Meta.OCD(
 	factory = true,
@@ -34,22 +34,10 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface ConfigurableScopeMapperConfiguration {
 
 	@Meta.AD(
-		deflt = "", description = "configuration-name-description",
-		id = "configuration.name", name = "configuration-name", required = false
-	)
-	public String configurationName();
-
-	@Meta.AD(
-		deflt = "", description = "osgi-jaxrs-name-description",
+		deflt = "Default", description = "osgi-jaxrs-name-description",
 		id = "osgi.jaxrs.name", name = "osgi-jaxrs-name", required = false
 	)
 	public String osgiJAXRSName();
-
-	@Meta.AD(
-		deflt = "false", description = "default-system-scopemapper-description",
-		id = "default", name = "default-system-scopemapper", required = false
-	)
-	public boolean defaultSystemScopeMapper();
 
 	@Meta.AD(
 		deflt = "GET\\,HEAD\\,OPTIONS=everything.readonly,PUT\\,POST\\,PATCH\\,DELETE=everything\\,everything.writeonly",
