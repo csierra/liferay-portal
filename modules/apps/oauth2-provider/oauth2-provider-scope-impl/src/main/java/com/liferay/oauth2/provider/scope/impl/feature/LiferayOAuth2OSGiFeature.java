@@ -261,14 +261,13 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 				if (oauth2ScopeCheckerType.equals("request.operation")) {
 					processRequestOperationStrategy(
-						bundleContext, endpoint, applicationClassName,
-						serviceProperties);
+						bundleContext, endpoint, serviceProperties);
 				}
 
 				if (oauth2ScopeCheckerType.equals("annotations")) {
 					processAnnotationStrategy(
 						bundleContext, (JAXRSServiceFactoryBean)factory,
-						endpoint, applicationClassName, serviceProperties);
+						endpoint, serviceProperties);
 				}
 
 				_registerDescriptors(endpoint, bundle, osgiJaxrsName);
@@ -306,8 +305,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 		protected void processAnnotationStrategy(
 			BundleContext bundleContext, JAXRSServiceFactoryBean factory,
-			Endpoint endpoint, String applicationClassName,
-			Dictionary<String, Object> serviceProperties) {
+			Endpoint endpoint, Dictionary<String, Object> serviceProperties) {
 
 			List<Class<?>> resourceClasses = factory.getResourceClasses();
 
@@ -340,7 +338,6 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 		protected void processRequestOperationStrategy(
 			BundleContext bundleContext, Endpoint endpoint,
-			String applicationClassName,
 			Dictionary<String, Object> serviceProperties) {
 
 			ServiceRegistration<ScopeFinder> serviceRegistration =
