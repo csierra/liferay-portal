@@ -26,9 +26,11 @@ import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -202,8 +204,6 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 				Class<? extends Application> clazz = application.getClass();
 
-				String applicationClassName = clazz.getName();
-
 				Bundle bundle = FrameworkUtil.getBundle(clazz);
 
 				if (bundle == null) {
@@ -247,7 +247,14 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 						property, serviceReference.getProperty(property));
 				}
 
-				serviceProperties.put("osgi.jaxrs.name", applicationClassName);
+				String osgiJaxrsName = GetterUtil.getString(
+					serviceProperties.get("osgi.jaxrs.name"));
+
+				if (Validator.isNull(osgiJaxrsName)) {
+					osgiJaxrsName = clazz.getName();
+
+					serviceProperties.put("osgi.jaxrs.name", osgiJaxrsName);
+				}
 
 				if (oauth2ScopeCheckerType.equals("request.operation")) {
 					processRequestOperation(
@@ -260,7 +267,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 						endpoint, serviceProperties);
 				}
 
-				registerDescriptors(endpoint, bundle, applicationClassName);
+				registerDescriptors(endpoint, bundle, osgiJaxrsName);
 			}
 		}
 
