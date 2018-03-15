@@ -22,8 +22,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  * @author Tomas Polesovsky
  */
 @ExtendedObjectClassDefinition(
-	category = "foundation",
-	factoryInstanceLabelAttribute = "osgi.jaxrs.name"
+	category = "foundation", factoryInstanceLabelAttribute = "osgi.jaxrs.name"
 )
 @Meta.OCD(
 	factory = true,
