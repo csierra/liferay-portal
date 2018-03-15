@@ -24,7 +24,8 @@ import java.util.Set;
 
 @Component(
 	immediate = true,
-	property = "requires.oauth2=true",
+	property = {
+		"requires.oauth2=true", "osgi.jaxrs.name=standard-jaxrs-app"},	
 	service = Application.class
 )
 public class Test extends Application {

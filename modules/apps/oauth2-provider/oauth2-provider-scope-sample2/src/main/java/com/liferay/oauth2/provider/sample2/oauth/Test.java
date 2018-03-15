@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 	immediate = true,
 	property = {
 		"oauth2.scopechecker.type=annotations",
+		"osgi.jaxrs.name=liferay-oauth2-jaxrs-app",
 		"requires.oauth2=true"
 	},
 	service = Application.class
