@@ -40,16 +40,16 @@ public class OAuth2AuthorizationImpl
 		return _createDate;
 	}
 
+	public long getOAuth2AccessTokenId() {
+		return _oAuth2AccessTokenId;
+	}
+
 	public long getOAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
 	}
 
 	public long getOAuth2RefreshTokenId() {
 		return _oAuth2RefreshTokenId;
-	}
-
-	public long getOAuth2TokenId() {
-		return _oAuth2TokenId;
 	}
 
 	public Date getRefreshTokenExpirationDate() {
@@ -60,12 +60,13 @@ public class OAuth2AuthorizationImpl
 		return _remoteIPInfo;
 	}
 
-	public String getScopes() {
+	public String getScopeAliases() {
 		return _scopes;
 	}
 
-	public List<String> getScopesList() {
-		return Arrays.asList(StringUtil.split(getScopes(), StringPool.SPACE));
+	public List<String> getScopeAliasesList() {
+		return Arrays.asList(
+			StringUtil.split(getScopeAliases(), StringPool.SPACE));
 	}
 
 	public long getUserId() {
@@ -88,16 +89,16 @@ public class OAuth2AuthorizationImpl
 		_createDate = createDate;
 	}
 
+	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId) {
+		_oAuth2AccessTokenId = oAuth2AccessTokenId;
+	}
+
 	public void setOAuth2ApplicationId(long oAuth2ApplicationId) {
 		_oAuth2ApplicationId = oAuth2ApplicationId;
 	}
 
 	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
 		_oAuth2RefreshTokenId = oAuth2RefreshTokenId;
-	}
-
-	public void setOAuth2TokenId(long oAuth2TokenId) {
-		_oAuth2TokenId = oAuth2TokenId;
 	}
 
 	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate) {
@@ -129,9 +130,9 @@ public class OAuth2AuthorizationImpl
 	private Date _accessTokenExpirationDate;
 	private long _companyId;
 	private Date _createDate;
+	private long _oAuth2AccessTokenId;
 	private long _oAuth2ApplicationId;
 	private long _oAuth2RefreshTokenId;
-	private long _oAuth2TokenId;
 	private Date _refreshTokenExpirationDate;
 	private String _remoteIPInfo;
 	private String _scopes;

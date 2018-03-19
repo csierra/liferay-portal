@@ -162,8 +162,8 @@ public class OAuth2AuthorizationModelImpl
 			}
 
 			@Override
-			public long getOAuth2TokenId() {
-				return parent.getOAuth2TokenId();
+			public long getOAuth2AccessTokenId() {
+				return parent.getOAuth2AccessTokenId();
 			}
 
 			@Override
@@ -177,13 +177,13 @@ public class OAuth2AuthorizationModelImpl
 			}
 
 			@Override
-			public String getScopes() {
-				return HtmlUtil.escape(parent.getScopes());
+			public String getScopeAliases() {
+				return HtmlUtil.escape(parent.getScopeAliases());
 			}
 
 			@Override
-			public List<String> getScopesList() {
-				return parent.getScopesList();
+			public List<String> getScopeAliasesList() {
+				return parent.getScopeAliasesList();
 			}
 
 			@Override

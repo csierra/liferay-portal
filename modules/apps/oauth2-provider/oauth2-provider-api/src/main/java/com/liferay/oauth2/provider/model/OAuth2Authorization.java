@@ -28,19 +28,19 @@ public interface OAuth2Authorization extends OAuth2AuthorizationModel {
 
 	public Date getCreateDate();
 
+	public long getOAuth2AccessTokenId();
+
 	public long getOAuth2ApplicationId();
 
 	public long getOAuth2RefreshTokenId();
-
-	public long getOAuth2TokenId();
 
 	public Date getRefreshTokenExpirationDate();
 
 	public String getRemoteIPInfo();
 
-	public String getScopes();
+	public String getScopeAliases();
 
-	public List<String> getScopesList();
+	public List<String> getScopeAliasesList();
 
 	public long getUserId();
 
@@ -52,11 +52,11 @@ public interface OAuth2Authorization extends OAuth2AuthorizationModel {
 
 	public void setCreateDate(Date createDate);
 
+	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId);
+
 	public void setOAuth2ApplicationId(long oAuth2ApplicationId);
 
 	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId);
-
-	public void setOAuth2TokenId(long oAuth2TokenId);
 
 	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate);
 
