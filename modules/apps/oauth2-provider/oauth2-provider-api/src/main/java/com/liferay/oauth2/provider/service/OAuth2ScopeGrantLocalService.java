@@ -16,7 +16,8 @@ package com.liferay.oauth2.provider.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
+import com.liferay.oauth2.provider.exception.DuplicateOAuth2ScopeGrantException;
+import com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 
@@ -235,8 +236,9 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	* Never reference this class directly. Always use {@link OAuth2ScopeGrantLocalServiceUtil} to access the o auth2 scope grant local service.
 	*/
 	public Collection<OAuth2ScopeGrant> grantScopesToToken(
-		java.lang.String tokenString, Collection<LiferayOAuth2Scope> scopes)
-		throws NoSuchOAuth2TokenException;
+		java.lang.String tokenContent, Collection<LiferayOAuth2Scope> scopes)
+		throws DuplicateOAuth2ScopeGrantException,
+			NoSuchOAuth2AccessTokenException;
 
 	/**
 	* Updates the o auth2 scope grant in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

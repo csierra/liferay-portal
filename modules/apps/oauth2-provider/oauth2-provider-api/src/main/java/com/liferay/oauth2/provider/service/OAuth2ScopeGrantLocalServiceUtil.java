@@ -260,10 +260,11 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 	* Never reference this class directly. Always use {@link OAuth2ScopeGrantLocalServiceUtil} to access the o auth2 scope grant local service.
 	*/
 	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> grantScopesToToken(
-		java.lang.String tokenString,
+		java.lang.String tokenContent,
 		java.util.Collection<com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope> scopes)
-		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException {
-		return getService().grantScopesToToken(tokenString, scopes);
+		throws com.liferay.oauth2.provider.exception.DuplicateOAuth2ScopeGrantException,
+			com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
+		return getService().grantScopesToToken(tokenContent, scopes);
 	}
 
 	/**

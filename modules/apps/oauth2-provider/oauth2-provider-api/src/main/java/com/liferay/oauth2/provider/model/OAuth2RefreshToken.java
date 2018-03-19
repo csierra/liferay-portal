@@ -56,7 +56,8 @@ public interface OAuth2RefreshToken extends OAuth2RefreshTokenModel,
 			}
 		};
 
-	public java.util.List<java.lang.String> getScopesList();
+	public java.util.List<java.lang.String> getScopeAliasesList();
 
-	public void setScopesList(java.util.List<java.lang.String> scopesList);
+	public void setScopeAliasesList(
+		java.util.List<java.lang.String> scopeAliasesList);
 }

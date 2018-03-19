@@ -65,10 +65,10 @@ public class OAuth2AuthorizationServiceWrapper
 	}
 
 	@Override
-	public boolean revokeAuthorization(long oAuth2TokenId,
+	public boolean revokeAuthorization(long oAuth2AccessTokenId,
 		long oAuth2RefreshTokenId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2AuthorizationService.revokeAuthorization(oAuth2TokenId,
+		return _oAuth2AuthorizationService.revokeAuthorization(oAuth2AccessTokenId,
 			oAuth2RefreshTokenId);
 	}
 

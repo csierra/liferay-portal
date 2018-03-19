@@ -119,14 +119,14 @@ public class OAuth2AuthorizationServiceHttp {
 	}
 
 	public static boolean revokeAuthorization(HttpPrincipal httpPrincipal,
-		long oAuth2TokenId, long oAuth2RefreshTokenId)
+		long oAuth2AccessTokenId, long oAuth2RefreshTokenId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
 					"revokeAuthorization", _revokeAuthorizationParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
-					oAuth2TokenId, oAuth2RefreshTokenId);
+					oAuth2AccessTokenId, oAuth2RefreshTokenId);
 
 			Object returnObj = null;
 

@@ -90,10 +90,10 @@ public class OAuth2AuthorizationServiceSoap {
 		}
 	}
 
-	public static boolean revokeAuthorization(long oAuth2TokenId,
+	public static boolean revokeAuthorization(long oAuth2AccessTokenId,
 		long oAuth2RefreshTokenId) throws RemoteException {
 		try {
-			boolean returnValue = OAuth2AuthorizationServiceUtil.revokeAuthorization(oAuth2TokenId,
+			boolean returnValue = OAuth2AuthorizationServiceUtil.revokeAuthorization(oAuth2AccessTokenId,
 					oAuth2RefreshTokenId);
 
 			return returnValue;

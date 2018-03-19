@@ -397,8 +397,8 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	}
 
 	@Override
-	public java.util.List<java.lang.String> getScopesList() {
-		return _oAuth2Application.getScopesList();
+	public java.util.List<java.lang.String> getScopeAliasesList() {
+		return _oAuth2Application.getScopeAliasesList();
 	}
 
 	/**
@@ -675,8 +675,9 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	}
 
 	@Override
-	public void setScopesList(java.util.List<java.lang.String> scopesList) {
-		_oAuth2Application.setScopesList(scopesList);
+	public void setScopeAliasesList(
+		java.util.List<java.lang.String> scopeAliasesList) {
+		_oAuth2Application.setScopeAliasesList(scopeAliasesList);
 	}
 
 	/**
