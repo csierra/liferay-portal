@@ -68,13 +68,13 @@ public interface OAuth2ApplicationService extends BaseService {
 	* Never reference this class directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service.
 	*/
 	public OAuth2Application addOAuth2Application(
-		List<GrantType> allowedGrantTypesList, boolean clientConfidential,
-		java.lang.String clientId, java.lang.String clientSecret,
+		List<GrantType> allowedGrantTypesList, java.lang.String clientId,
+		int clientProfile, java.lang.String clientSecret,
 		java.lang.String description, List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
-		List<java.lang.String> scopesList, ServiceContext serviceContext)
+		List<java.lang.String> scopeAliasesList, ServiceContext serviceContext)
 		throws PortalException;
 
 	public void check(OAuth2Application oAuth2Application,
@@ -117,15 +117,15 @@ public interface OAuth2ApplicationService extends BaseService {
 		InputStream inputStream) throws PortalException;
 
 	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
-		List<GrantType> allowedGrantTypesList, boolean clientConfidential,
-		java.lang.String clientId, java.lang.String clientSecret,
+		List<GrantType> allowedGrantTypesList, java.lang.String clientId,
+		int clientProfile, java.lang.String clientSecret,
 		java.lang.String description, List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
-		List<java.lang.String> scopesList, ServiceContext serviceContext)
+		List<java.lang.String> scopeAliasesList, ServiceContext serviceContext)
 		throws PortalException;
 
 	public OAuth2Application updateScopes(long oAuth2ApplicationId,
-		List<java.lang.String> scopes) throws PortalException;
+		List<java.lang.String> scopeAliasesList) throws PortalException;
 }

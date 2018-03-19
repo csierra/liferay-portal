@@ -236,8 +236,8 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 	}
 
 	@Override
-	public java.util.List<java.lang.String> getScopesList() {
-		return _oAuth2RefreshToken.getScopesList();
+	public java.util.List<java.lang.String> getScopeAliasesList() {
+		return _oAuth2RefreshToken.getScopeAliasesList();
 	}
 
 	/**
@@ -417,8 +417,9 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 	}
 
 	@Override
-	public void setScopesList(java.util.List<java.lang.String> scopesList) {
-		_oAuth2RefreshToken.setScopesList(scopesList);
+	public void setScopeAliasesList(
+		java.util.List<java.lang.String> scopeAliasesList) {
+		_oAuth2RefreshToken.setScopeAliasesList(scopeAliasesList);
 	}
 
 	/**

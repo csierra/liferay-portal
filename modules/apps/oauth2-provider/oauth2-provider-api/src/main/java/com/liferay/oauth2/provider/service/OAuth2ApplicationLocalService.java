@@ -66,13 +66,13 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 	 */
 	public OAuth2Application addOAuth2Application(long companyId, long userId,
 		java.lang.String userName, List<GrantType> allowedGrantTypesList,
-		boolean clientConfidential, java.lang.String clientId,
+		java.lang.String clientId, int clientProfile,
 		java.lang.String clientSecret, java.lang.String description,
 		List<java.lang.String> featuresList, java.lang.String homePageURL,
 		long iconFileEntryId, java.lang.String name,
 		java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
-		List<java.lang.String> scopesList, ServiceContext serviceContext)
+		List<java.lang.String> scopeAliasesList, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -246,13 +246,13 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 		InputStream inputStream) throws PortalException;
 
 	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
-		List<GrantType> allowedGrantTypesList, boolean clientConfidential,
-		java.lang.String clientId, java.lang.String clientSecret,
+		List<GrantType> allowedGrantTypesList, java.lang.String clientId,
+		int clientProfile, java.lang.String clientSecret,
 		java.lang.String description, List<java.lang.String> featuresList,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
-		List<java.lang.String> scopesList, ServiceContext serviceContext)
+		List<java.lang.String> scopeAliasesList, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -266,5 +266,6 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 		OAuth2Application oAuth2Application);
 
 	public OAuth2Application updateScopes(long oAuth2ApplicationId,
-		List<java.lang.String> scopes) throws NoSuchOAuth2ApplicationException;
+		List<java.lang.String> scopeAliasesList)
+		throws NoSuchOAuth2ApplicationException;
 }

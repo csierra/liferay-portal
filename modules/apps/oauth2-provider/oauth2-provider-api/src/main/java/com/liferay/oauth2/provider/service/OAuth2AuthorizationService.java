@@ -73,6 +73,6 @@ public interface OAuth2AuthorizationService extends BaseService {
 	*/
 	public java.lang.String getOSGiServiceIdentifier();
 
-	public boolean revokeAuthorization(long oAuth2TokenId,
+	public boolean revokeAuthorization(long oAuth2AccessTokenId,
 		long oAuth2RefreshTokenId) throws PortalException;
 }
