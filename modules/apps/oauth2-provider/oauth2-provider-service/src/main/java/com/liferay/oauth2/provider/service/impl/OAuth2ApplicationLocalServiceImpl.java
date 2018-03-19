@@ -32,10 +32,10 @@ import com.liferay.oauth2.provider.exception.MissingRedirectURIException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.exception.NonEmptyClientSecretException;
 import com.liferay.oauth2.provider.exception.UnsupportedGrantTypeForClientException;
+import com.liferay.oauth2.provider.model.OAuth2AccessToken;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
-import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationLocalServiceBaseImpl;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -75,11 +75,11 @@ public class OAuth2ApplicationLocalServiceImpl
 	@Override
 	public OAuth2Application addOAuth2Application(
 			long companyId, long userId, String userName,
-			List<GrantType> allowedGrantTypesList, boolean clientConfidential,
-			String clientId, String clientSecret, String description,
+			List<GrantType> allowedGrantTypesList, String clientId,
+			int clientProfile, String clientSecret, String description,
 			List<String> featuresList, String homePageURL, long iconFileEntryId,
 			String name, String privacyPolicyURL, List<String> redirectURIsList,
-			List<String> scopesList, ServiceContext serviceContext)
+			List<String> scopeAliasesList, ServiceContext serviceContext)
 		throws PortalException {
 
 		if (allowedGrantTypesList == null) {
@@ -95,12 +95,12 @@ public class OAuth2ApplicationLocalServiceImpl
 			redirectURIsList = new ArrayList<>();
 		}
 
-		if (scopesList == null) {
-			scopesList = new ArrayList<>();
+		if (scopeAliasesList == null) {
+			scopeAliasesList = new ArrayList<>();
 		}
 
 		validate(
-			companyId, allowedGrantTypesList, clientConfidential, clientId,
+			companyId, allowedGrantTypesList, clientId, clientProfile,
 			clientSecret, homePageURL, name, privacyPolicyURL,
 			redirectURIsList);
 
@@ -118,8 +118,8 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setUserId(userId);
 		oAuth2Application.setUserName(userName);
 		oAuth2Application.setAllowedGrantTypesList(allowedGrantTypesList);
-		oAuth2Application.setClientConfidential(clientConfidential);
 		oAuth2Application.setClientId(clientId);
+		oAuth2Application.setClientProfile(clientProfile);
 		oAuth2Application.setClientSecret(clientSecret);
 		oAuth2Application.setDescription(description);
 		oAuth2Application.setFeaturesList(featuresList);
@@ -128,7 +128,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setName(name);
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
-		oAuth2Application.setScopesList(scopesList);
+		oAuth2Application.setScopeAliasesList(scopeAliasesList);
 
 		// Resources
 
@@ -156,21 +156,22 @@ public class OAuth2ApplicationLocalServiceImpl
 	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
 		throws PortalException {
 
-		Collection<OAuth2Token> oAuth2Tokens =
-			oAuth2TokenLocalService.findByApplicationId(
+		Collection<OAuth2AccessToken> oAuth2AccessTokens =
+			oAuth2AccessTokenLocalService.findByApplicationId(
 				oAuth2ApplicationId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 				null);
 
-		for (OAuth2Token oAuth2Token : oAuth2Tokens) {
+		for (OAuth2AccessToken oAuth2AccessToken : oAuth2AccessTokens) {
 			Collection<OAuth2ScopeGrant> grants =
 				oAuth2ScopeGrantLocalService.findByToken(
-					oAuth2Token.getOAuth2TokenId());
+					oAuth2AccessToken.getOAuth2AccessTokenId());
 
 			for (OAuth2ScopeGrant grant : grants) {
 				oAuth2ScopeGrantLocalService.deleteOAuth2ScopeGrant(grant);
 			}
 
-			oAuth2TokenLocalService.deleteOAuth2Token(oAuth2Token);
+			oAuth2AccessTokenLocalService.deleteOAuth2AccessToken(
+				oAuth2AccessToken);
 		}
 
 		Collection<OAuth2RefreshToken> refreshTokens =
@@ -190,7 +191,7 @@ public class OAuth2ApplicationLocalServiceImpl
 	public OAuth2Application fetchOAuth2Application(
 		long companyId, String clientId) {
 
-		return oAuth2ApplicationPersistence.fetchByC_CI(companyId, clientId);
+		return oAuth2ApplicationPersistence.fetchByC_C(companyId, clientId);
 	}
 
 	@Override
@@ -198,7 +199,7 @@ public class OAuth2ApplicationLocalServiceImpl
 			long companyId, String clientId)
 		throws NoSuchOAuth2ApplicationException {
 
-		return oAuth2ApplicationPersistence.findByC_CI(companyId, clientId);
+		return oAuth2ApplicationPersistence.findByC_C(companyId, clientId);
 	}
 
 	@Override
@@ -254,10 +255,10 @@ public class OAuth2ApplicationLocalServiceImpl
 	@Override
 	public OAuth2Application updateOAuth2Application(
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
-			boolean clientConfidential, String clientId, String clientSecret,
+			String clientId, int clientProfile, String clientSecret,
 			String description, List<String> featuresList, String homePageURL,
 			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, List<String> scopesList,
+			List<String> redirectURIsList, List<String> scopeAliasesList,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -266,7 +267,7 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		validate(
 			oAuth2Application.getCompanyId(), oAuth2ApplicationId,
-			allowedGrantTypesList, clientConfidential, clientId, clientSecret,
+			allowedGrantTypesList, clientId, clientProfile, clientSecret,
 			homePageURL, name, privacyPolicyURL, redirectURIsList);
 
 		Date now = new Date();
@@ -274,8 +275,8 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setModifiedDate(now);
 
 		oAuth2Application.setAllowedGrantTypesList(allowedGrantTypesList);
-		oAuth2Application.setClientConfidential(clientConfidential);
 		oAuth2Application.setClientId(clientId);
+		oAuth2Application.setClientProfile(clientProfile);
 		oAuth2Application.setClientSecret(clientSecret);
 		oAuth2Application.setDescription(description);
 		oAuth2Application.setFeaturesList(featuresList);
@@ -284,14 +285,14 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setName(name);
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
-		oAuth2Application.setScopesList(scopesList);
+		oAuth2Application.setScopeAliasesList(scopeAliasesList);
 
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 
 	@Override
 	public OAuth2Application updateScopes(
-			long oAuth2ApplicationId, List<String> scopes)
+			long oAuth2ApplicationId, List<String> scopeAliasesList)
 		throws NoSuchOAuth2ApplicationException {
 
 		OAuth2Application oAuth2Application =
@@ -299,7 +300,7 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		Date now = new Date();
 
-		oAuth2Application.setScopesList(scopes);
+		oAuth2Application.setScopeAliasesList(scopeAliasesList);
 		oAuth2Application.setModifiedDate(now);
 
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
@@ -307,23 +308,25 @@ public class OAuth2ApplicationLocalServiceImpl
 
 	protected void validate(
 			long companyId, List<GrantType> allowedGrantTypesList,
-			boolean clientConfidential, String clientId, String clientSecret,
+			String clientId, int clientProfile, String clientSecret,
 			String homePageURL, String name, String privacyPolicyURL,
 			List<String> redirectURIsList)
 		throws PortalException {
 
 		validate(
-			companyId, 0, allowedGrantTypesList, clientConfidential, clientId,
+			companyId, 0, allowedGrantTypesList, clientId, clientProfile,
 			clientSecret, homePageURL, name, privacyPolicyURL,
 			redirectURIsList);
 	}
 
 	protected void validate(
 			long companyId, long oAuth2ApplicationId,
-			List<GrantType> allowedGrantTypesList, boolean clientConfidential,
-			String clientId, String clientSecret, String homePageURL,
+			List<GrantType> allowedGrantTypesList, String clientId,
+			int clientProfile, String clientSecret, String homePageURL,
 			String name, String privacyPolicyURL, List<String> redirectURIsList)
 		throws PortalException {
+
+		boolean clientConfidential = !Validator.isBlank(clientSecret);
 
 		if (clientConfidential) {
 			for (GrantType grantType : allowedGrantTypesList) {
@@ -343,7 +346,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		}
 
 		OAuth2Application duplicateApplication =
-			oAuth2ApplicationPersistence.fetchByC_CI(companyId, clientId);
+			oAuth2ApplicationPersistence.fetchByC_C(companyId, clientId);
 
 		if ((duplicateApplication != null) &&
 			(duplicateApplication.getOAuth2ApplicationId() !=
