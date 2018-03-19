@@ -55,18 +55,3 @@ create table OAuth2ScopeGrant (
 	oAuth2AccessTokenId LONG,
 	scope VARCHAR(75) null
 );
-
-create table OAuth2Token (
-	oAuth2TokenId LONG not null primary key,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	expirationDate DATE null,
-	remoteIPInfo VARCHAR(75) null,
-	oAuth2TokenContent TEXT null,
-	oAuth2ApplicationId LONG,
-	oAuth2TokenType VARCHAR(75) null,
-	oAuth2RefreshTokenId LONG,
-	scopes TEXT null
-);
