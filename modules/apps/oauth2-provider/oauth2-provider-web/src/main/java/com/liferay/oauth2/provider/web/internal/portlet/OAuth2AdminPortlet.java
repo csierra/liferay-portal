@@ -17,10 +17,10 @@ package com.liferay.oauth2.provider.web.internal.portlet;
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.service.OAuth2AccessTokenService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
 import com.liferay.oauth2.provider.service.OAuth2RefreshTokenService;
-import com.liferay.oauth2.provider.service.OAuth2TokenService;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext;
@@ -122,8 +122,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		long oAuth2ApplicationId = ParamUtil.getLong(
 			request, "oAuth2ApplicationId");
 
-		boolean clientConfidential = ParamUtil.get(
-			request, "clientConfidential", false);
+		int clientProfile = ParamUtil.getInteger(request, "clientProfile", 0);
 				
 		String clientId = ParamUtil.get(
 			request, "clientId", StringPool.BLANK);
@@ -183,7 +182,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			if (oAuth2ApplicationId == 0) {
 				oAuth2Application =
 					_oAuth2ApplicationService.addOAuth2Application(
-						allowedGrantTypes, clientConfidential, clientId,
+						allowedGrantTypes, clientId, clientProfile,
 						clientSecret, description, featuresList, homePageURL,
 						iconFileEntryId, name, privacyPolicyURL,
 						redirectURIsList, scopesList, serviceContext);
@@ -194,12 +193,12 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 						oAuth2ApplicationId);
 
 				iconFileEntryId = oAuth2Application.getIconFileEntryId();
-				scopesList = oAuth2Application.getScopesList();
+				scopesList = oAuth2Application.getScopeAliasesList();
 
 				oAuth2Application =
 					_oAuth2ApplicationService.updateOAuth2Application(
 						oAuth2ApplicationId, allowedGrantTypes,
-						clientConfidential, clientId, clientSecret, description,
+						clientId, clientProfile, clientSecret, description,
 						featuresList, homePageURL, iconFileEntryId, name,
 						privacyPolicyURL, redirectURIsList, scopesList,
 						serviceContext);
@@ -274,7 +273,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 	@Reference
 	private OAuth2AuthorizationService _oAuth2AuthorizationService;
 	@Reference
-	private OAuth2TokenService _oAuth2TokenService;
+	private OAuth2AccessTokenService _oAuth2AccessTokenService;
 	@Reference
 	private Portal _portal;
 

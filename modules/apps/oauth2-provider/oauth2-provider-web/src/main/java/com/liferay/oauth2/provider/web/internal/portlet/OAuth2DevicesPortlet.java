@@ -15,8 +15,6 @@
 package com.liferay.oauth2.provider.web.internal.portlet;
 
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
-import com.liferay.oauth2.provider.service.OAuth2RefreshTokenService;
-import com.liferay.oauth2.provider.service.OAuth2TokenService;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -63,8 +61,5 @@ public class OAuth2DevicesPortlet extends MVCPortlet {
 
 	@Reference
 	private OAuth2AuthorizationService _oAuth2AuthorizationService;
-	@Reference
-	private OAuth2RefreshTokenService _oAuth2RefreshTokenService;
-	@Reference
-	private OAuth2TokenService _oAuth2TokenService;
+
 }

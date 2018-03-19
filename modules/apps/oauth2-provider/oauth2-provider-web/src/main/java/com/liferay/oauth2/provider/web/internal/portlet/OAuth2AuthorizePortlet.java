@@ -101,7 +101,8 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 			String[] requestedScopes = StringUtil.split(
 				oAuth2Parameters.get("scope"), StringPool.SPACE);
 
-			List<String> allowedScopes = oAuth2Application.getScopesList();
+			List<String> allowedScopes =
+				oAuth2Application.getScopeAliasesList();
 
 			AuthorizationRequestModel authorizationRequestModel =
 				new AuthorizationRequestModel(

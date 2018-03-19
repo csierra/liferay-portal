@@ -47,7 +47,7 @@ Map<String, AuthorizationRequestModel> scopes = (Map<String, AuthorizationReques
 
 ServiceTrackerMap<String, ApplicationDescriptor> applicationDescriptors = (ServiceTrackerMap<String, ApplicationDescriptor>) request.getAttribute("applicationDescriptors");
 
-List<String> assignedScopes = oAuth2Application.getScopesList();
+List<String> assignedScopes = oAuth2Application.getScopeAliasesList();
 %>
 
 <style>
