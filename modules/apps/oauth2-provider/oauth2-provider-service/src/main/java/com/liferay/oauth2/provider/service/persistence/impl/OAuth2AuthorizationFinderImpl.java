@@ -204,7 +204,7 @@ public class OAuth2AuthorizationFinderImpl
 				oAuth2Authorization.setCreateDate(_date(row[i++]));
 				oAuth2Authorization.setOAuth2ApplicationId(_long(row[i++]));
 				oAuth2Authorization.setOAuth2RefreshTokenId(_long(row[i++]));
-				oAuth2Authorization.setOAuth2TokenId(_long(row[i++]));
+				oAuth2Authorization.setOAuth2AccessTokenId(_long(row[i++]));
 				oAuth2Authorization.setRefreshTokenExpirationDate(
 					_date(row[i++]));
 				oAuth2Authorization.setRemoteIPInfo(_string(row[i++]));
@@ -285,7 +285,7 @@ public class OAuth2AuthorizationFinderImpl
 				oAuth2Authorization.setCreateDate(_date(row[i++]));
 				oAuth2Authorization.setOAuth2ApplicationId(_long(row[i++]));
 				oAuth2Authorization.setOAuth2RefreshTokenId(_long(row[i++]));
-				oAuth2Authorization.setOAuth2TokenId(_long(row[i++]));
+				oAuth2Authorization.setOAuth2AccessTokenId(_long(row[i++]));
 				oAuth2Authorization.setRefreshTokenExpirationDate(
 					_date(row[i++]));
 				oAuth2Authorization.setRemoteIPInfo(_string(row[i++]));
@@ -350,9 +350,9 @@ public class OAuth2AuthorizationFinderImpl
 		_tableColumnsMap.put("accessTokenExpirationDate", Types.DATE);
 		_tableColumnsMap.put("companyId", Types.BIGINT);
 		_tableColumnsMap.put("createDate", Types.DATE);
+		_tableColumnsMap.put("oAuth2AccessTokenId", Types.BIGINT);
 		_tableColumnsMap.put("oAuth2ApplicationId", Types.BIGINT);
 		_tableColumnsMap.put("oAuth2RefreshTokenId", Types.BIGINT);
-		_tableColumnsMap.put("oAuth2TokenId", Types.BIGINT);
 		_tableColumnsMap.put("refreshTokenExpirationDate", Types.DATE);
 		_tableColumnsMap.put("remoteIPInfo", Types.VARCHAR);
 		_tableColumnsMap.put("scopes", Types.CLOB);

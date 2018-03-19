@@ -15,10 +15,10 @@
 package com.liferay.oauth2.provider.service.impl;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
+import com.liferay.oauth2.provider.model.OAuth2AccessToken;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
-import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.service.base.OAuth2AuthorizationServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -73,7 +73,7 @@ public class OAuth2AuthorizationServiceImpl
 
 	@Override
 	public boolean revokeAuthorization(
-			long oAuth2TokenId, long oAuth2RefreshTokenId)
+			long oAuth2AccessTokenId, long oAuth2RefreshTokenId)
 		throws PortalException {
 
 		long oAuth2ApplicationId = 0;
@@ -91,13 +91,14 @@ public class OAuth2AuthorizationServiceImpl
 				owner = false;
 			}
 		}
-		else if (oAuth2TokenId != 0) {
-			OAuth2Token oAuth2Token = oAuth2TokenLocalService.getOAuth2Token(
-				oAuth2TokenId);
+		else if (oAuth2AccessTokenId != 0) {
+			OAuth2AccessToken oAuth2AccessToken =
+				oAuth2AccessTokenLocalService.getOAuth2AccessToken(
+					oAuth2AccessTokenId);
 
-			oAuth2ApplicationId = oAuth2Token.getOAuth2ApplicationId();
+			oAuth2ApplicationId = oAuth2AccessToken.getOAuth2ApplicationId();
 
-			if (!Objects.equals(getUserId(), oAuth2Token.getUserId())) {
+			if (!Objects.equals(getUserId(), oAuth2AccessToken.getUserId())) {
 				owner = false;
 			}
 		}
@@ -116,7 +117,7 @@ public class OAuth2AuthorizationServiceImpl
 		}
 
 		return oAuth2AuthorizationLocalService.revokeAuthorization(
-			oAuth2TokenId, oAuth2RefreshTokenId);
+			oAuth2AccessTokenId, oAuth2RefreshTokenId);
 	}
 
 }

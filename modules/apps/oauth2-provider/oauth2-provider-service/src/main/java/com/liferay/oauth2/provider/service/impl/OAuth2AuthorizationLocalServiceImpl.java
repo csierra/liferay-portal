@@ -74,11 +74,12 @@ public class OAuth2AuthorizationLocalServiceImpl
 
 	@Override
 	public boolean revokeAuthorization(
-			long oAuth2TokenId, long oAuth2RefreshTokenId)
+			long oAuth2AccessTokenId, long oAuth2RefreshTokenId)
 		throws PortalException {
 
-		if (oAuth2TokenId > 0) {
-			oAuth2TokenLocalService.deleteOAuth2Token(oAuth2TokenId);
+		if (oAuth2AccessTokenId > 0) {
+			oAuth2AccessTokenLocalService.deleteOAuth2AccessToken(
+				oAuth2AccessTokenId);
 		}
 
 		if (oAuth2RefreshTokenId > 0) {

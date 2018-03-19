@@ -60,8 +60,9 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	}
 
 	@Override
-	public List<String> getScopesList() {
-		return Arrays.asList(StringUtil.split(getScopes(), StringPool.SPACE));
+	public List<String> getScopeAliasesList() {
+		return Arrays.asList(
+			StringUtil.split(getScopeAliases(), StringPool.SPACE));
 	}
 
 	@Override
@@ -95,10 +96,11 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	}
 
 	@Override
-	public void setScopesList(List<String> scopesList) {
-		String scopes = StringUtil.merge(scopesList, StringPool.SPACE);
+	public void setScopeAliasesList(List<String> scopeAliasesList) {
+		String scopeAliases = StringUtil.merge(
+			scopeAliasesList, StringPool.SPACE);
 
-		setScopes(scopes);
+		setScopeAliases(scopeAliases);
 	}
 
 }
