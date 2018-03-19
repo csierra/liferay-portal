@@ -18,7 +18,7 @@
 page import="com.liferay.oauth2.provider.model.OAuth2Authorization" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalServiceUtil" %><%@
-page import="com.liferay.oauth2.provider.service.OAuth2TokenLocalServiceUtil" %><%@
+page import="com.liferay.oauth2.provider.service.OAuth2AccessTokenLocalServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope" %><%@
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@

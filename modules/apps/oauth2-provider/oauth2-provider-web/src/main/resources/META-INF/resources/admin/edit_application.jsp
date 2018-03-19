@@ -99,7 +99,9 @@ renderResponse.setTitle(headerTitle);
 				<aui:input name="description" type="textarea" />
 				<aui:input name="homePageURL" />
 				<aui:input name="privacyPolicyURL" />
-				<aui:input name="clientConfidential" type="checkbox" value="<%= oAuth2Application == null ? true : oAuth2Application.getClientConfidential() %>"/>
+				<aui:select name="clientProfile">
+					<aui:option label="client-profile-0" selected="<%= oAuth2Application == null ? true : oAuth2Application.getClientProfile() == 0 %>" value="0"/>
+				</aui:select>
 				<aui:input name="clientId" required="true" />
 				<aui:input name="clientSecret" />
 				<aui:input label="redirect-uris" name="redirectURIs" helpMessage="redirect-uris-help" />

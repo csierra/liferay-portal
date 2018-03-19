@@ -14,16 +14,16 @@
 
 package com.liferay.oauth2.provider.jsonws;
 
-import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
+import com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException;
+import com.liferay.oauth2.provider.model.OAuth2AccessToken;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.model.OAuth2Token;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
+import com.liferay.oauth2.provider.service.OAuth2AccessTokenLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
-import com.liferay.oauth2.provider.service.OAuth2TokenLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -177,20 +177,20 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		}
 
 		String token = basicAuthParts[1];
-		OAuth2Token oAuth2Token = null;
+		OAuth2AccessToken oAuth2AccessToken = null;
 		try {
-			oAuth2Token = _oAuth2TokenLocalService.findByContent(token);
+			oAuth2AccessToken = _oAuth2AccessTokenLocalService.findByContent(token);
 		}
-		catch (NoSuchOAuth2TokenException e) {
+		catch (NoSuchOAuth2AccessTokenException e) {
 			return null;
 		}
 
 		OAuth2Application oAuth2Application =
 			_oAuth2ApplicationLocalService.getOAuth2Application(
-				oAuth2Token.getOAuth2ApplicationId());
+				oAuth2AccessToken.getOAuth2ApplicationId());
 
-		long issuedAtSeconds = oAuth2Token.getCreateDate().getTime() / 1000;
-		long expiresSeconds = oAuth2Token.getExpirationDate().getTime() / 1000;
+		long issuedAtSeconds = oAuth2AccessToken.getCreateDate().getTime() / 1000;
+		long expiresSeconds = oAuth2AccessToken.getExpirationDate().getTime() / 1000;
 		long lifeTime = expiresSeconds - issuedAtSeconds;
 
 		BearerTokenProvider.AccessToken accessToken =
@@ -208,11 +208,11 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				new HashMap<>(),
 				StringPool.BLANK,
 				StringPool.BLANK,
-				oAuth2Token.getScopesList(),
-				oAuth2Token.getOAuth2TokenContent(),
+				oAuth2AccessToken.getScopeAliasesList(),
+				oAuth2AccessToken.getTokenContent(),
 				"Bearer",
-				oAuth2Token.getUserId(),
-				oAuth2Token.getUserName());
+				oAuth2AccessToken.getUserId(),
+				oAuth2AccessToken.getUserName());
 
 		return accessToken;
 	}
@@ -235,7 +235,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	private volatile ScopeLocator _scopeFinderLocator;
 
 	@Reference
-	private OAuth2TokenLocalService _oAuth2TokenLocalService;
+	private OAuth2AccessTokenLocalService _oAuth2AccessTokenLocalService;
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;

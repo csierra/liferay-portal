@@ -77,7 +77,7 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 				String thumbnailURL = StringPool.BLANK;
 
 				try {
-					OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2Authorization.getoAuth2ApplicationId());
+					OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2Authorization.getOAuth2ApplicationId());
 					applicationDescription = oAuth2Application.getDescription();
 					applicationName = oAuth2Application.getName();
 
@@ -115,9 +115,9 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 			<liferay-ui:search-container-column-text
 				name="scopes">
 
-				<%= String.valueOf(oAuth2Authorization.getScopesList().size()) %>
+				<%= String.valueOf(oAuth2Authorization.getScopeAliasesList().size()) %>
 
-				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Authorization.getScopes()) %>" />
+				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Authorization.getScopeAliases()) %>" />
 
 			</liferay-ui:search-container-column-text>
 

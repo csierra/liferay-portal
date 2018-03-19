@@ -111,9 +111,9 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 			<liferay-ui:search-container-column-text
 				name="scopes">
 
-				<%= String.valueOf(oAuth2Authorization.getScopesList().size()) %>
+				<%= String.valueOf(oAuth2Authorization.getScopeAliasesList().size()) %>
 
-				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Authorization.getScopes()) %>" />
+				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Authorization.getScopeAliases()) %>" />
 
 			</liferay-ui:search-container-column-text>
 

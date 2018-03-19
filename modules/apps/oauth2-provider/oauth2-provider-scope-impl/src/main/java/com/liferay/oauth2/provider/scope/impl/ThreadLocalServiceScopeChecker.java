@@ -57,7 +57,7 @@ public class ThreadLocalServiceScopeChecker
 			}
 
 			boolean found = oAuth2ScopeGrants.removeIf(
-				o -> scope.equals(o.getOAuth2ScopeName()));
+				o -> scope.equals(o.getScope()));
 
 			if (!found) {
 				return false;
@@ -84,7 +84,7 @@ public class ThreadLocalServiceScopeChecker
 			}
 
 			for (OAuth2ScopeGrant oAuth2ScopeGrant : oAuth2ScopeGrants) {
-				if (scope.equals(oAuth2ScopeGrant.getOAuth2ScopeName())) {
+				if (scope.equals(oAuth2ScopeGrant.getScope())) {
 					return true;
 				}
 			}
@@ -106,7 +106,7 @@ public class ThreadLocalServiceScopeChecker
 
 		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
 
-		return stream.anyMatch(o -> scope.equals(o.getOAuth2ScopeName()));
+		return stream.anyMatch(o -> scope.equals(o.getScope()));
 	}
 
 	@Override
