@@ -49,13 +49,27 @@ public class OAuth2ScopeGrantLocalServiceWrapper
 	/**
 	* Creates a new o auth2 scope grant with the primary key. Does not add the o auth2 scope grant to the database.
 	*
-	* @param oAuth2ScopeGrantPK the primary key for the new o auth2 scope grant
+	* @param oAuth2ScopeGrantId the primary key for the new o auth2 scope grant
 	* @return the new o auth2 scope grant
 	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2ScopeGrant createOAuth2ScopeGrant(
-		com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK oAuth2ScopeGrantPK) {
-		return _oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(oAuth2ScopeGrantPK);
+		long oAuth2ScopeGrantId) {
+		return _oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(oAuth2ScopeGrantId);
+	}
+
+	/**
+	* Deletes the o auth2 scope grant with the primary key from the database. Also notifies the appropriate model listeners.
+	*
+	* @param oAuth2ScopeGrantId the primary key of the o auth2 scope grant
+	* @return the o auth2 scope grant that was removed
+	* @throws PortalException if a o auth2 scope grant with the primary key could not be found
+	*/
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2ScopeGrant deleteOAuth2ScopeGrant(
+		long oAuth2ScopeGrantId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2ScopeGrantLocalService.deleteOAuth2ScopeGrant(oAuth2ScopeGrantId);
 	}
 
 	/**
@@ -68,20 +82,6 @@ public class OAuth2ScopeGrantLocalServiceWrapper
 	public com.liferay.oauth2.provider.model.OAuth2ScopeGrant deleteOAuth2ScopeGrant(
 		com.liferay.oauth2.provider.model.OAuth2ScopeGrant oAuth2ScopeGrant) {
 		return _oAuth2ScopeGrantLocalService.deleteOAuth2ScopeGrant(oAuth2ScopeGrant);
-	}
-
-	/**
-	* Deletes the o auth2 scope grant with the primary key from the database. Also notifies the appropriate model listeners.
-	*
-	* @param oAuth2ScopeGrantPK the primary key of the o auth2 scope grant
-	* @return the o auth2 scope grant that was removed
-	* @throws PortalException if a o auth2 scope grant with the primary key could not be found
-	*/
-	@Override
-	public com.liferay.oauth2.provider.model.OAuth2ScopeGrant deleteOAuth2ScopeGrant(
-		com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK oAuth2ScopeGrantPK)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2ScopeGrantLocalService.deleteOAuth2ScopeGrant(oAuth2ScopeGrantPK);
 	}
 
 	/**
@@ -182,8 +182,8 @@ public class OAuth2ScopeGrantLocalServiceWrapper
 
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2ScopeGrant fetchOAuth2ScopeGrant(
-		com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK oAuth2ScopeGrantPK) {
-		return _oAuth2ScopeGrantLocalService.fetchOAuth2ScopeGrant(oAuth2ScopeGrantPK);
+		long oAuth2ScopeGrantId) {
+		return _oAuth2ScopeGrantLocalService.fetchOAuth2ScopeGrant(oAuth2ScopeGrantId);
 	}
 
 	@Override
@@ -200,18 +200,28 @@ public class OAuth2ScopeGrantLocalServiceWrapper
 		return _oAuth2ScopeGrantLocalService.findByToken(tokenId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _oAuth2ScopeGrantLocalService.getActionableDynamicQuery();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _oAuth2ScopeGrantLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the o auth2 scope grant with the primary key.
 	*
-	* @param oAuth2ScopeGrantPK the primary key of the o auth2 scope grant
+	* @param oAuth2ScopeGrantId the primary key of the o auth2 scope grant
 	* @return the o auth2 scope grant
 	* @throws PortalException if a o auth2 scope grant with the primary key could not be found
 	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2ScopeGrant getOAuth2ScopeGrant(
-		com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK oAuth2ScopeGrantPK)
+		long oAuth2ScopeGrantId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2ScopeGrantLocalService.getOAuth2ScopeGrant(oAuth2ScopeGrantPK);
+		return _oAuth2ScopeGrantLocalService.getOAuth2ScopeGrant(oAuth2ScopeGrantId);
 	}
 
 	/**

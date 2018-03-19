@@ -21,27 +21,27 @@ import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.util.Accessor;
 
 /**
- * The extended model interface for the OAuth2ScopeGrant service. Represents a row in the &quot;OAuth2ScopeGrant&quot; database table, with each column mapped to a property of this class.
+ * The extended model interface for the OAuth2AccessToken service. Represents a row in the &quot;OAuth2AccessToken&quot; database table, with each column mapped to a property of this class.
  *
  * @author Brian Wing Shun Chan
- * @see OAuth2ScopeGrantModel
- * @see com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantImpl
- * @see com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantModelImpl
+ * @see OAuth2AccessTokenModel
+ * @see com.liferay.oauth2.provider.model.impl.OAuth2AccessTokenImpl
+ * @see com.liferay.oauth2.provider.model.impl.OAuth2AccessTokenModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantImpl")
+@ImplementationClassName("com.liferay.oauth2.provider.model.impl.OAuth2AccessTokenImpl")
 @ProviderType
-public interface OAuth2ScopeGrant extends OAuth2ScopeGrantModel, PersistedModel {
+public interface OAuth2AccessToken extends OAuth2AccessTokenModel, PersistedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.oauth2.provider.model.impl.OAuth2AccessTokenImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<OAuth2ScopeGrant, Long> O_AUTH2_SCOPE_GRANT_ID_ACCESSOR =
-		new Accessor<OAuth2ScopeGrant, Long>() {
+	public static final Accessor<OAuth2AccessToken, Long> O_AUTH2_ACCESS_TOKEN_ID_ACCESSOR =
+		new Accessor<OAuth2AccessToken, Long>() {
 			@Override
-			public Long get(OAuth2ScopeGrant oAuth2ScopeGrant) {
-				return oAuth2ScopeGrant.getOAuth2ScopeGrantId();
+			public Long get(OAuth2AccessToken oAuth2AccessToken) {
+				return oAuth2AccessToken.getOAuth2AccessTokenId();
 			}
 
 			@Override
@@ -50,8 +50,8 @@ public interface OAuth2ScopeGrant extends OAuth2ScopeGrantModel, PersistedModel 
 			}
 
 			@Override
-			public Class<OAuth2ScopeGrant> getTypeClass() {
-				return OAuth2ScopeGrant.class;
+			public Class<OAuth2AccessToken> getTypeClass() {
+				return OAuth2AccessToken.class;
 			}
 		};
 }

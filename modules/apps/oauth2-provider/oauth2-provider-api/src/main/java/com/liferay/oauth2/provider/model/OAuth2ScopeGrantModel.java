@@ -18,8 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
 
-import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK;
-
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.CacheModel;
@@ -27,8 +25,6 @@ import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
-
-import java.util.Date;
 
 /**
  * The base model interface for the OAuth2ScopeGrant service. Represents a row in the &quot;OAuth2ScopeGrant&quot; database table, with each column mapped to a property of this class.
@@ -57,14 +53,28 @@ public interface OAuth2ScopeGrantModel extends BaseModel<OAuth2ScopeGrant>,
 	 *
 	 * @return the primary key of this o auth2 scope grant
 	 */
-	public OAuth2ScopeGrantPK getPrimaryKey();
+	public long getPrimaryKey();
 
 	/**
 	 * Sets the primary key of this o auth2 scope grant.
 	 *
 	 * @param primaryKey the primary key of this o auth2 scope grant
 	 */
-	public void setPrimaryKey(OAuth2ScopeGrantPK primaryKey);
+	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the o auth2 scope grant ID of this o auth2 scope grant.
+	 *
+	 * @return the o auth2 scope grant ID of this o auth2 scope grant
+	 */
+	public long getOAuth2ScopeGrantId();
+
+	/**
+	 * Sets the o auth2 scope grant ID of this o auth2 scope grant.
+	 *
+	 * @param oAuth2ScopeGrantId the o auth2 scope grant ID of this o auth2 scope grant
+	 */
+	public void setOAuth2ScopeGrantId(long oAuth2ScopeGrantId);
 
 	/**
 	 * Returns the application name of this o auth2 scope grant.
@@ -113,47 +123,33 @@ public interface OAuth2ScopeGrantModel extends BaseModel<OAuth2ScopeGrant>,
 	public void setCompanyId(long companyId);
 
 	/**
-	 * Returns the o auth2 scope name of this o auth2 scope grant.
+	 * Returns the o auth2 access token ID of this o auth2 scope grant.
 	 *
-	 * @return the o auth2 scope name of this o auth2 scope grant
+	 * @return the o auth2 access token ID of this o auth2 scope grant
+	 */
+	public long getOAuth2AccessTokenId();
+
+	/**
+	 * Sets the o auth2 access token ID of this o auth2 scope grant.
+	 *
+	 * @param oAuth2AccessTokenId the o auth2 access token ID of this o auth2 scope grant
+	 */
+	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId);
+
+	/**
+	 * Returns the scope of this o auth2 scope grant.
+	 *
+	 * @return the scope of this o auth2 scope grant
 	 */
 	@AutoEscape
-	public String getOAuth2ScopeName();
+	public String getScope();
 
 	/**
-	 * Sets the o auth2 scope name of this o auth2 scope grant.
+	 * Sets the scope of this o auth2 scope grant.
 	 *
-	 * @param oAuth2ScopeName the o auth2 scope name of this o auth2 scope grant
+	 * @param scope the scope of this o auth2 scope grant
 	 */
-	public void setOAuth2ScopeName(String oAuth2ScopeName);
-
-	/**
-	 * Returns the o auth2 token ID of this o auth2 scope grant.
-	 *
-	 * @return the o auth2 token ID of this o auth2 scope grant
-	 */
-	public long getOAuth2TokenId();
-
-	/**
-	 * Sets the o auth2 token ID of this o auth2 scope grant.
-	 *
-	 * @param oAuth2TokenId the o auth2 token ID of this o auth2 scope grant
-	 */
-	public void setOAuth2TokenId(long oAuth2TokenId);
-
-	/**
-	 * Returns the create date of this o auth2 scope grant.
-	 *
-	 * @return the create date of this o auth2 scope grant
-	 */
-	public Date getCreateDate();
-
-	/**
-	 * Sets the create date of this o auth2 scope grant.
-	 *
-	 * @param createDate the create date of this o auth2 scope grant
-	 */
-	public void setCreateDate(Date createDate);
+	public void setScope(String scope);
 
 	@Override
 	public boolean isNew();

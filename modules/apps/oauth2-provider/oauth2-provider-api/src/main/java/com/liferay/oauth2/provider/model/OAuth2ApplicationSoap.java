@@ -41,17 +41,17 @@ public class OAuth2ApplicationSoap implements Serializable {
 		soapModel.setUserId(model.getUserId());
 		soapModel.setUserName(model.getUserName());
 		soapModel.setAllowedGrantTypes(model.getAllowedGrantTypes());
-		soapModel.setClientConfidential(model.getClientConfidential());
 		soapModel.setClientId(model.getClientId());
+		soapModel.setClientProfile(model.getClientProfile());
 		soapModel.setClientSecret(model.getClientSecret());
 		soapModel.setDescription(model.getDescription());
+		soapModel.setFeatures(model.getFeatures());
 		soapModel.setHomePageURL(model.getHomePageURL());
 		soapModel.setIconFileEntryId(model.getIconFileEntryId());
 		soapModel.setName(model.getName());
 		soapModel.setPrivacyPolicyURL(model.getPrivacyPolicyURL());
 		soapModel.setRedirectURIs(model.getRedirectURIs());
-		soapModel.setScopes(model.getScopes());
-		soapModel.setFeatures(model.getFeatures());
+		soapModel.setScopeAliases(model.getScopeAliases());
 
 		return soapModel;
 	}
@@ -163,20 +163,20 @@ public class OAuth2ApplicationSoap implements Serializable {
 		_allowedGrantTypes = allowedGrantTypes;
 	}
 
-	public Boolean getClientConfidential() {
-		return _clientConfidential;
-	}
-
-	public void setClientConfidential(Boolean clientConfidential) {
-		_clientConfidential = clientConfidential;
-	}
-
 	public String getClientId() {
 		return _clientId;
 	}
 
 	public void setClientId(String clientId) {
 		_clientId = clientId;
+	}
+
+	public int getClientProfile() {
+		return _clientProfile;
+	}
+
+	public void setClientProfile(int clientProfile) {
+		_clientProfile = clientProfile;
 	}
 
 	public String getClientSecret() {
@@ -193,6 +193,14 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 	public void setDescription(String description) {
 		_description = description;
+	}
+
+	public String getFeatures() {
+		return _features;
+	}
+
+	public void setFeatures(String features) {
+		_features = features;
 	}
 
 	public String getHomePageURL() {
@@ -235,20 +243,12 @@ public class OAuth2ApplicationSoap implements Serializable {
 		_redirectURIs = redirectURIs;
 	}
 
-	public String getScopes() {
-		return _scopes;
+	public String getScopeAliases() {
+		return _scopeAliases;
 	}
 
-	public void setScopes(String scopes) {
-		_scopes = scopes;
-	}
-
-	public String getFeatures() {
-		return _features;
-	}
-
-	public void setFeatures(String features) {
-		_features = features;
+	public void setScopeAliases(String scopeAliases) {
+		_scopeAliases = scopeAliases;
 	}
 
 	private long _oAuth2ApplicationId;
@@ -258,15 +258,15 @@ public class OAuth2ApplicationSoap implements Serializable {
 	private long _userId;
 	private String _userName;
 	private String _allowedGrantTypes;
-	private Boolean _clientConfidential;
 	private String _clientId;
+	private int _clientProfile;
 	private String _clientSecret;
 	private String _description;
+	private String _features;
 	private String _homePageURL;
 	private long _iconFileEntryId;
 	private String _name;
 	private String _privacyPolicyURL;
 	private String _redirectURIs;
-	private String _scopes;
-	private String _features;
+	private String _scopeAliases;
 }

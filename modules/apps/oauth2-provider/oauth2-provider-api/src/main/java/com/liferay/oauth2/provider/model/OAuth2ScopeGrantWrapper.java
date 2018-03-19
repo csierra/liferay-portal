@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -58,18 +57,24 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("oAuth2ScopeGrantId", getOAuth2ScopeGrantId());
 		attributes.put("applicationName", getApplicationName());
 		attributes.put("bundleSymbolicName", getBundleSymbolicName());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("oAuth2ScopeName", getOAuth2ScopeName());
-		attributes.put("oAuth2TokenId", getOAuth2TokenId());
-		attributes.put("createDate", getCreateDate());
+		attributes.put("oAuth2AccessTokenId", getOAuth2AccessTokenId());
+		attributes.put("scope", getScope());
 
 		return attributes;
 	}
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long oAuth2ScopeGrantId = (Long)attributes.get("oAuth2ScopeGrantId");
+
+		if (oAuth2ScopeGrantId != null) {
+			setOAuth2ScopeGrantId(oAuth2ScopeGrantId);
+		}
+
 		String applicationName = (String)attributes.get("applicationName");
 
 		if (applicationName != null) {
@@ -88,22 +93,16 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 			setCompanyId(companyId);
 		}
 
-		String oAuth2ScopeName = (String)attributes.get("oAuth2ScopeName");
+		Long oAuth2AccessTokenId = (Long)attributes.get("oAuth2AccessTokenId");
 
-		if (oAuth2ScopeName != null) {
-			setOAuth2ScopeName(oAuth2ScopeName);
+		if (oAuth2AccessTokenId != null) {
+			setOAuth2AccessTokenId(oAuth2AccessTokenId);
 		}
 
-		Long oAuth2TokenId = (Long)attributes.get("oAuth2TokenId");
+		String scope = (String)attributes.get("scope");
 
-		if (oAuth2TokenId != null) {
-			setOAuth2TokenId(oAuth2TokenId);
-		}
-
-		Date createDate = (Date)attributes.get("createDate");
-
-		if (createDate != null) {
-			setCreateDate(createDate);
+		if (scope != null) {
+			setScope(scope);
 		}
 	}
 
@@ -147,39 +146,29 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 		return _oAuth2ScopeGrant.getCompanyId();
 	}
 
-	/**
-	* Returns the create date of this o auth2 scope grant.
-	*
-	* @return the create date of this o auth2 scope grant
-	*/
-	@Override
-	public Date getCreateDate() {
-		return _oAuth2ScopeGrant.getCreateDate();
-	}
-
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return _oAuth2ScopeGrant.getExpandoBridge();
 	}
 
 	/**
-	* Returns the o auth2 scope name of this o auth2 scope grant.
+	* Returns the o auth2 access token ID of this o auth2 scope grant.
 	*
-	* @return the o auth2 scope name of this o auth2 scope grant
+	* @return the o auth2 access token ID of this o auth2 scope grant
 	*/
 	@Override
-	public java.lang.String getOAuth2ScopeName() {
-		return _oAuth2ScopeGrant.getOAuth2ScopeName();
+	public long getOAuth2AccessTokenId() {
+		return _oAuth2ScopeGrant.getOAuth2AccessTokenId();
 	}
 
 	/**
-	* Returns the o auth2 token ID of this o auth2 scope grant.
+	* Returns the o auth2 scope grant ID of this o auth2 scope grant.
 	*
-	* @return the o auth2 token ID of this o auth2 scope grant
+	* @return the o auth2 scope grant ID of this o auth2 scope grant
 	*/
 	@Override
-	public long getOAuth2TokenId() {
-		return _oAuth2ScopeGrant.getOAuth2TokenId();
+	public long getOAuth2ScopeGrantId() {
+		return _oAuth2ScopeGrant.getOAuth2ScopeGrantId();
 	}
 
 	/**
@@ -188,13 +177,23 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 	* @return the primary key of this o auth2 scope grant
 	*/
 	@Override
-	public com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK getPrimaryKey() {
+	public long getPrimaryKey() {
 		return _oAuth2ScopeGrant.getPrimaryKey();
 	}
 
 	@Override
 	public Serializable getPrimaryKeyObj() {
 		return _oAuth2ScopeGrant.getPrimaryKeyObj();
+	}
+
+	/**
+	* Returns the scope of this o auth2 scope grant.
+	*
+	* @return the scope of this o auth2 scope grant
+	*/
+	@Override
+	public java.lang.String getScope() {
+		return _oAuth2ScopeGrant.getScope();
 	}
 
 	@Override
@@ -257,16 +256,6 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 		_oAuth2ScopeGrant.setCompanyId(companyId);
 	}
 
-	/**
-	* Sets the create date of this o auth2 scope grant.
-	*
-	* @param createDate the create date of this o auth2 scope grant
-	*/
-	@Override
-	public void setCreateDate(Date createDate) {
-		_oAuth2ScopeGrant.setCreateDate(createDate);
-	}
-
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
@@ -289,23 +278,23 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 	}
 
 	/**
-	* Sets the o auth2 scope name of this o auth2 scope grant.
+	* Sets the o auth2 access token ID of this o auth2 scope grant.
 	*
-	* @param oAuth2ScopeName the o auth2 scope name of this o auth2 scope grant
+	* @param oAuth2AccessTokenId the o auth2 access token ID of this o auth2 scope grant
 	*/
 	@Override
-	public void setOAuth2ScopeName(java.lang.String oAuth2ScopeName) {
-		_oAuth2ScopeGrant.setOAuth2ScopeName(oAuth2ScopeName);
+	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId) {
+		_oAuth2ScopeGrant.setOAuth2AccessTokenId(oAuth2AccessTokenId);
 	}
 
 	/**
-	* Sets the o auth2 token ID of this o auth2 scope grant.
+	* Sets the o auth2 scope grant ID of this o auth2 scope grant.
 	*
-	* @param oAuth2TokenId the o auth2 token ID of this o auth2 scope grant
+	* @param oAuth2ScopeGrantId the o auth2 scope grant ID of this o auth2 scope grant
 	*/
 	@Override
-	public void setOAuth2TokenId(long oAuth2TokenId) {
-		_oAuth2ScopeGrant.setOAuth2TokenId(oAuth2TokenId);
+	public void setOAuth2ScopeGrantId(long oAuth2ScopeGrantId) {
+		_oAuth2ScopeGrant.setOAuth2ScopeGrantId(oAuth2ScopeGrantId);
 	}
 
 	/**
@@ -314,14 +303,23 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 	* @param primaryKey the primary key of this o auth2 scope grant
 	*/
 	@Override
-	public void setPrimaryKey(
-		com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK primaryKey) {
+	public void setPrimaryKey(long primaryKey) {
 		_oAuth2ScopeGrant.setPrimaryKey(primaryKey);
 	}
 
 	@Override
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_oAuth2ScopeGrant.setPrimaryKeyObj(primaryKeyObj);
+	}
+
+	/**
+	* Sets the scope of this o auth2 scope grant.
+	*
+	* @param scope the scope of this o auth2 scope grant
+	*/
+	@Override
+	public void setScope(java.lang.String scope) {
+		_oAuth2ScopeGrant.setScope(scope);
 	}
 
 	@Override

@@ -19,9 +19,10 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2TokenException;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK;
 
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -76,11 +77,21 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	/**
 	* Creates a new o auth2 scope grant with the primary key. Does not add the o auth2 scope grant to the database.
 	*
-	* @param oAuth2ScopeGrantPK the primary key for the new o auth2 scope grant
+	* @param oAuth2ScopeGrantId the primary key for the new o auth2 scope grant
 	* @return the new o auth2 scope grant
 	*/
-	public OAuth2ScopeGrant createOAuth2ScopeGrant(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK);
+	public OAuth2ScopeGrant createOAuth2ScopeGrant(long oAuth2ScopeGrantId);
+
+	/**
+	* Deletes the o auth2 scope grant with the primary key from the database. Also notifies the appropriate model listeners.
+	*
+	* @param oAuth2ScopeGrantId the primary key of the o auth2 scope grant
+	* @return the o auth2 scope grant that was removed
+	* @throws PortalException if a o auth2 scope grant with the primary key could not be found
+	*/
+	@Indexable(type = IndexableType.DELETE)
+	public OAuth2ScopeGrant deleteOAuth2ScopeGrant(long oAuth2ScopeGrantId)
+		throws PortalException;
 
 	/**
 	* Deletes the o auth2 scope grant from the database. Also notifies the appropriate model listeners.
@@ -91,17 +102,6 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.DELETE)
 	public OAuth2ScopeGrant deleteOAuth2ScopeGrant(
 		OAuth2ScopeGrant oAuth2ScopeGrant);
-
-	/**
-	* Deletes the o auth2 scope grant with the primary key from the database. Also notifies the appropriate model listeners.
-	*
-	* @param oAuth2ScopeGrantPK the primary key of the o auth2 scope grant
-	* @return the o auth2 scope grant that was removed
-	* @throws PortalException if a o auth2 scope grant with the primary key could not be found
-	*/
-	@Indexable(type = IndexableType.DELETE)
-	public OAuth2ScopeGrant deleteOAuth2ScopeGrant(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK) throws PortalException;
 
 	/**
 	* @throws PortalException
@@ -170,8 +170,7 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 		Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public OAuth2ScopeGrant fetchOAuth2ScopeGrant(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK);
+	public OAuth2ScopeGrant fetchOAuth2ScopeGrant(long oAuth2ScopeGrantId);
 
 	public Collection<OAuth2ScopeGrant> findByA_BSN_C_T(
 		java.lang.String applicationName, java.lang.String bundleSymbolicName,
@@ -179,16 +178,22 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 
 	public Collection<OAuth2ScopeGrant> findByToken(long tokenId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ActionableDynamicQuery getActionableDynamicQuery();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
 	/**
 	* Returns the o auth2 scope grant with the primary key.
 	*
-	* @param oAuth2ScopeGrantPK the primary key of the o auth2 scope grant
+	* @param oAuth2ScopeGrantId the primary key of the o auth2 scope grant
 	* @return the o auth2 scope grant
 	* @throws PortalException if a o auth2 scope grant with the primary key could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public OAuth2ScopeGrant getOAuth2ScopeGrant(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK) throws PortalException;
+	public OAuth2ScopeGrant getOAuth2ScopeGrant(long oAuth2ScopeGrantId)
+		throws PortalException;
 
 	/**
 	* Returns a range of all the o auth2 scope grants.

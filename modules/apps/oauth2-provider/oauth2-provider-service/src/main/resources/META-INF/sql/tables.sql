@@ -1,3 +1,18 @@
+create table OAuth2AccessToken (
+	OAuth2AccessTokenId LONG not null primary key,
+	companyId LONG,
+	createDate DATE null,
+	expirationDate DATE null,
+	remoteIPInfo VARCHAR(75) null,
+	userId LONG,
+	userName VARCHAR(75) null,
+	oAuth2ApplicationId LONG,
+	oAuth2RefreshTokenId LONG,
+	scopeAliases VARCHAR(75) null,
+	tokenContent VARCHAR(75) null,
+	tokenType VARCHAR(75) null
+);
+
 create table OAuth2Application (
 	oAuth2ApplicationId LONG not null primary key,
 	companyId LONG,
@@ -6,40 +21,39 @@ create table OAuth2Application (
 	userId LONG,
 	userName VARCHAR(75) null,
 	allowedGrantTypes VARCHAR(75) null,
-	clientConfidential BOOLEAN,
 	clientId VARCHAR(75) null,
+	clientProfile INTEGER,
 	clientSecret VARCHAR(75) null,
 	description VARCHAR(75) null,
+	features STRING null,
 	homePageURL STRING null,
 	iconFileEntryId LONG,
 	name VARCHAR(75) null,
 	privacyPolicyURL STRING null,
 	redirectURIs STRING null,
-	scopes TEXT null,
-	features STRING null
+	scopeAliases VARCHAR(75) null
 );
 
 create table OAuth2RefreshToken (
 	oAuth2RefreshTokenId LONG not null primary key,
 	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
 	createDate DATE null,
 	expirationDate DATE null,
 	remoteIPInfo VARCHAR(75) null,
-	oAuth2RefreshTokenContent TEXT null,
+	userId LONG,
+	userName VARCHAR(75) null,
 	oAuth2ApplicationId LONG,
-	scopes TEXT null
+	scopeAliases VARCHAR(75) null,
+	tokenContent VARCHAR(75) null
 );
 
 create table OAuth2ScopeGrant (
-	applicationName VARCHAR(75) not null,
-	bundleSymbolicName VARCHAR(75) not null,
-	companyId LONG not null,
-	oAuth2ScopeName VARCHAR(75) not null,
-	oAuth2TokenId LONG not null,
-	createDate DATE null,
-	primary key (applicationName, bundleSymbolicName, companyId, oAuth2ScopeName, oAuth2TokenId)
+	oAuth2ScopeGrantId LONG not null primary key,
+	applicationName VARCHAR(75) null,
+	bundleSymbolicName VARCHAR(75) null,
+	companyId LONG,
+	oAuth2AccessTokenId LONG,
+	scope VARCHAR(75) null
 );
 
 create table OAuth2Token (

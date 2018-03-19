@@ -192,20 +192,6 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	public void setAllowedGrantTypes(String allowedGrantTypes);
 
 	/**
-	 * Returns the client confidential of this o auth2 application.
-	 *
-	 * @return the client confidential of this o auth2 application
-	 */
-	public Boolean getClientConfidential();
-
-	/**
-	 * Sets the client confidential of this o auth2 application.
-	 *
-	 * @param clientConfidential the client confidential of this o auth2 application
-	 */
-	public void setClientConfidential(Boolean clientConfidential);
-
-	/**
 	 * Returns the client ID of this o auth2 application.
 	 *
 	 * @return the client ID of this o auth2 application
@@ -219,6 +205,20 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	 * @param clientId the client ID of this o auth2 application
 	 */
 	public void setClientId(String clientId);
+
+	/**
+	 * Returns the client profile of this o auth2 application.
+	 *
+	 * @return the client profile of this o auth2 application
+	 */
+	public int getClientProfile();
+
+	/**
+	 * Sets the client profile of this o auth2 application.
+	 *
+	 * @param clientProfile the client profile of this o auth2 application
+	 */
+	public void setClientProfile(int clientProfile);
 
 	/**
 	 * Returns the client secret of this o auth2 application.
@@ -249,6 +249,21 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	 * @param description the description of this o auth2 application
 	 */
 	public void setDescription(String description);
+
+	/**
+	 * Returns the features of this o auth2 application.
+	 *
+	 * @return the features of this o auth2 application
+	 */
+	@AutoEscape
+	public String getFeatures();
+
+	/**
+	 * Sets the features of this o auth2 application.
+	 *
+	 * @param features the features of this o auth2 application
+	 */
+	public void setFeatures(String features);
 
 	/**
 	 * Returns the home page url of this o auth2 application.
@@ -325,34 +340,19 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	public void setRedirectURIs(String redirectURIs);
 
 	/**
-	 * Returns the scopes of this o auth2 application.
+	 * Returns the scope aliases of this o auth2 application.
 	 *
-	 * @return the scopes of this o auth2 application
+	 * @return the scope aliases of this o auth2 application
 	 */
 	@AutoEscape
-	public String getScopes();
+	public String getScopeAliases();
 
 	/**
-	 * Sets the scopes of this o auth2 application.
+	 * Sets the scope aliases of this o auth2 application.
 	 *
-	 * @param scopes the scopes of this o auth2 application
+	 * @param scopeAliases the scope aliases of this o auth2 application
 	 */
-	public void setScopes(String scopes);
-
-	/**
-	 * Returns the features of this o auth2 application.
-	 *
-	 * @return the features of this o auth2 application
-	 */
-	@AutoEscape
-	public String getFeatures();
-
-	/**
-	 * Sets the features of this o auth2 application.
-	 *
-	 * @param features the features of this o auth2 application
-	 */
-	public void setFeatures(String features);
+	public void setScopeAliases(String scopeAliases);
 
 	@Override
 	public boolean isNew();

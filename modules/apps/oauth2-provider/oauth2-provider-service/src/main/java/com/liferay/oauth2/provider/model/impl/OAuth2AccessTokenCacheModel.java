@@ -16,7 +16,7 @@ package com.liferay.oauth2.provider.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
+import com.liferay.oauth2.provider.model.OAuth2AccessToken;
 
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
@@ -30,14 +30,14 @@ import java.io.ObjectOutput;
 import java.util.Date;
 
 /**
- * The cache model class for representing OAuth2RefreshToken in entity cache.
+ * The cache model class for representing OAuth2AccessToken in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see OAuth2RefreshToken
+ * @see OAuth2AccessToken
  * @generated
  */
 @ProviderType
-public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshToken>,
+public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken>,
 	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
@@ -45,13 +45,13 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 			return true;
 		}
 
-		if (!(obj instanceof OAuth2RefreshTokenCacheModel)) {
+		if (!(obj instanceof OAuth2AccessTokenCacheModel)) {
 			return false;
 		}
 
-		OAuth2RefreshTokenCacheModel oAuth2RefreshTokenCacheModel = (OAuth2RefreshTokenCacheModel)obj;
+		OAuth2AccessTokenCacheModel oAuth2AccessTokenCacheModel = (OAuth2AccessTokenCacheModel)obj;
 
-		if (oAuth2RefreshTokenId == oAuth2RefreshTokenCacheModel.oAuth2RefreshTokenId) {
+		if (OAuth2AccessTokenId == oAuth2AccessTokenCacheModel.OAuth2AccessTokenId) {
 			return true;
 		}
 
@@ -60,15 +60,15 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 	@Override
 	public int hashCode() {
-		return HashUtil.hash(0, oAuth2RefreshTokenId);
+		return HashUtil.hash(0, OAuth2AccessTokenId);
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(25);
 
-		sb.append("{oAuth2RefreshTokenId=");
-		sb.append(oAuth2RefreshTokenId);
+		sb.append("{OAuth2AccessTokenId=");
+		sb.append(OAuth2AccessTokenId);
 		sb.append(", companyId=");
 		sb.append(companyId);
 		sb.append(", createDate=");
@@ -83,76 +83,88 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		sb.append(userName);
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(oAuth2ApplicationId);
+		sb.append(", oAuth2RefreshTokenId=");
+		sb.append(oAuth2RefreshTokenId);
 		sb.append(", scopeAliases=");
 		sb.append(scopeAliases);
 		sb.append(", tokenContent=");
 		sb.append(tokenContent);
+		sb.append(", tokenType=");
+		sb.append(tokenType);
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	@Override
-	public OAuth2RefreshToken toEntityModel() {
-		OAuth2RefreshTokenImpl oAuth2RefreshTokenImpl = new OAuth2RefreshTokenImpl();
+	public OAuth2AccessToken toEntityModel() {
+		OAuth2AccessTokenImpl oAuth2AccessTokenImpl = new OAuth2AccessTokenImpl();
 
-		oAuth2RefreshTokenImpl.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
-		oAuth2RefreshTokenImpl.setCompanyId(companyId);
+		oAuth2AccessTokenImpl.setOAuth2AccessTokenId(OAuth2AccessTokenId);
+		oAuth2AccessTokenImpl.setCompanyId(companyId);
 
 		if (createDate == Long.MIN_VALUE) {
-			oAuth2RefreshTokenImpl.setCreateDate(null);
+			oAuth2AccessTokenImpl.setCreateDate(null);
 		}
 		else {
-			oAuth2RefreshTokenImpl.setCreateDate(new Date(createDate));
+			oAuth2AccessTokenImpl.setCreateDate(new Date(createDate));
 		}
 
 		if (expirationDate == Long.MIN_VALUE) {
-			oAuth2RefreshTokenImpl.setExpirationDate(null);
+			oAuth2AccessTokenImpl.setExpirationDate(null);
 		}
 		else {
-			oAuth2RefreshTokenImpl.setExpirationDate(new Date(expirationDate));
+			oAuth2AccessTokenImpl.setExpirationDate(new Date(expirationDate));
 		}
 
 		if (remoteIPInfo == null) {
-			oAuth2RefreshTokenImpl.setRemoteIPInfo("");
+			oAuth2AccessTokenImpl.setRemoteIPInfo("");
 		}
 		else {
-			oAuth2RefreshTokenImpl.setRemoteIPInfo(remoteIPInfo);
+			oAuth2AccessTokenImpl.setRemoteIPInfo(remoteIPInfo);
 		}
 
-		oAuth2RefreshTokenImpl.setUserId(userId);
+		oAuth2AccessTokenImpl.setUserId(userId);
 
 		if (userName == null) {
-			oAuth2RefreshTokenImpl.setUserName("");
+			oAuth2AccessTokenImpl.setUserName("");
 		}
 		else {
-			oAuth2RefreshTokenImpl.setUserName(userName);
+			oAuth2AccessTokenImpl.setUserName(userName);
 		}
 
-		oAuth2RefreshTokenImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
+		oAuth2AccessTokenImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
+		oAuth2AccessTokenImpl.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 
 		if (scopeAliases == null) {
-			oAuth2RefreshTokenImpl.setScopeAliases("");
+			oAuth2AccessTokenImpl.setScopeAliases("");
 		}
 		else {
-			oAuth2RefreshTokenImpl.setScopeAliases(scopeAliases);
+			oAuth2AccessTokenImpl.setScopeAliases(scopeAliases);
 		}
 
 		if (tokenContent == null) {
-			oAuth2RefreshTokenImpl.setTokenContent("");
+			oAuth2AccessTokenImpl.setTokenContent("");
 		}
 		else {
-			oAuth2RefreshTokenImpl.setTokenContent(tokenContent);
+			oAuth2AccessTokenImpl.setTokenContent(tokenContent);
 		}
 
-		oAuth2RefreshTokenImpl.resetOriginalValues();
+		if (tokenType == null) {
+			oAuth2AccessTokenImpl.setTokenType("");
+		}
+		else {
+			oAuth2AccessTokenImpl.setTokenType(tokenType);
+		}
 
-		return oAuth2RefreshTokenImpl;
+		oAuth2AccessTokenImpl.resetOriginalValues();
+
+		return oAuth2AccessTokenImpl;
 	}
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
-		oAuth2RefreshTokenId = objectInput.readLong();
+		OAuth2AccessTokenId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
 		createDate = objectInput.readLong();
@@ -163,14 +175,17 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		userName = objectInput.readUTF();
 
 		oAuth2ApplicationId = objectInput.readLong();
+
+		oAuth2RefreshTokenId = objectInput.readLong();
 		scopeAliases = objectInput.readUTF();
 		tokenContent = objectInput.readUTF();
+		tokenType = objectInput.readUTF();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
-		objectOutput.writeLong(oAuth2RefreshTokenId);
+		objectOutput.writeLong(OAuth2AccessTokenId);
 
 		objectOutput.writeLong(companyId);
 		objectOutput.writeLong(createDate);
@@ -194,6 +209,8 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 		objectOutput.writeLong(oAuth2ApplicationId);
 
+		objectOutput.writeLong(oAuth2RefreshTokenId);
+
 		if (scopeAliases == null) {
 			objectOutput.writeUTF("");
 		}
@@ -207,9 +224,16 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		else {
 			objectOutput.writeUTF(tokenContent);
 		}
+
+		if (tokenType == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(tokenType);
+		}
 	}
 
-	public long oAuth2RefreshTokenId;
+	public long OAuth2AccessTokenId;
 	public long companyId;
 	public long createDate;
 	public long expirationDate;
@@ -217,6 +241,8 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 	public long userId;
 	public String userName;
 	public long oAuth2ApplicationId;
+	public long oAuth2RefreshTokenId;
 	public String scopeAliases;
 	public String tokenContent;
+	public String tokenType;
 }

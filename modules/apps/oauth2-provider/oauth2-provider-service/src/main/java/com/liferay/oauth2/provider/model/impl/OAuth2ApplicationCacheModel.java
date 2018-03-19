@@ -81,14 +81,16 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		sb.append(userName);
 		sb.append(", allowedGrantTypes=");
 		sb.append(allowedGrantTypes);
-		sb.append(", clientConfidential=");
-		sb.append(clientConfidential);
 		sb.append(", clientId=");
 		sb.append(clientId);
+		sb.append(", clientProfile=");
+		sb.append(clientProfile);
 		sb.append(", clientSecret=");
 		sb.append(clientSecret);
 		sb.append(", description=");
 		sb.append(description);
+		sb.append(", features=");
+		sb.append(features);
 		sb.append(", homePageURL=");
 		sb.append(homePageURL);
 		sb.append(", iconFileEntryId=");
@@ -99,10 +101,8 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		sb.append(privacyPolicyURL);
 		sb.append(", redirectURIs=");
 		sb.append(redirectURIs);
-		sb.append(", scopes=");
-		sb.append(scopes);
-		sb.append(", features=");
-		sb.append(features);
+		sb.append(", scopeAliases=");
+		sb.append(scopeAliases);
 		sb.append("}");
 
 		return sb.toString();
@@ -145,14 +145,14 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 			oAuth2ApplicationImpl.setAllowedGrantTypes(allowedGrantTypes);
 		}
 
-		oAuth2ApplicationImpl.setClientConfidential(clientConfidential);
-
 		if (clientId == null) {
 			oAuth2ApplicationImpl.setClientId("");
 		}
 		else {
 			oAuth2ApplicationImpl.setClientId(clientId);
 		}
+
+		oAuth2ApplicationImpl.setClientProfile(clientProfile);
 
 		if (clientSecret == null) {
 			oAuth2ApplicationImpl.setClientSecret("");
@@ -166,6 +166,13 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		}
 		else {
 			oAuth2ApplicationImpl.setDescription(description);
+		}
+
+		if (features == null) {
+			oAuth2ApplicationImpl.setFeatures("");
+		}
+		else {
+			oAuth2ApplicationImpl.setFeatures(features);
 		}
 
 		if (homePageURL == null) {
@@ -198,18 +205,11 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 			oAuth2ApplicationImpl.setRedirectURIs(redirectURIs);
 		}
 
-		if (scopes == null) {
-			oAuth2ApplicationImpl.setScopes("");
+		if (scopeAliases == null) {
+			oAuth2ApplicationImpl.setScopeAliases("");
 		}
 		else {
-			oAuth2ApplicationImpl.setScopes(scopes);
-		}
-
-		if (features == null) {
-			oAuth2ApplicationImpl.setFeatures("");
-		}
-		else {
-			oAuth2ApplicationImpl.setFeatures(features);
+			oAuth2ApplicationImpl.setScopeAliases(scopeAliases);
 		}
 
 		oAuth2ApplicationImpl.resetOriginalValues();
@@ -228,19 +228,19 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
 		allowedGrantTypes = objectInput.readUTF();
-
-		clientConfidential = objectInput.readBoolean();
 		clientId = objectInput.readUTF();
+
+		clientProfile = objectInput.readInt();
 		clientSecret = objectInput.readUTF();
 		description = objectInput.readUTF();
+		features = objectInput.readUTF();
 		homePageURL = objectInput.readUTF();
 
 		iconFileEntryId = objectInput.readLong();
 		name = objectInput.readUTF();
 		privacyPolicyURL = objectInput.readUTF();
 		redirectURIs = objectInput.readUTF();
-		scopes = objectInput.readUTF();
-		features = objectInput.readUTF();
+		scopeAliases = objectInput.readUTF();
 	}
 
 	@Override
@@ -268,14 +268,14 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 			objectOutput.writeUTF(allowedGrantTypes);
 		}
 
-		objectOutput.writeBoolean(clientConfidential);
-
 		if (clientId == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(clientId);
 		}
+
+		objectOutput.writeInt(clientProfile);
 
 		if (clientSecret == null) {
 			objectOutput.writeUTF("");
@@ -289,6 +289,13 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		}
 		else {
 			objectOutput.writeUTF(description);
+		}
+
+		if (features == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(features);
 		}
 
 		if (homePageURL == null) {
@@ -321,18 +328,11 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 			objectOutput.writeUTF(redirectURIs);
 		}
 
-		if (scopes == null) {
+		if (scopeAliases == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
-			objectOutput.writeUTF(scopes);
-		}
-
-		if (features == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(features);
+			objectOutput.writeUTF(scopeAliases);
 		}
 	}
 
@@ -343,15 +343,15 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 	public long userId;
 	public String userName;
 	public String allowedGrantTypes;
-	public boolean clientConfidential;
 	public String clientId;
+	public int clientProfile;
 	public String clientSecret;
 	public String description;
+	public String features;
 	public String homePageURL;
 	public long iconFileEntryId;
 	public String name;
 	public String privacyPolicyURL;
 	public String redirectURIs;
-	public String scopes;
-	public String features;
+	public String scopeAliases;
 }

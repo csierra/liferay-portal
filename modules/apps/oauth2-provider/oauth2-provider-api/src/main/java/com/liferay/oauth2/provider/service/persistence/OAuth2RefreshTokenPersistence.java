@@ -42,54 +42,6 @@ public interface OAuth2RefreshTokenPersistence extends BasePersistence<OAuth2Ref
 	 */
 
 	/**
-	* Returns the o auth2 refresh token where oAuth2RefreshTokenContent = &#63; or throws a {@link NoSuchOAuth2RefreshTokenException} if it could not be found.
-	*
-	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
-	* @return the matching o auth2 refresh token
-	* @throws NoSuchOAuth2RefreshTokenException if a matching o auth2 refresh token could not be found
-	*/
-	public OAuth2RefreshToken findByContent(
-		java.lang.String oAuth2RefreshTokenContent)
-		throws NoSuchOAuth2RefreshTokenException;
-
-	/**
-	* Returns the o auth2 refresh token where oAuth2RefreshTokenContent = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	*
-	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
-	* @return the matching o auth2 refresh token, or <code>null</code> if a matching o auth2 refresh token could not be found
-	*/
-	public OAuth2RefreshToken fetchByContent(
-		java.lang.String oAuth2RefreshTokenContent);
-
-	/**
-	* Returns the o auth2 refresh token where oAuth2RefreshTokenContent = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	*
-	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
-	* @param retrieveFromCache whether to retrieve from the finder cache
-	* @return the matching o auth2 refresh token, or <code>null</code> if a matching o auth2 refresh token could not be found
-	*/
-	public OAuth2RefreshToken fetchByContent(
-		java.lang.String oAuth2RefreshTokenContent, boolean retrieveFromCache);
-
-	/**
-	* Removes the o auth2 refresh token where oAuth2RefreshTokenContent = &#63; from the database.
-	*
-	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
-	* @return the o auth2 refresh token that was removed
-	*/
-	public OAuth2RefreshToken removeByContent(
-		java.lang.String oAuth2RefreshTokenContent)
-		throws NoSuchOAuth2RefreshTokenException;
-
-	/**
-	* Returns the number of o auth2 refresh tokens where oAuth2RefreshTokenContent = &#63;.
-	*
-	* @param oAuth2RefreshTokenContent the o auth2 refresh token content
-	* @return the number of matching o auth2 refresh tokens
-	*/
-	public int countByContent(java.lang.String oAuth2RefreshTokenContent);
-
-	/**
 	* Returns all the o auth2 refresh tokens where oAuth2ApplicationId = &#63;.
 	*
 	* @param oAuth2ApplicationId the o auth2 application ID
@@ -220,6 +172,51 @@ public interface OAuth2RefreshTokenPersistence extends BasePersistence<OAuth2Ref
 	* @return the number of matching o auth2 refresh tokens
 	*/
 	public int countByA(long oAuth2ApplicationId);
+
+	/**
+	* Returns the o auth2 refresh token where tokenContent = &#63; or throws a {@link NoSuchOAuth2RefreshTokenException} if it could not be found.
+	*
+	* @param tokenContent the token content
+	* @return the matching o auth2 refresh token
+	* @throws NoSuchOAuth2RefreshTokenException if a matching o auth2 refresh token could not be found
+	*/
+	public OAuth2RefreshToken findByTokenContent(java.lang.String tokenContent)
+		throws NoSuchOAuth2RefreshTokenException;
+
+	/**
+	* Returns the o auth2 refresh token where tokenContent = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param tokenContent the token content
+	* @return the matching o auth2 refresh token, or <code>null</code> if a matching o auth2 refresh token could not be found
+	*/
+	public OAuth2RefreshToken fetchByTokenContent(java.lang.String tokenContent);
+
+	/**
+	* Returns the o auth2 refresh token where tokenContent = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param tokenContent the token content
+	* @param retrieveFromCache whether to retrieve from the finder cache
+	* @return the matching o auth2 refresh token, or <code>null</code> if a matching o auth2 refresh token could not be found
+	*/
+	public OAuth2RefreshToken fetchByTokenContent(
+		java.lang.String tokenContent, boolean retrieveFromCache);
+
+	/**
+	* Removes the o auth2 refresh token where tokenContent = &#63; from the database.
+	*
+	* @param tokenContent the token content
+	* @return the o auth2 refresh token that was removed
+	*/
+	public OAuth2RefreshToken removeByTokenContent(
+		java.lang.String tokenContent) throws NoSuchOAuth2RefreshTokenException;
+
+	/**
+	* Returns the number of o auth2 refresh tokens where tokenContent = &#63;.
+	*
+	* @param tokenContent the token content
+	* @return the number of matching o auth2 refresh tokens
+	*/
+	public int countByTokenContent(java.lang.String tokenContent);
 
 	/**
 	* Caches the o auth2 refresh token in the entity cache if it is enabled.

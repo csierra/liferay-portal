@@ -95,49 +95,6 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	public void setCompanyId(long companyId);
 
 	/**
-	 * Returns the user ID of this o auth2 refresh token.
-	 *
-	 * @return the user ID of this o auth2 refresh token
-	 */
-	public long getUserId();
-
-	/**
-	 * Sets the user ID of this o auth2 refresh token.
-	 *
-	 * @param userId the user ID of this o auth2 refresh token
-	 */
-	public void setUserId(long userId);
-
-	/**
-	 * Returns the user uuid of this o auth2 refresh token.
-	 *
-	 * @return the user uuid of this o auth2 refresh token
-	 */
-	public String getUserUuid();
-
-	/**
-	 * Sets the user uuid of this o auth2 refresh token.
-	 *
-	 * @param userUuid the user uuid of this o auth2 refresh token
-	 */
-	public void setUserUuid(String userUuid);
-
-	/**
-	 * Returns the user name of this o auth2 refresh token.
-	 *
-	 * @return the user name of this o auth2 refresh token
-	 */
-	@AutoEscape
-	public String getUserName();
-
-	/**
-	 * Sets the user name of this o auth2 refresh token.
-	 *
-	 * @param userName the user name of this o auth2 refresh token
-	 */
-	public void setUserName(String userName);
-
-	/**
 	 * Returns the create date of this o auth2 refresh token.
 	 *
 	 * @return the create date of this o auth2 refresh token
@@ -181,19 +138,47 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	public void setRemoteIPInfo(String remoteIPInfo);
 
 	/**
-	 * Returns the o auth2 refresh token content of this o auth2 refresh token.
+	 * Returns the user ID of this o auth2 refresh token.
 	 *
-	 * @return the o auth2 refresh token content of this o auth2 refresh token
+	 * @return the user ID of this o auth2 refresh token
 	 */
-	@AutoEscape
-	public String getOAuth2RefreshTokenContent();
+	public long getUserId();
 
 	/**
-	 * Sets the o auth2 refresh token content of this o auth2 refresh token.
+	 * Sets the user ID of this o auth2 refresh token.
 	 *
-	 * @param oAuth2RefreshTokenContent the o auth2 refresh token content of this o auth2 refresh token
+	 * @param userId the user ID of this o auth2 refresh token
 	 */
-	public void setOAuth2RefreshTokenContent(String oAuth2RefreshTokenContent);
+	public void setUserId(long userId);
+
+	/**
+	 * Returns the user uuid of this o auth2 refresh token.
+	 *
+	 * @return the user uuid of this o auth2 refresh token
+	 */
+	public String getUserUuid();
+
+	/**
+	 * Sets the user uuid of this o auth2 refresh token.
+	 *
+	 * @param userUuid the user uuid of this o auth2 refresh token
+	 */
+	public void setUserUuid(String userUuid);
+
+	/**
+	 * Returns the user name of this o auth2 refresh token.
+	 *
+	 * @return the user name of this o auth2 refresh token
+	 */
+	@AutoEscape
+	public String getUserName();
+
+	/**
+	 * Sets the user name of this o auth2 refresh token.
+	 *
+	 * @param userName the user name of this o auth2 refresh token
+	 */
+	public void setUserName(String userName);
 
 	/**
 	 * Returns the o auth2 application ID of this o auth2 refresh token.
@@ -210,19 +195,34 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	public void setOAuth2ApplicationId(long oAuth2ApplicationId);
 
 	/**
-	 * Returns the scopes of this o auth2 refresh token.
+	 * Returns the scope aliases of this o auth2 refresh token.
 	 *
-	 * @return the scopes of this o auth2 refresh token
+	 * @return the scope aliases of this o auth2 refresh token
 	 */
 	@AutoEscape
-	public String getScopes();
+	public String getScopeAliases();
 
 	/**
-	 * Sets the scopes of this o auth2 refresh token.
+	 * Sets the scope aliases of this o auth2 refresh token.
 	 *
-	 * @param scopes the scopes of this o auth2 refresh token
+	 * @param scopeAliases the scope aliases of this o auth2 refresh token
 	 */
-	public void setScopes(String scopes);
+	public void setScopeAliases(String scopeAliases);
+
+	/**
+	 * Returns the token content of this o auth2 refresh token.
+	 *
+	 * @return the token content of this o auth2 refresh token
+	 */
+	@AutoEscape
+	public String getTokenContent();
+
+	/**
+	 * Sets the token content of this o auth2 refresh token.
+	 *
+	 * @param tokenContent the token content of this o auth2 refresh token
+	 */
+	public void setTokenContent(String tokenContent);
 
 	@Override
 	public boolean isNew();

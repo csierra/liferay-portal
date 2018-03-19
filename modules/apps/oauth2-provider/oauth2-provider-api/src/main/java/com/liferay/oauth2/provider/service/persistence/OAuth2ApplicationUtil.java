@@ -350,10 +350,10 @@ public class OAuth2ApplicationUtil {
 	* @return the matching o auth2 application
 	* @throws NoSuchOAuth2ApplicationException if a matching o auth2 application could not be found
 	*/
-	public static OAuth2Application findByC_CI(long companyId,
+	public static OAuth2Application findByC_C(long companyId,
 		java.lang.String clientId)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException {
-		return getPersistence().findByC_CI(companyId, clientId);
+		return getPersistence().findByC_C(companyId, clientId);
 	}
 
 	/**
@@ -363,9 +363,9 @@ public class OAuth2ApplicationUtil {
 	* @param clientId the client ID
 	* @return the matching o auth2 application, or <code>null</code> if a matching o auth2 application could not be found
 	*/
-	public static OAuth2Application fetchByC_CI(long companyId,
+	public static OAuth2Application fetchByC_C(long companyId,
 		java.lang.String clientId) {
-		return getPersistence().fetchByC_CI(companyId, clientId);
+		return getPersistence().fetchByC_C(companyId, clientId);
 	}
 
 	/**
@@ -376,10 +376,10 @@ public class OAuth2ApplicationUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching o auth2 application, or <code>null</code> if a matching o auth2 application could not be found
 	*/
-	public static OAuth2Application fetchByC_CI(long companyId,
+	public static OAuth2Application fetchByC_C(long companyId,
 		java.lang.String clientId, boolean retrieveFromCache) {
 		return getPersistence()
-				   .fetchByC_CI(companyId, clientId, retrieveFromCache);
+				   .fetchByC_C(companyId, clientId, retrieveFromCache);
 	}
 
 	/**
@@ -389,10 +389,10 @@ public class OAuth2ApplicationUtil {
 	* @param clientId the client ID
 	* @return the o auth2 application that was removed
 	*/
-	public static OAuth2Application removeByC_CI(long companyId,
+	public static OAuth2Application removeByC_C(long companyId,
 		java.lang.String clientId)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException {
-		return getPersistence().removeByC_CI(companyId, clientId);
+		return getPersistence().removeByC_C(companyId, clientId);
 	}
 
 	/**
@@ -402,8 +402,8 @@ public class OAuth2ApplicationUtil {
 	* @param clientId the client ID
 	* @return the number of matching o auth2 applications
 	*/
-	public static int countByC_CI(long companyId, java.lang.String clientId) {
-		return getPersistence().countByC_CI(companyId, clientId);
+	public static int countByC_C(long companyId, java.lang.String clientId) {
+		return getPersistence().countByC_C(companyId, clientId);
 	}
 
 	/**

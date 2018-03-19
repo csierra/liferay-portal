@@ -65,17 +65,17 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
 		attributes.put("allowedGrantTypes", getAllowedGrantTypes());
-		attributes.put("clientConfidential", getClientConfidential());
 		attributes.put("clientId", getClientId());
+		attributes.put("clientProfile", getClientProfile());
 		attributes.put("clientSecret", getClientSecret());
 		attributes.put("description", getDescription());
+		attributes.put("features", getFeatures());
 		attributes.put("homePageURL", getHomePageURL());
 		attributes.put("iconFileEntryId", getIconFileEntryId());
 		attributes.put("name", getName());
 		attributes.put("privacyPolicyURL", getPrivacyPolicyURL());
 		attributes.put("redirectURIs", getRedirectURIs());
-		attributes.put("scopes", getScopes());
-		attributes.put("features", getFeatures());
+		attributes.put("scopeAliases", getScopeAliases());
 
 		return attributes;
 	}
@@ -124,17 +124,16 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 			setAllowedGrantTypes(allowedGrantTypes);
 		}
 
-		Boolean clientConfidential = (Boolean)attributes.get(
-				"clientConfidential");
-
-		if (clientConfidential != null) {
-			setClientConfidential(clientConfidential);
-		}
-
 		String clientId = (String)attributes.get("clientId");
 
 		if (clientId != null) {
 			setClientId(clientId);
+		}
+
+		Integer clientProfile = (Integer)attributes.get("clientProfile");
+
+		if (clientProfile != null) {
+			setClientProfile(clientProfile);
 		}
 
 		String clientSecret = (String)attributes.get("clientSecret");
@@ -147,6 +146,12 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 
 		if (description != null) {
 			setDescription(description);
+		}
+
+		String features = (String)attributes.get("features");
+
+		if (features != null) {
+			setFeatures(features);
 		}
 
 		String homePageURL = (String)attributes.get("homePageURL");
@@ -179,16 +184,10 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 			setRedirectURIs(redirectURIs);
 		}
 
-		String scopes = (String)attributes.get("scopes");
+		String scopeAliases = (String)attributes.get("scopeAliases");
 
-		if (scopes != null) {
-			setScopes(scopes);
-		}
-
-		String features = (String)attributes.get("features");
-
-		if (features != null) {
-			setFeatures(features);
+		if (scopeAliases != null) {
+			setScopeAliases(scopeAliases);
 		}
 	}
 
@@ -218,16 +217,6 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	}
 
 	/**
-	* Returns the client confidential of this o auth2 application.
-	*
-	* @return the client confidential of this o auth2 application
-	*/
-	@Override
-	public java.lang.Boolean getClientConfidential() {
-		return _oAuth2Application.getClientConfidential();
-	}
-
-	/**
 	* Returns the client ID of this o auth2 application.
 	*
 	* @return the client ID of this o auth2 application
@@ -235,6 +224,16 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	@Override
 	public java.lang.String getClientId() {
 		return _oAuth2Application.getClientId();
+	}
+
+	/**
+	* Returns the client profile of this o auth2 application.
+	*
+	* @return the client profile of this o auth2 application
+	*/
+	@Override
+	public int getClientProfile() {
+		return _oAuth2Application.getClientProfile();
 	}
 
 	/**
@@ -388,13 +387,13 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	}
 
 	/**
-	* Returns the scopes of this o auth2 application.
+	* Returns the scope aliases of this o auth2 application.
 	*
-	* @return the scopes of this o auth2 application
+	* @return the scope aliases of this o auth2 application
 	*/
 	@Override
-	public java.lang.String getScopes() {
-		return _oAuth2Application.getScopes();
+	public java.lang.String getScopeAliases() {
+		return _oAuth2Application.getScopeAliases();
 	}
 
 	@Override
@@ -479,16 +478,6 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	}
 
 	/**
-	* Sets the client confidential of this o auth2 application.
-	*
-	* @param clientConfidential the client confidential of this o auth2 application
-	*/
-	@Override
-	public void setClientConfidential(java.lang.Boolean clientConfidential) {
-		_oAuth2Application.setClientConfidential(clientConfidential);
-	}
-
-	/**
 	* Sets the client ID of this o auth2 application.
 	*
 	* @param clientId the client ID of this o auth2 application
@@ -496,6 +485,16 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	@Override
 	public void setClientId(java.lang.String clientId) {
 		_oAuth2Application.setClientId(clientId);
+	}
+
+	/**
+	* Sets the client profile of this o auth2 application.
+	*
+	* @param clientProfile the client profile of this o auth2 application
+	*/
+	@Override
+	public void setClientProfile(int clientProfile) {
+		_oAuth2Application.setClientProfile(clientProfile);
 	}
 
 	/**
@@ -666,13 +665,13 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	}
 
 	/**
-	* Sets the scopes of this o auth2 application.
+	* Sets the scope aliases of this o auth2 application.
 	*
-	* @param scopes the scopes of this o auth2 application
+	* @param scopeAliases the scope aliases of this o auth2 application
 	*/
 	@Override
-	public void setScopes(java.lang.String scopes) {
-		_oAuth2Application.setScopes(scopes);
+	public void setScopeAliases(java.lang.String scopeAliases) {
+		_oAuth2Application.setScopeAliases(scopeAliases);
 	}
 
 	@Override

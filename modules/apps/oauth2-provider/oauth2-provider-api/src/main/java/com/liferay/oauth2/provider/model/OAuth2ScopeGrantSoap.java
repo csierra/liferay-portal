@@ -16,12 +16,9 @@ package com.liferay.oauth2.provider.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,12 +32,12 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 	public static OAuth2ScopeGrantSoap toSoapModel(OAuth2ScopeGrant model) {
 		OAuth2ScopeGrantSoap soapModel = new OAuth2ScopeGrantSoap();
 
+		soapModel.setOAuth2ScopeGrantId(model.getOAuth2ScopeGrantId());
 		soapModel.setApplicationName(model.getApplicationName());
 		soapModel.setBundleSymbolicName(model.getBundleSymbolicName());
 		soapModel.setCompanyId(model.getCompanyId());
-		soapModel.setOAuth2ScopeName(model.getOAuth2ScopeName());
-		soapModel.setOAuth2TokenId(model.getOAuth2TokenId());
-		soapModel.setCreateDate(model.getCreateDate());
+		soapModel.setOAuth2AccessTokenId(model.getOAuth2AccessTokenId());
+		soapModel.setScope(model.getScope());
 
 		return soapModel;
 	}
@@ -87,17 +84,20 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 	public OAuth2ScopeGrantSoap() {
 	}
 
-	public OAuth2ScopeGrantPK getPrimaryKey() {
-		return new OAuth2ScopeGrantPK(_applicationName, _bundleSymbolicName,
-			_companyId, _oAuth2ScopeName, _oAuth2TokenId);
+	public long getPrimaryKey() {
+		return _oAuth2ScopeGrantId;
 	}
 
-	public void setPrimaryKey(OAuth2ScopeGrantPK pk) {
-		setApplicationName(pk.applicationName);
-		setBundleSymbolicName(pk.bundleSymbolicName);
-		setCompanyId(pk.companyId);
-		setOAuth2ScopeName(pk.oAuth2ScopeName);
-		setOAuth2TokenId(pk.oAuth2TokenId);
+	public void setPrimaryKey(long pk) {
+		setOAuth2ScopeGrantId(pk);
+	}
+
+	public long getOAuth2ScopeGrantId() {
+		return _oAuth2ScopeGrantId;
+	}
+
+	public void setOAuth2ScopeGrantId(long oAuth2ScopeGrantId) {
+		_oAuth2ScopeGrantId = oAuth2ScopeGrantId;
 	}
 
 	public String getApplicationName() {
@@ -124,34 +124,26 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 		_companyId = companyId;
 	}
 
-	public String getOAuth2ScopeName() {
-		return _oAuth2ScopeName;
+	public long getOAuth2AccessTokenId() {
+		return _oAuth2AccessTokenId;
 	}
 
-	public void setOAuth2ScopeName(String oAuth2ScopeName) {
-		_oAuth2ScopeName = oAuth2ScopeName;
+	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId) {
+		_oAuth2AccessTokenId = oAuth2AccessTokenId;
 	}
 
-	public long getOAuth2TokenId() {
-		return _oAuth2TokenId;
+	public String getScope() {
+		return _scope;
 	}
 
-	public void setOAuth2TokenId(long oAuth2TokenId) {
-		_oAuth2TokenId = oAuth2TokenId;
+	public void setScope(String scope) {
+		_scope = scope;
 	}
 
-	public Date getCreateDate() {
-		return _createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
-
+	private long _oAuth2ScopeGrantId;
 	private String _applicationName;
 	private String _bundleSymbolicName;
 	private long _companyId;
-	private String _oAuth2ScopeName;
-	private long _oAuth2TokenId;
-	private Date _createDate;
+	private long _oAuth2AccessTokenId;
+	private String _scope;
 }

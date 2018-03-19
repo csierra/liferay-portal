@@ -56,12 +56,25 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 	/**
 	* Creates a new o auth2 scope grant with the primary key. Does not add the o auth2 scope grant to the database.
 	*
-	* @param oAuth2ScopeGrantPK the primary key for the new o auth2 scope grant
+	* @param oAuth2ScopeGrantId the primary key for the new o auth2 scope grant
 	* @return the new o auth2 scope grant
 	*/
 	public static com.liferay.oauth2.provider.model.OAuth2ScopeGrant createOAuth2ScopeGrant(
-		com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK oAuth2ScopeGrantPK) {
-		return getService().createOAuth2ScopeGrant(oAuth2ScopeGrantPK);
+		long oAuth2ScopeGrantId) {
+		return getService().createOAuth2ScopeGrant(oAuth2ScopeGrantId);
+	}
+
+	/**
+	* Deletes the o auth2 scope grant with the primary key from the database. Also notifies the appropriate model listeners.
+	*
+	* @param oAuth2ScopeGrantId the primary key of the o auth2 scope grant
+	* @return the o auth2 scope grant that was removed
+	* @throws PortalException if a o auth2 scope grant with the primary key could not be found
+	*/
+	public static com.liferay.oauth2.provider.model.OAuth2ScopeGrant deleteOAuth2ScopeGrant(
+		long oAuth2ScopeGrantId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deleteOAuth2ScopeGrant(oAuth2ScopeGrantId);
 	}
 
 	/**
@@ -73,19 +86,6 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 	public static com.liferay.oauth2.provider.model.OAuth2ScopeGrant deleteOAuth2ScopeGrant(
 		com.liferay.oauth2.provider.model.OAuth2ScopeGrant oAuth2ScopeGrant) {
 		return getService().deleteOAuth2ScopeGrant(oAuth2ScopeGrant);
-	}
-
-	/**
-	* Deletes the o auth2 scope grant with the primary key from the database. Also notifies the appropriate model listeners.
-	*
-	* @param oAuth2ScopeGrantPK the primary key of the o auth2 scope grant
-	* @return the o auth2 scope grant that was removed
-	* @throws PortalException if a o auth2 scope grant with the primary key could not be found
-	*/
-	public static com.liferay.oauth2.provider.model.OAuth2ScopeGrant deleteOAuth2ScopeGrant(
-		com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK oAuth2ScopeGrantPK)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().deleteOAuth2ScopeGrant(oAuth2ScopeGrantPK);
 	}
 
 	/**
@@ -176,8 +176,8 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 	}
 
 	public static com.liferay.oauth2.provider.model.OAuth2ScopeGrant fetchOAuth2ScopeGrant(
-		com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK oAuth2ScopeGrantPK) {
-		return getService().fetchOAuth2ScopeGrant(oAuth2ScopeGrantPK);
+		long oAuth2ScopeGrantId) {
+		return getService().fetchOAuth2ScopeGrant(oAuth2ScopeGrantId);
 	}
 
 	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByA_BSN_C_T(
@@ -193,17 +193,25 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 		return getService().findByToken(tokenId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the o auth2 scope grant with the primary key.
 	*
-	* @param oAuth2ScopeGrantPK the primary key of the o auth2 scope grant
+	* @param oAuth2ScopeGrantId the primary key of the o auth2 scope grant
 	* @return the o auth2 scope grant
 	* @throws PortalException if a o auth2 scope grant with the primary key could not be found
 	*/
 	public static com.liferay.oauth2.provider.model.OAuth2ScopeGrant getOAuth2ScopeGrant(
-		com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK oAuth2ScopeGrantPK)
+		long oAuth2ScopeGrantId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getOAuth2ScopeGrant(oAuth2ScopeGrantPK);
+		return getService().getOAuth2ScopeGrant(oAuth2ScopeGrantId);
 	}
 
 	/**

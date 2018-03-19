@@ -18,18 +18,20 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
+import com.liferay.oauth2.provider.service.persistence.OAuth2AccessTokenPersistence;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder;
-import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPersistence;
-import com.liferay.oauth2.provider.service.persistence.OAuth2TokenPersistence;
 
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -89,27 +91,26 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	/**
 	 * Creates a new o auth2 scope grant with the primary key. Does not add the o auth2 scope grant to the database.
 	 *
-	 * @param oAuth2ScopeGrantPK the primary key for the new o auth2 scope grant
+	 * @param oAuth2ScopeGrantId the primary key for the new o auth2 scope grant
 	 * @return the new o auth2 scope grant
 	 */
 	@Override
-	public OAuth2ScopeGrant createOAuth2ScopeGrant(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK) {
-		return oAuth2ScopeGrantPersistence.create(oAuth2ScopeGrantPK);
+	public OAuth2ScopeGrant createOAuth2ScopeGrant(long oAuth2ScopeGrantId) {
+		return oAuth2ScopeGrantPersistence.create(oAuth2ScopeGrantId);
 	}
 
 	/**
 	 * Deletes the o auth2 scope grant with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
-	 * @param oAuth2ScopeGrantPK the primary key of the o auth2 scope grant
+	 * @param oAuth2ScopeGrantId the primary key of the o auth2 scope grant
 	 * @return the o auth2 scope grant that was removed
 	 * @throws PortalException if a o auth2 scope grant with the primary key could not be found
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public OAuth2ScopeGrant deleteOAuth2ScopeGrant(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK) throws PortalException {
-		return oAuth2ScopeGrantPersistence.remove(oAuth2ScopeGrantPK);
+	public OAuth2ScopeGrant deleteOAuth2ScopeGrant(long oAuth2ScopeGrantId)
+		throws PortalException {
+		return oAuth2ScopeGrantPersistence.remove(oAuth2ScopeGrantId);
 	}
 
 	/**
@@ -209,22 +210,57 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	}
 
 	@Override
-	public OAuth2ScopeGrant fetchOAuth2ScopeGrant(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK) {
-		return oAuth2ScopeGrantPersistence.fetchByPrimaryKey(oAuth2ScopeGrantPK);
+	public OAuth2ScopeGrant fetchOAuth2ScopeGrant(long oAuth2ScopeGrantId) {
+		return oAuth2ScopeGrantPersistence.fetchByPrimaryKey(oAuth2ScopeGrantId);
 	}
 
 	/**
 	 * Returns the o auth2 scope grant with the primary key.
 	 *
-	 * @param oAuth2ScopeGrantPK the primary key of the o auth2 scope grant
+	 * @param oAuth2ScopeGrantId the primary key of the o auth2 scope grant
 	 * @return the o auth2 scope grant
 	 * @throws PortalException if a o auth2 scope grant with the primary key could not be found
 	 */
 	@Override
-	public OAuth2ScopeGrant getOAuth2ScopeGrant(
-		OAuth2ScopeGrantPK oAuth2ScopeGrantPK) throws PortalException {
-		return oAuth2ScopeGrantPersistence.findByPrimaryKey(oAuth2ScopeGrantPK);
+	public OAuth2ScopeGrant getOAuth2ScopeGrant(long oAuth2ScopeGrantId)
+		throws PortalException {
+		return oAuth2ScopeGrantPersistence.findByPrimaryKey(oAuth2ScopeGrantId);
+	}
+
+	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(oAuth2ScopeGrantLocalService);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(OAuth2ScopeGrant.class);
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("oAuth2ScopeGrantId");
+
+		return actionableDynamicQuery;
+	}
+
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(oAuth2ScopeGrantLocalService);
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(OAuth2ScopeGrant.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
+			"oAuth2ScopeGrantId");
+
+		return indexableActionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(oAuth2ScopeGrantLocalService);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(OAuth2ScopeGrant.class);
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("oAuth2ScopeGrantId");
 	}
 
 	/**
@@ -358,41 +394,41 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the o auth2 token local service.
+	 * Returns the o auth2 access token local service.
 	 *
-	 * @return the o auth2 token local service
+	 * @return the o auth2 access token local service
 	 */
-	public com.liferay.oauth2.provider.service.OAuth2TokenLocalService getOAuth2TokenLocalService() {
-		return oAuth2TokenLocalService;
+	public com.liferay.oauth2.provider.service.OAuth2AccessTokenLocalService getOAuth2AccessTokenLocalService() {
+		return oAuth2AccessTokenLocalService;
 	}
 
 	/**
-	 * Sets the o auth2 token local service.
+	 * Sets the o auth2 access token local service.
 	 *
-	 * @param oAuth2TokenLocalService the o auth2 token local service
+	 * @param oAuth2AccessTokenLocalService the o auth2 access token local service
 	 */
-	public void setOAuth2TokenLocalService(
-		com.liferay.oauth2.provider.service.OAuth2TokenLocalService oAuth2TokenLocalService) {
-		this.oAuth2TokenLocalService = oAuth2TokenLocalService;
+	public void setOAuth2AccessTokenLocalService(
+		com.liferay.oauth2.provider.service.OAuth2AccessTokenLocalService oAuth2AccessTokenLocalService) {
+		this.oAuth2AccessTokenLocalService = oAuth2AccessTokenLocalService;
 	}
 
 	/**
-	 * Returns the o auth2 token persistence.
+	 * Returns the o auth2 access token persistence.
 	 *
-	 * @return the o auth2 token persistence
+	 * @return the o auth2 access token persistence
 	 */
-	public OAuth2TokenPersistence getOAuth2TokenPersistence() {
-		return oAuth2TokenPersistence;
+	public OAuth2AccessTokenPersistence getOAuth2AccessTokenPersistence() {
+		return oAuth2AccessTokenPersistence;
 	}
 
 	/**
-	 * Sets the o auth2 token persistence.
+	 * Sets the o auth2 access token persistence.
 	 *
-	 * @param oAuth2TokenPersistence the o auth2 token persistence
+	 * @param oAuth2AccessTokenPersistence the o auth2 access token persistence
 	 */
-	public void setOAuth2TokenPersistence(
-		OAuth2TokenPersistence oAuth2TokenPersistence) {
-		this.oAuth2TokenPersistence = oAuth2TokenPersistence;
+	public void setOAuth2AccessTokenPersistence(
+		OAuth2AccessTokenPersistence oAuth2AccessTokenPersistence) {
+		this.oAuth2AccessTokenPersistence = oAuth2AccessTokenPersistence;
 	}
 
 	public void afterPropertiesSet() {
@@ -455,10 +491,10 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	protected OAuth2ScopeGrantFinder oAuth2ScopeGrantFinder;
 	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@BeanReference(type = com.liferay.oauth2.provider.service.OAuth2TokenLocalService.class)
-	protected com.liferay.oauth2.provider.service.OAuth2TokenLocalService oAuth2TokenLocalService;
-	@BeanReference(type = OAuth2TokenPersistence.class)
-	protected OAuth2TokenPersistence oAuth2TokenPersistence;
+	@BeanReference(type = com.liferay.oauth2.provider.service.OAuth2AccessTokenLocalService.class)
+	protected com.liferay.oauth2.provider.service.OAuth2AccessTokenLocalService oAuth2AccessTokenLocalService;
+	@BeanReference(type = OAuth2AccessTokenPersistence.class)
+	protected OAuth2AccessTokenPersistence oAuth2AccessTokenPersistence;
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

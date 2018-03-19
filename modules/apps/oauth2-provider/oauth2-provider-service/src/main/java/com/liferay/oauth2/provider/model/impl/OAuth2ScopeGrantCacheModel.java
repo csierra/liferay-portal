@@ -17,7 +17,6 @@ package com.liferay.oauth2.provider.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
-import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPK;
 
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
@@ -27,8 +26,6 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-
-import java.util.Date;
 
 /**
  * The cache model class for representing OAuth2ScopeGrant in entity cache.
@@ -52,8 +49,7 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 
 		OAuth2ScopeGrantCacheModel oAuth2ScopeGrantCacheModel = (OAuth2ScopeGrantCacheModel)obj;
 
-		if (oAuth2ScopeGrantPK.equals(
-					oAuth2ScopeGrantCacheModel.oAuth2ScopeGrantPK)) {
+		if (oAuth2ScopeGrantId == oAuth2ScopeGrantCacheModel.oAuth2ScopeGrantId) {
 			return true;
 		}
 
@@ -62,25 +58,25 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 
 	@Override
 	public int hashCode() {
-		return HashUtil.hash(0, oAuth2ScopeGrantPK);
+		return HashUtil.hash(0, oAuth2ScopeGrantId);
 	}
 
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(13);
 
-		sb.append("{applicationName=");
+		sb.append("{oAuth2ScopeGrantId=");
+		sb.append(oAuth2ScopeGrantId);
+		sb.append(", applicationName=");
 		sb.append(applicationName);
 		sb.append(", bundleSymbolicName=");
 		sb.append(bundleSymbolicName);
 		sb.append(", companyId=");
 		sb.append(companyId);
-		sb.append(", oAuth2ScopeName=");
-		sb.append(oAuth2ScopeName);
-		sb.append(", oAuth2TokenId=");
-		sb.append(oAuth2TokenId);
-		sb.append(", createDate=");
-		sb.append(createDate);
+		sb.append(", oAuth2AccessTokenId=");
+		sb.append(oAuth2AccessTokenId);
+		sb.append(", scope=");
+		sb.append(scope);
 		sb.append("}");
 
 		return sb.toString();
@@ -89,6 +85,8 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 	@Override
 	public OAuth2ScopeGrant toEntityModel() {
 		OAuth2ScopeGrantImpl oAuth2ScopeGrantImpl = new OAuth2ScopeGrantImpl();
+
+		oAuth2ScopeGrantImpl.setOAuth2ScopeGrantId(oAuth2ScopeGrantId);
 
 		if (applicationName == null) {
 			oAuth2ScopeGrantImpl.setApplicationName("");
@@ -105,21 +103,13 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 		}
 
 		oAuth2ScopeGrantImpl.setCompanyId(companyId);
+		oAuth2ScopeGrantImpl.setOAuth2AccessTokenId(oAuth2AccessTokenId);
 
-		if (oAuth2ScopeName == null) {
-			oAuth2ScopeGrantImpl.setOAuth2ScopeName("");
+		if (scope == null) {
+			oAuth2ScopeGrantImpl.setScope("");
 		}
 		else {
-			oAuth2ScopeGrantImpl.setOAuth2ScopeName(oAuth2ScopeName);
-		}
-
-		oAuth2ScopeGrantImpl.setOAuth2TokenId(oAuth2TokenId);
-
-		if (createDate == Long.MIN_VALUE) {
-			oAuth2ScopeGrantImpl.setCreateDate(null);
-		}
-		else {
-			oAuth2ScopeGrantImpl.setCreateDate(new Date(createDate));
+			oAuth2ScopeGrantImpl.setScope(scope);
 		}
 
 		oAuth2ScopeGrantImpl.resetOriginalValues();
@@ -129,22 +119,21 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
+		oAuth2ScopeGrantId = objectInput.readLong();
 		applicationName = objectInput.readUTF();
 		bundleSymbolicName = objectInput.readUTF();
 
 		companyId = objectInput.readLong();
-		oAuth2ScopeName = objectInput.readUTF();
 
-		oAuth2TokenId = objectInput.readLong();
-		createDate = objectInput.readLong();
-
-		oAuth2ScopeGrantPK = new OAuth2ScopeGrantPK(applicationName,
-				bundleSymbolicName, companyId, oAuth2ScopeName, oAuth2TokenId);
+		oAuth2AccessTokenId = objectInput.readLong();
+		scope = objectInput.readUTF();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
+		objectOutput.writeLong(oAuth2ScopeGrantId);
+
 		if (applicationName == null) {
 			objectOutput.writeUTF("");
 		}
@@ -161,22 +150,20 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 
 		objectOutput.writeLong(companyId);
 
-		if (oAuth2ScopeName == null) {
+		objectOutput.writeLong(oAuth2AccessTokenId);
+
+		if (scope == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
-			objectOutput.writeUTF(oAuth2ScopeName);
+			objectOutput.writeUTF(scope);
 		}
-
-		objectOutput.writeLong(oAuth2TokenId);
-		objectOutput.writeLong(createDate);
 	}
 
+	public long oAuth2ScopeGrantId;
 	public String applicationName;
 	public String bundleSymbolicName;
 	public long companyId;
-	public String oAuth2ScopeName;
-	public long oAuth2TokenId;
-	public long createDate;
-	public transient OAuth2ScopeGrantPK oAuth2ScopeGrantPK;
+	public long oAuth2AccessTokenId;
+	public String scope;
 }
