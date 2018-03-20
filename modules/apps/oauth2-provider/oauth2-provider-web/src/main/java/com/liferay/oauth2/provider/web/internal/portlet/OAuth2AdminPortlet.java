@@ -249,7 +249,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		long oAuth2RefreshTokenId = ParamUtil.getLong(
 			request, "oAuth2RefreshTokenId");
 
-		_oAuth2AuthorizationService.revokeAuthorization(
+		_oAuth2AuthorizationService.revokeOAuth2Authorization(
 			oAuth2TokenId, oAuth2RefreshTokenId);
 	}
 

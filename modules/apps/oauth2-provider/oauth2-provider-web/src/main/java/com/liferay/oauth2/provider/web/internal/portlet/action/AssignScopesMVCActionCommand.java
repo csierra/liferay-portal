@@ -46,11 +46,11 @@ public class AssignScopesMVCActionCommand implements MVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws PortletException {
 
-		List<String> scopes = new ArrayList<>();
+		List<String> scopeAliases = new ArrayList<>();
 		for (String parameterName : actionRequest.getParameterMap().keySet()) {
 			if (parameterName.startsWith("scope_") &&
 				ParamUtil.getBoolean(actionRequest, parameterName)) {
-				scopes.add(parameterName.substring("scope_".length()));
+				scopeAliases.add(parameterName.substring("scope_".length()));
 			}
 		}
 
@@ -58,7 +58,8 @@ public class AssignScopesMVCActionCommand implements MVCActionCommand {
 			actionRequest, "oAuth2ApplicationId");
 
 		try {
-			_oAuth2ApplicationService.updateScopes(oAuth2ApplicationId, scopes);
+			_oAuth2ApplicationService.updateScopeAliases(
+				oAuth2ApplicationId, scopeAliases);
 		}
 		catch (PortalException e) {
 			if (_log.isDebugEnabled()) {

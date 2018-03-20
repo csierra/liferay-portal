@@ -102,7 +102,7 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 
 			<liferay-ui:search-container-column-text
 				name="granted-authorizations"
-				value="<%= String.valueOf(OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2Application.getOAuth2ApplicationId())) %>" />
+				value="<%= String.valueOf(OAuth2AuthorizationLocalServiceUtil.getOAuth2AuthorizationsCount(themeDisplay.getCompanyId(), oAuth2Application.getOAuth2ApplicationId())) %>" />
 
 			<liferay-ui:search-container-column-text
 				name="scopes">

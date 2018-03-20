@@ -17,7 +17,7 @@
 <%@ include file="/devices/init.jsp" %>
 <%
 String orderByCol = ParamUtil.getString(request, "orderByCol", "createDate");
-String orderByType = ParamUtil.getString(request, "orderByType", "asc");
+String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 
 %>
 <liferay-portlet:renderURL varImpl="portletURL" />
@@ -50,7 +50,7 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 	<liferay-ui:search-container
 		emptyResultsMessage="no-devices-were-found"
 		iteratorURL="<%= portletURL %>"
-		total="<%= OAuth2AuthorizationServiceUtil.countByUserId() %>">
+		total="<%= OAuth2AuthorizationServiceUtil.getUserOAuth2AuthorizationsCount() %>">
 
 		<%
 			OrderByComparator orderByComparator = null;
@@ -64,7 +64,7 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 		%>
 
 		<liferay-ui:search-container-results
-			results="<%= OAuth2AuthorizationServiceUtil.findByUserId(searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
+			results="<%= OAuth2AuthorizationServiceUtil.getUserOAuth2Authorizations(searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.oauth2.provider.model.OAuth2Authorization"

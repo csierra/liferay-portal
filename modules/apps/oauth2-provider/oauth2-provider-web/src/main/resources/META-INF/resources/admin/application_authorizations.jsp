@@ -36,7 +36,7 @@ if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) 
 }
 
 String orderByCol = ParamUtil.getString(request, "orderByCol", "createDate");
-String orderByType = ParamUtil.getString(request, "orderByType", "asc");
+String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 %>
 <liferay-portlet:renderURL varImpl="portletURL">
 	<portlet:param name="mvcPath" value="/admin/application_authorizations.jsp" />
@@ -72,18 +72,18 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 	<liferay-ui:search-container
 		emptyResultsMessage="no-devices-were-found"
 		iteratorURL="<%= portletURL %>"
-		total="<%= OAuth2AuthorizationLocalServiceUtil.countByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId) %>">
+		total="<%= OAuth2AuthorizationLocalServiceUtil.getOAuth2AuthorizationsCount(themeDisplay.getCompanyId(), oAuth2ApplicationId) %>">
 
 		<%
 			OrderByComparator orderByComparator = null;
 
 			if (orderByCol.equals("createDate")) {
-				orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("asc"));
+				orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("desc"));
 			}
 		%>
 
 		<liferay-ui:search-container-results
-			results="<%= OAuth2AuthorizationLocalServiceUtil.findByApplicationId(themeDisplay.getCompanyId(), oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
+			results="<%= OAuth2AuthorizationLocalServiceUtil.getOAuth2Authorizations(themeDisplay.getCompanyId(), oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.oauth2.provider.model.OAuth2Authorization"

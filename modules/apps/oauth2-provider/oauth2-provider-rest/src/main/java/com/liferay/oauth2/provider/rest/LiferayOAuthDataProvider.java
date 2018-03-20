@@ -623,7 +623,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		for (String accessToken : accessTokens) {
 			OAuth2AccessToken oAuth2AccessToken =
-				_oAuth2AccessTokenLocalService.fetchByContent(accessToken);
+				_oAuth2AccessTokenLocalService.fetchOAuth2AccessToken(
+					accessToken);
 
 			if (oAuth2AccessToken == null) {
 				if (_log.isWarnEnabled()) {
@@ -684,7 +685,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	protected void doRevokeAccessToken(ServerAccessToken accessToken) {
 		try {
 			OAuth2AccessToken oAuth2AccessToken =
-				_oAuth2AccessTokenLocalService.findByContent(
+				_oAuth2AccessTokenLocalService.getOAuth2AccessToken(
 					accessToken.getTokenKey());
 
 			_oAuth2AccessTokenLocalService.deleteOAuth2AccessToken(
@@ -755,7 +756,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 					oAuth2RefreshToken.getUserName()));
 
 			Collection<OAuth2AccessToken> oAuth2AccessTokens =
-				_oAuth2AccessTokenLocalService.findByRefreshToken(
+				_oAuth2AccessTokenLocalService.getOAuth2AccessTokens(
 					oAuth2RefreshToken.getOAuth2RefreshTokenId());
 
 			List<String> accessTokens = new ArrayList<>(
@@ -820,8 +821,9 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	public ServerAccessToken getAccessToken(String accessToken)
 		throws OAuthServiceException {
 
-		OAuth2AccessToken oAuth2AccessToken = _oAuth2AccessTokenLocalService.fetchByContent(
-			accessToken);
+		OAuth2AccessToken oAuth2AccessToken =
+			_oAuth2AccessTokenLocalService.fetchOAuth2AccessToken(
+				accessToken);
 
 		if (oAuth2AccessToken == null) {
 			// audit: trying to use expired token or brute-force token
