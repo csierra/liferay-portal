@@ -58,15 +58,15 @@ public class OAuth2AccessTokenWrapper implements OAuth2AccessToken,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("OAuth2AccessTokenId", getOAuth2AccessTokenId());
+		attributes.put("oAuth2AccessTokenId", getOAuth2AccessTokenId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("createDate", getCreateDate());
-		attributes.put("expirationDate", getExpirationDate());
-		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
 		attributes.put("oAuth2RefreshTokenId", getOAuth2RefreshTokenId());
+		attributes.put("expirationDate", getExpirationDate());
+		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("scopeAliases", getScopeAliases());
 		attributes.put("tokenContent", getTokenContent());
 		attributes.put("tokenType", getTokenType());
@@ -76,34 +76,16 @@ public class OAuth2AccessTokenWrapper implements OAuth2AccessToken,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long OAuth2AccessTokenId = (Long)attributes.get("OAuth2AccessTokenId");
+		Long oAuth2AccessTokenId = (Long)attributes.get("oAuth2AccessTokenId");
 
-		if (OAuth2AccessTokenId != null) {
-			setOAuth2AccessTokenId(OAuth2AccessTokenId);
+		if (oAuth2AccessTokenId != null) {
+			setOAuth2AccessTokenId(oAuth2AccessTokenId);
 		}
 
 		Long companyId = (Long)attributes.get("companyId");
 
 		if (companyId != null) {
 			setCompanyId(companyId);
-		}
-
-		Date createDate = (Date)attributes.get("createDate");
-
-		if (createDate != null) {
-			setCreateDate(createDate);
-		}
-
-		Date expirationDate = (Date)attributes.get("expirationDate");
-
-		if (expirationDate != null) {
-			setExpirationDate(expirationDate);
-		}
-
-		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
-
-		if (remoteIPInfo != null) {
-			setRemoteIPInfo(remoteIPInfo);
 		}
 
 		Long userId = (Long)attributes.get("userId");
@@ -118,6 +100,12 @@ public class OAuth2AccessTokenWrapper implements OAuth2AccessToken,
 			setUserName(userName);
 		}
 
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
 		Long oAuth2ApplicationId = (Long)attributes.get("oAuth2ApplicationId");
 
 		if (oAuth2ApplicationId != null) {
@@ -128,6 +116,18 @@ public class OAuth2AccessTokenWrapper implements OAuth2AccessToken,
 
 		if (oAuth2RefreshTokenId != null) {
 			setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
+
+		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
+
+		if (remoteIPInfo != null) {
+			setRemoteIPInfo(remoteIPInfo);
 		}
 
 		String scopeAliases = (String)attributes.get("scopeAliases");
@@ -398,11 +398,11 @@ public class OAuth2AccessTokenWrapper implements OAuth2AccessToken,
 	/**
 	* Sets the o auth2 access token ID of this o auth2 access token.
 	*
-	* @param OAuth2AccessTokenId the o auth2 access token ID of this o auth2 access token
+	* @param oAuth2AccessTokenId the o auth2 access token ID of this o auth2 access token
 	*/
 	@Override
-	public void setOAuth2AccessTokenId(long OAuth2AccessTokenId) {
-		_oAuth2AccessToken.setOAuth2AccessTokenId(OAuth2AccessTokenId);
+	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId) {
+		_oAuth2AccessToken.setOAuth2AccessTokenId(oAuth2AccessTokenId);
 	}
 
 	/**

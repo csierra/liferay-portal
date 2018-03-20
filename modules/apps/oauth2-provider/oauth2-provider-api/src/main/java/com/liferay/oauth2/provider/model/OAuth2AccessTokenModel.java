@@ -74,9 +74,9 @@ public interface OAuth2AccessTokenModel extends BaseModel<OAuth2AccessToken>,
 	/**
 	 * Sets the o auth2 access token ID of this o auth2 access token.
 	 *
-	 * @param OAuth2AccessTokenId the o auth2 access token ID of this o auth2 access token
+	 * @param oAuth2AccessTokenId the o auth2 access token ID of this o auth2 access token
 	 */
-	public void setOAuth2AccessTokenId(long OAuth2AccessTokenId);
+	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId);
 
 	/**
 	 * Returns the company ID of this o auth2 access token.
@@ -93,49 +93,6 @@ public interface OAuth2AccessTokenModel extends BaseModel<OAuth2AccessToken>,
 	 */
 	@Override
 	public void setCompanyId(long companyId);
-
-	/**
-	 * Returns the create date of this o auth2 access token.
-	 *
-	 * @return the create date of this o auth2 access token
-	 */
-	public Date getCreateDate();
-
-	/**
-	 * Sets the create date of this o auth2 access token.
-	 *
-	 * @param createDate the create date of this o auth2 access token
-	 */
-	public void setCreateDate(Date createDate);
-
-	/**
-	 * Returns the expiration date of this o auth2 access token.
-	 *
-	 * @return the expiration date of this o auth2 access token
-	 */
-	public Date getExpirationDate();
-
-	/**
-	 * Sets the expiration date of this o auth2 access token.
-	 *
-	 * @param expirationDate the expiration date of this o auth2 access token
-	 */
-	public void setExpirationDate(Date expirationDate);
-
-	/**
-	 * Returns the remote ip info of this o auth2 access token.
-	 *
-	 * @return the remote ip info of this o auth2 access token
-	 */
-	@AutoEscape
-	public String getRemoteIPInfo();
-
-	/**
-	 * Sets the remote ip info of this o auth2 access token.
-	 *
-	 * @param remoteIPInfo the remote ip info of this o auth2 access token
-	 */
-	public void setRemoteIPInfo(String remoteIPInfo);
 
 	/**
 	 * Returns the user ID of this o auth2 access token.
@@ -181,6 +138,20 @@ public interface OAuth2AccessTokenModel extends BaseModel<OAuth2AccessToken>,
 	public void setUserName(String userName);
 
 	/**
+	 * Returns the create date of this o auth2 access token.
+	 *
+	 * @return the create date of this o auth2 access token
+	 */
+	public Date getCreateDate();
+
+	/**
+	 * Sets the create date of this o auth2 access token.
+	 *
+	 * @param createDate the create date of this o auth2 access token
+	 */
+	public void setCreateDate(Date createDate);
+
+	/**
 	 * Returns the o auth2 application ID of this o auth2 access token.
 	 *
 	 * @return the o auth2 application ID of this o auth2 access token
@@ -207,6 +178,35 @@ public interface OAuth2AccessTokenModel extends BaseModel<OAuth2AccessToken>,
 	 * @param oAuth2RefreshTokenId the o auth2 refresh token ID of this o auth2 access token
 	 */
 	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId);
+
+	/**
+	 * Returns the expiration date of this o auth2 access token.
+	 *
+	 * @return the expiration date of this o auth2 access token
+	 */
+	public Date getExpirationDate();
+
+	/**
+	 * Sets the expiration date of this o auth2 access token.
+	 *
+	 * @param expirationDate the expiration date of this o auth2 access token
+	 */
+	public void setExpirationDate(Date expirationDate);
+
+	/**
+	 * Returns the remote ip info of this o auth2 access token.
+	 *
+	 * @return the remote ip info of this o auth2 access token
+	 */
+	@AutoEscape
+	public String getRemoteIPInfo();
+
+	/**
+	 * Sets the remote ip info of this o auth2 access token.
+	 *
+	 * @param remoteIPInfo the remote ip info of this o auth2 access token
+	 */
+	public void setRemoteIPInfo(String remoteIPInfo);
 
 	/**
 	 * Returns the scope aliases of this o auth2 access token.

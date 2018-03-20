@@ -77,36 +77,6 @@ public interface OAuth2ScopeGrantModel extends BaseModel<OAuth2ScopeGrant>,
 	public void setOAuth2ScopeGrantId(long oAuth2ScopeGrantId);
 
 	/**
-	 * Returns the application name of this o auth2 scope grant.
-	 *
-	 * @return the application name of this o auth2 scope grant
-	 */
-	@AutoEscape
-	public String getApplicationName();
-
-	/**
-	 * Sets the application name of this o auth2 scope grant.
-	 *
-	 * @param applicationName the application name of this o auth2 scope grant
-	 */
-	public void setApplicationName(String applicationName);
-
-	/**
-	 * Returns the bundle symbolic name of this o auth2 scope grant.
-	 *
-	 * @return the bundle symbolic name of this o auth2 scope grant
-	 */
-	@AutoEscape
-	public String getBundleSymbolicName();
-
-	/**
-	 * Sets the bundle symbolic name of this o auth2 scope grant.
-	 *
-	 * @param bundleSymbolicName the bundle symbolic name of this o auth2 scope grant
-	 */
-	public void setBundleSymbolicName(String bundleSymbolicName);
-
-	/**
 	 * Returns the company ID of this o auth2 scope grant.
 	 *
 	 * @return the company ID of this o auth2 scope grant
@@ -135,6 +105,36 @@ public interface OAuth2ScopeGrantModel extends BaseModel<OAuth2ScopeGrant>,
 	 * @param oAuth2AccessTokenId the o auth2 access token ID of this o auth2 scope grant
 	 */
 	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId);
+
+	/**
+	 * Returns the application name of this o auth2 scope grant.
+	 *
+	 * @return the application name of this o auth2 scope grant
+	 */
+	@AutoEscape
+	public String getApplicationName();
+
+	/**
+	 * Sets the application name of this o auth2 scope grant.
+	 *
+	 * @param applicationName the application name of this o auth2 scope grant
+	 */
+	public void setApplicationName(String applicationName);
+
+	/**
+	 * Returns the bundle symbolic name of this o auth2 scope grant.
+	 *
+	 * @return the bundle symbolic name of this o auth2 scope grant
+	 */
+	@AutoEscape
+	public String getBundleSymbolicName();
+
+	/**
+	 * Sets the bundle symbolic name of this o auth2 scope grant.
+	 *
+	 * @param bundleSymbolicName the bundle symbolic name of this o auth2 scope grant
+	 */
+	public void setBundleSymbolicName(String bundleSymbolicName);
 
 	/**
 	 * Returns the scope of this o auth2 scope grant.

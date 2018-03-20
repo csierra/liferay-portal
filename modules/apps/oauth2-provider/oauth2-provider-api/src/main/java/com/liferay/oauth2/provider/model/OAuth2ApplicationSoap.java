@@ -36,10 +36,10 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 		soapModel.setOAuth2ApplicationId(model.getOAuth2ApplicationId());
 		soapModel.setCompanyId(model.getCompanyId());
-		soapModel.setCreateDate(model.getCreateDate());
-		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setUserId(model.getUserId());
 		soapModel.setUserName(model.getUserName());
+		soapModel.setCreateDate(model.getCreateDate());
+		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setAllowedGrantTypes(model.getAllowedGrantTypes());
 		soapModel.setClientId(model.getClientId());
 		soapModel.setClientProfile(model.getClientProfile());
@@ -123,22 +123,6 @@ public class OAuth2ApplicationSoap implements Serializable {
 		_companyId = companyId;
 	}
 
-	public Date getCreateDate() {
-		return _createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
-
-	public Date getModifiedDate() {
-		return _modifiedDate;
-	}
-
-	public void setModifiedDate(Date modifiedDate) {
-		_modifiedDate = modifiedDate;
-	}
-
 	public long getUserId() {
 		return _userId;
 	}
@@ -153,6 +137,22 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 	public void setUserName(String userName) {
 		_userName = userName;
+	}
+
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
+	public Date getModifiedDate() {
+		return _modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		_modifiedDate = modifiedDate;
 	}
 
 	public String getAllowedGrantTypes() {
@@ -253,10 +253,10 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 	private long _oAuth2ApplicationId;
 	private long _companyId;
-	private Date _createDate;
-	private Date _modifiedDate;
 	private long _userId;
 	private String _userName;
+	private Date _createDate;
+	private Date _modifiedDate;
 	private String _allowedGrantTypes;
 	private String _clientId;
 	private int _clientProfile;

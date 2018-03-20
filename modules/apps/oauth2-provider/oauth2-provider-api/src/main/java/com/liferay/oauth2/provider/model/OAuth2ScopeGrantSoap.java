@@ -33,10 +33,10 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 		OAuth2ScopeGrantSoap soapModel = new OAuth2ScopeGrantSoap();
 
 		soapModel.setOAuth2ScopeGrantId(model.getOAuth2ScopeGrantId());
-		soapModel.setApplicationName(model.getApplicationName());
-		soapModel.setBundleSymbolicName(model.getBundleSymbolicName());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setOAuth2AccessTokenId(model.getOAuth2AccessTokenId());
+		soapModel.setApplicationName(model.getApplicationName());
+		soapModel.setBundleSymbolicName(model.getBundleSymbolicName());
 		soapModel.setScope(model.getScope());
 
 		return soapModel;
@@ -100,22 +100,6 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 		_oAuth2ScopeGrantId = oAuth2ScopeGrantId;
 	}
 
-	public String getApplicationName() {
-		return _applicationName;
-	}
-
-	public void setApplicationName(String applicationName) {
-		_applicationName = applicationName;
-	}
-
-	public String getBundleSymbolicName() {
-		return _bundleSymbolicName;
-	}
-
-	public void setBundleSymbolicName(String bundleSymbolicName) {
-		_bundleSymbolicName = bundleSymbolicName;
-	}
-
 	public long getCompanyId() {
 		return _companyId;
 	}
@@ -132,6 +116,22 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 		_oAuth2AccessTokenId = oAuth2AccessTokenId;
 	}
 
+	public String getApplicationName() {
+		return _applicationName;
+	}
+
+	public void setApplicationName(String applicationName) {
+		_applicationName = applicationName;
+	}
+
+	public String getBundleSymbolicName() {
+		return _bundleSymbolicName;
+	}
+
+	public void setBundleSymbolicName(String bundleSymbolicName) {
+		_bundleSymbolicName = bundleSymbolicName;
+	}
+
 	public String getScope() {
 		return _scope;
 	}
@@ -141,9 +141,9 @@ public class OAuth2ScopeGrantSoap implements Serializable {
 	}
 
 	private long _oAuth2ScopeGrantId;
-	private String _applicationName;
-	private String _bundleSymbolicName;
 	private long _companyId;
 	private long _oAuth2AccessTokenId;
+	private String _applicationName;
+	private String _bundleSymbolicName;
 	private String _scope;
 }

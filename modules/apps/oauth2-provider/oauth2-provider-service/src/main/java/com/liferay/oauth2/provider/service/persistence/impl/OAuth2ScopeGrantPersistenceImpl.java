@@ -86,26 +86,28 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2ScopeGrantModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_TOKEN = new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_OAUTH2ACCESSTOKENID =
+		new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2ScopeGrantModelImpl.FINDER_CACHE_ENABLED,
 			OAuth2ScopeGrantImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByToken",
+			"findByOAuth2AccessTokenId",
 			new String[] {
 				Long.class.getName(),
 				
 			Integer.class.getName(), Integer.class.getName(),
 				OrderByComparator.class.getName()
 			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOKEN = new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OAUTH2ACCESSTOKENID =
+		new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2ScopeGrantModelImpl.FINDER_CACHE_ENABLED,
 			OAuth2ScopeGrantImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByToken",
-			new String[] { Long.class.getName() },
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"findByOAuth2AccessTokenId", new String[] { Long.class.getName() },
 			OAuth2ScopeGrantModelImpl.OAUTH2ACCESSTOKENID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_TOKEN = new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_COUNT_BY_OAUTH2ACCESSTOKENID = new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2ScopeGrantModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByToken",
-			new String[] { Long.class.getName() });
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByOAuth2AccessTokenId", new String[] { Long.class.getName() });
 
 	/**
 	 * Returns all the o auth2 scope grants where oAuth2AccessTokenId = &#63;.
@@ -114,9 +116,10 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @return the matching o auth2 scope grants
 	 */
 	@Override
-	public List<OAuth2ScopeGrant> findByToken(long oAuth2AccessTokenId) {
-		return findByToken(oAuth2AccessTokenId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<OAuth2ScopeGrant> findByOAuth2AccessTokenId(
+		long oAuth2AccessTokenId) {
+		return findByOAuth2AccessTokenId(oAuth2AccessTokenId,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -132,9 +135,9 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @return the range of matching o auth2 scope grants
 	 */
 	@Override
-	public List<OAuth2ScopeGrant> findByToken(long oAuth2AccessTokenId,
-		int start, int end) {
-		return findByToken(oAuth2AccessTokenId, start, end, null);
+	public List<OAuth2ScopeGrant> findByOAuth2AccessTokenId(
+		long oAuth2AccessTokenId, int start, int end) {
+		return findByOAuth2AccessTokenId(oAuth2AccessTokenId, start, end, null);
 	}
 
 	/**
@@ -151,11 +154,11 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @return the ordered range of matching o auth2 scope grants
 	 */
 	@Override
-	public List<OAuth2ScopeGrant> findByToken(long oAuth2AccessTokenId,
-		int start, int end,
+	public List<OAuth2ScopeGrant> findByOAuth2AccessTokenId(
+		long oAuth2AccessTokenId, int start, int end,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
-		return findByToken(oAuth2AccessTokenId, start, end, orderByComparator,
-			true);
+		return findByOAuth2AccessTokenId(oAuth2AccessTokenId, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -173,8 +176,8 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @return the ordered range of matching o auth2 scope grants
 	 */
 	@Override
-	public List<OAuth2ScopeGrant> findByToken(long oAuth2AccessTokenId,
-		int start, int end,
+	public List<OAuth2ScopeGrant> findByOAuth2AccessTokenId(
+		long oAuth2AccessTokenId, int start, int end,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator,
 		boolean retrieveFromCache) {
 		boolean pagination = true;
@@ -184,11 +187,11 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 				(orderByComparator == null)) {
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOKEN;
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OAUTH2ACCESSTOKENID;
 			finderArgs = new Object[] { oAuth2AccessTokenId };
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_TOKEN;
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_OAUTH2ACCESSTOKENID;
 			finderArgs = new Object[] {
 					oAuth2AccessTokenId,
 					
@@ -226,7 +229,7 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 			query.append(_SQL_SELECT_OAUTH2SCOPEGRANT_WHERE);
 
-			query.append(_FINDER_COLUMN_TOKEN_OAUTH2ACCESSTOKENID_2);
+			query.append(_FINDER_COLUMN_OAUTH2ACCESSTOKENID_OAUTH2ACCESSTOKENID_2);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
@@ -289,10 +292,11 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @throws NoSuchOAuth2ScopeGrantException if a matching o auth2 scope grant could not be found
 	 */
 	@Override
-	public OAuth2ScopeGrant findByToken_First(long oAuth2AccessTokenId,
+	public OAuth2ScopeGrant findByOAuth2AccessTokenId_First(
+		long oAuth2AccessTokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator)
 		throws NoSuchOAuth2ScopeGrantException {
-		OAuth2ScopeGrant oAuth2ScopeGrant = fetchByToken_First(oAuth2AccessTokenId,
+		OAuth2ScopeGrant oAuth2ScopeGrant = fetchByOAuth2AccessTokenId_First(oAuth2AccessTokenId,
 				orderByComparator);
 
 		if (oAuth2ScopeGrant != null) {
@@ -319,10 +323,11 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @return the first matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
 	 */
 	@Override
-	public OAuth2ScopeGrant fetchByToken_First(long oAuth2AccessTokenId,
+	public OAuth2ScopeGrant fetchByOAuth2AccessTokenId_First(
+		long oAuth2AccessTokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
-		List<OAuth2ScopeGrant> list = findByToken(oAuth2AccessTokenId, 0, 1,
-				orderByComparator);
+		List<OAuth2ScopeGrant> list = findByOAuth2AccessTokenId(oAuth2AccessTokenId,
+				0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -340,10 +345,11 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @throws NoSuchOAuth2ScopeGrantException if a matching o auth2 scope grant could not be found
 	 */
 	@Override
-	public OAuth2ScopeGrant findByToken_Last(long oAuth2AccessTokenId,
+	public OAuth2ScopeGrant findByOAuth2AccessTokenId_Last(
+		long oAuth2AccessTokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator)
 		throws NoSuchOAuth2ScopeGrantException {
-		OAuth2ScopeGrant oAuth2ScopeGrant = fetchByToken_Last(oAuth2AccessTokenId,
+		OAuth2ScopeGrant oAuth2ScopeGrant = fetchByOAuth2AccessTokenId_Last(oAuth2AccessTokenId,
 				orderByComparator);
 
 		if (oAuth2ScopeGrant != null) {
@@ -370,15 +376,16 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @return the last matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
 	 */
 	@Override
-	public OAuth2ScopeGrant fetchByToken_Last(long oAuth2AccessTokenId,
+	public OAuth2ScopeGrant fetchByOAuth2AccessTokenId_Last(
+		long oAuth2AccessTokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
-		int count = countByToken(oAuth2AccessTokenId);
+		int count = countByOAuth2AccessTokenId(oAuth2AccessTokenId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<OAuth2ScopeGrant> list = findByToken(oAuth2AccessTokenId,
+		List<OAuth2ScopeGrant> list = findByOAuth2AccessTokenId(oAuth2AccessTokenId,
 				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -398,8 +405,8 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @throws NoSuchOAuth2ScopeGrantException if a o auth2 scope grant with the primary key could not be found
 	 */
 	@Override
-	public OAuth2ScopeGrant[] findByToken_PrevAndNext(long oAuth2ScopeGrantId,
-		long oAuth2AccessTokenId,
+	public OAuth2ScopeGrant[] findByOAuth2AccessTokenId_PrevAndNext(
+		long oAuth2ScopeGrantId, long oAuth2AccessTokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator)
 		throws NoSuchOAuth2ScopeGrantException {
 		OAuth2ScopeGrant oAuth2ScopeGrant = findByPrimaryKey(oAuth2ScopeGrantId);
@@ -411,13 +418,15 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 			OAuth2ScopeGrant[] array = new OAuth2ScopeGrantImpl[3];
 
-			array[0] = getByToken_PrevAndNext(session, oAuth2ScopeGrant,
-					oAuth2AccessTokenId, orderByComparator, true);
+			array[0] = getByOAuth2AccessTokenId_PrevAndNext(session,
+					oAuth2ScopeGrant, oAuth2AccessTokenId, orderByComparator,
+					true);
 
 			array[1] = oAuth2ScopeGrant;
 
-			array[2] = getByToken_PrevAndNext(session, oAuth2ScopeGrant,
-					oAuth2AccessTokenId, orderByComparator, false);
+			array[2] = getByOAuth2AccessTokenId_PrevAndNext(session,
+					oAuth2ScopeGrant, oAuth2AccessTokenId, orderByComparator,
+					false);
 
 			return array;
 		}
@@ -429,8 +438,9 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 		}
 	}
 
-	protected OAuth2ScopeGrant getByToken_PrevAndNext(Session session,
-		OAuth2ScopeGrant oAuth2ScopeGrant, long oAuth2AccessTokenId,
+	protected OAuth2ScopeGrant getByOAuth2AccessTokenId_PrevAndNext(
+		Session session, OAuth2ScopeGrant oAuth2ScopeGrant,
+		long oAuth2AccessTokenId,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
@@ -445,7 +455,7 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 		query.append(_SQL_SELECT_OAUTH2SCOPEGRANT_WHERE);
 
-		query.append(_FINDER_COLUMN_TOKEN_OAUTH2ACCESSTOKENID_2);
+		query.append(_FINDER_COLUMN_OAUTH2ACCESSTOKENID_OAUTH2ACCESSTOKENID_2);
 
 		if (orderByComparator != null) {
 			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
@@ -541,8 +551,8 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @param oAuth2AccessTokenId the o auth2 access token ID
 	 */
 	@Override
-	public void removeByToken(long oAuth2AccessTokenId) {
-		for (OAuth2ScopeGrant oAuth2ScopeGrant : findByToken(
+	public void removeByOAuth2AccessTokenId(long oAuth2AccessTokenId) {
+		for (OAuth2ScopeGrant oAuth2ScopeGrant : findByOAuth2AccessTokenId(
 				oAuth2AccessTokenId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(oAuth2ScopeGrant);
 		}
@@ -555,8 +565,8 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * @return the number of matching o auth2 scope grants
 	 */
 	@Override
-	public int countByToken(long oAuth2AccessTokenId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_TOKEN;
+	public int countByOAuth2AccessTokenId(long oAuth2AccessTokenId) {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_OAUTH2ACCESSTOKENID;
 
 		Object[] finderArgs = new Object[] { oAuth2AccessTokenId };
 
@@ -567,7 +577,7 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 			query.append(_SQL_COUNT_OAUTH2SCOPEGRANT_WHERE);
 
-			query.append(_FINDER_COLUMN_TOKEN_OAUTH2ACCESSTOKENID_2);
+			query.append(_FINDER_COLUMN_OAUTH2ACCESSTOKENID_OAUTH2ACCESSTOKENID_2);
 
 			String sql = query.toString();
 
@@ -599,64 +609,66 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_TOKEN_OAUTH2ACCESSTOKENID_2 = "oAuth2ScopeGrant.oAuth2AccessTokenId = ?";
-	public static final FinderPath FINDER_PATH_FETCH_BY_A_B_C_T_S = new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
+	private static final String _FINDER_COLUMN_OAUTH2ACCESSTOKENID_OAUTH2ACCESSTOKENID_2 =
+		"oAuth2ScopeGrant.oAuth2AccessTokenId = ?";
+	public static final FinderPath FINDER_PATH_FETCH_BY_C_O_A_B_S = new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2ScopeGrantModelImpl.FINDER_CACHE_ENABLED,
 			OAuth2ScopeGrantImpl.class, FINDER_CLASS_NAME_ENTITY,
-			"fetchByA_B_C_T_S",
+			"fetchByC_O_A_B_S",
 			new String[] {
-				String.class.getName(), String.class.getName(),
 				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), String.class.getName(),
 				String.class.getName()
 			},
-			OAuth2ScopeGrantModelImpl.APPLICATIONNAME_COLUMN_BITMASK |
-			OAuth2ScopeGrantModelImpl.BUNDLESYMBOLICNAME_COLUMN_BITMASK |
 			OAuth2ScopeGrantModelImpl.COMPANYID_COLUMN_BITMASK |
 			OAuth2ScopeGrantModelImpl.OAUTH2ACCESSTOKENID_COLUMN_BITMASK |
+			OAuth2ScopeGrantModelImpl.APPLICATIONNAME_COLUMN_BITMASK |
+			OAuth2ScopeGrantModelImpl.BUNDLESYMBOLICNAME_COLUMN_BITMASK |
 			OAuth2ScopeGrantModelImpl.SCOPE_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_A_B_C_T_S = new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_COUNT_BY_C_O_A_B_S = new FinderPath(OAuth2ScopeGrantModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2ScopeGrantModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_B_C_T_S",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_O_A_B_S",
 			new String[] {
-				String.class.getName(), String.class.getName(),
 				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), String.class.getName(),
 				String.class.getName()
 			});
 
 	/**
-	 * Returns the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2AccessTokenId = &#63; and scope = &#63; or throws a {@link NoSuchOAuth2ScopeGrantException} if it could not be found.
+	 * Returns the o auth2 scope grant where companyId = &#63; and oAuth2AccessTokenId = &#63; and applicationName = &#63; and bundleSymbolicName = &#63; and scope = &#63; or throws a {@link NoSuchOAuth2ScopeGrantException} if it could not be found.
 	 *
-	 * @param applicationName the application name
-	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param companyId the company ID
 	 * @param oAuth2AccessTokenId the o auth2 access token ID
+	 * @param applicationName the application name
+	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param scope the scope
 	 * @return the matching o auth2 scope grant
 	 * @throws NoSuchOAuth2ScopeGrantException if a matching o auth2 scope grant could not be found
 	 */
 	@Override
-	public OAuth2ScopeGrant findByA_B_C_T_S(String applicationName,
-		String bundleSymbolicName, long companyId, long oAuth2AccessTokenId,
-		String scope) throws NoSuchOAuth2ScopeGrantException {
-		OAuth2ScopeGrant oAuth2ScopeGrant = fetchByA_B_C_T_S(applicationName,
-				bundleSymbolicName, companyId, oAuth2AccessTokenId, scope);
+	public OAuth2ScopeGrant findByC_O_A_B_S(long companyId,
+		long oAuth2AccessTokenId, String applicationName,
+		String bundleSymbolicName, String scope)
+		throws NoSuchOAuth2ScopeGrantException {
+		OAuth2ScopeGrant oAuth2ScopeGrant = fetchByC_O_A_B_S(companyId,
+				oAuth2AccessTokenId, applicationName, bundleSymbolicName, scope);
 
 		if (oAuth2ScopeGrant == null) {
 			StringBundler msg = new StringBundler(12);
 
 			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			msg.append("applicationName=");
-			msg.append(applicationName);
-
-			msg.append(", bundleSymbolicName=");
-			msg.append(bundleSymbolicName);
-
-			msg.append(", companyId=");
+			msg.append("companyId=");
 			msg.append(companyId);
 
 			msg.append(", oAuth2AccessTokenId=");
 			msg.append(oAuth2AccessTokenId);
+
+			msg.append(", applicationName=");
+			msg.append(applicationName);
+
+			msg.append(", bundleSymbolicName=");
+			msg.append(bundleSymbolicName);
 
 			msg.append(", scope=");
 			msg.append(scope);
@@ -674,59 +686,59 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	}
 
 	/**
-	 * Returns the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2AccessTokenId = &#63; and scope = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the o auth2 scope grant where companyId = &#63; and oAuth2AccessTokenId = &#63; and applicationName = &#63; and bundleSymbolicName = &#63; and scope = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param applicationName the application name
-	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param companyId the company ID
 	 * @param oAuth2AccessTokenId the o auth2 access token ID
+	 * @param applicationName the application name
+	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param scope the scope
 	 * @return the matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
 	 */
 	@Override
-	public OAuth2ScopeGrant fetchByA_B_C_T_S(String applicationName,
-		String bundleSymbolicName, long companyId, long oAuth2AccessTokenId,
-		String scope) {
-		return fetchByA_B_C_T_S(applicationName, bundleSymbolicName, companyId,
-			oAuth2AccessTokenId, scope, true);
+	public OAuth2ScopeGrant fetchByC_O_A_B_S(long companyId,
+		long oAuth2AccessTokenId, String applicationName,
+		String bundleSymbolicName, String scope) {
+		return fetchByC_O_A_B_S(companyId, oAuth2AccessTokenId,
+			applicationName, bundleSymbolicName, scope, true);
 	}
 
 	/**
-	 * Returns the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2AccessTokenId = &#63; and scope = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the o auth2 scope grant where companyId = &#63; and oAuth2AccessTokenId = &#63; and applicationName = &#63; and bundleSymbolicName = &#63; and scope = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param applicationName the application name
-	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param companyId the company ID
 	 * @param oAuth2AccessTokenId the o auth2 access token ID
+	 * @param applicationName the application name
+	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param scope the scope
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching o auth2 scope grant, or <code>null</code> if a matching o auth2 scope grant could not be found
 	 */
 	@Override
-	public OAuth2ScopeGrant fetchByA_B_C_T_S(String applicationName,
-		String bundleSymbolicName, long companyId, long oAuth2AccessTokenId,
-		String scope, boolean retrieveFromCache) {
+	public OAuth2ScopeGrant fetchByC_O_A_B_S(long companyId,
+		long oAuth2AccessTokenId, String applicationName,
+		String bundleSymbolicName, String scope, boolean retrieveFromCache) {
 		Object[] finderArgs = new Object[] {
-				applicationName, bundleSymbolicName, companyId,
-				oAuth2AccessTokenId, scope
+				companyId, oAuth2AccessTokenId, applicationName,
+				bundleSymbolicName, scope
 			};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(FINDER_PATH_FETCH_BY_A_B_C_T_S,
+			result = finderCache.getResult(FINDER_PATH_FETCH_BY_C_O_A_B_S,
 					finderArgs, this);
 		}
 
 		if (result instanceof OAuth2ScopeGrant) {
 			OAuth2ScopeGrant oAuth2ScopeGrant = (OAuth2ScopeGrant)result;
 
-			if (!Objects.equals(applicationName,
+			if ((companyId != oAuth2ScopeGrant.getCompanyId()) ||
+					(oAuth2AccessTokenId != oAuth2ScopeGrant.getOAuth2AccessTokenId()) ||
+					!Objects.equals(applicationName,
 						oAuth2ScopeGrant.getApplicationName()) ||
 					!Objects.equals(bundleSymbolicName,
 						oAuth2ScopeGrant.getBundleSymbolicName()) ||
-					(companyId != oAuth2ScopeGrant.getCompanyId()) ||
-					(oAuth2AccessTokenId != oAuth2ScopeGrant.getOAuth2AccessTokenId()) ||
 					!Objects.equals(scope, oAuth2ScopeGrant.getScope())) {
 				result = null;
 			}
@@ -737,50 +749,50 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 			query.append(_SQL_SELECT_OAUTH2SCOPEGRANT_WHERE);
 
+			query.append(_FINDER_COLUMN_C_O_A_B_S_COMPANYID_2);
+
+			query.append(_FINDER_COLUMN_C_O_A_B_S_OAUTH2ACCESSTOKENID_2);
+
 			boolean bindApplicationName = false;
 
 			if (applicationName == null) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_APPLICATIONNAME_1);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_APPLICATIONNAME_1);
 			}
 			else if (applicationName.equals("")) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_APPLICATIONNAME_3);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_APPLICATIONNAME_3);
 			}
 			else {
 				bindApplicationName = true;
 
-				query.append(_FINDER_COLUMN_A_B_C_T_S_APPLICATIONNAME_2);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_APPLICATIONNAME_2);
 			}
 
 			boolean bindBundleSymbolicName = false;
 
 			if (bundleSymbolicName == null) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_BUNDLESYMBOLICNAME_1);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_BUNDLESYMBOLICNAME_1);
 			}
 			else if (bundleSymbolicName.equals("")) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_BUNDLESYMBOLICNAME_3);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_BUNDLESYMBOLICNAME_3);
 			}
 			else {
 				bindBundleSymbolicName = true;
 
-				query.append(_FINDER_COLUMN_A_B_C_T_S_BUNDLESYMBOLICNAME_2);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_BUNDLESYMBOLICNAME_2);
 			}
-
-			query.append(_FINDER_COLUMN_A_B_C_T_S_COMPANYID_2);
-
-			query.append(_FINDER_COLUMN_A_B_C_T_S_OAUTH2ACCESSTOKENID_2);
 
 			boolean bindScope = false;
 
 			if (scope == null) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_SCOPE_1);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_SCOPE_1);
 			}
 			else if (scope.equals("")) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_SCOPE_3);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_SCOPE_3);
 			}
 			else {
 				bindScope = true;
 
-				query.append(_FINDER_COLUMN_A_B_C_T_S_SCOPE_2);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_SCOPE_2);
 			}
 
 			String sql = query.toString();
@@ -794,6 +806,10 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
+				qPos.add(companyId);
+
+				qPos.add(oAuth2AccessTokenId);
+
 				if (bindApplicationName) {
 					qPos.add(applicationName);
 				}
@@ -802,10 +818,6 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 					qPos.add(bundleSymbolicName);
 				}
 
-				qPos.add(companyId);
-
-				qPos.add(oAuth2AccessTokenId);
-
 				if (bindScope) {
 					qPos.add(scope);
 				}
@@ -813,7 +825,7 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 				List<OAuth2ScopeGrant> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(FINDER_PATH_FETCH_BY_A_B_C_T_S,
+					finderCache.putResult(FINDER_PATH_FETCH_BY_C_O_A_B_S,
 						finderArgs, list);
 				}
 				else {
@@ -822,7 +834,7 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 						if (_log.isWarnEnabled()) {
 							_log.warn(
-								"OAuth2ScopeGrantPersistenceImpl.fetchByA_B_C_T_S(String, String, long, long, String, boolean) with parameters (" +
+								"OAuth2ScopeGrantPersistenceImpl.fetchByC_O_A_B_S(long, long, String, String, String, boolean) with parameters (" +
 								StringUtil.merge(finderArgs) +
 								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
@@ -834,23 +846,23 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 					cacheResult(oAuth2ScopeGrant);
 
-					if ((oAuth2ScopeGrant.getApplicationName() == null) ||
+					if ((oAuth2ScopeGrant.getCompanyId() != companyId) ||
+							(oAuth2ScopeGrant.getOAuth2AccessTokenId() != oAuth2AccessTokenId) ||
+							(oAuth2ScopeGrant.getApplicationName() == null) ||
 							!oAuth2ScopeGrant.getApplicationName()
 												 .equals(applicationName) ||
 							(oAuth2ScopeGrant.getBundleSymbolicName() == null) ||
 							!oAuth2ScopeGrant.getBundleSymbolicName()
 												 .equals(bundleSymbolicName) ||
-							(oAuth2ScopeGrant.getCompanyId() != companyId) ||
-							(oAuth2ScopeGrant.getOAuth2AccessTokenId() != oAuth2AccessTokenId) ||
 							(oAuth2ScopeGrant.getScope() == null) ||
 							!oAuth2ScopeGrant.getScope().equals(scope)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_A_B_C_T_S,
+						finderCache.putResult(FINDER_PATH_FETCH_BY_C_O_A_B_S,
 							finderArgs, oAuth2ScopeGrant);
 					}
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_A_B_C_T_S,
+				finderCache.removeResult(FINDER_PATH_FETCH_BY_C_O_A_B_S,
 					finderArgs);
 
 				throw processException(e);
@@ -869,44 +881,44 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	}
 
 	/**
-	 * Removes the o auth2 scope grant where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2AccessTokenId = &#63; and scope = &#63; from the database.
+	 * Removes the o auth2 scope grant where companyId = &#63; and oAuth2AccessTokenId = &#63; and applicationName = &#63; and bundleSymbolicName = &#63; and scope = &#63; from the database.
 	 *
-	 * @param applicationName the application name
-	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param companyId the company ID
 	 * @param oAuth2AccessTokenId the o auth2 access token ID
+	 * @param applicationName the application name
+	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param scope the scope
 	 * @return the o auth2 scope grant that was removed
 	 */
 	@Override
-	public OAuth2ScopeGrant removeByA_B_C_T_S(String applicationName,
-		String bundleSymbolicName, long companyId, long oAuth2AccessTokenId,
-		String scope) throws NoSuchOAuth2ScopeGrantException {
-		OAuth2ScopeGrant oAuth2ScopeGrant = findByA_B_C_T_S(applicationName,
-				bundleSymbolicName, companyId, oAuth2AccessTokenId, scope);
+	public OAuth2ScopeGrant removeByC_O_A_B_S(long companyId,
+		long oAuth2AccessTokenId, String applicationName,
+		String bundleSymbolicName, String scope)
+		throws NoSuchOAuth2ScopeGrantException {
+		OAuth2ScopeGrant oAuth2ScopeGrant = findByC_O_A_B_S(companyId,
+				oAuth2AccessTokenId, applicationName, bundleSymbolicName, scope);
 
 		return remove(oAuth2ScopeGrant);
 	}
 
 	/**
-	 * Returns the number of o auth2 scope grants where applicationName = &#63; and bundleSymbolicName = &#63; and companyId = &#63; and oAuth2AccessTokenId = &#63; and scope = &#63;.
+	 * Returns the number of o auth2 scope grants where companyId = &#63; and oAuth2AccessTokenId = &#63; and applicationName = &#63; and bundleSymbolicName = &#63; and scope = &#63;.
 	 *
-	 * @param applicationName the application name
-	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param companyId the company ID
 	 * @param oAuth2AccessTokenId the o auth2 access token ID
+	 * @param applicationName the application name
+	 * @param bundleSymbolicName the bundle symbolic name
 	 * @param scope the scope
 	 * @return the number of matching o auth2 scope grants
 	 */
 	@Override
-	public int countByA_B_C_T_S(String applicationName,
-		String bundleSymbolicName, long companyId, long oAuth2AccessTokenId,
-		String scope) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_A_B_C_T_S;
+	public int countByC_O_A_B_S(long companyId, long oAuth2AccessTokenId,
+		String applicationName, String bundleSymbolicName, String scope) {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_C_O_A_B_S;
 
 		Object[] finderArgs = new Object[] {
-				applicationName, bundleSymbolicName, companyId,
-				oAuth2AccessTokenId, scope
+				companyId, oAuth2AccessTokenId, applicationName,
+				bundleSymbolicName, scope
 			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
@@ -916,50 +928,50 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 			query.append(_SQL_COUNT_OAUTH2SCOPEGRANT_WHERE);
 
+			query.append(_FINDER_COLUMN_C_O_A_B_S_COMPANYID_2);
+
+			query.append(_FINDER_COLUMN_C_O_A_B_S_OAUTH2ACCESSTOKENID_2);
+
 			boolean bindApplicationName = false;
 
 			if (applicationName == null) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_APPLICATIONNAME_1);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_APPLICATIONNAME_1);
 			}
 			else if (applicationName.equals("")) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_APPLICATIONNAME_3);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_APPLICATIONNAME_3);
 			}
 			else {
 				bindApplicationName = true;
 
-				query.append(_FINDER_COLUMN_A_B_C_T_S_APPLICATIONNAME_2);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_APPLICATIONNAME_2);
 			}
 
 			boolean bindBundleSymbolicName = false;
 
 			if (bundleSymbolicName == null) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_BUNDLESYMBOLICNAME_1);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_BUNDLESYMBOLICNAME_1);
 			}
 			else if (bundleSymbolicName.equals("")) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_BUNDLESYMBOLICNAME_3);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_BUNDLESYMBOLICNAME_3);
 			}
 			else {
 				bindBundleSymbolicName = true;
 
-				query.append(_FINDER_COLUMN_A_B_C_T_S_BUNDLESYMBOLICNAME_2);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_BUNDLESYMBOLICNAME_2);
 			}
-
-			query.append(_FINDER_COLUMN_A_B_C_T_S_COMPANYID_2);
-
-			query.append(_FINDER_COLUMN_A_B_C_T_S_OAUTH2ACCESSTOKENID_2);
 
 			boolean bindScope = false;
 
 			if (scope == null) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_SCOPE_1);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_SCOPE_1);
 			}
 			else if (scope.equals("")) {
-				query.append(_FINDER_COLUMN_A_B_C_T_S_SCOPE_3);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_SCOPE_3);
 			}
 			else {
 				bindScope = true;
 
-				query.append(_FINDER_COLUMN_A_B_C_T_S_SCOPE_2);
+				query.append(_FINDER_COLUMN_C_O_A_B_S_SCOPE_2);
 			}
 
 			String sql = query.toString();
@@ -973,6 +985,10 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
+				qPos.add(companyId);
+
+				qPos.add(oAuth2AccessTokenId);
+
 				if (bindApplicationName) {
 					qPos.add(applicationName);
 				}
@@ -980,10 +996,6 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 				if (bindBundleSymbolicName) {
 					qPos.add(bundleSymbolicName);
 				}
-
-				qPos.add(companyId);
-
-				qPos.add(oAuth2AccessTokenId);
 
 				if (bindScope) {
 					qPos.add(scope);
@@ -1006,17 +1018,17 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_A_B_C_T_S_APPLICATIONNAME_1 = "oAuth2ScopeGrant.applicationName IS NULL AND ";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_APPLICATIONNAME_2 = "oAuth2ScopeGrant.applicationName = ? AND ";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_APPLICATIONNAME_3 = "(oAuth2ScopeGrant.applicationName IS NULL OR oAuth2ScopeGrant.applicationName = '') AND ";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_BUNDLESYMBOLICNAME_1 = "oAuth2ScopeGrant.bundleSymbolicName IS NULL AND ";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_BUNDLESYMBOLICNAME_2 = "oAuth2ScopeGrant.bundleSymbolicName = ? AND ";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_BUNDLESYMBOLICNAME_3 = "(oAuth2ScopeGrant.bundleSymbolicName IS NULL OR oAuth2ScopeGrant.bundleSymbolicName = '') AND ";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_COMPANYID_2 = "oAuth2ScopeGrant.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_OAUTH2ACCESSTOKENID_2 = "oAuth2ScopeGrant.oAuth2AccessTokenId = ? AND ";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_SCOPE_1 = "oAuth2ScopeGrant.scope IS NULL";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_SCOPE_2 = "oAuth2ScopeGrant.scope = ?";
-	private static final String _FINDER_COLUMN_A_B_C_T_S_SCOPE_3 = "(oAuth2ScopeGrant.scope IS NULL OR oAuth2ScopeGrant.scope = '')";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_COMPANYID_2 = "oAuth2ScopeGrant.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_OAUTH2ACCESSTOKENID_2 = "oAuth2ScopeGrant.oAuth2AccessTokenId = ? AND ";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_APPLICATIONNAME_1 = "oAuth2ScopeGrant.applicationName IS NULL AND ";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_APPLICATIONNAME_2 = "oAuth2ScopeGrant.applicationName = ? AND ";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_APPLICATIONNAME_3 = "(oAuth2ScopeGrant.applicationName IS NULL OR oAuth2ScopeGrant.applicationName = '') AND ";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_BUNDLESYMBOLICNAME_1 = "oAuth2ScopeGrant.bundleSymbolicName IS NULL AND ";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_BUNDLESYMBOLICNAME_2 = "oAuth2ScopeGrant.bundleSymbolicName = ? AND ";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_BUNDLESYMBOLICNAME_3 = "(oAuth2ScopeGrant.bundleSymbolicName IS NULL OR oAuth2ScopeGrant.bundleSymbolicName = '') AND ";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_SCOPE_1 = "oAuth2ScopeGrant.scope IS NULL";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_SCOPE_2 = "oAuth2ScopeGrant.scope = ?";
+	private static final String _FINDER_COLUMN_C_O_A_B_S_SCOPE_3 = "(oAuth2ScopeGrant.scope IS NULL OR oAuth2ScopeGrant.scope = '')";
 
 	public OAuth2ScopeGrantPersistenceImpl() {
 		setModelClass(OAuth2ScopeGrant.class);
@@ -1033,12 +1045,12 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 			OAuth2ScopeGrantImpl.class, oAuth2ScopeGrant.getPrimaryKey(),
 			oAuth2ScopeGrant);
 
-		finderCache.putResult(FINDER_PATH_FETCH_BY_A_B_C_T_S,
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_O_A_B_S,
 			new Object[] {
-				oAuth2ScopeGrant.getApplicationName(),
-				oAuth2ScopeGrant.getBundleSymbolicName(),
 				oAuth2ScopeGrant.getCompanyId(),
 				oAuth2ScopeGrant.getOAuth2AccessTokenId(),
+				oAuth2ScopeGrant.getApplicationName(),
+				oAuth2ScopeGrant.getBundleSymbolicName(),
 				oAuth2ScopeGrant.getScope()
 			}, oAuth2ScopeGrant);
 
@@ -1117,16 +1129,16 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	protected void cacheUniqueFindersCache(
 		OAuth2ScopeGrantModelImpl oAuth2ScopeGrantModelImpl) {
 		Object[] args = new Object[] {
-				oAuth2ScopeGrantModelImpl.getApplicationName(),
-				oAuth2ScopeGrantModelImpl.getBundleSymbolicName(),
 				oAuth2ScopeGrantModelImpl.getCompanyId(),
 				oAuth2ScopeGrantModelImpl.getOAuth2AccessTokenId(),
+				oAuth2ScopeGrantModelImpl.getApplicationName(),
+				oAuth2ScopeGrantModelImpl.getBundleSymbolicName(),
 				oAuth2ScopeGrantModelImpl.getScope()
 			};
 
-		finderCache.putResult(FINDER_PATH_COUNT_BY_A_B_C_T_S, args,
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_O_A_B_S, args,
 			Long.valueOf(1), false);
-		finderCache.putResult(FINDER_PATH_FETCH_BY_A_B_C_T_S, args,
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_O_A_B_S, args,
 			oAuth2ScopeGrantModelImpl, false);
 	}
 
@@ -1135,29 +1147,29 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 		boolean clearCurrent) {
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					oAuth2ScopeGrantModelImpl.getApplicationName(),
-					oAuth2ScopeGrantModelImpl.getBundleSymbolicName(),
 					oAuth2ScopeGrantModelImpl.getCompanyId(),
 					oAuth2ScopeGrantModelImpl.getOAuth2AccessTokenId(),
+					oAuth2ScopeGrantModelImpl.getApplicationName(),
+					oAuth2ScopeGrantModelImpl.getBundleSymbolicName(),
 					oAuth2ScopeGrantModelImpl.getScope()
 				};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_A_B_C_T_S, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_A_B_C_T_S, args);
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_O_A_B_S, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_O_A_B_S, args);
 		}
 
 		if ((oAuth2ScopeGrantModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_A_B_C_T_S.getColumnBitmask()) != 0) {
+				FINDER_PATH_FETCH_BY_C_O_A_B_S.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-					oAuth2ScopeGrantModelImpl.getOriginalApplicationName(),
-					oAuth2ScopeGrantModelImpl.getOriginalBundleSymbolicName(),
 					oAuth2ScopeGrantModelImpl.getOriginalCompanyId(),
 					oAuth2ScopeGrantModelImpl.getOriginalOAuth2AccessTokenId(),
+					oAuth2ScopeGrantModelImpl.getOriginalApplicationName(),
+					oAuth2ScopeGrantModelImpl.getOriginalBundleSymbolicName(),
 					oAuth2ScopeGrantModelImpl.getOriginalScope()
 				};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_A_B_C_T_S, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_A_B_C_T_S, args);
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_O_A_B_S, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_O_A_B_S, args);
 		}
 	}
 
@@ -1304,8 +1316,9 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 					oAuth2ScopeGrantModelImpl.getOAuth2AccessTokenId()
 				};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_TOKEN, args);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOKEN,
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_OAUTH2ACCESSTOKENID,
+				args);
+			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OAUTH2ACCESSTOKENID,
 				args);
 
 			finderCache.removeResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY);
@@ -1315,21 +1328,23 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 		else {
 			if ((oAuth2ScopeGrantModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOKEN.getColumnBitmask()) != 0) {
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OAUTH2ACCESSTOKENID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
 						oAuth2ScopeGrantModelImpl.getOriginalOAuth2AccessTokenId()
 					};
 
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_TOKEN, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOKEN,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_OAUTH2ACCESSTOKENID,
+					args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OAUTH2ACCESSTOKENID,
 					args);
 
 				args = new Object[] {
 						oAuth2ScopeGrantModelImpl.getOAuth2AccessTokenId()
 					};
 
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_TOKEN, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TOKEN,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_OAUTH2ACCESSTOKENID,
+					args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OAUTH2ACCESSTOKENID,
 					args);
 			}
 		}
@@ -1358,10 +1373,10 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 		oAuth2ScopeGrantImpl.setPrimaryKey(oAuth2ScopeGrant.getPrimaryKey());
 
 		oAuth2ScopeGrantImpl.setOAuth2ScopeGrantId(oAuth2ScopeGrant.getOAuth2ScopeGrantId());
-		oAuth2ScopeGrantImpl.setApplicationName(oAuth2ScopeGrant.getApplicationName());
-		oAuth2ScopeGrantImpl.setBundleSymbolicName(oAuth2ScopeGrant.getBundleSymbolicName());
 		oAuth2ScopeGrantImpl.setCompanyId(oAuth2ScopeGrant.getCompanyId());
 		oAuth2ScopeGrantImpl.setOAuth2AccessTokenId(oAuth2ScopeGrant.getOAuth2AccessTokenId());
+		oAuth2ScopeGrantImpl.setApplicationName(oAuth2ScopeGrant.getApplicationName());
+		oAuth2ScopeGrantImpl.setBundleSymbolicName(oAuth2ScopeGrant.getBundleSymbolicName());
 		oAuth2ScopeGrantImpl.setScope(oAuth2ScopeGrant.getScope());
 
 		return oAuth2ScopeGrantImpl;

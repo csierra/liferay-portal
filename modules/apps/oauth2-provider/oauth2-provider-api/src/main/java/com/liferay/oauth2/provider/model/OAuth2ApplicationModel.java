@@ -96,38 +96,6 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	public void setCompanyId(long companyId);
 
 	/**
-	 * Returns the create date of this o auth2 application.
-	 *
-	 * @return the create date of this o auth2 application
-	 */
-	@Override
-	public Date getCreateDate();
-
-	/**
-	 * Sets the create date of this o auth2 application.
-	 *
-	 * @param createDate the create date of this o auth2 application
-	 */
-	@Override
-	public void setCreateDate(Date createDate);
-
-	/**
-	 * Returns the modified date of this o auth2 application.
-	 *
-	 * @return the modified date of this o auth2 application
-	 */
-	@Override
-	public Date getModifiedDate();
-
-	/**
-	 * Sets the modified date of this o auth2 application.
-	 *
-	 * @param modifiedDate the modified date of this o auth2 application
-	 */
-	@Override
-	public void setModifiedDate(Date modifiedDate);
-
-	/**
 	 * Returns the user ID of this o auth2 application.
 	 *
 	 * @return the user ID of this o auth2 application
@@ -175,6 +143,38 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	 */
 	@Override
 	public void setUserName(String userName);
+
+	/**
+	 * Returns the create date of this o auth2 application.
+	 *
+	 * @return the create date of this o auth2 application
+	 */
+	@Override
+	public Date getCreateDate();
+
+	/**
+	 * Sets the create date of this o auth2 application.
+	 *
+	 * @param createDate the create date of this o auth2 application
+	 */
+	@Override
+	public void setCreateDate(Date createDate);
+
+	/**
+	 * Returns the modified date of this o auth2 application.
+	 *
+	 * @return the modified date of this o auth2 application
+	 */
+	@Override
+	public Date getModifiedDate();
+
+	/**
+	 * Sets the modified date of this o auth2 application.
+	 *
+	 * @param modifiedDate the modified date of this o auth2 application
+	 */
+	@Override
+	public void setModifiedDate(Date modifiedDate);
 
 	/**
 	 * Returns the allowed grant types of this o auth2 application.

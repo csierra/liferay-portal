@@ -117,8 +117,9 @@ public class OAuth2AccessTokenUtil {
 	* @param oAuth2ApplicationId the o auth2 application ID
 	* @return the matching o auth2 access tokens
 	*/
-	public static List<OAuth2AccessToken> findByA(long oAuth2ApplicationId) {
-		return getPersistence().findByA(oAuth2ApplicationId);
+	public static List<OAuth2AccessToken> findByOAuth2ApplicationId(
+		long oAuth2ApplicationId) {
+		return getPersistence().findByOAuth2ApplicationId(oAuth2ApplicationId);
 	}
 
 	/**
@@ -133,9 +134,10 @@ public class OAuth2AccessTokenUtil {
 	* @param end the upper bound of the range of o auth2 access tokens (not inclusive)
 	* @return the range of matching o auth2 access tokens
 	*/
-	public static List<OAuth2AccessToken> findByA(long oAuth2ApplicationId,
-		int start, int end) {
-		return getPersistence().findByA(oAuth2ApplicationId, start, end);
+	public static List<OAuth2AccessToken> findByOAuth2ApplicationId(
+		long oAuth2ApplicationId, int start, int end) {
+		return getPersistence()
+				   .findByOAuth2ApplicationId(oAuth2ApplicationId, start, end);
 	}
 
 	/**
@@ -151,11 +153,12 @@ public class OAuth2AccessTokenUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching o auth2 access tokens
 	*/
-	public static List<OAuth2AccessToken> findByA(long oAuth2ApplicationId,
-		int start, int end,
+	public static List<OAuth2AccessToken> findByOAuth2ApplicationId(
+		long oAuth2ApplicationId, int start, int end,
 		OrderByComparator<OAuth2AccessToken> orderByComparator) {
 		return getPersistence()
-				   .findByA(oAuth2ApplicationId, start, end, orderByComparator);
+				   .findByOAuth2ApplicationId(oAuth2ApplicationId, start, end,
+			orderByComparator);
 	}
 
 	/**
@@ -172,13 +175,13 @@ public class OAuth2AccessTokenUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching o auth2 access tokens
 	*/
-	public static List<OAuth2AccessToken> findByA(long oAuth2ApplicationId,
-		int start, int end,
+	public static List<OAuth2AccessToken> findByOAuth2ApplicationId(
+		long oAuth2ApplicationId, int start, int end,
 		OrderByComparator<OAuth2AccessToken> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
-				   .findByA(oAuth2ApplicationId, start, end, orderByComparator,
-			retrieveFromCache);
+				   .findByOAuth2ApplicationId(oAuth2ApplicationId, start, end,
+			orderByComparator, retrieveFromCache);
 	}
 
 	/**
@@ -189,11 +192,13 @@ public class OAuth2AccessTokenUtil {
 	* @return the first matching o auth2 access token
 	* @throws NoSuchOAuth2AccessTokenException if a matching o auth2 access token could not be found
 	*/
-	public static OAuth2AccessToken findByA_First(long oAuth2ApplicationId,
+	public static OAuth2AccessToken findByOAuth2ApplicationId_First(
+		long oAuth2ApplicationId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
 		return getPersistence()
-				   .findByA_First(oAuth2ApplicationId, orderByComparator);
+				   .findByOAuth2ApplicationId_First(oAuth2ApplicationId,
+			orderByComparator);
 	}
 
 	/**
@@ -203,10 +208,12 @@ public class OAuth2AccessTokenUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching o auth2 access token, or <code>null</code> if a matching o auth2 access token could not be found
 	*/
-	public static OAuth2AccessToken fetchByA_First(long oAuth2ApplicationId,
+	public static OAuth2AccessToken fetchByOAuth2ApplicationId_First(
+		long oAuth2ApplicationId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator) {
 		return getPersistence()
-				   .fetchByA_First(oAuth2ApplicationId, orderByComparator);
+				   .fetchByOAuth2ApplicationId_First(oAuth2ApplicationId,
+			orderByComparator);
 	}
 
 	/**
@@ -217,11 +224,13 @@ public class OAuth2AccessTokenUtil {
 	* @return the last matching o auth2 access token
 	* @throws NoSuchOAuth2AccessTokenException if a matching o auth2 access token could not be found
 	*/
-	public static OAuth2AccessToken findByA_Last(long oAuth2ApplicationId,
+	public static OAuth2AccessToken findByOAuth2ApplicationId_Last(
+		long oAuth2ApplicationId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
 		return getPersistence()
-				   .findByA_Last(oAuth2ApplicationId, orderByComparator);
+				   .findByOAuth2ApplicationId_Last(oAuth2ApplicationId,
+			orderByComparator);
 	}
 
 	/**
@@ -231,27 +240,29 @@ public class OAuth2AccessTokenUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching o auth2 access token, or <code>null</code> if a matching o auth2 access token could not be found
 	*/
-	public static OAuth2AccessToken fetchByA_Last(long oAuth2ApplicationId,
+	public static OAuth2AccessToken fetchByOAuth2ApplicationId_Last(
+		long oAuth2ApplicationId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator) {
 		return getPersistence()
-				   .fetchByA_Last(oAuth2ApplicationId, orderByComparator);
+				   .fetchByOAuth2ApplicationId_Last(oAuth2ApplicationId,
+			orderByComparator);
 	}
 
 	/**
 	* Returns the o auth2 access tokens before and after the current o auth2 access token in the ordered set where oAuth2ApplicationId = &#63;.
 	*
-	* @param OAuth2AccessTokenId the primary key of the current o auth2 access token
+	* @param oAuth2AccessTokenId the primary key of the current o auth2 access token
 	* @param oAuth2ApplicationId the o auth2 application ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next o auth2 access token
 	* @throws NoSuchOAuth2AccessTokenException if a o auth2 access token with the primary key could not be found
 	*/
-	public static OAuth2AccessToken[] findByA_PrevAndNext(
-		long OAuth2AccessTokenId, long oAuth2ApplicationId,
+	public static OAuth2AccessToken[] findByOAuth2ApplicationId_PrevAndNext(
+		long oAuth2AccessTokenId, long oAuth2ApplicationId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
 		return getPersistence()
-				   .findByA_PrevAndNext(OAuth2AccessTokenId,
+				   .findByOAuth2ApplicationId_PrevAndNext(oAuth2AccessTokenId,
 			oAuth2ApplicationId, orderByComparator);
 	}
 
@@ -260,8 +271,8 @@ public class OAuth2AccessTokenUtil {
 	*
 	* @param oAuth2ApplicationId the o auth2 application ID
 	*/
-	public static void removeByA(long oAuth2ApplicationId) {
-		getPersistence().removeByA(oAuth2ApplicationId);
+	public static void removeByOAuth2ApplicationId(long oAuth2ApplicationId) {
+		getPersistence().removeByOAuth2ApplicationId(oAuth2ApplicationId);
 	}
 
 	/**
@@ -270,8 +281,8 @@ public class OAuth2AccessTokenUtil {
 	* @param oAuth2ApplicationId the o auth2 application ID
 	* @return the number of matching o auth2 access tokens
 	*/
-	public static int countByA(long oAuth2ApplicationId) {
-		return getPersistence().countByA(oAuth2ApplicationId);
+	public static int countByOAuth2ApplicationId(long oAuth2ApplicationId) {
+		return getPersistence().countByOAuth2ApplicationId(oAuth2ApplicationId);
 	}
 
 	/**
@@ -280,9 +291,9 @@ public class OAuth2AccessTokenUtil {
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID
 	* @return the matching o auth2 access tokens
 	*/
-	public static List<OAuth2AccessToken> findByRefreshToken(
+	public static List<OAuth2AccessToken> findByOAuth2RefreshTokenId(
 		long oAuth2RefreshTokenId) {
-		return getPersistence().findByRefreshToken(oAuth2RefreshTokenId);
+		return getPersistence().findByOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 	}
 
 	/**
@@ -297,10 +308,10 @@ public class OAuth2AccessTokenUtil {
 	* @param end the upper bound of the range of o auth2 access tokens (not inclusive)
 	* @return the range of matching o auth2 access tokens
 	*/
-	public static List<OAuth2AccessToken> findByRefreshToken(
+	public static List<OAuth2AccessToken> findByOAuth2RefreshTokenId(
 		long oAuth2RefreshTokenId, int start, int end) {
 		return getPersistence()
-				   .findByRefreshToken(oAuth2RefreshTokenId, start, end);
+				   .findByOAuth2RefreshTokenId(oAuth2RefreshTokenId, start, end);
 	}
 
 	/**
@@ -316,12 +327,12 @@ public class OAuth2AccessTokenUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching o auth2 access tokens
 	*/
-	public static List<OAuth2AccessToken> findByRefreshToken(
+	public static List<OAuth2AccessToken> findByOAuth2RefreshTokenId(
 		long oAuth2RefreshTokenId, int start, int end,
 		OrderByComparator<OAuth2AccessToken> orderByComparator) {
 		return getPersistence()
-				   .findByRefreshToken(oAuth2RefreshTokenId, start, end,
-			orderByComparator);
+				   .findByOAuth2RefreshTokenId(oAuth2RefreshTokenId, start,
+			end, orderByComparator);
 	}
 
 	/**
@@ -338,13 +349,13 @@ public class OAuth2AccessTokenUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching o auth2 access tokens
 	*/
-	public static List<OAuth2AccessToken> findByRefreshToken(
+	public static List<OAuth2AccessToken> findByOAuth2RefreshTokenId(
 		long oAuth2RefreshTokenId, int start, int end,
 		OrderByComparator<OAuth2AccessToken> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
-				   .findByRefreshToken(oAuth2RefreshTokenId, start, end,
-			orderByComparator, retrieveFromCache);
+				   .findByOAuth2RefreshTokenId(oAuth2RefreshTokenId, start,
+			end, orderByComparator, retrieveFromCache);
 	}
 
 	/**
@@ -355,12 +366,12 @@ public class OAuth2AccessTokenUtil {
 	* @return the first matching o auth2 access token
 	* @throws NoSuchOAuth2AccessTokenException if a matching o auth2 access token could not be found
 	*/
-	public static OAuth2AccessToken findByRefreshToken_First(
+	public static OAuth2AccessToken findByOAuth2RefreshTokenId_First(
 		long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
 		return getPersistence()
-				   .findByRefreshToken_First(oAuth2RefreshTokenId,
+				   .findByOAuth2RefreshTokenId_First(oAuth2RefreshTokenId,
 			orderByComparator);
 	}
 
@@ -371,11 +382,11 @@ public class OAuth2AccessTokenUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching o auth2 access token, or <code>null</code> if a matching o auth2 access token could not be found
 	*/
-	public static OAuth2AccessToken fetchByRefreshToken_First(
+	public static OAuth2AccessToken fetchByOAuth2RefreshTokenId_First(
 		long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator) {
 		return getPersistence()
-				   .fetchByRefreshToken_First(oAuth2RefreshTokenId,
+				   .fetchByOAuth2RefreshTokenId_First(oAuth2RefreshTokenId,
 			orderByComparator);
 	}
 
@@ -387,12 +398,12 @@ public class OAuth2AccessTokenUtil {
 	* @return the last matching o auth2 access token
 	* @throws NoSuchOAuth2AccessTokenException if a matching o auth2 access token could not be found
 	*/
-	public static OAuth2AccessToken findByRefreshToken_Last(
+	public static OAuth2AccessToken findByOAuth2RefreshTokenId_Last(
 		long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
 		return getPersistence()
-				   .findByRefreshToken_Last(oAuth2RefreshTokenId,
+				   .findByOAuth2RefreshTokenId_Last(oAuth2RefreshTokenId,
 			orderByComparator);
 	}
 
@@ -403,29 +414,29 @@ public class OAuth2AccessTokenUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching o auth2 access token, or <code>null</code> if a matching o auth2 access token could not be found
 	*/
-	public static OAuth2AccessToken fetchByRefreshToken_Last(
+	public static OAuth2AccessToken fetchByOAuth2RefreshTokenId_Last(
 		long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator) {
 		return getPersistence()
-				   .fetchByRefreshToken_Last(oAuth2RefreshTokenId,
+				   .fetchByOAuth2RefreshTokenId_Last(oAuth2RefreshTokenId,
 			orderByComparator);
 	}
 
 	/**
 	* Returns the o auth2 access tokens before and after the current o auth2 access token in the ordered set where oAuth2RefreshTokenId = &#63;.
 	*
-	* @param OAuth2AccessTokenId the primary key of the current o auth2 access token
+	* @param oAuth2AccessTokenId the primary key of the current o auth2 access token
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next o auth2 access token
 	* @throws NoSuchOAuth2AccessTokenException if a o auth2 access token with the primary key could not be found
 	*/
-	public static OAuth2AccessToken[] findByRefreshToken_PrevAndNext(
-		long OAuth2AccessTokenId, long oAuth2RefreshTokenId,
+	public static OAuth2AccessToken[] findByOAuth2RefreshTokenId_PrevAndNext(
+		long oAuth2AccessTokenId, long oAuth2RefreshTokenId,
 		OrderByComparator<OAuth2AccessToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
 		return getPersistence()
-				   .findByRefreshToken_PrevAndNext(OAuth2AccessTokenId,
+				   .findByOAuth2RefreshTokenId_PrevAndNext(oAuth2AccessTokenId,
 			oAuth2RefreshTokenId, orderByComparator);
 	}
 
@@ -434,8 +445,8 @@ public class OAuth2AccessTokenUtil {
 	*
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID
 	*/
-	public static void removeByRefreshToken(long oAuth2RefreshTokenId) {
-		getPersistence().removeByRefreshToken(oAuth2RefreshTokenId);
+	public static void removeByOAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
+		getPersistence().removeByOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 	}
 
 	/**
@@ -444,8 +455,8 @@ public class OAuth2AccessTokenUtil {
 	* @param oAuth2RefreshTokenId the o auth2 refresh token ID
 	* @return the number of matching o auth2 access tokens
 	*/
-	public static int countByRefreshToken(long oAuth2RefreshTokenId) {
-		return getPersistence().countByRefreshToken(oAuth2RefreshTokenId);
+	public static int countByOAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
+		return getPersistence().countByOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 	}
 
 	/**
@@ -528,23 +539,23 @@ public class OAuth2AccessTokenUtil {
 	/**
 	* Creates a new o auth2 access token with the primary key. Does not add the o auth2 access token to the database.
 	*
-	* @param OAuth2AccessTokenId the primary key for the new o auth2 access token
+	* @param oAuth2AccessTokenId the primary key for the new o auth2 access token
 	* @return the new o auth2 access token
 	*/
-	public static OAuth2AccessToken create(long OAuth2AccessTokenId) {
-		return getPersistence().create(OAuth2AccessTokenId);
+	public static OAuth2AccessToken create(long oAuth2AccessTokenId) {
+		return getPersistence().create(oAuth2AccessTokenId);
 	}
 
 	/**
 	* Removes the o auth2 access token with the primary key from the database. Also notifies the appropriate model listeners.
 	*
-	* @param OAuth2AccessTokenId the primary key of the o auth2 access token
+	* @param oAuth2AccessTokenId the primary key of the o auth2 access token
 	* @return the o auth2 access token that was removed
 	* @throws NoSuchOAuth2AccessTokenException if a o auth2 access token with the primary key could not be found
 	*/
-	public static OAuth2AccessToken remove(long OAuth2AccessTokenId)
+	public static OAuth2AccessToken remove(long oAuth2AccessTokenId)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
-		return getPersistence().remove(OAuth2AccessTokenId);
+		return getPersistence().remove(oAuth2AccessTokenId);
 	}
 
 	public static OAuth2AccessToken updateImpl(
@@ -555,23 +566,23 @@ public class OAuth2AccessTokenUtil {
 	/**
 	* Returns the o auth2 access token with the primary key or throws a {@link NoSuchOAuth2AccessTokenException} if it could not be found.
 	*
-	* @param OAuth2AccessTokenId the primary key of the o auth2 access token
+	* @param oAuth2AccessTokenId the primary key of the o auth2 access token
 	* @return the o auth2 access token
 	* @throws NoSuchOAuth2AccessTokenException if a o auth2 access token with the primary key could not be found
 	*/
-	public static OAuth2AccessToken findByPrimaryKey(long OAuth2AccessTokenId)
+	public static OAuth2AccessToken findByPrimaryKey(long oAuth2AccessTokenId)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
-		return getPersistence().findByPrimaryKey(OAuth2AccessTokenId);
+		return getPersistence().findByPrimaryKey(oAuth2AccessTokenId);
 	}
 
 	/**
 	* Returns the o auth2 access token with the primary key or returns <code>null</code> if it could not be found.
 	*
-	* @param OAuth2AccessTokenId the primary key of the o auth2 access token
+	* @param oAuth2AccessTokenId the primary key of the o auth2 access token
 	* @return the o auth2 access token, or <code>null</code> if a o auth2 access token with the primary key could not be found
 	*/
-	public static OAuth2AccessToken fetchByPrimaryKey(long OAuth2AccessTokenId) {
-		return getPersistence().fetchByPrimaryKey(OAuth2AccessTokenId);
+	public static OAuth2AccessToken fetchByPrimaryKey(long oAuth2AccessTokenId) {
+		return getPersistence().fetchByPrimaryKey(oAuth2AccessTokenId);
 	}
 
 	public static java.util.Map<java.io.Serializable, OAuth2AccessToken> fetchByPrimaryKeys(

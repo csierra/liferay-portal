@@ -67,14 +67,14 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 
 		sb.append("{oAuth2ScopeGrantId=");
 		sb.append(oAuth2ScopeGrantId);
-		sb.append(", applicationName=");
-		sb.append(applicationName);
-		sb.append(", bundleSymbolicName=");
-		sb.append(bundleSymbolicName);
 		sb.append(", companyId=");
 		sb.append(companyId);
 		sb.append(", oAuth2AccessTokenId=");
 		sb.append(oAuth2AccessTokenId);
+		sb.append(", applicationName=");
+		sb.append(applicationName);
+		sb.append(", bundleSymbolicName=");
+		sb.append(bundleSymbolicName);
 		sb.append(", scope=");
 		sb.append(scope);
 		sb.append("}");
@@ -87,6 +87,8 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 		OAuth2ScopeGrantImpl oAuth2ScopeGrantImpl = new OAuth2ScopeGrantImpl();
 
 		oAuth2ScopeGrantImpl.setOAuth2ScopeGrantId(oAuth2ScopeGrantId);
+		oAuth2ScopeGrantImpl.setCompanyId(companyId);
+		oAuth2ScopeGrantImpl.setOAuth2AccessTokenId(oAuth2AccessTokenId);
 
 		if (applicationName == null) {
 			oAuth2ScopeGrantImpl.setApplicationName("");
@@ -101,9 +103,6 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 		else {
 			oAuth2ScopeGrantImpl.setBundleSymbolicName(bundleSymbolicName);
 		}
-
-		oAuth2ScopeGrantImpl.setCompanyId(companyId);
-		oAuth2ScopeGrantImpl.setOAuth2AccessTokenId(oAuth2AccessTokenId);
 
 		if (scope == null) {
 			oAuth2ScopeGrantImpl.setScope("");
@@ -120,12 +119,12 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		oAuth2ScopeGrantId = objectInput.readLong();
-		applicationName = objectInput.readUTF();
-		bundleSymbolicName = objectInput.readUTF();
 
 		companyId = objectInput.readLong();
 
 		oAuth2AccessTokenId = objectInput.readLong();
+		applicationName = objectInput.readUTF();
+		bundleSymbolicName = objectInput.readUTF();
 		scope = objectInput.readUTF();
 	}
 
@@ -133,6 +132,10 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
 		objectOutput.writeLong(oAuth2ScopeGrantId);
+
+		objectOutput.writeLong(companyId);
+
+		objectOutput.writeLong(oAuth2AccessTokenId);
 
 		if (applicationName == null) {
 			objectOutput.writeUTF("");
@@ -148,10 +151,6 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 			objectOutput.writeUTF(bundleSymbolicName);
 		}
 
-		objectOutput.writeLong(companyId);
-
-		objectOutput.writeLong(oAuth2AccessTokenId);
-
 		if (scope == null) {
 			objectOutput.writeUTF("");
 		}
@@ -161,9 +160,9 @@ public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
 	}
 
 	public long oAuth2ScopeGrantId;
-	public String applicationName;
-	public String bundleSymbolicName;
 	public long companyId;
 	public long oAuth2AccessTokenId;
+	public String applicationName;
+	public String bundleSymbolicName;
 	public String scope;
 }

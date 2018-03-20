@@ -71,18 +71,18 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		sb.append(oAuth2RefreshTokenId);
 		sb.append(", companyId=");
 		sb.append(companyId);
-		sb.append(", createDate=");
-		sb.append(createDate);
-		sb.append(", expirationDate=");
-		sb.append(expirationDate);
-		sb.append(", remoteIPInfo=");
-		sb.append(remoteIPInfo);
 		sb.append(", userId=");
 		sb.append(userId);
 		sb.append(", userName=");
 		sb.append(userName);
+		sb.append(", createDate=");
+		sb.append(createDate);
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(oAuth2ApplicationId);
+		sb.append(", expirationDate=");
+		sb.append(expirationDate);
+		sb.append(", remoteIPInfo=");
+		sb.append(remoteIPInfo);
 		sb.append(", scopeAliases=");
 		sb.append(scopeAliases);
 		sb.append(", tokenContent=");
@@ -98,6 +98,14 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 		oAuth2RefreshTokenImpl.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 		oAuth2RefreshTokenImpl.setCompanyId(companyId);
+		oAuth2RefreshTokenImpl.setUserId(userId);
+
+		if (userName == null) {
+			oAuth2RefreshTokenImpl.setUserName("");
+		}
+		else {
+			oAuth2RefreshTokenImpl.setUserName(userName);
+		}
 
 		if (createDate == Long.MIN_VALUE) {
 			oAuth2RefreshTokenImpl.setCreateDate(null);
@@ -105,6 +113,8 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		else {
 			oAuth2RefreshTokenImpl.setCreateDate(new Date(createDate));
 		}
+
+		oAuth2RefreshTokenImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
 
 		if (expirationDate == Long.MIN_VALUE) {
 			oAuth2RefreshTokenImpl.setExpirationDate(null);
@@ -119,17 +129,6 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		else {
 			oAuth2RefreshTokenImpl.setRemoteIPInfo(remoteIPInfo);
 		}
-
-		oAuth2RefreshTokenImpl.setUserId(userId);
-
-		if (userName == null) {
-			oAuth2RefreshTokenImpl.setUserName("");
-		}
-		else {
-			oAuth2RefreshTokenImpl.setUserName(userName);
-		}
-
-		oAuth2RefreshTokenImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
 
 		if (scopeAliases == null) {
 			oAuth2RefreshTokenImpl.setScopeAliases("");
@@ -155,14 +154,14 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		oAuth2RefreshTokenId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
-		createDate = objectInput.readLong();
-		expirationDate = objectInput.readLong();
-		remoteIPInfo = objectInput.readUTF();
 
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
+		createDate = objectInput.readLong();
 
 		oAuth2ApplicationId = objectInput.readLong();
+		expirationDate = objectInput.readLong();
+		remoteIPInfo = objectInput.readUTF();
 		scopeAliases = objectInput.readUTF();
 		tokenContent = objectInput.readUTF();
 	}
@@ -173,15 +172,6 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 		objectOutput.writeLong(oAuth2RefreshTokenId);
 
 		objectOutput.writeLong(companyId);
-		objectOutput.writeLong(createDate);
-		objectOutput.writeLong(expirationDate);
-
-		if (remoteIPInfo == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(remoteIPInfo);
-		}
 
 		objectOutput.writeLong(userId);
 
@@ -192,7 +182,17 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 			objectOutput.writeUTF(userName);
 		}
 
+		objectOutput.writeLong(createDate);
+
 		objectOutput.writeLong(oAuth2ApplicationId);
+		objectOutput.writeLong(expirationDate);
+
+		if (remoteIPInfo == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(remoteIPInfo);
+		}
 
 		if (scopeAliases == null) {
 			objectOutput.writeUTF("");
@@ -211,12 +211,12 @@ public class OAuth2RefreshTokenCacheModel implements CacheModel<OAuth2RefreshTok
 
 	public long oAuth2RefreshTokenId;
 	public long companyId;
-	public long createDate;
-	public long expirationDate;
-	public String remoteIPInfo;
 	public long userId;
 	public String userName;
+	public long createDate;
 	public long oAuth2ApplicationId;
+	public long expirationDate;
+	public String remoteIPInfo;
 	public String scopeAliases;
 	public String tokenContent;
 }

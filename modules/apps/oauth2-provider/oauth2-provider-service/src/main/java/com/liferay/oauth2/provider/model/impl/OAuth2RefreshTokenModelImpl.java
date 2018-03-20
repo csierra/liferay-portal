@@ -69,12 +69,12 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 	public static final Object[][] TABLE_COLUMNS = {
 			{ "oAuth2RefreshTokenId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
-			{ "createDate", Types.TIMESTAMP },
-			{ "expirationDate", Types.TIMESTAMP },
-			{ "remoteIPInfo", Types.VARCHAR },
 			{ "userId", Types.BIGINT },
 			{ "userName", Types.VARCHAR },
+			{ "createDate", Types.TIMESTAMP },
 			{ "oAuth2ApplicationId", Types.BIGINT },
+			{ "expirationDate", Types.TIMESTAMP },
+			{ "remoteIPInfo", Types.VARCHAR },
 			{ "scopeAliases", Types.CLOB },
 			{ "tokenContent", Types.CLOB }
 		};
@@ -83,17 +83,17 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 	static {
 		TABLE_COLUMNS_MAP.put("oAuth2RefreshTokenId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
-		TABLE_COLUMNS_MAP.put("expirationDate", Types.TIMESTAMP);
-		TABLE_COLUMNS_MAP.put("remoteIPInfo", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("oAuth2ApplicationId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("expirationDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("remoteIPInfo", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("scopeAliases", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("tokenContent", Types.CLOB);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2RefreshToken (oAuth2RefreshTokenId LONG not null primary key,companyId LONG,createDate DATE null,expirationDate DATE null,remoteIPInfo VARCHAR(75) null,userId LONG,userName VARCHAR(75) null,oAuth2ApplicationId LONG,scopeAliases TEXT null,tokenContent TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2RefreshToken (oAuth2RefreshTokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,oAuth2ApplicationId LONG,expirationDate DATE null,remoteIPInfo VARCHAR(75) null,scopeAliases TEXT null,tokenContent TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2RefreshToken";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2RefreshToken.oAuth2RefreshTokenId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2RefreshToken.oAuth2RefreshTokenId ASC";
@@ -128,12 +128,12 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 		model.setOAuth2RefreshTokenId(soapModel.getOAuth2RefreshTokenId());
 		model.setCompanyId(soapModel.getCompanyId());
-		model.setCreateDate(soapModel.getCreateDate());
-		model.setExpirationDate(soapModel.getExpirationDate());
-		model.setRemoteIPInfo(soapModel.getRemoteIPInfo());
 		model.setUserId(soapModel.getUserId());
 		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
 		model.setOAuth2ApplicationId(soapModel.getOAuth2ApplicationId());
+		model.setExpirationDate(soapModel.getExpirationDate());
+		model.setRemoteIPInfo(soapModel.getRemoteIPInfo());
 		model.setScopeAliases(soapModel.getScopeAliases());
 		model.setTokenContent(soapModel.getTokenContent());
 
@@ -203,12 +203,12 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 		attributes.put("oAuth2RefreshTokenId", getOAuth2RefreshTokenId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("createDate", getCreateDate());
-		attributes.put("expirationDate", getExpirationDate());
-		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
+		attributes.put("expirationDate", getExpirationDate());
+		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("scopeAliases", getScopeAliases());
 		attributes.put("tokenContent", getTokenContent());
 
@@ -232,24 +232,6 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 			setCompanyId(companyId);
 		}
 
-		Date createDate = (Date)attributes.get("createDate");
-
-		if (createDate != null) {
-			setCreateDate(createDate);
-		}
-
-		Date expirationDate = (Date)attributes.get("expirationDate");
-
-		if (expirationDate != null) {
-			setExpirationDate(expirationDate);
-		}
-
-		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
-
-		if (remoteIPInfo != null) {
-			setRemoteIPInfo(remoteIPInfo);
-		}
-
 		Long userId = (Long)attributes.get("userId");
 
 		if (userId != null) {
@@ -262,10 +244,28 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 			setUserName(userName);
 		}
 
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
 		Long oAuth2ApplicationId = (Long)attributes.get("oAuth2ApplicationId");
 
 		if (oAuth2ApplicationId != null) {
 			setOAuth2ApplicationId(oAuth2ApplicationId);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
+
+		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
+
+		if (remoteIPInfo != null) {
+			setRemoteIPInfo(remoteIPInfo);
 		}
 
 		String scopeAliases = (String)attributes.get("scopeAliases");
@@ -299,41 +299,6 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 	@Override
 	public void setCompanyId(long companyId) {
 		_companyId = companyId;
-	}
-
-	@Override
-	public Date getCreateDate() {
-		return _createDate;
-	}
-
-	@Override
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
-
-	@Override
-	public Date getExpirationDate() {
-		return _expirationDate;
-	}
-
-	@Override
-	public void setExpirationDate(Date expirationDate) {
-		_expirationDate = expirationDate;
-	}
-
-	@Override
-	public String getRemoteIPInfo() {
-		if (_remoteIPInfo == null) {
-			return "";
-		}
-		else {
-			return _remoteIPInfo;
-		}
-	}
-
-	@Override
-	public void setRemoteIPInfo(String remoteIPInfo) {
-		_remoteIPInfo = remoteIPInfo;
 	}
 
 	@Override
@@ -378,6 +343,16 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 	}
 
 	@Override
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	@Override
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
+	@Override
 	public long getOAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
 	}
@@ -397,6 +372,31 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 	public long getOriginalOAuth2ApplicationId() {
 		return _originalOAuth2ApplicationId;
+	}
+
+	@Override
+	public Date getExpirationDate() {
+		return _expirationDate;
+	}
+
+	@Override
+	public void setExpirationDate(Date expirationDate) {
+		_expirationDate = expirationDate;
+	}
+
+	@Override
+	public String getRemoteIPInfo() {
+		if (_remoteIPInfo == null) {
+			return "";
+		}
+		else {
+			return _remoteIPInfo;
+		}
+	}
+
+	@Override
+	public void setRemoteIPInfo(String remoteIPInfo) {
+		_remoteIPInfo = remoteIPInfo;
 	}
 
 	@Override
@@ -472,12 +472,12 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 		oAuth2RefreshTokenImpl.setOAuth2RefreshTokenId(getOAuth2RefreshTokenId());
 		oAuth2RefreshTokenImpl.setCompanyId(getCompanyId());
-		oAuth2RefreshTokenImpl.setCreateDate(getCreateDate());
-		oAuth2RefreshTokenImpl.setExpirationDate(getExpirationDate());
-		oAuth2RefreshTokenImpl.setRemoteIPInfo(getRemoteIPInfo());
 		oAuth2RefreshTokenImpl.setUserId(getUserId());
 		oAuth2RefreshTokenImpl.setUserName(getUserName());
+		oAuth2RefreshTokenImpl.setCreateDate(getCreateDate());
 		oAuth2RefreshTokenImpl.setOAuth2ApplicationId(getOAuth2ApplicationId());
+		oAuth2RefreshTokenImpl.setExpirationDate(getExpirationDate());
+		oAuth2RefreshTokenImpl.setRemoteIPInfo(getRemoteIPInfo());
 		oAuth2RefreshTokenImpl.setScopeAliases(getScopeAliases());
 		oAuth2RefreshTokenImpl.setTokenContent(getTokenContent());
 
@@ -559,6 +559,16 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 
 		oAuth2RefreshTokenCacheModel.companyId = getCompanyId();
 
+		oAuth2RefreshTokenCacheModel.userId = getUserId();
+
+		oAuth2RefreshTokenCacheModel.userName = getUserName();
+
+		String userName = oAuth2RefreshTokenCacheModel.userName;
+
+		if ((userName != null) && (userName.length() == 0)) {
+			oAuth2RefreshTokenCacheModel.userName = null;
+		}
+
 		Date createDate = getCreateDate();
 
 		if (createDate != null) {
@@ -567,6 +577,8 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		else {
 			oAuth2RefreshTokenCacheModel.createDate = Long.MIN_VALUE;
 		}
+
+		oAuth2RefreshTokenCacheModel.oAuth2ApplicationId = getOAuth2ApplicationId();
 
 		Date expirationDate = getExpirationDate();
 
@@ -584,18 +596,6 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		if ((remoteIPInfo != null) && (remoteIPInfo.length() == 0)) {
 			oAuth2RefreshTokenCacheModel.remoteIPInfo = null;
 		}
-
-		oAuth2RefreshTokenCacheModel.userId = getUserId();
-
-		oAuth2RefreshTokenCacheModel.userName = getUserName();
-
-		String userName = oAuth2RefreshTokenCacheModel.userName;
-
-		if ((userName != null) && (userName.length() == 0)) {
-			oAuth2RefreshTokenCacheModel.userName = null;
-		}
-
-		oAuth2RefreshTokenCacheModel.oAuth2ApplicationId = getOAuth2ApplicationId();
 
 		oAuth2RefreshTokenCacheModel.scopeAliases = getScopeAliases();
 
@@ -624,18 +624,18 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		sb.append(getOAuth2RefreshTokenId());
 		sb.append(", companyId=");
 		sb.append(getCompanyId());
-		sb.append(", createDate=");
-		sb.append(getCreateDate());
-		sb.append(", expirationDate=");
-		sb.append(getExpirationDate());
-		sb.append(", remoteIPInfo=");
-		sb.append(getRemoteIPInfo());
 		sb.append(", userId=");
 		sb.append(getUserId());
 		sb.append(", userName=");
 		sb.append(getUserName());
+		sb.append(", createDate=");
+		sb.append(getCreateDate());
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(getOAuth2ApplicationId());
+		sb.append(", expirationDate=");
+		sb.append(getExpirationDate());
+		sb.append(", remoteIPInfo=");
+		sb.append(getRemoteIPInfo());
 		sb.append(", scopeAliases=");
 		sb.append(getScopeAliases());
 		sb.append(", tokenContent=");
@@ -662,18 +662,6 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		sb.append(getCompanyId());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>createDate</column-name><column-value><![CDATA[");
-		sb.append(getCreateDate());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>expirationDate</column-name><column-value><![CDATA[");
-		sb.append(getExpirationDate());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>remoteIPInfo</column-name><column-value><![CDATA[");
-		sb.append(getRemoteIPInfo());
-		sb.append("]]></column-value></column>");
-		sb.append(
 			"<column><column-name>userId</column-name><column-value><![CDATA[");
 		sb.append(getUserId());
 		sb.append("]]></column-value></column>");
@@ -682,8 +670,20 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		sb.append(getUserName());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>createDate</column-name><column-value><![CDATA[");
+		sb.append(getCreateDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>oAuth2ApplicationId</column-name><column-value><![CDATA[");
 		sb.append(getOAuth2ApplicationId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>expirationDate</column-name><column-value><![CDATA[");
+		sb.append(getExpirationDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>remoteIPInfo</column-name><column-value><![CDATA[");
+		sb.append(getRemoteIPInfo());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>scopeAliases</column-name><column-value><![CDATA[");
@@ -705,14 +705,14 @@ public class OAuth2RefreshTokenModelImpl extends BaseModelImpl<OAuth2RefreshToke
 		};
 	private long _oAuth2RefreshTokenId;
 	private long _companyId;
-	private Date _createDate;
-	private Date _expirationDate;
-	private String _remoteIPInfo;
 	private long _userId;
 	private String _userName;
+	private Date _createDate;
 	private long _oAuth2ApplicationId;
 	private long _originalOAuth2ApplicationId;
 	private boolean _setOriginalOAuth2ApplicationId;
+	private Date _expirationDate;
+	private String _remoteIPInfo;
 	private String _scopeAliases;
 	private String _tokenContent;
 	private String _originalTokenContent;

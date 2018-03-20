@@ -36,12 +36,12 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 
 		soapModel.setOAuth2RefreshTokenId(model.getOAuth2RefreshTokenId());
 		soapModel.setCompanyId(model.getCompanyId());
-		soapModel.setCreateDate(model.getCreateDate());
-		soapModel.setExpirationDate(model.getExpirationDate());
-		soapModel.setRemoteIPInfo(model.getRemoteIPInfo());
 		soapModel.setUserId(model.getUserId());
 		soapModel.setUserName(model.getUserName());
+		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setOAuth2ApplicationId(model.getOAuth2ApplicationId());
+		soapModel.setExpirationDate(model.getExpirationDate());
+		soapModel.setRemoteIPInfo(model.getRemoteIPInfo());
 		soapModel.setScopeAliases(model.getScopeAliases());
 		soapModel.setTokenContent(model.getTokenContent());
 
@@ -115,30 +115,6 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 		_companyId = companyId;
 	}
 
-	public Date getCreateDate() {
-		return _createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
-
-	public Date getExpirationDate() {
-		return _expirationDate;
-	}
-
-	public void setExpirationDate(Date expirationDate) {
-		_expirationDate = expirationDate;
-	}
-
-	public String getRemoteIPInfo() {
-		return _remoteIPInfo;
-	}
-
-	public void setRemoteIPInfo(String remoteIPInfo) {
-		_remoteIPInfo = remoteIPInfo;
-	}
-
 	public long getUserId() {
 		return _userId;
 	}
@@ -155,12 +131,36 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 		_userName = userName;
 	}
 
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
 	public long getOAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
 	}
 
 	public void setOAuth2ApplicationId(long oAuth2ApplicationId) {
 		_oAuth2ApplicationId = oAuth2ApplicationId;
+	}
+
+	public Date getExpirationDate() {
+		return _expirationDate;
+	}
+
+	public void setExpirationDate(Date expirationDate) {
+		_expirationDate = expirationDate;
+	}
+
+	public String getRemoteIPInfo() {
+		return _remoteIPInfo;
+	}
+
+	public void setRemoteIPInfo(String remoteIPInfo) {
+		_remoteIPInfo = remoteIPInfo;
 	}
 
 	public String getScopeAliases() {
@@ -181,12 +181,12 @@ public class OAuth2RefreshTokenSoap implements Serializable {
 
 	private long _oAuth2RefreshTokenId;
 	private long _companyId;
-	private Date _createDate;
-	private Date _expirationDate;
-	private String _remoteIPInfo;
 	private long _userId;
 	private String _userName;
+	private Date _createDate;
 	private long _oAuth2ApplicationId;
+	private Date _expirationDate;
+	private String _remoteIPInfo;
 	private String _scopeAliases;
 	private String _tokenContent;
 }
