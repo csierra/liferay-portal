@@ -36,13 +36,13 @@ public class OAuth2AccessTokenSoap implements Serializable {
 
 		soapModel.setOAuth2AccessTokenId(model.getOAuth2AccessTokenId());
 		soapModel.setCompanyId(model.getCompanyId());
-		soapModel.setCreateDate(model.getCreateDate());
-		soapModel.setExpirationDate(model.getExpirationDate());
-		soapModel.setRemoteIPInfo(model.getRemoteIPInfo());
 		soapModel.setUserId(model.getUserId());
 		soapModel.setUserName(model.getUserName());
+		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setOAuth2ApplicationId(model.getOAuth2ApplicationId());
 		soapModel.setOAuth2RefreshTokenId(model.getOAuth2RefreshTokenId());
+		soapModel.setExpirationDate(model.getExpirationDate());
+		soapModel.setRemoteIPInfo(model.getRemoteIPInfo());
 		soapModel.setScopeAliases(model.getScopeAliases());
 		soapModel.setTokenContent(model.getTokenContent());
 		soapModel.setTokenType(model.getTokenType());
@@ -94,7 +94,7 @@ public class OAuth2AccessTokenSoap implements Serializable {
 	}
 
 	public long getPrimaryKey() {
-		return _OAuth2AccessTokenId;
+		return _oAuth2AccessTokenId;
 	}
 
 	public void setPrimaryKey(long pk) {
@@ -102,11 +102,11 @@ public class OAuth2AccessTokenSoap implements Serializable {
 	}
 
 	public long getOAuth2AccessTokenId() {
-		return _OAuth2AccessTokenId;
+		return _oAuth2AccessTokenId;
 	}
 
-	public void setOAuth2AccessTokenId(long OAuth2AccessTokenId) {
-		_OAuth2AccessTokenId = OAuth2AccessTokenId;
+	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId) {
+		_oAuth2AccessTokenId = oAuth2AccessTokenId;
 	}
 
 	public long getCompanyId() {
@@ -115,30 +115,6 @@ public class OAuth2AccessTokenSoap implements Serializable {
 
 	public void setCompanyId(long companyId) {
 		_companyId = companyId;
-	}
-
-	public Date getCreateDate() {
-		return _createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
-
-	public Date getExpirationDate() {
-		return _expirationDate;
-	}
-
-	public void setExpirationDate(Date expirationDate) {
-		_expirationDate = expirationDate;
-	}
-
-	public String getRemoteIPInfo() {
-		return _remoteIPInfo;
-	}
-
-	public void setRemoteIPInfo(String remoteIPInfo) {
-		_remoteIPInfo = remoteIPInfo;
 	}
 
 	public long getUserId() {
@@ -157,6 +133,14 @@ public class OAuth2AccessTokenSoap implements Serializable {
 		_userName = userName;
 	}
 
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
 	public long getOAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
 	}
@@ -171,6 +155,22 @@ public class OAuth2AccessTokenSoap implements Serializable {
 
 	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
 		_oAuth2RefreshTokenId = oAuth2RefreshTokenId;
+	}
+
+	public Date getExpirationDate() {
+		return _expirationDate;
+	}
+
+	public void setExpirationDate(Date expirationDate) {
+		_expirationDate = expirationDate;
+	}
+
+	public String getRemoteIPInfo() {
+		return _remoteIPInfo;
+	}
+
+	public void setRemoteIPInfo(String remoteIPInfo) {
+		_remoteIPInfo = remoteIPInfo;
 	}
 
 	public String getScopeAliases() {
@@ -197,15 +197,15 @@ public class OAuth2AccessTokenSoap implements Serializable {
 		_tokenType = tokenType;
 	}
 
-	private long _OAuth2AccessTokenId;
+	private long _oAuth2AccessTokenId;
 	private long _companyId;
-	private Date _createDate;
-	private Date _expirationDate;
-	private String _remoteIPInfo;
 	private long _userId;
 	private String _userName;
+	private Date _createDate;
 	private long _oAuth2ApplicationId;
 	private long _oAuth2RefreshTokenId;
+	private Date _expirationDate;
+	private String _remoteIPInfo;
 	private String _scopeAliases;
 	private String _tokenContent;
 	private String _tokenType;

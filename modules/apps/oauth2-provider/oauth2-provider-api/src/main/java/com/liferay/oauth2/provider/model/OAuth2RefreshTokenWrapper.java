@@ -60,12 +60,12 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 
 		attributes.put("oAuth2RefreshTokenId", getOAuth2RefreshTokenId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("createDate", getCreateDate());
-		attributes.put("expirationDate", getExpirationDate());
-		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
+		attributes.put("expirationDate", getExpirationDate());
+		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("scopeAliases", getScopeAliases());
 		attributes.put("tokenContent", getTokenContent());
 
@@ -86,24 +86,6 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 			setCompanyId(companyId);
 		}
 
-		Date createDate = (Date)attributes.get("createDate");
-
-		if (createDate != null) {
-			setCreateDate(createDate);
-		}
-
-		Date expirationDate = (Date)attributes.get("expirationDate");
-
-		if (expirationDate != null) {
-			setExpirationDate(expirationDate);
-		}
-
-		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
-
-		if (remoteIPInfo != null) {
-			setRemoteIPInfo(remoteIPInfo);
-		}
-
 		Long userId = (Long)attributes.get("userId");
 
 		if (userId != null) {
@@ -116,10 +98,28 @@ public class OAuth2RefreshTokenWrapper implements OAuth2RefreshToken,
 			setUserName(userName);
 		}
 
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
 		Long oAuth2ApplicationId = (Long)attributes.get("oAuth2ApplicationId");
 
 		if (oAuth2ApplicationId != null) {
 			setOAuth2ApplicationId(oAuth2ApplicationId);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
+
+		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
+
+		if (remoteIPInfo != null) {
+			setRemoteIPInfo(remoteIPInfo);
 		}
 
 		String scopeAliases = (String)attributes.get("scopeAliases");

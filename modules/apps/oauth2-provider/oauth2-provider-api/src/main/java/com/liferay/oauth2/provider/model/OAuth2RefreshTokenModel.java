@@ -95,49 +95,6 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	public void setCompanyId(long companyId);
 
 	/**
-	 * Returns the create date of this o auth2 refresh token.
-	 *
-	 * @return the create date of this o auth2 refresh token
-	 */
-	public Date getCreateDate();
-
-	/**
-	 * Sets the create date of this o auth2 refresh token.
-	 *
-	 * @param createDate the create date of this o auth2 refresh token
-	 */
-	public void setCreateDate(Date createDate);
-
-	/**
-	 * Returns the expiration date of this o auth2 refresh token.
-	 *
-	 * @return the expiration date of this o auth2 refresh token
-	 */
-	public Date getExpirationDate();
-
-	/**
-	 * Sets the expiration date of this o auth2 refresh token.
-	 *
-	 * @param expirationDate the expiration date of this o auth2 refresh token
-	 */
-	public void setExpirationDate(Date expirationDate);
-
-	/**
-	 * Returns the remote ip info of this o auth2 refresh token.
-	 *
-	 * @return the remote ip info of this o auth2 refresh token
-	 */
-	@AutoEscape
-	public String getRemoteIPInfo();
-
-	/**
-	 * Sets the remote ip info of this o auth2 refresh token.
-	 *
-	 * @param remoteIPInfo the remote ip info of this o auth2 refresh token
-	 */
-	public void setRemoteIPInfo(String remoteIPInfo);
-
-	/**
 	 * Returns the user ID of this o auth2 refresh token.
 	 *
 	 * @return the user ID of this o auth2 refresh token
@@ -181,6 +138,20 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	public void setUserName(String userName);
 
 	/**
+	 * Returns the create date of this o auth2 refresh token.
+	 *
+	 * @return the create date of this o auth2 refresh token
+	 */
+	public Date getCreateDate();
+
+	/**
+	 * Sets the create date of this o auth2 refresh token.
+	 *
+	 * @param createDate the create date of this o auth2 refresh token
+	 */
+	public void setCreateDate(Date createDate);
+
+	/**
 	 * Returns the o auth2 application ID of this o auth2 refresh token.
 	 *
 	 * @return the o auth2 application ID of this o auth2 refresh token
@@ -193,6 +164,35 @@ public interface OAuth2RefreshTokenModel extends BaseModel<OAuth2RefreshToken>,
 	 * @param oAuth2ApplicationId the o auth2 application ID of this o auth2 refresh token
 	 */
 	public void setOAuth2ApplicationId(long oAuth2ApplicationId);
+
+	/**
+	 * Returns the expiration date of this o auth2 refresh token.
+	 *
+	 * @return the expiration date of this o auth2 refresh token
+	 */
+	public Date getExpirationDate();
+
+	/**
+	 * Sets the expiration date of this o auth2 refresh token.
+	 *
+	 * @param expirationDate the expiration date of this o auth2 refresh token
+	 */
+	public void setExpirationDate(Date expirationDate);
+
+	/**
+	 * Returns the remote ip info of this o auth2 refresh token.
+	 *
+	 * @return the remote ip info of this o auth2 refresh token
+	 */
+	@AutoEscape
+	public String getRemoteIPInfo();
+
+	/**
+	 * Sets the remote ip info of this o auth2 refresh token.
+	 *
+	 * @param remoteIPInfo the remote ip info of this o auth2 refresh token
+	 */
+	public void setRemoteIPInfo(String remoteIPInfo);
 
 	/**
 	 * Returns the scope aliases of this o auth2 refresh token.

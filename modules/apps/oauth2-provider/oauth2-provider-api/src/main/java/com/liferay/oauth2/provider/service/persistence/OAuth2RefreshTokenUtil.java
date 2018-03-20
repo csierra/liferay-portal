@@ -118,8 +118,9 @@ public class OAuth2RefreshTokenUtil {
 	* @param oAuth2ApplicationId the o auth2 application ID
 	* @return the matching o auth2 refresh tokens
 	*/
-	public static List<OAuth2RefreshToken> findByA(long oAuth2ApplicationId) {
-		return getPersistence().findByA(oAuth2ApplicationId);
+	public static List<OAuth2RefreshToken> findByOAuth2ApplicationId(
+		long oAuth2ApplicationId) {
+		return getPersistence().findByOAuth2ApplicationId(oAuth2ApplicationId);
 	}
 
 	/**
@@ -134,9 +135,10 @@ public class OAuth2RefreshTokenUtil {
 	* @param end the upper bound of the range of o auth2 refresh tokens (not inclusive)
 	* @return the range of matching o auth2 refresh tokens
 	*/
-	public static List<OAuth2RefreshToken> findByA(long oAuth2ApplicationId,
-		int start, int end) {
-		return getPersistence().findByA(oAuth2ApplicationId, start, end);
+	public static List<OAuth2RefreshToken> findByOAuth2ApplicationId(
+		long oAuth2ApplicationId, int start, int end) {
+		return getPersistence()
+				   .findByOAuth2ApplicationId(oAuth2ApplicationId, start, end);
 	}
 
 	/**
@@ -152,11 +154,12 @@ public class OAuth2RefreshTokenUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching o auth2 refresh tokens
 	*/
-	public static List<OAuth2RefreshToken> findByA(long oAuth2ApplicationId,
-		int start, int end,
+	public static List<OAuth2RefreshToken> findByOAuth2ApplicationId(
+		long oAuth2ApplicationId, int start, int end,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator) {
 		return getPersistence()
-				   .findByA(oAuth2ApplicationId, start, end, orderByComparator);
+				   .findByOAuth2ApplicationId(oAuth2ApplicationId, start, end,
+			orderByComparator);
 	}
 
 	/**
@@ -173,13 +176,13 @@ public class OAuth2RefreshTokenUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching o auth2 refresh tokens
 	*/
-	public static List<OAuth2RefreshToken> findByA(long oAuth2ApplicationId,
-		int start, int end,
+	public static List<OAuth2RefreshToken> findByOAuth2ApplicationId(
+		long oAuth2ApplicationId, int start, int end,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
-				   .findByA(oAuth2ApplicationId, start, end, orderByComparator,
-			retrieveFromCache);
+				   .findByOAuth2ApplicationId(oAuth2ApplicationId, start, end,
+			orderByComparator, retrieveFromCache);
 	}
 
 	/**
@@ -190,11 +193,13 @@ public class OAuth2RefreshTokenUtil {
 	* @return the first matching o auth2 refresh token
 	* @throws NoSuchOAuth2RefreshTokenException if a matching o auth2 refresh token could not be found
 	*/
-	public static OAuth2RefreshToken findByA_First(long oAuth2ApplicationId,
+	public static OAuth2RefreshToken findByOAuth2ApplicationId_First(
+		long oAuth2ApplicationId,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException {
 		return getPersistence()
-				   .findByA_First(oAuth2ApplicationId, orderByComparator);
+				   .findByOAuth2ApplicationId_First(oAuth2ApplicationId,
+			orderByComparator);
 	}
 
 	/**
@@ -204,10 +209,12 @@ public class OAuth2RefreshTokenUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching o auth2 refresh token, or <code>null</code> if a matching o auth2 refresh token could not be found
 	*/
-	public static OAuth2RefreshToken fetchByA_First(long oAuth2ApplicationId,
+	public static OAuth2RefreshToken fetchByOAuth2ApplicationId_First(
+		long oAuth2ApplicationId,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator) {
 		return getPersistence()
-				   .fetchByA_First(oAuth2ApplicationId, orderByComparator);
+				   .fetchByOAuth2ApplicationId_First(oAuth2ApplicationId,
+			orderByComparator);
 	}
 
 	/**
@@ -218,11 +225,13 @@ public class OAuth2RefreshTokenUtil {
 	* @return the last matching o auth2 refresh token
 	* @throws NoSuchOAuth2RefreshTokenException if a matching o auth2 refresh token could not be found
 	*/
-	public static OAuth2RefreshToken findByA_Last(long oAuth2ApplicationId,
+	public static OAuth2RefreshToken findByOAuth2ApplicationId_Last(
+		long oAuth2ApplicationId,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException {
 		return getPersistence()
-				   .findByA_Last(oAuth2ApplicationId, orderByComparator);
+				   .findByOAuth2ApplicationId_Last(oAuth2ApplicationId,
+			orderByComparator);
 	}
 
 	/**
@@ -232,10 +241,12 @@ public class OAuth2RefreshTokenUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching o auth2 refresh token, or <code>null</code> if a matching o auth2 refresh token could not be found
 	*/
-	public static OAuth2RefreshToken fetchByA_Last(long oAuth2ApplicationId,
+	public static OAuth2RefreshToken fetchByOAuth2ApplicationId_Last(
+		long oAuth2ApplicationId,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator) {
 		return getPersistence()
-				   .fetchByA_Last(oAuth2ApplicationId, orderByComparator);
+				   .fetchByOAuth2ApplicationId_Last(oAuth2ApplicationId,
+			orderByComparator);
 	}
 
 	/**
@@ -247,12 +258,12 @@ public class OAuth2RefreshTokenUtil {
 	* @return the previous, current, and next o auth2 refresh token
 	* @throws NoSuchOAuth2RefreshTokenException if a o auth2 refresh token with the primary key could not be found
 	*/
-	public static OAuth2RefreshToken[] findByA_PrevAndNext(
+	public static OAuth2RefreshToken[] findByOAuth2ApplicationId_PrevAndNext(
 		long oAuth2RefreshTokenId, long oAuth2ApplicationId,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2RefreshTokenException {
 		return getPersistence()
-				   .findByA_PrevAndNext(oAuth2RefreshTokenId,
+				   .findByOAuth2ApplicationId_PrevAndNext(oAuth2RefreshTokenId,
 			oAuth2ApplicationId, orderByComparator);
 	}
 
@@ -261,8 +272,8 @@ public class OAuth2RefreshTokenUtil {
 	*
 	* @param oAuth2ApplicationId the o auth2 application ID
 	*/
-	public static void removeByA(long oAuth2ApplicationId) {
-		getPersistence().removeByA(oAuth2ApplicationId);
+	public static void removeByOAuth2ApplicationId(long oAuth2ApplicationId) {
+		getPersistence().removeByOAuth2ApplicationId(oAuth2ApplicationId);
 	}
 
 	/**
@@ -271,8 +282,8 @@ public class OAuth2RefreshTokenUtil {
 	* @param oAuth2ApplicationId the o auth2 application ID
 	* @return the number of matching o auth2 refresh tokens
 	*/
-	public static int countByA(long oAuth2ApplicationId) {
-		return getPersistence().countByA(oAuth2ApplicationId);
+	public static int countByOAuth2ApplicationId(long oAuth2ApplicationId) {
+		return getPersistence().countByOAuth2ApplicationId(oAuth2ApplicationId);
 	}
 
 	/**

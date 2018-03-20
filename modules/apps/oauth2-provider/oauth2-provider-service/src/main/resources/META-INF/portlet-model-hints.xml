@@ -2,15 +2,15 @@
 
 <model-hints>
 	<model name="com.liferay.oauth2.provider.model.OAuth2AccessToken">
-		<field name="OAuth2AccessTokenId" type="long" />
+		<field name="oAuth2AccessTokenId" type="long" />
 		<field name="companyId" type="long" />
-		<field name="createDate" type="Date" />
-		<field name="expirationDate" type="Date" />
-		<field name="remoteIPInfo" type="String" />
 		<field name="userId" type="long" />
 		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
 		<field name="oAuth2ApplicationId" type="long" />
 		<field name="oAuth2RefreshTokenId" type="long" />
+		<field name="expirationDate" type="Date" />
+		<field name="remoteIPInfo" type="String" />
 		<field name="scopeAliases" type="String">
 			<hint-collection name="CLOB" />
 		</field>
@@ -22,10 +22,10 @@
 	<model name="com.liferay.oauth2.provider.model.OAuth2Application">
 		<field name="oAuth2ApplicationId" type="long" />
 		<field name="companyId" type="long" />
-		<field name="createDate" type="Date" />
-		<field name="modifiedDate" type="Date" />
 		<field name="userId" type="long" />
 		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
 		<field name="allowedGrantTypes" type="String" />
 		<field name="clientId" type="String" />
 		<field name="clientProfile" type="int" />
@@ -54,12 +54,12 @@
 	<model name="com.liferay.oauth2.provider.model.OAuth2RefreshToken">
 		<field name="oAuth2RefreshTokenId" type="long" />
 		<field name="companyId" type="long" />
-		<field name="createDate" type="Date" />
-		<field name="expirationDate" type="Date" />
-		<field name="remoteIPInfo" type="String" />
 		<field name="userId" type="long" />
 		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
 		<field name="oAuth2ApplicationId" type="long" />
+		<field name="expirationDate" type="Date" />
+		<field name="remoteIPInfo" type="String" />
 		<field name="scopeAliases" type="String">
 			<hint-collection name="CLOB" />
 		</field>
@@ -69,10 +69,10 @@
 	</model>
 	<model name="com.liferay.oauth2.provider.model.OAuth2ScopeGrant">
 		<field name="oAuth2ScopeGrantId" type="long" />
-		<field name="applicationName" type="String" />
-		<field name="bundleSymbolicName" type="String" />
 		<field name="companyId" type="long" />
 		<field name="oAuth2AccessTokenId" type="long" />
+		<field name="applicationName" type="String" />
+		<field name="bundleSymbolicName" type="String" />
 		<field name="scope" type="String" />
 	</model>
 </model-hints>

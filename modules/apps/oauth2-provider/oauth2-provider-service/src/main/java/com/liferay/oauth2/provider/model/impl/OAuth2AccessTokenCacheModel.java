@@ -51,7 +51,7 @@ public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken
 
 		OAuth2AccessTokenCacheModel oAuth2AccessTokenCacheModel = (OAuth2AccessTokenCacheModel)obj;
 
-		if (OAuth2AccessTokenId == oAuth2AccessTokenCacheModel.OAuth2AccessTokenId) {
+		if (oAuth2AccessTokenId == oAuth2AccessTokenCacheModel.oAuth2AccessTokenId) {
 			return true;
 		}
 
@@ -60,31 +60,31 @@ public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken
 
 	@Override
 	public int hashCode() {
-		return HashUtil.hash(0, OAuth2AccessTokenId);
+		return HashUtil.hash(0, oAuth2AccessTokenId);
 	}
 
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(25);
 
-		sb.append("{OAuth2AccessTokenId=");
-		sb.append(OAuth2AccessTokenId);
+		sb.append("{oAuth2AccessTokenId=");
+		sb.append(oAuth2AccessTokenId);
 		sb.append(", companyId=");
 		sb.append(companyId);
-		sb.append(", createDate=");
-		sb.append(createDate);
-		sb.append(", expirationDate=");
-		sb.append(expirationDate);
-		sb.append(", remoteIPInfo=");
-		sb.append(remoteIPInfo);
 		sb.append(", userId=");
 		sb.append(userId);
 		sb.append(", userName=");
 		sb.append(userName);
+		sb.append(", createDate=");
+		sb.append(createDate);
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(oAuth2ApplicationId);
 		sb.append(", oAuth2RefreshTokenId=");
 		sb.append(oAuth2RefreshTokenId);
+		sb.append(", expirationDate=");
+		sb.append(expirationDate);
+		sb.append(", remoteIPInfo=");
+		sb.append(remoteIPInfo);
 		sb.append(", scopeAliases=");
 		sb.append(scopeAliases);
 		sb.append(", tokenContent=");
@@ -100,8 +100,16 @@ public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken
 	public OAuth2AccessToken toEntityModel() {
 		OAuth2AccessTokenImpl oAuth2AccessTokenImpl = new OAuth2AccessTokenImpl();
 
-		oAuth2AccessTokenImpl.setOAuth2AccessTokenId(OAuth2AccessTokenId);
+		oAuth2AccessTokenImpl.setOAuth2AccessTokenId(oAuth2AccessTokenId);
 		oAuth2AccessTokenImpl.setCompanyId(companyId);
+		oAuth2AccessTokenImpl.setUserId(userId);
+
+		if (userName == null) {
+			oAuth2AccessTokenImpl.setUserName("");
+		}
+		else {
+			oAuth2AccessTokenImpl.setUserName(userName);
+		}
 
 		if (createDate == Long.MIN_VALUE) {
 			oAuth2AccessTokenImpl.setCreateDate(null);
@@ -109,6 +117,9 @@ public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken
 		else {
 			oAuth2AccessTokenImpl.setCreateDate(new Date(createDate));
 		}
+
+		oAuth2AccessTokenImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
+		oAuth2AccessTokenImpl.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 
 		if (expirationDate == Long.MIN_VALUE) {
 			oAuth2AccessTokenImpl.setExpirationDate(null);
@@ -123,18 +134,6 @@ public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken
 		else {
 			oAuth2AccessTokenImpl.setRemoteIPInfo(remoteIPInfo);
 		}
-
-		oAuth2AccessTokenImpl.setUserId(userId);
-
-		if (userName == null) {
-			oAuth2AccessTokenImpl.setUserName("");
-		}
-		else {
-			oAuth2AccessTokenImpl.setUserName(userName);
-		}
-
-		oAuth2AccessTokenImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
-		oAuth2AccessTokenImpl.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 
 		if (scopeAliases == null) {
 			oAuth2AccessTokenImpl.setScopeAliases("");
@@ -164,19 +163,19 @@ public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
-		OAuth2AccessTokenId = objectInput.readLong();
+		oAuth2AccessTokenId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
-		createDate = objectInput.readLong();
-		expirationDate = objectInput.readLong();
-		remoteIPInfo = objectInput.readUTF();
 
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
+		createDate = objectInput.readLong();
 
 		oAuth2ApplicationId = objectInput.readLong();
 
 		oAuth2RefreshTokenId = objectInput.readLong();
+		expirationDate = objectInput.readLong();
+		remoteIPInfo = objectInput.readUTF();
 		scopeAliases = objectInput.readUTF();
 		tokenContent = objectInput.readUTF();
 		tokenType = objectInput.readUTF();
@@ -185,18 +184,9 @@ public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
-		objectOutput.writeLong(OAuth2AccessTokenId);
+		objectOutput.writeLong(oAuth2AccessTokenId);
 
 		objectOutput.writeLong(companyId);
-		objectOutput.writeLong(createDate);
-		objectOutput.writeLong(expirationDate);
-
-		if (remoteIPInfo == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(remoteIPInfo);
-		}
 
 		objectOutput.writeLong(userId);
 
@@ -207,9 +197,19 @@ public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken
 			objectOutput.writeUTF(userName);
 		}
 
+		objectOutput.writeLong(createDate);
+
 		objectOutput.writeLong(oAuth2ApplicationId);
 
 		objectOutput.writeLong(oAuth2RefreshTokenId);
+		objectOutput.writeLong(expirationDate);
+
+		if (remoteIPInfo == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(remoteIPInfo);
+		}
 
 		if (scopeAliases == null) {
 			objectOutput.writeUTF("");
@@ -233,15 +233,15 @@ public class OAuth2AccessTokenCacheModel implements CacheModel<OAuth2AccessToken
 		}
 	}
 
-	public long OAuth2AccessTokenId;
+	public long oAuth2AccessTokenId;
 	public long companyId;
-	public long createDate;
-	public long expirationDate;
-	public String remoteIPInfo;
 	public long userId;
 	public String userName;
+	public long createDate;
 	public long oAuth2ApplicationId;
 	public long oAuth2RefreshTokenId;
+	public long expirationDate;
+	public String remoteIPInfo;
 	public String scopeAliases;
 	public String tokenContent;
 	public String tokenType;

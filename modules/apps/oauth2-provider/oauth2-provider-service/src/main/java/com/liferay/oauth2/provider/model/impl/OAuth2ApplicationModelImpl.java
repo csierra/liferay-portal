@@ -71,10 +71,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 	public static final Object[][] TABLE_COLUMNS = {
 			{ "oAuth2ApplicationId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
-			{ "createDate", Types.TIMESTAMP },
-			{ "modifiedDate", Types.TIMESTAMP },
 			{ "userId", Types.BIGINT },
 			{ "userName", Types.VARCHAR },
+			{ "createDate", Types.TIMESTAMP },
+			{ "modifiedDate", Types.TIMESTAMP },
 			{ "allowedGrantTypes", Types.VARCHAR },
 			{ "clientId", Types.VARCHAR },
 			{ "clientProfile", Types.INTEGER },
@@ -93,10 +93,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 	static {
 		TABLE_COLUMNS_MAP.put("oAuth2ApplicationId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
-		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("allowedGrantTypes", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("clientId", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("clientProfile", Types.INTEGER);
@@ -111,7 +111,7 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		TABLE_COLUMNS_MAP.put("scopeAliases", Types.CLOB);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,createDate DATE null,modifiedDate DATE null,userId LONG,userName VARCHAR(75) null,allowedGrantTypes VARCHAR(75) null,clientId VARCHAR(75) null,clientProfile INTEGER,clientSecret VARCHAR(75) null,description VARCHAR(75) null,features STRING null,homePageURL STRING null,iconFileEntryId LONG,name VARCHAR(75) null,privacyPolicyURL STRING null,redirectURIs STRING null,scopeAliases TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,allowedGrantTypes VARCHAR(75) null,clientId VARCHAR(75) null,clientProfile INTEGER,clientSecret VARCHAR(75) null,description VARCHAR(75) null,features STRING null,homePageURL STRING null,iconFileEntryId LONG,name VARCHAR(75) null,privacyPolicyURL STRING null,redirectURIs STRING null,scopeAliases TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2Application";
 	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2Application.oAuth2ApplicationId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY OAuth2Application.oAuth2ApplicationId ASC";
@@ -146,10 +146,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 		model.setOAuth2ApplicationId(soapModel.getOAuth2ApplicationId());
 		model.setCompanyId(soapModel.getCompanyId());
-		model.setCreateDate(soapModel.getCreateDate());
-		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setUserId(soapModel.getUserId());
 		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setAllowedGrantTypes(soapModel.getAllowedGrantTypes());
 		model.setClientId(soapModel.getClientId());
 		model.setClientProfile(soapModel.getClientProfile());
@@ -229,10 +229,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("createDate", getCreateDate());
-		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("allowedGrantTypes", getAllowedGrantTypes());
 		attributes.put("clientId", getClientId());
 		attributes.put("clientProfile", getClientProfile());
@@ -266,18 +266,6 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 			setCompanyId(companyId);
 		}
 
-		Date createDate = (Date)attributes.get("createDate");
-
-		if (createDate != null) {
-			setCreateDate(createDate);
-		}
-
-		Date modifiedDate = (Date)attributes.get("modifiedDate");
-
-		if (modifiedDate != null) {
-			setModifiedDate(modifiedDate);
-		}
-
 		Long userId = (Long)attributes.get("userId");
 
 		if (userId != null) {
@@ -288,6 +276,18 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 		if (userName != null) {
 			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
 		}
 
 		String allowedGrantTypes = (String)attributes.get("allowedGrantTypes");
@@ -399,34 +399,6 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 	@JSON
 	@Override
-	public Date getCreateDate() {
-		return _createDate;
-	}
-
-	@Override
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
-
-	@JSON
-	@Override
-	public Date getModifiedDate() {
-		return _modifiedDate;
-	}
-
-	public boolean hasSetModifiedDate() {
-		return _setModifiedDate;
-	}
-
-	@Override
-	public void setModifiedDate(Date modifiedDate) {
-		_setModifiedDate = true;
-
-		_modifiedDate = modifiedDate;
-	}
-
-	@JSON
-	@Override
 	public long getUserId() {
 		return _userId;
 	}
@@ -466,6 +438,34 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 	@Override
 	public void setUserName(String userName) {
 		_userName = userName;
+	}
+
+	@JSON
+	@Override
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	@Override
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
+	@JSON
+	@Override
+	public Date getModifiedDate() {
+		return _modifiedDate;
+	}
+
+	public boolean hasSetModifiedDate() {
+		return _setModifiedDate;
+	}
+
+	@Override
+	public void setModifiedDate(Date modifiedDate) {
+		_setModifiedDate = true;
+
+		_modifiedDate = modifiedDate;
 	}
 
 	@JSON
@@ -693,10 +693,10 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 		oAuth2ApplicationImpl.setOAuth2ApplicationId(getOAuth2ApplicationId());
 		oAuth2ApplicationImpl.setCompanyId(getCompanyId());
-		oAuth2ApplicationImpl.setCreateDate(getCreateDate());
-		oAuth2ApplicationImpl.setModifiedDate(getModifiedDate());
 		oAuth2ApplicationImpl.setUserId(getUserId());
 		oAuth2ApplicationImpl.setUserName(getUserName());
+		oAuth2ApplicationImpl.setCreateDate(getCreateDate());
+		oAuth2ApplicationImpl.setModifiedDate(getModifiedDate());
 		oAuth2ApplicationImpl.setAllowedGrantTypes(getAllowedGrantTypes());
 		oAuth2ApplicationImpl.setClientId(getClientId());
 		oAuth2ApplicationImpl.setClientProfile(getClientProfile());
@@ -790,6 +790,16 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 
 		oAuth2ApplicationCacheModel.companyId = getCompanyId();
 
+		oAuth2ApplicationCacheModel.userId = getUserId();
+
+		oAuth2ApplicationCacheModel.userName = getUserName();
+
+		String userName = oAuth2ApplicationCacheModel.userName;
+
+		if ((userName != null) && (userName.length() == 0)) {
+			oAuth2ApplicationCacheModel.userName = null;
+		}
+
 		Date createDate = getCreateDate();
 
 		if (createDate != null) {
@@ -806,16 +816,6 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		}
 		else {
 			oAuth2ApplicationCacheModel.modifiedDate = Long.MIN_VALUE;
-		}
-
-		oAuth2ApplicationCacheModel.userId = getUserId();
-
-		oAuth2ApplicationCacheModel.userName = getUserName();
-
-		String userName = oAuth2ApplicationCacheModel.userName;
-
-		if ((userName != null) && (userName.length() == 0)) {
-			oAuth2ApplicationCacheModel.userName = null;
 		}
 
 		oAuth2ApplicationCacheModel.allowedGrantTypes = getAllowedGrantTypes();
@@ -913,14 +913,14 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		sb.append(getOAuth2ApplicationId());
 		sb.append(", companyId=");
 		sb.append(getCompanyId());
-		sb.append(", createDate=");
-		sb.append(getCreateDate());
-		sb.append(", modifiedDate=");
-		sb.append(getModifiedDate());
 		sb.append(", userId=");
 		sb.append(getUserId());
 		sb.append(", userName=");
 		sb.append(getUserName());
+		sb.append(", createDate=");
+		sb.append(getCreateDate());
+		sb.append(", modifiedDate=");
+		sb.append(getModifiedDate());
 		sb.append(", allowedGrantTypes=");
 		sb.append(getAllowedGrantTypes());
 		sb.append(", clientId=");
@@ -967,20 +967,20 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 		sb.append(getCompanyId());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>createDate</column-name><column-value><![CDATA[");
-		sb.append(getCreateDate());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>modifiedDate</column-name><column-value><![CDATA[");
-		sb.append(getModifiedDate());
-		sb.append("]]></column-value></column>");
-		sb.append(
 			"<column><column-name>userId</column-name><column-value><![CDATA[");
 		sb.append(getUserId());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>userName</column-name><column-value><![CDATA[");
 		sb.append(getUserName());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>createDate</column-name><column-value><![CDATA[");
+		sb.append(getCreateDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>modifiedDate</column-name><column-value><![CDATA[");
+		sb.append(getModifiedDate());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>allowedGrantTypes</column-name><column-value><![CDATA[");
@@ -1044,11 +1044,11 @@ public class OAuth2ApplicationModelImpl extends BaseModelImpl<OAuth2Application>
 	private long _companyId;
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
+	private long _userId;
+	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;
-	private long _userId;
-	private String _userName;
 	private String _allowedGrantTypes;
 	private String _clientId;
 	private String _originalClientId;

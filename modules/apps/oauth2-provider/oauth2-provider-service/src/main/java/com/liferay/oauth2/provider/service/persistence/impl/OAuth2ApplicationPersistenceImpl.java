@@ -1573,10 +1573,10 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 		oAuth2ApplicationImpl.setOAuth2ApplicationId(oAuth2Application.getOAuth2ApplicationId());
 		oAuth2ApplicationImpl.setCompanyId(oAuth2Application.getCompanyId());
-		oAuth2ApplicationImpl.setCreateDate(oAuth2Application.getCreateDate());
-		oAuth2ApplicationImpl.setModifiedDate(oAuth2Application.getModifiedDate());
 		oAuth2ApplicationImpl.setUserId(oAuth2Application.getUserId());
 		oAuth2ApplicationImpl.setUserName(oAuth2Application.getUserName());
+		oAuth2ApplicationImpl.setCreateDate(oAuth2Application.getCreateDate());
+		oAuth2ApplicationImpl.setModifiedDate(oAuth2Application.getModifiedDate());
 		oAuth2ApplicationImpl.setAllowedGrantTypes(oAuth2Application.getAllowedGrantTypes());
 		oAuth2ApplicationImpl.setClientId(oAuth2Application.getClientId());
 		oAuth2ApplicationImpl.setClientProfile(oAuth2Application.getClientProfile());

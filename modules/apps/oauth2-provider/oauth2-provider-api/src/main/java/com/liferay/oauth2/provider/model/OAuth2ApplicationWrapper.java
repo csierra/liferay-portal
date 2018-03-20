@@ -60,10 +60,10 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("createDate", getCreateDate());
-		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("allowedGrantTypes", getAllowedGrantTypes());
 		attributes.put("clientId", getClientId());
 		attributes.put("clientProfile", getClientProfile());
@@ -94,18 +94,6 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 			setCompanyId(companyId);
 		}
 
-		Date createDate = (Date)attributes.get("createDate");
-
-		if (createDate != null) {
-			setCreateDate(createDate);
-		}
-
-		Date modifiedDate = (Date)attributes.get("modifiedDate");
-
-		if (modifiedDate != null) {
-			setModifiedDate(modifiedDate);
-		}
-
 		Long userId = (Long)attributes.get("userId");
 
 		if (userId != null) {
@@ -116,6 +104,18 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 
 		if (userName != null) {
 			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
 		}
 
 		String allowedGrantTypes = (String)attributes.get("allowedGrantTypes");

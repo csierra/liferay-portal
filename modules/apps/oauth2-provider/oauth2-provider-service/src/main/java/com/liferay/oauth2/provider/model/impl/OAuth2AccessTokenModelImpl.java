@@ -67,15 +67,15 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 	 */
 	public static final String TABLE_NAME = "OAuth2AccessToken";
 	public static final Object[][] TABLE_COLUMNS = {
-			{ "OAuth2AccessTokenId", Types.BIGINT },
+			{ "oAuth2AccessTokenId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
-			{ "createDate", Types.TIMESTAMP },
-			{ "expirationDate", Types.TIMESTAMP },
-			{ "remoteIPInfo", Types.VARCHAR },
 			{ "userId", Types.BIGINT },
 			{ "userName", Types.VARCHAR },
+			{ "createDate", Types.TIMESTAMP },
 			{ "oAuth2ApplicationId", Types.BIGINT },
 			{ "oAuth2RefreshTokenId", Types.BIGINT },
+			{ "expirationDate", Types.TIMESTAMP },
+			{ "remoteIPInfo", Types.VARCHAR },
 			{ "scopeAliases", Types.CLOB },
 			{ "tokenContent", Types.CLOB },
 			{ "tokenType", Types.VARCHAR }
@@ -83,24 +83,24 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
 
 	static {
-		TABLE_COLUMNS_MAP.put("OAuth2AccessTokenId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("oAuth2AccessTokenId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
-		TABLE_COLUMNS_MAP.put("expirationDate", Types.TIMESTAMP);
-		TABLE_COLUMNS_MAP.put("remoteIPInfo", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("oAuth2ApplicationId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("oAuth2RefreshTokenId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("expirationDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("remoteIPInfo", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("scopeAliases", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("tokenContent", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("tokenType", Types.VARCHAR);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table OAuth2AccessToken (OAuth2AccessTokenId LONG not null primary key,companyId LONG,createDate DATE null,expirationDate DATE null,remoteIPInfo VARCHAR(75) null,userId LONG,userName VARCHAR(75) null,oAuth2ApplicationId LONG,oAuth2RefreshTokenId LONG,scopeAliases TEXT null,tokenContent TEXT null,tokenType VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table OAuth2AccessToken (oAuth2AccessTokenId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,oAuth2ApplicationId LONG,oAuth2RefreshTokenId LONG,expirationDate DATE null,remoteIPInfo VARCHAR(75) null,scopeAliases TEXT null,tokenContent TEXT null,tokenType VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table OAuth2AccessToken";
-	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2AccessToken.OAuth2AccessTokenId ASC";
-	public static final String ORDER_BY_SQL = " ORDER BY OAuth2AccessToken.OAuth2AccessTokenId ASC";
+	public static final String ORDER_BY_JPQL = " ORDER BY oAuth2AccessToken.oAuth2AccessTokenId ASC";
+	public static final String ORDER_BY_SQL = " ORDER BY OAuth2AccessToken.oAuth2AccessTokenId ASC";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
@@ -133,13 +133,13 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 
 		model.setOAuth2AccessTokenId(soapModel.getOAuth2AccessTokenId());
 		model.setCompanyId(soapModel.getCompanyId());
-		model.setCreateDate(soapModel.getCreateDate());
-		model.setExpirationDate(soapModel.getExpirationDate());
-		model.setRemoteIPInfo(soapModel.getRemoteIPInfo());
 		model.setUserId(soapModel.getUserId());
 		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
 		model.setOAuth2ApplicationId(soapModel.getOAuth2ApplicationId());
 		model.setOAuth2RefreshTokenId(soapModel.getOAuth2RefreshTokenId());
+		model.setExpirationDate(soapModel.getExpirationDate());
+		model.setRemoteIPInfo(soapModel.getRemoteIPInfo());
 		model.setScopeAliases(soapModel.getScopeAliases());
 		model.setTokenContent(soapModel.getTokenContent());
 		model.setTokenType(soapModel.getTokenType());
@@ -176,7 +176,7 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 
 	@Override
 	public long getPrimaryKey() {
-		return _OAuth2AccessTokenId;
+		return _oAuth2AccessTokenId;
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 
 	@Override
 	public Serializable getPrimaryKeyObj() {
-		return _OAuth2AccessTokenId;
+		return _oAuth2AccessTokenId;
 	}
 
 	@Override
@@ -208,15 +208,15 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("OAuth2AccessTokenId", getOAuth2AccessTokenId());
+		attributes.put("oAuth2AccessTokenId", getOAuth2AccessTokenId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("createDate", getCreateDate());
-		attributes.put("expirationDate", getExpirationDate());
-		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
 		attributes.put("oAuth2RefreshTokenId", getOAuth2RefreshTokenId());
+		attributes.put("expirationDate", getExpirationDate());
+		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("scopeAliases", getScopeAliases());
 		attributes.put("tokenContent", getTokenContent());
 		attributes.put("tokenType", getTokenType());
@@ -229,34 +229,16 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long OAuth2AccessTokenId = (Long)attributes.get("OAuth2AccessTokenId");
+		Long oAuth2AccessTokenId = (Long)attributes.get("oAuth2AccessTokenId");
 
-		if (OAuth2AccessTokenId != null) {
-			setOAuth2AccessTokenId(OAuth2AccessTokenId);
+		if (oAuth2AccessTokenId != null) {
+			setOAuth2AccessTokenId(oAuth2AccessTokenId);
 		}
 
 		Long companyId = (Long)attributes.get("companyId");
 
 		if (companyId != null) {
 			setCompanyId(companyId);
-		}
-
-		Date createDate = (Date)attributes.get("createDate");
-
-		if (createDate != null) {
-			setCreateDate(createDate);
-		}
-
-		Date expirationDate = (Date)attributes.get("expirationDate");
-
-		if (expirationDate != null) {
-			setExpirationDate(expirationDate);
-		}
-
-		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
-
-		if (remoteIPInfo != null) {
-			setRemoteIPInfo(remoteIPInfo);
 		}
 
 		Long userId = (Long)attributes.get("userId");
@@ -271,6 +253,12 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 			setUserName(userName);
 		}
 
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
 		Long oAuth2ApplicationId = (Long)attributes.get("oAuth2ApplicationId");
 
 		if (oAuth2ApplicationId != null) {
@@ -281,6 +269,18 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 
 		if (oAuth2RefreshTokenId != null) {
 			setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
+
+		String remoteIPInfo = (String)attributes.get("remoteIPInfo");
+
+		if (remoteIPInfo != null) {
+			setRemoteIPInfo(remoteIPInfo);
 		}
 
 		String scopeAliases = (String)attributes.get("scopeAliases");
@@ -304,12 +304,12 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 
 	@Override
 	public long getOAuth2AccessTokenId() {
-		return _OAuth2AccessTokenId;
+		return _oAuth2AccessTokenId;
 	}
 
 	@Override
-	public void setOAuth2AccessTokenId(long OAuth2AccessTokenId) {
-		_OAuth2AccessTokenId = OAuth2AccessTokenId;
+	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId) {
+		_oAuth2AccessTokenId = oAuth2AccessTokenId;
 	}
 
 	@Override
@@ -320,41 +320,6 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 	@Override
 	public void setCompanyId(long companyId) {
 		_companyId = companyId;
-	}
-
-	@Override
-	public Date getCreateDate() {
-		return _createDate;
-	}
-
-	@Override
-	public void setCreateDate(Date createDate) {
-		_createDate = createDate;
-	}
-
-	@Override
-	public Date getExpirationDate() {
-		return _expirationDate;
-	}
-
-	@Override
-	public void setExpirationDate(Date expirationDate) {
-		_expirationDate = expirationDate;
-	}
-
-	@Override
-	public String getRemoteIPInfo() {
-		if (_remoteIPInfo == null) {
-			return "";
-		}
-		else {
-			return _remoteIPInfo;
-		}
-	}
-
-	@Override
-	public void setRemoteIPInfo(String remoteIPInfo) {
-		_remoteIPInfo = remoteIPInfo;
 	}
 
 	@Override
@@ -399,6 +364,16 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 	}
 
 	@Override
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	@Override
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
+	@Override
 	public long getOAuth2ApplicationId() {
 		return _oAuth2ApplicationId;
 	}
@@ -440,6 +415,31 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 
 	public long getOriginalOAuth2RefreshTokenId() {
 		return _originalOAuth2RefreshTokenId;
+	}
+
+	@Override
+	public Date getExpirationDate() {
+		return _expirationDate;
+	}
+
+	@Override
+	public void setExpirationDate(Date expirationDate) {
+		_expirationDate = expirationDate;
+	}
+
+	@Override
+	public String getRemoteIPInfo() {
+		if (_remoteIPInfo == null) {
+			return "";
+		}
+		else {
+			return _remoteIPInfo;
+		}
+	}
+
+	@Override
+	public void setRemoteIPInfo(String remoteIPInfo) {
+		_remoteIPInfo = remoteIPInfo;
 	}
 
 	@Override
@@ -530,13 +530,13 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 
 		oAuth2AccessTokenImpl.setOAuth2AccessTokenId(getOAuth2AccessTokenId());
 		oAuth2AccessTokenImpl.setCompanyId(getCompanyId());
-		oAuth2AccessTokenImpl.setCreateDate(getCreateDate());
-		oAuth2AccessTokenImpl.setExpirationDate(getExpirationDate());
-		oAuth2AccessTokenImpl.setRemoteIPInfo(getRemoteIPInfo());
 		oAuth2AccessTokenImpl.setUserId(getUserId());
 		oAuth2AccessTokenImpl.setUserName(getUserName());
+		oAuth2AccessTokenImpl.setCreateDate(getCreateDate());
 		oAuth2AccessTokenImpl.setOAuth2ApplicationId(getOAuth2ApplicationId());
 		oAuth2AccessTokenImpl.setOAuth2RefreshTokenId(getOAuth2RefreshTokenId());
+		oAuth2AccessTokenImpl.setExpirationDate(getExpirationDate());
+		oAuth2AccessTokenImpl.setRemoteIPInfo(getRemoteIPInfo());
 		oAuth2AccessTokenImpl.setScopeAliases(getScopeAliases());
 		oAuth2AccessTokenImpl.setTokenContent(getTokenContent());
 		oAuth2AccessTokenImpl.setTokenType(getTokenType());
@@ -619,9 +619,19 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 	public CacheModel<OAuth2AccessToken> toCacheModel() {
 		OAuth2AccessTokenCacheModel oAuth2AccessTokenCacheModel = new OAuth2AccessTokenCacheModel();
 
-		oAuth2AccessTokenCacheModel.OAuth2AccessTokenId = getOAuth2AccessTokenId();
+		oAuth2AccessTokenCacheModel.oAuth2AccessTokenId = getOAuth2AccessTokenId();
 
 		oAuth2AccessTokenCacheModel.companyId = getCompanyId();
+
+		oAuth2AccessTokenCacheModel.userId = getUserId();
+
+		oAuth2AccessTokenCacheModel.userName = getUserName();
+
+		String userName = oAuth2AccessTokenCacheModel.userName;
+
+		if ((userName != null) && (userName.length() == 0)) {
+			oAuth2AccessTokenCacheModel.userName = null;
+		}
 
 		Date createDate = getCreateDate();
 
@@ -631,6 +641,10 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 		else {
 			oAuth2AccessTokenCacheModel.createDate = Long.MIN_VALUE;
 		}
+
+		oAuth2AccessTokenCacheModel.oAuth2ApplicationId = getOAuth2ApplicationId();
+
+		oAuth2AccessTokenCacheModel.oAuth2RefreshTokenId = getOAuth2RefreshTokenId();
 
 		Date expirationDate = getExpirationDate();
 
@@ -648,20 +662,6 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 		if ((remoteIPInfo != null) && (remoteIPInfo.length() == 0)) {
 			oAuth2AccessTokenCacheModel.remoteIPInfo = null;
 		}
-
-		oAuth2AccessTokenCacheModel.userId = getUserId();
-
-		oAuth2AccessTokenCacheModel.userName = getUserName();
-
-		String userName = oAuth2AccessTokenCacheModel.userName;
-
-		if ((userName != null) && (userName.length() == 0)) {
-			oAuth2AccessTokenCacheModel.userName = null;
-		}
-
-		oAuth2AccessTokenCacheModel.oAuth2ApplicationId = getOAuth2ApplicationId();
-
-		oAuth2AccessTokenCacheModel.oAuth2RefreshTokenId = getOAuth2RefreshTokenId();
 
 		oAuth2AccessTokenCacheModel.scopeAliases = getScopeAliases();
 
@@ -694,24 +694,24 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 	public String toString() {
 		StringBundler sb = new StringBundler(25);
 
-		sb.append("{OAuth2AccessTokenId=");
+		sb.append("{oAuth2AccessTokenId=");
 		sb.append(getOAuth2AccessTokenId());
 		sb.append(", companyId=");
 		sb.append(getCompanyId());
-		sb.append(", createDate=");
-		sb.append(getCreateDate());
-		sb.append(", expirationDate=");
-		sb.append(getExpirationDate());
-		sb.append(", remoteIPInfo=");
-		sb.append(getRemoteIPInfo());
 		sb.append(", userId=");
 		sb.append(getUserId());
 		sb.append(", userName=");
 		sb.append(getUserName());
+		sb.append(", createDate=");
+		sb.append(getCreateDate());
 		sb.append(", oAuth2ApplicationId=");
 		sb.append(getOAuth2ApplicationId());
 		sb.append(", oAuth2RefreshTokenId=");
 		sb.append(getOAuth2RefreshTokenId());
+		sb.append(", expirationDate=");
+		sb.append(getExpirationDate());
+		sb.append(", remoteIPInfo=");
+		sb.append(getRemoteIPInfo());
 		sb.append(", scopeAliases=");
 		sb.append(getScopeAliases());
 		sb.append(", tokenContent=");
@@ -732,24 +732,12 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 		sb.append("</model-name>");
 
 		sb.append(
-			"<column><column-name>OAuth2AccessTokenId</column-name><column-value><![CDATA[");
+			"<column><column-name>oAuth2AccessTokenId</column-name><column-value><![CDATA[");
 		sb.append(getOAuth2AccessTokenId());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>companyId</column-name><column-value><![CDATA[");
 		sb.append(getCompanyId());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>createDate</column-name><column-value><![CDATA[");
-		sb.append(getCreateDate());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>expirationDate</column-name><column-value><![CDATA[");
-		sb.append(getExpirationDate());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>remoteIPInfo</column-name><column-value><![CDATA[");
-		sb.append(getRemoteIPInfo());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>userId</column-name><column-value><![CDATA[");
@@ -760,12 +748,24 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 		sb.append(getUserName());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>createDate</column-name><column-value><![CDATA[");
+		sb.append(getCreateDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>oAuth2ApplicationId</column-name><column-value><![CDATA[");
 		sb.append(getOAuth2ApplicationId());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>oAuth2RefreshTokenId</column-name><column-value><![CDATA[");
 		sb.append(getOAuth2RefreshTokenId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>expirationDate</column-name><column-value><![CDATA[");
+		sb.append(getExpirationDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>remoteIPInfo</column-name><column-value><![CDATA[");
+		sb.append(getRemoteIPInfo());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>scopeAliases</column-name><column-value><![CDATA[");
@@ -789,19 +789,19 @@ public class OAuth2AccessTokenModelImpl extends BaseModelImpl<OAuth2AccessToken>
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
 			OAuth2AccessToken.class
 		};
-	private long _OAuth2AccessTokenId;
+	private long _oAuth2AccessTokenId;
 	private long _companyId;
-	private Date _createDate;
-	private Date _expirationDate;
-	private String _remoteIPInfo;
 	private long _userId;
 	private String _userName;
+	private Date _createDate;
 	private long _oAuth2ApplicationId;
 	private long _originalOAuth2ApplicationId;
 	private boolean _setOriginalOAuth2ApplicationId;
 	private long _oAuth2RefreshTokenId;
 	private long _originalOAuth2RefreshTokenId;
 	private boolean _setOriginalOAuth2RefreshTokenId;
+	private Date _expirationDate;
+	private String _remoteIPInfo;
 	private String _scopeAliases;
 	private String _tokenContent;
 	private String _originalTokenContent;

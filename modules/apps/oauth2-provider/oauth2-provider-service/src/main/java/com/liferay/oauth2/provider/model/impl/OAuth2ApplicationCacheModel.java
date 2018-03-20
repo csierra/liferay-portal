@@ -71,14 +71,14 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		sb.append(oAuth2ApplicationId);
 		sb.append(", companyId=");
 		sb.append(companyId);
-		sb.append(", createDate=");
-		sb.append(createDate);
-		sb.append(", modifiedDate=");
-		sb.append(modifiedDate);
 		sb.append(", userId=");
 		sb.append(userId);
 		sb.append(", userName=");
 		sb.append(userName);
+		sb.append(", createDate=");
+		sb.append(createDate);
+		sb.append(", modifiedDate=");
+		sb.append(modifiedDate);
 		sb.append(", allowedGrantTypes=");
 		sb.append(allowedGrantTypes);
 		sb.append(", clientId=");
@@ -114,6 +114,14 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 
 		oAuth2ApplicationImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
 		oAuth2ApplicationImpl.setCompanyId(companyId);
+		oAuth2ApplicationImpl.setUserId(userId);
+
+		if (userName == null) {
+			oAuth2ApplicationImpl.setUserName("");
+		}
+		else {
+			oAuth2ApplicationImpl.setUserName(userName);
+		}
 
 		if (createDate == Long.MIN_VALUE) {
 			oAuth2ApplicationImpl.setCreateDate(null);
@@ -127,15 +135,6 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		}
 		else {
 			oAuth2ApplicationImpl.setModifiedDate(new Date(modifiedDate));
-		}
-
-		oAuth2ApplicationImpl.setUserId(userId);
-
-		if (userName == null) {
-			oAuth2ApplicationImpl.setUserName("");
-		}
-		else {
-			oAuth2ApplicationImpl.setUserName(userName);
 		}
 
 		if (allowedGrantTypes == null) {
@@ -222,11 +221,11 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		oAuth2ApplicationId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
-		createDate = objectInput.readLong();
-		modifiedDate = objectInput.readLong();
 
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
+		createDate = objectInput.readLong();
+		modifiedDate = objectInput.readLong();
 		allowedGrantTypes = objectInput.readUTF();
 		clientId = objectInput.readUTF();
 
@@ -249,8 +248,6 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		objectOutput.writeLong(oAuth2ApplicationId);
 
 		objectOutput.writeLong(companyId);
-		objectOutput.writeLong(createDate);
-		objectOutput.writeLong(modifiedDate);
 
 		objectOutput.writeLong(userId);
 
@@ -260,6 +257,9 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 		else {
 			objectOutput.writeUTF(userName);
 		}
+
+		objectOutput.writeLong(createDate);
+		objectOutput.writeLong(modifiedDate);
 
 		if (allowedGrantTypes == null) {
 			objectOutput.writeUTF("");
@@ -338,10 +338,10 @@ public class OAuth2ApplicationCacheModel implements CacheModel<OAuth2Application
 
 	public long oAuth2ApplicationId;
 	public long companyId;
-	public long createDate;
-	public long modifiedDate;
 	public long userId;
 	public String userName;
+	public long createDate;
+	public long modifiedDate;
 	public String allowedGrantTypes;
 	public String clientId;
 	public int clientProfile;

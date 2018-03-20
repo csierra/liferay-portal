@@ -58,10 +58,10 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("oAuth2ScopeGrantId", getOAuth2ScopeGrantId());
-		attributes.put("applicationName", getApplicationName());
-		attributes.put("bundleSymbolicName", getBundleSymbolicName());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("oAuth2AccessTokenId", getOAuth2AccessTokenId());
+		attributes.put("applicationName", getApplicationName());
+		attributes.put("bundleSymbolicName", getBundleSymbolicName());
 		attributes.put("scope", getScope());
 
 		return attributes;
@@ -75,18 +75,6 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 			setOAuth2ScopeGrantId(oAuth2ScopeGrantId);
 		}
 
-		String applicationName = (String)attributes.get("applicationName");
-
-		if (applicationName != null) {
-			setApplicationName(applicationName);
-		}
-
-		String bundleSymbolicName = (String)attributes.get("bundleSymbolicName");
-
-		if (bundleSymbolicName != null) {
-			setBundleSymbolicName(bundleSymbolicName);
-		}
-
 		Long companyId = (Long)attributes.get("companyId");
 
 		if (companyId != null) {
@@ -97,6 +85,18 @@ public class OAuth2ScopeGrantWrapper implements OAuth2ScopeGrant,
 
 		if (oAuth2AccessTokenId != null) {
 			setOAuth2AccessTokenId(oAuth2AccessTokenId);
+		}
+
+		String applicationName = (String)attributes.get("applicationName");
+
+		if (applicationName != null) {
+			setApplicationName(applicationName);
+		}
+
+		String bundleSymbolicName = (String)attributes.get("bundleSymbolicName");
+
+		if (bundleSymbolicName != null) {
+			setBundleSymbolicName(bundleSymbolicName);
 		}
 
 		String scope = (String)attributes.get("scope");
