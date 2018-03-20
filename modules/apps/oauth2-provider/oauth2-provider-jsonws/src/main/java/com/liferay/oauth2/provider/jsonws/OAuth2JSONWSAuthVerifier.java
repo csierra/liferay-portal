@@ -179,7 +179,8 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		String token = basicAuthParts[1];
 		OAuth2AccessToken oAuth2AccessToken = null;
 		try {
-			oAuth2AccessToken = _oAuth2AccessTokenLocalService.findByContent(token);
+			oAuth2AccessToken =
+				_oAuth2AccessTokenLocalService.getOAuth2AccessToken(token);
 		}
 		catch (NoSuchOAuth2AccessTokenException e) {
 			return null;

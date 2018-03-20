@@ -43,9 +43,9 @@ public class ThreadLocalServiceScopeChecker
 		}
 
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants = new ArrayList<>(
-			_oAuth2ScopeGrantLocalService.findByA_BSN_C_T(
-				_applicationName.get(), _bundleSymbolicName.get(),
-				_companyIdThreadLocal.get(), _accessToken.get()));
+			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
+				_companyIdThreadLocal.get(), _applicationName.get(),
+				_bundleSymbolicName.get(), _accessToken.get()));
 
 		if (scopes.length > oAuth2ScopeGrants.size()) {
 			return false;
@@ -74,9 +74,9 @@ public class ThreadLocalServiceScopeChecker
 		}
 
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
-			_oAuth2ScopeGrantLocalService.findByA_BSN_C_T(
-				_applicationName.get(), _bundleSymbolicName.get(),
-				_companyIdThreadLocal.get(), _accessToken.get());
+			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
+				_companyIdThreadLocal.get(), _applicationName.get(),
+				_bundleSymbolicName.get(), _accessToken.get());
 
 		for (String scope : scopes) {
 			if (Validator.isNull(scope)) {
@@ -100,9 +100,9 @@ public class ThreadLocalServiceScopeChecker
 		}
 
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
-			_oAuth2ScopeGrantLocalService.findByA_BSN_C_T(
-				_applicationName.get(), _bundleSymbolicName.get(),
-				_companyIdThreadLocal.get(), _accessToken.get());
+			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
+				_companyIdThreadLocal.get(), _applicationName.get(),
+				_bundleSymbolicName.get(), _accessToken.get());
 
 		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
 
