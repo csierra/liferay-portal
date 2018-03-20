@@ -180,19 +180,6 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 		return getService().fetchOAuth2ScopeGrant(oAuth2ScopeGrantId);
 	}
 
-	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByA_BSN_C_T(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.Long companyId, java.lang.String tokenContent) {
-		return getService()
-				   .findByA_BSN_C_T(applicationName, bundleSymbolicName,
-			companyId, tokenContent);
-	}
-
-	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByToken(
-		long tokenId) {
-		return getService().findByToken(tokenId);
-	}
-
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return getService().getActionableDynamicQuery();
 	}
@@ -230,6 +217,19 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 		return getService().getOAuth2ScopeGrants(start, end);
 	}
 
+	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> getOAuth2ScopeGrants(
+		long oAuth2AccessTokenId) {
+		return getService().getOAuth2ScopeGrants(oAuth2AccessTokenId);
+	}
+
+	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> getOAuth2ScopeGrants(
+		long companyId, java.lang.String applicationName,
+		java.lang.String bundleSymbolicName, java.lang.String tokenContent) {
+		return getService()
+				   .getOAuth2ScopeGrants(companyId, applicationName,
+			bundleSymbolicName, tokenContent);
+	}
+
 	/**
 	* Returns the number of o auth2 scope grants.
 	*
@@ -254,17 +254,12 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2ScopeGrantLocalServiceUtil} to access the o auth2 scope grant local service.
-	*/
 	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> grantScopesToToken(
-		java.lang.String tokenContent,
+		java.lang.String oAuth2AccessTokenContent,
 		java.util.Collection<com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope> scopes)
 		throws com.liferay.oauth2.provider.exception.DuplicateOAuth2ScopeGrantException,
 			com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
-		return getService().grantScopesToToken(tokenContent, scopes);
+		return getService().grantScopesToToken(oAuth2AccessTokenContent, scopes);
 	}
 
 	/**

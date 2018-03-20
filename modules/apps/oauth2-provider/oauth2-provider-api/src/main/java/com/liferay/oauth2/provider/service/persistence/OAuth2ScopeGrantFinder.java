@@ -22,7 +22,7 @@ import aQute.bnd.annotation.ProviderType;
  */
 @ProviderType
 public interface OAuth2ScopeGrantFinder {
-	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByA_BSN_C_T(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		long companyId, java.lang.String tokenContent);
+	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> findByC_A_B_T(
+		long companyId, java.lang.String applicationName,
+		java.lang.String bundleSymbolicName, java.lang.String tokenContent);
 }

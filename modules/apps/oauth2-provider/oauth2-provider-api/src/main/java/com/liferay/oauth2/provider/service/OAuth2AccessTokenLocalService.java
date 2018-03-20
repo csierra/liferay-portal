@@ -172,20 +172,11 @@ public interface OAuth2AccessTokenLocalService extends BaseLocalService,
 		Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public OAuth2AccessToken fetchByContent(java.lang.String tokenContent);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public OAuth2AccessToken fetchOAuth2AccessToken(long oAuth2AccessTokenId);
 
-	public Collection<OAuth2AccessToken> findByApplicationId(
-		long applicationId, int start, int end,
-		OrderByComparator<OAuth2AccessToken> orderByComparator);
-
-	public OAuth2AccessToken findByContent(java.lang.String tokenContent)
-		throws NoSuchOAuth2AccessTokenException;
-
-	public Collection<OAuth2AccessToken> findByRefreshToken(
-		long oAuth2RefreshTokenId);
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public OAuth2AccessToken fetchOAuth2AccessToken(
+		java.lang.String tokenContent);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -204,6 +195,10 @@ public interface OAuth2AccessTokenLocalService extends BaseLocalService,
 	public OAuth2AccessToken getOAuth2AccessToken(long oAuth2AccessTokenId)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public OAuth2AccessToken getOAuth2AccessToken(java.lang.String tokenContent)
+		throws NoSuchOAuth2AccessTokenException;
+
 	/**
 	* Returns a range of all the o auth2 access tokens.
 	*
@@ -217,6 +212,15 @@ public interface OAuth2AccessTokenLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuth2AccessToken> getOAuth2AccessTokens(int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Collection<OAuth2AccessToken> getOAuth2AccessTokens(
+		long oAuth2RefreshTokenId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Collection<OAuth2AccessToken> getOAuth2AccessTokens(
+		long applicationId, int start, int end,
+		OrderByComparator<OAuth2AccessToken> orderByComparator);
 
 	/**
 	* Returns the number of o auth2 access tokens.

@@ -41,34 +41,18 @@ public class OAuth2AuthorizationLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service.
-	*/
-	public static int countByApplicationId(long companyId, long applicationId) {
-		return getService().countByApplicationId(companyId, applicationId);
-	}
-
-	public static int countByUserId(long companyId, long userId) {
-		return getService().countByUserId(companyId, userId);
-	}
-
-	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> findByApplicationId(
+	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> getOAuth2Authorizations(
 		long companyId, long applicationId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator) {
 		return getService()
-				   .findByApplicationId(companyId, applicationId, start, end,
-			orderByComparator);
+				   .getOAuth2Authorizations(companyId, applicationId, start,
+			end, orderByComparator);
 	}
 
-	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> findByUserId(
-		long companyId, long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator) {
+	public static int getOAuth2AuthorizationsCount(long companyId,
+		long applicationId) {
 		return getService()
-				   .findByUserId(companyId, userId, start, end,
-			orderByComparator);
+				   .getOAuth2AuthorizationsCount(companyId, applicationId);
 	}
 
 	/**
@@ -80,11 +64,24 @@ public class OAuth2AuthorizationLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static boolean revokeAuthorization(long oAuth2AccessTokenId,
+	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> getUserOAuth2Authorizations(
+		long companyId, long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator) {
+		return getService()
+				   .getUserOAuth2Authorizations(companyId, userId, start, end,
+			orderByComparator);
+	}
+
+	public static int getUserOAuth2AuthorizationsCount(long companyId,
+		long userId) {
+		return getService().getUserOAuth2AuthorizationsCount(companyId, userId);
+	}
+
+	public static boolean revokeOAuth2Authorization(long oAuth2AccessTokenId,
 		long oAuth2RefreshTokenId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .revokeAuthorization(oAuth2AccessTokenId,
+				   .revokeOAuth2Authorization(oAuth2AccessTokenId,
 			oAuth2RefreshTokenId);
 	}
 

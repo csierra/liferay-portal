@@ -33,11 +33,6 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 		_oAuth2ApplicationService = oAuth2ApplicationService;
 	}
 
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service.
-	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
@@ -152,11 +147,11 @@ public class OAuth2ApplicationServiceWrapper implements OAuth2ApplicationService
 	}
 
 	@Override
-	public com.liferay.oauth2.provider.model.OAuth2Application updateScopes(
+	public com.liferay.oauth2.provider.model.OAuth2Application updateScopeAliases(
 		long oAuth2ApplicationId,
 		java.util.List<java.lang.String> scopeAliasesList)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2ApplicationService.updateScopes(oAuth2ApplicationId,
+		return _oAuth2ApplicationService.updateScopeAliases(oAuth2ApplicationId,
 			scopeAliasesList);
 	}
 

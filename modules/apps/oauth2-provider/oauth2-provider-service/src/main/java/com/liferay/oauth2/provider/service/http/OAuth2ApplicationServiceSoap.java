@@ -65,11 +65,6 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class OAuth2ApplicationServiceSoap {
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service.
-	*/
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap addOAuth2Application(
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		java.lang.String clientId, int clientProfile,
@@ -240,12 +235,12 @@ public class OAuth2ApplicationServiceSoap {
 		}
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap updateScopes(
+	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap updateScopeAliases(
 		long oAuth2ApplicationId,
 		java.util.List<java.lang.String> scopeAliasesList)
 		throws RemoteException {
 		try {
-			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.updateScopes(oAuth2ApplicationId,
+			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.updateScopeAliases(oAuth2ApplicationId,
 					scopeAliasesList);
 
 			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);

@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
@@ -56,23 +57,20 @@ public interface OAuth2AuthorizationService extends BaseService {
 	 */
 
 	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service.
-	*/
-	public int countByUserId() throws PortalException;
-
-	public List<OAuth2Authorization> findByUserId(int start, int end,
-		OrderByComparator<OAuth2Authorization> orderByComparator)
-		throws PortalException;
-
-	/**
 	* Returns the OSGi service identifier.
 	*
 	* @return the OSGi service identifier
 	*/
 	public java.lang.String getOSGiServiceIdentifier();
 
-	public boolean revokeAuthorization(long oAuth2AccessTokenId,
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<OAuth2Authorization> getUserOAuth2Authorizations(int start,
+		int end, OrderByComparator<OAuth2Authorization> orderByComparator)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getUserOAuth2AuthorizationsCount() throws PortalException;
+
+	public boolean revokeOAuth2Authorization(long oAuth2AccessTokenId,
 		long oAuth2RefreshTokenId) throws PortalException;
 }

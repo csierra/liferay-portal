@@ -34,10 +34,10 @@ public class OAuth2AccessTokenServiceWrapper implements OAuth2AccessTokenService
 	}
 
 	@Override
-	public com.liferay.oauth2.provider.model.OAuth2AccessToken deleteOAuth2Token(
+	public com.liferay.oauth2.provider.model.OAuth2AccessToken deleteOAuth2AccessToken(
 		long oAuth2AccessTokenId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2AccessTokenService.deleteOAuth2Token(oAuth2AccessTokenId);
+		return _oAuth2AccessTokenService.deleteOAuth2AccessToken(oAuth2AccessTokenId);
 	}
 
 	/**

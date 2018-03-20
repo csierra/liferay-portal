@@ -58,11 +58,6 @@ public class OAuth2RefreshTokenLocalServiceWrapper
 		return _oAuth2RefreshTokenLocalService.createOAuth2RefreshToken(oAuth2RefreshTokenId);
 	}
 
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2RefreshTokenLocalServiceUtil} to access the o auth2 refresh token local service.
-	*/
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2RefreshToken createOAuth2RefreshToken(
 		java.lang.String tokenContent) {

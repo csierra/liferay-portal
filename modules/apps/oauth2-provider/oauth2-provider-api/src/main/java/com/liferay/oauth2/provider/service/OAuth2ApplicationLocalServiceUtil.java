@@ -306,11 +306,12 @@ public class OAuth2ApplicationLocalServiceUtil {
 		return getService().updateOAuth2Application(oAuth2Application);
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopes(
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopeAliases(
 		long oAuth2ApplicationId,
 		java.util.List<java.lang.String> scopeAliasesList)
 		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException {
-		return getService().updateScopes(oAuth2ApplicationId, scopeAliasesList);
+		return getService()
+				   .updateScopeAliases(oAuth2ApplicationId, scopeAliasesList);
 	}
 
 	public static OAuth2ApplicationLocalService getService() {

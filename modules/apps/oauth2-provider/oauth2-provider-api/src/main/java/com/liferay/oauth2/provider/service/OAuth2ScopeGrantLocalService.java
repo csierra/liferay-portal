@@ -173,12 +173,6 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public OAuth2ScopeGrant fetchOAuth2ScopeGrant(long oAuth2ScopeGrantId);
 
-	public Collection<OAuth2ScopeGrant> findByA_BSN_C_T(
-		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.Long companyId, java.lang.String tokenContent);
-
-	public Collection<OAuth2ScopeGrant> findByToken(long tokenId);
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
@@ -210,6 +204,15 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuth2ScopeGrant> getOAuth2ScopeGrants(int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(
+		long oAuth2AccessTokenId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(long companyId,
+		java.lang.String applicationName, java.lang.String bundleSymbolicName,
+		java.lang.String tokenContent);
+
 	/**
 	* Returns the number of o auth2 scope grants.
 	*
@@ -230,13 +233,9 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2ScopeGrantLocalServiceUtil} to access the o auth2 scope grant local service.
-	*/
 	public Collection<OAuth2ScopeGrant> grantScopesToToken(
-		java.lang.String tokenContent, Collection<LiferayOAuth2Scope> scopes)
+		java.lang.String oAuth2AccessTokenContent,
+		Collection<LiferayOAuth2Scope> scopes)
 		throws DuplicateOAuth2ScopeGrantException,
 			NoSuchOAuth2AccessTokenException;
 

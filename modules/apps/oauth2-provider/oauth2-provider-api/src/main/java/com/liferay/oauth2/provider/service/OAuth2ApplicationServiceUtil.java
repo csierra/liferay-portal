@@ -41,12 +41,6 @@ public class OAuth2ApplicationServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2ApplicationServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service.
-	*/
 	public static com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		java.lang.String clientId, int clientProfile,
@@ -148,11 +142,12 @@ public class OAuth2ApplicationServiceUtil {
 			privacyPolicyURL, redirectURIsList, scopeAliasesList, serviceContext);
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopes(
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopeAliases(
 		long oAuth2ApplicationId,
 		java.util.List<java.lang.String> scopeAliasesList)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().updateScopes(oAuth2ApplicationId, scopeAliasesList);
+		return getService()
+				   .updateScopeAliases(oAuth2ApplicationId, scopeAliasesList);
 	}
 
 	public static OAuth2ApplicationService getService() {

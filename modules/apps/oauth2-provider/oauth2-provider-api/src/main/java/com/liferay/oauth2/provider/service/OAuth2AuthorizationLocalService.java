@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.transaction.Isolation;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
@@ -48,23 +49,13 @@ public interface OAuth2AuthorizationLocalService extends BaseLocalService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service.
-	*/
-	public int countByApplicationId(long companyId, long applicationId);
-
-	public int countByUserId(long companyId, long userId);
-
-	public List<OAuth2Authorization> findByApplicationId(long companyId,
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<OAuth2Authorization> getOAuth2Authorizations(long companyId,
 		long applicationId, int start, int end,
 		OrderByComparator<OAuth2Authorization> orderByComparator);
 
-	public List<OAuth2Authorization> findByUserId(long companyId, long userId,
-		int start, int end,
-		OrderByComparator<OAuth2Authorization> orderByComparator);
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getOAuth2AuthorizationsCount(long companyId, long applicationId);
 
 	/**
 	* Returns the OSGi service identifier.
@@ -73,6 +64,14 @@ public interface OAuth2AuthorizationLocalService extends BaseLocalService {
 	*/
 	public java.lang.String getOSGiServiceIdentifier();
 
-	public boolean revokeAuthorization(long oAuth2AccessTokenId,
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<OAuth2Authorization> getUserOAuth2Authorizations(
+		long companyId, long userId, int start, int end,
+		OrderByComparator<OAuth2Authorization> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getUserOAuth2AuthorizationsCount(long companyId, long userId);
+
+	public boolean revokeOAuth2Authorization(long oAuth2AccessTokenId,
 		long oAuth2RefreshTokenId) throws PortalException;
 }
