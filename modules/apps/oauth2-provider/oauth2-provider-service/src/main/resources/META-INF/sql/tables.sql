@@ -51,7 +51,7 @@ create table OAuth2ScopeGrant (
 	oAuth2ScopeGrantId LONG not null primary key,
 	companyId LONG,
 	oAuth2AccessTokenId LONG,
-	applicationName VARCHAR(75) null,
-	bundleSymbolicName VARCHAR(75) null,
-	scope VARCHAR(75) null
+	applicationName VARCHAR(255) null,
+	bundleSymbolicName VARCHAR(255) null,
+	scope VARCHAR(255) null
 );

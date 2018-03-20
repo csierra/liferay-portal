@@ -55,43 +55,14 @@ import com.liferay.portal.kernel.util.MethodKey;
  */
 @ProviderType
 public class OAuth2AuthorizationServiceHttp {
-	public static int countByUserId(HttpPrincipal httpPrincipal)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
-					"countByUserId", _countByUserIdParameterTypes0);
-
-			MethodHandler methodHandler = new MethodHandler(methodKey);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
-			}
-
-			return ((Integer)returnObj).intValue();
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
-
-			throw se;
-		}
-	}
-
-	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> findByUserId(
+	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> getUserOAuth2Authorizations(
 		HttpPrincipal httpPrincipal, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
-					"findByUserId", _findByUserIdParameterTypes1);
+					"getUserOAuth2Authorizations",
+					_getUserOAuth2AuthorizationsParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, start,
 					end, orderByComparator);
@@ -118,12 +89,46 @@ public class OAuth2AuthorizationServiceHttp {
 		}
 	}
 
-	public static boolean revokeAuthorization(HttpPrincipal httpPrincipal,
-		long oAuth2AccessTokenId, long oAuth2RefreshTokenId)
+	public static int getUserOAuth2AuthorizationsCount(
+		HttpPrincipal httpPrincipal)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
-					"revokeAuthorization", _revokeAuthorizationParameterTypes2);
+					"getUserOAuth2AuthorizationsCount",
+					_getUserOAuth2AuthorizationsCountParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return ((Integer)returnObj).intValue();
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
+	public static boolean revokeOAuth2Authorization(
+		HttpPrincipal httpPrincipal, long oAuth2AccessTokenId,
+		long oAuth2RefreshTokenId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		try {
+			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
+					"revokeOAuth2Authorization",
+					_revokeOAuth2AuthorizationParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					oAuth2AccessTokenId, oAuth2RefreshTokenId);
@@ -151,12 +156,13 @@ public class OAuth2AuthorizationServiceHttp {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(OAuth2AuthorizationServiceHttp.class);
-	private static final Class<?>[] _countByUserIdParameterTypes0 = new Class[] {  };
-	private static final Class<?>[] _findByUserIdParameterTypes1 = new Class[] {
+	private static final Class<?>[] _getUserOAuth2AuthorizationsParameterTypes0 = new Class[] {
 			int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _revokeAuthorizationParameterTypes2 = new Class[] {
+	private static final Class<?>[] _getUserOAuth2AuthorizationsCountParameterTypes1 =
+		new Class[] {  };
+	private static final Class<?>[] _revokeOAuth2AuthorizationParameterTypes2 = new Class[] {
 			long.class, long.class
 		};
 }

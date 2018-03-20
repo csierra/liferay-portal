@@ -55,12 +55,13 @@ import com.liferay.portal.kernel.util.MethodKey;
  */
 @ProviderType
 public class OAuth2AccessTokenServiceHttp {
-	public static com.liferay.oauth2.provider.model.OAuth2AccessToken deleteOAuth2Token(
+	public static com.liferay.oauth2.provider.model.OAuth2AccessToken deleteOAuth2AccessToken(
 		HttpPrincipal httpPrincipal, long oAuth2AccessTokenId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2AccessTokenServiceUtil.class,
-					"deleteOAuth2Token", _deleteOAuth2TokenParameterTypes0);
+					"deleteOAuth2AccessToken",
+					_deleteOAuth2AccessTokenParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					oAuth2AccessTokenId);
@@ -88,7 +89,7 @@ public class OAuth2AccessTokenServiceHttp {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(OAuth2AccessTokenServiceHttp.class);
-	private static final Class<?>[] _deleteOAuth2TokenParameterTypes0 = new Class[] {
+	private static final Class<?>[] _deleteOAuth2AccessTokenParameterTypes0 = new Class[] {
 			long.class
 		};
 }

@@ -424,13 +424,13 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopes(
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopeAliases(
 		HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
 		java.util.List<java.lang.String> scopeAliasesList)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
-					"updateScopes", _updateScopesParameterTypes11);
+					"updateScopeAliases", _updateScopeAliasesParameterTypes11);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					oAuth2ApplicationId, scopeAliasesList);
@@ -501,7 +501,7 @@ public class OAuth2ApplicationServiceHttp {
 			java.lang.String.class, java.util.List.class, java.util.List.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _updateScopesParameterTypes11 = new Class[] {
+	private static final Class<?>[] _updateScopeAliasesParameterTypes11 = new Class[] {
 			long.class, java.util.List.class
 		};
 }

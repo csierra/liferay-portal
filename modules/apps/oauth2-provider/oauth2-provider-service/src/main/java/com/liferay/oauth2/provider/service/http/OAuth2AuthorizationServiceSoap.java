@@ -54,32 +54,14 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class OAuth2AuthorizationServiceSoap {
-	/**
-	* NOTE FOR DEVELOPERS:
-	*
-	* Never reference this class directly. Always use {@link OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service.
-	*/
-	public static int countByUserId() throws RemoteException {
-		try {
-			int returnValue = OAuth2AuthorizationServiceUtil.countByUserId();
-
-			return returnValue;
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.oauth2.provider.model.OAuth2AuthorizationSoap[] findByUserId(
+	public static com.liferay.oauth2.provider.model.OAuth2AuthorizationSoap[] getUserOAuth2Authorizations(
 		int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> returnValue =
-				OAuth2AuthorizationServiceUtil.findByUserId(start, end,
-					orderByComparator);
+				OAuth2AuthorizationServiceUtil.getUserOAuth2Authorizations(start,
+					end, orderByComparator);
 
 			return com.liferay.oauth2.provider.model.OAuth2AuthorizationSoap.toSoapModels(returnValue);
 		}
@@ -90,10 +72,24 @@ public class OAuth2AuthorizationServiceSoap {
 		}
 	}
 
-	public static boolean revokeAuthorization(long oAuth2AccessTokenId,
+	public static int getUserOAuth2AuthorizationsCount()
+		throws RemoteException {
+		try {
+			int returnValue = OAuth2AuthorizationServiceUtil.getUserOAuth2AuthorizationsCount();
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static boolean revokeOAuth2Authorization(long oAuth2AccessTokenId,
 		long oAuth2RefreshTokenId) throws RemoteException {
 		try {
-			boolean returnValue = OAuth2AuthorizationServiceUtil.revokeAuthorization(oAuth2AccessTokenId,
+			boolean returnValue = OAuth2AuthorizationServiceUtil.revokeOAuth2Authorization(oAuth2AccessTokenId,
 					oAuth2RefreshTokenId);
 
 			return returnValue;

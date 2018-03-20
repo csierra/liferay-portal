@@ -265,7 +265,7 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 	public OAuth2Application updateOAuth2Application(
 		OAuth2Application oAuth2Application);
 
-	public OAuth2Application updateScopes(long oAuth2ApplicationId,
+	public OAuth2Application updateScopeAliases(long oAuth2ApplicationId,
 		List<java.lang.String> scopeAliasesList)
 		throws NoSuchOAuth2ApplicationException;
 }

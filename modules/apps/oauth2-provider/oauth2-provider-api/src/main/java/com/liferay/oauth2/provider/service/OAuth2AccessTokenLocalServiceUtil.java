@@ -180,33 +180,14 @@ public class OAuth2AccessTokenLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2AccessToken fetchByContent(
-		java.lang.String tokenContent) {
-		return getService().fetchByContent(tokenContent);
-	}
-
 	public static com.liferay.oauth2.provider.model.OAuth2AccessToken fetchOAuth2AccessToken(
 		long oAuth2AccessTokenId) {
 		return getService().fetchOAuth2AccessToken(oAuth2AccessTokenId);
 	}
 
-	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2AccessToken> findByApplicationId(
-		long applicationId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2AccessToken> orderByComparator) {
-		return getService()
-				   .findByApplicationId(applicationId, start, end,
-			orderByComparator);
-	}
-
-	public static com.liferay.oauth2.provider.model.OAuth2AccessToken findByContent(
-		java.lang.String tokenContent)
-		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
-		return getService().findByContent(tokenContent);
-	}
-
-	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2AccessToken> findByRefreshToken(
-		long oAuth2RefreshTokenId) {
-		return getService().findByRefreshToken(oAuth2RefreshTokenId);
+	public static com.liferay.oauth2.provider.model.OAuth2AccessToken fetchOAuth2AccessToken(
+		java.lang.String tokenContent) {
+		return getService().fetchOAuth2AccessToken(tokenContent);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
@@ -230,6 +211,12 @@ public class OAuth2AccessTokenLocalServiceUtil {
 		return getService().getOAuth2AccessToken(oAuth2AccessTokenId);
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2AccessToken getOAuth2AccessToken(
+		java.lang.String tokenContent)
+		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException {
+		return getService().getOAuth2AccessToken(tokenContent);
+	}
+
 	/**
 	* Returns a range of all the o auth2 access tokens.
 	*
@@ -244,6 +231,19 @@ public class OAuth2AccessTokenLocalServiceUtil {
 	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2AccessToken> getOAuth2AccessTokens(
 		int start, int end) {
 		return getService().getOAuth2AccessTokens(start, end);
+	}
+
+	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2AccessToken> getOAuth2AccessTokens(
+		long oAuth2RefreshTokenId) {
+		return getService().getOAuth2AccessTokens(oAuth2RefreshTokenId);
+	}
+
+	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2AccessToken> getOAuth2AccessTokens(
+		long applicationId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2AccessToken> orderByComparator) {
+		return getService()
+				   .getOAuth2AccessTokens(applicationId, start, end,
+			orderByComparator);
 	}
 
 	/**

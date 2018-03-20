@@ -51,7 +51,7 @@ public interface OAuth2AccessTokenService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2AccessTokenServiceUtil} to access the o auth2 access token remote service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2AccessTokenServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public OAuth2AccessToken deleteOAuth2Token(long oAuth2AccessTokenId)
+	public OAuth2AccessToken deleteOAuth2AccessToken(long oAuth2AccessTokenId)
 		throws PortalException;
 
 	/**
