@@ -35,28 +35,12 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * The implementation of the o auth2 application remote service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.oauth2.provider.service.OAuth2ApplicationService} interface.
- *
- * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
- * </p>
- *
  * @author Brian Wing Shun Chan
- * @see OAuth2ApplicationServiceBaseImpl
- * @see com.liferay.oauth2.provider.service.OAuth2ApplicationServiceUtil
  */
 @JSONWebService(mode = JSONWebServiceMode.IGNORE)
 public class OAuth2ApplicationServiceImpl
 	extends OAuth2ApplicationServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2ApplicationServiceUtil} to access the o auth2 application remote service.
-	 */
 	@Override
 	public OAuth2Application addOAuth2Application(
 			List<GrantType> allowedGrantTypesList, String clientId,
@@ -229,7 +213,7 @@ public class OAuth2ApplicationServiceImpl
 	}
 
 	@Override
-	public OAuth2Application updateScopes(
+	public OAuth2Application updateScopeAliases(
 			long oAuth2ApplicationId, List<String> scopeAliasesList)
 		throws PortalException {
 
@@ -239,7 +223,7 @@ public class OAuth2ApplicationServiceImpl
 
 		check(oAuth2Application, ActionKeys.UPDATE);
 
-		return oAuth2ApplicationLocalService.updateScopes(
+		return oAuth2ApplicationLocalService.updateScopeAliases(
 			oAuth2ApplicationId, scopeAliasesList);
 	}
 

@@ -25,28 +25,12 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 import java.util.Objects;
 
 /**
- * The implementation of the o auth2 refresh token remote service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.oauth2.provider.service.OAuth2RefreshTokenService} interface.
- *
- * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
- * </p>
- *
  * @author Brian Wing Shun Chan
- * @see OAuth2RefreshTokenServiceBaseImpl
- * @see com.liferay.oauth2.provider.service.OAuth2RefreshTokenServiceUtil
  */
 @JSONWebService(mode = JSONWebServiceMode.IGNORE)
 public class OAuth2RefreshTokenServiceImpl
 	extends OAuth2RefreshTokenServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2RefreshTokenServiceUtil} to access the o auth2 refresh token remote service.
-	 */
 	@Override
 	public OAuth2RefreshToken deleteOAuth2RefreshToken(
 			long oAuth2RefreshTokenId)

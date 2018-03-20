@@ -34,11 +34,11 @@ public class OAuth2ScopeGrantFinderImpl
 	extends OAuth2ScopeGrantFinderBaseImpl implements OAuth2ScopeGrantFinder {
 
 	public static final String FIND_BY_A_BSN_C_T =
-		OAuth2ScopeGrantFinder.class.getName() + ".findByA_BSN_C_T";
+		OAuth2ScopeGrantFinder.class.getName() + ".findByC_A_B_T";
 
 	@Override
-	public Collection<OAuth2ScopeGrant> findByA_BSN_C_T(
-		String applicationName, String bundleSymbolicName, long companyId,
+	public Collection<OAuth2ScopeGrant> findByC_A_B_T(
+		long companyId, String applicationName, String bundleSymbolicName,
 		String tokenContent) {
 
 		Session session = null;
@@ -54,9 +54,9 @@ public class OAuth2ScopeGrantFinderImpl
 
 			q.addEntity("OAuth2ScopeGrant", OAuth2ScopeGrantImpl.class);
 
+			qPos.add(companyId);
 			qPos.add(applicationName);
 			qPos.add(bundleSymbolicName);
-			qPos.add(companyId);
 			qPos.add(tokenContent);
 
 			return (List<OAuth2ScopeGrant>)QueryUtil.list(

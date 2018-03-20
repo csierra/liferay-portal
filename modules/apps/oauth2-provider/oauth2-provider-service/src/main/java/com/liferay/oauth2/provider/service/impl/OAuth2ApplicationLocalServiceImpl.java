@@ -17,21 +17,19 @@ package com.liferay.oauth2.provider.service.impl;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
-import com.liferay.oauth2.provider.exception.ApplicationNameException;
-import com.liferay.oauth2.provider.exception.DuplicateOAuth2ClientIdException;
-import com.liferay.oauth2.provider.exception.EmptyClientSecretException;
-import com.liferay.oauth2.provider.exception.InvalidHomePageURLException;
-import com.liferay.oauth2.provider.exception.InvalidHomePageURLSchemeException;
-import com.liferay.oauth2.provider.exception.InvalidPrivacyPolicyURLException;
-import com.liferay.oauth2.provider.exception.InvalidPrivacyPolicyURLSchemeException;
-import com.liferay.oauth2.provider.exception.InvalidRedirectURIException;
-import com.liferay.oauth2.provider.exception.InvalidRedirectURIFragmentException;
-import com.liferay.oauth2.provider.exception.InvalidRedirectURIPathException;
-import com.liferay.oauth2.provider.exception.InvalidRedirectURISchemeException;
-import com.liferay.oauth2.provider.exception.MissingRedirectURIException;
+import com.liferay.oauth2.provider.exception.DuplicateOAuth2ApplicationClientIdException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
-import com.liferay.oauth2.provider.exception.NonEmptyClientSecretException;
-import com.liferay.oauth2.provider.exception.UnsupportedGrantTypeForClientException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationClientGrantTypeException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationHomePageURLException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationHomePageURLSchemeException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationNameException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationPrivacyPolicyURLException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationPrivacyPolicyURLSchemeException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIFragmentException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIMissingException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIPathException;
+import com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURISchemeException;
 import com.liferay.oauth2.provider.model.OAuth2AccessToken;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
@@ -157,13 +155,13 @@ public class OAuth2ApplicationLocalServiceImpl
 		throws PortalException {
 
 		Collection<OAuth2AccessToken> oAuth2AccessTokens =
-			oAuth2AccessTokenLocalService.findByApplicationId(
+			oAuth2AccessTokenLocalService.getOAuth2AccessTokens(
 				oAuth2ApplicationId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 				null);
 
 		for (OAuth2AccessToken oAuth2AccessToken : oAuth2AccessTokens) {
 			Collection<OAuth2ScopeGrant> grants =
-				oAuth2ScopeGrantLocalService.findByToken(
+				oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
 					oAuth2AccessToken.getOAuth2AccessTokenId());
 
 			for (OAuth2ScopeGrant grant : grants) {
@@ -291,7 +289,7 @@ public class OAuth2ApplicationLocalServiceImpl
 	}
 
 	@Override
-	public OAuth2Application updateScopes(
+	public OAuth2Application updateScopeAliases(
 			long oAuth2ApplicationId, List<String> scopeAliasesList)
 		throws NoSuchOAuth2ApplicationException {
 
@@ -331,16 +329,18 @@ public class OAuth2ApplicationLocalServiceImpl
 		if (clientConfidential) {
 			for (GrantType grantType : allowedGrantTypesList) {
 				if (!grantType.isSupportsConfidentialClients()) {
-					throw new UnsupportedGrantTypeForClientException(
-						grantType.name());
+					throw new
+						OAuth2ApplicationClientGrantTypeException(
+							grantType.name());
 				}
 			}
 		}
 		else {
 			for (GrantType grantType : allowedGrantTypesList) {
 				if (!grantType.isSupportsPublicClients()) {
-					throw new UnsupportedGrantTypeForClientException(
-						grantType.name());
+					throw new
+						OAuth2ApplicationClientGrantTypeException(
+							grantType.name());
 				}
 			}
 		}
@@ -352,31 +352,23 @@ public class OAuth2ApplicationLocalServiceImpl
 			(duplicateApplication.getOAuth2ApplicationId() !=
 				oAuth2ApplicationId)) {
 
-			throw new DuplicateOAuth2ClientIdException();
-		}
-
-		if (Validator.isBlank(clientSecret) && clientConfidential) {
-			throw new EmptyClientSecretException();
-		}
-
-		if (!Validator.isBlank(clientSecret) && !clientConfidential) {
-			throw new NonEmptyClientSecretException();
+			throw new DuplicateOAuth2ApplicationClientIdException();
 		}
 
 		if (!Validator.isBlank(homePageURL)) {
 			if (!StringUtil.startsWith(homePageURL, Http.HTTP_WITH_SLASH) &&
 				!StringUtil.startsWith(homePageURL, Http.HTTPS_WITH_SLASH)) {
 
-				throw new InvalidHomePageURLSchemeException();
+				throw new OAuth2ApplicationHomePageURLSchemeException();
 			}
 
 			if (!Validator.isUri(homePageURL)) {
-				throw new InvalidHomePageURLException();
+				throw new OAuth2ApplicationHomePageURLException();
 			}
 		}
 
 		if (Validator.isBlank(name)) {
-			throw new ApplicationNameException();
+			throw new OAuth2ApplicationNameException();
 		}
 
 		if (!Validator.isBlank(privacyPolicyURL)) {
@@ -385,18 +377,19 @@ public class OAuth2ApplicationLocalServiceImpl
 				!StringUtil.startsWith(
 					privacyPolicyURL, Http.HTTPS_WITH_SLASH)) {
 
-				throw new InvalidPrivacyPolicyURLSchemeException();
+				throw new OAuth2ApplicationPrivacyPolicyURLSchemeException();
 			}
 
 			if (!Validator.isUri(privacyPolicyURL)) {
-				throw new InvalidPrivacyPolicyURLException();
+				throw new OAuth2ApplicationPrivacyPolicyURLException();
 			}
 		}
 
 		if (redirectURIsList.isEmpty()) {
 			for (GrantType grantType : allowedGrantTypesList) {
 				if (grantType.isRequiresRedirectURI()) {
-					throw new MissingRedirectURIException(grantType.name());
+					throw new OAuth2ApplicationRedirectURIMissingException(
+						grantType.name());
 				}
 			}
 		}
@@ -406,13 +399,15 @@ public class OAuth2ApplicationLocalServiceImpl
 				URI uri = new URI(redirectURI);
 
 				if (uri.getFragment() != null) {
-					throw new InvalidRedirectURIFragmentException(redirectURI);
+					throw new OAuth2ApplicationRedirectURIFragmentException(
+						redirectURI);
 				}
 
 				String scheme = uri.getScheme();
 
 				if (scheme == null) {
-					throw new InvalidRedirectURISchemeException(redirectURI);
+					throw new OAuth2ApplicationRedirectURISchemeException(
+						redirectURI);
 				}
 
 				scheme = StringUtil.toLowerCase(scheme);
@@ -421,7 +416,8 @@ public class OAuth2ApplicationLocalServiceImpl
 					!Objects.equals(scheme, Http.HTTPS) &&
 					_ianaRegisteredUriSchemes.contains(scheme)) {
 
-					throw new InvalidRedirectURISchemeException(redirectURI);
+					throw new OAuth2ApplicationHomePageURLSchemeException(
+						redirectURI);
 				}
 
 				String path = uri.getPath();
@@ -429,11 +425,13 @@ public class OAuth2ApplicationLocalServiceImpl
 				String normalizedPath = HttpUtil.normalizePath(path);
 
 				if (!Objects.equals(path, normalizedPath)) {
-					throw new InvalidRedirectURIPathException(redirectURI);
+					throw new OAuth2ApplicationRedirectURIPathException(
+						redirectURI);
 				}
 			}
 			catch (URISyntaxException urise) {
-				throw new InvalidRedirectURIException(redirectURI, urise);
+				throw new OAuth2ApplicationRedirectURIException(
+					redirectURI, urise);
 			}
 		}
 	}

@@ -23,22 +23,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The extended model implementation for the OAuth2RefreshToken service. Represents a row in the &quot;OAuth2RefreshToken&quot; database table, with each column mapped to a property of this class.
- *
- * <p>
- * Helper methods and all application logic should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.oauth2.provider.model.OAuth2RefreshToken} interface.
- * </p>
- *
  * @author Brian Wing Shun Chan
  */
 @ProviderType
 public class OAuth2RefreshTokenImpl extends OAuth2RefreshTokenBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. All methods that expect a o auth2 refresh token model instance should use the {@link com.liferay.oauth2.provider.model.OAuth2RefreshToken} interface instead.
-	 */
 	public OAuth2RefreshTokenImpl() {
 	}
 

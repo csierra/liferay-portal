@@ -29,42 +29,32 @@ import java.util.Collections;
 import org.osgi.framework.Bundle;
 
 /**
- * The implementation of the o auth2 scope grant local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService} interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
  * @author Brian Wing Shun Chan
- * @see OAuth2ScopeGrantLocalServiceBaseImpl
- * @see com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalServiceUtil
  */
 public class OAuth2ScopeGrantLocalServiceImpl
 	extends OAuth2ScopeGrantLocalServiceBaseImpl {
 
 	@Override
-	public Collection<OAuth2ScopeGrant> findByA_BSN_C_T(
-		String applicationName, String bundleSymbolicName, Long companyId,
+	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(
+		long oAuth2AccessTokenId) {
+
+		return oAuth2ScopeGrantPersistence.findByOAuth2AccessTokenId(
+			oAuth2AccessTokenId);
+	}
+
+	@Override
+	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(
+		long companyId, String applicationName, String bundleSymbolicName,
 		String tokenContent) {
 
-		return oAuth2ScopeGrantFinder.findByA_BSN_C_T(
-			applicationName, bundleSymbolicName, companyId, tokenContent);
+		return oAuth2ScopeGrantFinder.findByC_A_B_T(
+			companyId, applicationName, bundleSymbolicName, tokenContent);
 	}
 
-	public Collection<OAuth2ScopeGrant> findByToken(long tokenId) {
-		return oAuth2ScopeGrantPersistence.findByToken(tokenId);
-	}
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalServiceUtil} to access the o auth2 scope grant local service.
-	 */
+	@Override
 	public Collection<OAuth2ScopeGrant> grantScopesToToken(
-			String tokenContent, Collection<LiferayOAuth2Scope> scopes)
+			String oAuth2AccessTokenContent,
+			Collection<LiferayOAuth2Scope> scopes)
 		throws DuplicateOAuth2ScopeGrantException,
 			   NoSuchOAuth2AccessTokenException {
 
@@ -73,10 +63,12 @@ public class OAuth2ScopeGrantLocalServiceImpl
 		}
 
 		OAuth2AccessToken oAuth2AccessToken =
-			oAuth2AccessTokenPersistence.fetchByTokenContent(tokenContent);
+			oAuth2AccessTokenPersistence.fetchByTokenContent(
+				oAuth2AccessTokenContent);
 
 		if (oAuth2AccessToken == null) {
-			throw new NoSuchOAuth2AccessTokenException(tokenContent);
+			throw new NoSuchOAuth2AccessTokenException(
+				oAuth2AccessTokenContent);
 		}
 
 		long companyId = oAuth2AccessToken.getCompanyId();
@@ -93,9 +85,9 @@ public class OAuth2ScopeGrantLocalServiceImpl
 
 			String scopeString = scope.getScope();
 
-			if (oAuth2ScopeGrantPersistence.countByA_B_C_T_S(
-					applicationName, bundleSymbolicName, companyId,
-					oAuth2AccessTokenId, scopeString) > 0) {
+			if (oAuth2ScopeGrantPersistence.countByC_O_A_B_S(
+					companyId, oAuth2AccessTokenId, applicationName,
+					bundleSymbolicName, scopeString) > 0) {
 
 				StringBundler sb = new StringBundler(10);
 

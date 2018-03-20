@@ -41,7 +41,7 @@
 			) OAuth2Authorization
 		]]>
 	</sql>
-	<sql id="com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder.findByA_BSN_C_T">
+	<sql id="com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder.findByC_A_B_T">
 		<![CDATA[
 			SELECT
 				{OAuth2ScopeGrant.*}
@@ -51,9 +51,9 @@
 				OAuth2AccessToken ON
 					OAuth2ScopeGrant.oAuth2AccessTokenId = OAuth2AccessToken.oAuth2AccessTokenId
 			WHERE
+				(OAuth2ScopeGrant.companyId = ?) AND
 				(OAuth2ScopeGrant.applicationName = ?) AND
 				(OAuth2ScopeGrant.bundleSymbolicName = ?) AND
-				(OAuth2ScopeGrant.companyId = ?) AND
 				(OAuth2AccessToken.tokenContent = ?)
 		]]>
 	</sql>

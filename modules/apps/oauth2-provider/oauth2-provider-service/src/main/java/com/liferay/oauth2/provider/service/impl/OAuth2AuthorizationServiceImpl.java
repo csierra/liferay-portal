@@ -30,49 +30,33 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * The implementation of the o auth2 authorization remote service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.oauth2.provider.service.OAuth2AuthorizationService} interface.
- *
- * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
- * </p>
- *
  * @author Brian Wing Shun Chan
- * @see OAuth2AuthorizationServiceBaseImpl
- * @see com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil
  */
 @JSONWebService(mode = JSONWebServiceMode.IGNORE)
 public class OAuth2AuthorizationServiceImpl
 	extends OAuth2AuthorizationServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service.
-	 */
-	public int countByUserId() throws PortalException {
-		User user = getUser();
-
-		return oAuth2AuthorizationLocalService.countByUserId(
-			user.getCompanyId(), user.getUserId());
-	}
-
-	public List<OAuth2Authorization> findByUserId(
+	public List<OAuth2Authorization> getUserOAuth2Authorizations(
 			int start, int end,
 			OrderByComparator<OAuth2Authorization> orderByComparator)
 		throws PortalException {
 
 		User user = getUser();
 
-		return oAuth2AuthorizationLocalService.findByUserId(
+		return oAuth2AuthorizationLocalService.getUserOAuth2Authorizations(
 			user.getCompanyId(), user.getUserId(), start, end,
 			orderByComparator);
 	}
 
+	public int getUserOAuth2AuthorizationsCount() throws PortalException {
+		User user = getUser();
+
+		return oAuth2AuthorizationLocalService.getUserOAuth2AuthorizationsCount(
+			user.getCompanyId(), user.getUserId());
+	}
+
 	@Override
-	public boolean revokeAuthorization(
+	public boolean revokeOAuth2Authorization(
 			long oAuth2AccessTokenId, long oAuth2RefreshTokenId)
 		throws PortalException {
 
@@ -116,7 +100,7 @@ public class OAuth2AuthorizationServiceImpl
 				OAuth2ProviderActionKeys.ACTION_REVOKE_TOKEN);
 		}
 
-		return oAuth2AuthorizationLocalService.revokeAuthorization(
+		return oAuth2AuthorizationLocalService.revokeOAuth2Authorization(
 			oAuth2AccessTokenId, oAuth2RefreshTokenId);
 	}
 
