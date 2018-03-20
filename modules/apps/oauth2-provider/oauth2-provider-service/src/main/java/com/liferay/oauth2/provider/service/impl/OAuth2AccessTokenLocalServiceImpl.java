@@ -24,18 +24,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.util.Collection;
 
 /**
- * The implementation of the o auth2 access token local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.oauth2.provider.service.OAuth2AccessTokenLocalService} interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
  * @author Brian Wing Shun Chan
- * @see OAuth2AccessTokenLocalServiceBaseImpl
- * @see com.liferay.oauth2.provider.service.OAuth2AccessTokenLocalServiceUtil
  */
 public class OAuth2AccessTokenLocalServiceImpl
 	extends OAuth2AccessTokenLocalServiceBaseImpl {
@@ -55,7 +44,8 @@ public class OAuth2AccessTokenLocalServiceImpl
 		throws PortalException {
 
 		Collection<OAuth2ScopeGrant> grants =
-			oAuth2ScopeGrantLocalService.findByToken(oAuth2AccessTokenId);
+			oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
+				oAuth2AccessTokenId);
 
 		for (OAuth2ScopeGrant grant : grants) {
 			oAuth2ScopeGrantLocalService.deleteOAuth2ScopeGrant(grant);
@@ -65,32 +55,32 @@ public class OAuth2AccessTokenLocalServiceImpl
 	}
 
 	@Override
-	public OAuth2AccessToken fetchByContent(String tokenContent) {
+	public OAuth2AccessToken fetchOAuth2AccessToken(String tokenContent) {
 		return oAuth2AccessTokenPersistence.fetchByTokenContent(tokenContent);
 	}
 
 	@Override
-	public Collection<OAuth2AccessToken> findByApplicationId(
-		long applicationId, int start, int end,
-		OrderByComparator<OAuth2AccessToken> orderByComparator) {
-
-		return oAuth2AccessTokenPersistence.findByA(
-			applicationId, start, end, orderByComparator);
-	}
-
-	@Override
-	public OAuth2AccessToken findByContent(String tokenContent)
+	public OAuth2AccessToken getOAuth2AccessToken(String tokenContent)
 		throws NoSuchOAuth2AccessTokenException {
 
 		return oAuth2AccessTokenPersistence.findByTokenContent(tokenContent);
 	}
 
 	@Override
-	public Collection<OAuth2AccessToken> findByRefreshToken(
+	public Collection<OAuth2AccessToken> getOAuth2AccessTokens(
 		long oAuth2RefreshTokenId) {
 
-		return oAuth2AccessTokenPersistence.findByRefreshToken(
+		return oAuth2AccessTokenPersistence.findByOAuth2RefreshTokenId(
 			oAuth2RefreshTokenId);
+	}
+
+	@Override
+	public Collection<OAuth2AccessToken> getOAuth2AccessTokens(
+		long applicationId, int start, int end,
+		OrderByComparator<OAuth2AccessToken> orderByComparator) {
+
+		return oAuth2AccessTokenPersistence.findByOAuth2ApplicationId(
+			applicationId, start, end, orderByComparator);
 	}
 
 }

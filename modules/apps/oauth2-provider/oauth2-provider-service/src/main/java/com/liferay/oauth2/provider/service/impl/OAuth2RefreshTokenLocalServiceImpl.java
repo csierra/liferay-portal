@@ -24,27 +24,11 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.util.Collection;
 
 /**
- * The implementation of the o auth2 refresh token local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalService} interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
  * @author Brian Wing Shun Chan
- * @see OAuth2RefreshTokenLocalServiceBaseImpl
- * @see com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalServiceUtil
  */
 public class OAuth2RefreshTokenLocalServiceImpl
 	extends OAuth2RefreshTokenLocalServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2RefreshTokenLocalServiceUtil} to access the o auth2 refresh token local service.
-	 */
 	@Override
 	public OAuth2RefreshToken createOAuth2RefreshToken(String tokenContent) {
 		OAuth2RefreshToken oAuth2RefreshToken = createOAuth2RefreshToken(
@@ -61,7 +45,7 @@ public class OAuth2RefreshTokenLocalServiceImpl
 		throws PortalException {
 
 		Collection<OAuth2AccessToken> oAuth2AccessTokens =
-			oAuth2AccessTokenLocalService.findByRefreshToken(
+			oAuth2AccessTokenLocalService.getOAuth2AccessTokens(
 				oAuth2RefreshTokenId);
 
 		for (OAuth2AccessToken auth2AccessToken : oAuth2AccessTokens) {
@@ -83,7 +67,7 @@ public class OAuth2RefreshTokenLocalServiceImpl
 		long applicationId, int start, int end,
 		OrderByComparator<OAuth2RefreshToken> orderByComparator) {
 
-		return oAuth2RefreshTokenPersistence.findByA(
+		return oAuth2RefreshTokenPersistence.findByOAuth2ApplicationId(
 			applicationId, start, end, orderByComparator);
 	}
 

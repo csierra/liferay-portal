@@ -22,40 +22,13 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.util.List;
 
 /**
- * The implementation of the o auth2 authorization local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService} interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
  * @author Brian Wing Shun Chan
- * @see OAuth2AuthorizationLocalServiceBaseImpl
- * @see com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil
  */
 public class OAuth2AuthorizationLocalServiceImpl
 	extends OAuth2AuthorizationLocalServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil} to access the o auth2 authorization local service.
-	 */
 	@Override
-	public int countByApplicationId(long companyId, long applicationId) {
-		return oAuth2AuthorizationFinder.countByApplicationId(
-			companyId, applicationId);
-	}
-
-	@Override
-	public int countByUserId(long companyId, long userId) {
-		return oAuth2AuthorizationFinder.countByUserId(companyId, userId);
-	}
-
-	@Override
-	public List<OAuth2Authorization> findByApplicationId(
+	public List<OAuth2Authorization> getOAuth2Authorizations(
 		long companyId, long applicationId, int start, int end,
 		OrderByComparator<OAuth2Authorization> orderByComparator) {
 
@@ -64,7 +37,15 @@ public class OAuth2AuthorizationLocalServiceImpl
 	}
 
 	@Override
-	public List<OAuth2Authorization> findByUserId(
+	public int getOAuth2AuthorizationsCount(
+		long companyId, long applicationId) {
+
+		return oAuth2AuthorizationFinder.countByApplicationId(
+			companyId, applicationId);
+	}
+
+	@Override
+	public List<OAuth2Authorization> getUserOAuth2Authorizations(
 		long companyId, long userId, int start, int end,
 		OrderByComparator<OAuth2Authorization> orderByComparator) {
 
@@ -73,7 +54,12 @@ public class OAuth2AuthorizationLocalServiceImpl
 	}
 
 	@Override
-	public boolean revokeAuthorization(
+	public int getUserOAuth2AuthorizationsCount(long companyId, long userId) {
+		return oAuth2AuthorizationFinder.countByUserId(companyId, userId);
+	}
+
+	@Override
+	public boolean revokeOAuth2Authorization(
 			long oAuth2AccessTokenId, long oAuth2RefreshTokenId)
 		throws PortalException {
 
