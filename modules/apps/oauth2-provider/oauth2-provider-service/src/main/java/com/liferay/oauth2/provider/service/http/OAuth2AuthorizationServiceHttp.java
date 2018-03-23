@@ -55,6 +55,74 @@ import com.liferay.portal.kernel.util.MethodKey;
  */
 @ProviderType
 public class OAuth2AuthorizationServiceHttp {
+	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> getApplicationOAuth2Authorizations(
+		HttpPrincipal httpPrincipal, long oAuth2ApplicationId, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		try {
+			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
+					"getApplicationOAuth2Authorizations",
+					_getApplicationOAuth2AuthorizationsParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					oAuth2ApplicationId, start, end, orderByComparator);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return (java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization>)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
+	public static int getApplicationOAuth2AuthorizationsCount(
+		HttpPrincipal httpPrincipal, long oAuth2ApplicationId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		try {
+			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
+					"getApplicationOAuth2AuthorizationsCount",
+					_getApplicationOAuth2AuthorizationsCountParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					oAuth2ApplicationId);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return ((Integer)returnObj).intValue();
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> getUserOAuth2Authorizations(
 		HttpPrincipal httpPrincipal, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator)
@@ -62,7 +130,7 @@ public class OAuth2AuthorizationServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
 					"getUserOAuth2Authorizations",
-					_getUserOAuth2AuthorizationsParameterTypes0);
+					_getUserOAuth2AuthorizationsParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, start,
 					end, orderByComparator);
@@ -95,7 +163,7 @@ public class OAuth2AuthorizationServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
 					"getUserOAuth2AuthorizationsCount",
-					_getUserOAuth2AuthorizationsCountParameterTypes1);
+					_getUserOAuth2AuthorizationsCountParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey);
 
@@ -121,22 +189,19 @@ public class OAuth2AuthorizationServiceHttp {
 		}
 	}
 
-	public static boolean revokeOAuth2Authorization(
-		HttpPrincipal httpPrincipal, long oAuth2AccessTokenId,
-		long oAuth2RefreshTokenId)
+	public static void revokeOAuth2Authorization(HttpPrincipal httpPrincipal,
+		long oAuth2AuthorizationId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(OAuth2AuthorizationServiceUtil.class,
 					"revokeOAuth2Authorization",
-					_revokeOAuth2AuthorizationParameterTypes2);
+					_revokeOAuth2AuthorizationParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
-					oAuth2AccessTokenId, oAuth2RefreshTokenId);
-
-			Object returnObj = null;
+					oAuth2AuthorizationId);
 
 			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
 				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
@@ -145,8 +210,6 @@ public class OAuth2AuthorizationServiceHttp {
 
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
-
-			return ((Boolean)returnObj).booleanValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -156,13 +219,20 @@ public class OAuth2AuthorizationServiceHttp {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(OAuth2AuthorizationServiceHttp.class);
-	private static final Class<?>[] _getUserOAuth2AuthorizationsParameterTypes0 = new Class[] {
+	private static final Class<?>[] _getApplicationOAuth2AuthorizationsParameterTypes0 =
+		new Class[] {
+			long.class, int.class, int.class,
+			com.liferay.portal.kernel.util.OrderByComparator.class
+		};
+	private static final Class<?>[] _getApplicationOAuth2AuthorizationsCountParameterTypes1 =
+		new Class[] { long.class };
+	private static final Class<?>[] _getUserOAuth2AuthorizationsParameterTypes2 = new Class[] {
 			int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getUserOAuth2AuthorizationsCountParameterTypes1 =
+	private static final Class<?>[] _getUserOAuth2AuthorizationsCountParameterTypes3 =
 		new Class[] {  };
-	private static final Class<?>[] _revokeOAuth2AuthorizationParameterTypes2 = new Class[] {
-			long.class, long.class
+	private static final Class<?>[] _revokeOAuth2AuthorizationParameterTypes4 = new Class[] {
+			long.class
 		};
 }

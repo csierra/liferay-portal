@@ -59,18 +59,6 @@ public class OAuth2ApplicationServiceUtil {
 			redirectURIsList, scopeAliasesList, serviceContext);
 	}
 
-	public static void check(
-		com.liferay.oauth2.provider.model.OAuth2Application oAuth2Application,
-		java.lang.String action)
-		throws com.liferay.portal.kernel.security.auth.PrincipalException {
-		getService().check(oAuth2Application, action);
-	}
-
-	public static void check(java.lang.String action)
-		throws com.liferay.portal.kernel.security.auth.PrincipalException {
-		getService().check(action);
-	}
-
 	public static com.liferay.oauth2.provider.model.OAuth2Application deleteOAuth2Application(
 		long oAuth2ApplicationId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -79,7 +67,7 @@ public class OAuth2ApplicationServiceUtil {
 
 	public static com.liferay.oauth2.provider.model.OAuth2Application fetchOAuth2Application(
 		long companyId, java.lang.String clientId)
-		throws com.liferay.portal.kernel.security.auth.PrincipalException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().fetchOAuth2Application(companyId, clientId);
 	}
 
@@ -91,8 +79,7 @@ public class OAuth2ApplicationServiceUtil {
 
 	public static com.liferay.oauth2.provider.model.OAuth2Application getOAuth2Application(
 		long companyId, java.lang.String clientId)
-		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException,
-			com.liferay.portal.kernel.security.auth.PrincipalException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getOAuth2Application(companyId, clientId);
 	}
 
@@ -132,14 +119,15 @@ public class OAuth2ApplicationServiceUtil {
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
-		java.util.List<java.lang.String> scopeAliasesList,
+		long auth2ApplicationScopeAliasesId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateOAuth2Application(oAuth2ApplicationId,
 			allowedGrantTypesList, clientId, clientProfile, clientSecret,
 			description, featuresList, homePageURL, iconFileEntryId, name,
-			privacyPolicyURL, redirectURIsList, scopeAliasesList, serviceContext);
+			privacyPolicyURL, redirectURIsList, auth2ApplicationScopeAliasesId,
+			serviceContext);
 	}
 
 	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopeAliases(

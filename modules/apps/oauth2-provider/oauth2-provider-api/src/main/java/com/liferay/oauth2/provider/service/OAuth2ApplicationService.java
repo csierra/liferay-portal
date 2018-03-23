@@ -17,14 +17,12 @@ package com.liferay.oauth2.provider.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.oauth2.provider.constants.GrantType;
-import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
-import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
@@ -71,17 +69,12 @@ public interface OAuth2ApplicationService extends BaseService {
 		List<java.lang.String> scopeAliasesList, ServiceContext serviceContext)
 		throws PortalException;
 
-	public void check(OAuth2Application oAuth2Application,
-		java.lang.String action) throws PrincipalException;
-
-	public void check(java.lang.String action) throws PrincipalException;
-
 	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public OAuth2Application fetchOAuth2Application(long companyId,
-		java.lang.String clientId) throws PrincipalException;
+		java.lang.String clientId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public OAuth2Application getOAuth2Application(long oAuth2ApplicationId)
@@ -89,8 +82,7 @@ public interface OAuth2ApplicationService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public OAuth2Application getOAuth2Application(long companyId,
-		java.lang.String clientId)
-		throws NoSuchOAuth2ApplicationException, PrincipalException;
+		java.lang.String clientId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuth2Application> getOAuth2Applications(long companyId,
@@ -117,7 +109,7 @@ public interface OAuth2ApplicationService extends BaseService {
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
-		List<java.lang.String> scopeAliasesList, ServiceContext serviceContext)
+		long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
 		throws PortalException;
 
 	public OAuth2Application updateScopeAliases(long oAuth2ApplicationId,

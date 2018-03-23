@@ -55,20 +55,4 @@ public interface OAuth2Authorization extends OAuth2AuthorizationModel,
 				return OAuth2Authorization.class;
 			}
 		};
-
-	public long getOAuth2AccessTokenId();
-
-	public long getOAuth2RefreshTokenId();
-
-	public java.lang.String getScopeAliases();
-
-	public java.util.List<java.lang.String> getScopeAliasesList();
-
-	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId);
-
-	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId);
-
-	public void setScopes(java.lang.String scopes);
-
-	public void setScopesList(java.util.List<java.lang.String> scopesList);
 }

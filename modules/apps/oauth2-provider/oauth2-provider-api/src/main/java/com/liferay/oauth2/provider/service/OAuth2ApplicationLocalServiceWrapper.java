@@ -307,13 +307,14 @@ public class OAuth2ApplicationLocalServiceWrapper
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		java.util.List<java.lang.String> redirectURIsList,
-		java.util.List<java.lang.String> scopeAliasesList,
+		long auth2ApplicationScopeAliasesId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _oAuth2ApplicationLocalService.updateOAuth2Application(oAuth2ApplicationId,
 			allowedGrantTypesList, clientId, clientProfile, clientSecret,
 			description, featuresList, homePageURL, iconFileEntryId, name,
-			privacyPolicyURL, redirectURIsList, scopeAliasesList, serviceContext);
+			privacyPolicyURL, redirectURIsList, auth2ApplicationScopeAliasesId,
+			serviceContext);
 	}
 
 	/**
@@ -330,11 +331,11 @@ public class OAuth2ApplicationLocalServiceWrapper
 
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Application updateScopeAliases(
-		long oAuth2ApplicationId,
+		long userId, java.lang.String userName, long oAuth2ApplicationId,
 		java.util.List<java.lang.String> scopeAliasesList)
-		throws com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException {
-		return _oAuth2ApplicationLocalService.updateScopeAliases(oAuth2ApplicationId,
-			scopeAliasesList);
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2ApplicationLocalService.updateScopeAliases(userId,
+			userName, oAuth2ApplicationId, scopeAliasesList);
 	}
 
 	@Override

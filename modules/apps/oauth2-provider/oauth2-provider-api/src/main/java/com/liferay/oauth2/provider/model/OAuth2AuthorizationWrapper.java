@@ -238,11 +238,6 @@ public class OAuth2AuthorizationWrapper implements OAuth2Authorization,
 		return _oAuth2Authorization.getExpandoBridge();
 	}
 
-	@Override
-	public long getOAuth2AccessTokenId() {
-		return _oAuth2Authorization.getOAuth2AccessTokenId();
-	}
-
 	/**
 	* Returns the o auth2 application ID of this o auth2 authorization.
 	*
@@ -271,11 +266,6 @@ public class OAuth2AuthorizationWrapper implements OAuth2Authorization,
 	@Override
 	public long getOAuth2AuthorizationId() {
 		return _oAuth2Authorization.getOAuth2AuthorizationId();
-	}
-
-	@Override
-	public long getOAuth2RefreshTokenId() {
-		return _oAuth2Authorization.getOAuth2RefreshTokenId();
 	}
 
 	/**
@@ -331,16 +321,6 @@ public class OAuth2AuthorizationWrapper implements OAuth2Authorization,
 	@Override
 	public java.lang.String getRemoteIPInfo() {
 		return _oAuth2Authorization.getRemoteIPInfo();
-	}
-
-	@Override
-	public java.lang.String getScopeAliases() {
-		return _oAuth2Authorization.getScopeAliases();
-	}
-
-	@Override
-	public java.util.List<java.lang.String> getScopeAliasesList() {
-		return _oAuth2Authorization.getScopeAliasesList();
 	}
 
 	/**
@@ -474,11 +454,6 @@ public class OAuth2AuthorizationWrapper implements OAuth2Authorization,
 		_oAuth2Authorization.setNew(n);
 	}
 
-	@Override
-	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId) {
-		_oAuth2Authorization.setOAuth2AccessTokenId(oAuth2AccessTokenId);
-	}
-
 	/**
 	* Sets the o auth2 application ID of this o auth2 authorization.
 	*
@@ -508,11 +483,6 @@ public class OAuth2AuthorizationWrapper implements OAuth2Authorization,
 	@Override
 	public void setOAuth2AuthorizationId(long oAuth2AuthorizationId) {
 		_oAuth2Authorization.setOAuth2AuthorizationId(oAuth2AuthorizationId);
-	}
-
-	@Override
-	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId) {
-		_oAuth2Authorization.setOAuth2RefreshTokenId(oAuth2RefreshTokenId);
 	}
 
 	/**
@@ -568,16 +538,6 @@ public class OAuth2AuthorizationWrapper implements OAuth2Authorization,
 	@Override
 	public void setRemoteIPInfo(java.lang.String remoteIPInfo) {
 		_oAuth2Authorization.setRemoteIPInfo(remoteIPInfo);
-	}
-
-	@Override
-	public void setScopes(java.lang.String scopes) {
-		_oAuth2Authorization.setScopes(scopes);
-	}
-
-	@Override
-	public void setScopesList(java.util.List<java.lang.String> scopesList) {
-		_oAuth2Authorization.setScopesList(scopesList);
 	}
 
 	/**

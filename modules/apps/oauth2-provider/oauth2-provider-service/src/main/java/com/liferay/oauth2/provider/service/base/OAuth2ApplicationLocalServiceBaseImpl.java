@@ -20,7 +20,6 @@ import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ApplicationPersistence;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ApplicationScopeAliasesPersistence;
-import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationFinder;
 import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationPersistence;
 
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -546,25 +545,6 @@ public abstract class OAuth2ApplicationLocalServiceBaseImpl
 		this.oAuth2AuthorizationPersistence = oAuth2AuthorizationPersistence;
 	}
 
-	/**
-	 * Returns the o auth2 authorization finder.
-	 *
-	 * @return the o auth2 authorization finder
-	 */
-	public OAuth2AuthorizationFinder getOAuth2AuthorizationFinder() {
-		return oAuth2AuthorizationFinder;
-	}
-
-	/**
-	 * Sets the o auth2 authorization finder.
-	 *
-	 * @param oAuth2AuthorizationFinder the o auth2 authorization finder
-	 */
-	public void setOAuth2AuthorizationFinder(
-		OAuth2AuthorizationFinder oAuth2AuthorizationFinder) {
-		this.oAuth2AuthorizationFinder = oAuth2AuthorizationFinder;
-	}
-
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register("com.liferay.oauth2.provider.model.OAuth2Application",
 			oAuth2ApplicationLocalService);
@@ -641,8 +621,6 @@ public abstract class OAuth2ApplicationLocalServiceBaseImpl
 	protected com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService oAuth2AuthorizationLocalService;
 	@BeanReference(type = OAuth2AuthorizationPersistence.class)
 	protected OAuth2AuthorizationPersistence oAuth2AuthorizationPersistence;
-	@BeanReference(type = OAuth2AuthorizationFinder.class)
-	protected OAuth2AuthorizationFinder oAuth2AuthorizationFinder;
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

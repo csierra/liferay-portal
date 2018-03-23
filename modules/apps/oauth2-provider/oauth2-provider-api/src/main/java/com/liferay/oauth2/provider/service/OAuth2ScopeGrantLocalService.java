@@ -17,7 +17,6 @@ package com.liferay.oauth2.provider.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.oauth2.provider.exception.DuplicateOAuth2ScopeGrantException;
-import com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 
@@ -96,6 +95,11 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	* @return the new o auth2 scope grant
 	*/
 	public OAuth2ScopeGrant createOAuth2ScopeGrant(long oAuth2ScopeGrantId);
+
+	public OAuth2ScopeGrant createOAuth2ScopeGrant(long companyId,
+		long oAuth2ApplicationScopeAliasesId, java.lang.String applicationName,
+		java.lang.String bundleSymbolicName, java.lang.String scope)
+		throws DuplicateOAuth2ScopeGrantException;
 
 	public void deleteOAuth2AuthorizationOAuth2ScopeGrant(
 		long oAuth2AuthorizationId, long oAuth2ScopeGrantId);
@@ -258,12 +262,13 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(
-		long oAuth2AccessTokenId);
+		long oAuth2ApplicationScopeAliasesId, int start, int end,
+		OrderByComparator<OAuth2ScopeGrant> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(long companyId,
 		java.lang.String applicationName, java.lang.String bundleSymbolicName,
-		java.lang.String tokenContent);
+		java.lang.String accessTokenContent);
 
 	/**
 	* Returns the number of o auth2 scope grants.
@@ -285,11 +290,10 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
-	public Collection<OAuth2ScopeGrant> grantScopesToToken(
-		java.lang.String oAuth2AccessTokenContent,
-		Collection<LiferayOAuth2Scope> scopes)
-		throws DuplicateOAuth2ScopeGrantException,
-			NoSuchOAuth2AccessTokenException;
+	public Collection<OAuth2ScopeGrant> grantScopesToAuthorization(
+		long oAuth2AuthorizationId,
+		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasOAuth2AuthorizationOAuth2ScopeGrant(

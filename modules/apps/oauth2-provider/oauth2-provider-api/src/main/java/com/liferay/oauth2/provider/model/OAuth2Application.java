@@ -61,8 +61,6 @@ public interface OAuth2Application extends OAuth2ApplicationModel, PersistedMode
 
 	public java.util.List<java.lang.String> getRedirectURIsList();
 
-	public java.util.List<java.lang.String> getScopeAliasesList();
-
 	public void setAllowedGrantTypesList(
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList);
 
@@ -70,7 +68,4 @@ public interface OAuth2Application extends OAuth2ApplicationModel, PersistedMode
 
 	public void setRedirectURIsList(
 		java.util.List<java.lang.String> redirectURIsList);
-
-	public void setScopeAliasesList(
-		java.util.List<java.lang.String> scopeAliasesList);
 }

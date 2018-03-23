@@ -65,6 +65,38 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class OAuth2AuthorizationServiceSoap {
+	public static com.liferay.oauth2.provider.model.OAuth2AuthorizationSoap[] getApplicationOAuth2Authorizations(
+		long oAuth2ApplicationId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> returnValue =
+				OAuth2AuthorizationServiceUtil.getApplicationOAuth2Authorizations(oAuth2ApplicationId,
+					start, end, orderByComparator);
+
+			return com.liferay.oauth2.provider.model.OAuth2AuthorizationSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getApplicationOAuth2AuthorizationsCount(
+		long oAuth2ApplicationId) throws RemoteException {
+		try {
+			int returnValue = OAuth2AuthorizationServiceUtil.getApplicationOAuth2AuthorizationsCount(oAuth2ApplicationId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.oauth2.provider.model.OAuth2AuthorizationSoap[] getUserOAuth2Authorizations(
 		int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator)
@@ -97,13 +129,10 @@ public class OAuth2AuthorizationServiceSoap {
 		}
 	}
 
-	public static boolean revokeOAuth2Authorization(long oAuth2AccessTokenId,
-		long oAuth2RefreshTokenId) throws RemoteException {
+	public static void revokeOAuth2Authorization(long oAuth2AuthorizationId)
+		throws RemoteException {
 		try {
-			boolean returnValue = OAuth2AuthorizationServiceUtil.revokeOAuth2Authorization(oAuth2AccessTokenId,
-					oAuth2RefreshTokenId);
-
-			return returnValue;
+			OAuth2AuthorizationServiceUtil.revokeOAuth2Authorization(oAuth2AuthorizationId);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

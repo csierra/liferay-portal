@@ -398,11 +398,6 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 		return _oAuth2Application.getRedirectURIsList();
 	}
 
-	@Override
-	public java.util.List<java.lang.String> getScopeAliasesList() {
-		return _oAuth2Application.getScopeAliasesList();
-	}
-
 	/**
 	* Returns the user ID of this o auth2 application.
 	*
@@ -675,12 +670,6 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 	public void setRedirectURIsList(
 		java.util.List<java.lang.String> redirectURIsList) {
 		_oAuth2Application.setRedirectURIsList(redirectURIsList);
-	}
-
-	@Override
-	public void setScopeAliasesList(
-		java.util.List<java.lang.String> scopeAliasesList) {
-		_oAuth2Application.setScopeAliasesList(scopeAliasesList);
 	}
 
 	/**

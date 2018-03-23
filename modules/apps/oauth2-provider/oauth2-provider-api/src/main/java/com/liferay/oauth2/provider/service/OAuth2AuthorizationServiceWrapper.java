@@ -34,6 +34,21 @@ public class OAuth2AuthorizationServiceWrapper
 		_oAuth2AuthorizationService = oAuth2AuthorizationService;
 	}
 
+	@Override
+	public java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> getApplicationOAuth2Authorizations(
+		long oAuth2ApplicationId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2AuthorizationService.getApplicationOAuth2Authorizations(oAuth2ApplicationId,
+			start, end, orderByComparator);
+	}
+
+	@Override
+	public int getApplicationOAuth2AuthorizationsCount(long oAuth2ApplicationId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _oAuth2AuthorizationService.getApplicationOAuth2AuthorizationsCount(oAuth2ApplicationId);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -60,11 +75,9 @@ public class OAuth2AuthorizationServiceWrapper
 	}
 
 	@Override
-	public boolean revokeOAuth2Authorization(long oAuth2AccessTokenId,
-		long oAuth2RefreshTokenId)
+	public void revokeOAuth2Authorization(long oAuth2AuthorizationId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2AuthorizationService.revokeOAuth2Authorization(oAuth2AccessTokenId,
-			oAuth2RefreshTokenId);
+		_oAuth2AuthorizationService.revokeOAuth2Authorization(oAuth2AuthorizationId);
 	}
 
 	@Override

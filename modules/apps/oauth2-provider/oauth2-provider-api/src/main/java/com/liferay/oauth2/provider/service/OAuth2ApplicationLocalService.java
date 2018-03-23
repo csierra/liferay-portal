@@ -252,7 +252,7 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 		java.lang.String homePageURL, long iconFileEntryId,
 		java.lang.String name, java.lang.String privacyPolicyURL,
 		List<java.lang.String> redirectURIsList,
-		List<java.lang.String> scopeAliasesList, ServiceContext serviceContext)
+		long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -265,7 +265,7 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 	public OAuth2Application updateOAuth2Application(
 		OAuth2Application oAuth2Application);
 
-	public OAuth2Application updateScopeAliases(long oAuth2ApplicationId,
-		List<java.lang.String> scopeAliasesList)
-		throws NoSuchOAuth2ApplicationException;
+	public OAuth2Application updateScopeAliases(long userId,
+		java.lang.String userName, long oAuth2ApplicationId,
+		List<java.lang.String> scopeAliasesList) throws PortalException;
 }

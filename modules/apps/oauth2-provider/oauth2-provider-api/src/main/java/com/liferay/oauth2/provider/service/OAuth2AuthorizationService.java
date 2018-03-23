@@ -55,6 +55,15 @@ public interface OAuth2AuthorizationService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service. Add custom service methods to {@link com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<OAuth2Authorization> getApplicationOAuth2Authorizations(
+		long oAuth2ApplicationId, int start, int end,
+		OrderByComparator<OAuth2Authorization> orderByComparator)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getApplicationOAuth2AuthorizationsCount(long oAuth2ApplicationId)
+		throws PortalException;
 
 	/**
 	* Returns the OSGi service identifier.
@@ -71,6 +80,6 @@ public interface OAuth2AuthorizationService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getUserOAuth2AuthorizationsCount() throws PortalException;
 
-	public boolean revokeOAuth2Authorization(long oAuth2AccessTokenId,
-		long oAuth2RefreshTokenId) throws PortalException;
+	public void revokeOAuth2Authorization(long oAuth2AuthorizationId)
+		throws PortalException;
 }
