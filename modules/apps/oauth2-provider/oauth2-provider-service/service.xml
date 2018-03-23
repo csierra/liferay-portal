@@ -76,6 +76,10 @@
 		<finder name="OAuth2ApplicationId" return-type="Collection">
 			<finder-column name="oAuth2ApplicationId" />
 		</finder>
+		<finder name="O_S" return-type="OAuth2ApplicationScopeAliases">
+			<finder-column name="oAuth2ApplicationId" />
+			<finder-column name="scopeAliases" />
+		</finder>
 
 		<!-- References -->
 

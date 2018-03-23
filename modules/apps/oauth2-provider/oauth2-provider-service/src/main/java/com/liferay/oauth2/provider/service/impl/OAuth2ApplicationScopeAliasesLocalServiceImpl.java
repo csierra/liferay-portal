@@ -22,6 +22,8 @@ import com.liferay.oauth2.provider.service.base.OAuth2ApplicationScopeAliasesLoc
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 
@@ -103,6 +105,18 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		return oAuth2ApplicationScopeAliasesPersistence.
 			findByOAuth2ApplicationId(
 				oAuth2ApplicationId, start, end, orderByComparator);
+	}
+
+	@Override
+	public OAuth2ApplicationScopeAliases
+		fetchOAuth2ApplicationScopeAliases(
+			long oAuth2ApplicationId, List<String> scopeAliasesList) {
+
+		String scopeAliases = StringUtil.merge(
+			scopeAliasesList, StringPool.SPACE);
+
+		return oAuth2ApplicationScopeAliasesPersistence.fetchByO_S(
+				oAuth2ApplicationId, scopeAliases);
 	}
 
 	protected void createScopeGrants(

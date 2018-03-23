@@ -319,9 +319,16 @@ public class OAuth2ApplicationLocalServiceImpl
 		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() == 0) {
 			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
 				oAuth2ApplicationScopeAliasesLocalService.
-					addOAuth2ApplicationScopeAliases(
-						oAuth2Application.getCompanyId(), userId, userName,
+					fetchOAuth2ApplicationScopeAliases(
 						oAuth2ApplicationId, scopeAliasesList);
+
+			if (oAuth2ApplicationScopeAliases == null) {
+				oAuth2ApplicationScopeAliases =
+					oAuth2ApplicationScopeAliasesLocalService.
+						addOAuth2ApplicationScopeAliases(
+							oAuth2Application.getCompanyId(), userId, userName,
+							oAuth2ApplicationId, scopeAliasesList);
+			}
 
 			oAuth2Application.setOAuth2ApplicationScopeAliasesId(
 				oAuth2ApplicationScopeAliases.
@@ -346,9 +353,16 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		oAuth2ApplicationScopeAliases =
 			oAuth2ApplicationScopeAliasesLocalService.
-				addOAuth2ApplicationScopeAliases(
-					oAuth2Application.getCompanyId(), userId, userName,
+				fetchOAuth2ApplicationScopeAliases(
 					oAuth2ApplicationId, scopeAliasesList);
+
+		if (oAuth2ApplicationScopeAliases == null) {
+			oAuth2ApplicationScopeAliases =
+				oAuth2ApplicationScopeAliasesLocalService.
+					addOAuth2ApplicationScopeAliases(
+						oAuth2Application.getCompanyId(), userId, userName,
+						oAuth2ApplicationId, scopeAliasesList);
+		}
 
 		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
 			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
