@@ -31,9 +31,6 @@ import java.util.stream.Stream;
 @ProviderType
 public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 
-	public OAuth2ApplicationImpl() {
-	}
-
 	@Override
 	public List<GrantType> getAllowedGrantTypesList() {
 		Stream<String> stream = Arrays.stream(
@@ -57,12 +54,6 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	public List<String> getRedirectURIsList() {
 		return Arrays.asList(
 			StringUtil.split(getRedirectURIs(), StringPool.NEW_LINE));
-	}
-
-	@Override
-	public List<String> getScopeAliasesList() {
-		return Arrays.asList(
-			StringUtil.split(getScopeAliases(), StringPool.SPACE));
 	}
 
 	@Override
@@ -93,14 +84,6 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 			redirectURIsList, StringPool.NEW_LINE);
 
 		setRedirectURIs(redirectURIs);
-	}
-
-	@Override
-	public void setScopeAliasesList(List<String> scopeAliasesList) {
-		String scopeAliases = StringUtil.merge(
-			scopeAliasesList, StringPool.SPACE);
-
-		setScopeAliases(scopeAliases);
 	}
 
 }

@@ -30,10 +30,9 @@ import com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIFragmen
 import com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIMissingException;
 import com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIPathException;
 import com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURISchemeException;
-import com.liferay.oauth2.provider.model.OAuth2AccessToken;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.model.OAuth2RefreshToken;
-import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
+import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
+import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationLocalServiceBaseImpl;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -56,7 +55,6 @@ import java.net.URISyntaxException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -126,7 +124,20 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setName(name);
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
-		oAuth2Application.setScopeAliasesList(scopeAliasesList);
+
+		// OAuth2ScopeAliases
+
+		if ((scopeAliasesList != null) && !scopeAliasesList.isEmpty()) {
+			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+				oAuth2ApplicationScopeAliasesLocalService.
+					addOAuth2ApplicationScopeAliases(
+						companyId, userId, userName, oAuth2ApplicationId,
+						scopeAliasesList);
+
+			oAuth2Application.setOAuth2ApplicationScopeAliasesId(
+				oAuth2ApplicationScopeAliases.
+					getOAuth2ApplicationScopeAliasesId());
+		}
 
 		// Resources
 
@@ -154,32 +165,29 @@ public class OAuth2ApplicationLocalServiceImpl
 	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
 		throws PortalException {
 
-		Collection<OAuth2AccessToken> oAuth2AccessTokens =
-			oAuth2AccessTokenLocalService.getOAuth2AccessTokens(
+		List<OAuth2Authorization> oAuth2Authorizations =
+			oAuth2AuthorizationLocalService.getOAuth2Authorizations(
 				oAuth2ApplicationId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 				null);
 
-		for (OAuth2AccessToken oAuth2AccessToken : oAuth2AccessTokens) {
-			Collection<OAuth2ScopeGrant> grants =
-				oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
-					oAuth2AccessToken.getOAuth2AccessTokenId());
-
-			for (OAuth2ScopeGrant grant : grants) {
-				oAuth2ScopeGrantLocalService.deleteOAuth2ScopeGrant(grant);
-			}
-
-			oAuth2AccessTokenLocalService.deleteOAuth2AccessToken(
-				oAuth2AccessToken);
+		for (OAuth2Authorization oAuth2Authorization : oAuth2Authorizations) {
+			oAuth2AuthorizationLocalService.deleteOAuth2Authorization(
+				oAuth2Authorization.getOAuth2AuthorizationId());
 		}
 
-		Collection<OAuth2RefreshToken> refreshTokens =
-			oAuth2RefreshTokenLocalService.findByApplication(
-				oAuth2ApplicationId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				null);
+		List<OAuth2ApplicationScopeAliases> oAuth2ApplicationScopeAliaseses =
+			oAuth2ApplicationScopeAliasesLocalService.
+				getOAuth2ApplicationScopeAliaseses(
+					oAuth2ApplicationId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null);
 
-		for (OAuth2RefreshToken refreshToken : refreshTokens) {
-			oAuth2RefreshTokenLocalService.deleteOAuth2RefreshToken(
-				refreshToken);
+		for (OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases :
+				oAuth2ApplicationScopeAliaseses) {
+
+			oAuth2ApplicationScopeAliasesLocalService.
+				deleteOAuth2ApplicationScopeAliases(
+					oAuth2ApplicationScopeAliases.
+						getOAuth2ApplicationScopeAliasesId());
 		}
 
 		return super.deleteOAuth2Application(oAuth2ApplicationId);
@@ -256,7 +264,7 @@ public class OAuth2ApplicationLocalServiceImpl
 			String clientId, int clientProfile, String clientSecret,
 			String description, List<String> featuresList, String homePageURL,
 			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, List<String> scopeAliasesList,
+			List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -272,6 +280,9 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		oAuth2Application.setModifiedDate(now);
 
+		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
+			auth2ApplicationScopeAliasesId);
+
 		oAuth2Application.setAllowedGrantTypesList(allowedGrantTypesList);
 		oAuth2Application.setClientId(clientId);
 		oAuth2Application.setClientProfile(clientProfile);
@@ -283,22 +294,65 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setName(name);
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
-		oAuth2Application.setScopeAliasesList(scopeAliasesList);
 
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 
 	@Override
 	public OAuth2Application updateScopeAliases(
-			long oAuth2ApplicationId, List<String> scopeAliasesList)
-		throws NoSuchOAuth2ApplicationException {
+			long userId, String userName, long oAuth2ApplicationId,
+			List<String> scopeAliasesList)
+		throws PortalException {
 
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationPersistence.findByPrimaryKey(oAuth2ApplicationId);
 
 		Date now = new Date();
 
-		oAuth2Application.setScopeAliasesList(scopeAliasesList);
+		if ((scopeAliasesList == null) || scopeAliasesList.isEmpty()) {
+			oAuth2Application.setOAuth2ApplicationScopeAliasesId(0);
+			oAuth2Application.setModifiedDate(now);
+
+			return oAuth2ApplicationPersistence.update(oAuth2Application);
+		}
+
+		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() == 0) {
+			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+				oAuth2ApplicationScopeAliasesLocalService.
+					addOAuth2ApplicationScopeAliases(
+						oAuth2Application.getCompanyId(), userId, userName,
+						oAuth2ApplicationId, scopeAliasesList);
+
+			oAuth2Application.setOAuth2ApplicationScopeAliasesId(
+				oAuth2ApplicationScopeAliases.
+					getOAuth2ApplicationScopeAliasesId());
+
+			oAuth2Application.setModifiedDate(now);
+
+			return oAuth2ApplicationPersistence.update(oAuth2Application);
+		}
+
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+			oAuth2ApplicationScopeAliasesLocalService.
+				getOAuth2ApplicationScopeAliases(
+					oAuth2Application.getOAuth2ApplicationScopeAliasesId());
+
+		List<String> actualScopeAliasesList =
+			oAuth2ApplicationScopeAliases.getScopeAliasesList();
+
+		if (actualScopeAliasesList.equals(scopeAliasesList)) {
+			return oAuth2Application;
+		}
+
+		oAuth2ApplicationScopeAliases =
+			oAuth2ApplicationScopeAliasesLocalService.
+				addOAuth2ApplicationScopeAliases(
+					oAuth2Application.getCompanyId(), userId, userName,
+					oAuth2ApplicationId, scopeAliasesList);
+
+		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
+			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
+
 		oAuth2Application.setModifiedDate(now);
 
 		return oAuth2ApplicationPersistence.update(oAuth2Application);

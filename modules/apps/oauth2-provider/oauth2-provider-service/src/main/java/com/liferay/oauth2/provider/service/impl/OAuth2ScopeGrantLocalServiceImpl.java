@@ -15,16 +15,18 @@
 package com.liferay.oauth2.provider.service.impl;
 
 import com.liferay.oauth2.provider.exception.DuplicateOAuth2ScopeGrantException;
-import com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException;
-import com.liferay.oauth2.provider.model.OAuth2AccessToken;
+import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.service.base.OAuth2ScopeGrantLocalServiceBaseImpl;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import org.osgi.framework.Bundle;
 
@@ -35,94 +37,111 @@ public class OAuth2ScopeGrantLocalServiceImpl
 	extends OAuth2ScopeGrantLocalServiceBaseImpl {
 
 	@Override
-	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(
-		long oAuth2AccessTokenId) {
+	public OAuth2ScopeGrant createOAuth2ScopeGrant(
+			long companyId, long oAuth2ApplicationScopeAliasesId,
+			String applicationName, String bundleSymbolicName, String scope)
+		throws DuplicateOAuth2ScopeGrantException {
 
-		return oAuth2ScopeGrantPersistence.findByOAuth2AccessTokenId(
-			oAuth2AccessTokenId);
+		OAuth2ScopeGrant oAuth2ScopeGrant =
+			oAuth2ScopeGrantPersistence.fetchByC_O_A_B_S(
+				companyId, oAuth2ApplicationScopeAliasesId, applicationName,
+				bundleSymbolicName, scope);
+
+		if (oAuth2ScopeGrant != null) {
+			throw new DuplicateOAuth2ScopeGrantException();
+		}
+
+		long oAuth2ScopeGrantId = counterLocalService.increment(
+			OAuth2ScopeGrant.class.getName());
+
+		oAuth2ScopeGrant = oAuth2ScopeGrantPersistence.create(
+			oAuth2ScopeGrantId);
+
+		oAuth2ScopeGrant.setCompanyId(companyId);
+		oAuth2ScopeGrant.setOAuth2ApplicationScopeAliasesId(
+			oAuth2ApplicationScopeAliasesId);
+
+		oAuth2ScopeGrant.setApplicationName(applicationName);
+		oAuth2ScopeGrant.setBundleSymbolicName(bundleSymbolicName);
+		oAuth2ScopeGrant.setScope(scope);
+
+		return oAuth2ScopeGrantPersistence.update(oAuth2ScopeGrant);
+	}
+
+	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(
+		long oAuth2ApplicationScopeAliasesId, int start, int end,
+		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
+
+		return oAuth2ScopeGrantPersistence.
+			findByOAuth2ApplicationScopeAliasesId(
+				oAuth2ApplicationScopeAliasesId, start, end, orderByComparator);
 	}
 
 	@Override
 	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(
 		long companyId, String applicationName, String bundleSymbolicName,
-		String tokenContent) {
+		String accessTokenContent) {
 
-		return oAuth2ScopeGrantFinder.findByC_A_B_T(
-			companyId, applicationName, bundleSymbolicName, tokenContent);
+		return oAuth2ScopeGrantFinder.findByC_A_A_B(
+			companyId, accessTokenContent, applicationName, bundleSymbolicName);
 	}
 
 	@Override
-	public Collection<OAuth2ScopeGrant> grantScopesToToken(
-			String oAuth2AccessTokenContent,
-			Collection<LiferayOAuth2Scope> scopes)
-		throws DuplicateOAuth2ScopeGrantException,
-			   NoSuchOAuth2AccessTokenException {
+	public Collection<OAuth2ScopeGrant> grantScopesToAuthorization(
+			long oAuth2AuthorizationId,
+			Collection<LiferayOAuth2Scope> liferayOAuth2Scopes)
+		throws PortalException {
 
-		if (scopes.isEmpty()) {
+		if (liferayOAuth2Scopes.isEmpty()) {
 			return Collections.emptyList();
 		}
 
-		OAuth2AccessToken oAuth2AccessToken =
-			oAuth2AccessTokenPersistence.fetchByTokenContent(
-				oAuth2AccessTokenContent);
+		OAuth2Authorization oAuth2Authorization =
+			oAuth2AuthorizationLocalService.getOAuth2Authorization(
+				oAuth2AuthorizationId);
 
-		if (oAuth2AccessToken == null) {
-			throw new NoSuchOAuth2AccessTokenException(
-				oAuth2AccessTokenContent);
-		}
+		List<OAuth2ScopeGrant> oAuth2ScopeGrants =
+			oAuth2ScopeGrantPersistence.findByOAuth2ApplicationScopeAliasesId(
+				oAuth2Authorization.getOAuth2ApplicationScopeAliasesId());
 
-		long companyId = oAuth2AccessToken.getCompanyId();
-		long oAuth2AccessTokenId = oAuth2AccessToken.getOAuth2AccessTokenId();
+		List<OAuth2ScopeGrant> resultOAuth2ScopeGrants = new ArrayList<>(
+			oAuth2ScopeGrants.size());
 
-		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants = new ArrayList<>(
-			scopes.size());
-
-		for (LiferayOAuth2Scope scope : scopes) {
-			String applicationName = scope.getApplicationName();
-			Bundle bundle = scope.getBundle();
+		for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
+			Bundle bundle = liferayOAuth2Scope.getBundle();
 
 			String bundleSymbolicName = bundle.getSymbolicName();
 
-			String scopeString = scope.getScope();
+			for (OAuth2ScopeGrant oAuth2ScopeGrant : oAuth2ScopeGrants) {
+				if (!Objects.equals(
+						oAuth2ScopeGrant.getApplicationName(),
+						liferayOAuth2Scope.getApplicationName())) {
 
-			if (oAuth2ScopeGrantPersistence.countByC_O_A_B_S(
-					companyId, oAuth2AccessTokenId, applicationName,
-					bundleSymbolicName, scopeString) > 0) {
+					continue;
+				}
 
-				StringBundler sb = new StringBundler(10);
+				if (!Objects.equals(
+						oAuth2ScopeGrant.getBundleSymbolicName(),
+						bundleSymbolicName)) {
 
-				sb.append("Scope ");
-				sb.append(scopeString);
-				sb.append(" for application ");
-				sb.append(applicationName);
-				sb.append(" from bundle ");
-				sb.append(bundleSymbolicName);
-				sb.append(" in company ");
-				sb.append(companyId);
-				sb.append(" was already granted for token ");
-				sb.append(oAuth2AccessTokenId);
+					continue;
+				}
 
-				throw new DuplicateOAuth2ScopeGrantException(sb.toString());
+				if (!Objects.equals(
+						oAuth2ScopeGrant.getScope(),
+						liferayOAuth2Scope.getScope())) {
+
+					continue;
+				}
+
+				resultOAuth2ScopeGrants.add(oAuth2ScopeGrant);
 			}
-
-			long oAuth2ScopeGrantId = counterLocalService.increment(
-				OAuth2ScopeGrant.class.getName());
-
-			OAuth2ScopeGrant oAuth2ScopeGrant = createOAuth2ScopeGrant(
-				oAuth2ScopeGrantId);
-
-			oAuth2ScopeGrant.setApplicationName(applicationName);
-			oAuth2ScopeGrant.setBundleSymbolicName(bundleSymbolicName);
-			oAuth2ScopeGrant.setCompanyId(companyId);
-			oAuth2ScopeGrant.setOAuth2AccessTokenId(oAuth2AccessTokenId);
-			oAuth2ScopeGrant.setScope(scopeString);
-
-			oAuth2ScopeGrant = updateOAuth2ScopeGrant(oAuth2ScopeGrant);
-
-			oAuth2ScopeGrants.add(oAuth2ScopeGrant);
 		}
 
-		return oAuth2ScopeGrants;
+		oAuth2ScopeGrantLocalService.addOAuth2AuthorizationOAuth2ScopeGrants(
+			oAuth2AuthorizationId, resultOAuth2ScopeGrants);
+
+		return resultOAuth2ScopeGrants;
 	}
 
 }
