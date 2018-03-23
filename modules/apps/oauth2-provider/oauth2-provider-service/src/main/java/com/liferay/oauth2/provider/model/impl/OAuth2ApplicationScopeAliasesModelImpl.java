@@ -102,7 +102,8 @@ public class OAuth2ApplicationScopeAliasesModelImpl extends BaseModelImpl<OAuth2
 			true);
 	public static final long COMPANYID_COLUMN_BITMASK = 1L;
 	public static final long OAUTH2APPLICATIONID_COLUMN_BITMASK = 2L;
-	public static final long OAUTH2APPLICATIONSCOPEALIASESID_COLUMN_BITMASK = 4L;
+	public static final long SCOPEALIASES_COLUMN_BITMASK = 4L;
+	public static final long OAUTH2APPLICATIONSCOPEALIASESID_COLUMN_BITMASK = 8L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.oauth2.provider.service.util.ServiceProps.get(
 				"lock.expiration.time.com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases"));
 
@@ -322,7 +323,17 @@ public class OAuth2ApplicationScopeAliasesModelImpl extends BaseModelImpl<OAuth2
 
 	@Override
 	public void setScopeAliases(String scopeAliases) {
+		_columnBitmask |= SCOPEALIASES_COLUMN_BITMASK;
+
+		if (_originalScopeAliases == null) {
+			_originalScopeAliases = _scopeAliases;
+		}
+
 		_scopeAliases = scopeAliases;
+	}
+
+	public String getOriginalScopeAliases() {
+		return GetterUtil.getString(_originalScopeAliases);
 	}
 
 	public long getColumnBitmask() {
@@ -434,6 +445,8 @@ public class OAuth2ApplicationScopeAliasesModelImpl extends BaseModelImpl<OAuth2
 		oAuth2ApplicationScopeAliasesModelImpl._originalOAuth2ApplicationId = oAuth2ApplicationScopeAliasesModelImpl._oAuth2ApplicationId;
 
 		oAuth2ApplicationScopeAliasesModelImpl._setOriginalOAuth2ApplicationId = false;
+
+		oAuth2ApplicationScopeAliasesModelImpl._originalScopeAliases = oAuth2ApplicationScopeAliasesModelImpl._scopeAliases;
 
 		oAuth2ApplicationScopeAliasesModelImpl._columnBitmask = 0;
 	}
@@ -560,6 +573,7 @@ public class OAuth2ApplicationScopeAliasesModelImpl extends BaseModelImpl<OAuth2
 	private long _originalOAuth2ApplicationId;
 	private boolean _setOriginalOAuth2ApplicationId;
 	private String _scopeAliases;
+	private String _originalScopeAliases;
 	private long _columnBitmask;
 	private OAuth2ApplicationScopeAliases _escapedModel;
 }

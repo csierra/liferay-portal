@@ -176,6 +176,10 @@ public interface OAuth2ApplicationScopeAliasesLocalService
 		long oAuth2ApplicationScopeAliasesId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public OAuth2ApplicationScopeAliases fetchOAuth2ApplicationScopeAliases(
+		long oAuth2ApplicationId, List<java.lang.String> scopeAliasesList);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

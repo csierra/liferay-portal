@@ -312,6 +312,60 @@ public interface OAuth2ApplicationScopeAliasesPersistence
 	public int countByOAuth2ApplicationId(long oAuth2ApplicationId);
 
 	/**
+	* Returns the o auth2 application scope aliases where oAuth2ApplicationId = &#63; and scopeAliases = &#63; or throws a {@link NoSuchOAuth2ApplicationScopeAliasesException} if it could not be found.
+	*
+	* @param oAuth2ApplicationId the o auth2 application ID
+	* @param scopeAliases the scope aliases
+	* @return the matching o auth2 application scope aliases
+	* @throws NoSuchOAuth2ApplicationScopeAliasesException if a matching o auth2 application scope aliases could not be found
+	*/
+	public OAuth2ApplicationScopeAliases findByO_S(long oAuth2ApplicationId,
+		java.lang.String scopeAliases)
+		throws NoSuchOAuth2ApplicationScopeAliasesException;
+
+	/**
+	* Returns the o auth2 application scope aliases where oAuth2ApplicationId = &#63; and scopeAliases = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param oAuth2ApplicationId the o auth2 application ID
+	* @param scopeAliases the scope aliases
+	* @return the matching o auth2 application scope aliases, or <code>null</code> if a matching o auth2 application scope aliases could not be found
+	*/
+	public OAuth2ApplicationScopeAliases fetchByO_S(long oAuth2ApplicationId,
+		java.lang.String scopeAliases);
+
+	/**
+	* Returns the o auth2 application scope aliases where oAuth2ApplicationId = &#63; and scopeAliases = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param oAuth2ApplicationId the o auth2 application ID
+	* @param scopeAliases the scope aliases
+	* @param retrieveFromCache whether to retrieve from the finder cache
+	* @return the matching o auth2 application scope aliases, or <code>null</code> if a matching o auth2 application scope aliases could not be found
+	*/
+	public OAuth2ApplicationScopeAliases fetchByO_S(long oAuth2ApplicationId,
+		java.lang.String scopeAliases, boolean retrieveFromCache);
+
+	/**
+	* Removes the o auth2 application scope aliases where oAuth2ApplicationId = &#63; and scopeAliases = &#63; from the database.
+	*
+	* @param oAuth2ApplicationId the o auth2 application ID
+	* @param scopeAliases the scope aliases
+	* @return the o auth2 application scope aliases that was removed
+	*/
+	public OAuth2ApplicationScopeAliases removeByO_S(long oAuth2ApplicationId,
+		java.lang.String scopeAliases)
+		throws NoSuchOAuth2ApplicationScopeAliasesException;
+
+	/**
+	* Returns the number of o auth2 application scope aliaseses where oAuth2ApplicationId = &#63; and scopeAliases = &#63;.
+	*
+	* @param oAuth2ApplicationId the o auth2 application ID
+	* @param scopeAliases the scope aliases
+	* @return the number of matching o auth2 application scope aliaseses
+	*/
+	public int countByO_S(long oAuth2ApplicationId,
+		java.lang.String scopeAliases);
+
+	/**
 	* Caches the o auth2 application scope aliases in the entity cache if it is enabled.
 	*
 	* @param oAuth2ApplicationScopeAliases the o auth2 application scope aliases

@@ -197,6 +197,14 @@ public class OAuth2ApplicationScopeAliasesLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases fetchOAuth2ApplicationScopeAliases(
+		long oAuth2ApplicationId,
+		java.util.List<java.lang.String> scopeAliasesList) {
+		return _oAuth2ApplicationScopeAliasesLocalService.fetchOAuth2ApplicationScopeAliases(oAuth2ApplicationId,
+			scopeAliasesList);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return _oAuth2ApplicationScopeAliasesLocalService.getActionableDynamicQuery();
 	}

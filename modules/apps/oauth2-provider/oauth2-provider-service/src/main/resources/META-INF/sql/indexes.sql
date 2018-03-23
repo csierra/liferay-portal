@@ -1,7 +1,7 @@
 create index IX_523E5C67 on OAuth2Application (companyId, clientId[$COLUMN_LENGTH:75$]);
 
 create index IX_282ECE83 on OAuth2ApplicationScopeAliases (companyId);
-create index IX_2F9EBCBB on OAuth2ApplicationScopeAliases (oAuth2ApplicationId);
+create index IX_D8310AF9 on OAuth2ApplicationScopeAliases (oAuth2ApplicationId, scopeAliases[$COLUMN_LENGTH:2000000$]);
 
 create index IX_33088853 on OAuth2Auth_ScopeGrants (companyId);
 create index IX_1BC465B4 on OAuth2Auth_ScopeGrants (oAuth2AuthorizationId);

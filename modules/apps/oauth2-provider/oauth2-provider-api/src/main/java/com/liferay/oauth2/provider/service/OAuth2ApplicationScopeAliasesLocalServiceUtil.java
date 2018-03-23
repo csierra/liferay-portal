@@ -194,6 +194,14 @@ public class OAuth2ApplicationScopeAliasesLocalServiceUtil {
 				   .fetchOAuth2ApplicationScopeAliases(oAuth2ApplicationScopeAliasesId);
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases fetchOAuth2ApplicationScopeAliases(
+		long oAuth2ApplicationId,
+		java.util.List<java.lang.String> scopeAliasesList) {
+		return getService()
+				   .fetchOAuth2ApplicationScopeAliases(oAuth2ApplicationId,
+			scopeAliasesList);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return getService().getActionableDynamicQuery();
 	}

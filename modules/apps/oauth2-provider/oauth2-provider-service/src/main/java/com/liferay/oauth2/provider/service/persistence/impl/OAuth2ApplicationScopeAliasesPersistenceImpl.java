@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
@@ -49,6 +50,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -1130,6 +1132,280 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 
 	private static final String _FINDER_COLUMN_OAUTH2APPLICATIONID_OAUTH2APPLICATIONID_2 =
 		"oAuth2ApplicationScopeAliases.oAuth2ApplicationId = ?";
+	public static final FinderPath FINDER_PATH_FETCH_BY_O_S = new FinderPath(OAuth2ApplicationScopeAliasesModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationScopeAliasesModelImpl.FINDER_CACHE_ENABLED,
+			OAuth2ApplicationScopeAliasesImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByO_S",
+			new String[] { Long.class.getName(), String.class.getName() },
+			OAuth2ApplicationScopeAliasesModelImpl.OAUTH2APPLICATIONID_COLUMN_BITMASK |
+			OAuth2ApplicationScopeAliasesModelImpl.SCOPEALIASES_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_O_S = new FinderPath(OAuth2ApplicationScopeAliasesModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationScopeAliasesModelImpl.FINDER_CACHE_ENABLED,
+			Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByO_S",
+			new String[] { Long.class.getName(), String.class.getName() });
+
+	/**
+	 * Returns the o auth2 application scope aliases where oAuth2ApplicationId = &#63; and scopeAliases = &#63; or throws a {@link NoSuchOAuth2ApplicationScopeAliasesException} if it could not be found.
+	 *
+	 * @param oAuth2ApplicationId the o auth2 application ID
+	 * @param scopeAliases the scope aliases
+	 * @return the matching o auth2 application scope aliases
+	 * @throws NoSuchOAuth2ApplicationScopeAliasesException if a matching o auth2 application scope aliases could not be found
+	 */
+	@Override
+	public OAuth2ApplicationScopeAliases findByO_S(long oAuth2ApplicationId,
+		String scopeAliases)
+		throws NoSuchOAuth2ApplicationScopeAliasesException {
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases = fetchByO_S(oAuth2ApplicationId,
+				scopeAliases);
+
+		if (oAuth2ApplicationScopeAliases == null) {
+			StringBundler msg = new StringBundler(6);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("oAuth2ApplicationId=");
+			msg.append(oAuth2ApplicationId);
+
+			msg.append(", scopeAliases=");
+			msg.append(scopeAliases);
+
+			msg.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
+			}
+
+			throw new NoSuchOAuth2ApplicationScopeAliasesException(msg.toString());
+		}
+
+		return oAuth2ApplicationScopeAliases;
+	}
+
+	/**
+	 * Returns the o auth2 application scope aliases where oAuth2ApplicationId = &#63; and scopeAliases = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param oAuth2ApplicationId the o auth2 application ID
+	 * @param scopeAliases the scope aliases
+	 * @return the matching o auth2 application scope aliases, or <code>null</code> if a matching o auth2 application scope aliases could not be found
+	 */
+	@Override
+	public OAuth2ApplicationScopeAliases fetchByO_S(long oAuth2ApplicationId,
+		String scopeAliases) {
+		return fetchByO_S(oAuth2ApplicationId, scopeAliases, true);
+	}
+
+	/**
+	 * Returns the o auth2 application scope aliases where oAuth2ApplicationId = &#63; and scopeAliases = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param oAuth2ApplicationId the o auth2 application ID
+	 * @param scopeAliases the scope aliases
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the matching o auth2 application scope aliases, or <code>null</code> if a matching o auth2 application scope aliases could not be found
+	 */
+	@Override
+	public OAuth2ApplicationScopeAliases fetchByO_S(long oAuth2ApplicationId,
+		String scopeAliases, boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] { oAuth2ApplicationId, scopeAliases };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = finderCache.getResult(FINDER_PATH_FETCH_BY_O_S,
+					finderArgs, this);
+		}
+
+		if (result instanceof OAuth2ApplicationScopeAliases) {
+			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases = (OAuth2ApplicationScopeAliases)result;
+
+			if ((oAuth2ApplicationId != oAuth2ApplicationScopeAliases.getOAuth2ApplicationId()) ||
+					!Objects.equals(scopeAliases,
+						oAuth2ApplicationScopeAliases.getScopeAliases())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_SELECT_OAUTH2APPLICATIONSCOPEALIASES_WHERE);
+
+			query.append(_FINDER_COLUMN_O_S_OAUTH2APPLICATIONID_2);
+
+			boolean bindScopeAliases = false;
+
+			if (scopeAliases == null) {
+				query.append(_FINDER_COLUMN_O_S_SCOPEALIASES_1);
+			}
+			else if (scopeAliases.equals("")) {
+				query.append(_FINDER_COLUMN_O_S_SCOPEALIASES_3);
+			}
+			else {
+				bindScopeAliases = true;
+
+				query.append(_FINDER_COLUMN_O_S_SCOPEALIASES_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(oAuth2ApplicationId);
+
+				if (bindScopeAliases) {
+					qPos.add(scopeAliases);
+				}
+
+				List<OAuth2ApplicationScopeAliases> list = q.list();
+
+				if (list.isEmpty()) {
+					finderCache.putResult(FINDER_PATH_FETCH_BY_O_S, finderArgs,
+						list);
+				}
+				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
+
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"OAuth2ApplicationScopeAliasesPersistenceImpl.fetchByO_S(long, String, boolean) with parameters (" +
+								StringUtil.merge(finderArgs) +
+								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
+					OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases = list.get(0);
+
+					result = oAuth2ApplicationScopeAliases;
+
+					cacheResult(oAuth2ApplicationScopeAliases);
+
+					if ((oAuth2ApplicationScopeAliases.getOAuth2ApplicationId() != oAuth2ApplicationId) ||
+							(oAuth2ApplicationScopeAliases.getScopeAliases() == null) ||
+							!oAuth2ApplicationScopeAliases.getScopeAliases()
+															  .equals(scopeAliases)) {
+						finderCache.putResult(FINDER_PATH_FETCH_BY_O_S,
+							finderArgs, oAuth2ApplicationScopeAliases);
+					}
+				}
+			}
+			catch (Exception e) {
+				finderCache.removeResult(FINDER_PATH_FETCH_BY_O_S, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (OAuth2ApplicationScopeAliases)result;
+		}
+	}
+
+	/**
+	 * Removes the o auth2 application scope aliases where oAuth2ApplicationId = &#63; and scopeAliases = &#63; from the database.
+	 *
+	 * @param oAuth2ApplicationId the o auth2 application ID
+	 * @param scopeAliases the scope aliases
+	 * @return the o auth2 application scope aliases that was removed
+	 */
+	@Override
+	public OAuth2ApplicationScopeAliases removeByO_S(long oAuth2ApplicationId,
+		String scopeAliases)
+		throws NoSuchOAuth2ApplicationScopeAliasesException {
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases = findByO_S(oAuth2ApplicationId,
+				scopeAliases);
+
+		return remove(oAuth2ApplicationScopeAliases);
+	}
+
+	/**
+	 * Returns the number of o auth2 application scope aliaseses where oAuth2ApplicationId = &#63; and scopeAliases = &#63;.
+	 *
+	 * @param oAuth2ApplicationId the o auth2 application ID
+	 * @param scopeAliases the scope aliases
+	 * @return the number of matching o auth2 application scope aliaseses
+	 */
+	@Override
+	public int countByO_S(long oAuth2ApplicationId, String scopeAliases) {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_O_S;
+
+		Object[] finderArgs = new Object[] { oAuth2ApplicationId, scopeAliases };
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_OAUTH2APPLICATIONSCOPEALIASES_WHERE);
+
+			query.append(_FINDER_COLUMN_O_S_OAUTH2APPLICATIONID_2);
+
+			boolean bindScopeAliases = false;
+
+			if (scopeAliases == null) {
+				query.append(_FINDER_COLUMN_O_S_SCOPEALIASES_1);
+			}
+			else if (scopeAliases.equals("")) {
+				query.append(_FINDER_COLUMN_O_S_SCOPEALIASES_3);
+			}
+			else {
+				bindScopeAliases = true;
+
+				query.append(_FINDER_COLUMN_O_S_SCOPEALIASES_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(oAuth2ApplicationId);
+
+				if (bindScopeAliases) {
+					qPos.add(scopeAliases);
+				}
+
+				count = (Long)q.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				finderCache.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_O_S_OAUTH2APPLICATIONID_2 = "oAuth2ApplicationScopeAliases.oAuth2ApplicationId = ? AND ";
+	private static final String _FINDER_COLUMN_O_S_SCOPEALIASES_1 = "oAuth2ApplicationScopeAliases.scopeAliases IS NULL";
+	private static final String _FINDER_COLUMN_O_S_SCOPEALIASES_2 = "CAST_CLOB_TEXT(oAuth2ApplicationScopeAliases.scopeAliases) = ?";
+	private static final String _FINDER_COLUMN_O_S_SCOPEALIASES_3 = "(oAuth2ApplicationScopeAliases.scopeAliases IS NULL OR CAST_CLOB_TEXT(oAuth2ApplicationScopeAliases.scopeAliases) = '')";
 
 	public OAuth2ApplicationScopeAliasesPersistenceImpl() {
 		setModelClass(OAuth2ApplicationScopeAliases.class);
@@ -1166,6 +1442,12 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 			OAuth2ApplicationScopeAliasesImpl.class,
 			oAuth2ApplicationScopeAliases.getPrimaryKey(),
 			oAuth2ApplicationScopeAliases);
+
+		finderCache.putResult(FINDER_PATH_FETCH_BY_O_S,
+			new Object[] {
+				oAuth2ApplicationScopeAliases.getOAuth2ApplicationId(),
+				oAuth2ApplicationScopeAliases.getScopeAliases()
+			}, oAuth2ApplicationScopeAliases);
 
 		oAuth2ApplicationScopeAliases.resetOriginalValues();
 	}
@@ -1223,6 +1505,9 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache((OAuth2ApplicationScopeAliasesModelImpl)oAuth2ApplicationScopeAliases,
+			true);
 	}
 
 	@Override
@@ -1235,6 +1520,47 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 			entityCache.removeResult(OAuth2ApplicationScopeAliasesModelImpl.ENTITY_CACHE_ENABLED,
 				OAuth2ApplicationScopeAliasesImpl.class,
 				oAuth2ApplicationScopeAliases.getPrimaryKey());
+
+			clearUniqueFindersCache((OAuth2ApplicationScopeAliasesModelImpl)oAuth2ApplicationScopeAliases,
+				true);
+		}
+	}
+
+	protected void cacheUniqueFindersCache(
+		OAuth2ApplicationScopeAliasesModelImpl oAuth2ApplicationScopeAliasesModelImpl) {
+		Object[] args = new Object[] {
+				oAuth2ApplicationScopeAliasesModelImpl.getOAuth2ApplicationId(),
+				oAuth2ApplicationScopeAliasesModelImpl.getScopeAliases()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_O_S, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_O_S, args,
+			oAuth2ApplicationScopeAliasesModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		OAuth2ApplicationScopeAliasesModelImpl oAuth2ApplicationScopeAliasesModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					oAuth2ApplicationScopeAliasesModelImpl.getOAuth2ApplicationId(),
+					oAuth2ApplicationScopeAliasesModelImpl.getScopeAliases()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_O_S, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_O_S, args);
+		}
+
+		if ((oAuth2ApplicationScopeAliasesModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_O_S.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					oAuth2ApplicationScopeAliasesModelImpl.getOriginalOAuth2ApplicationId(),
+					oAuth2ApplicationScopeAliasesModelImpl.getOriginalScopeAliases()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_O_S, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_O_S, args);
 		}
 	}
 
@@ -1450,6 +1776,9 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 			OAuth2ApplicationScopeAliasesImpl.class,
 			oAuth2ApplicationScopeAliases.getPrimaryKey(),
 			oAuth2ApplicationScopeAliases, false);
+
+		clearUniqueFindersCache(oAuth2ApplicationScopeAliasesModelImpl, false);
+		cacheUniqueFindersCache(oAuth2ApplicationScopeAliasesModelImpl);
 
 		oAuth2ApplicationScopeAliases.resetOriginalValues();
 
