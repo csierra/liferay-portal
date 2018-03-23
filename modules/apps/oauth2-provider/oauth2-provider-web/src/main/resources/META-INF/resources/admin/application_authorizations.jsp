@@ -72,7 +72,7 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 	<liferay-ui:search-container
 		emptyResultsMessage="no-devices-were-found"
 		iteratorURL="<%= portletURL %>"
-		total="<%= OAuth2AuthorizationLocalServiceUtil.getOAuth2AuthorizationsCount(themeDisplay.getCompanyId(), oAuth2ApplicationId) %>">
+		total="<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2AuthorizationsCount(oAuth2ApplicationId) %>">
 
 		<%
 			OrderByComparator orderByComparator = null;
@@ -83,7 +83,7 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 		%>
 
 		<liferay-ui:search-container-results
-			results="<%= OAuth2AuthorizationLocalServiceUtil.getOAuth2Authorizations(themeDisplay.getCompanyId(), oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
+			results="<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2Authorizations(oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.oauth2.provider.model.OAuth2Authorization"
@@ -107,15 +107,6 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 
 			<liferay-ui:search-container-column-text
 				property="remoteIPInfo" />
-
-			<liferay-ui:search-container-column-text
-				name="scopes">
-
-				<%= String.valueOf(oAuth2Authorization.getScopeAliasesList().size()) %>
-
-				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Authorization.getScopeAliases()) %>" />
-
-			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-jsp
 				align="right"

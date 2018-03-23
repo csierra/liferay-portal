@@ -50,13 +50,11 @@ public class OAuth2DevicesPortlet extends MVCPortlet {
 		ActionRequest request, ActionResponse response)
 		throws PortalException {
 
-		long oAuth2TokenId = ParamUtil.getLong(request, "oAuth2TokenId");
-
-		long oAuth2RefreshTokenId = ParamUtil.getLong(
-			request, "oAuth2RefreshTokenId");
+		long oAuth2AuthorizationId = ParamUtil.getLong(
+			request, "oAuth2AuthorizationId");
 
 		_oAuth2AuthorizationService.revokeOAuth2Authorization(
-			oAuth2TokenId, oAuth2RefreshTokenId);
+			oAuth2AuthorizationId);
 	}
 
 	@Reference

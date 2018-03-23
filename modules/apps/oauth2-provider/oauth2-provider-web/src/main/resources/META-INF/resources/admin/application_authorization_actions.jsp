@@ -23,9 +23,6 @@ OAuth2Application oAuth2Application = (OAuth2Application)request.getAttribute("a
 ResultRow row = (ResultRow)request.getAttribute("SEARCH_CONTAINER_RESULT_ROW");
 
 OAuth2Authorization oAuth2Authorization = (OAuth2Authorization)row.getObject();
-
-long oAuth2AccessTokenId = oAuth2Authorization.getOAuth2AccessTokenId();
-long oAuth2RefreshTokenId = oAuth2Authorization.getOAuth2RefreshTokenId();
 %>
 
 <c:if test="<%= oAuth2AdminPortletDisplayContext.hasRevokeTokenPermission(oAuth2Application) %>">
@@ -37,8 +34,7 @@ long oAuth2RefreshTokenId = oAuth2Authorization.getOAuth2RefreshTokenId();
 		showWhenSingleIcon="<%= true %>"
 	>
 		<portlet:actionURL name="revokeAuthorizationTokens" var="revokeURL">
-			<portlet:param name="oAuth2TokenId" value="<%= String.valueOf(oAuth2AccessTokenId) %>" />
-			<portlet:param name="oAuth2RefreshTokenId" value="<%= String.valueOf(oAuth2RefreshTokenId) %>" />
+			<portlet:param name="oAuth2AuthorizationId" value="<%= String.valueOf(oAuth2Authorization.getOAuth2AuthorizationId()) %>" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 		</portlet:actionURL>
 

@@ -14,41 +14,42 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet;
 
-import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
-import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
+import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @Component(
 	immediate = true,
@@ -98,11 +99,21 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 
 			context.setOAuth2Application(oAuth2Application);
 
+			List<String> allowedScopes = Collections.emptyList();
+
+			if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
+				OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+					_oAuth2ApplicationScopeAliasesLocalService.
+						getOAuth2ApplicationScopeAliases(
+							oAuth2Application.
+								getOAuth2ApplicationScopeAliasesId());
+
+				allowedScopes =
+					oAuth2ApplicationScopeAliases.getScopeAliasesList();
+			}
+
 			String[] requestedScopes = StringUtil.split(
 				oAuth2Parameters.get("scope"), StringPool.SPACE);
-
-			List<String> allowedScopes =
-				oAuth2Application.getScopeAliasesList();
 
 			AuthorizationRequestModel authorizationRequestModel =
 				new AuthorizationRequestModel(
@@ -118,7 +129,7 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 			renderRequest.setAttribute(
 				OAuth2AdminWebKeys.AUTHORIZE_DISPLAY_CONTEXT, context);
 		} 
-		catch (PrincipalException e) {
+		catch (PortalException e) {
 			throw new PortletException(e);
 		}
 		
@@ -183,7 +194,11 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;
-	
+
+	@Reference
+	private OAuth2ApplicationScopeAliasesLocalService
+		_oAuth2ApplicationScopeAliasesLocalService;
+
 	@Reference
 	private ScopeLocator _scopeFinderLocator;
 

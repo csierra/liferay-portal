@@ -1,4 +1,9 @@
-<%--
+<%@ page
+	import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService" %>
+<%@ page
+	import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalServiceUtil" %>
+<%@ page
+	import="com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -102,14 +107,31 @@ String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 
 			<liferay-ui:search-container-column-text
 				name="granted-authorizations"
-				value="<%= String.valueOf(OAuth2AuthorizationLocalServiceUtil.getOAuth2AuthorizationsCount(themeDisplay.getCompanyId(), oAuth2Application.getOAuth2ApplicationId())) %>" />
+				value="<%= String.valueOf(OAuth2AuthorizationServiceUtil.getApplicationOAuth2AuthorizationsCount(oAuth2Application.getOAuth2ApplicationId())) %>" />
 
 			<liferay-ui:search-container-column-text
 				name="scopes">
 
-				<%= String.valueOf(oAuth2Application.getScopeAliasesList().size()) %>
+				<%
+					int scopeAliasesSize = 0;
+					String scopeAliases = "";
 
-				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Application.getScopeAliases()) %>" />
+					if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
+						OAuth2ApplicationScopeAliases
+							oAuth2ApplicationScopeAliases =
+							OAuth2ApplicationScopeAliasesLocalServiceUtil.getOAuth2ApplicationScopeAliases(
+								oAuth2Application.getOAuth2ApplicationScopeAliasesId());
+
+						List<String> scopeAliasesList = oAuth2ApplicationScopeAliases.getScopeAliasesList();
+
+						scopeAliasesSize = scopeAliasesList.size();
+						scopeAliases = oAuth2ApplicationScopeAliases.getScopeAliases();
+					}
+
+					out.println(String.valueOf(scopeAliasesSize));
+				%>
+
+				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(scopeAliases) %>" />
 
 			</liferay-ui:search-container-column-text>
 

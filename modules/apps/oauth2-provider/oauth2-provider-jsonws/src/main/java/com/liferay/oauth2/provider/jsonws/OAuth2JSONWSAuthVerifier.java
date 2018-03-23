@@ -14,16 +14,18 @@
 
 package com.liferay.oauth2.provider.jsonws;
 
-import com.liferay.oauth2.provider.exception.NoSuchOAuth2AccessTokenException;
-import com.liferay.oauth2.provider.model.OAuth2AccessToken;
-import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.exception.NoSuchOAuth2AuthorizationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
+import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
-import com.liferay.oauth2.provider.service.OAuth2AccessTokenLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
+import com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -44,6 +46,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -177,22 +180,40 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		}
 
 		String token = basicAuthParts[1];
-		OAuth2AccessToken oAuth2AccessToken = null;
+		OAuth2Authorization oAuth2Authorization = null;
 		try {
-			oAuth2AccessToken =
-				_oAuth2AccessTokenLocalService.getOAuth2AccessToken(token);
+			oAuth2Authorization =
+				_oAuth2AuthorizationLocalService.
+					getOAuth2AuthorizationByAccessTokenContent(token);
 		}
-		catch (NoSuchOAuth2AccessTokenException e) {
+		catch (NoSuchOAuth2AuthorizationException e) {
 			return null;
 		}
 
 		OAuth2Application oAuth2Application =
 			_oAuth2ApplicationLocalService.getOAuth2Application(
-				oAuth2AccessToken.getOAuth2ApplicationId());
+				oAuth2Authorization.getOAuth2ApplicationId());
 
-		long issuedAtSeconds = oAuth2AccessToken.getCreateDate().getTime() / 1000;
-		long expiresSeconds = oAuth2AccessToken.getExpirationDate().getTime() / 1000;
+		long issuedAtSeconds =
+			oAuth2Authorization.getAccessTokenCreateDate().getTime() / 1000;
+
+		long expiresSeconds =
+			oAuth2Authorization.getAccessTokenExpirationDate().getTime() / 1000;
+
 		long lifeTime = expiresSeconds - issuedAtSeconds;
+
+		List<String> scopeAliasesList = Collections.emptyList();
+
+		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
+			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+				_oAuth2ApplicationScopeAliasesLocalService.
+					getOAuth2ApplicationScopeAliases(
+						oAuth2Authorization.
+							getOAuth2ApplicationScopeAliasesId());
+
+			scopeAliasesList =
+				oAuth2ApplicationScopeAliases.getScopeAliasesList();
+		}
 
 		BearerTokenProvider.AccessToken accessToken =
 			new BearerTokenProvider.AccessToken(
@@ -209,11 +230,11 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				new HashMap<>(),
 				StringPool.BLANK,
 				StringPool.BLANK,
-				oAuth2AccessToken.getScopeAliasesList(),
-				oAuth2AccessToken.getTokenContent(),
+				scopeAliasesList,
+				oAuth2Authorization.getAccessTokenContent(),
 				"Bearer",
-				oAuth2AccessToken.getUserId(),
-				oAuth2AccessToken.getUserName());
+				oAuth2Authorization.getUserId(),
+				oAuth2Authorization.getUserName());
 
 		return accessToken;
 	}
@@ -236,10 +257,14 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	private volatile ScopeLocator _scopeFinderLocator;
 
 	@Reference
-	private OAuth2AccessTokenLocalService _oAuth2AccessTokenLocalService;
+	private OAuth2AuthorizationLocalService _oAuth2AuthorizationLocalService;
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
+
+	@Reference
+	private OAuth2ApplicationScopeAliasesLocalService
+		_oAuth2ApplicationScopeAliasesLocalService;
 
 	@Reference
 	private SAPEntryScopeRegistry _sapEntryScopeRegistry;

@@ -1,7 +1,12 @@
 <%@ page
 	import="com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor" %>
 <%@ page
-	import="com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap" %><%--
+	import="com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap" %>
+<%@ page
+	import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalServiceUtil" %>
+<%@ page import="java.util.Collections" %>
+<%@ page
+	import="com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -47,7 +52,12 @@ Map<String, AuthorizationRequestModel> scopes = (Map<String, AuthorizationReques
 
 ServiceTrackerMap<String, ApplicationDescriptor> applicationDescriptors = (ServiceTrackerMap<String, ApplicationDescriptor>) request.getAttribute("applicationDescriptors");
 
-List<String> assignedScopes = oAuth2Application.getScopeAliasesList();
+List<String> assignedScopes = Collections.emptyList();
+if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
+	OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases = OAuth2ApplicationScopeAliasesLocalServiceUtil.getOAuth2ApplicationScopeAliases(oAuth2Application.getOAuth2ApplicationScopeAliasesId());
+	assignedScopes = oAuth2ApplicationScopeAliases.getScopeAliasesList();
+}
+
 %>
 
 <style>

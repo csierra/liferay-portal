@@ -43,14 +43,15 @@ renderResponse.setTitle(headerTitle);
 		<liferay-ui:error exception="<%= DuplicateOAuth2ApplicationClientIdException.class %>" message="client-id-already-exists" focusField="clientId"/>
 		<liferay-ui:error exception="<%= OAuth2ApplicationHomePageURLException.class %>" message="home-page-url-is-invalid" focusField="homePageURL"/>
 		<liferay-ui:error exception="<%= OAuth2ApplicationHomePageURLSchemeException.class %>" message="home-page-url-scheme-is-invalid" focusField="homePageURL"/>
-		<liferay-ui:error exception="<%= OAuth2ApplicationPrivacyPolicyURLException.class %>" message="privacy-policy-url-is-invalid" focusField="privacyPolicyURL">
-			<liferay-ui:message key="redirect-uri-is-missing-for-grant-type-x" arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIMissingException)errorException).getMessage()) %>" />
-		</liferay-ui:error>
+		<liferay-ui:error exception="<%= OAuth2ApplicationPrivacyPolicyURLException.class %>" message="privacy-policy-url-is-invalid" focusField="privacyPolicyURL" />
 		<liferay-ui:error exception="<%= OAuth2ApplicationPrivacyPolicyURLSchemeException.class %>" focusField="privacyPolicyURL">
 			<liferay-ui:message key="privacy-policy-url-scheme-is-invalid" arguments="<%= HtmlUtil.escape(((OAuth2ApplicationPrivacyPolicyURLSchemeException)errorException).getMessage()) %>" />
 		</liferay-ui:error>
 		<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIException.class %>" focusField="redirectURIs">
 			<liferay-ui:message key="redirect-uri-x-is-invalid" arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIException)errorException).getMessage()) %>" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIMissingException.class %>" focusField="redirectURIs">
+			<liferay-ui:message key="redirect-uri-is-missing-for-grant-type-x" arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIMissingException)errorException).getMessage()) %>" />
 		</liferay-ui:error>
 		<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIFragmentException.class %>" focusField="redirectURIs">
 			<liferay-ui:message key="redirect-uri-x-fragment-is-invalid" arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIFragmentException)errorException).getMessage()) %>" />

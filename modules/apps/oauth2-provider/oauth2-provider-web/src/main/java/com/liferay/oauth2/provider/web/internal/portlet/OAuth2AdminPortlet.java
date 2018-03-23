@@ -17,10 +17,8 @@ package com.liferay.oauth2.provider.web.internal.portlet;
 import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.service.OAuth2AccessTokenService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
-import com.liferay.oauth2.provider.service.OAuth2RefreshTokenService;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext;
@@ -36,6 +34,11 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -44,13 +47,6 @@ import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -193,15 +189,17 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 						oAuth2ApplicationId);
 
 				iconFileEntryId = oAuth2Application.getIconFileEntryId();
-				scopesList = oAuth2Application.getScopeAliasesList();
+
+				long oAuth2ApplicationScopeAliasesId =
+					oAuth2Application.getOAuth2ApplicationScopeAliasesId();
 
 				oAuth2Application =
 					_oAuth2ApplicationService.updateOAuth2Application(
 						oAuth2ApplicationId, allowedGrantTypes,
 						clientId, clientProfile, clientSecret, description,
 						featuresList, homePageURL, iconFileEntryId, name,
-						privacyPolicyURL, redirectURIsList, scopesList,
-						serviceContext);
+						privacyPolicyURL, redirectURIsList,
+						oAuth2ApplicationScopeAliasesId, serviceContext);
 			}
 
 			UploadPortletRequest uploadPortletRequest =
@@ -244,13 +242,11 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			ActionRequest request, ActionResponse response)
 		throws PortalException {
 
-		long oAuth2TokenId = ParamUtil.getLong(request, "oAuth2TokenId");
-
-		long oAuth2RefreshTokenId = ParamUtil.getLong(
-			request, "oAuth2RefreshTokenId");
+		long oAuth2AuthorizationId = ParamUtil.getLong(
+			request, "oAuth2AuthorizationId");
 
 		_oAuth2AuthorizationService.revokeOAuth2Authorization(
-			oAuth2TokenId, oAuth2RefreshTokenId);
+			oAuth2AuthorizationId);
 	}
 
 
@@ -269,13 +265,8 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;
 	@Reference
-	private OAuth2RefreshTokenService _oAuth2RefreshTokenService;
-	@Reference
 	private OAuth2AuthorizationService _oAuth2AuthorizationService;
 	@Reference
-	private OAuth2AccessTokenService _oAuth2AccessTokenService;
-	@Reference
 	private Portal _portal;
-
 
 }

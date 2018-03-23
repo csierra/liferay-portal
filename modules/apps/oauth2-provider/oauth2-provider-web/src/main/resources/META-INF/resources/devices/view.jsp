@@ -112,15 +112,6 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 			<liferay-ui:search-container-column-text
 				property="remoteIPInfo" />
 
-			<liferay-ui:search-container-column-text
-				name="scopes">
-
-				<%= String.valueOf(oAuth2Authorization.getScopeAliasesList().size()) %>
-
-				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(oAuth2Authorization.getScopeAliases()) %>" />
-
-			</liferay-ui:search-container-column-text>
-
 			<liferay-ui:search-container-column-jsp
 				align="right"
 				path="/devices/authorization_actions.jsp" />
