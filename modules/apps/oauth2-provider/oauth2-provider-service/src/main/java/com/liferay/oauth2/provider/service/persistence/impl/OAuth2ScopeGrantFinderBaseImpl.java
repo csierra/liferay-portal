@@ -18,7 +18,15 @@ import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPersistence;
 
 import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+
+import java.lang.reflect.Field;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -27,6 +35,30 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 public class OAuth2ScopeGrantFinderBaseImpl extends BasePersistenceImpl<OAuth2ScopeGrant> {
 	public OAuth2ScopeGrantFinderBaseImpl() {
 		setModelClass(OAuth2ScopeGrant.class);
+
+		try {
+			Field field = BasePersistenceImpl.class.getDeclaredField(
+					"_dbColumnNames");
+
+			field.setAccessible(true);
+
+			Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+			dbColumnNames.put("oAuth2ApplicationScopeAliasesId",
+				"oA2AScopeAliasesId");
+
+			field.set(this, dbColumnNames);
+		}
+		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(e, e);
+			}
+		}
+	}
+
+	@Override
+	public Set<String> getBadColumnNames() {
+		return getOAuth2ScopeGrantPersistence().getBadColumnNames();
 	}
 
 	/**
@@ -50,4 +82,5 @@ public class OAuth2ScopeGrantFinderBaseImpl extends BasePersistenceImpl<OAuth2Sc
 
 	@BeanReference(type = OAuth2ScopeGrantPersistence.class)
 	protected OAuth2ScopeGrantPersistence oAuth2ScopeGrantPersistence;
+	private static final Log _log = LogFactoryUtil.getLog(OAuth2ScopeGrantFinderBaseImpl.class);
 }

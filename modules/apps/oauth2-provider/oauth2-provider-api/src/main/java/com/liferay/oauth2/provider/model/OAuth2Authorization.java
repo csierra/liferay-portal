@@ -14,60 +14,61 @@
 
 package com.liferay.oauth2.provider.model;
 
-import java.util.Date;
-import java.util.List;
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.annotation.ImplementationClassName;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.util.Accessor;
 
 /**
- * @author Tomas Polesovsky
+ * The extended model interface for the OAuth2Authorization service. Represents a row in the &quot;OAuth2Authorization&quot; database table, with each column mapped to a property of this class.
+ *
+ * @author Brian Wing Shun Chan
+ * @see OAuth2AuthorizationModel
+ * @see com.liferay.oauth2.provider.model.impl.OAuth2AuthorizationImpl
+ * @see com.liferay.oauth2.provider.model.impl.OAuth2AuthorizationModelImpl
+ * @generated
  */
-public interface OAuth2Authorization extends OAuth2AuthorizationModel {
+@ImplementationClassName("com.liferay.oauth2.provider.model.impl.OAuth2AuthorizationImpl")
+@ProviderType
+public interface OAuth2Authorization extends OAuth2AuthorizationModel,
+	PersistedModel {
+	/*
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify this interface directly. Add methods to {@link com.liferay.oauth2.provider.model.impl.OAuth2AuthorizationImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
+	public static final Accessor<OAuth2Authorization, Long> O_AUTH2_AUTHORIZATION_ID_ACCESSOR =
+		new Accessor<OAuth2Authorization, Long>() {
+			@Override
+			public Long get(OAuth2Authorization oAuth2Authorization) {
+				return oAuth2Authorization.getOAuth2AuthorizationId();
+			}
 
-	public Date getAccessTokenExpirationDate();
+			@Override
+			public Class<Long> getAttributeClass() {
+				return Long.class;
+			}
 
-	public long getCompanyId();
-
-	public Date getCreateDate();
+			@Override
+			public Class<OAuth2Authorization> getTypeClass() {
+				return OAuth2Authorization.class;
+			}
+		};
 
 	public long getOAuth2AccessTokenId();
 
-	public long getOAuth2ApplicationId();
-
 	public long getOAuth2RefreshTokenId();
 
-	public Date getRefreshTokenExpirationDate();
+	public java.lang.String getScopeAliases();
 
-	public String getRemoteIPInfo();
-
-	public String getScopeAliases();
-
-	public List<String> getScopeAliasesList();
-
-	public long getUserId();
-
-	public String getUserName();
-
-	public void setAccessTokenExpirationDate(Date accessTokenExpirationDate);
-
-	public void setCompanyId(long companyId);
-
-	public void setCreateDate(Date createDate);
+	public java.util.List<java.lang.String> getScopeAliasesList();
 
 	public void setOAuth2AccessTokenId(long oAuth2AccessTokenId);
 
-	public void setOAuth2ApplicationId(long oAuth2ApplicationId);
-
 	public void setOAuth2RefreshTokenId(long oAuth2RefreshTokenId);
 
-	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate);
+	public void setScopes(java.lang.String scopes);
 
-	public void setRemoteIPInfo(String remoteIPInfo);
-
-	public void setScopes(String scopes);
-
-	public void setScopesList(List<String> scopesList);
-
-	public void setUserId(long userId);
-
-	public void setUserName(String userName);
-
+	public void setScopesList(java.util.List<java.lang.String> scopesList);
 }

@@ -26,7 +26,7 @@ import java.util.List;
  * @author Tomas Polesovsky
  */
 public class OAuth2AuthorizationImpl
-	extends OAuth2AuthorizationModelImpl implements OAuth2Authorization {
+	extends OAuth2AuthorizationBaseImpl {
 
 	public Date getAccessTokenExpirationDate() {
 		return _accessTokenExpirationDate;
