@@ -24,11 +24,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(
-	immediate = true,
-	property = {"token.location=" + TokenLocation.REQUEST_HEADER},
-	service = TokenRetriever.class
-)
+@Component(property = {"token.location=" + TokenLocation.REQUEST_HEADER})
 public class RequestHeaderTokenRetriever implements TokenRetriever {
 
 	@Override

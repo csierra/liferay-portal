@@ -25,10 +25,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(
-	immediate = true, property = {"token.location=" + TokenLocation.COOKIE},
-	service = TokenRetriever.class
-)
+@Component(property = {"token.location=" + TokenLocation.COOKIE})
 public class CookieTokenRetriever implements TokenRetriever {
 
 	@Override
