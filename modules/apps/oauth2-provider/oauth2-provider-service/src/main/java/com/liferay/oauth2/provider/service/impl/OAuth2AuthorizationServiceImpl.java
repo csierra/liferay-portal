@@ -51,6 +51,9 @@ public class OAuth2AuthorizationServiceImpl
 	public int getApplicationOAuth2AuthorizationsCount(long oAuth2ApplicationId)
 		throws PortalException {
 
+		_oAuth2ApplicationModelResourcePermission.check(
+			getPermissionChecker(), oAuth2ApplicationId, ActionKeys.VIEW);
+
 		return oAuth2AuthorizationLocalService.getOAuth2AuthorizationsCount(
 			oAuth2ApplicationId);
 	}

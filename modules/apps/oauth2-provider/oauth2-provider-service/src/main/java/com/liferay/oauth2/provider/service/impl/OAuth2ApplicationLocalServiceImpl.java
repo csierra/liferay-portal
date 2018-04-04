@@ -83,8 +83,11 @@ public class OAuth2ApplicationLocalServiceImpl
 		}
 
 		clientId = StringUtil.trim(clientId);
+
 		homePageURL = StringUtil.trim(homePageURL);
+
 		name = StringUtil.trim(name);
+
 		privacyPolicyURL = StringUtil.trim(privacyPolicyURL);
 
 		if (redirectURIsList == null) {
@@ -270,6 +273,18 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationPersistence.findByPrimaryKey(oAuth2ApplicationId);
+
+		clientId = StringUtil.trim(clientId);
+
+		homePageURL = StringUtil.trim(homePageURL);
+
+		name = StringUtil.trim(name);
+
+		privacyPolicyURL = StringUtil.trim(privacyPolicyURL);
+
+		if (redirectURIsList == null) {
+			redirectURIsList = new ArrayList<>();
+		}
 
 		validate(
 			oAuth2Application.getCompanyId(), oAuth2ApplicationId,

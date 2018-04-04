@@ -22,17 +22,15 @@ import com.liferay.oauth2.provider.service.base.OAuth2ApplicationScopeAliasesLoc
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 
@@ -96,6 +94,17 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 	}
 
 	@Override
+	public OAuth2ApplicationScopeAliases fetchOAuth2ApplicationScopeAliases(
+		long oAuth2ApplicationId, List<String> scopeAliasesList) {
+
+		String scopeAliases = StringUtil.merge(
+			scopeAliasesList, StringPool.SPACE);
+
+		return oAuth2ApplicationScopeAliasesPersistence.fetchByO_S(
+			oAuth2ApplicationId, scopeAliases);
+	}
+
+	@Override
 	public List<OAuth2ApplicationScopeAliases>
 		getOAuth2ApplicationScopeAliaseses(
 			long oAuth2ApplicationId, int start, int end,
@@ -107,39 +116,17 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 				oAuth2ApplicationId, start, end, orderByComparator);
 	}
 
-	@Override
-	public OAuth2ApplicationScopeAliases
-		fetchOAuth2ApplicationScopeAliases(
-			long oAuth2ApplicationId, List<String> scopeAliasesList) {
-
-		String scopeAliases = StringUtil.merge(
-			scopeAliasesList, StringPool.SPACE);
-
-		return oAuth2ApplicationScopeAliasesPersistence.fetchByO_S(
-				oAuth2ApplicationId, scopeAliases);
-	}
-
 	protected void createScopeGrants(
 			long companyId, long oAuth2ApplicationScopeAliasesId,
 			List<String> scopeAliasesList)
 		throws PortalException {
 
-		Stream<String> scopeAliasesStream = scopeAliasesList.stream();
+		Set<LiferayOAuth2Scope> liferayOAuth2Scopes = new HashSet<>();
 
-		Registry registry = RegistryUtil.getRegistry();
-
-		Set<LiferayOAuth2Scope> liferayOAuth2Scopes = registry.callService(
-			ScopeLocator.class,
-			scopeLocator ->
-				scopeAliasesStream.map(
-					scopeAlias -> scopeLocator.getLiferayOAuth2Scopes(
-						companyId, scopeAlias)
-				).flatMap(
-					liferayOAuth2Scopes1 -> liferayOAuth2Scopes1.stream()
-				).collect(
-					Collectors.toSet()
-				)
-		);
+		for (String scopeAlias : scopeAliasesList) {
+			liferayOAuth2Scopes.addAll(
+				_scopeLocator.getLiferayOAuth2Scopes(companyId, scopeAlias));
+		}
 
 		for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
 			Bundle bundle = liferayOAuth2Scope.getBundle();
@@ -150,5 +137,8 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 				bundle.getSymbolicName(), liferayOAuth2Scope.getScope());
 		}
 	}
+
+	@ServiceReference(type = ScopeLocator.class)
+	private ScopeLocator _scopeLocator;
 
 }
