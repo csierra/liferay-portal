@@ -82,8 +82,8 @@ public class OAuth2ScopeGrantLocalServiceImpl
 		long companyId, String applicationName, String bundleSymbolicName,
 		String accessTokenContent) {
 
-		return oAuth2ScopeGrantFinder.findByC_A_A_B(
-			companyId, accessTokenContent, applicationName, bundleSymbolicName);
+		return oAuth2ScopeGrantFinder.findByC_A_B_A(
+			companyId, applicationName, bundleSymbolicName, accessTokenContent);
 	}
 
 	@Override
