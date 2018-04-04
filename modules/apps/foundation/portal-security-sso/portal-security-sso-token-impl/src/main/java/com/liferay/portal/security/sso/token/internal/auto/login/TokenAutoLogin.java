@@ -14,7 +14,6 @@
 
 package com.liferay.portal.security.sso.token.internal.auto.login;
 
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.StringPool;
@@ -36,7 +35,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.exportimport.UserImporter;
 import com.liferay.portal.security.sso.token.internal.configuration.TokenConfiguration;
 import com.liferay.portal.security.sso.token.internal.constants.TokenConstants;
-import com.liferay.portal.security.sso.token.security.auth.TokenLocation;
 import com.liferay.portal.security.sso.token.security.auth.TokenRetriever;
 import com.liferay.portal.util.PropsValues;
 
@@ -71,11 +69,7 @@ public class TokenAutoLogin extends BaseAutoLogin {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_tokenRetrievers = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, TokenRetriever.class, null,
-			ServiceReferenceMapperFactory.create(
-				bundleContext,
-				(tokenRetriever, emitter) -> emitter.emit(
-					tokenRetriever.getTokenLocation())));
+			bundleContext, TokenRetriever.class, "token.location");
 	}
 
 	@Deactivate
@@ -102,8 +96,7 @@ public class TokenAutoLogin extends BaseAutoLogin {
 
 		String userTokenName = tokenCompanyServiceSettings.userTokenName();
 
-		TokenLocation tokenLocation =
-			tokenCompanyServiceSettings.tokenLocation();
+		String tokenLocation = tokenCompanyServiceSettings.tokenLocation();
 
 		TokenRetriever tokenRetriever = _tokenRetrievers.getService(
 			tokenLocation);
@@ -235,7 +228,7 @@ public class TokenAutoLogin extends BaseAutoLogin {
 	@Reference
 	private Portal _portal;
 
-	private ServiceTrackerMap<TokenLocation, TokenRetriever> _tokenRetrievers;
+	private ServiceTrackerMap<String, TokenRetriever> _tokenRetrievers;
 	private UserImporter _userImporter;
 	private UserLocalService _userLocalService;
 

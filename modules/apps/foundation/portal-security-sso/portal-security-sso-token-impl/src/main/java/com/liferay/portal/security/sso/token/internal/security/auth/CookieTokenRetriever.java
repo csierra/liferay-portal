@@ -25,7 +25,10 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(immediate = true, service = TokenRetriever.class)
+@Component(
+	immediate = true, property = {"token.location=" + TokenLocation.COOKIE},
+	service = TokenRetriever.class
+)
 public class CookieTokenRetriever implements TokenRetriever {
 
 	@Override
@@ -33,11 +36,6 @@ public class CookieTokenRetriever implements TokenRetriever {
 		HttpServletRequest request, String userTokenName) {
 
 		return CookieKeys.getCookie(request, userTokenName, false);
-	}
-
-	@Override
-	public TokenLocation getTokenLocation() {
-		return TokenLocation.COOKIE;
 	}
 
 }
