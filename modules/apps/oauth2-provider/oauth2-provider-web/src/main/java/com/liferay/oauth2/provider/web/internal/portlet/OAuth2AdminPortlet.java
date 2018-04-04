@@ -83,7 +83,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
-			new OAuth2AdminPortletDisplayContext(_oAuth2Configuration);
+			new OAuth2AdminPortletDisplayContext(_oAuth2ProviderConfiguration);
 
 		renderRequest.setAttribute(
 			OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT,
@@ -148,7 +148,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			request, "homePageURL", StringPool.BLANK);
 
 		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
-			new OAuth2AdminPortletDisplayContext(_oAuth2Configuration);
+			new OAuth2AdminPortletDisplayContext(_oAuth2ProviderConfiguration);
 
 		List<GrantType> oAuth2Grants =
 			oAuth2AdminPortletDisplayContext.getOAuth2Grants(
@@ -252,7 +252,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		_oAuth2Configuration =
+		_oAuth2ProviderConfiguration =
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 	}
@@ -260,7 +260,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortlet.class);
 
-	private OAuth2ProviderConfiguration _oAuth2Configuration;
+	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
 
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;

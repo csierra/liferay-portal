@@ -59,24 +59,24 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		_grantHandlerServiceRegistration;
 	private ServiceRegistration<Object> _endpointServiceRegistration;
 
-	private OAuth2ProviderConfiguration _oAuth2Configuration;
+	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
 
 	@Activate
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		_oAuth2Configuration =
+		_oAuth2ProviderConfiguration =
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 
-		if (_oAuth2Configuration.allowAuthorizationCodeGrant() ||
-			_oAuth2Configuration.allowAuthorizationCodePKCEGrant()) {
+		if (_oAuth2ProviderConfiguration.allowAuthorizationCodeGrant() ||
+			_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant()) {
 
 			AuthorizationCodeGrantService authorizationCodeGrantService =
 				new AuthorizationCodeGrantService();
 
 			authorizationCodeGrantService.setCanSupportPublicClients(
-				_oAuth2Configuration.allowAuthorizationCodePKCEGrant());
+				_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant());
 
 			authorizationCodeGrantService.setDataProvider(
 				_liferayOAuthDataProvider);
@@ -98,7 +98,7 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 				_liferayOAuthDataProvider);
 
 			authorizationCodeGrantHandler.setExpectCodeVerifierForPublicClients(
-				_oAuth2Configuration.allowAuthorizationCodePKCEGrant());
+				_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant());
 
 			authorizationCodeGrantHandler.setCodeVerifierTransformer(
 				new DigestCodeVerifier());
@@ -178,7 +178,7 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		long companyId = oAuth2Application.getCompanyId();
 
 		if (client.isConfidential()) {
-			if (!_oAuth2Configuration.allowAuthorizationCodeGrant()){
+			if (!_oAuth2ProviderConfiguration.allowAuthorizationCodeGrant()){
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Auhotization code grant is disabled in " + companyId);
@@ -202,7 +202,7 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 			}
 		}
 		else {
-			if (!_oAuth2Configuration.allowAuthorizationCodePKCEGrant()){
+			if (!_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant()){
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"PKCE grant is disabled in " + companyId);

@@ -103,7 +103,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		_codeGrantsPortalCache = (PortalCache<String, ServerAuthorizationCodeGrant>)
 			_multiVMPool.getPortalCache("oauth2-provider-code-grants");
-		_oAuth2Configuration =
+		_oAuth2ProviderConfiguration =
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 		_codeGrantsPortalCache = (PortalCache<String, ServerAuthorizationCodeGrant>)
@@ -724,32 +724,34 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		List<String> clientGrantTypes = client.getAllowedGrantTypes();
 
 		for (GrantType allowedGrantType : allowedGrantTypes) {
-			if (_oAuth2Configuration.allowAuthorizationCodeGrant() &&
-					(allowedGrantType == GrantType.AUTHORIZATION_CODE)) {
+			if (_oAuth2ProviderConfiguration.allowAuthorizationCodeGrant() &&
+				(allowedGrantType == GrantType.AUTHORIZATION_CODE)) {
 
 				clientGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
 			}
-			else if (_oAuth2Configuration.allowAuthorizationCodePKCEGrant() &&
-					 (allowedGrantType == GrantType.AUTHORIZATION_CODE_PKCE)) {
+			else if (
+				_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant() &&
+				(allowedGrantType == GrantType.AUTHORIZATION_CODE_PKCE)) {
 
 				clientGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
 				clientGrantTypes.add(
 					LiferayAuthorizationCodeGrantHandlerRegistrator.
 						AUTHORIZATION_CODE_PKCE_GRANT);
 			}
-			else if (_oAuth2Configuration.allowClientCredentialsGrant() &&
-					 (allowedGrantType == GrantType.CLIENT_CREDENTIALS)) {
+			else if (
+				_oAuth2ProviderConfiguration.allowClientCredentialsGrant() &&
+				(allowedGrantType == GrantType.CLIENT_CREDENTIALS)) {
 
 				clientGrantTypes.add(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
 			}
 			else if (
-				_oAuth2Configuration.
+				_oAuth2ProviderConfiguration.
 					allowResourceOwnerPasswordCredentialsGrant() &&
 				(allowedGrantType == GrantType.RESOURCE_OWNER_PASSWORD)) {
 
 				clientGrantTypes.add(OAuthConstants.RESOURCE_OWNER_GRANT);
 			}
-			else if (_oAuth2Configuration.allowRefreshTokenGrant() &&
+			else if (_oAuth2ProviderConfiguration.allowRefreshTokenGrant() &&
 					 (allowedGrantType == GrantType.REFRESH_TOKEN)) {
 
 				clientGrantTypes.add(OAuthConstants.REFRESH_TOKEN_GRANT);
@@ -975,7 +977,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 	
-	private OAuth2ProviderConfiguration _oAuth2Configuration;
+	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
 
 	@Reference(
 		policyOption = ReferencePolicyOption.GREEDY,

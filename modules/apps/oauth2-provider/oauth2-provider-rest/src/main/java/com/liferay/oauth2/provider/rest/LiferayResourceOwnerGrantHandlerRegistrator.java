@@ -54,11 +54,11 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		OAuth2ProviderConfiguration oAuth2Configuration =
+		OAuth2ProviderConfiguration oAuth2ProviderConfiguration =
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 
-		if (oAuth2Configuration.allowResourceOwnerPasswordCredentialsGrant()) {
+		if (oAuth2ProviderConfiguration.allowResourceOwnerPasswordCredentialsGrant()) {
 			ResourceOwnerGrantHandler resourceOwnerGrantHandler =
 				new ResourceOwnerGrantHandler();
 

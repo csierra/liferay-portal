@@ -55,11 +55,11 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		OAuth2ProviderConfiguration oAuth2Configuration =
+		OAuth2ProviderConfiguration oAuth2ProviderConfiguration =
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 
-		if (oAuth2Configuration.allowRefreshTokenGrant()) {
+		if (oAuth2ProviderConfiguration.allowRefreshTokenGrant()) {
 			RefreshTokenGrantHandler refreshTokenGrantHandler =
 				new RefreshTokenGrantHandler();
 

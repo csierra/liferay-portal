@@ -42,9 +42,9 @@ import java.util.List;
 public class OAuth2AdminPortletDisplayContext {
 
 	public OAuth2AdminPortletDisplayContext(
-		OAuth2ProviderConfiguration oAuth2Configuration) {
+		OAuth2ProviderConfiguration oAuth2ProviderConfiguration) {
 
-		_oAuth2Configuration = oAuth2Configuration;
+		_oAuth2ProviderConfiguration = oAuth2ProviderConfiguration;
 	}
 
 	public List<GrantType> getOAuth2Grants(
@@ -63,19 +63,19 @@ public class OAuth2AdminPortletDisplayContext {
 			result.addAll(Arrays.asList(GrantType.values()));
 		}
 
-		if (!_oAuth2Configuration.allowAuthorizationCodeGrant()) {
+		if (!_oAuth2ProviderConfiguration.allowAuthorizationCodeGrant()) {
 			result.remove(GrantType.AUTHORIZATION_CODE);
 		}
-		if (!_oAuth2Configuration.allowAuthorizationCodePKCEGrant()) {
+		if (!_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant()) {
 			result.remove(GrantType.AUTHORIZATION_CODE_PKCE);
 		}
-		if (!_oAuth2Configuration.allowClientCredentialsGrant()) {
+		if (!_oAuth2ProviderConfiguration.allowClientCredentialsGrant()) {
 			result.remove(GrantType.CLIENT_CREDENTIALS);
 		}
-		if (!_oAuth2Configuration.allowRefreshTokenGrant()) {
+		if (!_oAuth2ProviderConfiguration.allowRefreshTokenGrant()) {
 			result.remove(GrantType.REFRESH_TOKEN);
 		}
-		if (!_oAuth2Configuration.
+		if (!_oAuth2ProviderConfiguration.
 			allowResourceOwnerPasswordCredentialsGrant()) {
 
 			result.remove(GrantType.RESOURCE_OWNER_PASSWORD);
@@ -164,7 +164,7 @@ public class OAuth2AdminPortletDisplayContext {
 		return false;
 	}
 
-	private OAuth2ProviderConfiguration _oAuth2Configuration;
+	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
 
 	private static Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortletDisplayContext.class);
