@@ -19,6 +19,7 @@ package com.liferay.oauth2.provider.constants;
  * validated by the framework.
  *
  * @author Tomas Polesovsky
+ * @review
  */
 public enum GrantType {
 

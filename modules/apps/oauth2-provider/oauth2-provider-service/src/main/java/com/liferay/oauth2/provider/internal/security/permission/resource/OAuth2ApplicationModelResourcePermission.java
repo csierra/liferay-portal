@@ -109,7 +109,9 @@ public class OAuth2ApplicationModelResourcePermission
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 
-	@Reference(target = "(resource.name=" + OAuth2ProviderConstants.RESOURCE_NAME + ")")
+	@Reference(
+		target = "(resource.name=" + OAuth2ProviderConstants.RESOURCE_NAME + ")"
+	)
 	private PortletResourcePermission _portletResourcePermission;
 
 }

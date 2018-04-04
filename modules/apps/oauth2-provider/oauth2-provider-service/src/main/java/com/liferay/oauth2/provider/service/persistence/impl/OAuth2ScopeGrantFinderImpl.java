@@ -33,20 +33,20 @@ import java.util.List;
 public class OAuth2ScopeGrantFinderImpl
 	extends OAuth2ScopeGrantFinderBaseImpl implements OAuth2ScopeGrantFinder {
 
-	public static final String FIND_BY_A_BSN_C_T =
-		OAuth2ScopeGrantFinder.class.getName() + ".findByC_A_A_B";
+	public static final String FIND_BY_C_A_B_A =
+		OAuth2ScopeGrantFinder.class.getName() + ".findByC_A_B_A";
 
 	@Override
 	public Collection<OAuth2ScopeGrant> findByC_A_A_B(
-		long companyId, String accessTokenContent, String applicationName,
-		String bundleSymbolicName) {
+		long companyId, String applicationName, String bundleSymbolicName,
+		String accessTokenContent) {
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			String sql = CustomSQLUtil.get(getClass(), FIND_BY_A_BSN_C_T);
+			String sql = CustomSQLUtil.get(getClass(), FIND_BY_C_A_B_A);
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
