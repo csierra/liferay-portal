@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.rest;
 
+import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 import com.liferay.portal.kernel.log.Log;
@@ -26,6 +27,8 @@ import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPol
 import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -125,10 +128,20 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 		String token = basicAuthParts[1];
 
+		if (Validator.isBlank(token)) {
+			return null;
+		}
+
 		ServerAccessToken serverAccessToken =
 			_liferayOAuthDataProvider.getAccessToken(token);
 
 		if (serverAccessToken == null) {
+			return null;
+		}
+
+		String tokenKey = serverAccessToken.getTokenKey();
+
+		if(OAuth2ProviderConstants.EXPIRED_TOKEN.equals(tokenKey)) {
 			return null;
 		}
 

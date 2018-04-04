@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.rest;
 
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.GrantType;
+import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
@@ -561,7 +562,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			return;
 		}
 
-		oAuth2Authorization.setAccessTokenContent(null);
+		oAuth2Authorization.setAccessTokenContent(
+			OAuth2ProviderConstants.EXPIRED_TOKEN);
 
 		_oAuth2AuthorizationLocalService.updateOAuth2Authorization(
 			oAuth2Authorization);
@@ -578,7 +580,8 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			return;
 		}
 
-		oAuth2Authorization.setRefreshTokenContent(null);
+		oAuth2Authorization.setRefreshTokenContent(
+			OAuth2ProviderConstants.EXPIRED_TOKEN);
 
 		_oAuth2AuthorizationLocalService.updateOAuth2Authorization(
 			oAuth2Authorization);

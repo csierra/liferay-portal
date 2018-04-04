@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.jsonws;
 
+import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2AuthorizationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
@@ -36,6 +37,8 @@ import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
 import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -180,6 +183,11 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		}
 
 		String token = basicAuthParts[1];
+
+		if (Validator.isBlank(token)) {
+			return null;
+		}
+
 		OAuth2Authorization oAuth2Authorization = null;
 		try {
 			oAuth2Authorization =
@@ -187,6 +195,12 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 					getOAuth2AuthorizationByAccessTokenContent(token);
 		}
 		catch (NoSuchOAuth2AuthorizationException e) {
+			return null;
+		}
+
+		String accessTokenContent = oAuth2Authorization.getAccessTokenContent();
+
+		if(OAuth2ProviderConstants.EXPIRED_TOKEN.equals(accessTokenContent)) {
 			return null;
 		}
 
@@ -231,7 +245,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				StringPool.BLANK,
 				StringPool.BLANK,
 				scopeAliasesList,
-				oAuth2Authorization.getAccessTokenContent(),
+				accessTokenContent,
 				"Bearer",
 				oAuth2Authorization.getUserId(),
 				oAuth2Authorization.getUserName());
