@@ -47,7 +47,11 @@ public class OAuth2SAPEntryPublisher {
 			"OAUTH2_everything.readonly",
 			"#fetch*\n#get*\n#has*\n#is*\n#search*"
 		},
-		{"OAUTH2_everything", "*"}
+		{"OAUTH2_everything", "*"},
+		{
+			"OAUTH2_userprofile",
+			"com.liferay.portal.kernel.service.UserService#getCurrentUser"
+		}
 	};
 
 	@Activate
