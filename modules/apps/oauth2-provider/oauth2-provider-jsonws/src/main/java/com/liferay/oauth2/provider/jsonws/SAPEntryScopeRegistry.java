@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Stream;
 
 /**
  * @author Tomas Polesovsky
@@ -75,17 +76,8 @@ public class SAPEntryScopeRegistry {
 
 		long sapEntryId = sapEntry.getSapEntryId();
 
-		for (Iterator<SAPEntryScope> it = sapEntryScopes.iterator();
-			 it.hasNext();) {
-
-			SAPEntryScope sapEntryScope = it.next();
-
-			if (sapEntryScope.getSapEntryId() == sapEntryId) {
-				it.remove();
-
-				return;
-			}
-		}
+		sapEntryScopes.removeIf(
+			sapEntryScope -> sapEntryScope.getSapEntryId() == sapEntryId);
 	}
 
 	public void updateSAPEntry(SAPEntry sapEntry){
