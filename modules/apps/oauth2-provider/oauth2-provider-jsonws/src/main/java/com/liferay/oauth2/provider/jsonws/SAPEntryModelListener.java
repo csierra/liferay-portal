@@ -30,19 +30,24 @@ public class SAPEntryModelListener extends BaseModelListener<SAPEntry> {
 	@Override
 	public void onAfterCreate(SAPEntry model) throws ModelListenerException {
 		_sapEntryScopeRegistry.registerSAPEntry(model);
+		_oAuth2SAPEntryScopesPublisher.publishSAPEntries(model.getCompanyId());
 	}
 
 	@Override
 	public void onAfterRemove(SAPEntry model) throws ModelListenerException {
 		_sapEntryScopeRegistry.unregisterSAPEntry(model);
+		_oAuth2SAPEntryScopesPublisher.publishSAPEntries(model.getCompanyId());
 	}
 
 	@Override
 	public void onAfterUpdate(SAPEntry model) throws ModelListenerException {
 		_sapEntryScopeRegistry.updateSAPEntry(model);
+		_oAuth2SAPEntryScopesPublisher.publishSAPEntries(model.getCompanyId());
 	}
 
 	@Reference
 	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
 
+	@Reference
+	private OAuth2SAPEntryScopesPublisher _oAuth2SAPEntryScopesPublisher;
 }

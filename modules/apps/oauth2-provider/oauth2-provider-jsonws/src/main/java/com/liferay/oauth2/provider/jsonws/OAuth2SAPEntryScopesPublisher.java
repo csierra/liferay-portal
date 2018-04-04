@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -92,6 +93,14 @@ public class OAuth2SAPEntryScopesPublisher {
 		}
 
 		_serviceRegistrations.clear();
+
+		for (ServiceRegistration serviceRegistration :
+			_sapEntryScopeDescriptorFinderServiceRegistry.values()) {
+
+			serviceRegistration.unregister();
+		}
+
+		_sapEntryScopeDescriptorFinderServiceRegistry.clear();
 	}
 
 	public String describeApplication(Locale locale) {
@@ -110,7 +119,7 @@ public class OAuth2SAPEntryScopesPublisher {
 	public void registerPortalInstance(long companyId) {
 		try {
 			registerSAPEntries(companyId);
-			registerSAPEntryScopeDescriptorFinder(companyId);
+			publishSAPEntries(companyId);
 		}
 		catch (Exception e) {
 			_log.error(
@@ -134,20 +143,28 @@ public class OAuth2SAPEntryScopesPublisher {
 		}
 	}
 
-	protected void registerSAPEntryScopeDescriptorFinder(long companyId) {
+	public void publishSAPEntries(long companyId) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put("osgi.jaxrs.name", _oAuth2PortalJSONWSApplicationName);
 		properties.put("companyId", String.valueOf(companyId));
 
-		_serviceRegistrations.add(
-			_bundleContext.registerService(
-				new String[]{
-					ScopeDescriptor.class.getName(),
-					ScopeFinder.class.getName()},
-				new SAPEntryScopeDescriptorFinder(
-					companyId, _sapEntryScopeRegistry),
-				properties));
+		_sapEntryScopeDescriptorFinderServiceRegistry.compute(
+			companyId, (__, serviceRegistration) -> {
+				if (serviceRegistration != null) {
+					serviceRegistration.unregister();
+				}
+
+				serviceRegistration = _bundleContext.registerService(
+					new String[]{
+						ScopeDescriptor.class.getName(),
+						ScopeFinder.class.getName()},
+					new SAPEntryScopeDescriptorFinder(
+						_sapEntryScopeRegistry.getSAPEntryScopes(companyId)),
+					properties);
+
+				return serviceRegistration;
+			});
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -171,4 +188,7 @@ public class OAuth2SAPEntryScopesPublisher {
 	private List<ServiceRegistration> _serviceRegistrations =
 		new CopyOnWriteArrayList<>();
 
+	private ConcurrentHashMap<Long, ServiceRegistration>
+		_sapEntryScopeDescriptorFinderServiceRegistry =
+			new ConcurrentHashMap<>();
 }

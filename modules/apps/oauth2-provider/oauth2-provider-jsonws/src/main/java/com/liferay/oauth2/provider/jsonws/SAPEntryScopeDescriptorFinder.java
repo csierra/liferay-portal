@@ -21,7 +21,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -32,19 +34,12 @@ import java.util.Locale;
 public class SAPEntryScopeDescriptorFinder
 	implements ScopeDescriptor, ScopeFinder {
 
-	public SAPEntryScopeDescriptorFinder(
-		long companyId,
-		SAPEntryScopeRegistry sapEntryScopeRegistry) {
-
-		_companyId = companyId;
-		_sapEntryScopeRegistry = sapEntryScopeRegistry;
+	public SAPEntryScopeDescriptorFinder(List<SAPEntryScope> sapEntryScopes) {
+		_sapEntryScopes = new ArrayList(sapEntryScopes);
 	}
 
 	@Override
 	public Collection<String> findScopes() {
-		List<SAPEntryScope> _sapEntryScopes =
-			_sapEntryScopeRegistry.getSAPEntryScopes(_companyId);
-
 		Collection<String> scopes = new HashSet<>(_sapEntryScopes.size());
 
 		for (SAPEntryScope sapEntryScope : _sapEntryScopes) {
@@ -56,9 +51,6 @@ public class SAPEntryScopeDescriptorFinder
 
 	@Override
 	public String describeScope(String scope, Locale locale) {
-		List<SAPEntryScope> _sapEntryScopes =
-			_sapEntryScopeRegistry.getSAPEntryScopes(_companyId);
-
 		for (SAPEntryScope sapEntryScope : _sapEntryScopes) {
 			if (sapEntryScope.getScopeName().equals(scope)) {
 				String languageId = LocaleUtil.toLanguageId(locale);
@@ -78,7 +70,6 @@ public class SAPEntryScopeDescriptorFinder
 	private static final Log _log = LogFactoryUtil.getLog(
 		SAPEntryScopeDescriptorFinder.class);
 
-	private long _companyId;
-	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
+	private final List<SAPEntryScope> _sapEntryScopes;
 
 }
