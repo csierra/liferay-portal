@@ -1,3 +1,10 @@
+create table OA2Auths_OA2ScopeGrants (
+	companyId LONG not null,
+	oAuth2AuthorizationId LONG not null,
+	oAuth2ScopeGrantId LONG not null,
+	primary key (oAuth2AuthorizationId, oAuth2ScopeGrantId)
+);
+
 create table OAuth2Application (
 	oAuth2ApplicationId LONG not null primary key,
 	companyId LONG,
@@ -27,13 +34,6 @@ create table OAuth2ApplicationScopeAliases (
 	createDate DATE null,
 	oAuth2ApplicationId LONG,
 	scopeAliases TEXT null
-);
-
-create table OAuth2Auth_ScopeGrants (
-	companyId LONG not null,
-	oAuth2AuthorizationId LONG not null,
-	oAuth2ScopeGrantId LONG not null,
-	primary key (oAuth2AuthorizationId, oAuth2ScopeGrantId)
 );
 
 create table OAuth2Authorization (
