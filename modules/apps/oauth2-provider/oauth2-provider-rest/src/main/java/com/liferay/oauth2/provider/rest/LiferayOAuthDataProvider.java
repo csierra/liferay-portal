@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest;
 
-import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
+import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
@@ -74,7 +74,7 @@ import java.util.Set;
 
 @Component(
 	service = LiferayOAuthDataProvider.class,
-	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2Configuration"
+	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration"
 )
 public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvider {
 
@@ -105,7 +105,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			_multiVMPool.getPortalCache("oauth2-provider-code-grants");
 		_oAuth2Configuration =
 			ConfigurableUtil.createConfigurable(
-				OAuth2Configuration.class, properties);
+				OAuth2ProviderConfiguration.class, properties);
 		_codeGrantsPortalCache = (PortalCache<String, ServerAuthorizationCodeGrant>)
 			_multiVMPool.getPortalCache("oauth2-provider-code-grants");
 
@@ -975,7 +975,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 	
-	private OAuth2Configuration _oAuth2Configuration;
+	private OAuth2ProviderConfiguration _oAuth2Configuration;
 
 	@Reference(
 		policyOption = ReferencePolicyOption.GREEDY,

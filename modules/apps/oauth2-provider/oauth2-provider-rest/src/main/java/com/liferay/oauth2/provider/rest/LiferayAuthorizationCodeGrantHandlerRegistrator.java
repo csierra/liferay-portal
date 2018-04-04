@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest;
 
-import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
+import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Component(
-	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2Configuration",
+	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true
 )
 public class LiferayAuthorizationCodeGrantHandlerRegistrator {
@@ -59,7 +59,7 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 		_grantHandlerServiceRegistration;
 	private ServiceRegistration<Object> _endpointServiceRegistration;
 
-	private OAuth2Configuration _oAuth2Configuration;
+	private OAuth2ProviderConfiguration _oAuth2Configuration;
 
 	@Activate
 	protected void activate(
@@ -67,7 +67,7 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 		_oAuth2Configuration =
 			ConfigurableUtil.createConfigurable(
-				OAuth2Configuration.class, properties);
+				OAuth2ProviderConfiguration.class, properties);
 
 		if (_oAuth2Configuration.allowAuthorizationCodeGrant() ||
 			_oAuth2Configuration.allowAuthorizationCodePKCEGrant()) {

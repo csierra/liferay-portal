@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest;
 
-import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
+import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -43,7 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Component(
-	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2Configuration",
+	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true
 )
 public class LiferayRefreshTokenGrantHandlerRegistrator {
@@ -55,9 +55,9 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		OAuth2Configuration oAuth2Configuration =
+		OAuth2ProviderConfiguration oAuth2Configuration =
 			ConfigurableUtil.createConfigurable(
-				OAuth2Configuration.class, properties);
+				OAuth2ProviderConfiguration.class, properties);
 
 		if (oAuth2Configuration.allowRefreshTokenGrant()) {
 			RefreshTokenGrantHandler refreshTokenGrantHandler =

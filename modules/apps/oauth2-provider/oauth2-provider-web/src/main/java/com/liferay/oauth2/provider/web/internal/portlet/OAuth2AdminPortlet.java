@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet;
 
-import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
+import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
@@ -60,7 +60,7 @@ import java.util.Map;
  * @author Stian Sigvartsen
  */
 @Component(
-	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2Configuration",
+	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true,
 	property = {
 		"com.liferay.portlet.display-category=category.hidden",
@@ -254,13 +254,13 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 	protected void activate(Map<String, Object> properties) {
 		_oAuth2Configuration =
 			ConfigurableUtil.createConfigurable(
-				OAuth2Configuration.class, properties);
+				OAuth2ProviderConfiguration.class, properties);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortlet.class);
 
-	private OAuth2Configuration _oAuth2Configuration;
+	private OAuth2ProviderConfiguration _oAuth2Configuration;
 
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;

@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.web.internal.display.context;
 
-import com.liferay.oauth2.provider.configuration.OAuth2Configuration;
+import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
@@ -42,7 +42,7 @@ import java.util.List;
 public class OAuth2AdminPortletDisplayContext {
 
 	public OAuth2AdminPortletDisplayContext(
-		OAuth2Configuration oAuth2Configuration) {
+		OAuth2ProviderConfiguration oAuth2Configuration) {
 
 		_oAuth2Configuration = oAuth2Configuration;
 	}
@@ -164,7 +164,7 @@ public class OAuth2AdminPortletDisplayContext {
 		return false;
 	}
 
-	private OAuth2Configuration _oAuth2Configuration;
+	private OAuth2ProviderConfiguration _oAuth2Configuration;
 
 	private static Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortletDisplayContext.class);
