@@ -61,7 +61,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.security.sso.token.internal.configuration.TokenConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = AutoLogin.class
 )
 public class TokenAutoLogin extends BaseAutoLogin {
