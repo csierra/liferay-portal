@@ -25,7 +25,10 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(immediate = true, service = TokenRetriever.class)
+@Component(
+	immediate = true, property = {"token.location=" + TokenLocation.REQUEST},
+	service = TokenRetriever.class
+)
 public class RequestTokenRetriever implements TokenRetriever {
 
 	@Override
@@ -33,11 +36,6 @@ public class RequestTokenRetriever implements TokenRetriever {
 		HttpServletRequest request, String userTokenName) {
 
 		return ParamUtil.getString(request, userTokenName);
-	}
-
-	@Override
-	public TokenLocation getTokenLocation() {
-		return TokenLocation.REQUEST;
 	}
 
 }
