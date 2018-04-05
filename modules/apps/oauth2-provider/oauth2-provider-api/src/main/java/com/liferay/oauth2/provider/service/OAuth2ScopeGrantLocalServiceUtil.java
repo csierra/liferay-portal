@@ -371,12 +371,12 @@ public class OAuth2ScopeGrantLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> grantScopesToAuthorization(
+	public static java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> grantLiferayOAuth2Scopes(
 		long oAuth2AuthorizationId,
 		java.util.Collection<com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope> liferayOAuth2Scopes)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .grantScopesToAuthorization(oAuth2AuthorizationId,
+				   .grantLiferayOAuth2Scopes(oAuth2AuthorizationId,
 			liferayOAuth2Scopes);
 	}
 

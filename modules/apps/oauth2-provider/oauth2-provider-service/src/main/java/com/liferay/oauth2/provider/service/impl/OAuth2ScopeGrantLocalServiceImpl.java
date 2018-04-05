@@ -60,7 +60,6 @@ public class OAuth2ScopeGrantLocalServiceImpl
 		oAuth2ScopeGrant.setCompanyId(companyId);
 		oAuth2ScopeGrant.setOAuth2ApplicationScopeAliasesId(
 			oAuth2ApplicationScopeAliasesId);
-
 		oAuth2ScopeGrant.setApplicationName(applicationName);
 		oAuth2ScopeGrant.setBundleSymbolicName(bundleSymbolicName);
 		oAuth2ScopeGrant.setScope(scope);
@@ -87,7 +86,7 @@ public class OAuth2ScopeGrantLocalServiceImpl
 	}
 
 	@Override
-	public Collection<OAuth2ScopeGrant> grantScopesToAuthorization(
+	public Collection<OAuth2ScopeGrant> grantLiferayOAuth2Scopes(
 			long oAuth2AuthorizationId,
 			Collection<LiferayOAuth2Scope> liferayOAuth2Scopes)
 		throws PortalException {
@@ -138,7 +137,7 @@ public class OAuth2ScopeGrantLocalServiceImpl
 			}
 		}
 
-		oAuth2ScopeGrantLocalService.addOAuth2AuthorizationOAuth2ScopeGrants(
+		addOAuth2AuthorizationOAuth2ScopeGrants(
 			oAuth2AuthorizationId, resultOAuth2ScopeGrants);
 
 		return resultOAuth2ScopeGrants;

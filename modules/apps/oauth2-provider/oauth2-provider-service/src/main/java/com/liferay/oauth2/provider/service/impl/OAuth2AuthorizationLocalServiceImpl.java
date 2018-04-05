@@ -52,12 +52,10 @@ public class OAuth2AuthorizationLocalServiceImpl
 		oAuth2Authorization.setOAuth2ApplicationId(oAuth2ApplicationId);
 		oAuth2Authorization.setOAuth2ApplicationScopeAliasesId(
 			oAuth2ApplicationScopeAliasesId);
-
 		oAuth2Authorization.setAccessTokenContent(accessTokenContent);
 		oAuth2Authorization.setAccessTokenCreateDate(accessTokenCreateDate);
 		oAuth2Authorization.setAccessTokenExpirationDate(
 			accessTokenExpirationDate);
-
 		oAuth2Authorization.setRemoteIPInfo(remoteIPInfo);
 		oAuth2Authorization.setRefreshTokenContent(refreshTokenContent);
 		oAuth2Authorization.setRefreshTokenCreateDate(refreshTokenCreateDate);
@@ -81,7 +79,7 @@ public class OAuth2AuthorizationLocalServiceImpl
 				oAuth2ScopeGrant);
 		}
 
-		return super.deleteOAuth2Authorization(oAuth2AuthorizationId);
+		return oAuth2AuthorizationPersistence.remove(oAuth2AuthorizationId);
 	}
 
 	@Override
@@ -120,17 +118,17 @@ public class OAuth2AuthorizationLocalServiceImpl
 
 	@Override
 	public List<OAuth2Authorization> getOAuth2Authorizations(
-		long applicationId, int start, int end,
+		long oAuth2ApplicationId, int start, int end,
 		OrderByComparator<OAuth2Authorization> orderByComparator) {
 
 		return oAuth2AuthorizationPersistence.findByOAuth2ApplicationId(
-			applicationId, start, end, orderByComparator);
+			oAuth2ApplicationId, start, end, orderByComparator);
 	}
 
 	@Override
-	public int getOAuth2AuthorizationsCount(long applicationId) {
+	public int getOAuth2AuthorizationsCount(long oAuth2ApplicationId) {
 		return oAuth2AuthorizationPersistence.countByOAuth2ApplicationId(
-			applicationId);
+			oAuth2ApplicationId);
 	}
 
 	@Override

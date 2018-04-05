@@ -290,7 +290,7 @@ public interface OAuth2ScopeGrantLocalService extends BaseLocalService,
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
-	public Collection<OAuth2ScopeGrant> grantScopesToAuthorization(
+	public Collection<OAuth2ScopeGrant> grantLiferayOAuth2Scopes(
 		long oAuth2AuthorizationId,
 		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes)
 		throws PortalException;

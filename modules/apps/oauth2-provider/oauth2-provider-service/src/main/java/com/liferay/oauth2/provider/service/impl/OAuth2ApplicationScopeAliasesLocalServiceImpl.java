@@ -59,14 +59,11 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		oAuth2ApplicationScopeAliases.setCreateDate(new Date());
 		oAuth2ApplicationScopeAliases.setOAuth2ApplicationId(
 			oAuth2ApplicationId);
-
 		oAuth2ApplicationScopeAliases.setScopeAliasesList(scopeAliasesList);
 
 		oAuth2ApplicationScopeAliases =
 			oAuth2ApplicationScopeAliasesPersistence.update(
 				oAuth2ApplicationScopeAliases);
-
-		// Scope Grants
 
 		createScopeGrants(
 			companyId, oAuth2ApplicationScopeAliasesId, scopeAliasesList);
@@ -89,7 +86,7 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 				oAuth2ScopeGrant.getOAuth2ScopeGrantId());
 		}
 
-		return super.deleteOAuth2ApplicationScopeAliases(
+		return oAuth2ApplicationScopeAliasesPersistence.remove(
 			oAuth2ApplicationScopeAliasesId);
 	}
 

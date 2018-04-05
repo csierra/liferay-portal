@@ -326,10 +326,10 @@ public class OAuth2AuthorizationLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> getOAuth2Authorizations(
-		long applicationId, int start, int end,
+		long oAuth2ApplicationId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator) {
 		return getService()
-				   .getOAuth2Authorizations(applicationId, start, end,
+				   .getOAuth2Authorizations(oAuth2ApplicationId, start, end,
 			orderByComparator);
 	}
 
@@ -342,8 +342,8 @@ public class OAuth2AuthorizationLocalServiceUtil {
 		return getService().getOAuth2AuthorizationsCount();
 	}
 
-	public static int getOAuth2AuthorizationsCount(long applicationId) {
-		return getService().getOAuth2AuthorizationsCount(applicationId);
+	public static int getOAuth2AuthorizationsCount(long oAuth2ApplicationId) {
+		return getService().getOAuth2AuthorizationsCount(oAuth2ApplicationId);
 	}
 
 	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> getOAuth2ScopeGrantOAuth2Authorizations(

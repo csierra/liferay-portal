@@ -340,9 +340,9 @@ public class OAuth2AuthorizationLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization> getOAuth2Authorizations(
-		long applicationId, int start, int end,
+		long oAuth2ApplicationId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Authorization> orderByComparator) {
-		return _oAuth2AuthorizationLocalService.getOAuth2Authorizations(applicationId,
+		return _oAuth2AuthorizationLocalService.getOAuth2Authorizations(oAuth2ApplicationId,
 			start, end, orderByComparator);
 	}
 
@@ -357,8 +357,8 @@ public class OAuth2AuthorizationLocalServiceWrapper
 	}
 
 	@Override
-	public int getOAuth2AuthorizationsCount(long applicationId) {
-		return _oAuth2AuthorizationLocalService.getOAuth2AuthorizationsCount(applicationId);
+	public int getOAuth2AuthorizationsCount(long oAuth2ApplicationId) {
+		return _oAuth2AuthorizationLocalService.getOAuth2AuthorizationsCount(oAuth2ApplicationId);
 	}
 
 	@Override

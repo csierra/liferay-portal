@@ -386,11 +386,11 @@ public class OAuth2ScopeGrantLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> grantScopesToAuthorization(
+	public java.util.Collection<com.liferay.oauth2.provider.model.OAuth2ScopeGrant> grantLiferayOAuth2Scopes(
 		long oAuth2AuthorizationId,
 		java.util.Collection<com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope> liferayOAuth2Scopes)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _oAuth2ScopeGrantLocalService.grantScopesToAuthorization(oAuth2AuthorizationId,
+		return _oAuth2ScopeGrantLocalService.grantLiferayOAuth2Scopes(oAuth2AuthorizationId,
 			liferayOAuth2Scopes);
 	}
 

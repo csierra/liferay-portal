@@ -260,7 +260,7 @@ public interface OAuth2AuthorizationLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuth2Authorization> getOAuth2Authorizations(
-		long applicationId, int start, int end,
+		long oAuth2ApplicationId, int start, int end,
 		OrderByComparator<OAuth2Authorization> orderByComparator);
 
 	/**
@@ -272,7 +272,7 @@ public interface OAuth2AuthorizationLocalService extends BaseLocalService,
 	public int getOAuth2AuthorizationsCount();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getOAuth2AuthorizationsCount(long applicationId);
+	public int getOAuth2AuthorizationsCount(long oAuth2ApplicationId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuth2Authorization> getOAuth2ScopeGrantOAuth2Authorizations(
