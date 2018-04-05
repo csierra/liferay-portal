@@ -16,47 +16,50 @@ package com.liferay.oauth2.provider.rest.internal.request.scope.checker.filter;
 
 import static junit.framework.TestCase.assertTrue;
 
+import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.RequestScopeCheckerFilter;
+
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
-
-import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.RequestScopeCheckerFilter;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mockito;
+
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 @RunWith(PowerMockRunner.class)
 public class HttpMethodRequestScopeCheckerTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
-		methodAllowedChecker = new HttpMethodRequestScopeChecker();	
+		methodAllowedChecker = new HttpMethodRequestScopeChecker();
 		resourceInfo = Mockito.mock(ResourceInfo.class);
 	}
-	
+
 	@Test
 	public void testHttpMethodAllowed() throws NoSuchMethodException {
-		TestScopeChecker testScopeChecker = new TestScopeChecker(
-			"GET");
+		TestScopeChecker testScopeChecker = new TestScopeChecker("GET");
 
 		Request request = Mockito.mock(Request.class);
-		
+
 		when(
 			request.getMethod()
 		).thenReturn(
 			"GET"
 		);
-		
+
 		assertTrue(
 			methodAllowedChecker.isAllowed(
-				testScopeChecker,
-				request,
-				resourceInfo));
+				testScopeChecker, request, resourceInfo));
 	}
 
-	protected ResourceInfo resourceInfo;
 	protected RequestScopeCheckerFilter methodAllowedChecker;
+	protected ResourceInfo resourceInfo;
+
 }

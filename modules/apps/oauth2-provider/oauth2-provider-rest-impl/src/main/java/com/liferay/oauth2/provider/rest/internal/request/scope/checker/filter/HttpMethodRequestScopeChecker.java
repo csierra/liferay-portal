@@ -15,20 +15,17 @@
 package com.liferay.oauth2.provider.rest.internal.request.scope.checker.filter;
 
 import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.RequestScopeCheckerFilter;
-
 import com.liferay.oauth2.provider.scope.ScopeChecker;
-import org.osgi.service.component.annotations.Component;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
 
-@Component(
-	immediate = true,
-	property = {
-		"default=true",
-		"type=http.method"
-	}
-)
+import org.osgi.service.component.annotations.Component;
+
+/**
+ * @author Carlos Sierra Andrés
+ */
+@Component(immediate = true, property = {"default=true", "type=http.method"})
 public class HttpMethodRequestScopeChecker
 	implements RequestScopeCheckerFilter {
 

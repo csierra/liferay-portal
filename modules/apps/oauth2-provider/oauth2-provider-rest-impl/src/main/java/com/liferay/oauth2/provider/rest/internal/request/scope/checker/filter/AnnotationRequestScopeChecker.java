@@ -18,15 +18,18 @@ import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.Request
 import com.liferay.oauth2.provider.scope.RequiresNoScope;
 import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
-import org.osgi.service.component.annotations.Component;
+
+import java.lang.reflect.Method;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
-import java.lang.reflect.Method;
 
-@Component(
-	property = "type=annotation"
-)
+import org.osgi.service.component.annotations.Component;
+
+/**
+ * @author Carlos Sierra Andrés
+ */
+@Component(property = "type=annotation")
 public class AnnotationRequestScopeChecker
 	implements RequestScopeCheckerFilter {
 

@@ -14,41 +14,47 @@
 
 package com.liferay.oauth2.provider.rest.internal.request.scope.checker.filter;
 
-import com.liferay.oauth2.provider.scope.RequiresScope;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+
+import com.liferay.oauth2.provider.scope.RequiresScope;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.mockito.Mockito;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+/**
+ * @author Carlos Sierra Andrés
+ */
 @RunWith(PowerMockRunner.class)
 public class AnnotationRequestScopeCheckerTest extends PowerMockito {
-	
+
 	@Before
 	public void setUp() throws Exception {
 		annotationRequestScopeChecker = new AnnotationRequestScopeChecker();
 		request = Mockito.mock(Request.class);
 	}
-	
+
 	@Test
 	public void testIsAllowed() throws NoSuchMethodException {
 		TestScopeChecker testScopeChecker = new TestScopeChecker("READ");
-		
+
 		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
-		
+
 		when(
 			resourceInfo.getResourceMethod()
 		).thenReturn(
-			TestEndpointSample.class.getMethod("hello", new Class<?>[] {})
+			TestEndpointSample.class.getMethod("hello", new Class<?>[0])
 		);
-		
+
 		assertTrue(
 			annotationRequestScopeChecker.isAllowed(
 				testScopeChecker, request, resourceInfo));
@@ -59,13 +65,13 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 		TestScopeChecker testScopeChecker = new TestScopeChecker("WRITE");
 
 		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
-		
+
 		when(
 			resourceInfo.getResourceMethod()
 		).thenReturn(
-			TestEndpointSample.class.getMethod("modify", new Class<?>[] {})
+			TestEndpointSample.class.getMethod("modify", new Class<?>[0])
 		);
-		
+
 		assertTrue(
 			annotationRequestScopeChecker.isAllowed(
 				testScopeChecker, request, resourceInfo));
@@ -79,14 +85,35 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 			"READ", "WRITE");
 
 		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
-		
+
 		when(
 			resourceInfo.getResourceMethod()
 		).thenReturn(
-			TestEndpointSample.class.getMethod("requiresAll", new Class<?>[] {})
+			TestEndpointSample.class.getMethod("requiresAll", new Class<?>[0])
 		);
-		
+
 		assertTrue(
+			annotationRequestScopeChecker.isAllowed(
+				testScopeChecker, request, resourceInfo));
+	}
+
+	@Test
+	public void testMethodAllowedWithMultipleAllRequiredAndNotGranted()
+		throws NoSuchMethodException {
+
+		TestScopeChecker testScopeChecker = new TestScopeChecker(
+			"READ", "WRITE");
+
+		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
+
+		when(
+			resourceInfo.getResourceMethod()
+		).thenReturn(
+			TestEndpointSample.class.getMethod(
+				"requiresTooMany", new Class<?>[0])
+		);
+
+		assertFalse(
 			annotationRequestScopeChecker.isAllowed(
 				testScopeChecker, request, resourceInfo));
 	}
@@ -98,13 +125,13 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 		TestScopeChecker testScopeChecker = new TestScopeChecker("READ");
 
 		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
-		
+
 		when(
 			resourceInfo.getResourceMethod()
 		).thenReturn(
-			TestEndpointSample.class.getMethod("requiresAny", new Class<?>[] {})
+			TestEndpointSample.class.getMethod("requiresAny", new Class<?>[0])
 		);
-		
+
 		assertTrue(
 			annotationRequestScopeChecker.isAllowed(
 				testScopeChecker, request, resourceInfo));
@@ -122,25 +149,8 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 				testScopeChecker, request, resourceInfo));
 	}
 
-	@Test
-	public void testMethodAllowedWithMultipleAllRequiredAndNotGranted()
-		throws NoSuchMethodException {
-
-		TestScopeChecker testScopeChecker = new TestScopeChecker(
-			"READ", "WRITE");
-
-		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
-		
-		when(
-			resourceInfo.getResourceMethod()
-		).thenReturn(
-			TestEndpointSample.class.getMethod("requiresTooMany", new Class<?>[] {})
-		);
-		
-		assertFalse(
-			annotationRequestScopeChecker.isAllowed(
-				testScopeChecker, request, resourceInfo));
-	}
+	protected AnnotationRequestScopeChecker annotationRequestScopeChecker;
+	protected Request request;
 
 	private static class TestEndpointSample {
 
@@ -151,27 +161,20 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 
 		@RequiresScope("WRITE")
 		public void modify() {
-
 		}
 
 		@RequiresScope({"READ", "WRITE"})
 		public void requiresAll() {
+		}
 
+		@RequiresScope(allNeeded = false, value = {"READ", "WRITE"})
+		public void requiresAny() {
 		}
 
 		@RequiresScope({"READ", "WRITE", "NOTGRANTED"})
 		public void requiresTooMany() {
-
 		}
 
-		@RequiresScope(
-			value = {"READ", "WRITE"},
-			allNeeded = false)
-		public void requiresAny() {
-
-		}
 	}
 
-	protected AnnotationRequestScopeChecker annotationRequestScopeChecker;
-	protected Request request;
 }

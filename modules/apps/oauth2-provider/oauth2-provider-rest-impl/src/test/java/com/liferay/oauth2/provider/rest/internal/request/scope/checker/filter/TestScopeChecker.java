@@ -19,11 +19,12 @@ import com.liferay.oauth2.provider.scope.ScopeChecker;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 public class TestScopeChecker implements ScopeChecker {
 
-	private Collection<String> _allowedScopes;
-
-	public TestScopeChecker(String ... allowedScopes) {
+	public TestScopeChecker(String... allowedScopes) {
 		_allowedScopes = Arrays.asList(allowedScopes);
 	}
 
@@ -31,5 +32,7 @@ public class TestScopeChecker implements ScopeChecker {
 	public boolean checkScope(String scope) {
 		return _allowedScopes.contains(scope);
 	}
+
+	private final Collection<String> _allowedScopes;
 
 }
