@@ -39,23 +39,12 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 
 	@Override
 	public boolean isValid(AccessToken accessToken) {
-		long expiresIn = accessToken.getExpiresIn() * 1000;
-		long issuedAt = accessToken.getIssuedAt() * 1000;
-
-		if (expiresIn < 0) {
-			return false;
-		}
-
-		if ((issuedAt + expiresIn) < System.currentTimeMillis()) {
-			return false;
-		}
-
-		return true;
+		return isValid(accessToken.getExpiresIn(), accessToken.getIssuedAt());
 	}
 
 	@Override
 	public boolean isValid(RefreshToken refreshToken) {
-		return true;
+		return isValid(refreshToken.getExpiresIn(), refreshToken.getIssuedAt());
 	}
 
 	@Override
@@ -88,6 +77,11 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 	}
 
 	protected String generateTokenKey(int size) {
+		if (size < 0) {
+			throw new IllegalArgumentException(
+				"Token key size must be positive number!");
+		}
+
 		int nextLongCount = (int)Math.ceil((double)size / 8);
 
 		byte[] buffer = new byte[nextLongCount * 8];
@@ -103,6 +97,25 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 		}
 
 		return tokenSB.toString();
+	}
+
+	protected boolean isValid(long expiresIn, long issuedAt) {
+		long expiresInMillis = expiresIn * 1000;
+		long issuedAtMillis = issuedAt * 1000;
+
+		if (expiresInMillis < 0) {
+			return false;
+		}
+
+		if (issuedAtMillis > System.currentTimeMillis()) {
+			return false;
+		}
+
+		if ((issuedAtMillis + expiresInMillis) < System.currentTimeMillis()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private DefaultBearerTokenProviderConfiguration
