@@ -14,43 +14,46 @@
 
 package com.liferay.oauth2.provider.rest.internal.bearer.token.provider;
 
+import com.liferay.oauth2.provider.rest.internal.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.security.SecureRandomUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 import java.util.Map;
 
 @Component(
-	immediate = true,
+	configurationPid = "com.liferay.oauth2.provider.rest.internal.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"token.format=opaque",
-		"name=default",
-		"access_token.expires_in:Long=600",
-		"access_token.key.byte.size:Long=32",
-		"refresh_token.expires_in:Long=604800",
-		"refresh_token.key.byte.size:Long=32",
+		"name=default"
 	}
 )
 public class DefaultBearerTokenProvider implements BearerTokenProvider {
 
 	@Override
 	public void onBeforeCreate(AccessToken accessToken) {
-		String tokenKey = generateToken(_accessTokenKeyByteSize);
+		String tokenKey = generateTokenKey(
+			_defaultBearerTokenProviderConfiguration.accessTokenKeyByteSize());
 
 		accessToken.setTokenKey(tokenKey);
-		accessToken.setExpiresIn(_accessTokenExpiresIn);
+		accessToken.setExpiresIn(
+			_defaultBearerTokenProviderConfiguration.accessTokenExpiresIn());
 	}
 
 	@Override
 	public void onBeforeCreate(RefreshToken refreshToken) {
-		String tokenKey = generateToken(_refreshTokenKeyByteSize);
+		String tokenKey = generateTokenKey(
+			_defaultBearerTokenProviderConfiguration.refreshTokenKeyByteSize());
 
 		refreshToken.setTokenKey(tokenKey);
-		refreshToken.setExpiresIn(_refreshTokenExpiresIn);
+		refreshToken.setExpiresIn(
+			_defaultBearerTokenProviderConfiguration.refreshTokenExpiresIn());
 	}
 
 	@Override
@@ -69,7 +72,7 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 		return true;
 	}
 
-	protected String generateToken(int size) {
+	protected String generateTokenKey(int size) {
 		int nextLongCount = (int) Math.ceil((double) size / 8);
 
 		byte[] buffer = new byte[nextLongCount * 8];
@@ -93,27 +96,12 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		_accessTokenExpiresIn =
-			MapUtil.getInteger(properties, "access_token.expires_in",
-				_accessTokenExpiresIn);
-
-		_accessTokenKeyByteSize =
-			MapUtil.getInteger(properties, "access_token.key.byte.size",
-				_accessTokenKeyByteSize);
-
-		_refreshTokenExpiresIn =
-			MapUtil.getInteger(properties, "refresh_token.expires_in",
-				_refreshTokenExpiresIn);
-
-		_refreshTokenKeyByteSize =
-			MapUtil.getInteger(properties, "refresh_token.key.byte.size",
-				_refreshTokenKeyByteSize);
-
+		_defaultBearerTokenProviderConfiguration =
+				ConfigurableUtil.createConfigurable(
+					DefaultBearerTokenProviderConfiguration.class, properties);
 	}
 
-	private int _accessTokenExpiresIn = 600;
-	private int _accessTokenKeyByteSize = 64;
-	private int _refreshTokenExpiresIn = 600;
-	private int _refreshTokenKeyByteSize = 64;
+	private DefaultBearerTokenProviderConfiguration
+		_defaultBearerTokenProviderConfiguration;
 
 }
