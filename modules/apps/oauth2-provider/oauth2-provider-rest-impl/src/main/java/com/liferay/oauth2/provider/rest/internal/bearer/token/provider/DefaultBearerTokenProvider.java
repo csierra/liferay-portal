@@ -12,11 +12,13 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.tokenprovider;
+package com.liferay.oauth2.provider.rest.internal.bearer.token.provider;
 
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
+import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+import com.liferay.portal.kernel.util.StringBundler;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
@@ -37,8 +39,7 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 
 	@Override
 	public void onBeforeCreate(AccessToken accessToken) {
-		String tokenKey = OAuthUtils.generateRandomTokenKey(
-			_accessTokenKeyByteSize);
+		String tokenKey = generateToken(_accessTokenKeyByteSize);
 
 		accessToken.setTokenKey(tokenKey);
 		accessToken.setExpiresIn(_accessTokenExpiresIn);
@@ -46,8 +47,7 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 
 	@Override
 	public void onBeforeCreate(RefreshToken refreshToken) {
-		String tokenKey = OAuthUtils.generateRandomTokenKey(
-			_accessTokenKeyByteSize);
+		String tokenKey = generateToken(_refreshTokenKeyByteSize);
 
 		refreshToken.setTokenKey(tokenKey);
 		refreshToken.setExpiresIn(_refreshTokenExpiresIn);
@@ -67,6 +67,23 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 		}
 
 		return true;
+	}
+
+	protected String generateToken(int size) {
+		int nextLongCount = (int) Math.ceil((double) size / 8);
+
+		byte[] buffer = new byte[nextLongCount * 8];
+		for (int i = 0; i < nextLongCount; i++) {
+			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
+		}
+
+		StringBundler tokenSB = new StringBundler(size);
+
+		for (int i = 0; i < size; i++) {
+			tokenSB.append(Integer.toHexString(0xFF & buffer[i]));
+		}
+
+		return tokenSB.toString();
 	}
 
 	@Override
