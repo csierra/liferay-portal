@@ -1,5 +1,5 @@
-Bundle-Name: Liferay OAuth2 Provider Rest
-Bundle-SymbolicName: com.liferay.oauth2.provider.rest
+Bundle-Name: Liferay OAuth2 Provider Rest Endpoint
+Bundle-SymbolicName: com.liferay.oauth2.provider.rest.endpoint
 Bundle-Version: 1.0.0
 
 Import-Package:\

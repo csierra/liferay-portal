@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest;
+package com.liferay.oauth2.provider.rest.endpoint;
 
 import org.osgi.service.component.annotations.Component;
 

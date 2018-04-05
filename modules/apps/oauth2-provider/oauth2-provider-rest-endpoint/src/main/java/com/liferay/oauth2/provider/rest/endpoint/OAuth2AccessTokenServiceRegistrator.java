@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest;
+package com.liferay.oauth2.provider.rest.endpoint;
 
 import com.liferay.portal.kernel.util.MapUtil;
 import org.apache.cxf.rs.security.oauth2.common.Client;
