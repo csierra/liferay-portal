@@ -14,7 +14,6 @@
 
 package com.liferay.portal.security.sso.token.internal.events;
 
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.events.Action;
@@ -120,11 +119,7 @@ public class TokenLogoutAction extends Action {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_logoutProcessors = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, LogoutProcessor.class, null,
-			ServiceReferenceMapperFactory.create(
-				bundleContext,
-				(logoutProcessor, emitter) -> emitter.emit(
-					logoutProcessor.getLogoutProcessorType())));
+			bundleContext, LogoutProcessor.class, "logout.processor.type");
 	}
 
 	@Deactivate
@@ -143,8 +138,7 @@ public class TokenLogoutAction extends Action {
 		TokenLogoutAction.class);
 
 	private ConfigurationProvider _configurationProvider;
-	private ServiceTrackerMap<LogoutProcessorType, LogoutProcessor>
-		_logoutProcessors;
+	private ServiceTrackerMap<String, LogoutProcessor> _logoutProcessors;
 
 	@Reference
 	private Portal _portal;
