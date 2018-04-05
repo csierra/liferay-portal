@@ -15,15 +15,13 @@
 package com.liferay.oauth2.provider.rest.internal.bearer.token.provider.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
+
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
-import com.liferay.portal.kernel.util.StringPool;
 
 /**
  * @author Tomas Polesovsky
  */
-@ExtendedObjectClassDefinition(
-	category = "foundation"
-)
+@ExtendedObjectClassDefinition(category = "foundation")
 @Meta.OCD(
 	id = "com.liferay.oauth2.provider.rest.internal.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration",
 	localization = "content/Language",
@@ -54,8 +52,8 @@ public interface DefaultBearerTokenProviderConfiguration {
 
 	@Meta.AD(
 		deflt = "32", description = "refresh-token-key-byte-size-description",
-		id = "refresh.token.key.byte.size", name = "refresh-token-key-byte-size",
-		required = false
+		id = "refresh.token.key.byte.size",
+		name = "refresh-token-key-byte-size", required = false
 	)
 	public int refreshTokenKeyByteSize();
 

@@ -20,41 +20,22 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+
+import java.util.Map;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 
-import java.util.Map;
-
+/**
+ * @author Tomas Polesovsky
+ */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.rest.internal.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
-	property = {
-		"token.format=opaque",
-		"name=default"
-	}
+	property = {"name=default", "token.format=opaque"}
 )
 public class DefaultBearerTokenProvider implements BearerTokenProvider {
-
-	@Override
-	public void onBeforeCreate(AccessToken accessToken) {
-		String tokenKey = generateTokenKey(
-			_defaultBearerTokenProviderConfiguration.accessTokenKeyByteSize());
-
-		accessToken.setTokenKey(tokenKey);
-		accessToken.setExpiresIn(
-			_defaultBearerTokenProviderConfiguration.accessTokenExpiresIn());
-	}
-
-	@Override
-	public void onBeforeCreate(RefreshToken refreshToken) {
-		String tokenKey = generateTokenKey(
-			_defaultBearerTokenProviderConfiguration.refreshTokenKeyByteSize());
-
-		refreshToken.setTokenKey(tokenKey);
-		refreshToken.setExpiresIn(
-			_defaultBearerTokenProviderConfiguration.refreshTokenExpiresIn());
-	}
 
 	@Override
 	public boolean isValid(AccessToken accessToken) {
@@ -65,17 +46,52 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 			return false;
 		}
 
-		if (issuedAt + expiresIn < System.currentTimeMillis()) {
+		if ((issuedAt + expiresIn) < System.currentTimeMillis()) {
 			return false;
 		}
 
 		return true;
 	}
 
+	@Override
+	public boolean isValid(RefreshToken refreshToken) {
+		return true;
+	}
+
+	@Override
+	public void onBeforeCreate(AccessToken accessToken) {
+		String tokenKey = generateTokenKey(
+			_defaultBearerTokenProviderConfiguration.accessTokenKeyByteSize());
+
+		accessToken.setTokenKey(tokenKey);
+
+		accessToken.setExpiresIn(
+			_defaultBearerTokenProviderConfiguration.accessTokenExpiresIn());
+	}
+
+	@Override
+	public void onBeforeCreate(RefreshToken refreshToken) {
+		String tokenKey = generateTokenKey(
+			_defaultBearerTokenProviderConfiguration.refreshTokenKeyByteSize());
+
+		refreshToken.setTokenKey(tokenKey);
+
+		refreshToken.setExpiresIn(
+			_defaultBearerTokenProviderConfiguration.refreshTokenExpiresIn());
+	}
+
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_defaultBearerTokenProviderConfiguration =
+			ConfigurableUtil.createConfigurable(
+				DefaultBearerTokenProviderConfiguration.class, properties);
+	}
+
 	protected String generateTokenKey(int size) {
-		int nextLongCount = (int) Math.ceil((double) size / 8);
+		int nextLongCount = (int)Math.ceil((double)size / 8);
 
 		byte[] buffer = new byte[nextLongCount * 8];
+
 		for (int i = 0; i < nextLongCount; i++) {
 			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
 		}
@@ -87,18 +103,6 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 		}
 
 		return tokenSB.toString();
-	}
-
-	@Override
-	public boolean isValid(RefreshToken refreshToken) {
-		return true;
-	}
-
-	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_defaultBearerTokenProviderConfiguration =
-				ConfigurableUtil.createConfigurable(
-					DefaultBearerTokenProviderConfiguration.class, properties);
 	}
 
 	private DefaultBearerTokenProviderConfiguration
