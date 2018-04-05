@@ -510,7 +510,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		}
 
 		try {
-			_oAuth2ScopeGrantLocalService.grantScopesToAuthorization(
+			_oAuth2ScopeGrantLocalService.grantLiferayOAuth2Scopes(
 				oAuth2Authorization.getOAuth2AuthorizationId(), liferayScopes);
 		}
 		catch (PortalException e) {
