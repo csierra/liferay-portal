@@ -17,10 +17,11 @@ package com.liferay.oauth2.provider.scope.internal.prefix.handler;
 import com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
@@ -28,6 +29,8 @@ import java.io.StringReader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -68,58 +71,25 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 		}
 
 		for (String serviceProperty : _serviceProperties) {
-			int modifiersStart = serviceProperty.indexOf(StringPool.SPACE);
-			String modifiersString = StringPool.BLANK;
+			Object value = propertyAccessorFunction.apply(serviceProperty);
 
-			if (modifiersStart > -1) {
-				modifiersString = serviceProperty.substring(modifiersStart);
-				serviceProperty = serviceProperty.substring(0, modifiersStart);
+			if (Validator.isNotNull(value)) {
+				parts.add(value.toString());
 			}
-
-			Object applyResult = propertyAccessorFunction.apply(
-				serviceProperty);
-
-			if (applyResult != null) {
-				parts.add(applyResult.toString());
-				continue;
+			else {
+				parts.add(_defaults.get(serviceProperty));
 			}
-
-			String propertiesFormat = modifiersString.replaceAll(
-				StringPool.SPACE, "\n");
-
-			Properties modifiers = new Properties();
-
-			try {
-				modifiers.load(new StringReader(propertiesFormat));
-			}
-			catch (IOException ioe) {
-				throw new IllegalArgumentException(ioe);
-			}
-
-			parts.add(GetterUtil.getString(modifiers.getProperty("default")));
 		}
 
-		PrefixHandler prefixHandler = create(
-			parts.toArray(_EMPTY_STRING_ARRAY));
+		String prefix = StringUtil.merge(parts, _delimiter);
 
 		return input -> {
 			if (_excludedScope.contains(input)) {
 				return input;
 			}
 
-			return prefixHandler.addPrefix(input);
+			return StringBundler.concat(prefix, _delimiter, input);
 		};
-	}
-
-	public PrefixHandler create(String... prefixes) {
-		StringBundler sb = new StringBundler(prefixes.length * 2);
-
-		for (String prefix : prefixes) {
-			sb.append(prefix);
-			sb.append(_separator);
-		}
-
-		return input -> sb.toString() + input;
 	}
 
 	@Activate
@@ -145,24 +115,46 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 		_includeBundleSymbolicName =
 			bundlePrefixHandlerFactoryConfiguration.includeBundleSymbolicName();
 
-		_separator = bundlePrefixHandlerFactoryConfiguration.separator();
+		_delimiter = bundlePrefixHandlerFactoryConfiguration.delimiter();
 
-		stream = Arrays.stream(
-			bundlePrefixHandlerFactoryConfiguration.serviceProperties());
+		for (String serviceProperty :
+				bundlePrefixHandlerFactoryConfiguration.serviceProperties()) {
 
-		_serviceProperties = stream.filter(
-			e -> !Validator.isBlank(e)
-		).collect(
-			Collectors.toList()
-		);
+			String servicePropertyKey;
+
+			int indexOfSpace = serviceProperty.indexOf(StringPool.SPACE);
+
+			if (indexOfSpace > -1) {
+				servicePropertyKey = serviceProperty.substring(0, indexOfSpace);
+
+				Properties modifiers = new Properties();
+
+				try {
+					modifiers.load(
+						new StringReader(
+							serviceProperty.substring(indexOfSpace)));
+				}
+				catch (IOException ioe) {
+					throw new IllegalArgumentException(ioe);
+				}
+
+				_defaults.put(
+					servicePropertyKey,
+					GetterUtil.getString(modifiers.getProperty("default")));
+			}
+			else {
+				servicePropertyKey = serviceProperty;
+			}
+
+			_serviceProperties.add(servicePropertyKey);
+		}
 	}
 
-	private static final String[] _EMPTY_STRING_ARRAY = new String[0];
-
 	private BundleContext _bundleContext;
+	private final Map<String, String> _defaults = new HashMap<>();
+	private String _delimiter = StringPool.SLASH;
 	private List<String> _excludedScope;
 	private boolean _includeBundleSymbolicName;
-	private String _separator = StringPool.SLASH;
-	private List<String> _serviceProperties;
+	private final Collection<String> _serviceProperties = new ArrayList<>();
 
 }

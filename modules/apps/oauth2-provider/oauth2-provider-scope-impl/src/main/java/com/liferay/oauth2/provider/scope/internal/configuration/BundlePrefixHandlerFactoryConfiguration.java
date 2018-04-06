@@ -23,8 +23,7 @@ import com.liferay.portal.kernel.util.StringPool;
  * @author Tomas Polesovsky
  */
 @ExtendedObjectClassDefinition(
-	category = "foundation",
-	factoryInstanceLabelAttribute = "osgi.jaxrs.name"
+	category = "foundation", factoryInstanceLabelAttribute = "osgi.jaxrs.name"
 )
 @Meta.OCD(
 	factory = true,
@@ -65,6 +64,6 @@ public interface BundlePrefixHandlerFactoryConfiguration {
 		deflt = StringPool.SLASH, description = "separator-description",
 		id = "separator", name = "separator", required = false
 	)
-	public String separator();
+	public String delimiter();
 
 }
