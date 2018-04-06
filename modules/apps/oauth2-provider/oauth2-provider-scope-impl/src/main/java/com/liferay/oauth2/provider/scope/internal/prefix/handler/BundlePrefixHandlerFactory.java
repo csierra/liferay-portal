@@ -27,11 +27,14 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -54,8 +57,7 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 	public PrefixHandler create(
 		Function<String, Object> propertyAccessorFunction) {
 
-		ArrayList<String> parts = new ArrayList<>(
-			_serviceProperties.length + 1);
+		List<String> parts = new ArrayList<>(_serviceProperties.length + 1);
 
 		if (_includeBundleSymbolicName) {
 			long bundleId = Long.parseLong(
@@ -135,13 +137,14 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 
 		_bundleContext = bundleContext;
 
-		_excludedScope = new ArrayList<>();
-
-		Collections.addAll(
-			_excludedScope,
+		Stream<String> stream = Arrays.stream(
 			bundlePrefixHandlerFactoryConfiguration.excludedScopes());
 
-		_excludedScope.removeIf(Validator::isBlank);
+		_excludedScope = stream.filter(
+			e -> !Validator.isBlank(e)
+		).collect(
+			Collectors.toList()
+		);
 
 		_includeBundleSymbolicName =
 			bundlePrefixHandlerFactoryConfiguration.includeBundleSymbolicName();
