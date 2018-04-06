@@ -20,7 +20,7 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 
-import com.liferay.oauth2.provider.scope.internal.scopematcher.StrictScopeMatcherFactory;
+import com.liferay.oauth2.provider.scope.internal.scope.matcher.StrictScopeMatcherFactory;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;

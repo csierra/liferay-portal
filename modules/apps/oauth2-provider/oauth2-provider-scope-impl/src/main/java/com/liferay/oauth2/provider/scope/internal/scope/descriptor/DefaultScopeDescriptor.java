@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal.scopedescriptor;
+package com.liferay.oauth2.provider.scope.internal.scope.descriptor;
 
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;

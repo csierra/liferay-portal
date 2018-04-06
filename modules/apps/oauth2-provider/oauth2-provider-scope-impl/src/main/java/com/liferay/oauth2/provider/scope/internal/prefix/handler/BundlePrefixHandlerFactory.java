@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal.prefixhandler;
+package com.liferay.oauth2.provider.scope.internal.prefix.handler;
 
 import com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;

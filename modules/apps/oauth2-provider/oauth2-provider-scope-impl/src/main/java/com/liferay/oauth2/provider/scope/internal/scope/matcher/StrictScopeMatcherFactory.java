@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal.scopematcher;
+package com.liferay.oauth2.provider.scope.internal.scope.matcher;
 
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
