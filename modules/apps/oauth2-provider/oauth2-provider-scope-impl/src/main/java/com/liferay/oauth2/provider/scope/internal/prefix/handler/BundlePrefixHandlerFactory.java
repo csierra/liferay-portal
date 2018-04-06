@@ -98,6 +98,7 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 				modifiers.load(new StringReader(propertiesFormat));
 			}
 			catch (IOException ioe) {
+				throw new IllegalArgumentException(ioe);
 			}
 
 			parts.add(GetterUtil.getString(modifiers.getProperty("default")));
