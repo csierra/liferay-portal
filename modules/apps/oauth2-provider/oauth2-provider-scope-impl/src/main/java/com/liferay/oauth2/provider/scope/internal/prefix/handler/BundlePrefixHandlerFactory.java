@@ -51,13 +51,15 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 
 	@Override
-	public PrefixHandler create(Function<String, Object> serviceProperties) {
+	public PrefixHandler create(
+		Function<String, Object> propertyAccessorFunction) {
+
 		ArrayList<String> parts = new ArrayList<>(
 			_serviceProperties.length + 1);
 
 		if (_includeBundleSymbolicName) {
 			long bundleId = Long.parseLong(
-				serviceProperties.apply("service.bundleid").toString());
+				propertyAccessorFunction.apply("service.bundleid").toString());
 
 			Bundle bundle = _bundleContext.getBundle(bundleId);
 
@@ -77,7 +79,8 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 				serviceProperty = serviceProperty.substring(0, modifiersStart);
 			}
 
-			Object applyResult = serviceProperties.apply(serviceProperty);
+			Object applyResult = propertyAccessorFunction.apply(
+				serviceProperty);
 
 			if (applyResult != null) {
 				parts.add(applyResult.toString());
