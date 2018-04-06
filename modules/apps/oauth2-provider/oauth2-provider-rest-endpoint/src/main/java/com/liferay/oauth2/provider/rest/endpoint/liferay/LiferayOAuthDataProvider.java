@@ -235,10 +235,25 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 			List<String> restrictedScopes)
 		throws OAuthServiceException {
 
-		RefreshToken cxfRefreshToken = getRefreshToken(refreshTokenKey);
+		RefreshToken oldRefreshToken = getRefreshToken(refreshTokenKey);
+
+		if (oldRefreshToken == null) {
+			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
+		}
+
+		if (OAuthUtils.isExpired(
+				oldRefreshToken.getIssuedAt(),
+				oldRefreshToken.getExpiresIn())) {
+
+			doRevokeRefreshToken(oldRefreshToken);
+
+			// audit: using expired refresh token
+
+			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
+		}
 
 		BearerTokenProvider.RefreshToken refreshToken =
-			fromCXFRefreshToken(cxfRefreshToken);
+			fromCXFRefreshToken(oldRefreshToken);
 
 		OAuth2Application oAuth2Application = resolveOAuth2Application(client);
 
@@ -248,36 +263,48 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				oAuth2Application.getClientId());
 
 		if (!tokenProvider.isValid(refreshToken)) {
+			doRevokeRefreshToken(oldRefreshToken);
+
+			// audit: using invalid refresh token
+
 			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
 		}
+
 
 		OAuth2Authorization oAuth2Authorization =
 			_oAuth2AuthorizationLocalService.
 				fetchOAuth2AuthorizationByRefreshTokenContent(refreshTokenKey);
 
 		if (oAuth2Authorization == null) {
+
+			// audit: using non-existing refresh token
+
 			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
 		}
 
+		ServerAccessToken accessToken = doRefreshAccessToken(
+			client, oldRefreshToken, Collections.emptyList());
+
+		accessToken.setRefreshToken(oldRefreshToken.getTokenKey());
+
+		RefreshToken newRefreshToken = doCreateNewRefreshToken(accessToken);
+
+		newRefreshToken.getAccessTokens().add(accessToken.getTokenKey());
+
 		try {
-			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
-				_oAuth2ApplicationScopeAliasesLocalService.
-					getOAuth2ApplicationScopeAliases(
-						oAuth2Authorization.
-							getOAuth2ApplicationScopeAliasesId());
-
-			restrictedScopes =
-				oAuth2ApplicationScopeAliases.getScopeAliasesList();
+			_invokeTransactionally(
+				() -> {
+					saveAccessToken(accessToken);
+					saveRefreshToken(newRefreshToken);
+				});
 		}
-		catch (PortalException pe) {
-			_log.error(
-				"Unable to find associated application scope aliases" ,pe);
-
-			throw new OAuthServiceException(pe);
+		catch (Throwable throwable) {
+			throw new OAuthServiceException(throwable);
 		}
 
-		return super.refreshAccessToken(
-			client, refreshTokenKey, restrictedScopes);
+		accessToken.setRefreshToken(newRefreshToken.getTokenKey());
+
+		return accessToken;
 	}
 
 	@Override
@@ -462,7 +489,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 			oAuth2Authorization.setAccessTokenContent(token.getTokenKey());
 			oAuth2Authorization.setAccessTokenCreateDate(createDate);
-			oAuth2Authorization.setAccessTokenExpirationDate(createDate);
+			oAuth2Authorization.setAccessTokenExpirationDate(expirationDate);
 
 			_oAuth2AuthorizationLocalService.updateOAuth2Authorization(
 				oAuth2Authorization);
