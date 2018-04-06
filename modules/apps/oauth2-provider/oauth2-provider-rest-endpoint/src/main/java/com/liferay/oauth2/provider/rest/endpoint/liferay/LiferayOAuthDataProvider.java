@@ -590,14 +590,26 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 	@Override
 	public RefreshToken getRefreshToken(String refreshTokenKey) {
+		if (Validator.isBlank(refreshTokenKey)) {
+			// audit: trying to use empty token
+
+			return null;
+		}
+
 		try {
 			OAuth2Authorization oAuth2Authorization =
 				_oAuth2AuthorizationLocalService.
 					fetchOAuth2AuthorizationByRefreshTokenContent(
 						refreshTokenKey);
 
-			if (oAuth2Authorization == null ){
-				// audit: trying to use expired token or brute-force token
+			if (oAuth2Authorization == null){
+				// audit: trying to use deleted token or brute-force token
+
+				return null;
+			}
+
+			if (OAuth2ProviderConstants.EXPIRED_TOKEN.equals(oAuth2Authorization.getRefreshTokenContent())) {
+				// audit: trying intentionally to use expired token
 
 				return null;
 			}
@@ -610,7 +622,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 				oAuth2Authorization.getRefreshTokenCreateDate());
 
 			long expires =  toCXFTime(
-				oAuth2Authorization.getRefreshTokenCreateDate());
+				oAuth2Authorization.getRefreshTokenExpirationDate());
 
 			long lifetime = expires - issuedAt;
 
@@ -688,12 +700,24 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	public ServerAccessToken getAccessToken(String accessToken)
 		throws OAuthServiceException {
 
+		if (Validator.isBlank(accessToken)) {
+			// audit: trying to use empty token
+
+			return null;
+		}
+
 		OAuth2Authorization oAuth2Authorization =
 			_oAuth2AuthorizationLocalService.
 				fetchOAuth2AuthorizationByAccessTokenContent(accessToken);
 
 		if (oAuth2Authorization == null) {
-			// audit: trying to use expired token or brute-force token
+			// audit: trying to use deleted token or brute-force token
+
+			return null;
+		}
+
+		if (OAuth2ProviderConstants.EXPIRED_TOKEN.equals(oAuth2Authorization.getAccessTokenContent())) {
+			// audit: trying intentionally to use expired token
 
 			return null;
 		}
