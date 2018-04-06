@@ -28,7 +28,6 @@ import java.io.StringReader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -57,7 +56,7 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 	public PrefixHandler create(
 		Function<String, Object> propertyAccessorFunction) {
 
-		List<String> parts = new ArrayList<>(_serviceProperties.length + 1);
+		List<String> parts = new ArrayList<>(_serviceProperties.size() + 1);
 
 		if (_includeBundleSymbolicName) {
 			long bundleId = Long.parseLong(
@@ -69,10 +68,6 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 		}
 
 		for (String serviceProperty : _serviceProperties) {
-			if (Validator.isBlank(serviceProperty)) {
-				continue;
-			}
-
 			int modifiersStart = serviceProperty.indexOf(StringPool.SPACE);
 			String modifiersString = StringPool.BLANK;
 
@@ -152,8 +147,14 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 
 		_separator = bundlePrefixHandlerFactoryConfiguration.separator();
 
-		_serviceProperties =
-			bundlePrefixHandlerFactoryConfiguration.serviceProperties();
+		stream = Arrays.stream(
+			bundlePrefixHandlerFactoryConfiguration.serviceProperties());
+
+		_serviceProperties = stream.filter(
+			e -> !Validator.isBlank(e)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private static final String[] _EMPTY_STRING_ARRAY = new String[0];
@@ -162,6 +163,6 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 	private List<String> _excludedScope;
 	private boolean _includeBundleSymbolicName;
 	private String _separator = StringPool.SLASH;
-	private String[] _serviceProperties;
+	private List<String> _serviceProperties;
 
 }
