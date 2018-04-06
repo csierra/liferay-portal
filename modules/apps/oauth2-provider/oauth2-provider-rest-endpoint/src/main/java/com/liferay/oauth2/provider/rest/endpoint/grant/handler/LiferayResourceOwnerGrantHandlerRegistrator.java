@@ -12,21 +12,24 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.endpoint;
+package com.liferay.oauth2.provider.rest.endpoint.grant.handler;
 
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayResourceOwnerLoginHandler;
+import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.grants.clientcred.ClientCredentialsGrantHandler;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerGrantHandler;
+import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -44,7 +47,7 @@ import java.util.Map;
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true
 )
-public class LiferayClientCredentialsGrantHandlerRegistrator {
+public class LiferayResourceOwnerGrantHandlerRegistrator {
 
 	private ServiceRegistration<AccessTokenGrantHandler>
 		_serviceRegistration;
@@ -57,17 +60,19 @@ public class LiferayClientCredentialsGrantHandlerRegistrator {
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 
-		if (oAuth2ProviderConfiguration.allowClientCredentialsGrant()) {
-			ClientCredentialsGrantHandler clientCredentialsGrantHandler =
-				new ClientCredentialsGrantHandler();
+		if (oAuth2ProviderConfiguration.allowResourceOwnerPasswordCredentialsGrant()) {
+			ResourceOwnerGrantHandler resourceOwnerGrantHandler =
+				new ResourceOwnerGrantHandler();
 
-			clientCredentialsGrantHandler.setDataProvider(
+			resourceOwnerGrantHandler.setLoginHandler(
+				_liferayLoginHandler);
+			resourceOwnerGrantHandler.setDataProvider(
 				_liferayOAuthDataProvider);
 
 			_serviceRegistration = bundleContext.registerService(
 				AccessTokenGrantHandler.class,
 				new LiferayPermissionedAccessTokenGrantHandler(
-					clientCredentialsGrantHandler,
+					resourceOwnerGrantHandler,
 					this::hasCreateTokenPermission),
 				new Hashtable<>());
 		}
@@ -83,15 +88,41 @@ public class LiferayClientCredentialsGrantHandlerRegistrator {
 	protected boolean hasCreateTokenPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
-		OAuth2Application oAuth2Application =
-			_liferayOAuthDataProvider.resolveOAuth2Application(client);
+		String userName = params.getFirst("username");
+		String password = params.getFirst("password");
 
-		long userId = oAuth2Application.getUserId();
+		if (userName == null || password == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("username or password parameter was not provided.");
+			}
+
+			return false;
+		}
+
+		OAuth2Application oAuth2Application =
+			_liferayOAuthDataProvider.resolveOAuth2Application(
+				client);
 
 		PermissionChecker permissionChecker = null;
 
+		User user = null;
+
 		try {
-			User user = _userLocalService.getUserById(userId);
+			if (_liferayLoginHandler instanceof LiferayResourceOwnerLoginHandler) {
+				user =
+					((LiferayResourceOwnerLoginHandler)_liferayLoginHandler).
+						authenticateUser(userName, password);
+			}
+			else {
+				UserSubject userSubject = _liferayLoginHandler.createSubject(
+					userName, password);
+
+				String subjectId = userSubject.getId();
+
+				long userId = Long.parseLong(subjectId);
+
+				user = _userLocalService.getUserById(userId);
+			}
 
 			permissionChecker =
 				PermissionCheckerFactoryUtil.create(user);
@@ -99,7 +130,7 @@ public class LiferayClientCredentialsGrantHandlerRegistrator {
 		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Unable to create PermissionChecker for user " + userId);
+					"Unable to create PermissionChecker for user " + userName);
 			}
 
 			return false;
@@ -124,7 +155,7 @@ public class LiferayClientCredentialsGrantHandlerRegistrator {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
-				"User " + userId +
+				"User " + user.getUserId() +
 					" doesn't have permission to create access token for " +
 						"client " + client.getClientId());
 		}
@@ -134,13 +165,13 @@ public class LiferayClientCredentialsGrantHandlerRegistrator {
 
 	private static Log _log =
 		LogFactoryUtil.getLog(
-			LiferayClientCredentialsGrantHandlerRegistrator.class);
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
+			LiferayResourceOwnerGrantHandlerRegistrator.class);
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+
+	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	private ResourceOwnerLoginHandler _liferayLoginHandler;
 
 	@Reference
 	private UserLocalService _userLocalService;

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.endpoint;
+package com.liferay.oauth2.provider.rest.endpoint.liferay;
 
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.GrantType;
@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
+import com.liferay.oauth2.provider.rest.endpoint.grant.handler.LiferayAuthorizationCodeGrantHandlerRegistrator;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider.AccessToken;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
@@ -194,13 +195,13 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		return serverAccessToken;
 	}
 
-	protected BearerTokenProvider getBearerTokenProvider(
+	public BearerTokenProvider getBearerTokenProvider(
 		long companyId, String clientId) {
 
 		return _scopedBearerTokenProvider.getService(companyId, clientId);
 	}
 
-	protected BearerTokenProvider.AccessToken fromCXFAccessToken(
+	public BearerTokenProvider.AccessToken fromCXFAccessToken(
 		ServerAccessToken serverAccessToken) {
 
 		OAuth2Application oAuth2Application =
@@ -312,7 +313,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		return cxfRefreshToken;
 	}
 
-	protected BearerTokenProvider.RefreshToken fromCXFRefreshToken(
+	public BearerTokenProvider.RefreshToken fromCXFRefreshToken(
 		RefreshToken cxfRefreshToken) {
 
 		OAuth2Application oAuth2Application =
@@ -552,7 +553,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	@Override
-	protected void doRevokeAccessToken(ServerAccessToken accessToken) {
+	public void doRevokeAccessToken(ServerAccessToken accessToken) {
 		OAuth2Authorization oAuth2Authorization =
 			_oAuth2AuthorizationLocalService.
 				fetchOAuth2AuthorizationByAccessTokenContent(
@@ -570,7 +571,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	@Override
-	protected void doRevokeRefreshToken(RefreshToken refreshToken) {
+	public void doRevokeRefreshToken(RefreshToken refreshToken) {
 		OAuth2Authorization oAuth2Authorization =
 			_oAuth2AuthorizationLocalService.
 				fetchOAuth2AuthorizationByRefreshTokenContent(
@@ -588,7 +589,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 	}
 
 	@Override
-	protected RefreshToken getRefreshToken(String refreshTokenKey) {
+	public RefreshToken getRefreshToken(String refreshTokenKey) {
 		try {
 			OAuth2Authorization oAuth2Authorization =
 				_oAuth2AuthorizationLocalService.
@@ -878,7 +879,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		return userSubject;
 	}
 
-	protected OAuth2Application resolveOAuth2Application(Client client) {
+	public OAuth2Application resolveOAuth2Application(Client client) {
 		long companyId = Long.parseLong(
 			client.getProperties().get("companyId"));
 
