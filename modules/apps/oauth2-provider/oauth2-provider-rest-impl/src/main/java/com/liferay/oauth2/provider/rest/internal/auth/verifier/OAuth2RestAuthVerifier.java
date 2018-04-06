@@ -15,9 +15,18 @@
 package com.liferay.oauth2.provider.rest.internal.auth.verifier;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
-import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayOAuthDataProvider;
+import com.liferay.oauth2.provider.exception.NoSuchOAuth2AuthorizationException;
+import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
+import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
+import com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
@@ -25,27 +34,40 @@ import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
 import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyManager;
-import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
-
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Properties;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Carlos Sierra Andrés
  */
 @Component(
 	immediate = true,
-	property = {
-		"auth.verifier.OAuth2RestAuthVerifier.urls.includes=#N/A#"
-	}
+	property = {"auth.verifier.OAuth2RestAuthVerifier.urls.includes=#N/A#"}
 )
 public class OAuth2RestAuthVerifier implements AuthVerifier {
+
+	@Activate
+	public void activate(BundleContext bundleContext) {
+		_scopedBearerTokenProvider = _scopedServiceTrackerMapFactory.create(
+			bundleContext, BearerTokenProvider.class,
+			"liferay.oauth2.client.id", () -> _defaultBearerTokenProvider);
+	}
 
 	@Override
 	public String getAuthType() {
@@ -60,15 +82,15 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 		AuthVerifierResult authVerifierResult = new AuthVerifierResult();
 
 		try {
-			BearerTokenProvider.AccessToken accessToken =
-				getAccessToken(accessControlContext);
+			BearerTokenProvider.AccessToken accessToken = getAccessToken(
+				accessControlContext);
 
 			if (accessToken == null) {
 				return authVerifierResult;
 			}
 
 			BearerTokenProvider bearerTokenProvider =
-				_liferayOAuthDataProvider.getBearerTokenProvider(
+				_scopedBearerTokenProvider.getService(
 					accessToken.getOAuth2Application().getCompanyId(),
 					accessToken.getOAuth2Application().getClientId());
 
@@ -81,10 +103,6 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 			}
 
 			_scopeContext.setAccessToken(accessToken.getTokenKey());
-
-			ServiceAccessPolicyThreadLocal.addActiveServiceAccessPolicyName(
-				_serviceAccessPolicyManager.getDefaultUserServiceAccessPolicyName(
-					accessToken.getOAuth2Application().getCompanyId()));
 
 			authVerifierResult.getSettings().put(
 				BearerTokenProvider.AccessToken.class.getName(), accessToken);
@@ -104,7 +122,8 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 	}
 
 	protected BearerTokenProvider.AccessToken getAccessToken(
-		AccessControlContext accessControlContext) {
+			AccessControlContext accessControlContext)
+		throws PortalException {
 
 		HttpServletRequest request = accessControlContext.getRequest();
 
@@ -122,7 +141,7 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 		String basicAuthPart = basicAuthParts[0];
 
-		if (!"Bearer".equalsIgnoreCase(basicAuthPart)) {
+		if (!_BEARER.equalsIgnoreCase(basicAuthPart)) {
 			return null;
 		}
 
@@ -132,34 +151,91 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 			return null;
 		}
 
-		ServerAccessToken serverAccessToken =
-			_liferayOAuthDataProvider.getAccessToken(token);
-
-		if (serverAccessToken == null) {
+		OAuth2Authorization oAuth2Authorization = null;
+		try {
+			oAuth2Authorization =
+				_oAuth2AuthorizationLocalService.
+					getOAuth2AuthorizationByAccessTokenContent(token);
+		}
+		catch (NoSuchOAuth2AuthorizationException nsoaae) {
 			return null;
 		}
 
-		String tokenKey = serverAccessToken.getTokenKey();
+		String accessTokenContent = oAuth2Authorization.getAccessTokenContent();
 
-		if(OAuth2ProviderConstants.EXPIRED_TOKEN.equals(tokenKey)) {
+		if (OAuth2ProviderConstants.EXPIRED_TOKEN.equals(accessTokenContent)) {
 			return null;
+		}
+
+		OAuth2Application oAuth2Application =
+			_oAuth2ApplicationLocalService.getOAuth2Application(
+				oAuth2Authorization.getOAuth2ApplicationId());
+
+		long issuedAtSeconds =
+			oAuth2Authorization.getAccessTokenCreateDate().getTime() / 1000;
+
+		long expiresSeconds =
+			oAuth2Authorization.getAccessTokenExpirationDate().getTime() / 1000;
+
+		long lifeTime = expiresSeconds - issuedAtSeconds;
+
+		List<String> scopeAliasesList = Collections.emptyList();
+
+		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
+			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+				_oAuth2ApplicationScopeAliasesLocalService.
+					getOAuth2ApplicationScopeAliases(
+						oAuth2Authorization.
+							getOAuth2ApplicationScopeAliasesId());
+
+			scopeAliasesList =
+				oAuth2ApplicationScopeAliases.getScopeAliasesList();
 		}
 
 		BearerTokenProvider.AccessToken accessToken =
-			_liferayOAuthDataProvider.fromCXFAccessToken(serverAccessToken);
+			new BearerTokenProvider.AccessToken(
+				oAuth2Application, new ArrayList<>(), StringPool.BLANK,
+				lifeTime, new HashMap<>(), StringPool.BLANK, StringPool.BLANK,
+				issuedAtSeconds, StringPool.BLANK, StringPool.BLANK,
+				new HashMap<>(), StringPool.BLANK, StringPool.BLANK,
+				scopeAliasesList, accessTokenContent, _BEARER,
+				oAuth2Authorization.getUserId(),
+				oAuth2Authorization.getUserName());
 
 		return accessToken;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(OAuth2RestAuthVerifier.class);
+	private static final String _BEARER = "Bearer";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		OAuth2RestAuthVerifier.class);
+
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY, target = "(name=default)"
+	)
+	private volatile BearerTokenProvider _defaultBearerTokenProvider;
 
 	@Reference
-	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 
 	@Reference
-	private ServiceAccessPolicyManager _serviceAccessPolicyManager;
+	private OAuth2ApplicationScopeAliasesLocalService
+		_oAuth2ApplicationScopeAliasesLocalService;
+
+	@Reference
+	private OAuth2AuthorizationLocalService _oAuth2AuthorizationLocalService;
 
 	@Reference
 	private ScopeContext _scopeContext;
+
+	private ScopedServiceTrackerMap<BearerTokenProvider>
+		_scopedBearerTokenProvider;
+
+	@Reference
+	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
+
+	@Reference
+	private ServiceAccessPolicyManager _serviceAccessPolicyManager;
 
 }
