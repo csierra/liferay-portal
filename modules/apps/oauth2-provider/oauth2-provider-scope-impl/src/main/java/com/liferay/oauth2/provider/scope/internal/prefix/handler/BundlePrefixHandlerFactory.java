@@ -102,24 +102,24 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 		PrefixHandler prefixHandler = create(
 			parts.toArray(_EMPTY_STRING_ARRAY));
 
-		return target -> {
-			if (_excludedScope.contains(target)) {
-				return target;
+		return input -> {
+			if (_excludedScope.contains(input)) {
+				return input;
 			}
 
-			return prefixHandler.addPrefix(target);
+			return prefixHandler.addPrefix(input);
 		};
 	}
 
 	public PrefixHandler create(String... prefixes) {
 		StringBundler sb = new StringBundler(prefixes.length * 2);
 
-		for (String namespace : prefixes) {
-			sb.append(namespace);
+		for (String prefix : prefixes) {
+			sb.append(prefix);
 			sb.append(_separator);
 		}
 
-		return target -> sb.toString() + target;
+		return input -> sb.toString() + input;
 	}
 
 	@Activate
