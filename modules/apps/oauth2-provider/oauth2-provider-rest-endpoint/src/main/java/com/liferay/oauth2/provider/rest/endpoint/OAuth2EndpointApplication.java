@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.rest.endpoint;
 
+import com.liferay.oauth2.provider.rest.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -170,7 +171,7 @@ public class OAuth2EndpointApplication extends Application {
 	@Reference(
 		cardinality = ReferenceCardinality.MULTIPLE,
 		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(liferay.oauth2.class=true)",
+		target = "(" + OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_CLASS + "=true)",
 		unbind = "removeOAuth2Class"
 	)
 	public void addOAuth2Class(Class<?> cls) {
@@ -184,14 +185,14 @@ public class OAuth2EndpointApplication extends Application {
 	@Reference(
 		cardinality = ReferenceCardinality.AT_LEAST_ONE,
 		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(liferay.oauth2.endpoint=true)",
-		unbind = "removeOauth2Endpoint"
+		target = "(" + OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT + "=true)",
+		unbind = "removeOAuth2Endpoint"
 	)
-	public void addOauth2Endpoint(Object endpoint) {
+	public void addOAuth2Endpoint(Object endpoint) {
 		_liferayOauth2Endpoints.add(endpoint);
 	}
 
-	public void removeOauth2Endpoint(Object endpoint) {
+	public void removeOAuth2Endpoint(Object endpoint) {
 		_liferayOauth2Endpoints.remove(endpoint);
 	}
 

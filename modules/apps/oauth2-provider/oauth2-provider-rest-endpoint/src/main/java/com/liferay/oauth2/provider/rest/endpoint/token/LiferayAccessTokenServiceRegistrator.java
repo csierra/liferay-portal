@@ -12,13 +12,12 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.endpoint;
+package com.liferay.oauth2.provider.rest.endpoint.token;
 
+import com.liferay.oauth2.provider.rest.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.kernel.util.MapUtil;
-import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
-import org.apache.cxf.rs.security.oauth2.services.AccessTokenService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -28,10 +27,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MultivaluedMap;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -43,41 +38,45 @@ import java.util.Map;
 @Component(
 	immediate=true,
 	property = {
-		"oauth2.allow.access.token.endpoint=true",
-		"oauth2.allow.access.token.endpoint.public.clients=true"
+		"allow.public.clients=true",
+		"block.unsecure.requests=true",
+		"enabled=true"
 	}
 )
-public class OAuth2AccessTokenServiceRegistrator {
+public class LiferayAccessTokenServiceRegistrator {
 
 	@Activate
 	public void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		boolean enabled = MapUtil.getBoolean(
-			properties, "oauth2.allow.token.introspection.endpoint", true);
+		boolean enabled = MapUtil.getBoolean(properties, "enabled", true);
 
-		if (enabled) {
-			boolean publicClientsEnabled = MapUtil.getBoolean(
-				properties,
-				"oauth2.allow.token.introspection.endpoint.public.clients",
-				true);
-
-			OAuth2AccessTokenService accessTokenService =
-				new OAuth2AccessTokenService();
-
-			accessTokenService.setBlockUnsecureRequests(true);
-			accessTokenService.setCanSupportPublicClients(publicClientsEnabled);
-			accessTokenService.setDataProvider(_liferayOAuthDataProvider);
-			accessTokenService.setGrantHandlers(_accessTokenGrantHandlers);
-
-			Hashtable<String, Object> endpointProperties = new Hashtable<>();
-
-			endpointProperties.put("liferay.oauth2.endpoint", true);
-
-			_endpointServiceRegistration = bundleContext.registerService(
-				Object.class, accessTokenService,
-				endpointProperties);
+		if (!enabled) {
+			return;
 		}
+
+		boolean allowPublicClients = MapUtil.getBoolean(
+			properties, "allow.public.clients", true);
+
+		boolean blockUnsecureRequests = MapUtil.getBoolean(
+			properties, "block.unsecure.requests", true);
+
+		LiferayAccessTokenService liferayAccessTokenService =
+			new LiferayAccessTokenService();
+
+		liferayAccessTokenService.setBlockUnsecureRequests(true);
+		liferayAccessTokenService.setCanSupportPublicClients(
+			allowPublicClients);
+		liferayAccessTokenService.setDataProvider(_liferayOAuthDataProvider);
+		liferayAccessTokenService.setGrantHandlers(_accessTokenGrantHandlers);
+
+		Hashtable<String, Object> endpointProperties = new Hashtable<>();
+
+		endpointProperties.put(
+			OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT, true);
+
+		_endpointServiceRegistration = bundleContext.registerService(
+			Object.class, liferayAccessTokenService, endpointProperties);
 	}
 
 	@Deactivate
@@ -112,38 +111,4 @@ public class OAuth2AccessTokenServiceRegistrator {
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
-	public class OAuth2AccessTokenService extends AccessTokenService {
-		@Override
-		protected Client authenticateClientIfNeeded(
-			MultivaluedMap<String, String> params) {
-
-			Client client = super.authenticateClientIfNeeded(params);
-
-			Map<String, String> clientProperties = client.getProperties();
-
-			HttpServletRequest httpServletRequest =
-				getMessageContext().getHttpServletRequest();
-
-			String remoteAddr = httpServletRequest.getRemoteAddr();
-
-			String remoteHost = httpServletRequest.getRemoteHost();
-
-			try {
-				InetAddress inetAddress = InetAddress.getByName(remoteAddr);
-				remoteHost = inetAddress.getCanonicalHostName();
-			}
-			catch (UnknownHostException e) {
-			}
-
-			clientProperties.put(
-				LiferayOAuthDataProvider.CLIENT_REMOTE_ADDR_PROPERTY,
-				remoteAddr);
-
-			clientProperties.put(
-				LiferayOAuthDataProvider.CLIENT_REMOTE_HOST_PROPERTY,
-				remoteHost);
-
-			return client;
-		}
-	}
 }

@@ -12,20 +12,15 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.endpoint.grant.handler;
+package com.liferay.oauth2.provider.rest.endpoint.token.grant.handler;
 
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
-import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayResourceOwnerLoginHandler;
+import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayAccessTokenGrantHandlerHelper;
 import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.service.UserLocalService;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerGrantHandler;
@@ -73,7 +68,7 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 				AccessTokenGrantHandler.class,
 				new LiferayPermissionedAccessTokenGrantHandler(
 					resourceOwnerGrantHandler,
-					this::hasCreateTokenPermission),
+					this::hasPermission),
 				new Hashtable<>());
 		}
 	}
@@ -85,7 +80,7 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 		}
 	}
 
-	protected boolean hasCreateTokenPermission(
+	protected boolean hasPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
 		String userName = params.getFirst("username");
@@ -99,68 +94,19 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 			return false;
 		}
 
+		UserSubject userSubject = _liferayLoginHandler.createSubject(
+			userName, password);
+
+		String subjectId = userSubject.getId();
+
+		long userId = Long.parseLong(subjectId);
+
 		OAuth2Application oAuth2Application =
 			_liferayOAuthDataProvider.resolveOAuth2Application(
 				client);
 
-		PermissionChecker permissionChecker = null;
-
-		User user = null;
-
-		try {
-			if (_liferayLoginHandler instanceof LiferayResourceOwnerLoginHandler) {
-				user =
-					((LiferayResourceOwnerLoginHandler)_liferayLoginHandler).
-						authenticateUser(userName, password);
-			}
-			else {
-				UserSubject userSubject = _liferayLoginHandler.createSubject(
-					userName, password);
-
-				String subjectId = userSubject.getId();
-
-				long userId = Long.parseLong(subjectId);
-
-				user = _userLocalService.getUserById(userId);
-			}
-
-			permissionChecker =
-				PermissionCheckerFactoryUtil.create(user);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Unable to create PermissionChecker for user " + userName);
-			}
-
-			return false;
-		}
-
-		if (permissionChecker.hasOwnerPermission(
-			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(),
-			oAuth2Application.getUserId(),
-			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
-
-			return true;
-		}
-
-		if (permissionChecker.hasPermission(
-			0, OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(),
-			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
-
-			return true;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"User " + user.getUserId() +
-					" doesn't have permission to create access token for " +
-						"client " + client.getClientId());
-		}
-
-		return false;
+		return _accessTokenGrantHandlerHelper.hasCreateTokenPermission(
+			userId, oAuth2Application);
 	}
 
 	private static Log _log =
@@ -174,6 +120,6 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 	private ResourceOwnerLoginHandler _liferayLoginHandler;
 
 	@Reference
-	private UserLocalService _userLocalService;
+	private LiferayAccessTokenGrantHandlerHelper _accessTokenGrantHandlerHelper;
 
 }

@@ -12,26 +12,23 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.endpoint.grant.handler;
+package com.liferay.oauth2.provider.rest.endpoint.token.grant.handler;
 
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
-import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.rest.endpoint.constants.OAuth2ProviderRestEndpointConstants;
+import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayAccessTokenGrantHandlerHelper;
 import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.UserLocalService;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth2.grants.code.DigestCodeVerifier;
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
-import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
-import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -45,22 +42,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true
 )
 public class LiferayAuthorizationCodeGrantHandlerRegistrator {
-
-	public static final String AUTHORIZATION_CODE_PKCE_GRANT =
-		"authorization_code_pkce";
-
-	private ServiceRegistration<AccessTokenGrantHandler>
-		_grantHandlerServiceRegistration;
-	private ServiceRegistration<Object> _endpointServiceRegistration;
-
-	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
 
 	@Activate
 	protected void activate(
@@ -70,73 +57,33 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 
-		if (_oAuth2ProviderConfiguration.allowAuthorizationCodeGrant() ||
-			_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant()) {
+		if (!_oAuth2ProviderConfiguration.allowAuthorizationCodeGrant() &&
+			!_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant()) {
 
-			AuthorizationCodeGrantService authorizationCodeGrantService =
-				new AuthorizationCodeGrantService();
-
-			authorizationCodeGrantService.setCanSupportPublicClients(
-				_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant());
-
-			authorizationCodeGrantService.setDataProvider(
-				_liferayOAuthDataProvider);
-
-			authorizationCodeGrantService.setSubjectCreator(_subjectCreator);
-
-			Hashtable<String, Object> endpointProperties = new Hashtable<>();
-
-			endpointProperties.put("liferay.oauth2.endpoint", true);
-
-			_endpointServiceRegistration = bundleContext.registerService(
-				Object.class, authorizationCodeGrantService,
-				endpointProperties);
-
-			AuthorizationCodeGrantHandler authorizationCodeGrantHandler =
-				new AuthorizationCodeGrantHandler();
-
-			authorizationCodeGrantHandler.setDataProvider(
-				_liferayOAuthDataProvider);
-
-			authorizationCodeGrantHandler.setExpectCodeVerifierForPublicClients(
-				_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant());
-
-			authorizationCodeGrantHandler.setCodeVerifierTransformer(
-				new DigestCodeVerifier());
-
-			_grantHandlerServiceRegistration = bundleContext.registerService(
-				AccessTokenGrantHandler.class,
-				new LiferayPermissionedAccessTokenGrantHandler(
-					authorizationCodeGrantHandler,
-					this::hasCreateTokenPermission),
-				new Hashtable<>());
+			return;
 		}
+
+		AuthorizationCodeGrantHandler authorizationCodeGrantHandler =
+			new AuthorizationCodeGrantHandler();
+
+		authorizationCodeGrantHandler.setDataProvider(
+			_liferayOAuthDataProvider);
+
+		authorizationCodeGrantHandler.setExpectCodeVerifierForPublicClients(
+			_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant());
+
+		authorizationCodeGrantHandler.setCodeVerifierTransformer(
+			new DigestCodeVerifier());
+
+		_grantHandlerServiceRegistration = bundleContext.registerService(
+			AccessTokenGrantHandler.class,
+			new LiferayPermissionedAccessTokenGrantHandler(
+				authorizationCodeGrantHandler,
+				this::hasPermission),
+			new Hashtable<>());
 	}
 
-	protected boolean clientsMatch(Client client1, Client client2) {
-		String client1Id = client1.getClientId();
-		String client2Id = client2.getClientId();
-
-		if (!Objects.equals(client1Id, client2Id)) {
-			return false;
-		}
-
-		Map<String, String> properties = client1.getProperties();
-
-		String companyId1 = properties.get("companyId");
-
-		properties = client2.getProperties();
-
-		String companyId2 = properties.get("companyId");
-
-		if (!Objects.equals(companyId1, companyId2)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	protected boolean hasCreateTokenPermission(
+	protected boolean hasPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
 		String code = params.getFirst("code");
@@ -160,7 +107,9 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 			return false;
 		}
 
-		if(!clientsMatch(client, serverAuthorizationCodeGrant.getClient())) {
+		if(!_accessTokenGrantHandlerHelper.clientsMatch(
+			client, serverAuthorizationCodeGrant.getClient())) {
+
 			// audit: Trying to get other client's code
 
 			_liferayOAuthDataProvider.removeCodeGrant(code);
@@ -214,10 +163,14 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 			List<String> allowedGrantTypes = client.getAllowedGrantTypes();
 
-			if (!allowedGrantTypes.contains(AUTHORIZATION_CODE_PKCE_GRANT)) {
+			if (!allowedGrantTypes.contains(
+				OAuth2ProviderRestEndpointConstants.
+					AUTHORIZATION_CODE_PKCE_GRANT)) {
+
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Client is not allowed to use " +
+						OAuth2ProviderRestEndpointConstants.
 							AUTHORIZATION_CODE_PKCE_GRANT + " grant");
 				}
 
@@ -229,63 +182,22 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 
 		long userId = Long.parseLong(subjectId);
 
-		PermissionChecker permissionChecker = null;
-
-		try {
-			User user = _userLocalService.getUserById(userId);
-
-			permissionChecker =
-				PermissionCheckerFactoryUtil.create(user);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Unable to create PermissionChecker for user " + userId);
-			}
-
-			return false;
-		}
-
-		if (permissionChecker.hasOwnerPermission(
-			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(),
-			oAuth2Application.getUserId(),
-			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
-
-			return true;
-		}
-
-		if (permissionChecker.hasPermission(
-			0, OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(),
-			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
-
-			return true;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"User " + userId +
-					" doesn't have permission to create access token for " +
-						"client " + client.getClientId());
-		}
-
-		return false;
+		return _accessTokenGrantHandlerHelper.hasCreateTokenPermission(
+			userId, oAuth2Application);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		if (_endpointServiceRegistration != null) {
-			_endpointServiceRegistration.unregister();
-		}
 		if (_grantHandlerServiceRegistration != null) {
 			_grantHandlerServiceRegistration.unregister();
 		}
 	}
 
-	private static Log _log =
-		LogFactoryUtil.getLog(
-			LiferayAuthorizationCodeGrantHandlerRegistrator.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		LiferayAuthorizationCodeGrantHandlerRegistrator.class);
+
+	private ServiceRegistration<AccessTokenGrantHandler>
+		_grantHandlerServiceRegistration;
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
@@ -293,7 +205,12 @@ public class LiferayAuthorizationCodeGrantHandlerRegistrator {
 	@Reference
 	private UserLocalService _userLocalService;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
-	private SubjectCreator _subjectCreator;
+	@Reference(target = "(model.class.name=com.liferay.oauth2.provider.model.OAuth2Application)")
+	private ModelResourcePermission<OAuth2Application>
+		_modelResourcePermission;
 
+	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
+
+	@Reference
+	private LiferayAccessTokenGrantHandlerHelper _accessTokenGrantHandlerHelper;
 }

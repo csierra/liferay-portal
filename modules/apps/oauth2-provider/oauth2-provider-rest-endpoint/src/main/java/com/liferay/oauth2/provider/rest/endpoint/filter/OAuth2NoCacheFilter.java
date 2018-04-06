@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.rest.endpoint.filter;
 
+import com.liferay.oauth2.provider.rest.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import org.osgi.service.component.annotations.Component;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -22,12 +23,14 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
+;
+
 /**
  * @author Tomas Polesovsky
  */
 @Component(
 	immediate = true,
-	property = "liferay.oauth2.endpoint=true",
+	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT + "=true",
 	service=Object.class
 )
 @Provider

@@ -12,21 +12,15 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.endpoint.grant.handler;
+package com.liferay.oauth2.provider.rest.endpoint.token.grant.handler;
 
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
-import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.rest.endpoint.grant.handler.LiferayClientCredentialsGrantHandlerRegistrator;
-import com.liferay.oauth2.provider.rest.endpoint.grant.handler.LiferayPermissionedAccessTokenGrantHandler;
+import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayAccessTokenGrantHandlerHelper;
 import com.liferay.oauth2.provider.rest.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.service.UserLocalService;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler;
@@ -43,7 +37,6 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Objects;
 
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
@@ -62,20 +55,22 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 
-		if (oAuth2ProviderConfiguration.allowRefreshTokenGrant()) {
-			RefreshTokenGrantHandler refreshTokenGrantHandler =
-				new RefreshTokenGrantHandler();
-
-			refreshTokenGrantHandler.setDataProvider(
-				_liferayOAuthDataProvider);
-
-			_serviceRegistration = bundleContext.registerService(
-				AccessTokenGrantHandler.class,
-				new LiferayPermissionedAccessTokenGrantHandler(
-					refreshTokenGrantHandler,
-					this::hasCreateTokenPermission),
-				new Hashtable<>());
+		if (!oAuth2ProviderConfiguration.allowRefreshTokenGrant()) {
+			return;
 		}
+
+		RefreshTokenGrantHandler refreshTokenGrantHandler =
+			new RefreshTokenGrantHandler();
+
+		refreshTokenGrantHandler.setDataProvider(
+			_liferayOAuthDataProvider);
+
+		_serviceRegistration = bundleContext.registerService(
+			AccessTokenGrantHandler.class,
+			new LiferayPermissionedAccessTokenGrantHandler(
+				refreshTokenGrantHandler,
+				this::hasPermission),
+			new Hashtable<>());
 	}
 
 	@Deactivate
@@ -85,31 +80,7 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 		}
 	}
 
-
-	protected boolean clientsMatch(Client client1, Client client2) {
-		String client1Id = client1.getClientId();
-		String client2Id = client2.getClientId();
-
-		if (!Objects.equals(client1Id, client2Id)) {
-			return false;
-		}
-
-		Map<String, String> properties = client1.getProperties();
-
-		String companyId1 = properties.get("companyId");
-
-		properties = client2.getProperties();
-
-		String companyId2 = properties.get("companyId");
-
-		if (!Objects.equals(companyId1, companyId2)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	protected boolean hasCreateTokenPermission(
+	protected boolean hasPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
 		String refreshTokenString = params.getFirst("refresh_token");
@@ -133,7 +104,9 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 			return false;
 		}
 
-		if(!clientsMatch(client, refreshToken.getClient())) {
+		if(!_accessTokenGrantHandlerHelper.clientsMatch(
+			client, refreshToken.getClient())) {
+
 			// audit: Trying to refresh token with other client's authentication
 
 			_liferayOAuthDataProvider.doRevokeRefreshToken(refreshToken);
@@ -154,56 +127,16 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 			return false;
 		}
 
-		OAuth2Application oAuth2Application =
-			_liferayOAuthDataProvider.resolveOAuth2Application(
-				refreshToken.getClient());
-
 		String subjectId = refreshToken.getSubject().getId();
 
 		long userId = Long.parseLong(subjectId);
 
-		PermissionChecker permissionChecker = null;
+		OAuth2Application oAuth2Application =
+			_liferayOAuthDataProvider.resolveOAuth2Application(
+				refreshToken.getClient());
 
-		try {
-			User user = _userLocalService.getUserById(userId);
-
-			permissionChecker =
-				PermissionCheckerFactoryUtil.create(user);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Unable to create PermissionChecker for user " + userId);
-			}
-
-			return false;
-		}
-
-		if (permissionChecker.hasOwnerPermission(
-			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(),
-			oAuth2Application.getUserId(),
-			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
-
-			return true;
-		}
-
-		if (permissionChecker.hasPermission(
-			0, OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(),
-			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
-
-			return true;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"User " + userId +
-					" doesn't have permission to create refresh token for " +
-						"client " + client.getClientId());
-		}
-
-		return false;
+		return _accessTokenGrantHandlerHelper.hasCreateTokenPermission(
+			userId, oAuth2Application);
 	}
 
 	private static Log _log =
@@ -214,6 +147,6 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
 	@Reference
-	private UserLocalService _userLocalService;
+	private LiferayAccessTokenGrantHandlerHelper _accessTokenGrantHandlerHelper;
 
 }

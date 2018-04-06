@@ -12,8 +12,9 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.endpoint.filter;
+package com.liferay.oauth2.provider.rest.endpoint.authorize;
 
+import com.liferay.oauth2.provider.rest.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -46,13 +47,13 @@ import java.util.Map;
  */
 @Component(
 	immediate = true,
-	property = "liferay.oauth2.endpoint=true",
+	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT + "=true",
 	service=Object.class
 )
 @PreMatching
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-public class LiferayAuthorizationServiceFilter
+public class AuthorizationCodeGrantServiceFilter
 	implements ContainerRequestFilter {
 
 	public void activate(Map<String, Object> properties) {
@@ -120,7 +121,7 @@ public class LiferayAuthorizationServiceFilter
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		LiferayAuthorizationServiceFilter.class);
+		AuthorizationCodeGrantServiceFilter.class);
 
 	@Context
 	private HttpServletRequest _request;

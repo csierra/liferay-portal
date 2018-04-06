@@ -12,8 +12,9 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.endpoint.authorization;
+package com.liferay.oauth2.provider.rest.endpoint.authorize;
 
+import com.liferay.oauth2.provider.rest.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -50,12 +51,12 @@ import java.util.Map;
  */
 @Component(
 	immediate = true,
-	property = "liferay.oauth2.endpoint=true",
+	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT + "=true",
 	service = Object.class
 )
 @Produces("text/html")
 @Provider
-public class AuthorizationMessageBodyWriter
+public class RedirectToAuthorizeMessageBodyWriter
 	implements MessageBodyWriter<OAuthAuthorizationData> {
 
 	@Override
@@ -184,6 +185,6 @@ public class AuthorizationMessageBodyWriter
 	private int _invokerFilterUriMaxLength = 4000;
 
 	private String _oAuth2AuthorizePortalScreenURL =
-		"/group/guest/oauth2-authorize";
+		"/group/guest/authorize-oauth2-application";
 
 }

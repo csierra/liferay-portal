@@ -20,7 +20,7 @@ import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
-import com.liferay.oauth2.provider.rest.endpoint.grant.handler.LiferayAuthorizationCodeGrantHandlerRegistrator;
+import com.liferay.oauth2.provider.rest.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider.AccessToken;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
@@ -79,13 +79,6 @@ import java.util.Set;
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration"
 )
 public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvider {
-
-	public static final String CLIENT_REMOTE_ADDR_PROPERTY =
-		"CLIENT_REMOTE_ADDR_ADDRESS";
-	public static final String CLIENT_REMOTE_HOST_PROPERTY =
-		"CLIENT_REMOTE_HOST";
-	public static final String FEATURE_PREFIX_PROPERTY = "FEATURE-";
-	public static final String FEATURES_PROPERTY = "FEATURES";
 
 	private PortalCache<String, ServerAuthorizationCodeGrant>
 		_codeGrantsPortalCache;
@@ -476,8 +469,10 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 		Map<String, String> clientProperties = client.getProperties();
 
-		String remoteAddr = clientProperties.get(CLIENT_REMOTE_ADDR_PROPERTY);
-		String remoteHost = clientProperties.get(CLIENT_REMOTE_HOST_PROPERTY);
+		String remoteAddr = clientProperties.get(
+			OAuth2ProviderRestEndpointConstants.CLIENT_REMOTE_ADDR);
+		String remoteHost = clientProperties.get(
+			OAuth2ProviderRestEndpointConstants.CLIENT_REMOTE_HOST);
 
 		String remoteIPInfo = remoteAddr + ", " + remoteHost;
 
@@ -790,8 +785,7 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 
 				clientGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
 				clientGrantTypes.add(
-					LiferayAuthorizationCodeGrantHandlerRegistrator.
-						AUTHORIZATION_CODE_PKCE_GRANT);
+					OAuth2ProviderRestEndpointConstants.AUTHORIZATION_CODE_PKCE_GRANT);
 			}
 			else if (
 				_oAuth2ProviderConfiguration.allowClientCredentialsGrant() &&
@@ -859,10 +853,11 @@ public class LiferayOAuthDataProvider extends AbstractAuthorizationCodeDataProvi
 		clientProperties.put("companyId", Long.toString(companyId));
 
 		clientProperties.put(
-			FEATURES_PROPERTY, oAuth2Application.getFeatures());
+			OAuth2ProviderRestEndpointConstants.FEATURES, oAuth2Application.getFeatures());
 
 		for (String feature : oAuth2Application.getFeaturesList()) {
-			clientProperties.put(FEATURE_PREFIX_PROPERTY + feature, feature);
+			clientProperties.put(
+				OAuth2ProviderRestEndpointConstants.FEATURE_PREFIX + feature, feature);
 		}
 
 		return client;
