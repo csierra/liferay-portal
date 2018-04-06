@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.rest.internal.auth.verifier;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
-import com.liferay.oauth2.provider.exception.NoSuchOAuth2AuthorizationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
@@ -40,6 +39,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -71,7 +71,7 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 	@Override
 	public String getAuthType() {
-		return "OAuth2";
+		return _OAUTH2;
 	}
 
 	@Override
@@ -151,13 +151,11 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 			return null;
 		}
 
-		OAuth2Authorization oAuth2Authorization = null;
-		try {
-			oAuth2Authorization =
-				_oAuth2AuthorizationLocalService.
-					getOAuth2AuthorizationByAccessTokenContent(token);
-		}
-		catch (NoSuchOAuth2AuthorizationException nsoaae) {
+		OAuth2Authorization oAuth2Authorization =
+			_oAuth2AuthorizationLocalService.
+				fetchOAuth2AuthorizationByAccessTokenContent(token);
+
+		if (oAuth2Authorization == null) {
 			return null;
 		}
 
@@ -171,17 +169,17 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 			_oAuth2ApplicationLocalService.getOAuth2Application(
 				oAuth2Authorization.getOAuth2ApplicationId());
 
-		long issuedAtSeconds =
-			oAuth2Authorization.getAccessTokenCreateDate().getTime() / 1000;
+		Date createDate = oAuth2Authorization.getAccessTokenCreateDate();
+		Date expirationDate =
+			oAuth2Authorization.getAccessTokenExpirationDate();
 
-		long expiresSeconds =
-			oAuth2Authorization.getAccessTokenExpirationDate().getTime() / 1000;
-
-		long lifeTime = expiresSeconds - issuedAtSeconds;
+		long expiresIn =
+			(expirationDate.getTime() - createDate.getTime()) / 1000;
+		long issuedAt = createDate.getTime() / 1000;
 
 		List<String> scopeAliasesList = Collections.emptyList();
 
-		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
+		if (oAuth2Authorization.getOAuth2ApplicationScopeAliasesId() > 0) {
 			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
 				_oAuth2ApplicationScopeAliasesLocalService.
 					getOAuth2ApplicationScopeAliases(
@@ -195,17 +193,18 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 		BearerTokenProvider.AccessToken accessToken =
 			new BearerTokenProvider.AccessToken(
 				oAuth2Application, new ArrayList<>(), StringPool.BLANK,
-				lifeTime, new HashMap<>(), StringPool.BLANK, StringPool.BLANK,
-				issuedAtSeconds, StringPool.BLANK, StringPool.BLANK,
-				new HashMap<>(), StringPool.BLANK, StringPool.BLANK,
-				scopeAliasesList, accessTokenContent, _BEARER,
-				oAuth2Authorization.getUserId(),
+				expiresIn, new HashMap<>(), StringPool.BLANK, StringPool.BLANK,
+				issuedAt, StringPool.BLANK, StringPool.BLANK, new HashMap<>(),
+				StringPool.BLANK, StringPool.BLANK, scopeAliasesList,
+				accessTokenContent, _BEARER, oAuth2Authorization.getUserId(),
 				oAuth2Authorization.getUserName());
 
 		return accessToken;
 	}
 
 	private static final String _BEARER = "Bearer";
+
+	private static final String _OAUTH2 = "OAuth2";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2RestAuthVerifier.class);
