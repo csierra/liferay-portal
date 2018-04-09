@@ -69,7 +69,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeRegistry scopeRegistry = builder.withPrefixHandlerFactories(
+		ScopeLocatorImpl scopeRegistry = builder.withPrefixHandlerFactories(
 			propertyAccessor -> defaultPrefixHandler,
 			registrator -> {
 			}
@@ -147,7 +147,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeRegistry scopeRegistry = builder.withScopeFinders(
+		ScopeLocatorImpl scopeRegistry = builder.withScopeFinders(
 			registrator -> {
 				registrator.register(
 					_COMPANY_ID, _APPLICATION_NAME, application1ScopeFinder);
@@ -184,7 +184,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeRegistry scopeRegistry = builder.withScopeMappers(
+		ScopeLocatorImpl scopeRegistry = builder.withScopeMappers(
 			defaultScopeMapper,
 			registrator -> {
 			}
@@ -263,7 +263,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeRegistry scopeRegistry = builder.withScopeFinders(
+		ScopeLocatorImpl scopeRegistry = builder.withScopeFinders(
 			registrator -> {
 				registrator.register(_COMPANY_ID, _APPLICATION_NAME, service);
 				registrator.register(_COMPANY_ID, applicationName2, service);
@@ -302,7 +302,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeRegistry scopeRegistry = builder.withPrefixHandlerFactories(
+		ScopeLocatorImpl scopeRegistry = builder.withPrefixHandlerFactories(
 			propertyAccessor -> PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
 			registrator -> {
 				registrator.register(
@@ -360,7 +360,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 	private class Builder {
 
-		public ScopeRegistry build() throws IllegalAccessException {
+		public ScopeLocatorImpl build() throws IllegalAccessException {
 			if (!_scopeMatcherFactoriesInitialized) {
 				withScopeMatcherFactories(
 					scopeAlias -> scopeAlias::equals,
@@ -545,7 +545,7 @@ public class ScopeRegistryTest extends PowerMockito {
 		private boolean _scopeFindersInitialized;
 		private boolean _scopeMappersInitialized;
 		private boolean _scopeMatcherFactoriesInitialized;
-		private final ScopeRegistry _scopeRegistry = new ScopeRegistry();
+		private final ScopeLocatorImpl _scopeRegistry = new ScopeLocatorImpl();
 
 	}
 
