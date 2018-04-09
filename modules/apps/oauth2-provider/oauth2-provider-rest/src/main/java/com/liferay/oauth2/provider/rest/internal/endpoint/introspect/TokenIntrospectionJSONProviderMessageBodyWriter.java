@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.rest.internal.endpoint.introspect;
 
+import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -38,10 +39,16 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Tomas Polesovsky
  */
+@Component(
+	immediate = true,
+	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_PROVIDER + "=true",
+	service = Object.class
+)
 @Produces("application/json")
 @Provider
 public class TokenIntrospectionJSONProviderMessageBodyWriter

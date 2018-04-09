@@ -36,11 +36,11 @@ public class OAuth2ProviderRestEndpointConstants {
 	public static final String LIFERAY_OAUTH2_CLIENT_ID =
 		"liferay.oauth2.client.id";
 
-	public static final String LIFERAY_OAUTH2_ENDPOINT =
-		"liferay.oauth2.endpoint";
+	public static final String LIFERAY_OAUTH2_ENDPOINT_RESOURCE =
+		"liferay.oauth2.endpoint.resource";
 
-	public static final String LIFERAY_OAUTH2_ENDPOINT_CLASS =
-		"liferay.oauth2.endpoint.class";
+	public static final String LIFERAY_OAUTH2_ENDPOINT_PROVIDER =
+		"liferay.oauth2.endpoint.provider";
 
 	public static final String TOKEN_INTROSPECTION_FEATURE =
 		"token-introspection";

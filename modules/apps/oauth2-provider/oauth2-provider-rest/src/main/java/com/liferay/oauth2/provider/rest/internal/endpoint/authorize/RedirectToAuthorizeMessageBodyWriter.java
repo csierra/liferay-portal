@@ -56,7 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT + "=true",
+	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_PROVIDER + "=true",
 	service = Object.class
 )
 @Produces("text/html")
