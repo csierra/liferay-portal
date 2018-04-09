@@ -25,11 +25,17 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+
+import java.net.URI;
+
+import java.security.Principal;
+
+import java.util.Map;
 
 import javax.annotation.Priority;
+
 import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -38,9 +44,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-import java.net.URI;
-import java.security.Principal;
-import java.util.Map;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tomas Polesovsky
@@ -48,11 +54,11 @@ import java.util.Map;
 @Component(
 	immediate = true,
 	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT + "=true",
-	service=Object.class
+	service = Object.class
 )
 @PreMatching
-@Provider
 @Priority(Priorities.AUTHENTICATION)
+@Provider
 public class AuthorizationCodeGrantServiceFilter
 	implements ContainerRequestFilter {
 
@@ -76,7 +82,8 @@ public class AuthorizationCodeGrantServiceFilter
 					requestContext.getSecurityContext();
 
 				requestContext.setSecurityContext(
-					new PortalCXFSecurityContext(){
+					new PortalCXFSecurityContext() {
+
 						@Override
 						public Principal getUserPrincipal() {
 							return new ProtectedPrincipal(
@@ -87,6 +94,7 @@ public class AuthorizationCodeGrantServiceFilter
 						public boolean isSecure() {
 							return securityContext.isSecure();
 						}
+
 					});
 
 				return;
@@ -95,7 +103,8 @@ public class AuthorizationCodeGrantServiceFilter
 			String loginPage = _loginPage;
 
 			if (Validator.isBlank(loginPage)) {
-				StringBundler sb = new StringBundler();
+				StringBundler sb = new StringBundler(4);
+
 				sb.append(_portal.getPortalURL(_request));
 				sb.append(_portal.getPathContext());
 				sb.append(_portal.getPathMain());
@@ -112,27 +121,25 @@ public class AuthorizationCodeGrantServiceFilter
 					.status(Response.Status.FOUND)
 					.location(URI.create(loginPage))
 					.build());
-
 		}
 		catch (Exception e) {
-			_log.error(
-				"Unable to resolve authenticated user", e);
+			_log.error("Unable to resolve authenticated user", e);
 		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AuthorizationCodeGrantServiceFilter.class);
 
-	@Context
-	private HttpServletRequest _request;
+	private String _loginPage;
 
 	@Reference
 	private Portal _portal;
 
-	private String _loginPage;
+	@Context
+	private HttpServletRequest _request;
 
 	abstract class PortalCXFSecurityContext
-		implements javax.ws.rs.core.SecurityContext,
+		implements SecurityContext,
 		org.apache.cxf.security.SecurityContext {
 
 		@Override
@@ -144,5 +151,7 @@ public class AuthorizationCodeGrantServiceFilter
 		public String getAuthenticationScheme() {
 			return "session";
 		}
+
 	}
+
 }

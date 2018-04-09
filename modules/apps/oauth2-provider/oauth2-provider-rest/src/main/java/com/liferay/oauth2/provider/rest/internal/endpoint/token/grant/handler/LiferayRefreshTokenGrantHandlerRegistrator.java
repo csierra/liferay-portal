@@ -21,11 +21,18 @@ import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDa
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+
+import java.util.Hashtable;
+import java.util.Map;
+
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -34,18 +41,14 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import javax.ws.rs.core.MultivaluedMap;
-import java.util.Hashtable;
-import java.util.Map;
-
+/**
+ * @author Tomas Polesovsky
+ */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true
 )
 public class LiferayRefreshTokenGrantHandlerRegistrator {
-
-	private ServiceRegistration<AccessTokenGrantHandler>
-		_serviceRegistration;
 
 	@Activate
 	protected void activate(
@@ -62,14 +65,12 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 		RefreshTokenGrantHandler refreshTokenGrantHandler =
 			new RefreshTokenGrantHandler();
 
-		refreshTokenGrantHandler.setDataProvider(
-			_liferayOAuthDataProvider);
+		refreshTokenGrantHandler.setDataProvider(_liferayOAuthDataProvider);
 
 		_serviceRegistration = bundleContext.registerService(
 			AccessTokenGrantHandler.class,
 			new LiferayPermissionedAccessTokenGrantHandler(
-				refreshTokenGrantHandler,
-				this::hasPermission),
+				refreshTokenGrantHandler, this::hasPermission),
 			new Hashtable<>());
 	}
 
@@ -93,8 +94,8 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 			return false;
 		}
 
-		RefreshToken refreshToken =
-			_liferayOAuthDataProvider.getRefreshToken(refreshTokenString);
+		RefreshToken refreshToken = _liferayOAuthDataProvider.getRefreshToken(
+			refreshTokenString);
 
 		if (refreshToken == null) {
 			if (_log.isDebugEnabled()) {
@@ -104,8 +105,8 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 			return false;
 		}
 
-		if(!_accessTokenGrantHandlerHelper.clientsMatch(
-			client, refreshToken.getClient())) {
+		if (!_accessTokenGrantHandlerHelper.clientsMatch(
+				client, refreshToken.getClient())) {
 
 			// audit: Trying to refresh token with other client's authentication
 
@@ -139,14 +140,15 @@ public class LiferayRefreshTokenGrantHandlerRegistrator {
 			userId, oAuth2Application);
 	}
 
-	private static Log _log =
-		LogFactoryUtil.getLog(
-			LiferayClientCredentialsGrantHandlerRegistrator.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayRefreshTokenGrantHandlerRegistrator.class);
+
+	@Reference
+	private LiferayAccessTokenGrantHandlerHelper _accessTokenGrantHandlerHelper;
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
-	@Reference
-	private LiferayAccessTokenGrantHandlerHelper _accessTokenGrantHandlerHelper;
+	private ServiceRegistration<AccessTokenGrantHandler> _serviceRegistration;
 
 }

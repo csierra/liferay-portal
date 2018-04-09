@@ -17,13 +17,10 @@ package com.liferay.oauth2.provider.rest.internal.endpoint.introspect;
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
-import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
-import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oauth2.services.AbstractTokenService;
-import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
@@ -33,8 +30,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.util.Map;
-import java.util.Objects;
+
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.services.AbstractTokenService;
+import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 /**
  * @author Tomas Polesovsky
@@ -52,17 +56,16 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		setDataProvider(liferayOAuthDataProvider);
 	}
 
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@POST
 	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response getTokenIntrospection(
 		@Encoded MultivaluedMap<String, String> params) {
 
 		Client authenticatedClient = authenticateClientIfNeeded(params);
 
 		String tokenId = params.getFirst(OAuthConstants.TOKEN_ID);
-		String tokenTypeHint =
-			params.getFirst(OAuthConstants.TOKEN_TYPE_HINT);
+		String tokenTypeHint = params.getFirst(OAuthConstants.TOKEN_TYPE_HINT);
 
 		if (tokenTypeHint == null) {
 			ServerAccessToken accessToken =
@@ -76,11 +79,9 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 				_liferayOAuthDataProvider.getRefreshToken(tokenId);
 
 			if (refreshToken != null) {
-				return handleRefreshToken(
-					authenticatedClient, refreshToken);
+				return handleRefreshToken(authenticatedClient, refreshToken);
 			}
 		}
-
 		else if (OAuthConstants.ACCESS_TOKEN.equals(tokenTypeHint)) {
 			ServerAccessToken accessToken =
 				_liferayOAuthDataProvider.getAccessToken(tokenId);
@@ -89,17 +90,14 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 				return handleAccessToken(authenticatedClient, accessToken);
 			}
 		}
-
 		else if (OAuthConstants.REFRESH_TOKEN.equals(tokenTypeHint)) {
 			RefreshToken refreshToken =
 				_liferayOAuthDataProvider.getRefreshToken(tokenId);
 
 			if (refreshToken != null) {
-				return handleRefreshToken(
-					authenticatedClient, refreshToken);
+				return handleRefreshToken(authenticatedClient, refreshToken);
 			}
 		}
-
 		else {
 			return createErrorResponseFromErrorCode(
 				OAuthConstants.UNSUPPORTED_TOKEN_TYPE);
@@ -121,8 +119,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		}
 
 		BearerTokenProvider.AccessToken accessToken =
-			_liferayOAuthDataProvider.fromCXFAccessToken(
-				cxfAccessToken);
+			_liferayOAuthDataProvider.fromCXFAccessToken(cxfAccessToken);
 
 		BearerTokenProvider bearerTokenProvider =
 			_liferayOAuthDataProvider.getBearerTokenProvider(
@@ -133,8 +130,8 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 			return Response.ok(new TokenIntrospection(false)).build();
 		}
 
-		TokenIntrospection tokenIntrospection =
-			_buildTokenIntrospection(cxfAccessToken);
+		TokenIntrospection tokenIntrospection = _buildTokenIntrospection(
+			cxfAccessToken);
 
 		return Response.ok(tokenIntrospection).build();
 	}
@@ -152,8 +149,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		}
 
 		BearerTokenProvider.RefreshToken refreshToken =
-			_liferayOAuthDataProvider.fromCXFRefreshToken(
-				cxfRefreshToken);
+			_liferayOAuthDataProvider.fromCXFRefreshToken(cxfRefreshToken);
 
 		BearerTokenProvider bearerTokenProvider =
 			_liferayOAuthDataProvider.getBearerTokenProvider(
@@ -164,8 +160,8 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 			return Response.ok(new TokenIntrospection(false)).build();
 		}
 
-		TokenIntrospection tokenIntrospection =
-			_buildTokenIntrospection(cxfRefreshToken);
+		TokenIntrospection tokenIntrospection = _buildTokenIntrospection(
+			cxfRefreshToken);
 
 		return Response.ok().entity(tokenIntrospection).build();
 	}
@@ -174,7 +170,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		Client authenticatedClient, ServerAccessToken serverAccessToken) {
 
 		if (!_clientsMatch(
-			authenticatedClient, serverAccessToken.getClient())) {
+				authenticatedClient, serverAccessToken.getClient())) {
 
 			return false;
 		}
@@ -183,8 +179,9 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 			authenticatedClient.getProperties();
 
 		if (!clientProperties.containsKey(
-			OAuth2ProviderRestEndpointConstants.FEATURE_PREFIX +
-			OAuth2ProviderRestEndpointConstants.TOKEN_INTROSPECTION_FEATURE)) {
+				OAuth2ProviderRestEndpointConstants.FEATURE_PREFIX +
+					OAuth2ProviderRestEndpointConstants.
+						TOKEN_INTROSPECTION_FEATURE)) {
 
 			return false;
 		}
@@ -194,8 +191,8 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 
 	protected boolean verifyCXFToken(ServerAccessToken serverAccessToken) {
 		if (OAuthUtils.isExpired(
-			serverAccessToken.getIssuedAt(),
-			serverAccessToken.getExpiresIn())) {
+				serverAccessToken.getIssuedAt(),
+				serverAccessToken.getExpiresIn())) {
 
 			return false;
 		}
@@ -206,31 +203,32 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 	private TokenIntrospection _buildTokenIntrospection(
 		ServerAccessToken serverAccessToken) {
 
-		TokenIntrospection tokenIntrospection =
-			new TokenIntrospection(true);
+		TokenIntrospection tokenIntrospection = new TokenIntrospection(true);
+
+		Client client = serverAccessToken.getClient();
 
 		tokenIntrospection.setClientId(
-			serverAccessToken.getClient().getClientId());
+			client.getClientId());
 
-		if (!serverAccessToken.getScopes().isEmpty()) {
+		List<OAuthPermission> oAuthPermissions = serverAccessToken.getScopes();
+
+		if ((oAuthPermissions != null) && !oAuthPermissions.isEmpty()) {
 			tokenIntrospection.setScope(
 				OAuthUtils.convertPermissionsToScope(
-					serverAccessToken.getScopes()));
+					oAuthPermissions));
 		}
 
 		UserSubject userSubject = serverAccessToken.getSubject();
 
 		if (userSubject != null) {
-			tokenIntrospection.setUsername(
-				serverAccessToken.getSubject().getLogin());
-
-			if (userSubject.getId() != null) {
-				tokenIntrospection.setSub(userSubject.getId());
-			}
+			tokenIntrospection.setUsername(userSubject.getLogin());
+			tokenIntrospection.setSub(userSubject.getId());
 		}
 
-		if (!serverAccessToken.getAudiences().isEmpty()) {
-			tokenIntrospection.setAud(serverAccessToken.getAudiences());
+		List<String> audiences = serverAccessToken.getAudiences();
+
+		if ((audiences != null) && !audiences.isEmpty()) {
+			tokenIntrospection.setAud(audiences);
 		}
 
 		if (serverAccessToken.getIssuer() != null) {
@@ -239,16 +237,16 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 
 		tokenIntrospection.setIat(serverAccessToken.getIssuedAt());
 
-		if (serverAccessToken.getExpiresIn() > 0) {
-			tokenIntrospection.setExp(
-				serverAccessToken.getIssuedAt() +
-				serverAccessToken.getExpiresIn());
-		}
+		tokenIntrospection.setExp(
+			serverAccessToken.getIssuedAt() + serverAccessToken.getExpiresIn());
 
 		tokenIntrospection.setTokenType(serverAccessToken.getTokenType());
 
-		tokenIntrospection.getExtensions().putAll(
-			serverAccessToken.getExtraProperties());
+		if (serverAccessToken.getExtraProperties() != null) {
+			Map<String, String> extensions = tokenIntrospection.getExtensions();
+
+			extensions.putAll(serverAccessToken.getExtraProperties());
+		}
 
 		return tokenIntrospection;
 	}
@@ -278,5 +276,6 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return true;
 	}
 
-	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+	private final LiferayOAuthDataProvider _liferayOAuthDataProvider;
+
 }

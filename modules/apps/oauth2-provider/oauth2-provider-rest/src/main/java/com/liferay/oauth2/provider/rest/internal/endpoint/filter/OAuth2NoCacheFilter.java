@@ -15,13 +15,14 @@
 package com.liferay.oauth2.provider.rest.internal.endpoint.filter;
 
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
-import org.osgi.service.component.annotations.Component;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
+
+import org.osgi.service.component.annotations.Component;
 
 ;
 
@@ -31,10 +32,11 @@ import javax.ws.rs.ext.Provider;
 @Component(
 	immediate = true,
 	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT + "=true",
-	service=Object.class
+	service = Object.class
 )
 @Provider
 public class OAuth2NoCacheFilter implements ContainerResponseFilter {
+
 	@Override
 	public void filter(
 		ContainerRequestContext requestContext,
@@ -42,8 +44,9 @@ public class OAuth2NoCacheFilter implements ContainerResponseFilter {
 
 		MultivaluedMap<String, Object> headers = responseContext.getHeaders();
 
-		headers.add("Cache-Control","no-cache, no-store, must-revalidate");
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 		headers.add("Expires", "0");
 		headers.add("Pragma", "no-cache");
 	}
+
 }

@@ -18,18 +18,24 @@ import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2Provid
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
+
+import java.security.Principal;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.SecurityContext;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
-import java.security.Principal;
-
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component
 public class LiferaySubjectCreator implements SubjectCreator {
 
@@ -55,8 +61,8 @@ public class LiferaySubjectCreator implements SubjectCreator {
 
 			return userSubject;
 		}
-		catch (PortalException e) {
-			throw new OAuthServiceException(e);
+		catch (PortalException pe) {
+			throw new OAuthServiceException(pe);
 		}
 	}
 

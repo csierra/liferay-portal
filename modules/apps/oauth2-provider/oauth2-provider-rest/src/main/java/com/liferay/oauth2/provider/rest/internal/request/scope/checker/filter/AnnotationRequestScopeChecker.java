@@ -24,10 +24,14 @@ import java.lang.reflect.Method;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
 
+import com.liferay.petra.string.StringPool;
+import com.liferay.petra.reflect.AnnotationLocator;
+import com.liferay.portal.kernel.util.StringBundler;
 import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Carlos Sierra Andrés
+ * @author Tomas Polesovsky
  */
 @Component(property = "type=annotation")
 public class AnnotationRequestScopeChecker
@@ -37,40 +41,118 @@ public class AnnotationRequestScopeChecker
 	public boolean isAllowed(
 		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo) {
 
-		Method method = resourceInfo.getResourceMethod();
+		Boolean isAllowed = isAllowed(
+			resourceInfo.getResourceMethod(), scopeChecker);
 
+		if (isAllowed != null) {
+			return isAllowed;
+		}
+
+		isAllowed = isAllowed(resourceInfo.getResourceClass(), scopeChecker);
+
+		if (isAllowed != null) {
+			return isAllowed;
+		}
+
+		return false;
+	}
+
+	protected Boolean isAllowed(Method method, ScopeChecker scopeChecker) {
 		RequiresNoScope requiresNoScope = method.getAnnotation(
 			RequiresNoScope.class);
+
+		RequiresScope requiresScope = method.getAnnotation(RequiresScope.class);
+
+		if ((requiresNoScope != null) && (requiresScope != null)) {
+			StringBundler sb = new StringBundler();
+			sb.append("Method ");
+			sb.append(method.getDeclaringClass().getName());
+			sb.append(StringPool.POUND);
+			sb.append(method.getName());
+			sb.append("has both @RequiresNoScope and @RequiresScope ");
+			sb.append("annotations defined.");
+
+			throw new RuntimeException(sb.toString());
+		}
 
 		if (requiresNoScope != null) {
 			return true;
 		}
 
-		RequiresScope annotation = method.getAnnotation(RequiresScope.class);
-
-		if (annotation == null) {
-			Class<?> resourceClass = resourceInfo.getResourceClass();
-
-			requiresNoScope = resourceClass.getAnnotation(
-				RequiresNoScope.class);
-
-			if (requiresNoScope != null) {
-				return true;
-			}
-
-			annotation = resourceClass.getAnnotation(RequiresScope.class);
-		}
-
-		if (annotation != null) {
-			if (annotation.allNeeded()) {
-				return scopeChecker.checkAllScopes(annotation.value());
+		if (requiresScope != null) {
+			if (requiresScope.allNeeded()) {
+				return scopeChecker.checkAllScopes(requiresScope.value());
 			}
 			else {
-				return scopeChecker.checkAnyScope(annotation.value());
+				return scopeChecker.checkAnyScope(requiresScope.value());
 			}
 		}
 
-		return false;
+		return null;
+	}
+
+	protected Boolean isAllowed(
+		Class<?> resourceClass, ScopeChecker scopeChecker) {
+
+		RequiresNoScope requiresNoScope = resourceClass.getAnnotation(
+			RequiresNoScope.class);
+
+		RequiresScope requiresScope = resourceClass.getAnnotation(
+			RequiresScope.class);
+
+		if ((requiresNoScope != null) && (requiresScope != null)) {
+			StringBundler sb = new StringBundler();
+			sb.append("Class ");
+			sb.append(resourceClass.getName());
+			sb.append("has both @RequiresNoScope and @RequiresScope ");
+			sb.append("annotations defined.");
+
+			throw new RuntimeException(sb.toString());
+		}
+
+		if (requiresNoScope != null) {
+			return true;
+		}
+
+		if (requiresScope != null) {
+			if (requiresScope.allNeeded()) {
+				return scopeChecker.checkAllScopes(requiresScope.value());
+			}
+			else {
+				return scopeChecker.checkAnyScope(requiresScope.value());
+			}
+		}
+
+		requiresNoScope = AnnotationLocator.locate(
+			resourceClass, RequiresNoScope.class);
+
+		requiresScope = AnnotationLocator.locate(
+			resourceClass, RequiresScope.class);
+
+		if ((requiresNoScope != null) && (requiresScope != null)) {
+			StringBundler sb = new StringBundler();
+			sb.append("Class ");
+			sb.append(resourceClass.getName());
+			sb.append("inherits both @RequiresNoScope and ");
+			sb.append("@RequiresScope.");
+
+			throw new RuntimeException(sb.toString());
+		}
+
+		if (requiresNoScope != null) {
+			return true;
+		}
+
+		if (requiresScope != null) {
+			if (requiresScope.allNeeded()) {
+				return scopeChecker.checkAllScopes(requiresScope.value());
+			}
+			else {
+				return scopeChecker.checkAnyScope(requiresScope.value());
+			}
+		}
+
+		return null;
 	}
 
 }

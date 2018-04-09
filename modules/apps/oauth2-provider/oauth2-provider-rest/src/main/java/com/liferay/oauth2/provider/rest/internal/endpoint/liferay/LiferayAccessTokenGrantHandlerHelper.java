@@ -25,12 +25,14 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.UserLocalService;
-import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.cxf.rs.security.oauth2.common.Client;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tomas Polesovsky
@@ -66,15 +68,14 @@ public class LiferayAccessTokenGrantHandlerHelper {
 	}
 
 	public boolean hasCreateTokenPermission(
-		long userId, OAuth2Application oAuth2Application){
+		long userId, OAuth2Application oAuth2Application) {
 
 		PermissionChecker permissionChecker = null;
 
 		try {
 			User user = _userLocalService.getUserById(userId);
 
-			permissionChecker =
-				PermissionCheckerFactoryUtil.create(user);
+			permissionChecker = PermissionCheckerFactoryUtil.create(user);
 		}
 		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
@@ -87,8 +88,8 @@ public class LiferayAccessTokenGrantHandlerHelper {
 
 		try {
 			if (_modelResourcePermission.contains(
-				permissionChecker, oAuth2Application,
-				OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
+					permissionChecker, oAuth2Application,
+					OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
 
 				return true;
 			}
@@ -112,14 +113,13 @@ public class LiferayAccessTokenGrantHandlerHelper {
 		return false;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		LiferayAccessTokenGrantHandlerHelper.class);
+
+	@Reference(target = "(model.class.name=com.liferay.oauth2.provider.model.OAuth2Application)")
+	private ModelResourcePermission<OAuth2Application> _modelResourcePermission;
 
 	@Reference
 	private UserLocalService _userLocalService;
-
-	@Reference(target = "(model.class.name=com.liferay.oauth2.provider.model.OAuth2Application)")
-	private ModelResourcePermission<OAuth2Application>
-		_modelResourcePermission;
 
 }

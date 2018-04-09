@@ -18,6 +18,7 @@ import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
+import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
@@ -66,7 +67,8 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 	public void activate(BundleContext bundleContext) {
 		_scopedBearerTokenProvider = _scopedServiceTrackerMapFactory.create(
 			bundleContext, BearerTokenProvider.class,
-			"liferay.oauth2.client.id", () -> _defaultBearerTokenProvider);
+			OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_CLIENT_ID,
+			() -> _defaultBearerTokenProvider);
 	}
 
 	@Override

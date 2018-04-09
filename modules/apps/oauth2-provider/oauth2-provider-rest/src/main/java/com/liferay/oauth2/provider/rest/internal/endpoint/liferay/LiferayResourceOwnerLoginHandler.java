@@ -21,42 +21,26 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.Authenticator;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManager;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+/**
+ * @author Carlos Sierra Andrés
+ */
 @Component
 public class LiferayResourceOwnerLoginHandler
 	implements ResourceOwnerLoginHandler {
-
-	@Override
-	public UserSubject createSubject(String login, String password) {
-		try {
-			User user = authenticateUser(login, password);
-
-			UserSubject userSubject = new UserSubject(
-				user.getLogin(), Long.toString(user.getUserId()));
-
-			userSubject.getProperties().put(
-				OAuth2ProviderRestEndpointConstants.COMPANY_ID,
-				Long.toString(user.getCompanyId()));
-
-			return userSubject;
-		}
-		catch (PortalException e) {
-			return null;
-		}
-	}
 
 	public User authenticateUser(String login, String password) {
 		Long companyId = CompanyThreadLocal.getCompanyId();
@@ -84,12 +68,11 @@ public class LiferayResourceOwnerLoginHandler
 			}
 			else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
 				authResult = _userLocalService.authenticateByUserId(
-					company.getCompanyId(), Long.parseLong(login),
-					password, headerMap, parameterMap, resultsMap);
+					company.getCompanyId(), Long.parseLong(login), password,
+					headerMap, parameterMap, resultsMap);
 			}
-
 		}
-		catch (PortalException e) {
+		catch (PortalException pe) {
 			return null;
 		}
 
@@ -110,6 +93,25 @@ public class LiferayResourceOwnerLoginHandler
 		}
 
 		return user;
+	}
+
+	@Override
+	public UserSubject createSubject(String login, String password) {
+		try {
+			User user = authenticateUser(login, password);
+
+			UserSubject userSubject = new UserSubject(
+				user.getLogin(), Long.toString(user.getUserId()));
+
+			userSubject.getProperties().put(
+				OAuth2ProviderRestEndpointConstants.COMPANY_ID,
+				Long.toString(user.getCompanyId()));
+
+			return userSubject;
+		}
+		catch (PortalException pe) {
+			return null;
+		}
 	}
 
 	@Reference

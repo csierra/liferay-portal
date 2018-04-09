@@ -17,6 +17,10 @@ package com.liferay.oauth2.provider.rest.internal.endpoint.introspect;
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.kernel.util.MapUtil;
+
+import java.util.Hashtable;
+import java.util.Map;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -25,20 +29,17 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import java.util.Hashtable;
-import java.util.Map;
-
+/**
+ * @author Tomas Polesovsky
+ */
 @Component(
-	immediate=true,
+	immediate = true,
 	property = {
 		"oauth2.allow.token.introspection.endpoint=true",
 		"oauth2.allow.token.introspection.endpoint.public.clients=true"
 	}
 )
 public class LiferayTokenIntrospectionServiceRegistrator {
-
-	private ServiceRegistration<Object> _endpointServiceRegistration;
-	private ServiceRegistration<Class> _classServiceRegistration;
 
 	@Activate
 	protected void activate(
@@ -60,7 +61,8 @@ public class LiferayTokenIntrospectionServiceRegistrator {
 			Hashtable<String, Object> endpointProperties = new Hashtable<>();
 
 			endpointProperties.put(
-				OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT, true);
+				OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT,
+				true);
 
 			_endpointServiceRegistration = bundleContext.registerService(
 				Object.class, liferayTokenIntrospectionService,
@@ -68,7 +70,9 @@ public class LiferayTokenIntrospectionServiceRegistrator {
 
 			Hashtable<String, Object> classProperties = new Hashtable<>();
 
-			classProperties.put(OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_CLASS, true);
+			classProperties.put(
+				OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_CLASS,
+				true);
 
 			_classServiceRegistration = bundleContext.registerService(
 				Class.class,
@@ -87,6 +91,9 @@ public class LiferayTokenIntrospectionServiceRegistrator {
 			_endpointServiceRegistration.unregister();
 		}
 	}
+
+	private ServiceRegistration<Class> _classServiceRegistration;
+	private ServiceRegistration<Object> _endpointServiceRegistration;
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;

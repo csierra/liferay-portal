@@ -22,14 +22,17 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-
 import com.liferay.portal.kernel.util.Validator;
-import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+
+import java.net.URI;
+
+import java.util.Map;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -39,12 +42,14 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.util.Map;
+
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Carlos Sierra Andrés
@@ -60,16 +65,6 @@ public class RedirectToAuthorizeMessageBodyWriter
 	implements MessageBodyWriter<OAuthAuthorizationData> {
 
 	@Override
-	public boolean isWriteable(
-		Class<?> aClass, Type type, Annotation[] annotations,
-		MediaType mediaType) {
-
-		return aClass.isAssignableFrom(OAuthAuthorizationData.class) &&
-			   "text".equalsIgnoreCase(mediaType.getType()) &&
-			   "html".equalsIgnoreCase(mediaType.getSubtype());
-	}
-
-	@Override
 	public long getSize(
 		OAuthAuthorizationData oAuthAuthorizationData, Class<?> aClass,
 		Type type, Annotation[] annotations, MediaType mediaType) {
@@ -78,18 +73,33 @@ public class RedirectToAuthorizeMessageBodyWriter
 	}
 
 	@Override
+	public boolean isWriteable(
+		Class<?> aClass, Type type, Annotation[] annotations,
+		MediaType mediaType) {
+
+		if (aClass.isAssignableFrom(OAuthAuthorizationData.class) &&
+			"text".equalsIgnoreCase(mediaType.getType()) &&
+			"html".equalsIgnoreCase(mediaType.getSubtype())) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public void writeTo(
-		OAuthAuthorizationData oAuthAuthorizationData, Class<?> aClass,
-		Type type, Annotation[] annotations, MediaType mediaType,
-		MultivaluedMap<String, Object> httpHeaders,
-		OutputStream outputStream)
+			OAuthAuthorizationData oAuthAuthorizationData, Class<?> aClass,
+			Type type, Annotation[] annotations, MediaType mediaType,
+			MultivaluedMap<String, Object> httpHeaders,
+			OutputStream outputStream)
 		throws IOException, WebApplicationException {
 
 		String redirect = _oAuth2AuthorizePortalScreenURL;
 
 		if (!_http.hasDomain(redirect)) {
-			String portalURL =
-				_portal.getPortalURL(_messageContext.getHttpServletRequest());
+			String portalURL = _portal.getPortalURL(
+				_messageContext.getHttpServletRequest());
 
 			redirect = portalURL + redirect;
 		}
@@ -103,8 +113,7 @@ public class RedirectToAuthorizeMessageBodyWriter
 			oAuthAuthorizationData.getRedirectUri());
 
 		redirect = setParameter(
-			redirect, OAuthConstants.STATE,
-			oAuthAuthorizationData.getState());
+			redirect, OAuthConstants.STATE, oAuthAuthorizationData.getState());
 
 		redirect = setParameter(
 			redirect, OAuthConstants.SCOPE,
@@ -115,8 +124,7 @@ public class RedirectToAuthorizeMessageBodyWriter
 			oAuthAuthorizationData.getAudience());
 
 		redirect = setParameter(
-			redirect, OAuthConstants.NONCE,
-			oAuthAuthorizationData.getNonce());
+			redirect, OAuthConstants.NONCE, oAuthAuthorizationData.getNonce());
 
 		redirect = setParameter(
 			redirect, OAuthConstants.AUTHORIZATION_CODE_CHALLENGE,
@@ -144,6 +152,17 @@ public class RedirectToAuthorizeMessageBodyWriter
 				.build());
 	}
 
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_oAuth2AuthorizePortalScreenURL = MapUtil.getString(
+			properties, "oauth2.authorize.portal.screen.url",
+			_oAuth2AuthorizePortalScreenURL);
+
+		_invokerFilterUriMaxLength = GetterUtil.getInteger(
+			PropsUtil.get(PropsKeys.INVOKER_FILTER_URI_MAX_LENGTH),
+			_invokerFilterUriMaxLength);
+	}
+
 	protected String removeParameter(String url, String name) {
 		return _http.removeParameter(url, "oauth2_" + name);
 	}
@@ -156,35 +175,21 @@ public class RedirectToAuthorizeMessageBodyWriter
 		return _http.addParameter(url, "oauth2_" + name, value);
 	}
 
-	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_oAuth2AuthorizePortalScreenURL =
-			MapUtil.getString(
-				properties, "oauth2.authorize.portal.screen.url",
-				_oAuth2AuthorizePortalScreenURL);
+	@Reference
+	private Http _http;
 
-		_invokerFilterUriMaxLength =
-			GetterUtil.getInteger(
-				PropsUtil.get(PropsKeys.INVOKER_FILTER_URI_MAX_LENGTH),
-				_invokerFilterUriMaxLength);
-
-	}
+	private int _invokerFilterUriMaxLength = 4000;
 
 	@Context
 	private MessageContext _messageContext;
+
+	private String _oAuth2AuthorizePortalScreenURL =
+		"/group/guest/authorize-oauth2-application";
 
 	@Reference
 	private Portal _portal;
 
 	@Reference
-	private Http _http;
-
-	@Reference
 	private Props _props;
-
-	private int _invokerFilterUriMaxLength = 4000;
-
-	private String _oAuth2AuthorizePortalScreenURL =
-		"/group/guest/authorize-oauth2-application";
 
 }
