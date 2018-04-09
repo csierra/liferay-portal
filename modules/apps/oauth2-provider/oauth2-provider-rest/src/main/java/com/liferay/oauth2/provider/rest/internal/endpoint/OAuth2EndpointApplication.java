@@ -56,33 +56,6 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 @Component(immediate = true, service = Application.class)
 public class OAuth2EndpointApplication extends Application {
 
-	@Activate
-	public void activate(
-			BundleContext bundleContext, final Map<String, Object> properties)
-		throws IOException {
-
-		ServiceReference<ConfigurationAdmin> serviceReference =
-			bundleContext.getServiceReference(ConfigurationAdmin.class);
-
-		try {
-			ConfigurationAdmin configurationAdmin = bundleContext.getService(
-				serviceReference);
-
-			String contextPath = MapUtil.getString(
-				properties, "contextPath", "/oauth2");
-
-			createCXFConfiguration(configurationAdmin, contextPath);
-
-			createRESTConfiguration(configurationAdmin, contextPath);
-		}
-		catch (InvalidSyntaxException ise) {
-			_log.error(ise);
-		}
-		finally {
-			bundleContext.ungetService(serviceReference);
-		}
-	}
-
 	@Reference(
 		cardinality = ReferenceCardinality.MULTIPLE,
 		policyOption = ReferencePolicyOption.GREEDY,
@@ -123,86 +96,6 @@ public class OAuth2EndpointApplication extends Application {
 
 	public void removeOAuth2Endpoint(Object endpoint) {
 		_liferayOauth2Endpoints.remove(endpoint);
-	}
-
-	protected void createCXFConfiguration(
-			ConfigurationAdmin configurationAdmin, String contextPath)
-		throws InvalidSyntaxException, IOException {
-
-		StringBundler filter = new StringBundler(6);
-
-		filter.append("(&(service.factoryPid=");
-		filter.append("com.liferay.portal.remote.cxf.common.configuration.");
-		filter.append("CXFEndpointPublisherConfiguration");
-		filter.append(")(contextPath=");
-		filter.append(escapeFilterArgument(contextPath));
-		filter.append("))");
-
-		Configuration[] cxfConfigurations =
-			configurationAdmin.listConfigurations(filter.toString());
-
-		if (cxfConfigurations != null) {
-			for (Configuration configuration : cxfConfigurations) {
-				configuration.delete();
-			}
-		}
-
-		Configuration cxfConfiguration =
-			configurationAdmin.createFactoryConfiguration(
-				"com.liferay.portal.remote.cxf.common.configuration." +
-					"CXFEndpointPublisherConfiguration", "?");
-
-		Dictionary<String, Object> dictionary = new Hashtable<>();
-
-		dictionary.put("contextPath", contextPath);
-
-		cxfConfiguration.update(dictionary);
-	}
-
-	private void createRESTConfiguration(
-			ConfigurationAdmin configurationAdmin, String contextPath)
-		throws InvalidSyntaxException, IOException {
-
-		String restComponentNameFilter =
-			"(component.name=" + getClass().getName() + ")";
-
-		StringBundler filter = new StringBundler(6);
-
-		filter.append("(&(service.factoryPid=");
-		filter.append("com.liferay.portal.remote.rest.extender.configuration.");
-		filter.append("RestExtenderConfiguration");
-		filter.append(")(jaxRsApplicationFilterStrings=");
-		filter.append(escapeFilterArgument(restComponentNameFilter));
-		filter.append("))");
-
-		Configuration[] restConfigurations =
-			configurationAdmin.listConfigurations(filter.toString());
-
-		if (restConfigurations != null) {
-			for (Configuration configuration : restConfigurations) {
-				configuration.delete();
-			}
-		}
-
-		Configuration restConfiguration =
-			configurationAdmin.createFactoryConfiguration(
-				"com.liferay.portal.remote.rest.extender.configuration." +
-					"RestExtenderConfiguration", "?");
-
-		Dictionary<String, Object> dictionary = new Hashtable<>();
-
-		dictionary.put("contextPaths", new String[] {contextPath});
-		dictionary.put(
-			"jaxRsApplicationFilterStrings",
-			new String[] {restComponentNameFilter});
-
-		restConfiguration.update(dictionary);
-	}
-
-	private String escapeFilterArgument(String filter) {
-		return StringUtil.replace(
-			filter, new String[] {"\\", "(", ")"},
-			new String[] {"\\\\", "\\(", "\\)"});
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
