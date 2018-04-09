@@ -38,52 +38,15 @@ public class ScopedServiceTrackerMapFactoryImpl
 	@Override
 	public <T> ScopedServiceTrackerMap<T> create(
 		BundleContext bundleContext, Class<T> clazz, String property,
-		Supplier<T> defaultServiceSupplier, Runnable onChange) {
+		Supplier<T> defaultServiceSupplier, Runnable onChangeRunnable) {
 
 		return new ScopedServiceTrackerMapImpl<>(
-			bundleContext, clazz, property, defaultServiceSupplier, onChange);
+			bundleContext, clazz, property, defaultServiceSupplier,
+			onChangeRunnable);
 	}
 
 	private static class ScopedServiceTrackerMapImpl<T>
 		implements ScopedServiceTrackerMap<T> {
-
-		public ScopedServiceTrackerMapImpl(
-			BundleContext bundleContext, Class<T> clazz, String property,
-			Supplier<T> defaultServiceSupplier, Runnable onChange) {
-
-			_defaultServiceSupplier = defaultServiceSupplier;
-			_onChange = onChange;
-
-			_servicesByCompany = ServiceTrackerMapFactory.openMultiValueMap(
-				bundleContext, clazz, "(&(companyId=*)(!(" + property + "=*)))",
-				new PropertyServiceReferenceMapper<>("companyId"),
-				new ServiceTrackerMapListenerImpl<>());
-
-			_servicesByKey = ServiceTrackerMapFactory.openMultiValueMap(
-				bundleContext, clazz,
-				"(&(" + property + "=*)(|(!(companyId=*))(companyId=0)))",
-				new PropertyServiceReferenceMapper<>(property),
-				new ServiceTrackerMapListenerImpl<>());
-
-			_servicesByCompanyAndKey =
-				ServiceTrackerMapFactory.openMultiValueMap(
-					bundleContext, clazz,
-					"(&(companyId=*)(" + property + "=*))",
-					(serviceReference, emitter) -> {
-						ServiceReferenceMapper<String, T> companyMapper =
-							new PropertyServiceReferenceMapper<>("companyId");
-						ServiceReferenceMapper<String, T> nameMapper =
-							new PropertyServiceReferenceMapper<>(property);
-
-						companyMapper.map(
-							serviceReference,
-							key1 -> nameMapper.map(
-								serviceReference,
-								key2 -> emitter.emit(
-									String.join("-", key1, key2))));
-					},
-					new ServiceTrackerMapListenerImpl<>());
-		}
 
 		@Override
 		public void close() {
@@ -118,14 +81,52 @@ public class ScopedServiceTrackerMapFactoryImpl
 			return _defaultServiceSupplier.get();
 		}
 
+		private ScopedServiceTrackerMapImpl(
+			BundleContext bundleContext, Class<T> clazz, String property,
+			Supplier<T> defaultServiceSupplier, Runnable onChangeRunnable) {
+
+			_defaultServiceSupplier = defaultServiceSupplier;
+			_onChangeRunnable = onChangeRunnable;
+
+			_servicesByCompany = ServiceTrackerMapFactory.openMultiValueMap(
+				bundleContext, clazz, "(&(companyId=*)(!(" + property + "=*)))",
+				new PropertyServiceReferenceMapper<>("companyId"),
+				new ServiceTrackerMapListenerImpl());
+
+			_servicesByCompanyAndKey =
+				ServiceTrackerMapFactory.openMultiValueMap(
+					bundleContext, clazz,
+					"(&(companyId=*)(" + property + "=*))",
+					(serviceReference, emitter) -> {
+						ServiceReferenceMapper<String, T> companyMapper =
+							new PropertyServiceReferenceMapper<>("companyId");
+						ServiceReferenceMapper<String, T> nameMapper =
+							new PropertyServiceReferenceMapper<>(property);
+
+						companyMapper.map(
+							serviceReference,
+							key1 -> nameMapper.map(
+								serviceReference,
+								key2 -> emitter.emit(
+									String.join("-", key1, key2))));
+					},
+					new ServiceTrackerMapListenerImpl());
+
+			_servicesByKey = ServiceTrackerMapFactory.openMultiValueMap(
+				bundleContext, clazz,
+				"(&(" + property + "=*)(|(!(companyId=*))(companyId=0)))",
+				new PropertyServiceReferenceMapper<>(property),
+				new ServiceTrackerMapListenerImpl());
+		}
+
 		private final Supplier<T> _defaultServiceSupplier;
-		private final Runnable _onChange;
+		private final Runnable _onChangeRunnable;
 		private final ServiceTrackerMap<String, List<T>> _servicesByCompany;
 		private final ServiceTrackerMap<String, List<T>>
 			_servicesByCompanyAndKey;
 		private final ServiceTrackerMap<String, List<T>> _servicesByKey;
 
-		private class ServiceTrackerMapListenerImpl<T>
+		private class ServiceTrackerMapListenerImpl
 			implements ServiceTrackerMapListener<String, T, List<T>> {
 
 			@Override
@@ -133,7 +134,7 @@ public class ScopedServiceTrackerMapFactoryImpl
 				ServiceTrackerMap<String, List<T>> serviceTrackerMap,
 				String key, T service, List<T> content) {
 
-				_onChange.run();
+				_onChangeRunnable.run();
 			}
 
 			@Override
@@ -141,7 +142,7 @@ public class ScopedServiceTrackerMapFactoryImpl
 				ServiceTrackerMap<String, List<T>> serviceTrackerMap,
 				String key, T service, List<T> content) {
 
-				_onChange.run();
+				_onChangeRunnable.run();
 			}
 
 		}
