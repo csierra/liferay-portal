@@ -144,6 +144,7 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 			else {
 				servicePropertyKey = serviceProperty;
 			}
+
 			_serviceProperties.add(servicePropertyKey);
 		}
 	}
