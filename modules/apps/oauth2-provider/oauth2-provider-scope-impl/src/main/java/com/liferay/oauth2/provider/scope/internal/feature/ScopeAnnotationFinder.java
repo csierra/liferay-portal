@@ -30,6 +30,8 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
+ * This class collects scope information from an annotated JAX-RS application.
+ *
  * @author Carlos Sierra Andrés
  * @review
  */
@@ -48,10 +50,11 @@ public class ScopeAnnotationFinder {
 	}
 
 	private static void _find(
-		Set<ClassResourceInfo> visited, Set<String> accum, boolean recurse,
+		Set<ClassResourceInfo> visitedClassResourceInfos,
+		Set<String> accumulatedScopes, boolean recurse,
 		ClassResourceInfo classResourceInfo) {
 
-		visited.add(classResourceInfo);
+		visitedClassResourceInfos.add(classResourceInfo);
 
 		Class<?> resourceClass = classResourceInfo.getResourceClass();
 
@@ -59,7 +62,7 @@ public class ScopeAnnotationFinder {
 			RequiresScope.class);
 
 		if (declaredAnnotation != null) {
-			Collections.addAll(accum, declaredAnnotation.value());
+			Collections.addAll(accumulatedScopes, declaredAnnotation.value());
 		}
 
 		MethodDispatcher methodDispatcher =
@@ -71,14 +74,17 @@ public class ScopeAnnotationFinder {
 		for (OperationResourceInfo operationResourceInfo :
 				operationResourceInfos) {
 
-			_find(visited, accum, recurse, operationResourceInfo);
+			_find(
+				visitedClassResourceInfos, accumulatedScopes, recurse,
+				operationResourceInfo);
 		}
 
-		visited.remove(classResourceInfo);
+		visitedClassResourceInfos.remove(classResourceInfo);
 	}
 
 	private static void _find(
-		Set<ClassResourceInfo> visited, Set<String> accum, boolean recurse,
+		Set<ClassResourceInfo> visitedClassResourceInfos,
+		Set<String> accumulatedScopes, boolean recurse,
 		OperationResourceInfo operationResourceInfo) {
 
 		Method annotatedMethod = operationResourceInfo.getAnnotatedMethod();
@@ -87,7 +93,7 @@ public class ScopeAnnotationFinder {
 			annotatedMethod.getDeclaredAnnotation(RequiresScope.class);
 
 		if (declaredAnnotation != null) {
-			Collections.addAll(accum, declaredAnnotation.value());
+			Collections.addAll(accumulatedScopes, declaredAnnotation.value());
 		}
 
 		if (operationResourceInfo.isSubResourceLocator()) {
@@ -101,7 +107,9 @@ public class ScopeAnnotationFinder {
 
 			if (subresource != null) {
 				if (recurse) {
-					_find(visited, accum, false, subresource);
+					_find(
+						visitedClassResourceInfos, accumulatedScopes, false,
+						subresource);
 				}
 			}
 		}
