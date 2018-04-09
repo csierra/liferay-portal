@@ -31,7 +31,6 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 /**
  * @author Carlos Sierra Andrés
@@ -68,13 +67,12 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 			}
 		}
 		catch (PortalException pe) {
-			ResponseBuilder builder = Response.status(500);
-
-			Response response = builder.entity(
-				pe.getMessage()
-			).build();
-
-			requestContext.abortWith(response);
+			requestContext.abortWith(
+				Response.status(
+					500
+				).entity(
+					pe.getMessage()
+				).build());
 		}
 	}
 
