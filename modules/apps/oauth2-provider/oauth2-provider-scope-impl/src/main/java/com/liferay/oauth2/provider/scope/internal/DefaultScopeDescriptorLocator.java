@@ -45,12 +45,12 @@ public class DefaultScopeDescriptorLocator implements ScopeDescriptorLocator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_scopeDescriptorsByCompany =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, ScopeDescriptor.class, "company.id");
 		_scopeDescriptorsByApplicationName =
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, ScopeDescriptor.class, "osgi.jaxrs.name");
+		_scopeDescriptorsByCompany =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, ScopeDescriptor.class, "company.id");
 	}
 
 	@Deactivate
