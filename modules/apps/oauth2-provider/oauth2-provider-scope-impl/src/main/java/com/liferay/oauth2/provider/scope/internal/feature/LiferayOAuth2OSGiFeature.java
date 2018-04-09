@@ -25,10 +25,10 @@ import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationD
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,9 +36,9 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javax.ws.rs.HttpMethod;
@@ -77,9 +77,6 @@ import org.osgi.util.tracker.ServiceTracker;
 @Component(immediate = true, property = {"liferay.extension=OAuth2"})
 @Provider
 public class LiferayOAuth2OSGiFeature implements Feature {
-
-	public static final String APPLICATION_CLASS_NAME =
-		Application.class.getName();
 
 	public LiferayOAuth2OSGiFeature() {
 		_factoryBeanListener = new ScopeFinderFactoryBeanListener();
@@ -199,7 +196,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				Endpoint endpoint = server.getEndpoint();
 
 				ApplicationInfo applicationInfo = (ApplicationInfo)endpoint.get(
-					APPLICATION_CLASS_NAME);
+					Application.class.getName());
 
 				Application application = applicationInfo.getProvider();
 
@@ -215,7 +212,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 				BundleContext bundleContext = bundle.getBundleContext();
 
-				ServiceReference<?> serviceReference = findReference(
+				ServiceReference<?> serviceReference = getServiceReference(
 					bundleContext, application);
 
 				Map<String, Object> properties = new HashMap<>();
@@ -253,22 +250,21 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				serviceProperties.put("osgi.jaxrs.name", applicationClassName);
 
 				if (oauth2ScopeCheckerType.equals("request.operation")) {
-					processRequestOperationStrategy(
-						bundleContext, endpoint, applicationClassName,
-						serviceProperties);
+					processRequestOperation(
+						bundleContext, endpoint, serviceProperties);
 				}
 
 				if (oauth2ScopeCheckerType.equals("annotations")) {
-					processAnnotationStrategy(
+					processAnnotation(
 						bundleContext, (JAXRSServiceFactoryBean)factory,
-						endpoint, applicationClassName, serviceProperties);
+						endpoint, serviceProperties);
 				}
 
-				_registerDescriptors(endpoint, bundle, applicationClassName);
+				registerDescriptors(endpoint, bundle, applicationClassName);
 			}
 		}
 
-		protected ServiceReference<?> findReference(
+		protected ServiceReference<?> getServiceReference(
 			BundleContext bundleContext, Application application) {
 
 			ServiceReference<?>[] serviceReferences;
@@ -285,7 +281,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				try {
 					Object service = bundleContext.getService(serviceReference);
 
-					if (service == application) {
+					if (Objects.equals(service, application)) {
 						return serviceReference;
 					}
 				}
@@ -297,19 +293,16 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			return null;
 		}
 
-		protected void processAnnotationStrategy(
+		protected void processAnnotation(
 			BundleContext bundleContext, JAXRSServiceFactoryBean factory,
-			Endpoint endpoint, String applicationClassName,
-			Dictionary<String, Object> serviceProperties) {
-
-			List<Class<?>> resourceClasses = factory.getResourceClasses();
-
-			Bus bus = factory.getBus();
+			Endpoint endpoint, Dictionary<String, Object> serviceProperties) {
 
 			Collection<String> scopes = new HashSet<>();
 
-			for (Class<?> resourceClass : resourceClasses) {
-				scopes.addAll(ScopeAnnotationFinder.find(resourceClass, bus));
+			for (Class<?> resourceClass : factory.getResourceClasses()) {
+				scopes.addAll(
+					ScopeAnnotationFinder.find(
+						resourceClass, factory.getBus()));
 			}
 
 			ServiceRegistration<ScopeFinder> scopeFinderRegistration =
@@ -331,9 +324,8 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				});
 		}
 
-		protected void processRequestOperationStrategy(
+		protected void processRequestOperation(
 			BundleContext bundleContext, Endpoint endpoint,
-			String applicationClassName,
 			Dictionary<String, Object> serviceProperties) {
 
 			ServiceRegistration<ScopeFinder> serviceRegistration =
@@ -349,7 +341,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			endpoint.addCleanupHook(serviceRegistration::unregister);
 		}
 
-		private void _registerDescriptors(
+		protected void registerDescriptors(
 			Endpoint endpoint, Bundle bundle, String applicationClassName) {
 
 			String bundleSymbolicName = bundle.getSymbolicName();
@@ -366,6 +358,10 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				serviceTracker = ServiceTrackerFactory.open(
 					_bundleContext, sb.toString());
 
+			Hashtable<String, Object> properties = new Hashtable<>();
+
+			properties.put("osgi.jaxrs.name", applicationClassName);
+
 			ServiceRegistration<?> serviceRegistration =
 				_bundleContext.registerService(
 					new String[] {
@@ -374,11 +370,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					},
 					new ApplicationDescriptorsImpl(
 						serviceTracker, applicationClassName),
-					new Hashtable<String, Object>() {
-						{
-							put("osgi.jaxrs.name", applicationClassName);
-						}
-					});
+					properties);
 
 			endpoint.addCleanupHook(
 				() -> {
@@ -404,14 +396,12 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				ResourceBundleLoader resourceBundleLoader =
 					_serviceTracker.getService();
 
-				ResourceBundle resourceBundle =
+				return ResourceBundleUtil.getString(
 					resourceBundleLoader.loadResourceBundle(
-						LocaleUtil.toLanguageId(locale));
-
-				String key =
-					"oauth2.application.description." + _applicationClassName;
-
-				return ResourceBundleUtil.getString(resourceBundle, key);
+						LocaleUtil.toLanguageId(locale)),
+					StringBundler.concat(
+						"oauth2.application.description.",
+						_applicationClassName));
 			}
 
 			@Override
@@ -427,7 +417,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					resourceBundleLoader.loadResourceBundle(
 						LocaleUtil.toLanguageId(locale));
 
-				String key = "oauth2.scope." + scope;
+				String key = StringBundler.concat("oauth2.scope.", scope);
 
 				if (!resourceBundle.containsKey(key)) {
 					return _defaultScopeDescriptor.describeScope(scope, locale);
