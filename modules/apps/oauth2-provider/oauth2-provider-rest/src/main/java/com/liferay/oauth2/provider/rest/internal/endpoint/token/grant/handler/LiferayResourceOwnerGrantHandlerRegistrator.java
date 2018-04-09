@@ -21,11 +21,18 @@ import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDa
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+
+import java.util.Hashtable;
+import java.util.Map;
+
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerGrantHandler;
 import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -34,18 +41,14 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import javax.ws.rs.core.MultivaluedMap;
-import java.util.Hashtable;
-import java.util.Map;
-
+/**
+ * @author Tomas Polesovsky
+ */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true
 )
 public class LiferayResourceOwnerGrantHandlerRegistrator {
-
-	private ServiceRegistration<AccessTokenGrantHandler>
-		_serviceRegistration;
 
 	@Activate
 	protected void activate(
@@ -55,20 +58,20 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 
-		if (oAuth2ProviderConfiguration.allowResourceOwnerPasswordCredentialsGrant()) {
+		if (oAuth2ProviderConfiguration.
+				allowResourceOwnerPasswordCredentialsGrant()) {
+
 			ResourceOwnerGrantHandler resourceOwnerGrantHandler =
 				new ResourceOwnerGrantHandler();
 
-			resourceOwnerGrantHandler.setLoginHandler(
-				_liferayLoginHandler);
+			resourceOwnerGrantHandler.setLoginHandler(_liferayLoginHandler);
 			resourceOwnerGrantHandler.setDataProvider(
 				_liferayOAuthDataProvider);
 
 			_serviceRegistration = bundleContext.registerService(
 				AccessTokenGrantHandler.class,
 				new LiferayPermissionedAccessTokenGrantHandler(
-					resourceOwnerGrantHandler,
-					this::hasPermission),
+					resourceOwnerGrantHandler, this::hasPermission),
 				new Hashtable<>());
 		}
 	}
@@ -102,24 +105,24 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 		long userId = Long.parseLong(subjectId);
 
 		OAuth2Application oAuth2Application =
-			_liferayOAuthDataProvider.resolveOAuth2Application(
-				client);
+			_liferayOAuthDataProvider.resolveOAuth2Application(client);
 
 		return _accessTokenGrantHandlerHelper.hasCreateTokenPermission(
 			userId, oAuth2Application);
 	}
 
-	private static Log _log =
-		LogFactoryUtil.getLog(
-			LiferayResourceOwnerGrantHandlerRegistrator.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayResourceOwnerGrantHandlerRegistrator.class);
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
-	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+	@Reference
+	private LiferayAccessTokenGrantHandlerHelper _accessTokenGrantHandlerHelper;
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private ResourceOwnerLoginHandler _liferayLoginHandler;
 
-	@Reference
-	private LiferayAccessTokenGrantHandlerHelper _accessTokenGrantHandlerHelper;
+	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+
+	private ServiceRegistration<AccessTokenGrantHandler> _serviceRegistration;
 
 }

@@ -14,14 +14,15 @@
 
 package com.liferay.oauth2.provider.rest.internal.endpoint.token.grant.handler;
 
+import java.util.List;
+import java.util.function.BiFunction;
+
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-
-import javax.ws.rs.core.MultivaluedMap;
-import java.util.List;
-import java.util.function.BiFunction;
 
 /**
  * @author Tomas Polesovsky
@@ -39,13 +40,8 @@ public class LiferayPermissionedAccessTokenGrantHandler
 	}
 
 	@Override
-	public List<String> getSupportedGrantTypes() {
-		return _accessTokenGrantHandler.getSupportedGrantTypes();
-	}
-
-	@Override
 	public ServerAccessToken createAccessToken(
-		Client client, MultivaluedMap<String, String> multivaluedMap)
+			Client client, MultivaluedMap<String, String> multivaluedMap)
 		throws OAuthServiceException {
 
 		if (!_hasPermissionBiFunction.apply(client, multivaluedMap)) {
@@ -57,8 +53,13 @@ public class LiferayPermissionedAccessTokenGrantHandler
 			client, multivaluedMap);
 	}
 
-	private AccessTokenGrantHandler _accessTokenGrantHandler;
+	@Override
+	public List<String> getSupportedGrantTypes() {
+		return _accessTokenGrantHandler.getSupportedGrantTypes();
+	}
 
-	private BiFunction<Client, MultivaluedMap<String, String>, Boolean>
+	private final AccessTokenGrantHandler _accessTokenGrantHandler;
+	private final BiFunction<Client, MultivaluedMap<String, String>, Boolean>
 		_hasPermissionBiFunction;
+
 }

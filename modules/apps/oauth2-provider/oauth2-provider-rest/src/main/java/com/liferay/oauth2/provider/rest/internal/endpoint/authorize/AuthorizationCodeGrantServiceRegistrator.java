@@ -18,8 +18,13 @@ import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+
+import java.util.Hashtable;
+import java.util.Map;
+
 import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -28,13 +33,9 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import java.util.Hashtable;
-import java.util.Map;
-
 /**
  * @author Tomas Polesovsky
  */
-
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true
@@ -68,11 +69,11 @@ public class AuthorizationCodeGrantServiceRegistrator {
 
 		Hashtable<String, Object> endpointProperties = new Hashtable<>();
 
-		endpointProperties.put(OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT, true);
+		endpointProperties.put(
+			OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT, true);
 
 		_endpointServiceRegistration = bundleContext.registerService(
-			Object.class, authorizationCodeGrantService,
-			endpointProperties);
+			Object.class, authorizationCodeGrantService, endpointProperties);
 	}
 
 	@Deactivate
@@ -89,4 +90,5 @@ public class AuthorizationCodeGrantServiceRegistrator {
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private SubjectCreator _subjectCreator;
+
 }

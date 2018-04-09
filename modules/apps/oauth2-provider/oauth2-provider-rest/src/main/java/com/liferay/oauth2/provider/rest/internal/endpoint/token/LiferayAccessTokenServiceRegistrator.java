@@ -17,7 +17,14 @@ package com.liferay.oauth2.provider.rest.internal.endpoint.token;
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.kernel.util.MapUtil;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -27,19 +34,13 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Tomas Polesovsky
  */
 @Component(
-	immediate=true,
+	immediate = true,
 	property = {
-		"allow.public.clients=true",
-		"block.unsecure.requests=true",
+		"block.unsecure.requests=true", "can.support.public.clients=true",
 		"enabled=true"
 	}
 )
@@ -49,13 +50,11 @@ public class LiferayAccessTokenServiceRegistrator {
 	public void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		boolean enabled = MapUtil.getBoolean(properties, "enabled", true);
-
-		if (!enabled) {
+		if (!MapUtil.getBoolean(properties, "enabled", true)) {
 			return;
 		}
 
-		boolean allowPublicClients = MapUtil.getBoolean(
+		boolean canSupportPublicClients = MapUtil.getBoolean(
 			properties, "allow.public.clients", true);
 
 		boolean blockUnsecureRequests = MapUtil.getBoolean(
@@ -64,9 +63,10 @@ public class LiferayAccessTokenServiceRegistrator {
 		LiferayAccessTokenService liferayAccessTokenService =
 			new LiferayAccessTokenService();
 
-		liferayAccessTokenService.setBlockUnsecureRequests(true);
+		liferayAccessTokenService.setBlockUnsecureRequests(
+			blockUnsecureRequests);
 		liferayAccessTokenService.setCanSupportPublicClients(
-			allowPublicClients);
+			canSupportPublicClients);
 		liferayAccessTokenService.setDataProvider(_liferayOAuthDataProvider);
 		liferayAccessTokenService.setGrantHandlers(_accessTokenGrantHandlers);
 
@@ -77,13 +77,6 @@ public class LiferayAccessTokenServiceRegistrator {
 
 		_endpointServiceRegistration = bundleContext.registerService(
 			Object.class, liferayAccessTokenService, endpointProperties);
-	}
-
-	@Deactivate
-	public void deactivate() {
-		if (_endpointServiceRegistration != null) {
-			_endpointServiceRegistration.unregister();
-		}
 	}
 
 	@Reference(
@@ -97,15 +90,21 @@ public class LiferayAccessTokenServiceRegistrator {
 		_accessTokenGrantHandlers.add(accessTokenGrantHandler);
 	}
 
+	@Deactivate
+	public void deactivate() {
+		if (_endpointServiceRegistration != null) {
+			_endpointServiceRegistration.unregister();
+		}
+	}
+
 	public void removeAccessTokenGrantHandler(
 		AccessTokenGrantHandler accessTokenGrantHandler) {
 
 		_accessTokenGrantHandlers.remove(accessTokenGrantHandler);
 	}
 
-	private List<AccessTokenGrantHandler> _accessTokenGrantHandlers =
+	private final List<AccessTokenGrantHandler> _accessTokenGrantHandlers =
 		new ArrayList<>();
-
 	private ServiceRegistration<Object> _endpointServiceRegistration;
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)

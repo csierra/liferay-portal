@@ -18,24 +18,31 @@ package com.liferay.oauth2.provider.rest.internal.endpoint.constants;
  * @author Tomas Polesovsky
  */
 public class OAuth2ProviderRestEndpointConstants {
+
+	public static final String AUTHORIZATION_CODE_PKCE_GRANT =
+		"authorization_code_pkce";
+
+	public static final String CLIENT_REMOTE_ADDR =
+		"CLIENT_REMOTE_ADDR_ADDRESS";
+
+	public static final String CLIENT_REMOTE_HOST = "CLIENT_REMOTE_HOST";
+
+	public static final String COMPANY_ID = "COMPANY_ID";
+
+	public static final String FEATURE_PREFIX = "FEATURE-";
+
+	public static final String FEATURES = "FEATURES";
+
+	public static final String LIFERAY_OAUTH2_CLIENT_ID =
+		"liferay.oauth2.client.id";
+
 	public static final String LIFERAY_OAUTH2_ENDPOINT =
 		"liferay.oauth2.endpoint";
 
 	public static final String LIFERAY_OAUTH2_ENDPOINT_CLASS =
 		"liferay.oauth2.endpoint.class";
 
-	public static final String CLIENT_REMOTE_ADDR =
-		"CLIENT_REMOTE_ADDR_ADDRESS";
+	public static final String TOKEN_INTROSPECTION_FEATURE =
+		"token-introspection";
 
-	public static final String CLIENT_REMOTE_HOST =
-		"CLIENT_REMOTE_HOST";
-
-	public static final String COMPANY_ID =
-		"COMPANY_ID";
-
-	public static final String FEATURE_PREFIX = "FEATURE-";
-	public static final String FEATURES = "FEATURES";
-	public static final String AUTHORIZATION_CODE_PKCE_GRANT =
-		"authorization_code_pkce";
-	public static final String TOKEN_INTROSPECTION_FEATURE = "token-introspection";
 }

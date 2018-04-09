@@ -16,7 +16,19 @@ package com.liferay.oauth2.provider.rest.internal.endpoint.introspect;
 
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+
+import java.nio.charset.StandardCharsets;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -24,23 +36,24 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
  * @author Tomas Polesovsky
  */
-@Provider
 @Produces("application/json")
+@Provider
 public class TokenIntrospectionJSONProviderMessageBodyWriter
-	implements
-	MessageBodyWriter<TokenIntrospection> {
+	implements MessageBodyWriter<TokenIntrospection> {
+
+	@Override
+	public long getSize(
+		TokenIntrospection tokenIntrospection, Class<?> type, Type genericType,
+		Annotation[] annotations, MediaType mediaType) {
+
+		return -1;
+	}
 
 	@Override
 	public boolean isWriteable(
@@ -51,70 +64,89 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 	}
 
 	@Override
-	public long getSize(
-		TokenIntrospection tokenIntrospection, Class<?> type,
-		Type genericType, Annotation[] annotations, MediaType mediaType) {
-
-		return -1;
-	}
-
-	@Override
 	public void writeTo(
-		TokenIntrospection tokenIntrospection, Class<?> type,
-		Type genericType, Annotation[] annotations, MediaType mediaType,
-		MultivaluedMap<String, Object> httpHeaders,
-		OutputStream entityStream)
+			TokenIntrospection tokenIntrospection, Class<?> type,
+			Type genericType, Annotation[] annotations, MediaType mediaType,
+			MultivaluedMap<String, Object> httpHeaders,
+			OutputStream entityStream)
 		throws IOException, WebApplicationException {
 
-		StringBundler sb = new StringBundler();
+		if (!tokenIntrospection.isActive()) {
+			StringBundler sb = new StringBundler(6);
+
+			sb.append("{");
+
+			append(sb, "active", false, false);
+
+			sb.append("}");
+
+			String result = sb.toString();
+
+			entityStream.write(result.getBytes(StandardCharsets.UTF_8));
+
+			entityStream.flush();
+
+			return;
+		}
+
+		StringBundler sb = new StringBundler(72);
+
 		sb.append("{");
 
 		append(sb, "active", tokenIntrospection.isActive(), false);
 
-		if (tokenIntrospection.isActive()) {
-			if (tokenIntrospection.getAud() != null) {
-				List<String> audience = new ArrayList<>(
-					tokenIntrospection.getAud());
+		if (tokenIntrospection.getAud() != null) {
+			List<String> audience = new ArrayList<>(
+				tokenIntrospection.getAud());
 
-				audience.removeIf(String::isEmpty);
+			audience.removeIf(String::isEmpty);
 
-				if (!audience.isEmpty()) {
-					if (audience.size() == 1) {
-						append(sb, "aud", audience.get(0));
-					}
-					else {
-						append(sb, "aud", audience);
-					}
+			if (!audience.isEmpty()) {
+				StringBundler audienceSB = null;
+
+				if (audience.size() == 1) {
+					audienceSB = new StringBundler(7);
+
+					Iterator<String> iterator = audience.iterator();
+
+					append(audienceSB, "aud", iterator.next());
 				}
+				else {
+					audienceSB = new StringBundler(5);
+
+					append(audienceSB, "aud", audience);
+				}
+
+				sb.append(audienceSB);
+			}
+		}
+
+		append(sb, OAuthConstants.CLIENT_ID, tokenIntrospection.getClientId());
+
+		append(sb, "exp", tokenIntrospection.getExp());
+		append(sb, "iat", tokenIntrospection.getIat());
+		append(sb, "iss", tokenIntrospection.getIss());
+		append(sb, "jti", tokenIntrospection.getJti());
+		append(sb, "nbf", tokenIntrospection.getNbf());
+		append(sb, OAuthConstants.SCOPE, tokenIntrospection.getScope());
+		append(sb, "sub", tokenIntrospection.getSub());
+		append(
+			sb, OAuthConstants.ACCESS_TOKEN_TYPE,
+			tokenIntrospection.getTokenType());
+
+		append(sb, "username", tokenIntrospection.getUsername());
+
+		Map<String, String> extensions = tokenIntrospection.getExtensions();
+
+		if ((extensions != null) && !extensions.isEmpty()) {
+			StringBundler extensionSB = new StringBundler(
+				extensions.size() * 7);
+
+			for (Map.Entry<String, String> extension : extensions.entrySet()) {
+				append(extensionSB, extension.getKey(), extension.getValue());
 			}
 
-			append(
-				sb, OAuthConstants.CLIENT_ID,
-				tokenIntrospection.getClientId());
-
-			append(sb, "exp", tokenIntrospection.getExp());
-			append(sb, "iat", tokenIntrospection.getIat());
-			append(sb, "iss", tokenIntrospection.getIss());
-			append(sb, "jti", tokenIntrospection.getJti());
-			append(sb, "nbf", tokenIntrospection.getNbf());
-			append(sb, OAuthConstants.SCOPE, tokenIntrospection.getScope());
-			append(sb, "sub", tokenIntrospection.getSub());
-			append(
-				sb, OAuthConstants.ACCESS_TOKEN_TYPE,
-				tokenIntrospection.getTokenType());
-
-			append(sb, "username", tokenIntrospection.getUsername());
-
-			Map<String, String> extensions =
-				tokenIntrospection.getExtensions();
-
-			if ((extensions != null) && !extensions.isEmpty()) {
-				for (Map.Entry<String, String> extension :
-					extensions.entrySet()) {
-
-					append(sb, extension.getKey(), extension.getValue());
-				}
-			}
+			sb.append(extensionSB);
 		}
 
 		sb.append("}");
@@ -126,35 +158,8 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 		entityStream.flush();
 	}
 
-	protected void append(
-		StringBundler sb, String key, Long value) {
-
-		if (value == null) {
-			return;
-		}
-
-		sb.append(",");
-
-		append(sb, key, value, false);
-	}
-
-	protected void append(
-		StringBundler sb, String key, String value) {
-
-		if (value == null) {
-			return;
-		}
-
-		sb.append(",");
-
-		append(sb, key, value, true);
-	}
-
-	protected void append(
-		StringBundler sb, String key, List<String> value) {
-
-		StringBundler arraySB = new StringBundler(
-			(value.size() * 2 - 1) + 2);
+	protected void append(StringBundler sb, String key, List<String> value) {
+		StringBundler arraySB = new StringBundler((value.size() * 3 - 1) + 2);
 
 		arraySB.append("[");
 
@@ -162,6 +167,7 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 			if (i > 0) {
 				arraySB.append(",");
 			}
+
 			appendValue(arraySB, value.get(i), true);
 		}
 
@@ -170,6 +176,16 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 		sb.append(",");
 
 		append(sb, key, arraySB.toString(), false);
+	}
+
+	protected void append(StringBundler sb, String key, Long value) {
+		if (value == null) {
+			return;
+		}
+
+		sb.append(",");
+
+		append(sb, key, value, false);
 	}
 
 	protected void append(
@@ -182,20 +198,38 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 		appendValue(sb, value, quote);
 	}
 
-	protected void appendValue(
-		StringBundler sb, Object value, boolean quote) {
+	protected void append(StringBundler sb, String key, String value) {
+		if (value == null) {
+			return;
+		}
+
+		sb.append(",");
+
+		append(sb, key, value, true);
+	}
+
+	protected void appendValue(StringBundler sb, Object value, boolean quote) {
 		if (quote) {
 			sb.append("\"");
 
-			String stringValue = StringUtil.replace(
-				String.valueOf(value), new String[]{"\\", "\""},
-				new String[]{"\\\\", "\\\""});
+			String stringValue = null;
+
+			if (value == null) {
+				stringValue = "null";
+			}
+			else {
+				stringValue = StringUtil.replace(
+					value.toString(), new String[] {"\\", "\""},
+					new String[] {"\\\\", "\\\""});
+			}
 
 			sb.append(stringValue);
+
 			sb.append("\"");
 		}
 		else {
 			sb.append(value);
 		}
 	}
+
 }

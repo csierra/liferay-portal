@@ -15,21 +15,26 @@
 package com.liferay.oauth2.provider.rest.internal.endpoint.token;
 
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
-import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.services.AccessTokenService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.MultivaluedMap;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.services.AccessTokenService;
 
 /**
  * @author Tomas Polesovsky
  */
 @Path("/token")
 public class LiferayAccessTokenService extends AccessTokenService {
+
 	@Override
 	protected Client authenticateClientIfNeeded(
 		MultivaluedMap<String, String> params) {
@@ -47,19 +52,19 @@ public class LiferayAccessTokenService extends AccessTokenService {
 
 		try {
 			InetAddress inetAddress = InetAddress.getByName(remoteAddr);
+
 			remoteHost = inetAddress.getCanonicalHostName();
 		}
-		catch (UnknownHostException e) {
+		catch (UnknownHostException uhe) {
 		}
 
 		clientProperties.put(
-			OAuth2ProviderRestEndpointConstants.CLIENT_REMOTE_ADDR,
-			remoteAddr);
+			OAuth2ProviderRestEndpointConstants.CLIENT_REMOTE_ADDR, remoteAddr);
 
 		clientProperties.put(
-			OAuth2ProviderRestEndpointConstants.CLIENT_REMOTE_HOST,
-			remoteHost);
+			OAuth2ProviderRestEndpointConstants.CLIENT_REMOTE_HOST, remoteHost);
 
 		return client;
 	}
+
 }
