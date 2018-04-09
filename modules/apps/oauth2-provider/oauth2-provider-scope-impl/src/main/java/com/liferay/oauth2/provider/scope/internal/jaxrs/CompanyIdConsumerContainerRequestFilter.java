@@ -29,10 +29,10 @@ import javax.ws.rs.core.Context;
 /**
  * @author Carlos Sierra Andrés
  */
-public class CompanyRetrieverContainerRequestFilter
+public class CompanyIdConsumerContainerRequestFilter
 	implements ContainerRequestFilter {
 
-	public CompanyRetrieverContainerRequestFilter(Consumer<Long> consumer) {
+	public CompanyIdConsumerContainerRequestFilter(Consumer<Long> consumer) {
 		_consumer = consumer;
 	}
 

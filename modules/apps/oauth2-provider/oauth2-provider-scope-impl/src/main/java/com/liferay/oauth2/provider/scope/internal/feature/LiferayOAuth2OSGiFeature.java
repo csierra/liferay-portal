@@ -16,7 +16,7 @@ package com.liferay.oauth2.provider.scope.internal.feature;
 
 import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.RequestScopeCheckerFilter;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
-import com.liferay.oauth2.provider.scope.internal.jaxrs.CompanyRetrieverContainerRequestFilter;
+import com.liferay.oauth2.provider.scope.internal.jaxrs.CompanyIdConsumerContainerRequestFilter;
 import com.liferay.oauth2.provider.scope.internal.jaxrs.RunnableExecutorContainerResponseFilter;
 import com.liferay.oauth2.provider.scope.internal.jaxrs.ScopedRequestScopeChecker;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
@@ -88,7 +88,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 	@Override
 	public boolean configure(FeatureContext context) {
 		context.register(
-			new CompanyRetrieverContainerRequestFilter(
+			new CompanyIdConsumerContainerRequestFilter(
 				_scopeContext::setCompanyId),
 			Priorities.AUTHORIZATION - 10);
 
