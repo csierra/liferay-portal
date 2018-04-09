@@ -23,17 +23,17 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Carlos Sierra Andrés
  */
 @Component(service = {ScopeChecker.class, ScopeContext.class})
-public class ThreadLocalServiceScopeChecker
+public class ThreadLocalScopeContextChecker
 	implements ScopeChecker, ScopeContext {
 
 	@Override
@@ -44,8 +44,9 @@ public class ThreadLocalServiceScopeChecker
 
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants = new ArrayList<>(
 			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
-				_companyIdThreadLocal.get(), _applicationName.get(),
-				_bundleSymbolicName.get(), _accessToken.get()));
+				_companyIdThreadLocal.get(), _applicationNameThreadLocal.get(),
+				_bundleSymbolicNameThreadLocal.get(),
+				_accessTokenThreadLocal.get()));
 
 		if (scopes.length > oAuth2ScopeGrants.size()) {
 			return false;
@@ -75,8 +76,9 @@ public class ThreadLocalServiceScopeChecker
 
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
 			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
-				_companyIdThreadLocal.get(), _applicationName.get(),
-				_bundleSymbolicName.get(), _accessToken.get());
+				_companyIdThreadLocal.get(), _applicationNameThreadLocal.get(),
+				_bundleSymbolicNameThreadLocal.get(),
+				_accessTokenThreadLocal.get());
 
 		for (String scope : scopes) {
 			if (Validator.isNull(scope)) {
@@ -101,35 +103,40 @@ public class ThreadLocalServiceScopeChecker
 
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
 			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
-				_companyIdThreadLocal.get(), _applicationName.get(),
-				_bundleSymbolicName.get(), _accessToken.get());
+				_companyIdThreadLocal.get(), _applicationNameThreadLocal.get(),
+				_bundleSymbolicNameThreadLocal.get(),
+				_accessTokenThreadLocal.get());
 
-		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
+		for (OAuth2ScopeGrant oAuth2ScopeGrant : oAuth2ScopeGrants) {
+			if (scope.equals(oAuth2ScopeGrant.getScope())) {
+				return true;
+			}
+		}
 
-		return stream.anyMatch(o -> scope.equals(o.getScope()));
+		return false;
 	}
 
 	@Override
 	public void clear() {
-		_applicationName.remove();
-		_bundleSymbolicName.remove();
+		_applicationNameThreadLocal.remove();
+		_bundleSymbolicNameThreadLocal.remove();
 		_companyIdThreadLocal.remove();
-		_accessToken.remove();
+		_accessTokenThreadLocal.remove();
 	}
 
 	@Override
 	public void setAccessToken(String accessToken) {
-		_accessToken.set(accessToken);
+		_accessTokenThreadLocal.set(accessToken);
 	}
 
 	@Override
 	public void setApplicationName(String applicationName) {
-		_applicationName.set(applicationName);
+		_applicationNameThreadLocal.set(applicationName);
 	}
 
 	@Override
 	public void setBundle(Bundle bundle) {
-		_bundleSymbolicName.set(bundle.getSymbolicName());
+		_bundleSymbolicNameThreadLocal.set(bundle.getSymbolicName());
 	}
 
 	@Override
@@ -137,16 +144,16 @@ public class ThreadLocalServiceScopeChecker
 		_companyIdThreadLocal.set(companyId);
 	}
 
-	private final ThreadLocal<String> _accessToken = ThreadLocal.withInitial(
-		() -> StringPool.BLANK);
-	private final ThreadLocal<String> _applicationName =
+	private final ThreadLocal<String> _accessTokenThreadLocal =
 		ThreadLocal.withInitial(() -> StringPool.BLANK);
-	private final ThreadLocal<String> _bundleSymbolicName =
+	private final ThreadLocal<String> _applicationNameThreadLocal =
+		ThreadLocal.withInitial(() -> StringPool.BLANK);
+	private final ThreadLocal<String> _bundleSymbolicNameThreadLocal =
 		ThreadLocal.withInitial(() -> StringPool.BLANK);
 	private final ThreadLocal<Long> _companyIdThreadLocal =
 		ThreadLocal.withInitial(() -> 0L);
 
-	@Reference
+	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
 
 }
