@@ -93,7 +93,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			Priorities.AUTHORIZATION - 10);
 
 		context.register(
-			new ScopeContextContainerRequestFilter(_scopeContext),
+			new ScopeContextPopulatorContainerRequestFilter(_scopeContext),
 			Priorities.AUTHORIZATION - 9);
 
 		context.register(

@@ -29,10 +29,12 @@ import org.osgi.framework.FrameworkUtil;
 /**
  * @author Carlos Sierra Andrés
  */
-public class ScopeContextContainerRequestFilter
+public class ScopeContextPopulatorContainerRequestFilter
 	implements ContainerRequestFilter {
 
-	public ScopeContextContainerRequestFilter(ScopeContext scopeContext) {
+	public ScopeContextPopulatorContainerRequestFilter(
+		ScopeContext scopeContext) {
+
 		_scopeContext = scopeContext;
 	}
 
