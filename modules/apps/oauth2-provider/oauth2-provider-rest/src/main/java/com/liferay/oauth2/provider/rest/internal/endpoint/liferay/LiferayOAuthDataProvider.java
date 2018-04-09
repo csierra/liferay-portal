@@ -23,9 +23,9 @@ import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider.AccessToken;
+import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
-import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
@@ -75,7 +75,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Carlos Sierra Andrés
@@ -283,7 +282,8 @@ public class LiferayOAuthDataProvider
 	public BearerTokenProvider getBearerTokenProvider(
 		long companyId, String clientId) {
 
-		return _scopedBearerTokenProvider.getService(companyId, clientId);
+		return _bearerTokenProviderAccessor.getBearerTokenProvider(
+			companyId, clientId);
 	}
 
 	@Override
@@ -568,10 +568,6 @@ public class LiferayOAuthDataProvider
 		_codeGrantsPortalCache =
 			(PortalCache<String, ServerAuthorizationCodeGrant>)
 				_multiVMPool.getPortalCache("oauth2-provider-code-grants");
-		_scopedBearerTokenProvider = _scopedServiceTrackerMapFactory.create(
-			bundleContext, BearerTokenProvider.class,
-			OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_CLIENT_ID,
-			() -> _defaultBearerTokenProvider);
 	}
 
 	@Override
@@ -1044,11 +1040,6 @@ public class LiferayOAuthDataProvider
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 
-	@Reference(
-		policyOption = ReferencePolicyOption.GREEDY, target = "(name=default)"
-	)
-	private BearerTokenProvider _defaultBearerTokenProvider;
-
 	@Reference
 	private MultiVMPool _multiVMPool;
 
@@ -1067,8 +1058,8 @@ public class LiferayOAuthDataProvider
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
 
-	private ScopedServiceTrackerMap<BearerTokenProvider>
-		_scopedBearerTokenProvider;
+	@Reference
+	private BearerTokenProviderAccessor _bearerTokenProviderAccessor;
 
 	@Reference
 	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;

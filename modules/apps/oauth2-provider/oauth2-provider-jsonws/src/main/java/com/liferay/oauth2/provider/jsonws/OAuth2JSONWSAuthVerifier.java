@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
+import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
@@ -71,10 +72,6 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	@Activate
 	public void activate(BundleContext bundleContext){
 		_bundleContext = bundleContext;
-
-		_scopedBearerTokenProvider = _scopedServiceTrackerMapFactory.create(
-			bundleContext, BearerTokenProvider.class,
-			"liferay.oauth2.client.id", () -> _defaultBearerTokenProvider);
 	}
 
 	@Override
@@ -97,12 +94,14 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				return authVerifierResult;
 			}
 
-			long companyId = accessToken.getOAuth2Application().getCompanyId();
+			OAuth2Application oAuth2Application =
+				accessToken.getOAuth2Application();
+
+			long companyId = oAuth2Application.getCompanyId();
 
 			BearerTokenProvider bearerTokenProvider =
-				_scopedBearerTokenProvider.getService(
-					companyId,
-					accessToken.getOAuth2Application().getClientId());
+				_scopedBearerTokenProviderAccessor.getBearerTokenProvider(
+					companyId, oAuth2Application.getClientId());
 
 			if (bearerTokenProvider == null) {
 				return authVerifierResult;
@@ -280,7 +279,8 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	@Reference
 	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 
-	private ScopedServiceTrackerMap<BearerTokenProvider>
-		_scopedBearerTokenProvider;
+	@Reference
+	private BearerTokenProviderAccessor
+		_scopedBearerTokenProviderAccessor;
 
 }

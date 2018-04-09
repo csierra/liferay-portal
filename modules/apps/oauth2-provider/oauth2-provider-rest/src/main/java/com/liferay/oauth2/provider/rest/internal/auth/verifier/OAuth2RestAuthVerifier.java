@@ -18,10 +18,9 @@ import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
-import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
+import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
-import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
@@ -47,8 +46,6 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -62,14 +59,6 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 	property = {"auth.verifier.OAuth2RestAuthVerifier.urls.includes=#N/A#"}
 )
 public class OAuth2RestAuthVerifier implements AuthVerifier {
-
-	@Activate
-	public void activate(BundleContext bundleContext) {
-		_scopedBearerTokenProvider = _scopedServiceTrackerMapFactory.create(
-			bundleContext, BearerTokenProvider.class,
-			OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_CLIENT_ID,
-			() -> _defaultBearerTokenProvider);
-	}
 
 	@Override
 	public String getAuthType() {
@@ -91,10 +80,13 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 				return authVerifierResult;
 			}
 
+			OAuth2Application oAuth2Application =
+				accessToken.getOAuth2Application();
+
 			BearerTokenProvider bearerTokenProvider =
-				_scopedBearerTokenProvider.getService(
-					accessToken.getOAuth2Application().getCompanyId(),
-					accessToken.getOAuth2Application().getClientId());
+				_bearerTokenProviderAccessor.getBearerTokenProvider(
+					oAuth2Application.getCompanyId(),
+					oAuth2Application.getClientId());
 
 			if (bearerTokenProvider == null) {
 				return authVerifierResult;
@@ -230,8 +222,8 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 	@Reference
 	private ScopeContext _scopeContext;
 
-	private ScopedServiceTrackerMap<BearerTokenProvider>
-		_scopedBearerTokenProvider;
+	@Reference
+	private BearerTokenProviderAccessor _bearerTokenProviderAccessor;
 
 	@Reference
 	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
