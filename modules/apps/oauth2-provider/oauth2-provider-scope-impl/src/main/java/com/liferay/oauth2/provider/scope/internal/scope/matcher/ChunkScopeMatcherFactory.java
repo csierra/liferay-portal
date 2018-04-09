@@ -16,9 +16,9 @@ package com.liferay.oauth2.provider.scope.internal.scope.matcher;
 
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
 
@@ -29,50 +29,41 @@ import org.osgi.service.component.annotations.Component;
  * @author Carlos Sierra Andrés
  */
 @Component(
-	configurationPid = "com.liferay.oauth2.provider.impl.scope.ChunkScopeMatcherFactory",
-	property = {"default=true", "separator=" + StringPool.PERIOD, "type=chunks"}
+	property = {"default=true", "delimiter=" + StringPool.PERIOD, "type=chunks"}
 )
 public class ChunkScopeMatcherFactory implements ScopeMatcherFactory {
 
 	@Override
 	public ScopeMatcher create(String input) {
-		String[] inputParts = StringUtil.split(input, _separator);
+		String[] inputParts = StringUtil.split(input, _delimiter);
 
 		if (inputParts.length == 0) {
 			return ScopeMatcher.NONE;
 		}
 
-		return new ChunkScopeMatcher(input, inputParts);
+		return new ChunkScopeMatcher(inputParts);
 	}
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		Object separator = properties.get("separator");
-
-		_separator = separator.toString();
-
-		if (Validator.isNull(_separator)) {
-			throw new IllegalArgumentException(
-				"separator property can't be null");
-		}
+		_delimiter = MapUtil.getString(
+			properties, "delimiter", StringPool.PERIOD);
 	}
 
-	private String _separator = StringPool.PERIOD;
+	private String _delimiter = StringPool.PERIOD;
 
 	private class ChunkScopeMatcher implements ScopeMatcher {
 
 		@Override
 		public boolean match(String name) {
-			String[] scopeParts = StringUtil.split(name, _separator);
+			String[] nameParts = StringUtil.split(name, _delimiter);
 
-			if (scopeParts.length < _inputParts.length) {
+			if (nameParts.length < _inputParts.length) {
 				return false;
 			}
 
 			for (int i = 0; i < _inputParts.length; i++) {
-				String inputPart = _inputParts[i];
-
-				if (inputPart.equals(scopeParts[i])) {
+				if (_inputParts[i].equals(nameParts[i])) {
 					continue;
 				}
 
@@ -82,12 +73,10 @@ public class ChunkScopeMatcherFactory implements ScopeMatcherFactory {
 			return true;
 		}
 
-		private ChunkScopeMatcher(String input, String[] inputParts) {
-			_input = input;
+		private ChunkScopeMatcher(String[] inputParts) {
 			_inputParts = inputParts;
 		}
 
-		private final String _input;
 		private final String[] _inputParts;
 
 	}
