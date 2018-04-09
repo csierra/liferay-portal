@@ -130,8 +130,9 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 				Properties modifiers = new Properties();
 
 				try {
-					modifiers.load(new StringReader(
-						serviceProperty.substring(indexOfSpace)));
+					modifiers.load(
+						new StringReader(
+							serviceProperty.substring(indexOfSpace)));
 				}
 				catch (IOException ioe) {
 					throw new IllegalArgumentException(ioe);
