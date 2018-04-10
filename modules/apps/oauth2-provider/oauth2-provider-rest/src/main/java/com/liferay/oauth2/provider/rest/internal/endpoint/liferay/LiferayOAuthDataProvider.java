@@ -1040,7 +1040,7 @@ public class LiferayOAuthDataProvider
 		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private BearerTokenProviderAccessor _bearerTokenProviderAccessor;
+	private volatile BearerTokenProviderAccessor _bearerTokenProviderAccessor;
 
 	private PortalCache<String, ServerAuthorizationCodeGrant>
 		_codeGrantsPortalCache;

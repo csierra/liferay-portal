@@ -12,9 +12,12 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.jsonws;
+package com.liferay.oauth2.provider.jsonws.internal.auth.verifier;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
+import com.liferay.oauth2.provider.jsonws.internal.OAuth2JSONWSScopePublisher;
+import com.liferay.oauth2.provider.jsonws.internal.constants.OAuth2JSONWSConstants;
+import com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope.SAPEntryScope;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
@@ -22,7 +25,6 @@ import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenPro
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
-import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService;
@@ -52,8 +54,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -68,11 +68,6 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 		{"auth.verifier.OAuth2JSONWSAuthVerifier.urls.includes=/api/jsonws/*"}
 )
 public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
-
-	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-	}
 
 	@Override
 	public String getAuthType() {
@@ -100,7 +95,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 			long companyId = oAuth2Application.getCompanyId();
 
 			BearerTokenProvider bearerTokenProvider =
-				_scopedBearerTokenProviderAccessor.getBearerTokenProvider(
+				_bearerTokenProviderAccessor.getBearerTokenProvider(
 					companyId, oAuth2Application.getClientId());
 
 			if (bearerTokenProvider == null) {
@@ -113,15 +108,11 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 			Set<String> scopeNames = new HashSet<>();
 
-			String auth2PortalJSONWSApplicationName =
-				_oAuth2SAPEntryScopesPublisher.
-					getOAuth2PortalJSONWSApplicationName();
-
 			for (String accessTokenScope : accessToken.getScopes()) {
 				Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
-					_scopeFinderLocator.getLiferayOAuth2Scopes(
+					_scopeLocator.getLiferayOAuth2Scopes(
 						companyId, accessTokenScope,
-						auth2PortalJSONWSApplicationName);
+						OAuth2JSONWSConstants.OSGI_JAXRS_APPLICATION_NAME);
 
 				for (LiferayOAuth2Scope liferayOAuth2Scope :
 						liferayOAuth2Scopes) {
@@ -131,7 +122,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 			}
 
 			List<SAPEntryScope> sapEntryScopes =
-				_sapEntryScopeRegistry.getSAPEntryScopes(companyId);
+				_oAuth2JSONWSScopePublisher.getPublishedScopes(companyId);
 
 			for (SAPEntryScope sapEntryScope : sapEntryScopes) {
 				if (scopeNames.contains(sapEntryScope.getScopeName())) {
@@ -249,7 +240,11 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2JSONWSAuthVerifier.class);
 
-	private BundleContext _bundleContext;
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile BearerTokenProviderAccessor _bearerTokenProviderAccessor;
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
@@ -262,21 +257,9 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	private OAuth2AuthorizationLocalService _oAuth2AuthorizationLocalService;
 
 	@Reference
-	private OAuth2SAPEntryScopesPublisher _oAuth2SAPEntryScopesPublisher;
+	private OAuth2JSONWSScopePublisher _oAuth2JSONWSScopePublisher;
 
 	@Reference
-	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
-
-	@Reference
-	private BearerTokenProviderAccessor _scopedBearerTokenProviderAccessor;
-
-	@Reference
-	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
-
-	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile ScopeLocator _scopeFinderLocator;
+	private ScopeLocator _scopeLocator;
 
 }

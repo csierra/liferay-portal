@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.jsonws;
+package com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope;
 
 /**
  * @author Tomas Polesovsky
@@ -44,25 +44,9 @@ public class SAPEntryScope {
 		return _title;
 	}
 
-	public void setSapEntryId(long sapEntryId) {
-		_sapEntryId = sapEntryId;
-	}
-
-	public void setSapEntryName(String sapEntryName) {
-		_sapEntryName = sapEntryName;
-	}
-
-	public void setScopeName(String scopeName) {
-		_scopeName = scopeName;
-	}
-
-	public void setTitle(String title) {
-		_title = title;
-	}
-
-	private long _sapEntryId;
-	private String _sapEntryName;
-	private String _scopeName;
-	private String _title;
+	private final long _sapEntryId;
+	private final String _sapEntryName;
+	private final String _scopeName;
+	private final String _title;
 
 }
