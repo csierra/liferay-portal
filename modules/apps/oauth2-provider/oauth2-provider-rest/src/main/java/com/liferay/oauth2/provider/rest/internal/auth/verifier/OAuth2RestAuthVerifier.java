@@ -21,10 +21,10 @@ import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
-import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -32,9 +32,8 @@ import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
-import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyManager;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -98,7 +98,9 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 			_scopeContext.setAccessToken(accessToken.getTokenKey());
 
-			authVerifierResult.getSettings().put(
+			Map<String, Object> settings = authVerifierResult.getSettings();
+
+			settings.put(
 				BearerTokenProvider.AccessToken.class.getName(), accessToken);
 
 			authVerifierResult.setState(AuthVerifierResult.State.SUCCESS);
@@ -119,27 +121,25 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 			AccessControlContext accessControlContext)
 		throws PortalException {
 
-		HttpServletRequest request = accessControlContext.getRequest();
+		HttpServletRequest httpServletRequest =
+			accessControlContext.getRequest();
 
-		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+		String authorization = httpServletRequest.getHeader(
+			HttpHeaders.AUTHORIZATION);
 
-		if (authorization == null) {
+		if (Validator.isBlank(authorization)) {
 			return null;
 		}
 
-		String[] basicAuthParts = authorization.split(" ");
+		String[] authorizationParts = authorization.split("\\s");
 
-		if (basicAuthParts.length != 2) {
+		String scheme = authorizationParts[0];
+
+		if (!StringUtil.equalsIgnoreCase(scheme, _BEARER)) {
 			return null;
 		}
 
-		String basicAuthPart = basicAuthParts[0];
-
-		if (!_BEARER.equalsIgnoreCase(basicAuthPart)) {
-			return null;
-		}
-
-		String token = basicAuthParts[1];
+		String token = authorizationParts[1];
 
 		if (Validator.isBlank(token)) {
 			return null;
@@ -169,16 +169,19 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 		long expiresIn =
 			(expirationDate.getTime() - createDate.getTime()) / 1000;
+
 		long issuedAt = createDate.getTime() / 1000;
 
 		List<String> scopeAliasesList = Collections.emptyList();
 
-		if (oAuth2Authorization.getOAuth2ApplicationScopeAliasesId() > 0) {
+		long oAuth2ApplicationScopeAliasesId =
+			oAuth2Authorization.getOAuth2ApplicationScopeAliasesId();
+
+		if (oAuth2ApplicationScopeAliasesId > 0) {
 			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
 				_oAuth2ApplicationScopeAliasesLocalService.
 					getOAuth2ApplicationScopeAliases(
-						oAuth2Authorization.
-							getOAuth2ApplicationScopeAliasesId());
+						oAuth2ApplicationScopeAliasesId);
 
 			scopeAliasesList =
 				oAuth2ApplicationScopeAliases.getScopeAliasesList();
@@ -205,9 +208,9 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY, target = "(name=default)"
+		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private volatile BearerTokenProvider _defaultBearerTokenProvider;
+	private BearerTokenProviderAccessor _bearerTokenProviderAccessor;
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
@@ -221,14 +224,5 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 	@Reference
 	private ScopeContext _scopeContext;
-
-	@Reference
-	private BearerTokenProviderAccessor _bearerTokenProviderAccessor;
-
-	@Reference
-	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
-
-	@Reference
-	private ServiceAccessPolicyManager _serviceAccessPolicyManager;
 
 }

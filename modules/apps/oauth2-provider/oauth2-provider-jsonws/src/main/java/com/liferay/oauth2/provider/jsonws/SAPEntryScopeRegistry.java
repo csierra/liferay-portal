@@ -17,16 +17,15 @@ package com.liferay.oauth2.provider.jsonws;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Stream;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Tomas Polesovsky
@@ -48,15 +47,14 @@ public class SAPEntryScopeRegistry {
 			_sapEntryCompanyScopes.get(companyId));
 	}
 
-	public void registerSAPEntry(SAPEntry sapEntry){
+	public void registerSAPEntry(SAPEntry sapEntry) {
 		if (!StringUtil.startsWith(sapEntry.getName(), _sapEntryOAuth2Prefix)) {
 			return;
 		}
 
 		SAPEntryScope sapEntryScope = new SAPEntryScope(
 			sapEntry.getSapEntryId(), sapEntry.getName(),
-			getScopeName(sapEntry.getName()),
-			sapEntry.getTitle());
+			getScopeName(sapEntry.getName()), sapEntry.getTitle());
 
 		List<SAPEntryScope> sapEntryScopes =
 			_sapEntryCompanyScopes.computeIfAbsent(
@@ -65,7 +63,7 @@ public class SAPEntryScopeRegistry {
 		sapEntryScopes.add(sapEntryScope);
 	}
 
-	public void unregisterSAPEntry(SAPEntry sapEntry){
+	public void unregisterSAPEntry(SAPEntry sapEntry) {
 		List<SAPEntryScope> sapEntryScopes = _sapEntryCompanyScopes.get(
 			sapEntry.getCompanyId());
 
@@ -80,7 +78,7 @@ public class SAPEntryScopeRegistry {
 			sapEntryScope -> sapEntryScope.getSapEntryId() == sapEntryId);
 	}
 
-	public void updateSAPEntry(SAPEntry sapEntry){
+	public void updateSAPEntry(SAPEntry sapEntry) {
 		if (!StringUtil.startsWith(sapEntry.getName(), _sapEntryOAuth2Prefix)) {
 			unregisterSAPEntry(sapEntry);
 
@@ -110,9 +108,8 @@ public class SAPEntryScopeRegistry {
 		return sapEntryName.substring(_sapEntryOAuth2Prefix.length());
 	}
 
-	private String _sapEntryOAuth2Prefix = "OAUTH2_";
-
-	private Map<Long, List<SAPEntryScope>> _sapEntryCompanyScopes =
+	private final Map<Long, List<SAPEntryScope>> _sapEntryCompanyScopes =
 		new ConcurrentHashMap<>();
+	private String _sapEntryOAuth2Prefix = "OAUTH2_";
 
 }

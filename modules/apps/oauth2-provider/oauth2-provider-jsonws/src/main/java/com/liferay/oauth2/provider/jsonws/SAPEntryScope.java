@@ -18,6 +18,7 @@ package com.liferay.oauth2.provider.jsonws;
  * @author Tomas Polesovsky
  */
 public class SAPEntryScope {
+
 	public SAPEntryScope(
 		long sapEntryId, String sapEntryName, String scopeName, String title) {
 
@@ -31,28 +32,28 @@ public class SAPEntryScope {
 		return _sapEntryId;
 	}
 
-	public void setSapEntryId(long sapEntryId) {
-		_sapEntryId = sapEntryId;
-	}
-
 	public String getSapEntryName() {
 		return _sapEntryName;
-	}
-
-	public void setSapEntryName(String sapEntryName) {
-		_sapEntryName = sapEntryName;
 	}
 
 	public String getScopeName() {
 		return _scopeName;
 	}
 
-	public void setScopeName(String scopeName) {
-		_scopeName = scopeName;
-	}
-
 	public String getTitle() {
 		return _title;
+	}
+
+	public void setSapEntryId(long sapEntryId) {
+		_sapEntryId = sapEntryId;
+	}
+
+	public void setSapEntryName(String sapEntryName) {
+		_sapEntryName = sapEntryName;
+	}
+
+	public void setScopeName(String scopeName) {
+		_scopeName = scopeName;
 	}
 
 	public void setTitle(String title) {

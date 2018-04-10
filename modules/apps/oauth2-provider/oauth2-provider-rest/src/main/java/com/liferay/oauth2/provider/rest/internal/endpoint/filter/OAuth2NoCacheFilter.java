@@ -24,8 +24,6 @@ import javax.ws.rs.ext.Provider;
 
 import org.osgi.service.component.annotations.Component;
 
-;
-
 /**
  * @author Tomas Polesovsky
  */

@@ -15,8 +15,6 @@
 package com.liferay.oauth2.provider.rest.internal.endpoint;
 
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +26,7 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -61,13 +60,13 @@ public class OAuth2EndpointApplication extends Application {
 	}
 
 	@Override
-	public Set<Object> getSingletons() {
-		return new HashSet<>(_liferayOauth2Endpoints);
+	public Set<Class<?>> getClasses() {
+		return Collections.singleton(OAuthJSONProvider.class);
 	}
 
 	@Override
-	public Set<Class<?>> getClasses() {
-		return Collections.singleton(OAuthJSONProvider.class);
+	public Set<Object> getSingletons() {
+		return new HashSet<>(_liferayOauth2Endpoints);
 	}
 
 	public void removeOAuth2Endpoint(Object endpoint) {

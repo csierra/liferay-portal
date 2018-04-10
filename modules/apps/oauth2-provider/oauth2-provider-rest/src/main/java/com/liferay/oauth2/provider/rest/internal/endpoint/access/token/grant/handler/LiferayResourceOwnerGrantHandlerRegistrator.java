@@ -12,17 +12,15 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.internal.endpoint.token.grant.handler;
+package com.liferay.oauth2.provider.rest.internal.endpoint.access.token.grant.handler;
 
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayAccessTokenGrantHandlerHelper;
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
-import java.util.Hashtable;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -33,54 +31,34 @@ import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerGrantHandler;
 import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Tomas Polesovsky
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
-	immediate = true
+	immediate = true, service = AccessTokenGrantHandler.class
 )
-public class LiferayResourceOwnerGrantHandlerRegistrator {
+public class LiferayResourceOwnerGrantHandlerRegistrator
+	extends BaseAccessTokenGrantHandler {
 
 	@Activate
-	protected void activate(
-		BundleContext bundleContext, Map<String, Object> properties) {
+	protected void activate(Map<String, Object> properties) {
+		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
+			OAuth2ProviderConfiguration.class, properties);
 
-		OAuth2ProviderConfiguration oAuth2ProviderConfiguration =
-			ConfigurableUtil.createConfigurable(
-				OAuth2ProviderConfiguration.class, properties);
+		_resourceOwnerGrantHandler = new ResourceOwnerGrantHandler();
 
-		if (oAuth2ProviderConfiguration.
-				allowResourceOwnerPasswordCredentialsGrant()) {
-
-			ResourceOwnerGrantHandler resourceOwnerGrantHandler =
-				new ResourceOwnerGrantHandler();
-
-			resourceOwnerGrantHandler.setLoginHandler(_liferayLoginHandler);
-			resourceOwnerGrantHandler.setDataProvider(
-				_liferayOAuthDataProvider);
-
-			_serviceRegistration = bundleContext.registerService(
-				AccessTokenGrantHandler.class,
-				new LiferayPermissionedAccessTokenGrantHandler(
-					resourceOwnerGrantHandler, this::hasPermission),
-				new Hashtable<>());
-		}
+		_resourceOwnerGrantHandler.setLoginHandler(_liferayLoginHandler);
+		_resourceOwnerGrantHandler.setDataProvider(_liferayOAuthDataProvider);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		if (_serviceRegistration != null) {
-			_serviceRegistration.unregister();
-		}
+	@Override
+	protected AccessTokenGrantHandler getAccessTokenGrantHandler() {
+		return _resourceOwnerGrantHandler;
 	}
 
 	protected boolean hasPermission(
@@ -89,7 +67,7 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 		String userName = params.getFirst("username");
 		String password = params.getFirst("password");
 
-		if (userName == null || password == null) {
+		if ((userName == null) || (password == null)) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("username or password parameter was not provided.");
 			}
@@ -107,22 +85,25 @@ public class LiferayResourceOwnerGrantHandlerRegistrator {
 		OAuth2Application oAuth2Application =
 			_liferayOAuthDataProvider.resolveOAuth2Application(client);
 
-		return _accessTokenGrantHandlerHelper.hasCreateTokenPermission(
-			userId, oAuth2Application);
+		return hasCreateTokenPermission(userId, oAuth2Application);
+	}
+
+	@Override
+	protected boolean isGrantHandlerEnabled() {
+		return _oAuth2ProviderConfiguration.
+			allowResourceOwnerPasswordCredentialsGrant();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LiferayResourceOwnerGrantHandlerRegistrator.class);
 
 	@Reference
-	private LiferayAccessTokenGrantHandlerHelper _accessTokenGrantHandlerHelper;
-
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private ResourceOwnerLoginHandler _liferayLoginHandler;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	@Reference
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
-	private ServiceRegistration<AccessTokenGrantHandler> _serviceRegistration;
+	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
+	private ResourceOwnerGrantHandler _resourceOwnerGrantHandler;
 
 }

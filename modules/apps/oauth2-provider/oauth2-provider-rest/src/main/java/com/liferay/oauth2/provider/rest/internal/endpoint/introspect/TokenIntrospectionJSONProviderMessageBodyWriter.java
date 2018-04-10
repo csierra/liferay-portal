@@ -39,6 +39,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+
 import org.osgi.service.component.annotations.Component;
 
 /**

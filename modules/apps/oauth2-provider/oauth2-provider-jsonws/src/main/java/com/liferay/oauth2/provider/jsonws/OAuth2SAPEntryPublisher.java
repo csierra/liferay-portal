@@ -26,15 +26,16 @@ import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
+
+import java.util.Locale;
+import java.util.Map;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author Tomas Polesovsky
@@ -117,7 +118,7 @@ public class OAuth2SAPEntryPublisher {
 			catch (PortalException pe) {
 				_log.error(
 					"Unable to add service access policy entry for company " +
-					company.getCompanyId(),
+						company.getCompanyId(),
 					pe);
 			}
 		}
