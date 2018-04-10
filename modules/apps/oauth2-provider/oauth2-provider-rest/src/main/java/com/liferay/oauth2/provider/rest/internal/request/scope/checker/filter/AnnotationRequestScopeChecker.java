@@ -18,15 +18,15 @@ import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.Request
 import com.liferay.oauth2.provider.scope.RequiresNoScope;
 import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
+import com.liferay.petra.reflect.AnnotationLocator;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.StringBundler;
 
 import java.lang.reflect.Method;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Request;
 
-import com.liferay.petra.string.StringPool;
-import com.liferay.petra.reflect.AnnotationLocator;
-import com.liferay.portal.kernel.util.StringBundler;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -41,54 +41,20 @@ public class AnnotationRequestScopeChecker
 	public boolean isAllowed(
 		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo) {
 
-		Boolean isAllowed = isAllowed(
+		Boolean allowed = isAllowed(
 			resourceInfo.getResourceMethod(), scopeChecker);
 
-		if (isAllowed != null) {
-			return isAllowed;
+		if (allowed != null) {
+			return allowed;
 		}
 
-		isAllowed = isAllowed(resourceInfo.getResourceClass(), scopeChecker);
+		allowed = isAllowed(resourceInfo.getResourceClass(), scopeChecker);
 
-		if (isAllowed != null) {
-			return isAllowed;
+		if (allowed != null) {
+			return allowed;
 		}
 
 		return false;
-	}
-
-	protected Boolean isAllowed(Method method, ScopeChecker scopeChecker) {
-		RequiresNoScope requiresNoScope = method.getAnnotation(
-			RequiresNoScope.class);
-
-		RequiresScope requiresScope = method.getAnnotation(RequiresScope.class);
-
-		if ((requiresNoScope != null) && (requiresScope != null)) {
-			StringBundler sb = new StringBundler();
-			sb.append("Method ");
-			sb.append(method.getDeclaringClass().getName());
-			sb.append(StringPool.POUND);
-			sb.append(method.getName());
-			sb.append("has both @RequiresNoScope and @RequiresScope ");
-			sb.append("annotations defined.");
-
-			throw new RuntimeException(sb.toString());
-		}
-
-		if (requiresNoScope != null) {
-			return true;
-		}
-
-		if (requiresScope != null) {
-			if (requiresScope.allNeeded()) {
-				return scopeChecker.checkAllScopes(requiresScope.value());
-			}
-			else {
-				return scopeChecker.checkAnyScope(requiresScope.value());
-			}
-		}
-
-		return null;
 	}
 
 	protected Boolean isAllowed(
@@ -101,7 +67,8 @@ public class AnnotationRequestScopeChecker
 			RequiresScope.class);
 
 		if ((requiresNoScope != null) && (requiresScope != null)) {
-			StringBundler sb = new StringBundler();
+			StringBundler sb = new StringBundler(4);
+
 			sb.append("Class ");
 			sb.append(resourceClass.getName());
 			sb.append("has both @RequiresNoScope and @RequiresScope ");
@@ -130,11 +97,48 @@ public class AnnotationRequestScopeChecker
 			resourceClass, RequiresScope.class);
 
 		if ((requiresNoScope != null) && (requiresScope != null)) {
-			StringBundler sb = new StringBundler();
+			StringBundler sb = new StringBundler(3);
+
 			sb.append("Class ");
 			sb.append(resourceClass.getName());
-			sb.append("inherits both @RequiresNoScope and ");
-			sb.append("@RequiresScope.");
+			sb.append("inherits both @RequiresNoScope and @RequiresScope.");
+
+			throw new RuntimeException(sb.toString());
+		}
+
+		if (requiresNoScope != null) {
+			return true;
+		}
+
+		if (requiresScope != null) {
+			if (requiresScope.allNeeded()) {
+				return scopeChecker.checkAllScopes(requiresScope.value());
+			}
+			else {
+				return scopeChecker.checkAnyScope(requiresScope.value());
+			}
+		}
+
+		return null;
+	}
+
+	protected Boolean isAllowed(Method method, ScopeChecker scopeChecker) {
+		RequiresNoScope requiresNoScope = method.getAnnotation(
+			RequiresNoScope.class);
+
+		RequiresScope requiresScope = method.getAnnotation(RequiresScope.class);
+
+		if ((requiresNoScope != null) && (requiresScope != null)) {
+			StringBundler sb = new StringBundler(6);
+
+			Class<?> declaringClass = method.getDeclaringClass();
+
+			sb.append("Method ");
+			sb.append(declaringClass.getName());
+			sb.append(StringPool.POUND);
+			sb.append(method.getName());
+			sb.append("has both @RequiresNoScope and @RequiresScope ");
+			sb.append("annotations defined.");
 
 			throw new RuntimeException(sb.toString());
 		}

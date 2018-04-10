@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.internal.endpoint.token;
+package com.liferay.oauth2.provider.rest.internal.endpoint.access.token;
 
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
@@ -73,7 +73,9 @@ public class LiferayAccessTokenServiceRegistrator {
 		Hashtable<String, Object> endpointProperties = new Hashtable<>();
 
 		endpointProperties.put(
-			OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_RESOURCE, true);
+			OAuth2ProviderRestEndpointConstants.
+				LIFERAY_OAUTH2_ENDPOINT_RESOURCE,
+			true);
 
 		_endpointServiceRegistration = bundleContext.registerService(
 			Object.class, liferayAccessTokenService, endpointProperties);
@@ -107,7 +109,7 @@ public class LiferayAccessTokenServiceRegistrator {
 		new ArrayList<>();
 	private ServiceRegistration<Object> _endpointServiceRegistration;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	@Reference
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
 }

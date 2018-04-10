@@ -18,6 +18,7 @@ import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenPro
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -33,11 +34,12 @@ public class BearerTokenProviderAccessorImpl
 	implements BearerTokenProviderAccessor {
 
 	@Activate
-	public void activate(BundleContext bundleContext){
+	public void activate(BundleContext bundleContext) {
 		_scopedBearerTokenProvider = _scopedServiceTrackerMapFactory.create(
 			bundleContext, BearerTokenProvider.class,
 			"liferay.oauth2.client.id", () -> _defaultBearerTokenProvider);
 	}
+
 	@Override
 	public BearerTokenProvider getBearerTokenProvider(
 		long companyId, String clientId) {
@@ -47,14 +49,14 @@ public class BearerTokenProviderAccessorImpl
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(name=default)"
+		policyOption = ReferencePolicyOption.GREEDY, target = "(name=default)"
 	)
 	private volatile BearerTokenProvider _defaultBearerTokenProvider;
+
+	private ScopedServiceTrackerMap<BearerTokenProvider>
+		_scopedBearerTokenProvider;
 
 	@Reference
 	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 
-	private ScopedServiceTrackerMap<BearerTokenProvider>
-		_scopedBearerTokenProvider;
 }

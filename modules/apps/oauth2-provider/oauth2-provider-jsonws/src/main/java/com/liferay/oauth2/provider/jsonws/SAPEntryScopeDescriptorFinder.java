@@ -23,10 +23,10 @@ import com.liferay.portal.kernel.util.LocalizationUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @author Tomas Polesovsky
@@ -39,20 +39,9 @@ public class SAPEntryScopeDescriptorFinder
 	}
 
 	@Override
-	public Collection<String> findScopes() {
-		Collection<String> scopes = new HashSet<>(_sapEntryScopes.size());
-
-		for (SAPEntryScope sapEntryScope : _sapEntryScopes) {
-			scopes.add(sapEntryScope.getScopeName());
-		}
-
-		return scopes;
-	}
-
-	@Override
 	public String describeScope(String scope, Locale locale) {
 		for (SAPEntryScope sapEntryScope : _sapEntryScopes) {
-			if (sapEntryScope.getScopeName().equals(scope)) {
+			if (Objects.equals(sapEntryScope.getScopeName(), scope)) {
 				String languageId = LocaleUtil.toLanguageId(locale);
 
 				return LocalizationUtil.getLocalization(
@@ -65,6 +54,17 @@ public class SAPEntryScopeDescriptorFinder
 		}
 
 		return scope;
+	}
+
+	@Override
+	public Collection<String> findScopes() {
+		Collection<String> scopes = new HashSet<>(_sapEntryScopes.size());
+
+		for (SAPEntryScope sapEntryScope : _sapEntryScopes) {
+			scopes.add(sapEntryScope.getScopeName());
+		}
+
+		return scopes;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

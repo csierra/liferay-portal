@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.jsonws;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
-import com.liferay.oauth2.provider.exception.NoSuchOAuth2AuthorizationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
@@ -23,7 +22,6 @@ import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenPro
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
-import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
@@ -40,14 +38,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,22 +46,31 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Tomas Polesovsky
  */
 @Component(
 	immediate = true,
-	property = {
-		"auth.verifier.OAuth2JSONWSAuthVerifier.urls.includes=/api/jsonws/*"
-	}
+	property =
+		{"auth.verifier.OAuth2JSONWSAuthVerifier.urls.includes=/api/jsonws/*"}
 )
 public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 	@Activate
-	public void activate(BundleContext bundleContext){
+	public void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
 	}
 
@@ -87,8 +87,8 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		AuthVerifierResult authVerifierResult = new AuthVerifierResult();
 
 		try {
-			BearerTokenProvider.AccessToken accessToken =
-				getAccessToken(accessControlContext);
+			BearerTokenProvider.AccessToken accessToken = getAccessToken(
+				accessControlContext);
 
 			if (accessToken == null) {
 				return authVerifierResult;
@@ -122,12 +122,12 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 					_scopeFinderLocator.getLiferayOAuth2Scopes(
 						companyId, accessTokenScope,
 						auth2PortalJSONWSApplicationName);
-				
+
 				for (LiferayOAuth2Scope liferayOAuth2Scope :
-					liferayOAuth2Scopes) {
+						liferayOAuth2Scopes) {
 
 					scopeNames.add(liferayOAuth2Scope.getScope());
-				}				
+				}
 			}
 
 			List<SAPEntryScope> sapEntryScopes =
@@ -141,7 +141,9 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				}
 			}
 
-			authVerifierResult.getSettings().put(
+			Map<String, Object> settings = authVerifierResult.getSettings();
+
+			settings.put(
 				BearerTokenProvider.AccessToken.class.getName(), accessToken);
 
 			authVerifierResult.setState(AuthVerifierResult.State.SUCCESS);
@@ -159,30 +161,28 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	}
 
 	protected BearerTokenProvider.AccessToken getAccessToken(
-		AccessControlContext accessControlContext)
+			AccessControlContext accessControlContext)
 		throws PortalException {
 
-		HttpServletRequest request = accessControlContext.getRequest();
+		HttpServletRequest httpServletRequest =
+			accessControlContext.getRequest();
 
-		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+		String authorization = httpServletRequest.getHeader(
+			HttpHeaders.AUTHORIZATION);
 
-		if (authorization == null) {
+		if (Validator.isBlank(authorization)) {
 			return null;
 		}
 
-		String[] basicAuthParts = authorization.split(" ");
+		String[] authorizationParts = authorization.split("\\s");
 
-		if (basicAuthParts.length != 2) {
+		String scheme = authorizationParts[0];
+
+		if (!StringUtil.equalsIgnoreCase(scheme, _BEARER)) {
 			return null;
 		}
 
-		String basicAuthPart = basicAuthParts[0];
-
-		if (!_BEARER.equalsIgnoreCase(basicAuthPart)) {
-			return null;
-		}
-
-		String token = basicAuthParts[1];
+		String token = authorizationParts[1];
 
 		if (Validator.isBlank(token)) {
 			return null;
@@ -212,16 +212,19 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 		long expiresIn =
 			(expirationDate.getTime() - createDate.getTime()) / 1000;
+
 		long issuedAt = createDate.getTime() / 1000;
 
 		List<String> scopeAliasesList = Collections.emptyList();
 
-		if (oAuth2Authorization.getOAuth2ApplicationScopeAliasesId() > 0) {
+		long oAuth2ApplicationScopeAliasesId =
+			oAuth2Authorization.getOAuth2ApplicationScopeAliasesId();
+
+		if (oAuth2ApplicationScopeAliasesId > 0) {
 			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
 				_oAuth2ApplicationScopeAliasesLocalService.
 					getOAuth2ApplicationScopeAliases(
-						oAuth2Authorization.
-							getOAuth2ApplicationScopeAliasesId());
+						oAuth2ApplicationScopeAliasesId);
 
 			scopeAliasesList =
 				oAuth2ApplicationScopeAliases.getScopeAliasesList();
@@ -243,25 +246,10 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 	private static final String _OAUTH2 = "OAuth2";
 
-	private static Log _log = LogFactoryUtil.getLog(OAuth2JSONWSAuthVerifier.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		OAuth2JSONWSAuthVerifier.class);
 
 	private BundleContext _bundleContext;
-
-	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(name=default)"
-	)
-	private volatile BearerTokenProvider _defaultBearerTokenProvider;
-
-	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile ScopeLocator _scopeFinderLocator;
-
-	@Reference
-	private OAuth2AuthorizationLocalService _oAuth2AuthorizationLocalService;
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
@@ -271,16 +259,24 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		_oAuth2ApplicationScopeAliasesLocalService;
 
 	@Reference
-	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
+	private OAuth2AuthorizationLocalService _oAuth2AuthorizationLocalService;
 
 	@Reference
 	private OAuth2SAPEntryScopesPublisher _oAuth2SAPEntryScopesPublisher;
 
 	@Reference
-	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
+	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
 
 	@Reference
-	private BearerTokenProviderAccessor
-		_scopedBearerTokenProviderAccessor;
+	private BearerTokenProviderAccessor _scopedBearerTokenProviderAccessor;
+
+	@Reference
+	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
+
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile ScopeLocator _scopeFinderLocator;
 
 }

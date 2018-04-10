@@ -27,6 +27,8 @@ Import-Package:\
 	\
 	*
 
+-dsannotations-options: inherit
+
 -includeresource:\
 	@cxf-rt-rs-extension-providers*.jar,\
 	@cxf-rt-rs-security-jose*.jar,\

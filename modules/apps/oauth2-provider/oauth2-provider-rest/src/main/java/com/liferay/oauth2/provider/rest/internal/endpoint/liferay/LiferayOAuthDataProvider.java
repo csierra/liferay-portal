@@ -75,6 +75,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Carlos Sierra Andrés
@@ -1034,6 +1036,12 @@ public class LiferayOAuthDataProvider
 	private static Log _log = LogFactoryUtil.getLog(
 		LiferayOAuthDataProvider.class);
 
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private BearerTokenProviderAccessor _bearerTokenProviderAccessor;
+
 	private PortalCache<String, ServerAuthorizationCodeGrant>
 		_codeGrantsPortalCache;
 
@@ -1057,9 +1065,6 @@ public class LiferayOAuthDataProvider
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
-
-	@Reference
-	private BearerTokenProviderAccessor _bearerTokenProviderAccessor;
 
 	@Reference
 	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;

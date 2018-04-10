@@ -16,6 +16,8 @@ package com.liferay.oauth2.provider.rest.internal.endpoint.liferay;
 
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.User;
@@ -73,6 +75,8 @@ public class LiferayResourceOwnerLoginHandler
 			}
 		}
 		catch (PortalException pe) {
+			_log.error(pe);
+
 			return null;
 		}
 
@@ -103,21 +107,28 @@ public class LiferayResourceOwnerLoginHandler
 			UserSubject userSubject = new UserSubject(
 				user.getLogin(), Long.toString(user.getUserId()));
 
-			userSubject.getProperties().put(
+			Map<String, String> properties = userSubject.getProperties();
+
+			properties.put(
 				OAuth2ProviderRestEndpointConstants.COMPANY_ID,
 				Long.toString(user.getCompanyId()));
 
 			return userSubject;
 		}
 		catch (PortalException pe) {
+			_log.error(pe);
+
 			return null;
 		}
 	}
 
-	@Reference
-	CompanyLocalService _companyLocalService;
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayResourceOwnerLoginHandler.class);
 
 	@Reference
-	UserLocalService _userLocalService;
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

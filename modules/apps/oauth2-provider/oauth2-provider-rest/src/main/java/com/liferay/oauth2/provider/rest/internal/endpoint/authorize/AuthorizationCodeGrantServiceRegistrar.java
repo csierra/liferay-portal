@@ -31,7 +31,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Tomas Polesovsky
@@ -40,7 +39,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true
 )
-public class AuthorizationCodeGrantServiceRegistrator {
+public class AuthorizationCodeGrantServiceRegistrar {
 
 	@Activate
 	public void activate(
@@ -70,7 +69,9 @@ public class AuthorizationCodeGrantServiceRegistrator {
 		Hashtable<String, Object> endpointProperties = new Hashtable<>();
 
 		endpointProperties.put(
-			OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_RESOURCE, true);
+			OAuth2ProviderRestEndpointConstants.
+				LIFERAY_OAUTH2_ENDPOINT_RESOURCE,
+			true);
 
 		_endpointServiceRegistration = bundleContext.registerService(
 			Object.class, authorizationCodeGrantService, endpointProperties);
@@ -85,10 +86,10 @@ public class AuthorizationCodeGrantServiceRegistrator {
 
 	private ServiceRegistration<Object> _endpointServiceRegistration;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	@Reference
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	@Reference
 	private SubjectCreator _subjectCreator;
 
 }

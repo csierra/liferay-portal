@@ -14,17 +14,21 @@
 
 package com.liferay.oauth2.provider.rest.internal.endpoint.authorize;
 
+import com.liferay.oauth2.provider.rest.internal.endpoint.authorize.configuration.AuthorizeScreenConfiguration;
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import java.lang.annotation.Annotation;
@@ -32,7 +36,7 @@ import java.lang.reflect.Type;
 
 import java.net.URI;
 
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -61,7 +65,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 @Produces("text/html")
 @Provider
-public class RedirectToAuthorizeMessageBodyWriter
+public class AuthorizeScreenRedirectMessageBodyWriter
 	implements MessageBodyWriter<OAuthAuthorizationData> {
 
 	@Override
@@ -78,8 +82,8 @@ public class RedirectToAuthorizeMessageBodyWriter
 		MediaType mediaType) {
 
 		if (aClass.isAssignableFrom(OAuthAuthorizationData.class) &&
-			"text".equalsIgnoreCase(mediaType.getType()) &&
-			"html".equalsIgnoreCase(mediaType.getSubtype())) {
+			StringUtil.equalsIgnoreCase(mediaType.getType(), "text") &&
+			StringUtil.equalsIgnoreCase(mediaType.getSubtype(), "html")) {
 
 			return true;
 		}
@@ -93,74 +97,101 @@ public class RedirectToAuthorizeMessageBodyWriter
 			Type type, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, Object> httpHeaders,
 			OutputStream outputStream)
-		throws IOException, WebApplicationException {
+		throws WebApplicationException {
 
-		String redirect = _oAuth2AuthorizePortalScreenURL;
+		HttpServletRequest httpServletRequest =
+			_messageContext.getHttpServletRequest();
 
-		if (!_http.hasDomain(redirect)) {
-			String portalURL = _portal.getPortalURL(
-				_messageContext.getHttpServletRequest());
+		long companyId = _portal.getCompanyId(httpServletRequest);
 
-			redirect = portalURL + redirect;
+		String authorizeScreenURL = null;
+
+		try {
+			authorizeScreenURL = getAuthorizeScreenURL(companyId);
+		}
+		catch (ConfigurationException ce) {
+			_log.error("Unable to locate configuration", ce);
+
+			throw new WebApplicationException(
+				Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
 		}
 
-		redirect = setParameter(
-			redirect, OAuthConstants.CLIENT_ID,
+		if (!_http.hasDomain(authorizeScreenURL)) {
+			String portalURL = _portal.getPortalURL(httpServletRequest);
+
+			authorizeScreenURL = portalURL + authorizeScreenURL;
+		}
+
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.CLIENT_ID,
 			oAuthAuthorizationData.getClientId());
 
-		redirect = setParameter(
-			redirect, OAuthConstants.REDIRECT_URI,
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.REDIRECT_URI,
 			oAuthAuthorizationData.getRedirectUri());
 
-		redirect = setParameter(
-			redirect, OAuthConstants.STATE, oAuthAuthorizationData.getState());
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.STATE,
+			oAuthAuthorizationData.getState());
 
-		redirect = setParameter(
-			redirect, OAuthConstants.SCOPE,
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.SCOPE,
 			oAuthAuthorizationData.getProposedScope());
 
-		redirect = setParameter(
-			redirect, OAuthConstants.CLIENT_AUDIENCE,
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.CLIENT_AUDIENCE,
 			oAuthAuthorizationData.getAudience());
 
-		redirect = setParameter(
-			redirect, OAuthConstants.NONCE, oAuthAuthorizationData.getNonce());
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.NONCE,
+			oAuthAuthorizationData.getNonce());
 
-		redirect = setParameter(
-			redirect, OAuthConstants.AUTHORIZATION_CODE_CHALLENGE,
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.AUTHORIZATION_CODE_CHALLENGE,
 			oAuthAuthorizationData.getClientCodeChallenge());
 
-		redirect = setParameter(
-			redirect, OAuthConstants.RESPONSE_TYPE,
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.RESPONSE_TYPE,
 			oAuthAuthorizationData.getResponseType());
 
-		redirect = setParameter(
-			redirect, OAuthConstants.SESSION_AUTHENTICITY_TOKEN,
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.SESSION_AUTHENTICITY_TOKEN,
 			oAuthAuthorizationData.getAuthenticityToken());
 
-		redirect = setParameter(
-			redirect, "reply_to", oAuthAuthorizationData.getReplyTo());
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, "reply_to",
+			oAuthAuthorizationData.getReplyTo());
 
-		if (redirect.length() > _invokerFilterUriMaxLength) {
-			redirect = removeParameter(redirect, OAuthConstants.SCOPE);
+		if (authorizeScreenURL.length() > _invokerFilterUriMaxLength) {
+			authorizeScreenURL = removeParameter(
+				authorizeScreenURL, OAuthConstants.SCOPE);
 		}
 
 		throw new WebApplicationException(
-			Response
-				.status(Response.Status.FOUND)
-				.location(URI.create(redirect))
-				.build());
+			Response.status(
+				Response.Status.FOUND
+			).location(
+				URI.create(authorizeScreenURL)
+			).build());
 	}
 
 	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_oAuth2AuthorizePortalScreenURL = MapUtil.getString(
-			properties, "oauth2.authorize.portal.screen.url",
-			_oAuth2AuthorizePortalScreenURL);
-
+	protected void activate() {
 		_invokerFilterUriMaxLength = GetterUtil.getInteger(
-			PropsUtil.get(PropsKeys.INVOKER_FILTER_URI_MAX_LENGTH),
+			_props.get(PropsKeys.INVOKER_FILTER_URI_MAX_LENGTH),
 			_invokerFilterUriMaxLength);
+	}
+
+	protected String getAuthorizeScreenURL(long companyId)
+		throws ConfigurationException {
+
+		AuthorizeScreenConfiguration authorizeScreenRedirectConfiguration =
+			_configurationProvider.getConfiguration(
+				AuthorizeScreenConfiguration.class,
+				new CompanyServiceSettingsLocator(
+					companyId, AuthorizeScreenConfiguration.class.getName()));
+
+		return authorizeScreenRedirectConfiguration.authorizeScreenURL();
 	}
 
 	protected String removeParameter(String url, String name) {
@@ -175,6 +206,12 @@ public class RedirectToAuthorizeMessageBodyWriter
 		return _http.addParameter(url, "oauth2_" + name, value);
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		AuthorizeScreenRedirectMessageBodyWriter.class);
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+
 	@Reference
 	private Http _http;
 
@@ -182,9 +219,6 @@ public class RedirectToAuthorizeMessageBodyWriter
 
 	@Context
 	private MessageContext _messageContext;
-
-	private String _oAuth2AuthorizePortalScreenURL =
-		"/group/guest/authorize-oauth2-application";
 
 	@Reference
 	private Portal _portal;

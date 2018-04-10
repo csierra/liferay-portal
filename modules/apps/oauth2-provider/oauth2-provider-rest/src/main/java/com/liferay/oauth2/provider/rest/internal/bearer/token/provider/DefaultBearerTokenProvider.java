@@ -82,21 +82,21 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 				"Token key size must be positive number!");
 		}
 
-		int nextLongCount = (int)Math.ceil((double)size / 8);
+		int count = (int)Math.ceil((double)size / 8);
 
-		byte[] buffer = new byte[nextLongCount * 8];
+		byte[] buffer = new byte[count * 8];
 
-		for (int i = 0; i < nextLongCount; i++) {
+		for (int i = 0; i < count; i++) {
 			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
 		}
 
-		StringBundler tokenSB = new StringBundler(size);
+		StringBundler sb = new StringBundler(size);
 
 		for (int i = 0; i < size; i++) {
-			tokenSB.append(Integer.toHexString(0xFF & buffer[i]));
+			sb.append(Integer.toHexString(0xFF & buffer[i]));
 		}
 
-		return tokenSB.toString();
+		return sb.toString();
 	}
 
 	protected boolean isValid(long expiresIn, long issuedAt) {

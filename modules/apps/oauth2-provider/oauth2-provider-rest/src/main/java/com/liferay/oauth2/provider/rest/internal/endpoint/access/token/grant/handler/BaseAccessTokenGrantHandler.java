@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.internal.endpoint.liferay;
+package com.liferay.oauth2.provider.rest.internal.endpoint.access.token.grant.handler;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -25,22 +25,26 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.StringBundler;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.cxf.rs.security.oauth2.common.Client;
+import javax.ws.rs.core.MultivaluedMap;
 
-import org.osgi.service.component.annotations.Component;
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tomas Polesovsky
  */
-@Component (
-	immediate = true, service = LiferayAccessTokenGrantHandlerHelper.class
-)
-public class LiferayAccessTokenGrantHandlerHelper {
+public abstract class BaseAccessTokenGrantHandler
+	implements AccessTokenGrantHandler {
 
 	public boolean clientsMatch(Client client1, Client client2) {
 		String client1Id = client1.getClientId();
@@ -65,6 +69,29 @@ public class LiferayAccessTokenGrantHandlerHelper {
 		}
 
 		return true;
+	}
+
+	@Override
+	public ServerAccessToken createAccessToken(
+			Client client, MultivaluedMap<String, String> multivaluedMap)
+		throws OAuthServiceException {
+
+		if (!isGrantHandlerEnabled()) {
+			throw new OAuthServiceException("Grant handler is not enabled");
+		}
+
+		if (!hasPermission(client, multivaluedMap)) {
+			throw new OAuthServiceException(
+				"User doesn't have permission to create token");
+		}
+
+		return getAccessTokenGrantHandler().createAccessToken(
+			client, multivaluedMap);
+	}
+
+	@Override
+	public List<String> getSupportedGrantTypes() {
+		return getAccessTokenGrantHandler().getSupportedGrantTypes();
 	}
 
 	public boolean hasCreateTokenPermission(
@@ -104,19 +131,33 @@ public class LiferayAccessTokenGrantHandlerHelper {
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"User " + userId +
-					" doesn't have permission to create access token for " +
-						"client " + oAuth2Application.getClientId());
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("User ");
+			sb.append(userId);
+			sb.append(" doesn't have permission to create access token for ");
+			sb.append("client ");
+			sb.append(oAuth2Application.getClientId());
+
+			_log.debug(sb.toString());
 		}
 
 		return false;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		LiferayAccessTokenGrantHandlerHelper.class);
+	protected abstract AccessTokenGrantHandler getAccessTokenGrantHandler();
 
-	@Reference(target = "(model.class.name=com.liferay.oauth2.provider.model.OAuth2Application)")
+	protected abstract boolean hasPermission(
+		Client client, MultivaluedMap<String, String> multivaluedMap);
+
+	protected abstract boolean isGrantHandlerEnabled();
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseAccessTokenGrantHandler.class);
+
+	@Reference(
+		target = "(model.class.name=com.liferay.oauth2.provider.model.OAuth2Application)"
+	)
 	private ModelResourcePermission<OAuth2Application> _modelResourcePermission;
 
 	@Reference

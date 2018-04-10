@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -46,8 +47,9 @@ public class SAPEntryModelListener extends BaseModelListener<SAPEntry> {
 	}
 
 	@Reference
-	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
+	private OAuth2SAPEntryScopesPublisher _oAuth2SAPEntryScopesPublisher;
 
 	@Reference
-	private OAuth2SAPEntryScopesPublisher _oAuth2SAPEntryScopesPublisher;
+	private SAPEntryScopeRegistry _sapEntryScopeRegistry;
+
 }

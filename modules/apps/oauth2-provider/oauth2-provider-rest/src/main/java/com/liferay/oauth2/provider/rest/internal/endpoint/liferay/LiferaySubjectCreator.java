@@ -21,6 +21,8 @@ import com.liferay.portal.kernel.service.UserLocalService;
 
 import java.security.Principal;
 
+import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 
@@ -31,7 +33,6 @@ import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Carlos Sierra Andrés
@@ -55,7 +56,9 @@ public class LiferaySubjectCreator implements SubjectCreator {
 			UserSubject userSubject = new UserSubject(
 				user.getLogin(), Long.toString(user.getUserId()));
 
-			userSubject.getProperties().put(
+			Map<String, String> properties = userSubject.getProperties();
+
+			properties.put(
 				OAuth2ProviderRestEndpointConstants.COMPANY_ID,
 				Long.toString(user.getCompanyId()));
 
@@ -66,7 +69,7 @@ public class LiferaySubjectCreator implements SubjectCreator {
 		}
 	}
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	@Reference
 	private UserLocalService _userLocalService;
 
 }

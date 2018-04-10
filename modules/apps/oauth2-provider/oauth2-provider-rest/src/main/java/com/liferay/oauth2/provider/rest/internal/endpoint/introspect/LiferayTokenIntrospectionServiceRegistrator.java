@@ -27,7 +27,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Tomas Polesovsky
@@ -61,13 +60,13 @@ public class LiferayTokenIntrospectionServiceRegistrator {
 			Hashtable<String, Object> endpointProperties = new Hashtable<>();
 
 			endpointProperties.put(
-				OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_RESOURCE,
+				OAuth2ProviderRestEndpointConstants.
+					LIFERAY_OAUTH2_ENDPOINT_RESOURCE,
 				true);
 
 			_endpointServiceRegistration = bundleContext.registerService(
 				Object.class, liferayTokenIntrospectionService,
 				endpointProperties);
-
 		}
 	}
 
@@ -80,7 +79,7 @@ public class LiferayTokenIntrospectionServiceRegistrator {
 
 	private ServiceRegistration<Object> _endpointServiceRegistration;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
+	@Reference
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
 }
