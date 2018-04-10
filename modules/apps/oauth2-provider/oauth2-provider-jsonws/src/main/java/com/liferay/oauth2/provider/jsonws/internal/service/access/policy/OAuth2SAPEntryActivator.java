@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.jsonws;
+package com.liferay.oauth2.provider.jsonws.internal.service.access.policy;
 
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
@@ -41,19 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tomas Polesovsky
  */
 @Component(immediate = true)
-public class OAuth2SAPEntryPublisher {
-
-	public static final String[][] SAP_ENTRY_OBJECT_ARRAYS = {
-		{
-			"OAUTH2_everything.readonly",
-			"#fetch*\n#get*\n#has*\n#is*\n#search*"
-		},
-		{"OAUTH2_everything", "*"},
-		{
-			"OAUTH2_userprofile",
-			"com.liferay.portal.kernel.service.UserService#getCurrentUser"
-		}
-	};
+public class OAuth2SAPEntryActivator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
@@ -63,7 +51,7 @@ public class OAuth2SAPEntryPublisher {
 	}
 
 	protected void addSAPEntry(long companyId) throws PortalException {
-		for (String[] sapEntryObjectArray : SAP_ENTRY_OBJECT_ARRAYS) {
+		for (String[] sapEntryObjectArray : _SAP_ENTRY_OBJECT_ARRAYS) {
 			String name = sapEntryObjectArray[0];
 			String allowedServiceSignatures = sapEntryObjectArray[1];
 
@@ -91,8 +79,20 @@ public class OAuth2SAPEntryPublisher {
 		}
 	}
 
+	private static final String[][] _SAP_ENTRY_OBJECT_ARRAYS = {
+		{
+			"OAUTH2_everything.readonly",
+			"#fetch*\n#get*\n#has*\n#is*\n#search*"
+		},
+		{"OAUTH2_everything", "*"},
+		{
+			"OAUTH2_userprofile",
+			"com.liferay.portal.kernel.service.UserService#getCurrentUser"
+		}
+	};
+
 	private static final Log _log = LogFactoryUtil.getLog(
-		OAuth2SAPEntryPublisher.class);
+		OAuth2SAPEntryActivator.class);
 
 	@Reference(
 		target = "(bundle.symbolic.name=com.liferay.oauth2.provider.jsonws)"

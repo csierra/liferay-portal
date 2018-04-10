@@ -100,7 +100,7 @@ public abstract class BaseAccessTokenGrantHandler
 		PermissionChecker permissionChecker = null;
 
 		try {
-			User user = _userLocalService.getUserById(userId);
+			User user = userLocalService.getUserById(userId);
 
 			permissionChecker = PermissionCheckerFactoryUtil.create(user);
 		}
@@ -114,7 +114,7 @@ public abstract class BaseAccessTokenGrantHandler
 		}
 
 		try {
-			if (_modelResourcePermission.contains(
+			if (modelResourcePermission.contains(
 					permissionChecker, oAuth2Application,
 					OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN)) {
 
@@ -158,9 +158,10 @@ public abstract class BaseAccessTokenGrantHandler
 	@Reference(
 		target = "(model.class.name=com.liferay.oauth2.provider.model.OAuth2Application)"
 	)
-	private ModelResourcePermission<OAuth2Application> _modelResourcePermission;
+	protected ModelResourcePermission<OAuth2Application>
+		modelResourcePermission;
 
 	@Reference
-	private UserLocalService _userLocalService;
+	protected UserLocalService userLocalService;
 
 }

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.jsonws;
+package com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope;
 
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +34,7 @@ public class SAPEntryScopeDescriptorFinder
 	implements ScopeDescriptor, ScopeFinder {
 
 	public SAPEntryScopeDescriptorFinder(List<SAPEntryScope> sapEntryScopes) {
-		_sapEntryScopes = new ArrayList(sapEntryScopes);
+		_sapEntryScopes = sapEntryScopes;
 	}
 
 	@Override

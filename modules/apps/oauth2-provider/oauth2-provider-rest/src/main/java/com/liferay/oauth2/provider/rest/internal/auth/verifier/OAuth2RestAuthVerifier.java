@@ -210,7 +210,7 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private BearerTokenProviderAccessor _bearerTokenProviderAccessor;
+	private volatile BearerTokenProviderAccessor _bearerTokenProviderAccessor;
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
