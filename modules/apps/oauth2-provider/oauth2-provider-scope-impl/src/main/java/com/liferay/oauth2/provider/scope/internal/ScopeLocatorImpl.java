@@ -230,7 +230,7 @@ public class ScopeLocatorImpl implements ScopeLocator {
 
 	@SuppressWarnings("unchecked")
 	private <T> T _getFromCacheOr(String key, Supplier<T> supplier) {
-		T value = (T)_invocationResultCache.get(key);
+		Object value = _invocationResultCache.get(key);
 
 		if (value == null) {
 			value = supplier.get();
@@ -238,7 +238,7 @@ public class ScopeLocatorImpl implements ScopeLocator {
 			_invocationResultCache.put(key, value);
 		}
 
-		return value;
+		return (T)value;
 	}
 
 	private Collection<LiferayOAuth2Scope> _getLiferayOAuth2Scopes(
