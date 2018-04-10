@@ -152,9 +152,6 @@ public abstract class BaseAccessTokenGrantHandler
 
 	protected abstract boolean isGrantHandlerEnabled();
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseAccessTokenGrantHandler.class);
-
 	@Reference(
 		target = "(model.class.name=com.liferay.oauth2.provider.model.OAuth2Application)"
 	)
@@ -163,5 +160,8 @@ public abstract class BaseAccessTokenGrantHandler
 
 	@Reference
 	protected UserLocalService userLocalService;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseAccessTokenGrantHandler.class);
 
 }
