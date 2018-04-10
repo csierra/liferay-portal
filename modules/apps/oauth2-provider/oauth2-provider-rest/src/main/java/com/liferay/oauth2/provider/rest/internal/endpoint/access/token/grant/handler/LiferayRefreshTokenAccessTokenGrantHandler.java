@@ -124,7 +124,7 @@ public class LiferayRefreshTokenAccessTokenGrantHandler
 
 	@Override
 	protected boolean isGrantHandlerEnabled() {
-		return !_oAuth2ProviderConfiguration.allowRefreshTokenGrant();
+		return _oAuth2ProviderConfiguration.allowRefreshTokenGrant();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
