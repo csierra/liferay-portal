@@ -17,18 +17,17 @@ package com.liferay.oauth2.provider.test.internal.activator.configuration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
-import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -53,27 +52,109 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * @author Carlos Sierra Andrés
  */
-public class Oauth2ConfigurationAdminBundleActivator
-	implements BundleActivator {
+public abstract class BaseTestActivator implements BundleActivator {
 
-	private OAuth2Application _oAuth2ApplicationBefore;
+	public Oauth2Runnable createOauth2Application(
+		final long companyId, User user, String clientId) {
+
+		return createOauth2Application(
+			companyId, user, clientId,
+			Arrays.asList("everything", "everything.readonly"));
+	}
+
+	public Oauth2Runnable createOauth2Application(
+		final long companyId, User user, String clientId,
+		List<String> availableScopes) {
+
+		return bundleContext -> {
+			ServiceReference<OAuth2ApplicationLocalService> serviceReference =
+				bundleContext.getServiceReference(
+					OAuth2ApplicationLocalService.class);
+
+			_oAuth2ApplicationLocalService = bundleContext.getService(
+				serviceReference);
+
+			final OAuth2Application oAuth2Application =
+				_oAuth2ApplicationLocalService.addOAuth2Application(
+					companyId, user.getUserId(), user.getLogin(),
+					Collections.singletonList(GrantType.CLIENT_CREDENTIALS),
+					clientId, 0, "oauthTestApplicationSecret",
+					"test oauth application",
+					Collections.singletonList("token-introspection"),
+					"http://localhost:8080", 0, "test application",
+					"http://localhost:8080",
+					Collections.singletonList("http://localhost:8080"),
+					availableScopes, new ServiceContext());
+
+			return () -> {
+				_oAuth2ApplicationLocalService.deleteOAuth2Application(
+					oAuth2Application.getOAuth2ApplicationId());
+
+				bundleContext.ungetService(serviceReference);
+			};
+		};
+	}
+
+	public Oauth2Runnable registerJaxRsApplication(
+		Application application, Dictionary<String, Object> properties) {
+
+		return bundleContext -> {
+			ServiceRegistration<Application> serviceRegistration =
+				bundleContext.registerService(
+					Application.class, application, properties);
+
+			ServiceTracker<Bus, Bus> serviceTracker =
+				ServiceTrackerFactory.open(
+					bundleContext,
+					"(&(objectClass=" + Bus.class.getName() + ")(" +
+					HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH +
+					"=/oauth2-test))");
+
+			Bus bus = serviceTracker.waitForService(10000L);
+
+			if (bus == null) {
+				throw new IllegalStateException(
+					"Bus was not registered within 10 seconds");
+			}
+
+			ServerRegistry serverRegistry = bus.getExtension(
+				ServerRegistry.class);
+
+			List<Server> servers = null;
+
+			for (int i = 0; i <= 100; i++) {
+				servers = serverRegistry.getServers();
+
+				if (!servers.isEmpty()) {
+					break;
+				}
+
+				Thread.sleep(100);
+			}
+
+			if (servers.isEmpty()) {
+				_cleanUp(bundleContext);
+
+				throw new IllegalStateException(
+					"Endpoint was not registered within 10 seconds");
+			}
+
+			return () -> {
+				serviceRegistration.unregister();
+
+				serviceTracker.close();
+			};
+		};
+	}
 
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
 		ServiceReference<ConfigurationAdmin> serviceReference =
 			bundleContext.getServiceReference(ConfigurationAdmin.class);
 
-		ServiceReference<OAuth2ApplicationLocalService>
-			auth2ApplicationLocalServiceReference =
-				bundleContext.getServiceReference(
-					OAuth2ApplicationLocalService.class);
-
 		try {
 			ConfigurationAdmin configurationAdmin = bundleContext.getService(
 				serviceReference);
-
-			_oAuth2ApplicationLocalService = bundleContext.getService(
-				auth2ApplicationLocalServiceReference);
 
 			_cxfConfiguration = configurationAdmin.createFactoryConfiguration(
 				"com.liferay.portal.remote.cxf.common.configuration." +
@@ -106,86 +187,18 @@ public class Oauth2ConfigurationAdminBundleActivator
 
 			_restConfiguration.update(properties);
 
-			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
+			List<Oauth2Runnable> testRunnables = getTestRunnables();
 
-			User user = UserTestUtil.getAdminUser(defaultCompanyId);
+			_autoCloseables = new ArrayList<>();
 
-			_oAuth2ApplicationBefore =
-				_oAuth2ApplicationLocalService.addOAuth2Application(
-					defaultCompanyId, user.getUserId(), user.getLogin(),
-					Collections.singletonList(GrantType.CLIENT_CREDENTIALS),
-					"oauthTestApplicationBefore", 0,
-					"oauthTestApplicationSecret", "test oauth application",
-					Collections.singletonList("token-introspection"),
-					"http://localhost:8080", 0, "test application",
-					"http://localhost:8080",
-					Collections.singletonList("http://localhost:8080"),
-					Arrays.asList("everything", "everything.readonly"),
-					new ServiceContext());
-
-			properties = new Hashtable<>();
-
-			properties.put("oauth2.test.application", true);
-			properties.put("oauth2.scopechecker.type", "annotations");
-
-			_serviceRegistration = bundleContext.registerService(
-				Application.class, new TestAnnotatedApplication(), properties);
-
-			ServiceTracker<Bus, Bus> serviceTracker =
-				ServiceTrackerFactory.open(
-					bundleContext,
-					"(&(objectClass=" + Bus.class.getName() + ")(" +
-						HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH +
-							"=/oauth2-test))");
-
-			Bus bus = serviceTracker.waitForService(10000L);
-
-			if (bus == null) {
-				throw new IllegalStateException(
-					"Bus was not registered within 10 seconds");
+			for (Oauth2Runnable testRunnable : testRunnables) {
+				_autoCloseables.add(testRunnable.run(bundleContext));
 			}
-
-			ServerRegistry serverRegistry = bus.getExtension(
-				ServerRegistry.class);
-
-			List<Server> servers = null;
-
-			for (int i = 0; i <= 100; i++) {
-				servers = serverRegistry.getServers();
-
-				if (!servers.isEmpty()) {
-					break;
-				}
-
-				Thread.sleep(100);
-			}
-
-			if (servers.isEmpty()) {
-				_cleanUp(bundleContext);
-
-				throw new IllegalStateException(
-					"Endpoint was not registered within 10 seconds");
-			}
-
-			_oAuth2ApplicationAfter =
-				_oAuth2ApplicationLocalService.addOAuth2Application(
-					defaultCompanyId, user.getUserId(), user.getLogin(),
-					Collections.singletonList(GrantType.CLIENT_CREDENTIALS),
-					"oauthTestApplicationAfter", 0,
-					"oauthTestApplicationSecret", "test oauth application",
-					Collections.singletonList("token-introspection"),
-					"http://localhost:8080", 0, "test application",
-					"http://localhost:8080",
-					Collections.singletonList("http://localhost:8080"),
-					Arrays.asList("everything", "everything.readonly"),
-					new ServiceContext());
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 
 			bundleContext.ungetService(serviceReference);
-
-			bundleContext.ungetService(auth2ApplicationLocalServiceReference);
 		}
 	}
 
@@ -194,8 +207,29 @@ public class Oauth2ConfigurationAdminBundleActivator
 		_cleanUp(bundleContext);
 	}
 
+	public interface Oauth2Runnable {
+
+		public AutoCloseable run(BundleContext bundleContext) throws Exception;
+
+	}
+
+	protected abstract List<Oauth2Runnable> getTestRunnables() throws Exception;
+
 	private void _cleanUp(BundleContext bundleContext) throws Exception {
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
+		ListIterator<AutoCloseable> listIterator = _autoCloseables.listIterator(
+			_autoCloseables.size());
+
+		while (listIterator.hasPrevious()) {
+			AutoCloseable previous = listIterator.previous();
+
+			try {
+				previous.close();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 		ServiceTracker<ServletContextHelper, ServletContextHelper>
 			serviceTracker =
@@ -223,12 +257,6 @@ public class Oauth2ConfigurationAdminBundleActivator
 		serviceTracker.open();
 
 		try {
-			_serviceRegistration.unregister();
-		}
-		catch (Exception e) {
-		}
-
-		try {
 			_restConfiguration.delete();
 		}
 		catch (Exception e) {
@@ -240,28 +268,14 @@ public class Oauth2ConfigurationAdminBundleActivator
 		catch (Exception e) {
 		}
 
-		try {
-			_oAuth2ApplicationLocalService.deleteOAuth2Application(
-				_oAuth2ApplicationBefore.getOAuth2ApplicationId());
-		}
-		catch (Exception e) {
-		}
-		try {
-			_oAuth2ApplicationLocalService.deleteOAuth2Application(
-				_oAuth2ApplicationAfter.getOAuth2ApplicationId());
-		}
-		catch (Exception e) {
-		}
-
 		if (!countDownLatch.await(10, TimeUnit.SECONDS)) {
 			throw new TimeoutException("Service unregister waiting timeout");
 		}
 	}
 
+	private ArrayList<AutoCloseable> _autoCloseables;
 	private Configuration _cxfConfiguration;
-	private OAuth2Application _oAuth2ApplicationAfter;
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 	private Configuration _restConfiguration;
-	private ServiceRegistration<Application> _serviceRegistration;
 
 }
