@@ -252,9 +252,9 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 				if (Validator.isNull(osgiJaxrsName)) {
 					osgiJaxrsName = clazz.getName();
-
-					serviceProperties.put("osgi.jaxrs.name", osgiJaxrsName);
 				}
+
+				serviceProperties.put("osgi.jaxrs.name", osgiJaxrsName);
 
 				if (oauth2ScopeCheckerType.equals("request.operation")) {
 					processRequestOperation(
@@ -349,7 +349,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		}
 
 		protected void registerDescriptors(
-			Endpoint endpoint, Bundle bundle, String applicationClassName) {
+			Endpoint endpoint, Bundle bundle, String osgiJaxrsName) {
 
 			String bundleSymbolicName = bundle.getSymbolicName();
 
@@ -367,7 +367,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 			Hashtable<String, Object> properties = new Hashtable<>();
 
-			properties.put("osgi.jaxrs.name", applicationClassName);
+			properties.put("osgi.jaxrs.name", osgiJaxrsName);
 
 			ServiceRegistration<?> serviceRegistration =
 				_bundleContext.registerService(
@@ -376,7 +376,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 						ApplicationDescriptor.class.getName()
 					},
 					new ApplicationDescriptorsImpl(
-						serviceTracker, applicationClassName),
+						serviceTracker, osgiJaxrsName),
 					properties);
 
 			endpoint.addCleanupHook(
@@ -392,10 +392,10 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 			public ApplicationDescriptorsImpl(
 				ServiceTracker<?, ResourceBundleLoader> serviceTracker,
-				String applicationClassName) {
+				String osgiJaxrsName) {
 
 				_serviceTracker = serviceTracker;
-				_applicationClassName = applicationClassName;
+				_osgiJaxrsName = osgiJaxrsName;
 			}
 
 			@Override
@@ -407,8 +407,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 					resourceBundleLoader.loadResourceBundle(
 						LocaleUtil.toLanguageId(locale)),
 					StringBundler.concat(
-						"oauth2.application.description.",
-						_applicationClassName));
+						"oauth2.application.description.", _osgiJaxrsName));
 			}
 
 			@Override
@@ -433,7 +432,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				return ResourceBundleUtil.getString(resourceBundle, key);
 			}
 
-			private final String _applicationClassName;
+			private final String _osgiJaxrsName;
 			private final ServiceTracker<?, ResourceBundleLoader>
 				_serviceTracker;
 
