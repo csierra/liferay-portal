@@ -23,6 +23,9 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.IOException;
 
+import java.util.Collection;
+import java.util.stream.Stream;
+
 import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -31,6 +34,12 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Carlos Sierra Andrés
@@ -55,9 +64,37 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 
 			Class<? extends Application> clazz = _application.getClass();
 
+			Bundle bundle = FrameworkUtil.getBundle(clazz);
+
+			if (bundle == null) {
+				return;
+			}
+
+			String osgiJaxrsName;
+
+			BundleContext bundleContext = bundle.getBundleContext();
+
+			Collection<ServiceReference<Application>> serviceReferences =
+				bundleContext.getServiceReferences(
+					Application.class,
+					"(component.name=" + clazz.getName() + ")");
+
+			Stream<ServiceReference<Application>> serviceReferencesStream =
+				serviceReferences.stream();
+
+			osgiJaxrsName = (String)serviceReferencesStream.map(
+				serviceReference ->
+					serviceReference.getProperty("osgi.jaxrs.name")
+			).filter(
+				obj -> obj != null
+			).findFirst(
+			).orElse(
+				clazz.getName()
+			);
+
 			RequestScopeCheckerFilter requestScopeChecker =
 				_scopedServiceTrackerMap.getService(
-					company.getCompanyId(), clazz.getName());
+					company.getCompanyId(), osgiJaxrsName);
 
 			if (!requestScopeChecker.isAllowed(
 					_scopeChecker, requestContext.getRequest(),
@@ -66,12 +103,12 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 				requestContext.abortWith(Response.status(403).build());
 			}
 		}
-		catch (PortalException pe) {
+		catch (InvalidSyntaxException | PortalException e) {
 			requestContext.abortWith(
 				Response.status(
 					500
 				).entity(
-					pe.getMessage()
+					e.getMessage()
 				).build());
 		}
 	}
