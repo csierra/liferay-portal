@@ -18,13 +18,19 @@ import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 
 import java.io.IOException;
 
+import java.util.Collection;
+import java.util.stream.Stream;
+
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Carlos Sierra Andrés
@@ -50,8 +56,34 @@ public class ScopeContextPopulatorContainerRequestFilter
 			return;
 		}
 
+		try {
+			BundleContext bundleContext = bundle.getBundleContext();
+
+			Collection<ServiceReference<Application>> serviceReferences =
+				bundleContext.getServiceReferences(
+					Application.class,
+					"(component.name=" + clazz.getName() + ")");
+
+			Stream<ServiceReference<Application>> serviceReferencesStream =
+				serviceReferences.stream();
+
+			String osgiJaxrsName = (String)serviceReferencesStream.map(
+				serviceReference ->
+					serviceReference.getProperty("osgi.jaxrs.name")
+			).filter(
+				obj -> obj != null
+			).findFirst(
+			).orElse(
+				clazz.getName()
+			);
+
+			_scopeContext.setApplicationName(osgiJaxrsName);
+		}
+		catch (InvalidSyntaxException ise) {
+			throw new IOException(ise);
+		}
+
 		_scopeContext.setBundle(bundle);
-		_scopeContext.setApplicationName(clazz.getName());
 	}
 
 	@Context
