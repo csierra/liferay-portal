@@ -24,10 +24,12 @@ import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.ListIterator;
@@ -260,7 +262,8 @@ public abstract class BaseTestActivator implements BundleActivator {
 
 			ServiceRegistration<ManagedServiceFactory> serviceRegistration =
 				bundleContext.registerService(
-					ManagedServiceFactory.class, new ManagedServiceFactory() {
+					ManagedServiceFactory.class,
+					new ManagedServiceFactory() {
 						@Override
 						public String getName() {
 							return
@@ -274,7 +277,7 @@ public abstract class BaseTestActivator implements BundleActivator {
 								Dictionary<String, ?> incomingProperties)
 							throws ConfigurationException {
 
-							if (properties.equals(incomingProperties)) {
+							if (isIncluded(properties, incomingProperties)) {
 								countDownLatch.countDown();
 							}
 						}
@@ -297,6 +300,8 @@ public abstract class BaseTestActivator implements BundleActivator {
 
 			factoryConfiguration.update(properties);
 
+			countDownLatch.await(10, TimeUnit.SECONDS);
+
 			return () -> {
 				factoryConfiguration.delete();
 
@@ -305,6 +310,40 @@ public abstract class BaseTestActivator implements BundleActivator {
 				serviceRegistration.unregister();
 			};
 		};
+	}
+
+	private boolean isIncluded(
+		Dictionary<String, ?> properties,
+		Dictionary<String, ?> other) {
+
+		if (properties.size() > other.size()) {
+			return false;
+		}
+
+		Enumeration<String> keys = properties.keys();
+
+		while (keys.hasMoreElements()) {
+			String key = keys.nextElement();
+
+			Object value = properties.get(key);
+
+			Object otherValue = other.get(key);
+
+			if (otherValue == null) {
+				return false;
+			}
+
+			if (value.getClass().isArray()) {
+				if (!Arrays.equals((Object[])value, (Object[])otherValue)) {
+					return false;
+				}
+			}
+			else if (!value.equals(otherValue)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private void _cleanUp(BundleContext bundleContext) throws Exception {
