@@ -14,7 +14,6 @@
 
 package com.liferay.oauth2.provider.client.test;
 
-import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.oauth2.provider.test.internal.TestApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestActivator;
@@ -39,8 +38,6 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Carlos Sierra Andrés
@@ -105,26 +102,19 @@ public class AnnotationsAndHttpApplicationClientTest extends BaseClientTest {
 				registerJaxRsApplication(
 					new TestAnnotatedApplication(),
 					annotatedApplicationProperties),
-				bundleContext -> {
-					ServiceRegistration<ScopeMapper> serviceRegistration =
-						bundleContext.registerService(
-							ScopeMapper.class,
-							input -> {
-								switch (input) {
-									case "GET":
-										return Collections.singleton(
-											"everything.readonly");
-									case "POST":
-										return Collections.singleton(
-											"everything.writeonly");
-								}
+				registerScopeMapper(
+					input -> {
+						if (input.equals("GET")) {
+							return Collections.singleton("everything.readonly");
+						}
+						else if (input.equals("POST")) {
+							return Collections.singleton(
+								"everything.writeonly");
+						}
 
-								return Collections.singleton(input);
-							},
-							scopeMapperProperties);
-
-					return serviceRegistration::unregister;
-				},
+						return Collections.singleton(input);
+					},
+					scopeMapperProperties),
 				createOauth2Application(
 					defaultCompanyId, user, "oauthTestApplication",
 					Collections.singletonList("everything")));

@@ -16,6 +16,9 @@ package com.liferay.oauth2.provider.test.internal.activator.configuration;
 
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
+import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
+import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.model.User;
@@ -41,10 +44,13 @@ import org.apache.cxf.endpoint.ServerRegistry;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.http.context.ServletContextHelper;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
@@ -214,6 +220,92 @@ public abstract class BaseTestActivator implements BundleActivator {
 	}
 
 	protected abstract List<Oauth2Runnable> getTestRunnables() throws Exception;
+
+	protected Oauth2Runnable registerPrefixHandler(
+		PrefixHandler prefixHandler,
+		Hashtable<String, Object> prefixHandlerProperties) {
+
+		return b -> {
+			ServiceRegistration<PrefixHandlerFactory> serviceRegistration =
+				b.registerService(
+				PrefixHandlerFactory.class, __ -> prefixHandler,
+				prefixHandlerProperties);
+
+			return serviceRegistration::unregister;
+		};
+	}
+
+	protected Oauth2Runnable registerScopeMapper(
+		ScopeMapper scopeMapper,
+		Hashtable<String, Object> scopeMapperProperties) {
+
+		return bundleContext -> {
+			ServiceRegistration<ScopeMapper> serviceRegistration =
+				bundleContext.registerService(
+					ScopeMapper.class, scopeMapper, scopeMapperProperties);
+
+			return serviceRegistration::unregister;
+		};
+	}
+
+	protected Oauth2Runnable createConfigurationFactory(
+		String factoryPid, Dictionary<String, Object> properties) {
+
+		return bundleContext -> {
+			CountDownLatch countDownLatch = new CountDownLatch(1);
+
+			Hashtable<String, Object> registrationProperties = new Hashtable<>();
+
+			registrationProperties.put(Constants.SERVICE_PID, factoryPid);
+
+			ServiceRegistration<ManagedServiceFactory> serviceRegistration =
+				bundleContext.registerService(
+					ManagedServiceFactory.class, new ManagedServiceFactory() {
+						@Override
+						public String getName() {
+							return
+								"Test managedservicefactory for pid " +
+								factoryPid;
+						}
+
+						@Override
+						public void updated(
+								String pid,
+								Dictionary<String, ?> incomingProperties)
+							throws ConfigurationException {
+
+							if (properties.equals(incomingProperties)) {
+								countDownLatch.countDown();
+							}
+						}
+
+						@Override
+						public void deleted(String pid) {
+
+						}
+					},
+					registrationProperties);
+
+			ServiceReference<ConfigurationAdmin> serviceReference =
+				bundleContext.getServiceReference(ConfigurationAdmin.class);
+
+			ConfigurationAdmin configurationAdmin =
+				bundleContext.getService(serviceReference);
+
+			Configuration factoryConfiguration =
+				configurationAdmin.createFactoryConfiguration(factoryPid, "?");
+
+			factoryConfiguration.update(properties);
+
+			return () -> {
+				factoryConfiguration.delete();
+
+				bundleContext.ungetService(serviceReference);
+
+				serviceRegistration.unregister();
+			};
+		};
+	}
 
 	private void _cleanUp(BundleContext bundleContext) throws Exception {
 		final CountDownLatch countDownLatch = new CountDownLatch(1);

@@ -14,7 +14,6 @@
 
 package com.liferay.oauth2.provider.client.test;
 
-import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestActivator;
 import com.liferay.portal.kernel.model.User;
@@ -38,8 +37,6 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Carlos Sierra Andrés
@@ -86,14 +83,8 @@ public class AnnotatedApplicationPrefixHandlerClientTest
 				"osgi.jaxrs.name", TestAnnotatedApplication.class.getName());
 
 			return Arrays.asList(
-				b -> {
-					ServiceRegistration<PrefixHandlerFactory>
-						serviceRegistration = b.registerService(
-						PrefixHandlerFactory.class, __ -> i -> "test/" + i,
-						prefixHandlerProperties);
-
-					return serviceRegistration::unregister;
-				},
+				registerPrefixHandler(
+					input -> "test/" + input, prefixHandlerProperties),
 				registerJaxRsApplication(
 					new TestAnnotatedApplication(), properties),
 				createOauth2Application(

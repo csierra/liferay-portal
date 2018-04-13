@@ -26,8 +26,10 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -60,6 +62,11 @@ public class HttpMethodApplicationClientTest extends BaseClientTest {
 			applicationTarget.request(), getToken("oauthTestApplicationAfter"));
 
 		Assert.assertEquals("get", builder.get(String.class));
+
+		Response post = builder.post(
+			Entity.entity("post", MediaType.TEXT_PLAIN_TYPE));
+
+		Assert.assertEquals("post", post.readEntity(String.class));
 
 		builder = authorize(
 			applicationTarget.request(),
