@@ -20,8 +20,12 @@ import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
+
+import java.util.Collection;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,6 +35,12 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Carlos Sierra Andrés
@@ -55,9 +65,49 @@ public class ScopedRequestScopeChecker implements ContainerRequestFilter {
 
 			Class<? extends Application> clazz = _application.getClass();
 
+			Bundle bundle = FrameworkUtil.getBundle(clazz);
+
+			if (bundle == null) {
+				return;
+			}
+
+			String osgiJaxrsName;
+
+			try {
+				BundleContext bundleContext = bundle.getBundleContext();
+
+				Collection<ServiceReference<Application>> serviceReferences =
+					bundleContext.getServiceReferences(
+						Application.class,
+						"(component.name=" + clazz.getName() + ")");
+
+				Stream<ServiceReference<Application>> serviceReferencesStream =
+					serviceReferences.stream();
+
+				osgiJaxrsName = (String)serviceReferencesStream.findFirst(
+				).orElse(
+					null
+				).getProperty(
+					"osgi.jaxrs.name"
+				);
+
+				if (Validator.isNull(osgiJaxrsName)) {
+					requestContext.abortWith(
+						Response.status(
+							500
+						).entity(
+							"Application not registered as a service"
+						).build());
+					return;
+				}
+			}
+			catch (InvalidSyntaxException ise) {
+				throw new IOException(ise);
+			}
+
 			RequestScopeCheckerFilter requestScopeChecker =
 				_scopedServiceTrackerMap.getService(
-					company.getCompanyId(), clazz.getName());
+					company.getCompanyId(), osgiJaxrsName);
 
 			if (!requestScopeChecker.isAllowed(
 					_scopeChecker, requestContext.getRequest(),

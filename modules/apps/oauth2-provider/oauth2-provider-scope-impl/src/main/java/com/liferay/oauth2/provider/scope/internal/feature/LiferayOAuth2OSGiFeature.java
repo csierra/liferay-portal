@@ -252,9 +252,9 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 				if (Validator.isNull(osgiJaxrsName)) {
 					osgiJaxrsName = clazz.getName();
-
-					serviceProperties.put("osgi.jaxrs.name", osgiJaxrsName);
 				}
+
+				serviceProperties.put("osgi.jaxrs.name", osgiJaxrsName);
 
 				if (oauth2ScopeCheckerType.equals("request.operation")) {
 					processRequestOperation(
