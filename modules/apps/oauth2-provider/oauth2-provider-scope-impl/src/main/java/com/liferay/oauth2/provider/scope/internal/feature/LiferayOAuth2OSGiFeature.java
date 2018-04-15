@@ -403,11 +403,15 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				ResourceBundleLoader resourceBundleLoader =
 					_serviceTracker.getService();
 
-				return ResourceBundleUtil.getString(
-					resourceBundleLoader.loadResourceBundle(
-						LocaleUtil.toLanguageId(locale)),
-					StringBundler.concat(
-						"oauth2.application.description.", _osgiJaxrsName));
+				String key = StringBundler.concat(
+					"oauth2.application.description.", _osgiJaxrsName);
+				
+				return 
+					GetterUtil.getString(
+						ResourceBundleUtil.getString(
+							resourceBundleLoader.loadResourceBundle(
+								LocaleUtil.toLanguageId(locale)), key),
+							key);
 			}
 
 			@Override
