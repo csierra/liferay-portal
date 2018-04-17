@@ -19,8 +19,8 @@ import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminActionKeys;
+import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -31,10 +31,11 @@ import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
-import javax.portlet.PortletPreferences;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import javax.portlet.PortletPreferences;
 
 /**
  * @author Tomas Polesovsky
@@ -60,23 +61,27 @@ public class OAuth2AdminPortletDisplayContext {
 		}
 
 		if (result.isEmpty()) {
-			result.addAll(Arrays.asList(GrantType.values()));
+			Collections.addAll(result, GrantType.values());
 		}
 
 		if (!_oAuth2ProviderConfiguration.allowAuthorizationCodeGrant()) {
 			result.remove(GrantType.AUTHORIZATION_CODE);
 		}
+
 		if (!_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant()) {
 			result.remove(GrantType.AUTHORIZATION_CODE_PKCE);
 		}
+
 		if (!_oAuth2ProviderConfiguration.allowClientCredentialsGrant()) {
 			result.remove(GrantType.CLIENT_CREDENTIALS);
 		}
+
 		if (!_oAuth2ProviderConfiguration.allowRefreshTokenGrant()) {
 			result.remove(GrantType.REFRESH_TOKEN);
 		}
+
 		if (!_oAuth2ProviderConfiguration.
-			allowResourceOwnerPasswordCredentialsGrant()) {
+				allowResourceOwnerPasswordCredentialsGrant()) {
 
 			result.remove(GrantType.RESOURCE_OWNER_PASSWORD);
 		}
@@ -89,9 +94,9 @@ public class OAuth2AdminPortletDisplayContext {
 			PermissionThreadLocal.getPermissionChecker();
 
 		if (permissionChecker.hasPermission(
-			0, OAuth2ProviderConstants.RESOURCE_NAME,
-			OAuth2ProviderConstants.RESOURCE_NAME,
-			OAuth2ProviderActionKeys.ACTION_ADD_APPLICATION)) {
+				0, OAuth2ProviderConstants.RESOURCE_NAME,
+				OAuth2ProviderConstants.RESOURCE_NAME,
+				OAuth2ProviderActionKeys.ACTION_ADD_APPLICATION)) {
 
 			return true;
 		}
@@ -99,32 +104,33 @@ public class OAuth2AdminPortletDisplayContext {
 		return false;
 	}
 
-	public boolean hasUpdatePermission(OAuth2Application oAuth2Application) {
-		return hasPermission(oAuth2Application, ActionKeys.UPDATE);
+	public boolean hasDeletePermission(OAuth2Application oAuth2Application) {
+		return hasPermission(oAuth2Application, ActionKeys.DELETE);
 	}
 
-	public boolean hasViewPermission(OAuth2Application oAuth2Application) {
-		return hasPermission(oAuth2Application, ActionKeys.VIEW);
-	}
+	public boolean hasPermission(
+		OAuth2Application oAuth2Application, String actionId) {
 
-	public boolean hasViewGrantedAuthorizationsPermission() {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
-		try {
-			return PortletPermissionUtil.contains(permissionChecker,
-				OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
-				OAuth2AdminActionKeys.VIEW_GRANTED_AUTHORIZATIONS);
-		}
-		catch (PortalException e) {
-			_log.error(e);
+		if (permissionChecker.hasOwnerPermission(
+				oAuth2Application.getCompanyId(),
+				OAuth2Application.class.getName(),
+				oAuth2Application.getOAuth2ApplicationId(),
+				oAuth2Application.getUserId(), actionId)) {
 
-			return false;
+			return true;
 		}
-	}
 
-	public boolean hasDeletePermission(OAuth2Application oAuth2Application) {
-		return hasPermission(oAuth2Application, ActionKeys.DELETE);
+		if (permissionChecker.hasPermission(
+				0, OAuth2Application.class.getName(),
+				oAuth2Application.getOAuth2ApplicationId(), actionId)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean hasPermissionsPermission(
@@ -140,32 +146,34 @@ public class OAuth2AdminPortletDisplayContext {
 			oAuth2Application, OAuth2ProviderActionKeys.ACTION_REVOKE_TOKEN);
 	}
 
-	public boolean hasPermission(
-		OAuth2Application oAuth2Application, String actionId) {
+	public boolean hasUpdatePermission(OAuth2Application oAuth2Application) {
+		return hasPermission(oAuth2Application, ActionKeys.UPDATE);
+	}
 
+	public boolean hasViewGrantedAuthorizationsPermission() {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
-		if (permissionChecker.hasOwnerPermission(
-			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(),
-			oAuth2Application.getUserId(), actionId)) {
-
-			return true;
+		try {
+			return PortletPermissionUtil.contains(
+				permissionChecker,
+				OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
+				OAuth2AdminActionKeys.VIEW_GRANTED_AUTHORIZATIONS);
 		}
+		catch (PortalException pe) {
+			_log.error(pe);
 
-		if (permissionChecker.hasPermission(
-			0, OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(), actionId)) {
-
-			return true;
+			return false;
 		}
-
-		return false;
 	}
 
-	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
+	public boolean hasViewPermission(OAuth2Application oAuth2Application) {
+		return hasPermission(oAuth2Application, ActionKeys.VIEW);
+	}
 
 	private static Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortletDisplayContext.class);
+
+	private final OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
+
 }

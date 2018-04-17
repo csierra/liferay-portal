@@ -19,6 +19,7 @@ package com.liferay.oauth2.provider.web.internal.constants;
  */
 public class OAuth2AdminActionKeys {
 
-	public static final String VIEW_GRANTED_AUTHORIZATIONS = "VIEW_GRANTED_AUTHORIZATIONS";
+	public static final String VIEW_GRANTED_AUTHORIZATIONS =
+		"VIEW_GRANTED_AUTHORIZATIONS";
 
 }

@@ -19,12 +19,13 @@ import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletK
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.ParamUtil;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tomas Polesovsky
@@ -40,14 +41,14 @@ import javax.portlet.Portlet;
 		"javax.portlet.init-param.template-path=/devices/",
 		"javax.portlet.init-param.view-template=/devices/view.jsp",
 		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_DEVICES_PORTLET,
-		"javax.portlet.resource-bundle=content.Language",
+		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class
 )
 public class OAuth2DevicesPortlet extends MVCPortlet {
 
 	public void revokeAuthorizationTokens(
-		ActionRequest request, ActionResponse response)
+			ActionRequest request, ActionResponse response)
 		throws PortalException {
 
 		long oAuth2AuthorizationId = ParamUtil.getLong(
