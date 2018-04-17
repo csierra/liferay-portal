@@ -15,11 +15,12 @@
 --%>
 
 <%@ include file="/devices/init.jsp" %>
+
 <%
 String orderByCol = ParamUtil.getString(request, "orderByCol", "createDate");
 String orderByType = ParamUtil.getString(request, "orderByType", "desc");
-
 %>
+
 <liferay-portlet:renderURL varImpl="portletURL" />
 
 <liferay-frontend:management-bar>
@@ -50,79 +51,90 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 	<liferay-ui:search-container
 		emptyResultsMessage="no-devices-were-found"
 		iteratorURL="<%= portletURL %>"
-		total="<%= OAuth2AuthorizationServiceUtil.getUserOAuth2AuthorizationsCount() %>">
+		total="<%= OAuth2AuthorizationServiceUtil.getUserOAuth2AuthorizationsCount() %>"
+	>
 
 		<%
-			OrderByComparator orderByComparator = null;
+		OrderByComparator orderByComparator = null;
 
-			if (orderByCol.equals("createDate")) {
-				orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("asc"));
-			}
-			else if (orderByCol.equals("application-name")) {
-				orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "oAuth2ApplicationId", orderByType.equals("asc"));
-			}
+		if (orderByCol.equals("createDate")) {
+			orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("asc"));
+		}
+		else if (orderByCol.equals("application-name")) {
+			orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "oAuth2ApplicationId", orderByType.equals("asc"));
+		}
 		%>
 
 		<liferay-ui:search-container-results
-			results="<%= OAuth2AuthorizationServiceUtil.getUserOAuth2Authorizations(searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
+			results="<%= OAuth2AuthorizationServiceUtil.getUserOAuth2Authorizations(searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"
+		/>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.oauth2.provider.model.OAuth2Authorization"
-			escapedModel="true"
-			modelVar="oAuth2Authorization">
+			escapedModel="<%= true %>"
+			modelVar="oAuth2Authorization"
+		>
 
 			<%
-				String applicationDescription = StringPool.BLANK;
-				String applicationName = StringPool.BLANK;
-				String thumbnailURL = StringPool.BLANK;
+			String applicationDescription = StringPool.BLANK;
+			String applicationName = StringPool.BLANK;
+			String thumbnailURL = StringPool.BLANK;
 
-				try {
-					OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2Authorization.getOAuth2ApplicationId());
-					applicationDescription = oAuth2Application.getDescription();
-					applicationName = oAuth2Application.getName();
+			try {
+				OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2Authorization.getOAuth2ApplicationId());
 
-					if (oAuth2Application.getIconFileEntryId() > 0) {
-						FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(oAuth2Application.getIconFileEntryId());
-						thumbnailURL = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
-					}
+				applicationDescription = oAuth2Application.getDescription();
+				applicationName = oAuth2Application.getName();
+
+				if (oAuth2Application.getIconFileEntryId() > 0) {
+					FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(oAuth2Application.getIconFileEntryId());
+					thumbnailURL = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
 				}
-				catch (PortalException e) {
-					// user has no longer access to the application
-				}
+			}
+			catch (PortalException e) {
 
+				// user has no longer access to the application
+
+			}
 			%>
+
 			<liferay-ui:search-container-column-image name="icon"
-				src="<%= thumbnailURL %>" />
+				src="<%= thumbnailURL %>"
+			/>
 
 			<liferay-ui:search-container-column-text
-				name="application-name" value="<%= HtmlUtil.escape(applicationName) %>"/>
+				name="application-name" value="<%= HtmlUtil.escape(applicationName) %>"
+			/>
 
 			<liferay-ui:search-container-column-text
-				name="application-description" value="<%= HtmlUtil.escape(applicationDescription) %>"/>
+				name="application-description" value="<%= HtmlUtil.escape(applicationDescription) %>"
+			/>
 
 			<liferay-ui:search-container-column-date
-				property="createDate" />
+				property="createDate"
+			/>
 
 			<liferay-ui:search-container-column-date
-				property="accessTokenExpirationDate" />
+				property="accessTokenExpirationDate"
+			/>
 
 			<liferay-ui:search-container-column-date
-				property="refreshTokenExpirationDate" />
+				property="refreshTokenExpirationDate"
+			/>
 
 			<liferay-ui:search-container-column-text
-				property="remoteIPInfo" />
+				property="remoteIPInfo"
+			/>
 
 			<liferay-ui:search-container-column-jsp
 				align="right"
-				path="/devices/authorization_actions.jsp" />
-
+				path="/devices/authorization_actions.jsp"
+			/>
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator
 			markupView="lexicon"
-			searchContainer="<%= searchContainer %>"/>
-
+			searchContainer="<%= searchContainer %>"
+		/>
 	</liferay-ui:search-container>
-
 </div>
-

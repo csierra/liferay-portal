@@ -17,12 +17,10 @@
 <%@ include file="/devices/init.jsp" %>
 
 <%
-
 ResultRow row = (ResultRow)request.getAttribute("SEARCH_CONTAINER_RESULT_ROW");
 
 OAuth2Authorization oAuth2Authorization = (OAuth2Authorization)row.getObject();
 %>
-
 
 <liferay-ui:icon-menu
 	direction="left-side"
@@ -38,6 +36,6 @@ OAuth2Authorization oAuth2Authorization = (OAuth2Authorization)row.getObject();
 
 	<liferay-ui:icon
 		message="revoke-authorization"
-		url="<%= revokeURL.toString() %>" />
-
+		url="<%= revokeURL.toString() %>"
+	/>
 </liferay-ui:icon-menu>

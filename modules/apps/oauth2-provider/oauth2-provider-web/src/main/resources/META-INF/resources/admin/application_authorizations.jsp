@@ -17,7 +17,6 @@
 <%@ include file="/admin/init.jsp" %>
 
 <%
-
 String redirect = ParamUtil.getString(request, "redirect");
 
 portletDisplay.setShowBackIcon(true);
@@ -29,7 +28,7 @@ OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Appl
 
 request.setAttribute("application_authorizations.jsp-oAuth2Application", oAuth2Application);
 
-renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new String[]{oAuth2Application.getName()}));
+renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new String[] {oAuth2Application.getName()}));
 
 if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) {
 	return;
@@ -38,6 +37,7 @@ if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) 
 String orderByCol = ParamUtil.getString(request, "orderByCol", "createDate");
 String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 %>
+
 <liferay-portlet:renderURL varImpl="portletURL">
 	<portlet:param name="mvcPath" value="/admin/application_authorizations.jsp" />
 	<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2ApplicationId) %>" />
@@ -72,53 +72,59 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 	<liferay-ui:search-container
 		emptyResultsMessage="no-devices-were-found"
 		iteratorURL="<%= portletURL %>"
-		total="<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2AuthorizationsCount(oAuth2ApplicationId) %>">
+		total="<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2AuthorizationsCount(oAuth2ApplicationId) %>"
+	>
 
 		<%
-			OrderByComparator orderByComparator = null;
+		OrderByComparator orderByComparator = null;
 
-			if (orderByCol.equals("createDate")) {
-				orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("desc"));
-			}
+		if (orderByCol.equals("createDate")) {
+			orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("desc"));
+		}
 		%>
 
 		<liferay-ui:search-container-results
-			results="<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2Authorizations(oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"/>
+			results="<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2Authorizations(oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"
+		/>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.oauth2.provider.model.OAuth2Authorization"
-			escapedModel="true"
-			modelVar="oAuth2Authorization">
+			escapedModel="<%= true %>"
+			modelVar="oAuth2Authorization"
+		>
+			<liferay-ui:search-container-column-text
+				property="userId"
+			/>
 
 			<liferay-ui:search-container-column-text
-				property="userId" />
+				property="userName"
+			/>
+
+			<liferay-ui:search-container-column-date
+				property="createDate"
+			/>
+
+			<liferay-ui:search-container-column-date
+				property="accessTokenExpirationDate"
+			/>
+
+			<liferay-ui:search-container-column-date
+				property="refreshTokenExpirationDate"
+			/>
 
 			<liferay-ui:search-container-column-text
-				property="userName" />
-
-			<liferay-ui:search-container-column-date
-				property="createDate" />
-
-			<liferay-ui:search-container-column-date
-				property="accessTokenExpirationDate" />
-
-			<liferay-ui:search-container-column-date
-				property="refreshTokenExpirationDate" />
-
-			<liferay-ui:search-container-column-text
-				property="remoteIPInfo" />
+				property="remoteIPInfo"
+			/>
 
 			<liferay-ui:search-container-column-jsp
 				align="right"
-				path="/admin/application_authorization_actions.jsp" />
-
+				path="/admin/application_authorization_actions.jsp"
+			/>
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator
 			markupView="lexicon"
-			searchContainer="<%= searchContainer %>"/>
-
+			searchContainer="<%= searchContainer %>"
+		/>
 	</liferay-ui:search-container>
-
 </div>
-
