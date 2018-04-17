@@ -14,20 +14,31 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
-import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
+import static com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys.ASSIGN_SCOPES_MODEL;
+
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
-import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
-import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel.ApplicationScopeDescriptor;
+import com.liferay.oauth2.provider.web.internal.display.context.AssignScopesModel;
+import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel;
+import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel.ApplicationScopeDescriptor;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -36,16 +47,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys.SCOPES;
-
 /**
  * @author Tomas Polesovsky
+ * @author Stian Sigvartsen
  */
 @Component(
 	property = {
@@ -66,41 +70,43 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 		long companyId = company.getCompanyId();
 
-		Collection<String> externalAliases =
-			_scopeFinderLocator.getScopeAliases(companyId);
+		Map<String, String> invocationResultCache = new HashMap<>(50);
 
-		Map<String, AuthorizationRequestModel> aliasedScopes = new HashMap<>();
-		
-		ApplicationScopeDescriptor applicationScopeDescriptor =
-			(cid, applicationName, scope) -> {
-				ScopeDescriptor scopeDescriptor =
-					_scopeDescriptorLocator.getScopeDescriptor(
-						applicationName);
+		AuthorizationModel.ApplicationDescriptor
+			assignScopesModelApplicationDescriptor = (cid, applicationName) -> {
+				return _getFromCacheOr(
+					cid + "|" + applicationName, invocationResultCache,
+					() -> {
+						ApplicationDescriptor applicationDescriptor =
+							_applicationDescriptors.getService(applicationName);
 
-				return scopeDescriptor.describeScope(
-					scope, themeDisplay.getLocale());
+						return applicationDescriptor.describeApplication(
+							themeDisplay.getLocale());
+					});
 			};
 
-		for (String externalAlias : externalAliases) {
-			AuthorizationRequestModel authorizationRequestModel =
-				aliasedScopes.computeIfAbsent(
-					externalAlias,
-					__ -> new AuthorizationRequestModel(
-						externalAliases.size(),
-						applicationScopeDescriptor));
+		ApplicationScopeDescriptor applicationScopeDescriptor =
+			(cid, applicationName, scope) -> {
+				String key = StringBundler.concat(
+					String.valueOf(cid), "|", applicationName, "|", scope);
 
-			Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
-				_scopeFinderLocator.getLiferayOAuth2Scopes(
-					companyId, externalAlias);
+				return _getFromCacheOr(
+					key, invocationResultCache,
+					() -> {
+						ScopeDescriptor scopeDescriptor =
+							_scopeDescriptorLocator.getScopeDescriptor(
+								applicationName);
 
-			for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
-				authorizationRequestModel.addLiferayOAuth2Scope(liferayOAuth2Scope);
-			}
-		}
+						return scopeDescriptor.describeScope(
+							scope, themeDisplay.getLocale());
+					});
+			};
 
-		renderRequest.setAttribute(SCOPES, aliasedScopes);
-		renderRequest.setAttribute(
-			"applicationDescriptors", _applicationDescriptors);
+		AssignScopesModel assignScopesModel = new AssignScopesModel(
+			companyId, _scopeFinderLocator,
+			assignScopesModelApplicationDescriptor, applicationScopeDescriptor);
+
+		renderRequest.setAttribute(ASSIGN_SCOPES_MODEL, assignScopesModel);
 
 		return "/admin/assign_scopes.jsp";
 	}
@@ -116,18 +122,32 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		_applicationDescriptors.close();
 	}
 
-	@Reference(
-		policyOption = ReferencePolicyOption.GREEDY,
-		policy = ReferencePolicy.DYNAMIC
-	)
-	private volatile ScopeDescriptorLocator _scopeDescriptorLocator;
+	@SuppressWarnings("unchecked")
+	private <T> T _getFromCacheOr(
+		String key, Map<String, T> invocationResultCache,
+		Supplier<T> supplier) {
+
+		T value = invocationResultCache.get(key);
+
+		if (value == null) {
+			value = supplier.get();
+
+			invocationResultCache.put(key, value);
+		}
+
+		return (T)value;
+	}
 
 	private ServiceTrackerMap<String, ApplicationDescriptor>
 		_applicationDescriptors;
 
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile ScopeDescriptorLocator _scopeDescriptorLocator;
 
 	@Reference
 	private ScopeLocator _scopeFinderLocator;
-
 
 }

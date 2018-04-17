@@ -16,8 +16,11 @@
 <%@ include file="/init.jsp" %>
 <%@ page import="com.liferay.oauth2.provider.service.OAuth2ApplicationLocalServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys"%><%@
-page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel"%><%@
-page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext" %>
+page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel"%><%@
+page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext" %><%@
+page import="java.util.ArrayList"%><%@
+page import="java.util.Comparator"%>
+
 
 <%
 OAuth2AuthorizePortletDisplayContext oAuth2AuthorizePortletDisplayContext = (OAuth2AuthorizePortletDisplayContext)request.getAttribute(OAuth2AdminWebKeys.AUTHORIZE_DISPLAY_CONTEXT);
