@@ -15,9 +15,7 @@
 package com.liferay.oauth2.provider.web.internal.display.context;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
-import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 
@@ -29,39 +27,8 @@ import java.util.Map;
  */
 public class OAuth2AuthorizePortletDisplayContext {
 
-	public boolean hasCreateTokenApplicationPermission(
-		OAuth2Application oAuth2Application) {
-
-		return hasPermission(oAuth2Application,
-			OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN);
-	}
-
-	public boolean hasPermission(
-		OAuth2Application oAuth2Application, String actionId) {
-
-		PermissionChecker permissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-
-		if (permissionChecker.hasOwnerPermission(
-			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(),
-			oAuth2Application.getUserId(), actionId)) {
-
-			return true;
-		}
-
-		if (permissionChecker.hasPermission(
-			0, OAuth2Application.class.getName(),
-			oAuth2Application.getOAuth2ApplicationId(), actionId)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	public AuthorizationRequestModel getAuthorizationRequestModel() {
-		return _authorizationRequestModel;
+	public AuthorizationModel getAuthorizationModel() {
+		return _authorizationModel;
 	}
 
 	public OAuth2Application getOAuth2Application() {
@@ -72,21 +39,52 @@ public class OAuth2AuthorizePortletDisplayContext {
 		return _oAuth2Parameters;
 	}
 
-	public void setAuthorizationRequestModel(
-		AuthorizationRequestModel authorizationRequestModel) {
-		_authorizationRequestModel = authorizationRequestModel;
+	public boolean hasCreateTokenApplicationPermission(
+		OAuth2Application oAuth2Application) {
+
+		return hasPermission(
+			oAuth2Application, OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN);
 	}
 
-	public void setOAuth2Parameters(Map<String, String> oAuth2Parameters) {
-		_oAuth2Parameters = oAuth2Parameters;
+	public boolean hasPermission(
+		OAuth2Application oAuth2Application, String actionId) {
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (permissionChecker.hasOwnerPermission(
+				oAuth2Application.getCompanyId(),
+				OAuth2Application.class.getName(),
+				oAuth2Application.getOAuth2ApplicationId(),
+				oAuth2Application.getUserId(), actionId)) {
+
+			return true;
+		}
+
+		if (permissionChecker.hasPermission(
+				0, OAuth2Application.class.getName(),
+				oAuth2Application.getOAuth2ApplicationId(), actionId)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public void setAuthorizationModel(AuthorizationModel authorizationModel) {
+		_authorizationModel = authorizationModel;
 	}
 
 	public void setOAuth2Application(OAuth2Application oAuth2Application) {
 		_oAuth2Application = oAuth2Application;
 	}
 
-	private AuthorizationRequestModel _authorizationRequestModel;
-	private OAuth2Application _oAuth2Application = null;
+	public void setOAuth2Parameters(Map<String, String> oAuth2Parameters) {
+		_oAuth2Parameters = oAuth2Parameters;
+	}
+
+	private AuthorizationModel _authorizationModel;
+	private OAuth2Application _oAuth2Application;
 	private Map<String, String> _oAuth2Parameters = new HashMap<>();
 
 }

@@ -17,7 +17,7 @@
 <%@include file="/authorize/init.jsp"%>
 
 <%
-AuthorizationRequestModel authorizationRequestModel = oAuth2AuthorizePortletDisplayContext.getAuthorizationRequestModel();
+AuthorizationModel authorizationModel = oAuth2AuthorizePortletDisplayContext.getAuthorizationModel();
 
 OAuth2Application oAuth2Application = oAuth2AuthorizePortletDisplayContext.getOAuth2Application();
 
@@ -48,14 +48,14 @@ String replyTo = PortalUtil.escapeRedirect(oAuth2Parameters.get("reply_to"));
 	    <div>
 		    <ul>
 				<%
-				for (String appName : authorizationRequestModel.getApplicationNames()) {
+				for (String appName : authorizationModel.getApplicationNames()) {
 				%>
 					<div>
 					<ul>
 						<li><%= HtmlUtil.escape(appName) %></li>
 						<ul>
 						<%
-						for (String description : authorizationRequestModel.getApplicationScopeDescription(appName)) {
+						for (String description : authorizationModel.getApplicationScopeDescription(appName)) {
 							%>
 							<li><%= HtmlUtil.escape(description) %></li>
 							<%

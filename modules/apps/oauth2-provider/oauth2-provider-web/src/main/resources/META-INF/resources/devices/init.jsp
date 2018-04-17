@@ -13,16 +13,9 @@
  * details.
  */
 --%>
+
 <%@ include file="/init.jsp" %>
 <%@ page import="com.liferay.oauth2.provider.model.OAuth2Authorization" %><%@
-page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil" %><%@
-page import="com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope" %><%@
-page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@
-page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel"%><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
-page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
-page import="com.liferay.portal.kernel.security.auth.PrincipalException" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %>
-
-<%@ page import="java.util.ArrayList" %>

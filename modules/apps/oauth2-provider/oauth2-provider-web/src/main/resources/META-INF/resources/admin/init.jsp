@@ -27,20 +27,32 @@ page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIF
 page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIMissingException" %><%@
 page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIPathException" %><%@
 page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURISchemeException" %><%@
-page import="com.liferay.oauth2.provider.model.OAuth2Authorization" %><%@
-page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil" %><%@
+page import="com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases" %><%@
+page import="com.liferay.oauth2.provider.model.OAuth2Authorization" %><%@ 
+page import="com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor" %><%@
 page import="com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope" %><%@
+page import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService" %><%@ 
+page import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalServiceUtil" %><%@
+page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil" %><%@ 
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@
-page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel"%><%@
+page import="com.liferay.oauth2.provider.web.internal.display.context.AssignScopesModel"%><%@
+page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel"%><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext" %><%@
+page import="com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.security.auth.PrincipalException" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %>
 
-<%@ page import="java.util.ArrayList" %>
-
+<%@ page import="java.util.ArrayList" %><%@ 
+page import="java.util.Collections" %><%@
+page import="java.util.Comparator"%><%@
+page import="java.util.HashSet"%><%@
+page import="java.util.Map"%><%@
+page import="java.util.Set"%><%@
+page import="java.util.stream.Collectors"%>
+	
 <%
 OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = (OAuth2AdminPortletDisplayContext)request.getAttribute(OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT);
 %>

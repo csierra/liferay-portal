@@ -21,14 +21,17 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tomas Polesovsky
@@ -47,12 +50,9 @@ public class AssignScopesMVCActionCommand implements MVCActionCommand {
 		throws PortletException {
 
 		List<String> scopeAliases = new ArrayList<>();
-		for (String parameterName : actionRequest.getParameterMap().keySet()) {
-			if (parameterName.startsWith("scope_") &&
-				ParamUtil.getBoolean(actionRequest, parameterName)) {
-				scopeAliases.add(parameterName.substring("scope_".length()));
-			}
-		}
+
+		Collections.addAll(
+			scopeAliases, actionRequest.getParameterValues("scope"));
 
 		long oAuth2ApplicationId = ParamUtil.getLong(
 			actionRequest, "oAuth2ApplicationId");
@@ -61,17 +61,17 @@ public class AssignScopesMVCActionCommand implements MVCActionCommand {
 			_oAuth2ApplicationService.updateScopeAliases(
 				oAuth2ApplicationId, scopeAliases);
 		}
-		catch (PortalException e) {
-			if (_log.isDebugEnabled()) {
+		catch (PortalException pe) {
+			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to load OAuth2Application with id " +
-					oAuth2ApplicationId);
+						oAuth2ApplicationId,
+					pe);
 			}
 		}
 
 		return true;
 	}
-
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssignScopesMVCActionCommand.class);

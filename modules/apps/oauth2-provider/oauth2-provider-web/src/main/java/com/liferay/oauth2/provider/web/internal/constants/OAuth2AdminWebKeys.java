@@ -19,9 +19,14 @@ package com.liferay.oauth2.provider.web.internal.constants;
  */
 public class OAuth2AdminWebKeys {
 
-	public static final String SCOPES = "scopes";
 	public static final String ADMIN_DISPLAY_CONTEXT = "admin.display.context";
-	public static final String AUTHORIZATION_REQUEST_MODEL = "authorization.request.model";
-	public static final String AUTHORIZE_DISPLAY_CONTEXT = "authorize.display.context";
+
+	public static final String ASSIGN_SCOPES_MODEL = "assign.scopes.model";
+
+	public static final String AUTHORIZATION_REQUEST_MODEL =
+		"authorization.request.model";
+
+	public static final String AUTHORIZE_DISPLAY_CONTEXT =
+		"authorize.display.context";
 
 }
