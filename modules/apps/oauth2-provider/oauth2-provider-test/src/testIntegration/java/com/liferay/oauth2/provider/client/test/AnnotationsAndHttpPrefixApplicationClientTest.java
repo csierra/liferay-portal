@@ -88,7 +88,7 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 		extends BaseTestActivator {
 
 		@Override
-		protected List<Oauth2Runnable> getTestRunnables() throws Exception {
+		protected List<Oauth2Runnable<?>> getTestRunnables() throws Exception {
 			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
@@ -140,19 +140,6 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 				registerJaxRsApplication(
 					new TestAnnotatedApplication(),
 					annotatedApplicationProperties),
-				registerScopeMapper(
-					input -> {
-						if (input.equals("GET")) {
-							return Collections.singleton("everything.readonly");
-						}
-						else if (input.equals("POST")) {
-							return Collections.singleton(
-								"everything.writeonly");
-						}
-
-						return Collections.singleton(input);
-					},
-					scopeMapperProperties),
 				createOauth2Application(
 					defaultCompanyId, user, "oauthTestApplication",
 					Arrays.asList(

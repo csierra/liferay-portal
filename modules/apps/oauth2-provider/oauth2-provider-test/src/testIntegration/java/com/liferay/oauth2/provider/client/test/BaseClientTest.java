@@ -22,6 +22,9 @@ import com.liferay.shrinkwrap.osgi.api.BndProjectBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -36,6 +39,12 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 
@@ -46,11 +55,17 @@ import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
+import org.junit.BeforeClass;
 import org.osgi.framework.BundleActivator;
 
 import org.w3c.dom.Document;
 
 public class BaseClientTest {
+
+	@BeforeClass
+	public static void setupClass() {
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+	}
 
 	public static Archive<?> getDeployment(
 		Class<? extends BundleActivator> bundleActivator) throws Exception {
@@ -129,6 +144,12 @@ public class BaseClientTest {
 	}
 
 	protected String getToken(String clientId) throws URISyntaxException {
+		return getToken(clientId, null);
+	}
+
+	protected String getToken(String clientId, String hostname)
+		throws URISyntaxException {
+
 		Client client = getClient();
 
 		WebTarget tokenTarget = client.target(
@@ -141,13 +162,52 @@ public class BaseClientTest {
 		formData.add("client_secret", "oauthTestApplicationSecret");
 		formData.add("grant_type", "client_credentials");
 
-		Response tokenResponse =
-			tokenTarget.request().post(Entity.form(formData));
+		Invocation.Builder builder = tokenTarget.request();
+
+		if (hostname != null) {
+			builder.header("Host", hostname);
+		}
+
+		Response tokenResponse = builder.post(Entity.form(formData));
 
 		Document document = tokenResponse.readEntity(Document.class);
 
-		return document.getElementsByTagName(
-			"access_token").item(0).getTextContent();
+		try {
+			return document.getElementsByTagName(
+				"access_token"
+			).item(
+				0
+			).getTextContent(
+			);
+		}
+		catch (Exception e1) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+			try {
+				printDocument(document, baos);
+			}
+			catch (Exception e2) {
+				throw new RuntimeException(e2);
+			}
+
+			throw new IllegalArgumentException(
+				"The token service returned " + baos.toString());
+		}
+	}
+
+	public static void printDocument(Document doc, OutputStream out) throws
+		IOException, TransformerException {
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer transformer = tf.newTransformer();
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		transformer.setOutputProperty(
+			"{http://xml.apache.org/xslt}indent-amount", "4");
+
+		transformer.transform(new DOMSource(doc),
+			new StreamResult(new OutputStreamWriter(out, "UTF-8")));
 	}
 
 	protected WebTarget getWebTarget(String... paths)

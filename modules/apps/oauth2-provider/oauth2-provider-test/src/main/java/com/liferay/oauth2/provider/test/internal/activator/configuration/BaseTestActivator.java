@@ -21,10 +21,11 @@ import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,9 +38,12 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import javax.ws.rs.core.Application;
 
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
@@ -62,7 +66,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public abstract class BaseTestActivator implements BundleActivator {
 
-	public Oauth2Runnable createOauth2Application(
+	public Oauth2Runnable<OAuth2Application> createOauth2Application(
 		final long companyId, User user, String clientId) {
 
 		return createOauth2Application(
@@ -70,11 +74,36 @@ public abstract class BaseTestActivator implements BundleActivator {
 			Arrays.asList("everything", "everything.readonly"));
 	}
 
-	public Oauth2Runnable createOauth2Application(
+	public Oauth2Runnable<User> addUser(Company company) {
+		return new Oauth2RunnableImpl<>(
+			bundleContext -> {
+				User user = UserTestUtil.addUser(company);
+
+				return new Oauth2TestResult<>(
+					user,
+					() -> UserLocalServiceUtil.deleteUser(user.getUserId()));
+			}
+		);
+	}
+
+	public Oauth2Runnable<User> addAdminUser(Company company) {
+		return new Oauth2RunnableImpl<>(
+			bundleContext -> {
+				User user = UserTestUtil.addCompanyAdminUser(company);
+
+				return new Oauth2TestResult<>(
+					user,
+					() -> UserLocalServiceUtil.deleteUser(user.getUserId()));
+			}
+		);
+	}
+
+	public Oauth2Runnable<OAuth2Application> createOauth2Application(
 		final long companyId, User user, String clientId,
 		List<String> availableScopes) {
 
-		return bundleContext -> {
+		return new Oauth2RunnableImpl<>(
+			bundleContext -> {
 			ServiceReference<OAuth2ApplicationLocalService> serviceReference =
 				bundleContext.getServiceReference(
 					OAuth2ApplicationLocalService.class);
@@ -94,19 +123,36 @@ public abstract class BaseTestActivator implements BundleActivator {
 					Collections.singletonList("http://localhost:8080"),
 					availableScopes, new ServiceContext());
 
-			return () -> {
+			return new Oauth2TestResult<>(
+				oAuth2Application, () -> {
 				_oAuth2ApplicationLocalService.deleteOAuth2Application(
 					oAuth2Application.getOAuth2ApplicationId());
 
 				bundleContext.ungetService(serviceReference);
-			};
-		};
+			});
+		});
 	}
 
-	public Oauth2Runnable registerJaxRsApplication(
+	public Oauth2Runnable<Company> createCompany(String hostName) {
+		return new Oauth2RunnableImpl<>(
+			bundleContext -> {
+				Company company = CompanyLocalServiceUtil.addCompany(
+					hostName, hostName + ".xyz", hostName + ".xyz", false, 0,
+					true);
+
+				return new Oauth2TestResult<>(
+					company, () -> {
+						CompanyLocalServiceUtil.deleteCompany(
+							company.getCompanyId());
+				});
+			}
+		);
+	}
+
+	public Oauth2Runnable<ServiceRegistration<Application>> registerJaxRsApplication(
 		Application application, Dictionary<String, Object> properties) {
 
-		return bundleContext -> {
+		return new Oauth2RunnableImpl<>(bundleContext -> {
 			ServiceRegistration<Application> serviceRegistration =
 				bundleContext.registerService(
 					Application.class, application, properties);
@@ -147,12 +193,14 @@ public abstract class BaseTestActivator implements BundleActivator {
 					"Endpoint was not registered within 10 seconds");
 			}
 
-			return () -> {
-				serviceRegistration.unregister();
+			return new Oauth2TestResult<>(
+				serviceRegistration,
+				() -> {
+					serviceRegistration.unregister();
 
-				serviceTracker.close();
-			};
-		};
+					serviceTracker.close();
+				});
+		});
 	}
 
 	@Override
@@ -195,11 +243,11 @@ public abstract class BaseTestActivator implements BundleActivator {
 
 			_restConfiguration.update(properties);
 
-			List<Oauth2Runnable> testRunnables = getTestRunnables();
+			List<Oauth2Runnable<?>> testRunnables = getTestRunnables();
 
 			_autoCloseables = new ArrayList<>();
 
-			for (Oauth2Runnable testRunnable : testRunnables) {
+			for (Oauth2Runnable<?> testRunnable : testRunnables) {
 				_autoCloseables.add(testRunnable.run(bundleContext));
 			}
 		}
@@ -215,45 +263,116 @@ public abstract class BaseTestActivator implements BundleActivator {
 		_cleanUp(bundleContext);
 	}
 
-	public interface Oauth2Runnable {
+	public interface Oauth2Runnable<T> {
 
-		public AutoCloseable run(BundleContext bundleContext) throws Exception;
+		<S> Oauth2Runnable<S> flatMap(Function<T, Oauth2Runnable<S>> function);
 
+		AutoCloseable run(BundleContext bundleContext);
 	}
 
-	protected abstract List<Oauth2Runnable> getTestRunnables() throws Exception;
+	public interface OAuth2TestOperation<T> {
+		Oauth2TestResult<T> run(BundleContext bundleContext) throws Exception;
+	}
 
-	protected Oauth2Runnable registerPrefixHandler(
-		PrefixHandler prefixHandler,
-		Hashtable<String, Object> prefixHandlerProperties) {
+	public class Oauth2TestResult<T> {
 
-		return b -> {
+		private final T _t;
+		private final AutoCloseable _closeable;
+
+		Oauth2TestResult(T t, AutoCloseable closeable) {
+			_t = t;
+			_closeable = closeable;
+		}
+
+		public T getT() {
+			return _t;
+		}
+
+		public AutoCloseable getCloseable() {
+			return _closeable;
+		}
+	}
+
+	public class Oauth2RunnableImpl<T> implements Oauth2Runnable<T> {
+		private OAuth2TestOperation<T> _operation;
+
+		public Oauth2RunnableImpl(OAuth2TestOperation<T> operation) {
+			_operation = operation;
+		}
+
+		@Override
+		public <S> Oauth2Runnable<S> flatMap(
+			Function<T, Oauth2Runnable<S>> function) {
+
+			return new Oauth2RunnableImpl<>(
+				bundleContext -> {
+					Oauth2TestResult<T> result = _operation.run(bundleContext);
+
+					Oauth2RunnableImpl<S> oauth2Runnable =
+						(Oauth2RunnableImpl<S>) function.apply(result.getT());
+
+					Oauth2TestResult<S> result2 =
+						oauth2Runnable._operation.run(bundleContext);
+
+					return
+						new Oauth2TestResult<>(result2.getT(),
+						() -> {
+							result2.getCloseable().close();
+
+							result.getCloseable().close();
+						});
+				});
+		}
+
+		@Override
+		public AutoCloseable run(BundleContext bundleContext) {
+			try {
+				return _operation.run(bundleContext).getCloseable();
+			}
+			catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+		}
+	}
+
+	protected abstract List<Oauth2Runnable<?>> getTestRunnables()
+		throws Exception;
+
+	protected Oauth2Runnable<ServiceRegistration<PrefixHandlerFactory>>
+		registerPrefixHandler(
+			PrefixHandler prefixHandler,
+			Hashtable<String, Object> prefixHandlerProperties) {
+
+		return new Oauth2RunnableImpl<>(
+			b -> {
 			ServiceRegistration<PrefixHandlerFactory> serviceRegistration =
 				b.registerService(
 				PrefixHandlerFactory.class, __ -> prefixHandler,
 				prefixHandlerProperties);
 
-			return serviceRegistration::unregister;
-		};
+			return new Oauth2TestResult<>(
+				serviceRegistration, serviceRegistration::unregister);
+		});
 	}
 
-	protected Oauth2Runnable registerScopeMapper(
+	protected Oauth2Runnable<ServiceRegistration<ScopeMapper>> registerScopeMapper(
 		ScopeMapper scopeMapper,
 		Hashtable<String, Object> scopeMapperProperties) {
 
-		return bundleContext -> {
+		return new Oauth2RunnableImpl<>(bundleContext -> {
 			ServiceRegistration<ScopeMapper> serviceRegistration =
 				bundleContext.registerService(
 					ScopeMapper.class, scopeMapper, scopeMapperProperties);
 
-			return serviceRegistration::unregister;
-		};
+			return new Oauth2TestResult<>(
+				serviceRegistration, serviceRegistration::unregister);
+		});
 	}
 
-	protected Oauth2Runnable createConfigurationFactory(
+	protected Oauth2Runnable<Configuration> createConfigurationFactory(
 		String factoryPid, Dictionary<String, Object> properties) {
 
-		return bundleContext -> {
+		return new Oauth2RunnableImpl<>(bundleContext -> {
 			CountDownLatch countDownLatch = new CountDownLatch(1);
 
 			Hashtable<String, Object> registrationProperties = new Hashtable<>();
@@ -302,14 +421,16 @@ public abstract class BaseTestActivator implements BundleActivator {
 
 			countDownLatch.await(10, TimeUnit.SECONDS);
 
-			return () -> {
+			return new Oauth2TestResult<>(
+				factoryConfiguration,
+				() -> {
 				factoryConfiguration.delete();
 
 				bundleContext.ungetService(serviceReference);
 
 				serviceRegistration.unregister();
-			};
-		};
+			});
+		});
 	}
 
 	private boolean isIncluded(

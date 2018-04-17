@@ -88,7 +88,7 @@ public class HttpMethodApplicationClientTest extends BaseClientTest {
 		extends BaseTestActivator {
 
 		@Override
-		protected List<Oauth2Runnable> getTestRunnables() throws Exception {
+		protected List<Oauth2Runnable<?>> getTestRunnables() throws Exception {
 			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
