@@ -28,6 +28,7 @@ import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -37,7 +38,6 @@ import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
 import com.liferay.portal.kernel.security.service.access.policy.ServiceAccessPolicyThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -71,7 +71,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 	@Override
 	public String getAuthType() {
-		return _OAUTH2;
+		return "OAuth2";
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				return authVerifierResult;
 			}
 
-			Set<String> scopeNames = new HashSet<>();
+			Set<String> scopes = new HashSet<>();
 
 			for (String accessTokenScope : accessToken.getScopes()) {
 				Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
@@ -117,7 +117,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				for (LiferayOAuth2Scope liferayOAuth2Scope :
 						liferayOAuth2Scopes) {
 
-					scopeNames.add(liferayOAuth2Scope.getScope());
+					scopes.add(liferayOAuth2Scope.getScope());
 				}
 			}
 
@@ -125,7 +125,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				_oAuth2JSONWSScopePublisher.getPublishedScopes(companyId);
 
 			for (SAPEntryScope sapEntryScope : sapEntryScopes) {
-				if (scopeNames.contains(sapEntryScope.getScopeName())) {
+				if (scopes.contains(sapEntryScope.getScopeName())) {
 					ServiceAccessPolicyThreadLocal.
 						addActiveServiceAccessPolicyName(
 							sapEntryScope.getSapEntryName());
@@ -144,7 +144,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		}
 		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("OAuth2 Access Token validation failed", e);
+				_log.debug("Unable to verify OAuth2 access token", e);
 			}
 
 			return authVerifierResult;
@@ -169,7 +169,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 		String scheme = authorizationParts[0];
 
-		if (!StringUtil.equalsIgnoreCase(scheme, _BEARER)) {
+		if (!StringUtil.equalsIgnoreCase(scheme, _TOKEN_KEY)) {
 			return null;
 		}
 
@@ -227,15 +227,13 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				expiresIn, new HashMap<>(), StringPool.BLANK, StringPool.BLANK,
 				issuedAt, StringPool.BLANK, StringPool.BLANK, new HashMap<>(),
 				StringPool.BLANK, StringPool.BLANK, scopeAliasesList,
-				accessTokenContent, _BEARER, oAuth2Authorization.getUserId(),
+				accessTokenContent, _TOKEN_KEY, oAuth2Authorization.getUserId(),
 				oAuth2Authorization.getUserName());
 
 		return accessToken;
 	}
 
-	private static final String _BEARER = "Bearer";
-
-	private static final String _OAUTH2 = "OAuth2";
+	private static final String _TOKEN_KEY = "Bearer";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2JSONWSAuthVerifier.class);
