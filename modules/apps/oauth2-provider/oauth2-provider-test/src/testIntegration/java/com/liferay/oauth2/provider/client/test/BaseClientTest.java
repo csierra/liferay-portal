@@ -29,6 +29,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.util.Properties;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -91,6 +93,7 @@ public class BaseClientTest {
 		Analyzer analyzer = new Analyzer();
 
 		File bndFile = new File("bnd.bnd");
+
 		JavaArchive javaArchive = bndProjectBuilder.setBndFile(
 			bndFile
 		).as(
@@ -114,6 +117,7 @@ public class BaseClientTest {
 			javaArchive.get("META-INF/MANIFEST.MF").getAsset().openStream());
 
 		firstPassManifest.getMainAttributes().remove(new Attributes.Name("Import-Package"));
+
 		firstPassManifest.getMainAttributes().putValue("Bundle-Activator", bundleActivator.getName());
 		analyzer.mergeManifest(firstPassManifest);
 		Manifest manifest = analyzer.calcManifest();
@@ -150,26 +154,21 @@ public class BaseClientTest {
 	protected String getToken(String clientId, String hostname)
 		throws URISyntaxException {
 
-		Client client = getClient();
+		return parseTokenString(
+			getClientCredentialsResponse(
+				clientId, getTokenInvocationBuilder(hostname)));
+	}
 
-		WebTarget tokenTarget = client.target(
-			_url.toURI()).path("o").path("oauth2").path("token");
+	protected <T> T getToken(
+		String clientId, String hostname,
+		BiFunction<String, Invocation.Builder, Response> credentials,
+		Function<Response, T> tokenParser) throws URISyntaxException {
 
-		MultivaluedHashMap<String, String> formData =
-			new MultivaluedHashMap<>();
+		return tokenParser.apply(
+			credentials.apply(clientId, getTokenInvocationBuilder(hostname)));
+	}
 
-		formData.add("client_id", clientId);
-		formData.add("client_secret", "oauthTestApplicationSecret");
-		formData.add("grant_type", "client_credentials");
-
-		Invocation.Builder builder = tokenTarget.request();
-
-		if (hostname != null) {
-			builder.header("Host", hostname);
-		}
-
-		Response tokenResponse = builder.post(Entity.form(formData));
-
+	protected String parseTokenString(Response tokenResponse) {
 		Document document = tokenResponse.readEntity(Document.class);
 
 		try {
@@ -193,6 +192,52 @@ public class BaseClientTest {
 			throw new IllegalArgumentException(
 				"The token service returned " + baos.toString());
 		}
+	}
+
+	protected Response getClientCredentialsResponse(
+		String clientId, Invocation.Builder builder) {
+		MultivaluedHashMap<String, String> formData =
+			new MultivaluedHashMap<>();
+
+		formData.add("client_id", clientId);
+		formData.add("client_secret", "oauthTestApplicationSecret");
+		formData.add("grant_type", "client_credentials");
+
+		return builder.post(Entity.form(formData));
+	}
+
+	protected BiFunction<String, Invocation.Builder, Response>
+		getResourceOwnerPassword(String user, String password) {
+
+		return (clientId, builder) -> {
+			MultivaluedHashMap<String, String> formData =
+				new MultivaluedHashMap<>();
+
+			formData.add("client_id", clientId);
+			formData.add("client_secret", "oauthTestApplicationSecret");
+			formData.add("grant_type", "password");
+			formData.add("username", user);
+			formData.add("password", password);
+
+			return builder.post(Entity.form(formData));
+		};
+	}
+
+	private Invocation.Builder getTokenInvocationBuilder(String hostname)
+		throws URISyntaxException {
+
+		Client client = getClient();
+
+		WebTarget tokenTarget = client.target(
+			_url.toURI()).path("o").path("oauth2").path("token");
+
+		Invocation.Builder builder = tokenTarget.request();
+
+		if (hostname != null) {
+			builder = builder.header("Host", hostname);
+		}
+
+		return builder;
 	}
 
 	public static void printDocument(Document doc, OutputStream out) throws

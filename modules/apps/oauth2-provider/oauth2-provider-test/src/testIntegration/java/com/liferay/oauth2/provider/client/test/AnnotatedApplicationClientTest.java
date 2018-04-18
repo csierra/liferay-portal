@@ -56,7 +56,11 @@ public class AnnotatedApplicationClientTest extends BaseClientTest {
 		WebTarget applicationTarget = getWebTarget("/annotated");
 
 		Invocation.Builder builder = authorize(
-			applicationTarget.request(), getToken("oauthTestApplicationAfter"));
+			applicationTarget.request(),
+			getToken(
+				"oauthTestApplicationAfter", null,
+				getResourceOwnerPassword("test@liferay.com", "test"),
+				this::parseTokenString));
 
 		Assert.assertEquals("everything.readonly", builder.get(String.class));
 

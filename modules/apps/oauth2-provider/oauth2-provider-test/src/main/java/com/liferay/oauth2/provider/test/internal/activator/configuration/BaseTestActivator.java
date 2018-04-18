@@ -71,6 +71,9 @@ public abstract class BaseTestActivator implements BundleActivator {
 
 		return createOauth2Application(
 			companyId, user, clientId,
+			Arrays.asList(
+				GrantType.CLIENT_CREDENTIALS,
+				GrantType.RESOURCE_OWNER_PASSWORD),
 			Arrays.asList("everything", "everything.readonly"));
 	}
 
@@ -100,7 +103,7 @@ public abstract class BaseTestActivator implements BundleActivator {
 
 	public Oauth2Runnable<OAuth2Application> createOauth2Application(
 		final long companyId, User user, String clientId,
-		List<String> availableScopes) {
+		List<GrantType> availableCredentials, List<String> availableScopes) {
 
 		return new Oauth2RunnableImpl<>(
 			bundleContext -> {
@@ -114,9 +117,8 @@ public abstract class BaseTestActivator implements BundleActivator {
 			final OAuth2Application oAuth2Application =
 				_oAuth2ApplicationLocalService.addOAuth2Application(
 					companyId, user.getUserId(), user.getLogin(),
-					Collections.singletonList(GrantType.CLIENT_CREDENTIALS),
-					clientId, 0, "oauthTestApplicationSecret",
-					"test oauth application",
+					availableCredentials, clientId, 0,
+					"oauthTestApplicationSecret", "test oauth application",
 					Collections.singletonList("token-introspection"),
 					"http://localhost:8080", 0, "test application",
 					"http://localhost:8080",
@@ -149,8 +151,9 @@ public abstract class BaseTestActivator implements BundleActivator {
 		);
 	}
 
-	public Oauth2Runnable<ServiceRegistration<Application>> registerJaxRsApplication(
-		Application application, Dictionary<String, Object> properties) {
+	public Oauth2Runnable<ServiceRegistration<Application>>
+		registerJaxRsApplication(
+			Application application, Dictionary<String, Object> properties) {
 
 		return new Oauth2RunnableImpl<>(bundleContext -> {
 			ServiceRegistration<Application> serviceRegistration =
@@ -261,6 +264,18 @@ public abstract class BaseTestActivator implements BundleActivator {
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
 		_cleanUp(bundleContext);
+	}
+
+	protected Oauth2Runnable<OAuth2Application> createOauth2Application(
+		long companyId, User user, String clientId,
+		List<String> availableScopes) {
+
+		return createOauth2Application(
+			companyId, user, clientId,
+			Arrays.asList(
+				GrantType.CLIENT_CREDENTIALS,
+				GrantType.RESOURCE_OWNER_PASSWORD),
+			availableScopes);
 	}
 
 	public interface Oauth2Runnable<T> {
@@ -424,12 +439,12 @@ public abstract class BaseTestActivator implements BundleActivator {
 			return new Oauth2TestResult<>(
 				factoryConfiguration,
 				() -> {
-				factoryConfiguration.delete();
+					factoryConfiguration.delete();
 
-				bundleContext.ungetService(serviceReference);
+					bundleContext.ungetService(serviceReference);
 
-				serviceRegistration.unregister();
-			});
+					serviceRegistration.unregister();
+				});
 		});
 	}
 
