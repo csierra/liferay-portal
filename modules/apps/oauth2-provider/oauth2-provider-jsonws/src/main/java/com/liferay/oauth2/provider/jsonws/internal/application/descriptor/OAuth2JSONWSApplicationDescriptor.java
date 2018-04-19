@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.jsonws.internal.application.descriptor;
 
 import com.liferay.oauth2.provider.jsonws.internal.constants.OAuth2JSONWSConstants;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
@@ -37,7 +38,8 @@ public class OAuth2JSONWSApplicationDescriptor
 	@Override
 	public String describeApplication(Locale locale) {
 		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(locale);
+			_resourceBundleLoader.loadResourceBundle(
+				LocaleUtil.toLanguageId(locale));
 
 		return ResourceBundleUtil.getString(
 			resourceBundle,
