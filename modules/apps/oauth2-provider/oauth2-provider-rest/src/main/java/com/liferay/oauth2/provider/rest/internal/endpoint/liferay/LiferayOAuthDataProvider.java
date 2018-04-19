@@ -122,7 +122,7 @@ public class LiferayOAuthDataProvider
 	public ServerAccessToken createAccessToken(AccessTokenRegistration reg)
 		throws OAuthServiceException {
 
-		List<String> approvedScope = new ArrayList<>(reg.getApprovedScope());
+		List<String> approvedScope = new ArrayList<>(reg.getRequestedScope());
 
 		if (approvedScope.isEmpty()) {
 			Client client = reg.getClient();
