@@ -1,9 +1,4 @@
-<%@ page
-	import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService" %>
-<%@ page
-	import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalServiceUtil" %>
-<%@ page
-	import="com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases" %><%--
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *

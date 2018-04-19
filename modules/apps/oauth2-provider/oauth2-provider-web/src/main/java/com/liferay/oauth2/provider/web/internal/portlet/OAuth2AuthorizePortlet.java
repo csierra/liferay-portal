@@ -19,30 +19,27 @@ import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
+import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
-import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationRequestModel;
+import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
-import javax.portlet.Portlet;
-import javax.portlet.PortletException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -51,6 +48,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+
+/**
+ * @author Tomas Polesovsky
+ */
 @Component(
 	immediate = true,
 	property = {
@@ -68,19 +81,19 @@ import java.util.Map;
 	service = Portlet.class
 )
 public class OAuth2AuthorizePortlet extends MVCPortlet {
-	
+
 	@Override
-	public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
-			throws IOException, PortletException {
+	public void doView(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		long companyId = themeDisplay.getCompanyId();
 
-		HttpServletRequest request =
-			PortalUtil.getOriginalServletRequest(
-				PortalUtil.getHttpServletRequest(renderRequest));
+		HttpServletRequest request = _portal.getOriginalServletRequest(
+			_portal.getHttpServletRequest(renderRequest));
 
 		OAuth2AuthorizePortletDisplayContext context =
 			new OAuth2AuthorizePortletDisplayContext();
@@ -92,14 +105,13 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 		String clientId = oAuth2Parameters.get("client_id");
 
 		try {
-
 			OAuth2Application oAuth2Application =
 				_oAuth2ApplicationService.fetchOAuth2Application(
 					companyId, clientId);
 
 			context.setOAuth2Application(oAuth2Application);
 
-			List<String> allowedScopes = Collections.emptyList();
+			List<String> allowedScopeAliases = Collections.emptyList();
 
 			if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 				OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
@@ -108,55 +120,73 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 							oAuth2Application.
 								getOAuth2ApplicationScopeAliasesId());
 
-				allowedScopes =
+				allowedScopeAliases =
 					oAuth2ApplicationScopeAliases.getScopeAliasesList();
 			}
 
-			String[] requestedScopes = StringUtil.split(
+			String[] requestedScopeAliases = StringUtil.split(
 				oAuth2Parameters.get("scope"), StringPool.SPACE);
 
-			AuthorizationRequestModel authorizationRequestModel =
-				new AuthorizationRequestModel(
-					allowedScopes.size(),
-					buildApplicationScopeDescriptor(themeDisplay.getLocale()));
+			Locale locale = themeDisplay.getLocale();
+
+			AuthorizationModel authorizationModel = new AuthorizationModel(
+				allowedScopeAliases.size(), buildApplicationDescriptor(locale),
+				buildApplicationScopeDescriptor(locale));
 
 			locateLiferayOAuth2Scopes(
-				companyId, allowedScopes,
-				authorizationRequestModel, requestedScopes);
+				companyId, allowedScopeAliases, authorizationModel, requestedScopeAliases);
 
-			context.setAuthorizationRequestModel(authorizationRequestModel);
+			context.setAuthorizationModel(authorizationModel);
 
 			renderRequest.setAttribute(
 				OAuth2AdminWebKeys.AUTHORIZE_DISPLAY_CONTEXT, context);
-		} 
-		catch (PortalException e) {
-			throw new PortletException(e);
 		}
-		
+		catch (PortalException pe) {
+			throw new PortletException(pe);
+		}
+
 		super.doView(renderRequest, renderResponse);
 	}
 
-	protected AuthorizationRequestModel.ApplicationScopeDescriptor
-		buildApplicationScopeDescriptor(Locale locale){
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_applicationDescriptors = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, ApplicationDescriptor.class, "osgi.jaxrs.name");
+	}
 
-		AuthorizationRequestModel.ApplicationScopeDescriptor
-			applicationScopeDescriptor =
-			(__, applicationName, internalScope) -> {
-				ScopeDescriptor scopeDescriptor =
-					_scopeDescriptorLocator.getScopeDescriptor(applicationName);
+	protected AuthorizationModel.ApplicationDescriptor
+		buildApplicationDescriptor(Locale locale) {
 
-				return scopeDescriptor.describeScope(
-					internalScope, locale);
-			};
+		return (companyId, applicationName) -> {
+			ApplicationDescriptor applicationDescriptor =
+				_applicationDescriptors.getService(applicationName);
 
-		return applicationScopeDescriptor;
+			return applicationDescriptor.describeApplication(locale);
+		};
+	}
+
+	protected AuthorizationModel.ApplicationScopeDescriptor
+		buildApplicationScopeDescriptor(Locale locale) {
+
+		return (companyId, applicationName, internalScope) -> {
+			ScopeDescriptor scopeDescriptor =
+				_scopeDescriptorLocator.getScopeDescriptor(applicationName);
+
+			return scopeDescriptor.describeScope(internalScope, locale);
+		};
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_applicationDescriptors.close();
 	}
 
 	protected Map<String, String> getOAuth2Parameters(
 		HttpServletRequest request) {
 
 		HashMap<String, String> result = new HashMap<>();
-		for(Enumeration<String> names = request.getParameterNames();
+
+		for (Enumeration<String> names = request.getParameterNames();
 			names.hasMoreElements();) {
 
 			String name = names.nextElement();
@@ -172,37 +202,41 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 	}
 
 	protected void locateLiferayOAuth2Scopes(
-		long companyId, List<String> allowedScopes,
-		AuthorizationRequestModel authorizationRequestModel,
-		String[] requestedScopes) {
+		long companyId, List<String> allowedScopeAliases,
+		AuthorizationModel authorizationModel, String[] requestedScopeAliases) {
 
-		for (String requestedScope : requestedScopes) {
-			if (!allowedScopes.contains(requestedScope)) {
+		for (String requestedScopeAlias : requestedScopeAliases) {
+			if (!allowedScopeAliases.contains(requestedScopeAlias)) {
 				continue;
 			}
 
 			Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
 				_scopeFinderLocator.getLiferayOAuth2Scopes(
-					companyId, requestedScope);
+					companyId, requestedScopeAlias);
 
 			for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
-				authorizationRequestModel.addLiferayOAuth2Scope(
-					liferayOAuth2Scope);
+				authorizationModel.addLiferayOAuth2Scope(liferayOAuth2Scope);
 			}
 		}
 	}
 
-	@Reference
-	private OAuth2ApplicationService _oAuth2ApplicationService;
+	private ServiceTrackerMap<String, ApplicationDescriptor>
+		_applicationDescriptors;
 
 	@Reference
 	private OAuth2ApplicationScopeAliasesLocalService
 		_oAuth2ApplicationScopeAliasesLocalService;
 
 	@Reference
-	private ScopeLocator _scopeFinderLocator;
+	private OAuth2ApplicationService _oAuth2ApplicationService;
 
 	@Reference
-	ScopeDescriptorLocator _scopeDescriptorLocator;
+	private Portal _portal;
+
+	@Reference
+	private ScopeDescriptorLocator _scopeDescriptorLocator;
+
+	@Reference
+	private ScopeLocator _scopeFinderLocator;
 
 }

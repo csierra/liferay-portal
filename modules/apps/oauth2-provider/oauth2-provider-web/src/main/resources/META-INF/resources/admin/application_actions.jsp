@@ -17,7 +17,6 @@
 <%@ include file="/admin/init.jsp" %>
 
 <%
-
 ResultRow row = (ResultRow)request.getAttribute("SEARCH_CONTAINER_RESULT_ROW");
 
 OAuth2Application oauth2application = (OAuth2Application)row.getObject();

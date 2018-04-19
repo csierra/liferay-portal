@@ -36,9 +36,15 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -47,14 +53,10 @@ import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Stian Sigvartsen
@@ -77,21 +79,6 @@ import java.util.Map;
 )
 public class OAuth2AdminPortlet extends MVCPortlet {
 
-	@Override
-	public void render(
-			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws IOException, PortletException {
-
-		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
-			new OAuth2AdminPortletDisplayContext(_oAuth2ProviderConfiguration);
-
-		renderRequest.setAttribute(
-			OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT,
-			oAuth2AdminPortletDisplayContext);
-
-		super.render(renderRequest, renderResponse);
-	}
-
 	public void deleteOAuth2Application(
 			ActionRequest request, ActionResponse response)
 		throws PortalException {
@@ -108,6 +95,32 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		}
 	}
 
+	@Override
+	public void render(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
+
+		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
+			new OAuth2AdminPortletDisplayContext(_oAuth2ProviderConfiguration);
+
+		renderRequest.setAttribute(
+			OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT,
+			oAuth2AdminPortletDisplayContext);
+
+		super.render(renderRequest, renderResponse);
+	}
+
+	public void revokeAuthorizationTokens(
+			ActionRequest request, ActionResponse response)
+		throws PortalException {
+
+		long oAuth2AuthorizationId = ParamUtil.getLong(
+			request, "oAuth2AuthorizationId");
+
+		_oAuth2AuthorizationService.revokeOAuth2Authorization(
+			oAuth2AuthorizationId);
+	}
+
 	public void updateOAuth2Application(
 			ActionRequest request, ActionResponse response)
 		throws PortalException {
@@ -119,9 +132,8 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			request, "oAuth2ApplicationId");
 
 		int clientProfile = ParamUtil.getInteger(request, "clientProfile", 0);
-				
-		String clientId = ParamUtil.get(
-			request, "clientId", StringPool.BLANK);
+
+		String clientId = ParamUtil.get(request, "clientId", StringPool.BLANK);
 
 		String clientSecret = ParamUtil.get(
 			request, "clientSecret", StringPool.BLANK);
@@ -130,12 +142,12 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 		PortletPreferences portletPreferences = request.getPreferences();
 
-		String[] oAuth2Features = StringUtil.split(portletPreferences.getValue(
-			"oAuth2Features", StringPool.BLANK));
+		String[] oAuth2Features = StringUtil.split(
+			portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
 
 		List<String> featuresList = new ArrayList<>(oAuth2Features.length);
 
-		for(String feature : oAuth2Features) {
+		for (String feature : oAuth2Features) {
 			if (ParamUtil.getBoolean(request, "feature-" + feature, false)) {
 				featuresList.add(feature);
 			}
@@ -157,7 +169,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		List<GrantType> allowedGrantTypes = new ArrayList<>(
 			oAuth2Grants.size());
 
-		for(GrantType grantType : oAuth2Grants) {
+		for (GrantType grantType : oAuth2Grants) {
 			if (ParamUtil.getBoolean(request, "grant-" + grantType.name())) {
 				allowedGrantTypes.add(grantType);
 			}
@@ -174,6 +186,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		long iconFileEntryId = 0;
 
 		OAuth2Application oAuth2Application = null;
+
 		try {
 			if (oAuth2ApplicationId == 0) {
 				oAuth2Application =
@@ -195,11 +208,11 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 				oAuth2Application =
 					_oAuth2ApplicationService.updateOAuth2Application(
-						oAuth2ApplicationId, allowedGrantTypes,
-						clientId, clientProfile, clientSecret, description,
-						featuresList, homePageURL, iconFileEntryId, name,
-						privacyPolicyURL, redirectURIsList,
-						oAuth2ApplicationScopeAliasesId, serviceContext);
+						oAuth2ApplicationId, allowedGrantTypes, clientId,
+						clientProfile, clientSecret, description, featuresList,
+						homePageURL, iconFileEntryId, name, privacyPolicyURL,
+						redirectURIsList, oAuth2ApplicationScopeAliasesId,
+						serviceContext);
 			}
 
 			UploadPortletRequest uploadPortletRequest =
@@ -209,7 +222,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 			if (!Validator.isBlank(sourceFileName)) {
 				try (InputStream inputStream =
-						 uploadPortletRequest.getFileAsStream("icon")) {
+						uploadPortletRequest.getFileAsStream("icon")) {
 
 					_oAuth2ApplicationService.updateIcon(
 						oAuth2Application.getOAuth2ApplicationId(),
@@ -222,7 +235,6 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 			response.setRenderParameter(
 				"mvcPath", "/admin/edit_application.jsp");
-
 		}
 		catch (PortalException pe) {
 			if (_log.isDebugEnabled()) {
@@ -238,34 +250,23 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		}
 	}
 
-	public void revokeAuthorizationTokens(
-			ActionRequest request, ActionResponse response)
-		throws PortalException {
-
-		long oAuth2AuthorizationId = ParamUtil.getLong(
-			request, "oAuth2AuthorizationId");
-
-		_oAuth2AuthorizationService.revokeOAuth2Authorization(
-			oAuth2AuthorizationId);
-	}
-
-
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		_oAuth2ProviderConfiguration =
-			ConfigurableUtil.createConfigurable(
-				OAuth2ProviderConfiguration.class, properties);
+		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
+			OAuth2ProviderConfiguration.class, properties);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortlet.class);
 
-	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
-
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;
+
 	@Reference
 	private OAuth2AuthorizationService _oAuth2AuthorizationService;
+
+	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
+
 	@Reference
 	private Portal _portal;
 
