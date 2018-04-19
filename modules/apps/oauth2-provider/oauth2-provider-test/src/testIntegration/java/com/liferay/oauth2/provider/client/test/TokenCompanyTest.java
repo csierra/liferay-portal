@@ -14,8 +14,10 @@
 
 package com.liferay.oauth2.provider.client.test;
 
-import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestActivator;
+import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.User;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -23,9 +25,6 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Carlos Sierra Andrés
@@ -44,12 +43,10 @@ public class TokenCompanyTest extends BaseClientTest {
 	public void testDifferentRoles() throws Exception {
 		getToken("oauthTestApplication", "myhost.xyz");
 
-		// This does not fail
+		getToken("oauthTestApplicationAllowed", "myhostallowed.xyz");
 
 		try {
 			getToken("oauthTestApplicationDefault", "myhostdefaultuser.xyz");
-
-			//This fails because of lack of permissions
 
 			Assert.fail("This should have failed");
 		}
@@ -57,39 +54,35 @@ public class TokenCompanyTest extends BaseClientTest {
 			Assert.assertTrue(e.getMessage().contains("invalid_grant"));
 		}
 
-		getToken("oauthTestApplicationAllowed", "myhostallowed.xyz");
 	}
 
 	public static class AnnotatedApplicationBundleActivator
-		extends BaseTestActivator {
+		extends BaseTestPreparatorBundleActivator {
 
 		@Override
-		protected List<Oauth2Runnable<?>> getTestRunnables() throws Exception {
-			return Arrays.asList(
-				createCompany("myhost").flatMap(
-					this::addUser
-				).flatMap(
-					user -> createOauth2Application(
-						user.getCompanyId(), user, "oauthTestApplication")),
-				createCompany("myhostallowed").flatMap(
-					this::addAdminUser
-				).flatMap(
-					user -> createOauth2Application(
-						user.getCompanyId(), user,
-						"oauthTestApplicationAllowed")),
-				createCompany("myhostdefaultuser").flatMap(
-					company -> {
-						try {
-							return createOauth2Application(
-								company.getCompanyId(),
-								company.getDefaultUser(),
-								"oauthTestApplicationDefault");
-						}
-						catch (PortalException e) {
-							throw new IllegalArgumentException(e);
-						}
-					})
-			);
+		protected void prepareTest() throws Exception {
+			User user = addUser(createCompany("myhost"));
+
+			createOauth2Application(
+				user.getCompanyId(), user, "oauthTestApplication");
+
+			User adminUser = addAdminUser(createCompany("myhostallowed"));
+
+			createOauth2Application(
+				adminUser.getCompanyId(), adminUser,
+				"oauthTestApplicationAllowed");
+
+			Company company = createCompany("myhostdefaultuser");
+
+			try {
+				createOauth2Application(
+					company.getCompanyId(), company.getDefaultUser(),
+					"oauthTestApplicationDefault");
+			}
+			catch (PortalException e) {
+				throw new IllegalArgumentException(e);
+			}
+
 		}
 
 	}

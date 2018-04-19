@@ -16,16 +16,14 @@ package com.liferay.oauth2.provider.client.test;
 
 import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.oauth2.provider.test.internal.TestApplication;
-import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestActivator;
+import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -71,10 +69,10 @@ public class AnnotationsAndHttpApplicationClientTest extends BaseClientTest {
 	}
 
 	public static class AnnotationsAndHttpBundleActivator
-		extends BaseTestActivator {
+		extends BaseTestPreparatorBundleActivator {
 
 		@Override
-		protected List<Oauth2Runnable<?>> getTestRunnables() throws Exception {
+		protected void prepareTest() throws Exception {
 			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
@@ -96,28 +94,26 @@ public class AnnotationsAndHttpApplicationClientTest extends BaseClientTest {
 			scopeMapperProperties.put(
 				"osgi.jaxrs.name", TestApplication.class.getName());
 
-			return Arrays.asList(
-				registerJaxRsApplication(
-					new TestApplication(), testApplicationProperties),
-				registerJaxRsApplication(
-					new TestAnnotatedApplication(),
-					annotatedApplicationProperties),
-				registerScopeMapper(
-					input -> {
-						if (input.equals("GET")) {
-							return Collections.singleton("everything.readonly");
-						}
-						else if (input.equals("POST")) {
-							return Collections.singleton(
-								"everything.writeonly");
-						}
+			registerJaxRsApplication(
+				new TestApplication(), testApplicationProperties);
+			registerJaxRsApplication(
+				new TestAnnotatedApplication(), annotatedApplicationProperties);
+			registerScopeMapper(
+				input -> {
+					if (input.equals("GET")) {
+						return Collections.singleton("everything.readonly");
+					}
+					else if (input.equals("POST")) {
+						return Collections.singleton(
+							"everything.writeonly");
+					}
 
-						return Collections.singleton(input);
-					},
-					scopeMapperProperties),
-				createOauth2Application(
-					defaultCompanyId, user, "oauthTestApplication",
-					Collections.singletonList("everything")));
+					return Collections.singleton(input);
+				},
+				scopeMapperProperties);
+			createOauth2Application(
+				defaultCompanyId, user, "oauthTestApplication",
+				Collections.singletonList("everything"));
 		}
 
 	}

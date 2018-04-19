@@ -15,7 +15,7 @@
 package com.liferay.oauth2.provider.client.test;
 
 import com.liferay.oauth2.provider.test.internal.TestApplication;
-import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestActivator;
+import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -85,10 +84,10 @@ public class HttpMethodApplicationClientTest extends BaseClientTest {
 	}
 
 	public static class MethodApplicationBundleActivator
-		extends BaseTestActivator {
+		extends BaseTestPreparatorBundleActivator {
 
 		@Override
-		protected List<Oauth2Runnable<?>> getTestRunnables() throws Exception {
+		protected void prepareTest() throws Exception {
 			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
@@ -97,17 +96,16 @@ public class HttpMethodApplicationClientTest extends BaseClientTest {
 
 			properties.put("oauth2.test.application", true);
 
-			return Arrays.asList(
-				createOauth2Application(
-					defaultCompanyId, user, "oauthTestApplicationBefore",
-					Arrays.asList("GET", "POST")),
-				registerJaxRsApplication(new TestApplication(), properties),
-				createOauth2Application(
-					defaultCompanyId, user, "oauthTestApplicationAfter",
-					Arrays.asList("GET", "POST")),
-				createOauth2Application(
-					defaultCompanyId, user, "oauthTestApplicationWrong",
-					Collections.singletonList("everything")));
+			createOauth2Application(
+				defaultCompanyId, user, "oauthTestApplicationBefore",
+				Arrays.asList("GET", "POST"));
+			registerJaxRsApplication(new TestApplication(), properties);
+			createOauth2Application(
+				defaultCompanyId, user, "oauthTestApplicationAfter",
+				Arrays.asList("GET", "POST"));
+			createOauth2Application(
+				defaultCompanyId, user, "oauthTestApplicationWrong",
+				Collections.singletonList("everything"));
 		}
 
 	}

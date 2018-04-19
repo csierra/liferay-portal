@@ -50,6 +50,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -169,28 +171,30 @@ public class BaseClientTest {
 	}
 
 	protected String parseTokenString(Response tokenResponse) {
-		Document document = tokenResponse.readEntity(Document.class);
+		String jsonString = tokenResponse.readEntity(String.class);
 
 		try {
-			return document.getElementsByTagName(
-				"access_token"
-			).item(
-				0
-			).getTextContent(
-			);
+			JSONObject jsonObject = new JSONObject(jsonString);
+
+			return jsonObject.getString("access_token");
 		}
-		catch (Exception e1) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-			try {
-				printDocument(document, baos);
-			}
-			catch (Exception e2) {
-				throw new RuntimeException(e2);
-			}
-
+		catch (JSONException e) {
 			throw new IllegalArgumentException(
-				"The token service returned " + baos.toString());
+				"The token service returned " + jsonString);
+		}
+	}
+
+	protected String parseScopeString(Response tokenResponse) {
+		String jsonString = tokenResponse.readEntity(String.class);
+
+		try {
+			JSONObject jsonObject = new JSONObject(jsonString);
+
+			return jsonObject.getString("scope");
+		}
+		catch (JSONException e) {
+			throw new IllegalArgumentException(
+				"The token service returned " + jsonString);
 		}
 	}
 
@@ -218,6 +222,24 @@ public class BaseClientTest {
 			formData.add("grant_type", "password");
 			formData.add("username", user);
 			formData.add("password", password);
+
+			return builder.post(Entity.form(formData));
+		};
+	}
+
+	protected BiFunction<String, Invocation.Builder, Response>
+		getResourceOwnerPassword(String user, String password, String scope) {
+
+		return (clientId, builder) -> {
+			MultivaluedHashMap<String, String> formData =
+				new MultivaluedHashMap<>();
+
+			formData.add("client_id", clientId);
+			formData.add("client_secret", "oauthTestApplicationSecret");
+			formData.add("grant_type", "password");
+			formData.add("username", user);
+			formData.add("password", password);
+			formData.add("scope", scope);
 
 			return builder.post(Entity.form(formData));
 		};

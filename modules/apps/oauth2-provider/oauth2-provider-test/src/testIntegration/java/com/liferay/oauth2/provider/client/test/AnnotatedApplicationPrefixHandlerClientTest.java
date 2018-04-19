@@ -15,16 +15,14 @@
 package com.liferay.oauth2.provider.client.test;
 
 import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
-import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestActivator;
+import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -63,10 +61,10 @@ public class AnnotatedApplicationPrefixHandlerClientTest
 	}
 
 	public static class AnnotatedApplicationPrefixHandlerBundleActivator
-		extends BaseTestActivator {
+		extends BaseTestPreparatorBundleActivator {
 
 		@Override
-		protected List<Oauth2Runnable<?>> getTestRunnables() throws Exception {
+		protected void prepareTest() throws Exception {
 			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
@@ -82,14 +80,15 @@ public class AnnotatedApplicationPrefixHandlerClientTest
 			prefixHandlerProperties.put(
 				"osgi.jaxrs.name", TestAnnotatedApplication.class.getName());
 
-			return Arrays.asList(
-				registerPrefixHandler(
-					input -> "test/" + input, prefixHandlerProperties),
-				registerJaxRsApplication(
-					new TestAnnotatedApplication(), properties),
-				createOauth2Application(
-					defaultCompanyId, user, "oauthTestApplication",
-					Collections.singletonList("test/everything")));
+			registerPrefixHandler(
+				input -> "test/" + input, prefixHandlerProperties);
+
+			registerJaxRsApplication(
+				new TestAnnotatedApplication(), properties);
+
+			createOauth2Application(
+				defaultCompanyId, user, "oauthTestApplication",
+				Collections.singletonList("test/everything"));
 		}
 
 	}
