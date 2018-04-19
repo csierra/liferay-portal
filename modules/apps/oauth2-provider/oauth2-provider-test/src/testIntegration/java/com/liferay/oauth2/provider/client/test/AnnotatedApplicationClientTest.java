@@ -50,7 +50,7 @@ public class AnnotatedApplicationClientTest extends BaseClientTest {
 	}
 
 	@Test
-	public void testAnnotatedApplication() throws Exception {
+	public void test() throws Exception {
 		WebTarget applicationTarget = getWebTarget("/annotated");
 
 		Invocation.Builder builder = authorize(

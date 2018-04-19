@@ -54,7 +54,7 @@ public class HttpMethodApplicationClientTest extends BaseClientTest {
 	}
 
 	@Test
-	public void testHttpMethodApplication() throws Exception {
+	public void test() throws Exception {
 		WebTarget applicationTarget = getWebTarget("/methods");
 
 		Invocation.Builder builder = authorize(

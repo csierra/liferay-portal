@@ -51,7 +51,7 @@ public class AnnotationsAndHttpApplicationClientTest extends BaseClientTest {
 	}
 
 	@Test
-	public void testHttpMethodApplication() throws Exception {
+	public void test() throws Exception {
 		String tokenString = getToken("oauthTestApplication");
 
 		WebTarget applicationTarget = getWebTarget("/methods");

@@ -198,6 +198,36 @@ public class BaseClientTest {
 		}
 	}
 
+	protected String parseError(Response tokenResponse) {
+		String jsonString = tokenResponse.readEntity(String.class);
+
+		try {
+			JSONObject jsonObject = new JSONObject(jsonString);
+
+			return jsonObject.getString("error");
+		}
+		catch (JSONException e) {
+			throw new IllegalArgumentException(
+				"The token service returned " + jsonString);
+		}
+	}
+
+	protected BiFunction<String, Invocation.Builder, Response>
+		getClientCredentialsResponse(String scope) {
+
+		return (clientId, builder) -> {
+			MultivaluedHashMap<String, String> formData =
+				new MultivaluedHashMap<>();
+
+			formData.add("client_id", clientId);
+			formData.add("client_secret", "oauthTestApplicationSecret");
+			formData.add("grant_type", "client_credentials");
+			formData.add("scope", scope);
+
+			return builder.post(Entity.form(formData));
+		};
+	}
+
 	protected Response getClientCredentialsResponse(
 		String clientId, Invocation.Builder builder) {
 		MultivaluedHashMap<String, String> formData =

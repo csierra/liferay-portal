@@ -27,9 +27,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.ws.rs.client.WebTarget;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 /**
@@ -46,14 +46,36 @@ public class NarrowDownScopeClientTest extends BaseClientTest {
 	}
 
 	@Test
-	public void testHttpMethodApplication() throws Exception {
-		String scope =
+	public void test() throws Exception {
+		Assert.assertEquals(
+			"HEAD",
+			getToken(
+				"oauthTestApplication", null,
+				getClientCredentialsResponse("HEAD"), this::parseScopeString));
+
+		Assert.assertEquals(
+			"HEAD",
 			getToken(
 				"oauthTestApplication", null,
 				getResourceOwnerPassword("test@liferay.com", "test", "HEAD"),
-				this::parseScopeString);
+				this::parseScopeString));
 
-		Assert.assertEquals("HEAD", scope);
+		String scopeString = getToken(
+			"oauthTestApplication", null,
+			getResourceOwnerPassword("test@liferay.com", "test"),
+			this::parseScopeString);
+
+		Assert.assertEquals(
+			new HashSet<>(Arrays.asList("HEAD", "GET", "OPTIONS", "POST")),
+			new HashSet<>(Arrays.asList(scopeString.split(" "))));
+
+		Assert.assertEquals(
+			"invalid_grant",
+			getToken(
+				"oauthTestApplication", null,
+				getResourceOwnerPassword(
+					"test@liferay.com", "test", "HEAD GET OPTIONS POST PUT"),
+				this::parseError));
 	}
 
 	public static class NarrowDownScopeTestPreparator

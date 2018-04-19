@@ -40,20 +40,17 @@ public class TokenCompanyTest extends BaseClientTest {
 	}
 
 	@Test
-	public void testDifferentRoles() throws Exception {
+	public void test() throws Exception {
 		getToken("oauthTestApplication", "myhost.xyz");
 
 		getToken("oauthTestApplicationAllowed", "myhostallowed.xyz");
 
-		try {
-			getToken("oauthTestApplicationDefault", "myhostdefaultuser.xyz");
-
-			Assert.fail("This should have failed");
-		}
-		catch (Exception e) {
-			Assert.assertTrue(e.getMessage().contains("invalid_grant"));
-		}
-
+		Assert.assertEquals(
+			"invalid_grant",
+			getToken(
+				"oauthTestApplicationDefault", "myhostdefaultuser.xyz",
+				this::getClientCredentialsResponse,
+				this::parseError));
 	}
 
 	public static class AnnotatedApplicationBundleActivator

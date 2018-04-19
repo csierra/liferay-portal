@@ -50,8 +50,7 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 	}
 
 	@Test
-	public void testAnnotationsHttpMethodApplicationConfiguration()
-		throws Exception {
+	public void test() throws Exception {
 
 		String tokenString = getToken("oauthTestApplication");
 

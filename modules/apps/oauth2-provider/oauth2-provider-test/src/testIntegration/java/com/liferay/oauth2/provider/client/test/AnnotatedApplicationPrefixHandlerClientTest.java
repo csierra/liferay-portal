@@ -51,7 +51,7 @@ public class AnnotatedApplicationPrefixHandlerClientTest
 	}
 
 	@Test
-	public void testAnnotatedApplicationWithPrefixHandler() throws Exception {
+	public void test() throws Exception {
 		WebTarget webTarget = getWebTarget("/annotated");
 
 		Invocation.Builder builder = authorize(
