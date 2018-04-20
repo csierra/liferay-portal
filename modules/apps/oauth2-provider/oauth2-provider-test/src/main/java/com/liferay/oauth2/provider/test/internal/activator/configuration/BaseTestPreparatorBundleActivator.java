@@ -206,6 +206,26 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		return serviceRegistration;
 	}
 
+	public ServiceRegistration<Object> registerJsonWebService(
+		String name, String path, Object service,
+		Dictionary<String, Object> properties) {
+
+		if (properties == null || properties.isEmpty()) {
+			properties = new Hashtable<>();
+		}
+
+		properties.put("json.web.service.context.name", name);
+		properties.put("json.web.service.context.path", path);
+
+		ServiceRegistration<Object> serviceRegistration =
+			_bundleContext.registerService(
+				Object.class, service, properties);
+
+		_autoCloseables.add(serviceRegistration::unregister);
+
+		return serviceRegistration;
+	}
+
 	protected OAuth2Application createOauth2Application(
 		long companyId, User user, String clientId,
 		List<String> availableScopes) throws PortalException {

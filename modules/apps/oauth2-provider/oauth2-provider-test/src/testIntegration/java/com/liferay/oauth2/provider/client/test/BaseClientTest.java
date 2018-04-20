@@ -323,6 +323,22 @@ public class BaseClientTest {
 		return target;
 	}
 
+	protected WebTarget getJsonWebTarget(String... paths)
+		throws URISyntaxException {
+
+		Client client = getClient();
+
+		WebTarget target = client.target(getUrl().toURI());
+
+		target = target.path("api").path("jsonws");
+
+		for (String path : paths) {
+			target = target.path(path);
+		}
+
+		return target;
+	}
+
 	@ArquillianResource
 	private URL _url;
 
