@@ -34,11 +34,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * @author Carlos Sierra Andrés
  */
 @RunWith(PowerMockRunner.class)
-public class HttpMethodRequestScopeCheckerTest extends PowerMockito {
+public class HttpMethodRequestScopeCheckerFilterTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
-		requestScopeCheckerFilter = new HttpMethodRequestScopeChecker();
+		requestScopeCheckerFilter = new HttpMethodRequestScopeCheckerFilter();
 		resourceInfo = Mockito.mock(ResourceInfo.class);
 	}
 

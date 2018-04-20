@@ -17,6 +17,7 @@ package com.liferay.oauth2.provider.rest.internal.request.scope.checker.filter;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
+import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.RequestScopeCheckerFilter;
 import com.liferay.oauth2.provider.scope.RequiresScope;
 
 import javax.ws.rs.container.ResourceInfo;
@@ -35,11 +36,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * @author Carlos Sierra Andrés
  */
 @RunWith(PowerMockRunner.class)
-public class AnnotationRequestScopeCheckerTest extends PowerMockito {
+public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
-		annotationRequestScopeChecker = new AnnotationRequestScopeChecker();
+		requestScopeCheckerFilter = new AnnotationRequestScopeCheckerFilter();
 		request = Mockito.mock(Request.class);
 	}
 
@@ -56,7 +57,7 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 		);
 
 		assertTrue(
-			annotationRequestScopeChecker.isAllowed(
+			requestScopeCheckerFilter.isAllowed(
 				testScopeChecker, request, resourceInfo));
 	}
 
@@ -73,7 +74,7 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 		);
 
 		assertTrue(
-			annotationRequestScopeChecker.isAllowed(
+			requestScopeCheckerFilter.isAllowed(
 				testScopeChecker, request, resourceInfo));
 	}
 
@@ -93,7 +94,7 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 		);
 
 		assertTrue(
-			annotationRequestScopeChecker.isAllowed(
+			requestScopeCheckerFilter.isAllowed(
 				testScopeChecker, request, resourceInfo));
 	}
 
@@ -114,7 +115,7 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 		);
 
 		assertFalse(
-			annotationRequestScopeChecker.isAllowed(
+			requestScopeCheckerFilter.isAllowed(
 				testScopeChecker, request, resourceInfo));
 	}
 
@@ -133,24 +134,24 @@ public class AnnotationRequestScopeCheckerTest extends PowerMockito {
 		);
 
 		assertTrue(
-			annotationRequestScopeChecker.isAllowed(
+			requestScopeCheckerFilter.isAllowed(
 				testScopeChecker, request, resourceInfo));
 
 		testScopeChecker = new TestScopeChecker("WRITE");
 
 		assertTrue(
-			annotationRequestScopeChecker.isAllowed(
+			requestScopeCheckerFilter.isAllowed(
 				testScopeChecker, request, resourceInfo));
 
 		testScopeChecker = new TestScopeChecker("RANDOM");
 
 		assertFalse(
-			annotationRequestScopeChecker.isAllowed(
+			requestScopeCheckerFilter.isAllowed(
 				testScopeChecker, request, resourceInfo));
 	}
 
-	protected AnnotationRequestScopeChecker annotationRequestScopeChecker;
 	protected Request request;
+	protected RequestScopeCheckerFilter requestScopeCheckerFilter;
 
 	private static class TestEndpointSample {
 

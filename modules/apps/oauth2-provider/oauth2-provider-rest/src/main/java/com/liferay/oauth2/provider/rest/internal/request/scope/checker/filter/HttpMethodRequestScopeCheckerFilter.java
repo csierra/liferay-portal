@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Carlos Sierra Andrés
  */
 @Component(immediate = true, property = {"default=true", "type=http.method"})
-public class HttpMethodRequestScopeChecker
+public class HttpMethodRequestScopeCheckerFilter
 	implements RequestScopeCheckerFilter {
 
 	@Override

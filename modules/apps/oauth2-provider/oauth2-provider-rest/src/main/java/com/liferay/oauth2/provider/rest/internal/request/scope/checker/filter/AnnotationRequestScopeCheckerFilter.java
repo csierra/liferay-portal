@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Tomas Polesovsky
  */
 @Component(property = "type=annotation")
-public class AnnotationRequestScopeChecker
+public class AnnotationRequestScopeCheckerFilter
 	implements RequestScopeCheckerFilter {
 
 	@Override
