@@ -77,15 +77,9 @@ public class AnnotationsAndHttpApplicationClientTest extends BaseClientTest {
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
-			Dictionary<String, Object> testApplicationProperties =
-				new Hashtable<>();
-
-			testApplicationProperties.put("oauth2.test.application", true);
-
 			Dictionary<String, Object> annotatedApplicationProperties =
 				new Hashtable<>();
 
-			annotatedApplicationProperties.put("oauth2.test.application", true);
 			annotatedApplicationProperties.put(
 				"oauth2.scopechecker.type", "annotations");
 
@@ -94,8 +88,7 @@ public class AnnotationsAndHttpApplicationClientTest extends BaseClientTest {
 			scopeMapperProperties.put(
 				"osgi.jaxrs.name", TestApplication.class.getName());
 
-			registerJaxRsApplication(
-				new TestApplication(), testApplicationProperties);
+			registerJaxRsApplication(new TestApplication(), new Hashtable<>());
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), annotatedApplicationProperties);
 			registerScopeMapper(

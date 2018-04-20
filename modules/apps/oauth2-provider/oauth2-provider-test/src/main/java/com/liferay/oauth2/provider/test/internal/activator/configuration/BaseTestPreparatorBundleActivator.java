@@ -148,6 +148,12 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		Application application, Dictionary<String, Object> properties)
 		throws InterruptedException {
 
+		if (properties == null || properties.isEmpty()) {
+			properties = new Hashtable<>();
+		}
+
+		properties.put("oauth2.test.application", true);
+
 		ServiceRegistration<Application> serviceRegistration =
 			_bundleContext.registerService(
 				Application.class, application, properties);

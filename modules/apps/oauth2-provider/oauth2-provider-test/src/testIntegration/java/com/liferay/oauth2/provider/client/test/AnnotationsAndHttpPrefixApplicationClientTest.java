@@ -94,13 +94,11 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 			Dictionary<String, Object> testApplicationProperties =
 				new Hashtable<>();
 
-			testApplicationProperties.put("oauth2.test.application", true);
 			testApplicationProperties.put("prefix", "methods");
 
 			Dictionary<String, Object> annotatedApplicationProperties =
 				new Hashtable<>();
 
-			annotatedApplicationProperties.put("oauth2.test.application", true);
 			annotatedApplicationProperties.put(
 				"oauth2.scopechecker.type", "annotations");
 			annotatedApplicationProperties.put("prefix", "annotations");

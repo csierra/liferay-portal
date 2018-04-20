@@ -78,19 +78,14 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
-			Dictionary<String, Object> testApplicationProperties =
-				new Hashtable<>();
-
-			testApplicationProperties.put("oauth2.test.application", true);
-
 			Dictionary<String, Object> annotatedApplicationProperties =
 				new Hashtable<>();
 
-			annotatedApplicationProperties.put("oauth2.test.application", true);
 			annotatedApplicationProperties.put(
 				"oauth2.scopechecker.type", "annotations");
 
-			Hashtable<String, Object> scopeMapperProperties = new Hashtable<>();
+			Dictionary<String, Object> scopeMapperProperties =
+				new Hashtable<>();
 
 			scopeMapperProperties.put(
 				"osgi.jaxrs.name", TestApplication.class.getName());
@@ -99,11 +94,9 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 				"com.liferay.oauth2.provider.scope.internal." +
 				"configuration.ConfigurableScopeMapperConfiguration",
 				scopeMapperProperties);
+			registerJaxRsApplication(new TestApplication(), new Hashtable<>());
 			registerJaxRsApplication(
-				new TestApplication(), testApplicationProperties);
-			registerJaxRsApplication(
-				new TestAnnotatedApplication(),
-				annotatedApplicationProperties);
+				new TestAnnotatedApplication(), annotatedApplicationProperties);
 			createOauth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Collections.singletonList("everything"));

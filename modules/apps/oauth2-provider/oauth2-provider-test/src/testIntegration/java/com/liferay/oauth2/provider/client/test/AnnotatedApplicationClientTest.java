@@ -82,7 +82,6 @@ public class AnnotatedApplicationClientTest extends BaseClientTest {
 
 			Dictionary<String, Object> properties = new Hashtable<>();
 
-			properties.put("oauth2.test.application", true);
 			properties.put("oauth2.scopechecker.type", "annotations");
 
 			createOauth2Application(
