@@ -184,6 +184,18 @@ public class BaseClientTest {
 		}
 	}
 
+	protected JSONObject parseJsonObject(Response tokenResponse) {
+		String jsonString = tokenResponse.readEntity(String.class);
+
+		try {
+			return  new JSONObject(jsonString);
+		}
+		catch (JSONException e) {
+			throw new IllegalArgumentException(
+				"The token service returned " + jsonString);
+		}
+	}
+
 	protected String parseScopeString(Response tokenResponse) {
 		String jsonString = tokenResponse.readEntity(String.class);
 
