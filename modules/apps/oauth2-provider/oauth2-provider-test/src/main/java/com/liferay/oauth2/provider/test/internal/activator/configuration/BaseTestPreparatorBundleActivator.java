@@ -97,7 +97,7 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 
 	public OAuth2Application createOauth2Application(
 		final long companyId, User user, String clientId,
-		List<GrantType> availableCredentials, List<String> availableScopes)
+		List<GrantType> availableGrants, List<String> availableScopes)
 		throws PortalException {
 
 		ServiceReference<OAuth2ApplicationLocalService> serviceReference =
@@ -113,7 +113,7 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			oAuth2Application =
 				_oAuth2ApplicationLocalService.addOAuth2Application(
 					companyId, user.getUserId(), user.getLogin(),
-					availableCredentials, clientId, 0,
+					availableGrants, clientId, 0,
 					"oauthTestApplicationSecret", "test oauth application",
 					Collections.singletonList("token-introspection"),
 					"http://localhost:8080", 0, "test application",
