@@ -57,11 +57,41 @@ public class TokenExpeditionTest extends BaseClientTest {
 		MultivaluedHashMap<String, String> formData =
 			new MultivaluedHashMap<>();
 
+		formData.add("client_id", "");
+		formData.add("client_secret", "");
+		formData.add("grant_type", "client_credentials");
+
+		String error = parseError(builder.post(Entity.form(formData)));
+
+		Assert.assertEquals("invalid_client", error);
+
+		formData = new MultivaluedHashMap<>();
+
+		formData.add("client_id", "");
+		formData.add("client_secret", "wrong");
+		formData.add("grant_type", "client_credentials");
+
+		error = parseError(builder.post(Entity.form(formData)));
+
+		Assert.assertEquals("invalid_client", error);
+
+		formData = new MultivaluedHashMap<>();
+
+		formData.add("client_id", "oauthTestApplication");
+		formData.add("client_secret", "");
+		formData.add("grant_type", "client_credentials");
+
+		error = parseError(builder.post(Entity.form(formData)));
+
+		Assert.assertEquals("invalid_client", error);
+
+		formData = new MultivaluedHashMap<>();
+
 		formData.add("client_id", "oauthTestApplication");
 		formData.add("client_secret", "wrong");
 		formData.add("grant_type", "client_credentials");
 
-		String error = parseError(builder.post(Entity.form(formData)));
+		error = parseError(builder.post(Entity.form(formData)));
 
 		Assert.assertEquals("invalid_client", error);
 
