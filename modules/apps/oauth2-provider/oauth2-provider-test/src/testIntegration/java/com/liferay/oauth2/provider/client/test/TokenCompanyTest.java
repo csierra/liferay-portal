@@ -49,7 +49,7 @@ public class TokenCompanyTest extends BaseClientTest {
 			"invalid_grant",
 			getToken(
 				"oauthTestApplicationDefault", "myhostdefaultuser.xyz",
-				this::getClientCredentialsResponse,
+				this::getClientCredentials,
 				this::parseError));
 	}
 

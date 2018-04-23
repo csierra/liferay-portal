@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.client.test;
 
 import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
-import com.liferay.oauth2.provider.test.internal.TestApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -28,9 +27,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
-import java.util.Collections;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.Response;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -39,36 +40,70 @@ import java.util.Hashtable;
  */
 @RunAsClient
 @RunWith(Arquillian.class)
-public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
+public class TokenExpeditionTest extends BaseClientTest {
 
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTest.getDeployment(
-			ScopeMapperNarrowDownClientTestPreparator.class);
+			TokenExpeditionTestPreparator.class);
 	}
 
 	@Test
 	public void test() throws Exception {
-		WebTarget applicationTarget = getWebTarget("/annotated");
+		WebTarget tokenWebTarget = getTokenWebTarget();
 
-		Invocation.Builder builder = authorize(
-			applicationTarget.request(),
-			getToken(
-				"oauthTestApplication", null,
-				getClientCredentials("everything"),
-				this::parseTokenString));
+		Invocation.Builder builder = tokenWebTarget.request();
+
+		MultivaluedHashMap<String, String> formData =
+			new MultivaluedHashMap<>();
+
+		formData.add("client_id", "oauthTestApplication");
+		formData.add("client_secret", "wrong");
+		formData.add("grant_type", "client_credentials");
+
+		String error = parseError(builder.post(Entity.form(formData)));
+
+		Assert.assertEquals("invalid_client", error);
+
+		formData = new MultivaluedHashMap<>();
+
+		formData.add("client_id", "wrong");
+		formData.add("client_secret", "oauthTestApplicationSecret");
+		formData.add("grant_type", "client_credentials");
+
+		error = parseError(builder.post(Entity.form(formData)));
+
+		Assert.assertEquals("invalid_client", error);
+
+		formData = new MultivaluedHashMap<>();
+
+		formData.add("client_id", "oauthTestApplication");
+		formData.add("client_secret", "oauthTestApplicationSecret");
+		formData.add("grant_type", "client_credentials");
+
+		WebTarget webTarget = getWebTarget("/annotated");
+
+		String tokenString = parseTokenString(
+			builder.post(Entity.form(formData)));
+
+		builder = authorize(webTarget.request(), tokenString);
 
 		Assert.assertEquals("everything.readonly", builder.get(String.class));
 
-		String scopeString = getToken(
-			"oauthTestApplication", null,
-			getClientCredentials("everything.readonly"),
-			this::parseScopeString);
+		builder = webTarget.request().header("Authorization", "Bearer ");
 
-		Assert.assertEquals("everything.readonly", scopeString);
+		Response response = builder.get();
+
+		Assert.assertEquals(403, response.getStatus());
+
+		builder = webTarget.request().header("Authorization", "Bearer wrong");
+
+		response = builder.get();
+
+		Assert.assertEquals(403, response.getStatus());
 	}
 
-	public static class ScopeMapperNarrowDownClientTestPreparator
+	public static class TokenExpeditionTestPreparator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override
@@ -77,29 +112,17 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
-			Dictionary<String, Object> annotatedApplicationProperties =
-				new Hashtable<>();
+			Dictionary<String, Object> properties = new Hashtable<>();
 
-			annotatedApplicationProperties.put(
-				"oauth2.scopechecker.type", "annotations");
+			properties.put("oauth2.scopechecker.type", "annotations");
 
-			Dictionary<String, Object> scopeMapperProperties =
-				new Hashtable<>();
-
-			scopeMapperProperties.put(
-				"osgi.jaxrs.name", TestApplication.class.getName());
-
-			createConfigurationFactory(
-				"com.liferay.oauth2.provider.scope.internal." +
-				"configuration.ConfigurableScopeMapperConfiguration",
-				scopeMapperProperties);
-			registerJaxRsApplication(new TestApplication(), new Hashtable<>());
 			registerJaxRsApplication(
-				new TestAnnotatedApplication(), annotatedApplicationProperties);
+				new TestAnnotatedApplication(), properties);
+
 			createOauth2Application(
-				defaultCompanyId, user, "oauthTestApplication",
-				Collections.singletonList("everything"));
+				defaultCompanyId, user, "oauthTestApplication");
 		}
+
 	}
 
 }

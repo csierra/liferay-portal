@@ -157,7 +157,7 @@ public class BaseClientTest {
 		throws URISyntaxException {
 
 		return parseTokenString(
-			getClientCredentialsResponse(
+			getClientCredentials(
 				clientId, getTokenInvocationBuilder(hostname)));
 	}
 
@@ -213,7 +213,7 @@ public class BaseClientTest {
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>
-		getClientCredentialsResponse(String scope) {
+	getClientCredentials(String scope) {
 
 		return (clientId, builder) -> {
 			MultivaluedHashMap<String, String> formData =
@@ -228,7 +228,7 @@ public class BaseClientTest {
 		};
 	}
 
-	protected Response getClientCredentialsResponse(
+	protected Response getClientCredentials(
 		String clientId, Invocation.Builder builder) {
 		MultivaluedHashMap<String, String> formData =
 			new MultivaluedHashMap<>();
@@ -275,13 +275,10 @@ public class BaseClientTest {
 		};
 	}
 
-	private Invocation.Builder getTokenInvocationBuilder(String hostname)
+	protected Invocation.Builder getTokenInvocationBuilder(String hostname)
 		throws URISyntaxException {
 
-		Client client = getClient();
-
-		WebTarget tokenTarget = client.target(
-			_url.toURI()).path("o").path("oauth2").path("token");
+		WebTarget tokenTarget = getTokenWebTarget();
 
 		Invocation.Builder builder = tokenTarget.request();
 
@@ -290,6 +287,13 @@ public class BaseClientTest {
 		}
 
 		return builder;
+	}
+
+	protected WebTarget getTokenWebTarget() throws URISyntaxException {
+		Client client = getClient();
+
+		return client.target(
+			_url.toURI()).path("o").path("oauth2").path("token");
 	}
 
 	public static void printDocument(Document doc, OutputStream out) throws
@@ -340,6 +344,6 @@ public class BaseClientTest {
 	}
 
 	@ArquillianResource
-	private URL _url;
+	protected URL _url;
 
 }
