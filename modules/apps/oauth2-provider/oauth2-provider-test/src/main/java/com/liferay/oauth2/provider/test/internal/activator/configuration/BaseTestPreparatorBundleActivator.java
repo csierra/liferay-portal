@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,6 +51,7 @@ import org.apache.cxf.endpoint.ServerRegistry;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
@@ -63,7 +65,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public abstract class BaseTestPreparatorBundleActivator implements BundleActivator {
 
-	private BundleContext _bundleContext;
+	protected BundleContext _bundleContext;
 
 	public OAuth2Application createOauth2Application(
 		final long companyId, User user, String clientId)
@@ -158,6 +160,8 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			_bundleContext.registerService(
 				Application.class, application, properties);
 
+		_autoCloseables.add(serviceRegistration::unregister);
+
 		ServiceTracker<Bus, Bus> serviceTracker =
 			ServiceTrackerFactory.open(
 				_bundleContext,
@@ -173,8 +177,6 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		finally {
 			serviceTracker.close();
 		}
-
-		serviceTracker.close();
 
 		if (bus == null) {
 			throw new IllegalStateException(
@@ -200,8 +202,6 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			throw new IllegalStateException(
 				"Endpoint was not registered within 10 seconds");
 		}
-
-		_autoCloseables.add(serviceRegistration::unregister);
 
 		return serviceRegistration;
 	}
@@ -322,8 +322,6 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			e.printStackTrace();
 
 			bundleContext.ungetService(serviceReference);
-
-			_cleanUp(bundleContext);
 		}
 	}
 
@@ -331,10 +329,6 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		_cleanUp(bundleContext);
-	}
-
-	private void _cleanUp(BundleContext bundleContext) throws Exception {
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
 
 		ListIterator<AutoCloseable> listIterator = _autoCloseables.listIterator(
@@ -388,14 +382,39 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		catch (Exception e) {
 		}
 
-		if (!countDownLatch.await(10, TimeUnit.SECONDS)) {
-			throw new TimeoutException("Service unregister waiting timeout");
-		}
+		countDownLatch.await(10, TimeUnit.SECONDS);
 	}
 
 	private ArrayList<AutoCloseable> _autoCloseables;
 	private Configuration _cxfConfiguration;
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 	private Configuration _restConfiguration;
+
+	protected Configuration updateOrCreateConfiguration(
+			String pid, Dictionary<String, ?> properties)
+		throws IOException, InvalidSyntaxException {
+
+		Configuration configuration;
+
+		configuration = TestUtils.configurationExists(
+			_bundleContext, pid);
+
+		if (configuration == null) {
+			configuration = TestUtils.updateConfiguration(
+				_bundleContext, pid, properties);
+
+			_autoCloseables.add(configuration::delete);
+		}
+		else {
+			Dictionary<String, Object> oldProperties =
+				configuration.getProperties();
+
+			_autoCloseables.add(
+				() -> TestUtils.updateConfiguration(
+					_bundleContext, pid, oldProperties));
+		}
+
+		return configuration;
+	}
 
 }

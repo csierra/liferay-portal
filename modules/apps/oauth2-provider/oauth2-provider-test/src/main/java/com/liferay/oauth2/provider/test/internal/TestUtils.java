@@ -13,13 +13,17 @@
  */
 package com.liferay.oauth2.provider.test.internal;
 
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Validator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 
 import java.io.IOException;
@@ -96,6 +100,10 @@ public class TestUtils {
 						Dictionary<String, ?> incomingProperties)
 						throws ConfigurationException {
 
+						if (Validator.isNotNull(incomingProperties)) {
+							return;
+						}
+
 						if (isIncluded(
 							properties, incomingProperties)) {
 
@@ -146,5 +154,93 @@ public class TestUtils {
 		}
 
 		return factoryConfiguration;
+	}
+
+	public static Configuration configurationExists(
+			BundleContext bundleContext, String pid)
+		throws IOException, InvalidSyntaxException {
+
+		ServiceReference<ConfigurationAdmin> serviceReference =
+			bundleContext.getServiceReference(ConfigurationAdmin.class);
+
+		ConfigurationAdmin configurationAdmin =
+			bundleContext.getService(serviceReference);
+
+		try {
+			Configuration[] configurations = configurationAdmin.listConfigurations(
+				"(" + Constants.SERVICE_PID + "=" + pid + ")");
+
+			if (ArrayUtil.isEmpty(configurations)) {
+				return null;
+			}
+
+			return configurations[0];
+		}
+		finally {
+			bundleContext.ungetService(serviceReference);
+		}
+	}
+
+	public static Configuration updateConfiguration(
+		BundleContext bundleContext, String pid,
+		Dictionary<String, ?> properties) {
+
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+
+		Hashtable<String, Object> registrationProperties = new Hashtable<>();
+
+		registrationProperties.put(Constants.SERVICE_PID, pid);
+
+		ServiceRegistration<ManagedService> serviceRegistration =
+			bundleContext.registerService(
+				ManagedService.class,
+				incomingProperties -> {
+					if (Validator.isNull(incomingProperties)) {
+						return;
+					}
+
+					if (isIncluded(
+						properties, incomingProperties)) {
+
+						countDownLatch.countDown();
+					}
+				},
+				registrationProperties);
+
+		ServiceReference<ConfigurationAdmin> serviceReference =
+			bundleContext.getServiceReference(ConfigurationAdmin.class);
+
+		ConfigurationAdmin configurationAdmin =
+			bundleContext.getService(serviceReference);
+
+		Configuration configuration = null;
+
+		try {
+			configuration = configurationAdmin.getConfiguration(pid, "?");
+
+			configuration.update(properties);
+
+			countDownLatch.await(10, TimeUnit.SECONDS);
+		}
+		catch (IOException ioe1) {
+			throw new RuntimeException(ioe1);
+		}
+		catch (InterruptedException ie) {
+			try {
+				configuration.delete();
+			}
+			catch (IOException ioe2) {
+				throw new RuntimeException(ioe2);
+			}
+
+			throw new RuntimeException(ie);
+		}
+		finally {
+			bundleContext.ungetService(serviceReference);
+
+			serviceRegistration.unregister();
+		}
+
+		return configuration;
 	}
 }
