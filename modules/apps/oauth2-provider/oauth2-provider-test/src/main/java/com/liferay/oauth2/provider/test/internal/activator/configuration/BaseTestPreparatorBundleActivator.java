@@ -20,11 +20,13 @@ import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.oauth2.provider.test.internal.TestAutoLogin;
 import com.liferay.oauth2.provider.test.internal.TestUtils;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auto.login.AutoLogin;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -120,7 +122,7 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 					Collections.singletonList("token-introspection"),
 					"http://localhost:8080", 0, "test application",
 					"http://localhost:8080",
-					Collections.singletonList("http://localhost:8080"),
+					Collections.singletonList("http://clienthost:8080"),
 					availableScopes, new ServiceContext());
 
 			_autoCloseables.add(
@@ -234,7 +236,8 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			companyId, user, clientId,
 			Arrays.asList(
 				GrantType.CLIENT_CREDENTIALS,
-				GrantType.RESOURCE_OWNER_PASSWORD),
+				GrantType.RESOURCE_OWNER_PASSWORD,
+				GrantType.AUTHORIZATION_CODE),
 			availableScopes);
 	}
 
@@ -259,6 +262,20 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		ServiceRegistration<ScopeMapper> serviceRegistration =
 			_bundleContext.registerService(
 				ScopeMapper.class, scopeMapper, scopeMapperProperties);
+
+		_autoCloseables.add(serviceRegistration::unregister);
+
+		return serviceRegistration;
+	}
+
+	protected ServiceRegistration<AutoLogin> registerTestAutoLogin(User user) {
+
+		TestAutoLogin testAutoLogin = new TestAutoLogin(user);
+		
+		ServiceRegistration<AutoLogin> serviceRegistration =
+			_bundleContext.registerService(
+				AutoLogin.class, testAutoLogin,
+				new Hashtable<>());
 
 		_autoCloseables.add(serviceRegistration::unregister);
 

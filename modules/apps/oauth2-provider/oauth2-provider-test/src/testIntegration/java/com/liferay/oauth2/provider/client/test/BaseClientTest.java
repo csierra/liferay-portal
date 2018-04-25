@@ -17,6 +17,7 @@ package com.liferay.oauth2.provider.client.test;
 import aQute.bnd.osgi.Analyzer;
 import aQute.bnd.osgi.Jar;
 
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.shrinkwrap.osgi.api.BndProjectBuilder;
 
 import java.io.ByteArrayOutputStream;
@@ -25,20 +26,30 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
-
+import java.net.URLDecoder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import javax.xml.transform.OutputKeys;
@@ -58,8 +69,9 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
+import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.osgi.framework.BundleActivator;
 
 import org.w3c.dom.Document;
@@ -149,6 +161,19 @@ public class BaseClientTest {
 		return builder.header("Authorization", "Bearer " + tokenString);
 	}
 
+	protected <T> T executeCodeGrant(
+		String clientId, String clientSecret, String hostname,
+		BiFunction<ClientCredentials, WebTarget, Response> credentials,
+		Function<Response, T> authorizationCodeResponseParser) throws URISyntaxException {
+	
+		WebTarget webTarget = getAuthorizeEndpointInvocationWebTarget();
+		
+		return authorizationCodeResponseParser.apply(
+			credentials.apply(
+				new ClientCredentials(clientId, clientSecret, hostname), 
+				webTarget));
+	}
+
 	protected String getToken(String clientId) throws URISyntaxException {
 		return getToken(clientId, null);
 	}
@@ -168,6 +193,29 @@ public class BaseClientTest {
 
 		return tokenParser.apply(
 			credentials.apply(clientId, getTokenInvocationBuilder(hostname)));
+	}
+
+	protected <T> T getTokenForAuthorizationCodeGrant(
+		String clientId, String clientSecret, String hostname,
+		BiFunction<ClientCredentials, Invocation.Builder, Response> credentials,
+		Function<Response, T> tokenParser) throws URISyntaxException {
+
+		return tokenParser.apply(
+			credentials.apply(
+				new ClientCredentials(clientId, clientSecret, hostname), 
+				getTokenInvocationBuilder(hostname)));
+	}
+
+	protected String parseAuthorizationCodeString(Response response) {
+		String redirectLocation = response.getHeaderString("Location");
+		
+		if (redirectLocation == null) {
+			throw new IllegalArgumentException(
+				"Authorization service response missing Location header from " +
+					"which code is extracted");
+		}
+		
+		return _getParameterValue(redirectLocation, "code");
 	}
 
 	protected String parseTokenString(Response tokenResponse) {
@@ -222,6 +270,92 @@ public class BaseClientTest {
 			throw new IllegalArgumentException(
 				"The token service returned " + jsonString);
 		}
+	}
+
+	protected BiFunction<ClientCredentials, WebTarget, Response>
+		getAuthorizationCodeGrantExecutor(String redirectURI, String scope) {
+	
+		return (clientCredentials, webTarget) -> {
+			
+			webTarget = webTarget.queryParam(
+				"client_id", clientCredentials.clientId
+			).queryParam(
+				"client_secret", clientCredentials.clientSecret
+			).queryParam(
+				"response_type", "code"
+			).queryParam(
+				"redirect_uri", redirectURI
+			).queryParam(
+				"scope", scope
+			);
+
+			Invocation.Builder builder = webTarget.request();
+			
+			if (clientCredentials.hostname != null) {
+				builder = builder.header("Host", clientCredentials.hostname);
+			}
+			
+			builder = builder.header("Accept", "text/html");
+			
+			Response response = builder.get();
+			
+			Client client = getClient();
+			
+			Set<Cookie> cookies = new HashSet<>();
+			
+			while (_isRedirectResponse(response)) {
+				
+				String redirect = response.getHeaderString("Location");
+				
+				if (redirect.startsWith(redirectURI)) {
+					return response;
+				}
+				
+				String oauth2ReplyTo = _getParameterValue(redirect, "oauth2_reply_to");
+
+				WebTarget redirectWebTarget;
+				if (oauth2ReplyTo != null) {
+				
+					try {
+						oauth2ReplyTo = URLDecoder.decode(oauth2ReplyTo, "UTF-8");
+					} 
+					catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					
+					// Simulate user consent
+					redirectWebTarget = getDecisionWebTarget(client, redirect, response, oauth2ReplyTo);
+					
+				}
+				else {
+					redirectWebTarget = client.target(redirect);
+				}
+				
+				int protoEnd = redirect.indexOf("://");
+				int contextStart = redirect.indexOf('/', protoEnd + 3);
+				
+				String hostname = redirect.substring(protoEnd + 3, contextStart);
+				
+				Invocation.Builder redirectBuilder = 
+					redirectWebTarget.request().header(
+						"Host", hostname
+					).header(
+						"Accept", "text/html"
+					);
+
+				for (Cookie cookie : response.getCookies().values()) {
+					cookies.add(cookie);					
+				}
+				
+				for (Cookie cookie : cookies) {
+					redirectBuilder = redirectBuilder.cookie(cookie);
+				}
+				
+				response = redirectBuilder.get();
+			}
+			
+			return response;
+		};
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>
@@ -287,6 +421,34 @@ public class BaseClientTest {
 		};
 	}
 
+	protected BiFunction<ClientCredentials, Invocation.Builder, Response>
+		getCodeToAccessTokenExchangeExecutor(String code, String redirectURI) {
+	
+		return (clientCredentials, builder) -> {
+			MultivaluedHashMap<String, String> formData =
+				new MultivaluedHashMap<>();
+	
+			formData.add("client_id", clientCredentials.clientId);
+			formData.add("client_secret", clientCredentials.clientSecret);
+			formData.add("grant_type", "authorization_code");
+			formData.add("code", code);
+			formData.add("redirect_uri", redirectURI);
+	
+			return builder.post(Entity.form(formData));
+		};
+	}
+	
+	protected WebTarget getAuthorizeEndpointInvocationWebTarget()
+		throws URISyntaxException {
+	
+		Client client = getClient();
+	
+		WebTarget tokenTarget = client.target(
+			_url.toURI()).path("o").path("oauth2").path("authorize");
+	
+		return tokenTarget;
+	}
+
 	protected Invocation.Builder getTokenInvocationBuilder(String hostname)
 		throws URISyntaxException {
 
@@ -303,9 +465,30 @@ public class BaseClientTest {
 
 	protected WebTarget getTokenWebTarget() throws URISyntaxException {
 		Client client = getClient();
-
+	
 		return client.target(
 			_url.toURI()).path("o").path("oauth2").path("token");
+	}
+
+	protected static WebTarget getDecisionWebTarget(
+		Client client, String locationString, Response response, String oauth2ReplyTo) {
+		
+		Map<String, String> params = _getParameterMap(locationString);
+		Stream<String> stream = params.keySet().stream();
+		
+		StringBundler sb = new StringBundler(oauth2ReplyTo);
+		
+		sb.append('?');
+		
+		stream.filter(
+			key -> key.startsWith("oauth2_") && !key.equals("oauth2_reply_to")
+		).forEach(key -> {
+			sb.append(key.substring("oauth2_".length())).append('=').append(params.get(key)).append('&');
+		});
+		
+		sb.append("oauthDecision=allow");
+		
+		return client.target(sb.toString());		
 	}
 
 	public static void printDocument(Document doc, OutputStream out) throws
@@ -355,7 +538,57 @@ public class BaseClientTest {
 		return target;
 	}
 
+	private static boolean _isRedirectResponse(Response response) {
+		return 
+				response.getStatus() > 300 
+				&& response.getStatus() < 400 
+				&& response.getHeaderString("Location") != null;
+	}
+
+	private static Map<String, String> _getParameterMap(String uRIString) {
+		
+		int queryStringStartIndex = uRIString.indexOf('?');
+		
+		if (queryStringStartIndex < 0) {
+			return Collections.EMPTY_MAP;
+		}
+	
+		Pattern p = Pattern.compile("[?&]([^$=&]*)=([^$&]*){0,1}");
+		
+		Matcher m = p.matcher(uRIString.substring(queryStringStartIndex));
+		
+		Map<String, String> paramMap = new HashMap<>();
+		
+		while (m.find()) {
+			paramMap.put(m.group(1), m.group(2));
+		}
+		
+		return paramMap;
+	}
+
+	private static String _getParameterValue(String uRIString, String paramName) {
+		Pattern p = Pattern.compile("[?&]" + paramName + "=([^$&]*)");
+		
+		Matcher m = p.matcher(uRIString);
+		
+		if (m.find()) {
+			return m.group(1);
+		}
+		
+		return null;
+	}
+
 	@ArquillianResource
 	protected URL _url;
-
+	
+	private static class ClientCredentials {
+		
+		public ClientCredentials(String clientId, String clientSecret, String hostname) {
+			this.clientId = clientId;
+			this.clientSecret = clientSecret;
+			this.hostname = hostname;
+		}
+		
+		public String clientId, clientSecret, hostname;
+	}
 }
