@@ -111,7 +111,26 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		).build();
 	}
 
-	protected TokenIntrospection buildTokenIntrospection(
+	protected boolean clientsMatch(Client client1, Client client2) {
+		if (!Objects.equals(client1.getClientId(), client2.getClientId())) {
+			return false;
+		}
+
+		String companyId1 = MapUtil.getString(
+			client1.getProperties(),
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
+		String companyId2 = MapUtil.getString(
+			client2.getProperties(),
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
+
+		if (Objects.equals(companyId1, companyId2)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	protected TokenIntrospection createTokenIntrospection(
 		ServerAccessToken serverAccessToken) {
 
 		TokenIntrospection tokenIntrospection = new TokenIntrospection(true);
@@ -165,25 +184,6 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return tokenIntrospection;
 	}
 
-	protected boolean clientsMatch(Client client1, Client client2) {
-		if (!Objects.equals(client1.getClientId(), client2.getClientId())) {
-			return false;
-		}
-
-		String companyId1 = MapUtil.getString(
-			client1.getProperties(),
-			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
-		String companyId2 = MapUtil.getString(
-			client2.getProperties(),
-			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
-
-		if (Objects.equals(companyId1, companyId2)) {
-			return true;
-		}
-
-		return false;
-	}
-
 	protected Response handleAccessToken(
 		Client client, ServerAccessToken serverAccessToken) {
 
@@ -215,11 +215,8 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 			).build();
 		}
 
-		TokenIntrospection tokenIntrospection = buildTokenIntrospection(
-			serverAccessToken);
-
 		return Response.ok(
-			tokenIntrospection
+			createTokenIntrospection(serverAccessToken)
 		).build();
 	}
 
@@ -252,13 +249,10 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 			).build();
 		}
 
-		TokenIntrospection tokenIntrospection = buildTokenIntrospection(
-			refreshToken);
-
 		return Response.status(
 			Response.Status.OK
 		).entity(
-			tokenIntrospection
+			createTokenIntrospection(refreshToken)
 		).build();
 	}
 
