@@ -64,7 +64,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 @Produces("text/html")
 @Provider
-public class AuthorizeScreenRedirectMessageBodyWriter
+public class OAuthAuthorizationDataMessageBodyWriter
 	implements MessageBodyWriter<OAuthAuthorizationData> {
 
 	@Override
@@ -198,7 +198,7 @@ public class AuthorizeScreenRedirectMessageBodyWriter
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		AuthorizeScreenRedirectMessageBodyWriter.class);
+		OAuthAuthorizationDataMessageBodyWriter.class);
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
