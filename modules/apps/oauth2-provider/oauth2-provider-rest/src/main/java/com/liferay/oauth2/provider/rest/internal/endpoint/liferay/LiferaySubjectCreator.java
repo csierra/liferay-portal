@@ -43,10 +43,11 @@ public class LiferaySubjectCreator implements SubjectCreator {
 
 	@Override
 	public UserSubject createUserSubject(
-			MessageContext mc, MultivaluedMap<String, String> params)
+			MessageContext messageContext,
+			MultivaluedMap<String, String> params)
 		throws OAuthServiceException {
 
-		SecurityContext securityContext = mc.getSecurityContext();
+		SecurityContext securityContext = messageContext.getSecurityContext();
 
 		Principal userPrincipal = securityContext.getUserPrincipal();
 
