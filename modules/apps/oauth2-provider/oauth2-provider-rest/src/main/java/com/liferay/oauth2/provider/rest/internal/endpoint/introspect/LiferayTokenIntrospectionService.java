@@ -215,11 +215,8 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 			).build();
 		}
 
-		TokenIntrospection tokenIntrospection = createTokenIntrospection(
-			serverAccessToken);
-
 		return Response.ok(
-			tokenIntrospection
+			createTokenIntrospection(serverAccessToken)
 		).build();
 	}
 
@@ -252,13 +249,10 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 			).build();
 		}
 
-		TokenIntrospection tokenIntrospection = createTokenIntrospection(
-			refreshToken);
-
 		return Response.status(
 			Response.Status.OK
 		).entity(
-			tokenIntrospection
+			createTokenIntrospection(refreshToken)
 		).build();
 	}
 
