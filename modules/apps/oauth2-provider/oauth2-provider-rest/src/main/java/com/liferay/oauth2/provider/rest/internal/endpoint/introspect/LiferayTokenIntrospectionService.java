@@ -107,111 +107,32 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return Response.ok(new TokenIntrospection(false)).build();
 	}
 
-	protected Response handleAccessToken(
-		Client authenticatedClient, ServerAccessToken cxfAccessToken) {
+	protected boolean clientsMatch(Client client1, Client client2) {
+		String client1Id = client1.getClientId();
+		String client2Id = client2.getClientId();
 
-		if (!verifyClient(authenticatedClient, cxfAccessToken)) {
-			return createErrorResponseFromErrorCode(
-				OAuthConstants.UNAUTHORIZED_CLIENT);
-		}
-
-		if (!verifyCXFToken(cxfAccessToken)) {
-			return Response.ok(new TokenIntrospection(false)).build();
-		}
-
-		BearerTokenProvider.AccessToken accessToken =
-			_liferayOAuthDataProvider.fromCXFAccessToken(cxfAccessToken);
-
-		OAuth2Application oAuth2Application =
-			accessToken.getOAuth2Application();
-
-		BearerTokenProvider bearerTokenProvider =
-			_liferayOAuthDataProvider.getBearerTokenProvider(
-				oAuth2Application.getCompanyId(),
-				oAuth2Application.getClientId());
-
-		if (!bearerTokenProvider.isValid(accessToken)) {
-			return Response.ok(new TokenIntrospection(false)).build();
-		}
-
-		TokenIntrospection tokenIntrospection = _buildTokenIntrospection(
-			cxfAccessToken);
-
-		return Response.ok(tokenIntrospection).build();
-	}
-
-	protected Response handleRefreshToken(
-		Client authenticatedClient, RefreshToken cxfRefreshToken) {
-
-		if (!verifyClient(authenticatedClient, cxfRefreshToken)) {
-			return createErrorResponseFromErrorCode(
-				OAuthConstants.UNAUTHORIZED_CLIENT);
-		}
-
-		if (!verifyCXFToken(cxfRefreshToken)) {
-			return Response.ok(new TokenIntrospection(false)).build();
-		}
-
-		BearerTokenProvider.RefreshToken refreshToken =
-			_liferayOAuthDataProvider.fromCXFRefreshToken(cxfRefreshToken);
-
-		OAuth2Application oAuth2Application =
-			refreshToken.getOAuth2Application();
-
-		BearerTokenProvider bearerTokenProvider =
-			_liferayOAuthDataProvider.getBearerTokenProvider(
-				oAuth2Application.getCompanyId(),
-				oAuth2Application.getClientId());
-
-		if (!bearerTokenProvider.isValid(refreshToken)) {
-			return Response.ok(new TokenIntrospection(false)).build();
-		}
-
-		TokenIntrospection tokenIntrospection = _buildTokenIntrospection(
-			cxfRefreshToken);
-
-		return Response.status(
-			Response.Status.OK
-		).entity(
-			tokenIntrospection
-		).build();
-	}
-
-	protected boolean verifyClient(
-		Client authenticatedClient, ServerAccessToken serverAccessToken) {
-
-		if (!_clientsMatch(
-				authenticatedClient, serverAccessToken.getClient())) {
-
+		if (!Objects.equals(client1Id, client2Id)) {
 			return false;
 		}
 
-		Map<String, String> properties = authenticatedClient.getProperties();
+		Map<String, String> properties = client1.getProperties();
 
-		if (!properties.containsKey(
-				OAuth2ProviderRestEndpointConstants.
-					PROPERTY_KEY_CLIENT_FEATURE_PREFIX +
-						OAuth2ProviderRestEndpointConstants.
-							PROPERTY_KEY_CLIENT_FEATURE_TOKEN_INTROSPECTION)) {
+		String companyId1 = properties.get(
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
 
+		properties = client2.getProperties();
+
+		String companyId2 = properties.get(
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
+
+		if (!Objects.equals(companyId1, companyId2)) {
 			return false;
 		}
 
 		return true;
 	}
 
-	protected boolean verifyCXFToken(ServerAccessToken serverAccessToken) {
-		if (OAuthUtils.isExpired(
-				serverAccessToken.getIssuedAt(),
-				serverAccessToken.getExpiresIn())) {
-
-			return false;
-		}
-
-		return true;
-	}
-
-	private TokenIntrospection _buildTokenIntrospection(
+	protected TokenIntrospection createTokenIntrospection(
 		ServerAccessToken serverAccessToken) {
 
 		TokenIntrospection tokenIntrospection = new TokenIntrospection(true);
@@ -260,25 +181,102 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return tokenIntrospection;
 	}
 
-	private boolean _clientsMatch(Client client1, Client client2) {
-		String client1Id = client1.getClientId();
-		String client2Id = client2.getClientId();
+	protected Response handleAccessToken(
+		Client authenticatedClient, ServerAccessToken cxfAccessToken) {
 
-		if (!Objects.equals(client1Id, client2Id)) {
+		if (!verifyClient(authenticatedClient, cxfAccessToken)) {
+			return createErrorResponseFromErrorCode(
+				OAuthConstants.UNAUTHORIZED_CLIENT);
+		}
+
+		if (!verifyCXFToken(cxfAccessToken)) {
+			return Response.ok(new TokenIntrospection(false)).build();
+		}
+
+		BearerTokenProvider.AccessToken accessToken =
+			_liferayOAuthDataProvider.fromCXFAccessToken(cxfAccessToken);
+
+		OAuth2Application oAuth2Application =
+			accessToken.getOAuth2Application();
+
+		BearerTokenProvider bearerTokenProvider =
+			_liferayOAuthDataProvider.getBearerTokenProvider(
+				oAuth2Application.getCompanyId(),
+				oAuth2Application.getClientId());
+
+		if (!bearerTokenProvider.isValid(accessToken)) {
+			return Response.ok(new TokenIntrospection(false)).build();
+		}
+
+		TokenIntrospection tokenIntrospection = createTokenIntrospection(
+			cxfAccessToken);
+
+		return Response.ok(tokenIntrospection).build();
+	}
+
+	protected Response handleRefreshToken(
+		Client authenticatedClient, RefreshToken cxfRefreshToken) {
+
+		if (!verifyClient(authenticatedClient, cxfRefreshToken)) {
+			return createErrorResponseFromErrorCode(
+				OAuthConstants.UNAUTHORIZED_CLIENT);
+		}
+
+		if (!verifyCXFToken(cxfRefreshToken)) {
+			return Response.ok(new TokenIntrospection(false)).build();
+		}
+
+		BearerTokenProvider.RefreshToken refreshToken =
+			_liferayOAuthDataProvider.fromCXFRefreshToken(cxfRefreshToken);
+
+		OAuth2Application oAuth2Application =
+			refreshToken.getOAuth2Application();
+
+		BearerTokenProvider bearerTokenProvider =
+			_liferayOAuthDataProvider.getBearerTokenProvider(
+				oAuth2Application.getCompanyId(),
+				oAuth2Application.getClientId());
+
+		if (!bearerTokenProvider.isValid(refreshToken)) {
+			return Response.ok(new TokenIntrospection(false)).build();
+		}
+
+		TokenIntrospection tokenIntrospection = createTokenIntrospection(
+			cxfRefreshToken);
+
+		return Response.status(
+			Response.Status.OK
+		).entity(
+			tokenIntrospection
+		).build();
+	}
+
+	protected boolean verifyClient(
+		Client authenticatedClient, ServerAccessToken serverAccessToken) {
+
+		if (!clientsMatch(authenticatedClient, serverAccessToken.getClient())) {
 			return false;
 		}
 
-		Map<String, String> properties = client1.getProperties();
+		Map<String, String> properties = authenticatedClient.getProperties();
 
-		String companyId1 = properties.get(
-			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
+		if (!properties.containsKey(
+				OAuth2ProviderRestEndpointConstants.
+					PROPERTY_KEY_CLIENT_FEATURE_PREFIX +
+						OAuth2ProviderRestEndpointConstants.
+							PROPERTY_KEY_CLIENT_FEATURE_TOKEN_INTROSPECTION)) {
 
-		properties = client2.getProperties();
+			return false;
+		}
 
-		String companyId2 = properties.get(
-			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
+		return true;
+	}
 
-		if (!Objects.equals(companyId1, companyId2)) {
+	protected boolean verifyCXFToken(ServerAccessToken serverAccessToken) {
+		if (OAuthUtils.isExpired(
+				serverAccessToken.getIssuedAt(),
+				serverAccessToken.getExpiresIn())) {
+
 			return false;
 		}
 
