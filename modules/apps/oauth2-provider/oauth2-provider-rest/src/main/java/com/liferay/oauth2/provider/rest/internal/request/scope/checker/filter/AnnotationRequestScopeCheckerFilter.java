@@ -58,19 +58,19 @@ public class AnnotationRequestScopeCheckerFilter
 	}
 
 	protected Boolean isAllowed(
-		Class<?> resourceClass, ScopeChecker scopeChecker) {
+		Class<?> clazz, ScopeChecker scopeChecker) {
 
-		RequiresNoScope requiresNoScope = resourceClass.getAnnotation(
+		RequiresNoScope requiresNoScope = clazz.getAnnotation(
 			RequiresNoScope.class);
 
-		RequiresScope requiresScope = resourceClass.getAnnotation(
+		RequiresScope requiresScope = clazz.getAnnotation(
 			RequiresScope.class);
 
 		if ((requiresNoScope != null) && (requiresScope != null)) {
 			StringBundler sb = new StringBundler(4);
 
 			sb.append("Class ");
-			sb.append(resourceClass.getName());
+			sb.append(clazz.getName());
 			sb.append("has both @RequiresNoScope and @RequiresScope ");
 			sb.append("annotations defined");
 
@@ -91,16 +91,16 @@ public class AnnotationRequestScopeCheckerFilter
 		}
 
 		requiresNoScope = AnnotationLocator.locate(
-			resourceClass, RequiresNoScope.class);
+			clazz, RequiresNoScope.class);
 
 		requiresScope = AnnotationLocator.locate(
-			resourceClass, RequiresScope.class);
+			clazz, RequiresScope.class);
 
 		if ((requiresNoScope != null) && (requiresScope != null)) {
 			StringBundler sb = new StringBundler(3);
 
 			sb.append("Class ");
-			sb.append(resourceClass.getName());
+			sb.append(clazz.getName());
 			sb.append("inherits both @RequiresNoScope and @RequiresScope");
 
 			throw new RuntimeException(sb.toString());
