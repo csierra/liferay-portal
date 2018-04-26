@@ -111,7 +111,9 @@ public class OAuthAuthorizationDataMessageBodyWriter
 			_log.error("Unable to locate configuration", ce);
 
 			throw new WebApplicationException(
-				Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
+				Response.status(
+					Response.Status.INTERNAL_SERVER_ERROR
+				).build());
 		}
 
 		if (!_http.hasDomain(authorizeScreenURLString)) {
