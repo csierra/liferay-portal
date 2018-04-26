@@ -46,9 +46,9 @@ public class LiferayResourceOwnerLoginHandler
 	implements ResourceOwnerLoginHandler {
 
 	@Override
-	public UserSubject createSubject(String login, String password) {
+	public UserSubject createSubject(String name, String password) {
 		try {
-			User user = authenticateUser(login, password);
+			User user = authenticateUser(name, password);
 
 			if (user == null) {
 				return null;
@@ -72,7 +72,7 @@ public class LiferayResourceOwnerLoginHandler
 		}
 	}
 
-	protected User authenticateUser(String login, String password) {
+	protected User authenticateUser(String name, String password) {
 		int authResult = Authenticator.FAILURE;
 		Long companyId = CompanyThreadLocal.getCompanyId();
 
@@ -85,17 +85,17 @@ public class LiferayResourceOwnerLoginHandler
 		try {
 			if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
 				authResult = _userLocalService.authenticateByEmailAddress(
-					company.getCompanyId(), login, password,
+					company.getCompanyId(), name, password,
 					Collections.emptyMap(), Collections.emptyMap(), resultsMap);
 			}
 			else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
 				authResult = _userLocalService.authenticateByScreenName(
-					company.getCompanyId(), login, password,
+					company.getCompanyId(), name, password,
 					Collections.emptyMap(), Collections.emptyMap(), resultsMap);
 			}
 			else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
 				authResult = _userLocalService.authenticateByUserId(
-					company.getCompanyId(), GetterUtil.getLong(login), password,
+					company.getCompanyId(), GetterUtil.getLong(name), password,
 					Collections.emptyMap(), Collections.emptyMap(), resultsMap);
 			}
 		}
