@@ -72,7 +72,7 @@ public class AnnotationRequestScopeCheckerFilter
 			sb.append("Class ");
 			sb.append(resourceClass.getName());
 			sb.append("has both @RequiresNoScope and @RequiresScope ");
-			sb.append("annotations defined.");
+			sb.append("annotations defined");
 
 			throw new RuntimeException(sb.toString());
 		}
@@ -101,7 +101,7 @@ public class AnnotationRequestScopeCheckerFilter
 
 			sb.append("Class ");
 			sb.append(resourceClass.getName());
-			sb.append("inherits both @RequiresNoScope and @RequiresScope.");
+			sb.append("inherits both @RequiresNoScope and @RequiresScope");
 
 			throw new RuntimeException(sb.toString());
 		}
@@ -138,7 +138,7 @@ public class AnnotationRequestScopeCheckerFilter
 			sb.append(StringPool.POUND);
 			sb.append(method.getName());
 			sb.append("has both @RequiresNoScope and @RequiresScope ");
-			sb.append("annotations defined.");
+			sb.append("annotations defined");
 
 			throw new RuntimeException(sb.toString());
 		}
