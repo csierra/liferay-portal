@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 public class AuthorizationCodeGrantServiceRegistrator {
 
 	@Activate
-	public void activate(
+	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
 		OAuth2ProviderConfiguration oAuth2ProviderConfiguration =
@@ -79,7 +79,7 @@ public class AuthorizationCodeGrantServiceRegistrator {
 	}
 
 	@Deactivate
-	public void deactivate() {
+	protected void deactivate() {
 		if (_serviceRegistration != null) {
 			_serviceRegistration.unregister();
 		}
