@@ -182,7 +182,7 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 	@Reference
 	private Portal _portal;
 
-	private abstract class PortalCXFSecurityContext
+	private abstract static class PortalCXFSecurityContext
 		implements SecurityContext, org.apache.cxf.security.SecurityContext {
 
 		@Override
