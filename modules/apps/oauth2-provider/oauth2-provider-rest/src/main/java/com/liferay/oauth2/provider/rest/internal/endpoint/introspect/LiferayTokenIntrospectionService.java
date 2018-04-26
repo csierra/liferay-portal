@@ -192,7 +192,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 				OAuthConstants.UNAUTHORIZED_CLIENT);
 		}
 
-		if (!verifyCXFToken(serverAccessToken)) {
+		if (!verifyServerAccessToken(serverAccessToken)) {
 			return Response.ok(
 				new TokenIntrospection(false)
 			).build();
@@ -231,7 +231,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 				OAuthConstants.UNAUTHORIZED_CLIENT);
 		}
 
-		if (!verifyCXFToken(refreshToken)) {
+		if (!verifyServerAccessToken(refreshToken)) {
 			return Response.ok(new TokenIntrospection(false)).build();
 		}
 
@@ -283,7 +283,9 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return true;
 	}
 
-	protected boolean verifyCXFToken(ServerAccessToken serverAccessToken) {
+	protected boolean verifyServerAccessToken(
+		ServerAccessToken serverAccessToken) {
+
 		if (OAuthUtils.isExpired(
 				serverAccessToken.getIssuedAt(),
 				serverAccessToken.getExpiresIn())) {
