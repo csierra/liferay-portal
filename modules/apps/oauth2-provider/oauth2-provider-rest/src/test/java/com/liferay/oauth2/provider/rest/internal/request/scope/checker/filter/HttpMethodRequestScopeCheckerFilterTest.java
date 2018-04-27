@@ -43,7 +43,7 @@ public class HttpMethodRequestScopeCheckerFilterTest extends PowerMockito {
 	}
 
 	@Test
-	public void testHttpMethodAllowed() throws NoSuchMethodException {
+	public void testIsAllowed() throws NoSuchMethodException {
 		TestScopeChecker testScopeChecker = new TestScopeChecker("GET");
 
 		Request request = Mockito.mock(Request.class);
