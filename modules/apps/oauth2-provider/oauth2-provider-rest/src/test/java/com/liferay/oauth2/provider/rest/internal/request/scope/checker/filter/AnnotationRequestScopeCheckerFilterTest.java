@@ -62,7 +62,7 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 	}
 
 	@Test
-	public void testMethodAllowed() throws NoSuchMethodException {
+	public void testMethodIsAllowed() throws NoSuchMethodException {
 		TestScopeChecker testScopeChecker = new TestScopeChecker("WRITE");
 
 		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
@@ -79,7 +79,7 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 	}
 
 	@Test
-	public void testMethodAllowedWithMultipleAllRequired()
+	public void testMethodIsAllowedWithMultipleWhenAllRequired()
 		throws NoSuchMethodException {
 
 		TestScopeChecker testScopeChecker = new TestScopeChecker(
@@ -99,7 +99,7 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 	}
 
 	@Test
-	public void testMethodAllowedWithMultipleAllRequiredAndNotGranted()
+	public void testMethodIsAllowedWithMultipleWhenAllRequiredAndNotGranted()
 		throws NoSuchMethodException {
 
 		TestScopeChecker testScopeChecker = new TestScopeChecker(
@@ -120,7 +120,7 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 	}
 
 	@Test
-	public void testMethodAllowedWithMultipleSomeRequired()
+	public void testMethodIsAllowedWithMultipleWhenSomeRequired()
 		throws NoSuchMethodException {
 
 		TestScopeChecker testScopeChecker = new TestScopeChecker("READ");
