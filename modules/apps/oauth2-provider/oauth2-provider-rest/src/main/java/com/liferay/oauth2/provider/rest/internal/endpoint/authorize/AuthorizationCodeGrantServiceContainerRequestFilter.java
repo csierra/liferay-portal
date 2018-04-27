@@ -86,7 +86,7 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 						@Override
 						public Principal getUserPrincipal() {
 							return new ProtectedPrincipal(
-								GetterUtil.getString(user.getUserId()));
+								Long.toString(user.getUserId()));
 						}
 
 						@Override
