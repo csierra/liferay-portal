@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.internal.bearer.token.provider.configuration;
+package com.liferay.oauth2.provider.rest.internal.spi.bearer.token.provider.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
 
@@ -23,7 +23,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  */
 @ExtendedObjectClassDefinition(category = "foundation")
 @Meta.OCD(
-	id = "com.liferay.oauth2.provider.rest.internal.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration",
+	id = "com.liferay.oauth2.provider.rest.internal.spi.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration",
 	localization = "content/Language",
 	name = "default-bearer-token-provider-configuration-name"
 )

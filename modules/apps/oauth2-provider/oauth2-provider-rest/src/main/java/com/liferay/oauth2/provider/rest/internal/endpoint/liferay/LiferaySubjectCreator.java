@@ -18,6 +18,7 @@ import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2Provid
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.security.Principal;
 
@@ -42,25 +43,26 @@ public class LiferaySubjectCreator implements SubjectCreator {
 
 	@Override
 	public UserSubject createUserSubject(
-			MessageContext mc, MultivaluedMap<String, String> params)
+			MessageContext messageContext,
+			MultivaluedMap<String, String> params)
 		throws OAuthServiceException {
 
-		SecurityContext securityContext = mc.getSecurityContext();
+		SecurityContext securityContext = messageContext.getSecurityContext();
 
 		Principal userPrincipal = securityContext.getUserPrincipal();
 
 		try {
 			User user = _userLocalService.getUser(
-				Long.parseLong(userPrincipal.getName()));
+				GetterUtil.getLong(userPrincipal.getName()));
 
 			UserSubject userSubject = new UserSubject(
-				user.getLogin(), Long.toString(user.getUserId()));
+				user.getLogin(), GetterUtil.getString(user.getUserId()));
 
 			Map<String, String> properties = userSubject.getProperties();
 
 			properties.put(
-				OAuth2ProviderRestEndpointConstants.COMPANY_ID,
-				Long.toString(user.getCompanyId()));
+				OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+				GetterUtil.getString(user.getCompanyId()));
 
 			return userSubject;
 		}

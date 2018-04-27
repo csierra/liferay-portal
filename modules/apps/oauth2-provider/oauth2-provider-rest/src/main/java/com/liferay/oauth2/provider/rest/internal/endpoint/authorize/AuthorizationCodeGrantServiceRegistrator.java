@@ -18,8 +18,9 @@ import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 
-import java.util.Hashtable;
+import java.util.Dictionary;
 import java.util.Map;
 
 import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
@@ -39,10 +40,10 @@ import org.osgi.service.component.annotations.Reference;
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true
 )
-public class AuthorizationCodeGrantServiceRegistrar {
+public class AuthorizationCodeGrantServiceRegistrator {
 
 	@Activate
-	public void activate(
+	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
 		OAuth2ProviderConfiguration oAuth2ProviderConfiguration =
@@ -60,34 +61,34 @@ public class AuthorizationCodeGrantServiceRegistrar {
 
 		authorizationCodeGrantService.setCanSupportPublicClients(
 			oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant());
-
 		authorizationCodeGrantService.setDataProvider(
 			_liferayOAuthDataProvider);
-
 		authorizationCodeGrantService.setSubjectCreator(_subjectCreator);
 
-		Hashtable<String, Object> endpointProperties = new Hashtable<>();
+		Dictionary<String, Object> authorizationCodeGrantProperties =
+			new HashMapDictionary<>();
 
-		endpointProperties.put(
+		authorizationCodeGrantProperties.put(
 			OAuth2ProviderRestEndpointConstants.
-				LIFERAY_OAUTH2_ENDPOINT_RESOURCE,
+				PROPERTY_KEY_OAUTH2_ENDPOINT_JAXRS_RESOURCE,
 			true);
 
-		_endpointServiceRegistration = bundleContext.registerService(
-			Object.class, authorizationCodeGrantService, endpointProperties);
+		_serviceRegistration = bundleContext.registerService(
+			Object.class, authorizationCodeGrantService,
+			authorizationCodeGrantProperties);
 	}
 
 	@Deactivate
-	public void deactivate() {
-		if (_endpointServiceRegistration != null) {
-			_endpointServiceRegistration.unregister();
+	protected void deactivate() {
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
 		}
 	}
 
-	private ServiceRegistration<Object> _endpointServiceRegistration;
-
 	@Reference
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+
+	private ServiceRegistration<Object> _serviceRegistration;
 
 	@Reference
 	private SubjectCreator _subjectCreator;

@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.rest.internal.endpoint.introspect;
 
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -46,8 +47,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Tomas Polesovsky
  */
 @Component(
-	immediate = true,
-	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_PROVIDER + "=true",
+	property = OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_OAUTH2_ENDPOINT_JAXRS_PROVIDER + "=true",
 	service = Object.class
 )
 @Produces("application/json")
@@ -57,7 +57,7 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 
 	@Override
 	public long getSize(
-		TokenIntrospection tokenIntrospection, Class<?> type, Type genericType,
+		TokenIntrospection tokenIntrospection, Class<?> clazz, Type genericType,
 		Annotation[] annotations, MediaType mediaType) {
 
 		return -1;
@@ -65,18 +65,18 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 
 	@Override
 	public boolean isWriteable(
-		Class<?> type, Type genericType, Annotation[] annotations,
+		Class<?> clazz, Type genericType, Annotation[] annotations,
 		MediaType mediaType) {
 
-		return TokenIntrospection.class.isAssignableFrom(type);
+		return TokenIntrospection.class.isAssignableFrom(clazz);
 	}
 
 	@Override
 	public void writeTo(
-			TokenIntrospection tokenIntrospection, Class<?> type,
+			TokenIntrospection tokenIntrospection, Class<?> clazz,
 			Type genericType, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, Object> httpHeaders,
-			OutputStream entityStream)
+			OutputStream outputStream)
 		throws IOException, WebApplicationException {
 
 		if (!tokenIntrospection.isActive()) {
@@ -88,11 +88,11 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 
 			sb.append("}");
 
-			String result = sb.toString();
+			String string = sb.toString();
 
-			entityStream.write(result.getBytes(StandardCharsets.UTF_8));
+			outputStream.write(string.getBytes(StandardCharsets.UTF_8));
 
-			entityStream.flush();
+			outputStream.flush();
 
 			return;
 		}
@@ -110,7 +110,7 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 			audience.removeIf(String::isEmpty);
 
 			if (!audience.isEmpty()) {
-				StringBundler audienceSB = null;
+				StringBundler audienceSB;
 
 				if (audience.size() == 1) {
 					audienceSB = new StringBundler(7);
@@ -146,7 +146,7 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 
 		Map<String, String> extensions = tokenIntrospection.getExtensions();
 
-		if ((extensions != null) && !extensions.isEmpty()) {
+		if (MapUtil.isNotEmpty(extensions)) {
 			StringBundler extensionSB = new StringBundler(
 				extensions.size() * 7);
 
@@ -161,9 +161,9 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 
 		String result = sb.toString();
 
-		entityStream.write(result.getBytes(StandardCharsets.UTF_8));
+		outputStream.write(result.getBytes(StandardCharsets.UTF_8));
 
-		entityStream.flush();
+		outputStream.flush();
 	}
 
 	protected void append(StringBundler sb, String key, List<String> value) {
@@ -220,7 +220,7 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 		if (quote) {
 			sb.append("\"");
 
-			String stringValue = null;
+			String stringValue;
 
 			if (value == null) {
 				stringValue = "null";

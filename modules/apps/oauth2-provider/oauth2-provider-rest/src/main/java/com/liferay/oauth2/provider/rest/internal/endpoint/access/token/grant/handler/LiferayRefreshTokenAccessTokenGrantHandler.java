@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDa
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.Map;
 
@@ -32,7 +33,6 @@ import org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -42,21 +42,19 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
-	immediate = true, service = AccessTokenGrantHandler.class
+	service = AccessTokenGrantHandler.class
 )
 public class LiferayRefreshTokenAccessTokenGrantHandler
 	extends BaseAccessTokenGrantHandler {
 
 	@Activate
-	protected void activate(
-		BundleContext bundleContext, Map<String, Object> properties) {
-
-		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
-			OAuth2ProviderConfiguration.class, properties);
-
+	protected void activate(Map<String, Object> properties) {
 		_refreshTokenGrantHandler = new RefreshTokenGrantHandler();
 
 		_refreshTokenGrantHandler.setDataProvider(_liferayOAuthDataProvider);
+
+		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
+			OAuth2ProviderConfiguration.class, properties);
 	}
 
 	@Override
@@ -64,6 +62,7 @@ public class LiferayRefreshTokenAccessTokenGrantHandler
 		return _refreshTokenGrantHandler;
 	}
 
+	@Override
 	protected boolean hasPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
@@ -71,7 +70,7 @@ public class LiferayRefreshTokenAccessTokenGrantHandler
 
 		if (refreshTokenString == null) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("No refresh_token parameter was provided.");
+				_log.debug("No refresh_token parameter was provided");
 			}
 
 			return false;
@@ -90,7 +89,9 @@ public class LiferayRefreshTokenAccessTokenGrantHandler
 
 		if (!clientsMatch(client, refreshToken.getClient())) {
 
-			// audit: Trying to refresh token with other client's authentication
+			// TODO: Inform the audit service that the user is trying to
+			// refresh a token belonging to a client other than the
+			// authenticated client
 
 			_liferayOAuthDataProvider.doRevokeRefreshToken(refreshToken);
 
@@ -104,7 +105,7 @@ public class LiferayRefreshTokenAccessTokenGrantHandler
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Client authentication doesn't match refresh token's " +
+					"Authenticated client does not match the refresh token's " +
 						"client");
 			}
 
@@ -113,13 +114,12 @@ public class LiferayRefreshTokenAccessTokenGrantHandler
 
 		UserSubject userSubject = refreshToken.getSubject();
 
-		long userId = Long.parseLong(userSubject.getId());
-
 		OAuth2Application oAuth2Application =
 			_liferayOAuthDataProvider.resolveOAuth2Application(
 				refreshToken.getClient());
 
-		return hasCreateTokenPermission(userId, oAuth2Application);
+		return hasCreateTokenPermission(
+			GetterUtil.getLong(userSubject.getId()), oAuth2Application);
 	}
 
 	@Override
