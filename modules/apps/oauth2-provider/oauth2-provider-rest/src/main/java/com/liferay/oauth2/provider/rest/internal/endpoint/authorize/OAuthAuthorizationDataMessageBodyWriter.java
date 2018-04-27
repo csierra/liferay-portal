@@ -59,29 +59,28 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Sierra Andrés
  */
 @Component(
-	immediate = true,
-	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_PROVIDER + "=true",
+	property = OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_OAUTH2_ENDPOINT_JAXRS_PROVIDER + "=true",
 	service = Object.class
 )
 @Produces("text/html")
 @Provider
-public class AuthorizeScreenRedirectMessageBodyWriter
+public class OAuthAuthorizationDataMessageBodyWriter
 	implements MessageBodyWriter<OAuthAuthorizationData> {
 
 	@Override
 	public long getSize(
-		OAuthAuthorizationData oAuthAuthorizationData, Class<?> aClass,
-		Type type, Annotation[] annotations, MediaType mediaType) {
+		OAuthAuthorizationData oAuthAuthorizationData, Class<?> clazz,
+		Type genericType, Annotation[] annotations, MediaType mediaType) {
 
 		return -1L;
 	}
 
 	@Override
 	public boolean isWriteable(
-		Class<?> aClass, Type type, Annotation[] annotations,
+		Class<?> clazz, Type genericType, Annotation[] annotations,
 		MediaType mediaType) {
 
-		if (aClass.isAssignableFrom(OAuthAuthorizationData.class) &&
+		if (clazz.isAssignableFrom(OAuthAuthorizationData.class) &&
 			StringUtil.equalsIgnoreCase(mediaType.getType(), "text") &&
 			StringUtil.equalsIgnoreCase(mediaType.getSubtype(), "html")) {
 
@@ -93,27 +92,28 @@ public class AuthorizeScreenRedirectMessageBodyWriter
 
 	@Override
 	public void writeTo(
-			OAuthAuthorizationData oAuthAuthorizationData, Class<?> aClass,
-			Type type, Annotation[] annotations, MediaType mediaType,
+			OAuthAuthorizationData oAuthAuthorizationData, Class<?> clazz,
+			Type genericType, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, Object> httpHeaders,
-			OutputStream outputStream)
+			OutputStream entityStream)
 		throws WebApplicationException {
 
 		HttpServletRequest httpServletRequest =
 			_messageContext.getHttpServletRequest();
 
-		long companyId = _portal.getCompanyId(httpServletRequest);
-
 		String authorizeScreenURL = null;
 
 		try {
-			authorizeScreenURL = getAuthorizeScreenURL(companyId);
+			authorizeScreenURL = getAuthorizeScreenURL(
+				_portal.getCompanyId(httpServletRequest));
 		}
 		catch (ConfigurationException ce) {
-			_log.error("Unable to locate configuration", ce);
+			_log.error("Unable to get authorize screen configuration", ce);
 
 			throw new WebApplicationException(
-				Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
+				Response.status(
+					Response.Status.INTERNAL_SERVER_ERROR
+				).build());
 		}
 
 		if (!_http.hasDomain(authorizeScreenURL)) {
@@ -123,46 +123,37 @@ public class AuthorizeScreenRedirectMessageBodyWriter
 		}
 
 		authorizeScreenURL = setParameter(
-			authorizeScreenURL, OAuthConstants.CLIENT_ID,
-			oAuthAuthorizationData.getClientId());
-
-		authorizeScreenURL = setParameter(
-			authorizeScreenURL, OAuthConstants.REDIRECT_URI,
-			oAuthAuthorizationData.getRedirectUri());
-
-		authorizeScreenURL = setParameter(
-			authorizeScreenURL, OAuthConstants.STATE,
-			oAuthAuthorizationData.getState());
-
-		authorizeScreenURL = setParameter(
-			authorizeScreenURL, OAuthConstants.SCOPE,
-			oAuthAuthorizationData.getProposedScope());
-
+			authorizeScreenURL, OAuthConstants.AUTHORIZATION_CODE_CHALLENGE,
+			oAuthAuthorizationData.getClientCodeChallenge());
 		authorizeScreenURL = setParameter(
 			authorizeScreenURL, OAuthConstants.CLIENT_AUDIENCE,
 			oAuthAuthorizationData.getAudience());
-
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.CLIENT_ID,
+			oAuthAuthorizationData.getClientId());
 		authorizeScreenURL = setParameter(
 			authorizeScreenURL, OAuthConstants.NONCE,
 			oAuthAuthorizationData.getNonce());
-
 		authorizeScreenURL = setParameter(
-			authorizeScreenURL, OAuthConstants.AUTHORIZATION_CODE_CHALLENGE,
-			oAuthAuthorizationData.getClientCodeChallenge());
-
+			authorizeScreenURL, OAuthConstants.REDIRECT_URI,
+			oAuthAuthorizationData.getRedirectUri());
 		authorizeScreenURL = setParameter(
 			authorizeScreenURL, OAuthConstants.RESPONSE_TYPE,
 			oAuthAuthorizationData.getResponseType());
-
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.SCOPE,
+			oAuthAuthorizationData.getProposedScope());
 		authorizeScreenURL = setParameter(
 			authorizeScreenURL, OAuthConstants.SESSION_AUTHENTICITY_TOKEN,
 			oAuthAuthorizationData.getAuthenticityToken());
-
+		authorizeScreenURL = setParameter(
+			authorizeScreenURL, OAuthConstants.STATE,
+			oAuthAuthorizationData.getState());
 		authorizeScreenURL = setParameter(
 			authorizeScreenURL, "reply_to",
 			oAuthAuthorizationData.getReplyTo());
 
-		if (authorizeScreenURL.length() > _invokerFilterUriMaxLength) {
+		if (authorizeScreenURL.length() > _invokerFilterURIMaxLength) {
 			authorizeScreenURL = removeParameter(
 				authorizeScreenURL, OAuthConstants.SCOPE);
 		}
@@ -177,21 +168,21 @@ public class AuthorizeScreenRedirectMessageBodyWriter
 
 	@Activate
 	protected void activate() {
-		_invokerFilterUriMaxLength = GetterUtil.getInteger(
+		_invokerFilterURIMaxLength = GetterUtil.getInteger(
 			_props.get(PropsKeys.INVOKER_FILTER_URI_MAX_LENGTH),
-			_invokerFilterUriMaxLength);
+			_invokerFilterURIMaxLength);
 	}
 
 	protected String getAuthorizeScreenURL(long companyId)
 		throws ConfigurationException {
 
-		AuthorizeScreenConfiguration authorizeScreenRedirectConfiguration =
+		AuthorizeScreenConfiguration authorizeScreenConfiguration =
 			_configurationProvider.getConfiguration(
 				AuthorizeScreenConfiguration.class,
 				new CompanyServiceSettingsLocator(
 					companyId, AuthorizeScreenConfiguration.class.getName()));
 
-		return authorizeScreenRedirectConfiguration.authorizeScreenURL();
+		return authorizeScreenConfiguration.authorizeScreenURL();
 	}
 
 	protected String removeParameter(String url, String name) {
@@ -207,7 +198,7 @@ public class AuthorizeScreenRedirectMessageBodyWriter
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		AuthorizeScreenRedirectMessageBodyWriter.class);
+		OAuthAuthorizationDataMessageBodyWriter.class);
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
@@ -215,7 +206,7 @@ public class AuthorizeScreenRedirectMessageBodyWriter
 	@Reference
 	private Http _http;
 
-	private int _invokerFilterUriMaxLength = 4000;
+	private int _invokerFilterURIMaxLength = 4000;
 
 	@Context
 	private MessageContext _messageContext;

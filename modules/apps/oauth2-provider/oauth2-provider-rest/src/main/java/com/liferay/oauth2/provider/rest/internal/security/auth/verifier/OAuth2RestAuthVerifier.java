@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.internal.auth.verifier;
+package com.liferay.oauth2.provider.rest.internal.security.auth.verifier;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -56,13 +56,13 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	immediate = true,
-	property = {"auth.verifier.OAuth2RestAuthVerifier.urls.includes=#N/A#"}
+	property = "auth.verifier.OAuth2RestAuthVerifier.urls.includes=#N/A#"
 )
 public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 	@Override
 	public String getAuthType() {
-		return _OAUTH2;
+		return "OAuth2";
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 		}
 		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("OAuth2 Access Token validation failed", e);
+				_log.debug("Unable to verify OAuth2 access token", e);
 			}
 
 			return authVerifierResult;
@@ -135,7 +135,7 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 
 		String scheme = authorizationParts[0];
 
-		if (!StringUtil.equalsIgnoreCase(scheme, _BEARER)) {
+		if (!StringUtil.equalsIgnoreCase(scheme, _TOKEN_KEY)) {
 			return null;
 		}
 
@@ -193,15 +193,13 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 				expiresIn, new HashMap<>(), StringPool.BLANK, StringPool.BLANK,
 				issuedAt, StringPool.BLANK, StringPool.BLANK, new HashMap<>(),
 				StringPool.BLANK, StringPool.BLANK, scopeAliasesList,
-				accessTokenContent, _BEARER, oAuth2Authorization.getUserId(),
+				accessTokenContent, _TOKEN_KEY, oAuth2Authorization.getUserId(),
 				oAuth2Authorization.getUserName());
 
 		return accessToken;
 	}
 
-	private static final String _BEARER = "Bearer";
-
-	private static final String _OAUTH2 = "OAuth2";
+	private static final String _TOKEN_KEY = "Bearer";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2RestAuthVerifier.class);

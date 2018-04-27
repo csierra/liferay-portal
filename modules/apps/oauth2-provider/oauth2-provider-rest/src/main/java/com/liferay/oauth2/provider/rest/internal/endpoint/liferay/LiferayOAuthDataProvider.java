@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -98,9 +100,9 @@ public class LiferayOAuthDataProvider
 	public List<OAuthPermission> convertScopeToPermissions(
 		Client client, List<String> requestedScopes) {
 
-		List<String> invisibleToClientScopes = getInvisibleToClientScopes();
+		List<OAuthPermission> oAuth2Permissions = new ArrayList<>();
 
-		List<OAuthPermission> permissions = new ArrayList<>();
+		List<String> invisibleToClientScopes = getInvisibleToClientScopes();
 
 		for (String requestedScope : requestedScopes) {
 			OAuthPermission oAuthPermission = new OAuthPermission(
@@ -112,48 +114,51 @@ public class LiferayOAuthDataProvider
 				oAuthPermission.setInvisibleToClient(true);
 			}
 
-			permissions.add(oAuthPermission);
+			oAuth2Permissions.add(oAuthPermission);
 		}
 
-		return permissions;
+		return oAuth2Permissions;
 	}
 
 	@Override
-	public ServerAccessToken createAccessToken(AccessTokenRegistration reg)
+	public ServerAccessToken createAccessToken(
+			AccessTokenRegistration accessTokenRegistration)
 		throws OAuthServiceException {
 
-		List<String> approvedScope = new ArrayList<>(reg.getRequestedScope());
+		List<String> approvedScope = new ArrayList<>(
+			accessTokenRegistration.getApprovedScope());
 
 		if (approvedScope.isEmpty()) {
-			Client client = reg.getClient();
+			Client client = accessTokenRegistration.getClient();
 
 			approvedScope.addAll(client.getRegisteredScopes());
 		}
 
-		reg.setApprovedScope(approvedScope);
+		accessTokenRegistration.setApprovedScope(approvedScope);
 
 		if (!OAuthConstants.CLIENT_CREDENTIALS_GRANT.equals(
-				reg.getGrantType())) {
+				accessTokenRegistration.getGrantType())) {
 
 			approvedScope.add(OAuthConstants.REFRESH_TOKEN_SCOPE);
 		}
 
-		return super.createAccessToken(reg);
+		return super.createAccessToken(accessTokenRegistration);
 	}
 
 	@Override
 	public ServerAuthorizationCodeGrant createCodeGrant(
-			AuthorizationCodeRegistration reg)
+			AuthorizationCodeRegistration authorizationCodeRegistration)
 		throws OAuthServiceException {
 
-		ServerAuthorizationCodeGrant authorizationCodeGrant =
-			super.createCodeGrant(reg);
+		ServerAuthorizationCodeGrant serverAuthorizationCodeGrant =
+			super.createCodeGrant(authorizationCodeRegistration);
 
 		_codeGrantsPortalCache.put(
-			authorizationCodeGrant.getCode(), authorizationCodeGrant,
-			Math.toIntExact(authorizationCodeGrant.getExpiresIn()));
+			serverAuthorizationCodeGrant.getCode(),
+			serverAuthorizationCodeGrant,
+			Math.toIntExact(serverAuthorizationCodeGrant.getExpiresIn()));
 
-		return authorizationCodeGrant;
+		return serverAuthorizationCodeGrant;
 	}
 
 	@Override
@@ -197,7 +202,6 @@ public class LiferayOAuthDataProvider
 
 		OAuth2Application oAuth2Application = resolveOAuth2Application(
 			serverAccessToken.getClient());
-
 		UserSubject userSubject = serverAccessToken.getSubject();
 
 		return new AccessToken(
@@ -213,7 +217,7 @@ public class LiferayOAuthDataProvider
 			OAuthUtils.convertPermissionsToScopeList(
 				serverAccessToken.getScopes()),
 			serverAccessToken.getTokenKey(), serverAccessToken.getTokenType(),
-			Long.parseLong(userSubject.getId()), userSubject.getLogin());
+			GetterUtil.getLong(userSubject.getId()), userSubject.getLogin());
 	}
 
 	public BearerTokenProvider.RefreshToken fromCXFRefreshToken(
@@ -221,7 +225,6 @@ public class LiferayOAuthDataProvider
 
 		OAuth2Application oAuth2Application = resolveOAuth2Application(
 			refreshToken.getClient());
-
 		UserSubject userSubject = refreshToken.getSubject();
 
 		return new BearerTokenProvider.RefreshToken(
@@ -230,7 +233,7 @@ public class LiferayOAuthDataProvider
 			refreshToken.getGrantType(), refreshToken.getIssuedAt(),
 			OAuthUtils.convertPermissionsToScopeList(refreshToken.getScopes()),
 			refreshToken.getTokenKey(), refreshToken.getTokenType(),
-			Long.parseLong(userSubject.getId()), userSubject.getLogin());
+			GetterUtil.getLong(userSubject.getId()), userSubject.getLogin());
 	}
 
 	@Override
@@ -239,7 +242,8 @@ public class LiferayOAuthDataProvider
 
 		if (Validator.isBlank(accessToken)) {
 
-			// audit: trying to use empty token
+			// TODO: Inform the audit service that the user is trying to use an
+			// empty token
 
 			return null;
 		}
@@ -250,7 +254,8 @@ public class LiferayOAuthDataProvider
 
 		if (oAuth2Authorization == null) {
 
-			// audit: trying to use deleted token or brute-force token
+			// TODO: Inform the audit service that the user is trying to use a
+			// deleted token or brute force token
 
 			return null;
 		}
@@ -258,7 +263,8 @@ public class LiferayOAuthDataProvider
 		if (OAuth2ProviderConstants.EXPIRED_TOKEN.equals(
 				oAuth2Authorization.getAccessTokenContent())) {
 
-			// audit: trying intentionally to use expired token
+			// TODO: Inform the audit service that the user is intentionally
+			// trying to use an expired token
 
 			return null;
 		}
@@ -268,7 +274,6 @@ public class LiferayOAuthDataProvider
 		}
 		catch (PortalException pe) {
 			_log.error("Unable to populate access token", pe);
-
 			throw new OAuthServiceException(pe);
 		}
 	}
@@ -298,12 +303,15 @@ public class LiferayOAuthDataProvider
 
 		if (oAuth2Application == null) {
 
-			//audit: trying non-existing or removed clientId
+			// TODO: Inform the audit service that the user is trying a
+			// nonexistent or removed clientId
 
 			return null;
 		}
 
-		getMessageContext().put(OAuthConstants.CLIENT_ID, clientId);
+		MessageContext messageContext = getMessageContext();
+
+		messageContext.put(OAuthConstants.CLIENT_ID, clientId);
 
 		return populateClient(oAuth2Application);
 	}
@@ -326,10 +334,10 @@ public class LiferayOAuthDataProvider
 			Client client, UserSubject subject)
 		throws OAuthServiceException {
 
-		List<String> keys = _codeGrantsPortalCache.getKeys();
-
-		List<ServerAuthorizationCodeGrant> authorizationCodeGrants =
+		List<ServerAuthorizationCodeGrant> serverAuthorizationCodeGrants =
 			new ArrayList<>();
+
+		List<String> keys = _codeGrantsPortalCache.getKeys();
 
 		for (String key : keys) {
 			ServerAuthorizationCodeGrant serverAuthorizationCodeGrant =
@@ -342,18 +350,19 @@ public class LiferayOAuthDataProvider
 			if (client.equals(serverAuthorizationCodeGrant.getClient()) &&
 				subject.equals(serverAuthorizationCodeGrant.getSubject())) {
 
-				authorizationCodeGrants.add(serverAuthorizationCodeGrant);
+				serverAuthorizationCodeGrants.add(serverAuthorizationCodeGrant);
 			}
 		}
 
-		return authorizationCodeGrants;
+		return serverAuthorizationCodeGrants;
 	}
 
 	@Override
 	public RefreshToken getRefreshToken(String refreshTokenKey) {
 		if (Validator.isBlank(refreshTokenKey)) {
 
-			// audit: trying to use empty token
+			// TODO: Inform the audit service that the user is trying to use an
+			// empty token
 
 			return null;
 		}
@@ -366,7 +375,8 @@ public class LiferayOAuthDataProvider
 
 			if (oAuth2Authorization == null) {
 
-				// audit: trying to use deleted token or brute-force token
+				// TODO: Inform the audit service that the user is trying to use
+				// a deleted token or brute force token
 
 				return null;
 			}
@@ -374,7 +384,8 @@ public class LiferayOAuthDataProvider
 			if (OAuth2ProviderConstants.EXPIRED_TOKEN.equals(
 					oAuth2Authorization.getRefreshTokenContent())) {
 
-				// audit: trying intentionally to use expired token
+				// TODO: Inform the audit service that the user is intentionally
+				// trying to use an expired token
 
 				return null;
 			}
@@ -383,11 +394,10 @@ public class LiferayOAuthDataProvider
 				_oAuth2ApplicationLocalService.getOAuth2Application(
 					oAuth2Authorization.getOAuth2ApplicationId());
 
-			long issuedAt = toCXFTime(
-				oAuth2Authorization.getRefreshTokenCreateDate());
-
 			long expires = toCXFTime(
 				oAuth2Authorization.getRefreshTokenExpirationDate());
+			long issuedAt = toCXFTime(
+				oAuth2Authorization.getRefreshTokenCreateDate());
 
 			long lifetime = expires - issuedAt;
 
@@ -421,8 +431,8 @@ public class LiferayOAuthDataProvider
 				refreshToken.getExtraProperties();
 
 			extraProperties.put(
-				OAuth2ProviderRestEndpointConstants.COMPANY_ID,
-				Long.toString(oAuth2Authorization.getCompanyId()));
+				OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+				GetterUtil.getString(oAuth2Authorization.getCompanyId()));
 
 			return refreshToken;
 		}
@@ -457,7 +467,8 @@ public class LiferayOAuthDataProvider
 
 			doRevokeRefreshToken(oldRefreshToken);
 
-			// audit: using expired refresh token
+			// TODO: Inform the audit service that the user is using an expired
+			// refresh token
 
 			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
 		}
@@ -472,7 +483,8 @@ public class LiferayOAuthDataProvider
 
 			doRevokeRefreshToken(oldRefreshToken);
 
-			// audit: using invalid refresh token
+			// TODO: Inform the audit service that the user is using an invalid
+			// refresh token
 
 			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
 		}
@@ -483,7 +495,8 @@ public class LiferayOAuthDataProvider
 
 		if (oAuth2Authorization == null) {
 
-			// audit: using non-existing refresh token
+			// TODO: Inform the audit service that the user is using a
+			// non-existent refresh token
 
 			throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
 		}
@@ -498,7 +511,6 @@ public class LiferayOAuthDataProvider
 		List<String> accessTokens = newRefreshToken.getAccessTokens();
 
 		accessTokens.add(accessToken.getTokenKey());
-
 		try {
 			_invokeTransactionally(
 				() -> {
@@ -532,11 +544,11 @@ public class LiferayOAuthDataProvider
 	}
 
 	public OAuth2Application resolveOAuth2Application(Client client) {
-		Map<String, String> clientProperties = client.getProperties();
+		Map<String, String> properties = client.getProperties();
 
-		long companyId = Long.parseLong(
-			clientProperties.get(
-				OAuth2ProviderRestEndpointConstants.COMPANY_ID));
+		long companyId = GetterUtil.getLong(
+			properties.get(
+				OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID));
 
 		OAuth2Application oAuth2Application =
 			_oAuth2ApplicationLocalService.fetchOAuth2Application(
@@ -544,7 +556,8 @@ public class LiferayOAuthDataProvider
 
 		if (oAuth2Application == null) {
 
-			// audit: possible attack on client_id
+			// TODO: Inform the audit service of a possible attack on the
+			// client ID
 
 			return null;
 		}
@@ -567,9 +580,6 @@ public class LiferayOAuthDataProvider
 				_multiVMPool.getPortalCache("oauth2-provider-code-grants");
 		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
 			OAuth2ProviderConfiguration.class, properties);
-		_codeGrantsPortalCache =
-			(PortalCache<String, ServerAuthorizationCodeGrant>)
-				_multiVMPool.getPortalCache("oauth2-provider-code-grants");
 	}
 
 	@Override
@@ -611,7 +621,7 @@ public class LiferayOAuthDataProvider
 
 		UserSubject userSubject = serverAccessToken.getSubject();
 
-		userSubject.setId(String.valueOf(accessToken.getUserId()));
+		userSubject.setId(GetterUtil.getString(accessToken.getUserId()));
 		userSubject.setLogin(accessToken.getUserName());
 
 		return serverAccessToken;
@@ -649,7 +659,7 @@ public class LiferayOAuthDataProvider
 
 		UserSubject userSubject = cxfRefreshToken.getSubject();
 
-		userSubject.setId(String.valueOf(refreshToken.getUserId()));
+		userSubject.setId(GetterUtil.getString(refreshToken.getUserId()));
 		userSubject.setLogin(refreshToken.getUserName());
 
 		return cxfRefreshToken;
@@ -692,9 +702,10 @@ public class LiferayOAuthDataProvider
 				serverAccessToken.getClient(), accessToken.getScopes()));
 		serverAccessToken.setTokenKey(accessToken.getTokenKey());
 		serverAccessToken.setTokenType(accessToken.getTokenType());
+
 		UserSubject userSubject = serverAccessToken.getSubject();
 
-		userSubject.setId(String.valueOf(accessToken.getUserId()));
+		userSubject.setId(GetterUtil.getString(accessToken.getUserId()));
 		userSubject.setLogin(accessToken.getUserName());
 
 		return serverAccessToken;
@@ -719,17 +730,16 @@ public class LiferayOAuthDataProvider
 
 		if (oAuth2Application == null) {
 			throw new SystemException(
-				"Inconsistent DB state! No application found for " +
-					"authorization " + oAuth2Authorization);
+				"No application found for authorization " +
+					oAuth2Authorization);
 		}
 
 		Client client = getClient(oAuth2Application.getClientId());
 
-		long issuedAt = toCXFTime(
-			oAuth2Authorization.getAccessTokenCreateDate());
-
 		long expires = toCXFTime(
 			oAuth2Authorization.getAccessTokenExpirationDate());
+		long issuedAt = toCXFTime(
+			oAuth2Authorization.getAccessTokenCreateDate());
 
 		long lifetime = expires - issuedAt;
 
@@ -748,17 +758,17 @@ public class LiferayOAuthDataProvider
 				getOAuth2ApplicationScopeAliases(
 					oAuth2Authorization.getOAuth2ApplicationScopeAliasesId());
 
-		List<OAuthPermission> permissions = convertScopeToPermissions(
+		List<OAuthPermission> oAuth2Permissions = convertScopeToPermissions(
 			client, oAuth2ApplicationScopeAliases.getScopeAliasesList());
 
-		serverAccessToken.setScopes(permissions);
+		serverAccessToken.setScopes(oAuth2Permissions);
 
 		Map<String, String> extraProperties =
 			serverAccessToken.getExtraProperties();
 
 		extraProperties.put(
-			OAuth2ProviderRestEndpointConstants.COMPANY_ID,
-			Long.toString(oAuth2Authorization.getCompanyId()));
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+			GetterUtil.getString(oAuth2Authorization.getCompanyId()));
 
 		return serverAccessToken;
 	}
@@ -775,12 +785,11 @@ public class LiferayOAuthDataProvider
 			!Validator.isBlank(clientSecret), oAuth2Application.getName(),
 			oAuth2Application.getHomePageURL());
 
-		List<GrantType> allowedGrantTypes =
-			oAuth2Application.getAllowedGrantTypesList();
-
 		List<String> clientGrantTypes = client.getAllowedGrantTypes();
 
-		for (GrantType allowedGrantType : allowedGrantTypes) {
+		for (GrantType allowedGrantType :
+				oAuth2Application.getAllowedGrantTypesList()) {
+
 			if (_oAuth2ProviderConfiguration.allowAuthorizationCodeGrant() &&
 				(allowedGrantType == GrantType.AUTHORIZATION_CODE)) {
 
@@ -820,7 +829,7 @@ public class LiferayOAuthDataProvider
 			}
 		}
 
-		// CXF considers no allowed grant types as allow all!
+		// CXF considers no allowed grant types as allow all
 
 		if (clientGrantTypes.isEmpty()) {
 			clientGrantTypes.add(StringPool.BLANK);
@@ -842,32 +851,30 @@ public class LiferayOAuthDataProvider
 			catch (PortalException pe) {
 				_log.error(
 					"Unable to find associated application scope aliases", pe);
-
 				throw new OAuthServiceException(pe);
 			}
 		}
 
 		client.setRedirectUris(oAuth2Application.getRedirectURIsList());
-
 		client.setSubject(
 			populateUserSubject(
 				oAuth2Application.getCompanyId(), oAuth2Application.getUserId(),
 				oAuth2Application.getUserName()));
 
-		long companyId = oAuth2Application.getCompanyId();
+		Map<String, String> properties = client.getProperties();
 
-		Map<String, String> clientProperties = client.getProperties();
-
-		clientProperties.put(
-			OAuth2ProviderRestEndpointConstants.COMPANY_ID,
-			Long.toString(companyId));
-		clientProperties.put(
-			OAuth2ProviderRestEndpointConstants.FEATURES,
+		properties.put(
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+			GetterUtil.getString(oAuth2Application.getCompanyId()));
+		properties.put(
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_CLIENT_FEATURES,
 			oAuth2Application.getFeatures());
 
 		for (String feature : oAuth2Application.getFeaturesList()) {
-			clientProperties.put(
-				OAuth2ProviderRestEndpointConstants.FEATURE_PREFIX + feature,
+			properties.put(
+				OAuth2ProviderRestEndpointConstants.
+					PROPERTY_KEY_CLIENT_FEATURE_PREFIX +
+						feature,
 				feature);
 		}
 
@@ -875,25 +882,25 @@ public class LiferayOAuthDataProvider
 	}
 
 	protected UserSubject populateUserSubject(
-		long companyId, long userId, String userName) {
+		long companyId, long userId, String username) {
 
 		UserSubject userSubject = new UserSubject(
-			userName, Long.toString(userId));
+			username, GetterUtil.getString(userId));
 
 		Map<String, String> properties = userSubject.getProperties();
 
 		properties.put(
-			OAuth2ProviderRestEndpointConstants.COMPANY_ID,
-			Long.toString(companyId));
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+			GetterUtil.getString(companyId));
 
 		return userSubject;
 	}
 
 	@Override
-	protected void saveAccessToken(ServerAccessToken serverToken) {
+	protected void saveAccessToken(ServerAccessToken serverAccessToken) {
 		try {
 			_invokeTransactionally(
-				() -> _transactionalSaveAccessToken(serverToken));
+				() -> _transactionalSaveServerAccessToken(serverAccessToken));
 		}
 		catch (Throwable throwable) {
 			throw new OAuthServiceException(throwable);
@@ -908,10 +915,6 @@ public class LiferayOAuthDataProvider
 			throw new OAuthServiceException("Unable to find granted token");
 		}
 
-		Date createDate = fromCXFTime(refreshToken.getIssuedAt());
-		Date expirationDate = fromCXFTime(
-			refreshToken.getIssuedAt() + refreshToken.getExpiresIn());
-
 		Iterator<String> iterator = accessTokens.iterator();
 
 		String accessTokenContent = iterator.next();
@@ -922,7 +925,14 @@ public class LiferayOAuthDataProvider
 					accessTokenContent);
 
 		oAuth2Authorization.setRefreshTokenContent(refreshToken.getTokenKey());
+
+		Date createDate = fromCXFTime(refreshToken.getIssuedAt());
+
 		oAuth2Authorization.setRefreshTokenCreateDate(createDate);
+
+		Date expirationDate = fromCXFTime(
+			refreshToken.getIssuedAt() + refreshToken.getExpiresIn());
+
 		oAuth2Authorization.setRefreshTokenExpirationDate(expirationDate);
 
 		_oAuth2AuthorizationLocalService.updateOAuth2Authorization(
@@ -946,11 +956,10 @@ public class LiferayOAuthDataProvider
 			});
 	}
 
-	private void _transactionalSaveAccessToken(
+	private void _transactionalSaveServerAccessToken(
 		ServerAccessToken serverAccessToken) {
 
 		Client client = serverAccessToken.getClient();
-
 		Date createDate = fromCXFTime(serverAccessToken.getIssuedAt());
 		Date expirationDate = fromCXFTime(
 			serverAccessToken.getIssuedAt() + serverAccessToken.getExpiresIn());
@@ -968,56 +977,57 @@ public class LiferayOAuthDataProvider
 
 			_oAuth2AuthorizationLocalService.updateOAuth2Authorization(
 				oAuth2Authorization);
-
 			return;
 		}
 
 		OAuth2Application oAuth2Application = resolveOAuth2Application(client);
 
-		long companyId = oAuth2Application.getCompanyId();
-
-		UserSubject subject = serverAccessToken.getSubject();
-
 		long userId = 0;
 		String userName = StringPool.BLANK;
 
-		if (subject != null) {
+		UserSubject userSubject = serverAccessToken.getSubject();
+
+		if (userSubject != null) {
 			try {
-				userId = Long.parseLong(subject.getId());
+				userId = GetterUtil.getLong(userSubject.getId());
 
 				User user = _userLocalService.getUser(userId);
 
 				userName = user.getFullName();
 			}
 			catch (Exception e) {
-				_log.error("Unable to load user " + subject.getId(), e);
+				_log.error("Unable to load user " + userSubject.getId(), e);
+
 				throw new RuntimeException(e);
 			}
 		}
 
-		Map<String, String> clientProperties = client.getProperties();
+		Map<String, String> properties = client.getProperties();
 
-		String remoteAddr = clientProperties.get(
-			OAuth2ProviderRestEndpointConstants.CLIENT_REMOTE_ADDR);
-		String remoteHost = clientProperties.get(
-			OAuth2ProviderRestEndpointConstants.CLIENT_REMOTE_HOST);
+		String remoteAddr = properties.get(
+			OAuth2ProviderRestEndpointConstants.
+				PROPERTY_KEY_CLIENT_REMOTE_ADDR);
+		String remoteHost = properties.get(
+			OAuth2ProviderRestEndpointConstants.
+				PROPERTY_KEY_CLIENT_REMOTE_HOST);
 
 		OAuth2Authorization oAuth2Authorization =
 			_oAuth2AuthorizationLocalService.addOAuth2Authorization(
-				companyId, userId, userName,
+				oAuth2Application.getCompanyId(), userId, userName,
 				oAuth2Application.getOAuth2ApplicationId(),
 				oAuth2Application.getOAuth2ApplicationScopeAliasesId(),
 				serverAccessToken.getTokenKey(), createDate, expirationDate,
 				remoteAddr + ", " + remoteHost, null, null, null);
 
-		List<String> scopeList = OAuthUtils.convertPermissionsToScopeList(
-			serverAccessToken.getScopes());
-
 		Set<LiferayOAuth2Scope> liferayOAuth2Scopes = new HashSet<>();
 
-		for (String scope : scopeList) {
+		List<String> scopesList = OAuthUtils.convertPermissionsToScopeList(
+			serverAccessToken.getScopes());
+
+		for (String scope : scopesList) {
 			liferayOAuth2Scopes.addAll(
-				_scopeFinderLocator.getLiferayOAuth2Scopes(companyId, scope));
+				_scopeFinderLocator.getLiferayOAuth2Scopes(
+					oAuth2Application.getCompanyId(), scope));
 		}
 
 		try {
