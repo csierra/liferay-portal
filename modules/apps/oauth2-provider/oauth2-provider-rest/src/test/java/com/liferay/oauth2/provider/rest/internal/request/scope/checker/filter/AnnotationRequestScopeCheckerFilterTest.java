@@ -18,6 +18,7 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
 import com.liferay.oauth2.provider.rest.spi.request.scope.checker.filter.RequestScopeCheckerFilter;
+import com.liferay.oauth2.provider.scope.RequiresNoScope;
 import com.liferay.oauth2.provider.scope.RequiresScope;
 
 import javax.ws.rs.container.ResourceInfo;
@@ -42,6 +43,53 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 	public void setUp() throws Exception {
 		requestScopeCheckerFilter = new AnnotationRequestScopeCheckerFilter();
 		request = Mockito.mock(Request.class);
+	}
+
+	@Test
+	public void testAnnotationInheritance() throws NoSuchMethodException {
+		TestScopeChecker testScopeChecker = new TestScopeChecker("SUPER");
+
+		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
+
+		doReturn(
+			TestEndpointSample.class
+		).when(
+			resourceInfo
+		).getResourceClass();
+
+		when(
+			resourceInfo.getResourceMethod()
+		).thenReturn(
+			TestEndpointSample.class.getMethod(
+				"annotationOnSuperType", new Class<?>[0])
+		);
+
+		assertTrue(
+			requestScopeCheckerFilter.isAllowed(
+				testScopeChecker, request, resourceInfo));
+
+		testScopeChecker = new TestScopeChecker("RANDOM");
+
+		assertFalse(
+			requestScopeCheckerFilter.isAllowed(
+				testScopeChecker, request, resourceInfo));
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void testBadAnnotationsCombination() throws NoSuchMethodException {
+		TestScopeChecker testScopeChecker = new TestScopeChecker("RANDOM");
+
+		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
+
+		when(
+			resourceInfo.getResourceMethod()
+		).thenReturn(
+			TestEndpointSample.class.getMethod(
+				"badAnnotationsCombination", new Class<?>[0])
+		);
+
+		requestScopeCheckerFilter.isAllowed(
+			testScopeChecker, request, resourceInfo);
 	}
 
 	@Test
@@ -71,6 +119,32 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 			resourceInfo.getResourceMethod()
 		).thenReturn(
 			TestEndpointSample.class.getMethod("modify", new Class<?>[0])
+		);
+
+		assertTrue(
+			requestScopeCheckerFilter.isAllowed(
+				testScopeChecker, request, resourceInfo));
+	}
+
+	@Test
+	public void testMethodIsAllowedRequiresNoScope()
+		throws NoSuchMethodException {
+
+		TestScopeChecker testScopeChecker = new TestScopeChecker("RANDOM");
+
+		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
+
+		doReturn(
+			TestEndpointSample.class
+		).when(
+			resourceInfo
+		).getResourceClass();
+
+		when(
+			resourceInfo.getResourceMethod()
+		).thenReturn(
+			TestEndpointSample.class.getMethod(
+				"requiresNoScope", new Class<?>[0])
 		);
 
 		assertTrue(
@@ -150,10 +224,48 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 				testScopeChecker, request, resourceInfo));
 	}
 
+	@Test
+	public void testMethodIsAllowedWithoutAnnotation()
+		throws NoSuchMethodException {
+
+		TestScopeChecker testScopeChecker = new TestScopeChecker("RANDOM");
+
+		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
+
+		doReturn(
+			TestEndpointSample.class
+		).when(
+			resourceInfo
+		).getResourceClass();
+
+		when(
+			resourceInfo.getResourceMethod()
+		).thenReturn(
+			TestEndpointSample.class.getMethod("noAnnotation", new Class<?>[0])
+		);
+
+		assertFalse(
+			requestScopeCheckerFilter.isAllowed(
+				testScopeChecker, request, resourceInfo));
+	}
+
+	@RequiresScope("SUPER")
+	public static class TestEndpointSampleSuperType {
+	}
+
 	protected Request request;
 	protected RequestScopeCheckerFilter requestScopeCheckerFilter;
 
-	private static class TestEndpointSample {
+	private static class TestEndpointSample
+		extends TestEndpointSampleSuperType {
+
+		public void annotationOnSuperType() {
+		}
+
+		@RequiresNoScope
+		@RequiresScope("READ")
+		public void badAnnotationsCombination() {
+		}
 
 		@RequiresScope("READ")
 		public String hello() {
@@ -164,12 +276,19 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 		public void modify() {
 		}
 
+		public void noAnnotation() {
+		}
+
 		@RequiresScope({"READ", "WRITE"})
 		public void requiresAll() {
 		}
 
 		@RequiresScope(allNeeded = false, value = {"READ", "WRITE"})
 		public void requiresAny() {
+		}
+
+		@RequiresNoScope
+		public void requiresNoScope() {
 		}
 
 		@RequiresScope({"READ", "WRITE", "NOTGRANTED"})
