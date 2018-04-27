@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.internal.bearer.token.provider;
+package com.liferay.oauth2.provider.rest.internal.spi.bearer.token.provider;
 
-import com.liferay.oauth2.provider.rest.internal.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration;
+import com.liferay.oauth2.provider.rest.internal.spi.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.io.BigEndianCodec;
@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
  * @author Tomas Polesovsky
  */
 @Component(
-	configurationPid = "com.liferay.oauth2.provider.rest.internal.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration",
+	configurationPid = "com.liferay.oauth2.provider.rest.internal.spi.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {"name=default", "token.format=opaque"}
 )
@@ -78,8 +78,7 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 
 	protected String generateTokenKey(int size) {
 		if (size < 0) {
-			throw new IllegalArgumentException(
-				"Token key size must be positive number!");
+			throw new IllegalArgumentException("Token key size is less than 0");
 		}
 
 		int count = (int)Math.ceil((double)size / 8);
@@ -101,11 +100,12 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 
 	protected boolean isValid(long expiresIn, long issuedAt) {
 		long expiresInMillis = expiresIn * 1000;
-		long issuedAtMillis = issuedAt * 1000;
 
 		if (expiresInMillis < 0) {
 			return false;
 		}
+
+		long issuedAtMillis = issuedAt * 1000;
 
 		if (issuedAtMillis > System.currentTimeMillis()) {
 			return false;

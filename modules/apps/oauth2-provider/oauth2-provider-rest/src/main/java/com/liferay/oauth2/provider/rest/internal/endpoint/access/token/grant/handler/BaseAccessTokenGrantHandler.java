@@ -25,10 +25,10 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -46,58 +46,59 @@ import org.osgi.service.component.annotations.Reference;
 public abstract class BaseAccessTokenGrantHandler
 	implements AccessTokenGrantHandler {
 
-	public boolean clientsMatch(Client client1, Client client2) {
-		String client1Id = client1.getClientId();
-		String client2Id = client2.getClientId();
-
-		if (!Objects.equals(client1Id, client2Id)) {
-			return false;
-		}
-
-		Map<String, String> properties = client1.getProperties();
-
-		String companyId1 = properties.get(
-			OAuth2ProviderRestEndpointConstants.COMPANY_ID);
-
-		properties = client2.getProperties();
-
-		String companyId2 = properties.get(
-			OAuth2ProviderRestEndpointConstants.COMPANY_ID);
-
-		if (!Objects.equals(companyId1, companyId2)) {
-			return false;
-		}
-
-		return true;
-	}
-
 	@Override
 	public ServerAccessToken createAccessToken(
-			Client client, MultivaluedMap<String, String> multivaluedMap)
+			Client client, MultivaluedMap<String, String> params)
 		throws OAuthServiceException {
 
 		if (!isGrantHandlerEnabled()) {
 			throw new OAuthServiceException("Grant handler is not enabled");
 		}
 
-		if (!hasPermission(client, multivaluedMap)) {
+		if (!hasPermission(client, params)) {
 			throw new OAuthServiceException(
-				"User doesn't have permission to create token");
+				"User does not have permission to create token");
 		}
 
-		return getAccessTokenGrantHandler().createAccessToken(
-			client, multivaluedMap);
+		AccessTokenGrantHandler accessTokenGrantHandler =
+			getAccessTokenGrantHandler();
+
+		return accessTokenGrantHandler.createAccessToken(client, params);
 	}
 
 	@Override
 	public List<String> getSupportedGrantTypes() {
-		return getAccessTokenGrantHandler().getSupportedGrantTypes();
+		AccessTokenGrantHandler accessTokenGrantHandler =
+			getAccessTokenGrantHandler();
+
+		return accessTokenGrantHandler.getSupportedGrantTypes();
 	}
 
-	public boolean hasCreateTokenPermission(
+	protected boolean clientsMatch(Client client1, Client client2) {
+		if (!Objects.equals(client1.getClientId(), client2.getClientId())) {
+			return false;
+		}
+
+		String companyId1 = MapUtil.getString(
+			client1.getProperties(),
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
+		String companyId2 = MapUtil.getString(
+			client2.getProperties(),
+			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID);
+
+		if (Objects.equals(companyId1, companyId2)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	protected abstract AccessTokenGrantHandler getAccessTokenGrantHandler();
+
+	protected boolean hasCreateTokenPermission(
 		long userId, OAuth2Application oAuth2Application) {
 
-		PermissionChecker permissionChecker = null;
+		PermissionChecker permissionChecker;
 
 		try {
 			User user = userLocalService.getUserById(userId);
@@ -107,7 +108,7 @@ public abstract class BaseAccessTokenGrantHandler
 		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Unable to create PermissionChecker for user " + userId);
+					"Unable to create permission checker for user " + userId);
 			}
 
 			return false;
@@ -135,7 +136,7 @@ public abstract class BaseAccessTokenGrantHandler
 
 			sb.append("User ");
 			sb.append(userId);
-			sb.append(" doesn't have permission to create access token for ");
+			sb.append(" does not have permission to create access token for ");
 			sb.append("client ");
 			sb.append(oAuth2Application.getClientId());
 
@@ -145,10 +146,8 @@ public abstract class BaseAccessTokenGrantHandler
 		return false;
 	}
 
-	protected abstract AccessTokenGrantHandler getAccessTokenGrantHandler();
-
 	protected abstract boolean hasPermission(
-		Client client, MultivaluedMap<String, String> multivaluedMap);
+		Client client, MultivaluedMap<String, String> params);
 
 	protected abstract boolean isGrantHandlerEnabled();
 

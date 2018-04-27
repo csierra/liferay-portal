@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDa
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.Map;
 
@@ -40,20 +41,20 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
-	immediate = true, service = AccessTokenGrantHandler.class
+	service = AccessTokenGrantHandler.class
 )
-public class LiferayResourceOwnerGrantHandlerRegistrator
+public class LiferayResourceOwnerAccessTokenGrantHandler
 	extends BaseAccessTokenGrantHandler {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
-			OAuth2ProviderConfiguration.class, properties);
-
 		_resourceOwnerGrantHandler = new ResourceOwnerGrantHandler();
 
-		_resourceOwnerGrantHandler.setLoginHandler(_liferayLoginHandler);
 		_resourceOwnerGrantHandler.setDataProvider(_liferayOAuthDataProvider);
+		_resourceOwnerGrantHandler.setLoginHandler(_resourceOwnerLoginHandler);
+
+		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
+			OAuth2ProviderConfiguration.class, properties);
 	}
 
 	@Override
@@ -61,31 +62,38 @@ public class LiferayResourceOwnerGrantHandlerRegistrator
 		return _resourceOwnerGrantHandler;
 	}
 
+	@Override
 	protected boolean hasPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
-		String userName = params.getFirst("username");
-		String password = params.getFirst("password");
+		String username = params.getFirst("username");
 
-		if ((userName == null) || (password == null)) {
+		if (username == null) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("username or password parameter was not provided.");
+				_log.debug("No username parameter was provided");
 			}
 
 			return false;
 		}
 
-		UserSubject userSubject = _liferayLoginHandler.createSubject(
-			userName, password);
+		String password = params.getFirst("password");
 
-		String subjectId = userSubject.getId();
+		if (password == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("No password parameter was provided");
+			}
 
-		long userId = Long.parseLong(subjectId);
+			return false;
+		}
+
+		UserSubject userSubject = _resourceOwnerLoginHandler.createSubject(
+			username, password);
 
 		OAuth2Application oAuth2Application =
 			_liferayOAuthDataProvider.resolveOAuth2Application(client);
 
-		return hasCreateTokenPermission(userId, oAuth2Application);
+		return hasCreateTokenPermission(
+			GetterUtil.getLong(userSubject.getId()), oAuth2Application);
 	}
 
 	@Override
@@ -95,15 +103,15 @@ public class LiferayResourceOwnerGrantHandlerRegistrator
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		LiferayResourceOwnerGrantHandlerRegistrator.class);
-
-	@Reference
-	private ResourceOwnerLoginHandler _liferayLoginHandler;
+		LiferayResourceOwnerAccessTokenGrantHandler.class);
 
 	@Reference
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
 	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
 	private ResourceOwnerGrantHandler _resourceOwnerGrantHandler;
+
+	@Reference
+	private ResourceOwnerLoginHandler _resourceOwnerLoginHandler;
 
 }

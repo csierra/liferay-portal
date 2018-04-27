@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.internal.bearer.token.provider;
+package com.liferay.oauth2.provider.rest.internal.spi.bearer.token.provider;
 
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
@@ -30,14 +30,14 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Tomas Polesovsky
  */
 @Component(immediate = true)
-public class BearerTokenProviderAccessorImpl
+public class DefaultBearerTokenProviderAccessor
 	implements BearerTokenProviderAccessor {
 
 	@Activate
 	public void activate(BundleContext bundleContext) {
 		_scopedServiceTrackerMap = _scopedServiceTrackerMapFactory.create(
 			bundleContext, BearerTokenProvider.class,
-			"liferay.oauth2.client.id", () -> _bearerTokenProvider);
+			"liferay.oauth2.client.id", () -> _defaultBearerTokenProvider);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class BearerTokenProviderAccessorImpl
 		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY, target = "(name=default)"
 	)
-	private volatile BearerTokenProvider _bearerTokenProvider;
+	private volatile BearerTokenProvider _defaultBearerTokenProvider;
 
 	private ScopedServiceTrackerMap<BearerTokenProvider>
 		_scopedServiceTrackerMap;

@@ -18,6 +18,7 @@ import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2Provid
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.kernel.util.MapUtil;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -48,38 +49,39 @@ public class LiferayTokenIntrospectionServiceRegistrator {
 			properties, "oauth2.allow.token.introspection.endpoint", true);
 
 		if (enabled) {
-			boolean publicClientsEnabled = MapUtil.getBoolean(
+			boolean canSupportPublicClients = MapUtil.getBoolean(
 				properties,
 				"oauth2.allow.token.introspection.endpoint.public.clients",
 				true);
 
 			LiferayTokenIntrospectionService liferayTokenIntrospectionService =
 				new LiferayTokenIntrospectionService(
-					_liferayOAuthDataProvider, publicClientsEnabled);
+					_liferayOAuthDataProvider, canSupportPublicClients);
 
-			Hashtable<String, Object> endpointProperties = new Hashtable<>();
+			Dictionary<String, Object> liferayTokenIntrospectionProperties =
+				new Hashtable<>();
 
-			endpointProperties.put(
+			liferayTokenIntrospectionProperties.put(
 				OAuth2ProviderRestEndpointConstants.
-					LIFERAY_OAUTH2_ENDPOINT_RESOURCE,
+					PROPERTY_KEY_OAUTH2_ENDPOINT_JAXRS_RESOURCE,
 				true);
 
-			_endpointServiceRegistration = bundleContext.registerService(
+			_serviceRegistration = bundleContext.registerService(
 				Object.class, liferayTokenIntrospectionService,
-				endpointProperties);
+				liferayTokenIntrospectionProperties);
 		}
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		if (_endpointServiceRegistration != null) {
-			_endpointServiceRegistration.unregister();
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
 		}
 	}
 
-	private ServiceRegistration<Object> _endpointServiceRegistration;
-
 	@Reference
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
+
+	private ServiceRegistration<Object> _serviceRegistration;
 
 }
