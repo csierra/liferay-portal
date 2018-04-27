@@ -41,33 +41,53 @@ public class AnnotationRequestScopeCheckerFilter
 	public boolean isAllowed(
 		ScopeChecker scopeChecker, Request request, ResourceInfo resourceInfo) {
 
-		Boolean allowed = isAllowed(
-			resourceInfo.getResourceMethod(), scopeChecker);
+		Method resourceMethod = resourceInfo.getResourceMethod();
 
-		if (allowed != null) {
-			return allowed;
-		}
-
-		allowed = isAllowed(resourceInfo.getResourceClass(), scopeChecker);
-
-		if (allowed != null) {
-			return allowed;
-		}
-
-		return false;
-	}
-
-	protected Boolean isAllowed(Class<?> clazz, ScopeChecker scopeChecker) {
-		RequiresNoScope requiresNoScope = clazz.getAnnotation(
+		RequiresNoScope requiresNoScope = resourceMethod.getAnnotation(
 			RequiresNoScope.class);
 
-		RequiresScope requiresScope = clazz.getAnnotation(RequiresScope.class);
+		RequiresScope requiresScope = resourceMethod.getAnnotation(
+			RequiresScope.class);
+
+		if ((requiresNoScope != null) && (requiresScope != null)) {
+			StringBundler sb = new StringBundler(6);
+
+			Class<?> declaringClass = resourceMethod.getDeclaringClass();
+
+			sb.append("Method ");
+			sb.append(declaringClass.getName());
+			sb.append(StringPool.POUND);
+			sb.append(resourceMethod.getName());
+			sb.append("has both @RequiresNoScope and @RequiresScope ");
+			sb.append("annotations defined");
+
+			throw new RuntimeException(sb.toString());
+		}
+
+		if (requiresNoScope != null) {
+			return true;
+		}
+
+		if (requiresScope != null) {
+			if (requiresScope.allNeeded()) {
+				return scopeChecker.checkAllScopes(requiresScope.value());
+			}
+			else {
+				return scopeChecker.checkAnyScope(requiresScope.value());
+			}
+		}
+
+		Class<?> resourceClass = resourceInfo.getResourceClass();
+
+		requiresNoScope = resourceClass.getAnnotation(RequiresNoScope.class);
+
+		requiresScope = resourceClass.getAnnotation(RequiresScope.class);
 
 		if ((requiresNoScope != null) && (requiresScope != null)) {
 			StringBundler sb = new StringBundler(4);
 
 			sb.append("Class ");
-			sb.append(clazz.getName());
+			sb.append(resourceClass.getName());
 			sb.append("has both @RequiresNoScope and @RequiresScope ");
 			sb.append("annotations defined");
 
@@ -88,15 +108,16 @@ public class AnnotationRequestScopeCheckerFilter
 		}
 
 		requiresNoScope = AnnotationLocator.locate(
-			clazz, RequiresNoScope.class);
+			resourceClass, RequiresNoScope.class);
 
-		requiresScope = AnnotationLocator.locate(clazz, RequiresScope.class);
+		requiresScope = AnnotationLocator.locate(
+			resourceClass, RequiresScope.class);
 
 		if ((requiresNoScope != null) && (requiresScope != null)) {
 			StringBundler sb = new StringBundler(3);
 
 			sb.append("Class ");
-			sb.append(clazz.getName());
+			sb.append(resourceClass.getName());
 			sb.append("inherits both @RequiresNoScope and @RequiresScope");
 
 			throw new RuntimeException(sb.toString());
@@ -115,44 +136,7 @@ public class AnnotationRequestScopeCheckerFilter
 			}
 		}
 
-		return null;
-	}
-
-	protected Boolean isAllowed(Method method, ScopeChecker scopeChecker) {
-		RequiresNoScope requiresNoScope = method.getAnnotation(
-			RequiresNoScope.class);
-
-		RequiresScope requiresScope = method.getAnnotation(RequiresScope.class);
-
-		if ((requiresNoScope != null) && (requiresScope != null)) {
-			StringBundler sb = new StringBundler(6);
-
-			Class<?> declaringClass = method.getDeclaringClass();
-
-			sb.append("Method ");
-			sb.append(declaringClass.getName());
-			sb.append(StringPool.POUND);
-			sb.append(method.getName());
-			sb.append("has both @RequiresNoScope and @RequiresScope ");
-			sb.append("annotations defined");
-
-			throw new RuntimeException(sb.toString());
-		}
-
-		if (requiresNoScope != null) {
-			return true;
-		}
-
-		if (requiresScope != null) {
-			if (requiresScope.allNeeded()) {
-				return scopeChecker.checkAllScopes(requiresScope.value());
-			}
-			else {
-				return scopeChecker.checkAnyScope(requiresScope.value());
-			}
-		}
-
-		return null;
+		return false;
 	}
 
 }
