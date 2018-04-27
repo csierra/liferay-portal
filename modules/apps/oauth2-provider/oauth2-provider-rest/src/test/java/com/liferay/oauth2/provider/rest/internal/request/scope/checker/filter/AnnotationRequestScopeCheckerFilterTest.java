@@ -46,7 +46,26 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 	}
 
 	@Test
-	public void testAnnotationInheritance() throws NoSuchMethodException {
+	public void testIsAllowed() throws NoSuchMethodException {
+		TestScopeChecker testScopeChecker = new TestScopeChecker("READ");
+
+		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
+
+		when(
+			resourceInfo.getResourceMethod()
+		).thenReturn(
+			TestEndpointSample.class.getMethod("hello", new Class<?>[0])
+		);
+
+		assertTrue(
+			requestScopeCheckerFilter.isAllowed(
+				testScopeChecker, request, resourceInfo));
+	}
+
+	@Test
+	public void testIsAllowedWithAnnotationInheritance()
+		throws NoSuchMethodException {
+
 		TestScopeChecker testScopeChecker = new TestScopeChecker("SUPER");
 
 		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
@@ -76,7 +95,9 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 	}
 
 	@Test(expected = RuntimeException.class)
-	public void testBadAnnotationsCombination() throws NoSuchMethodException {
+	public void testIsAllowedWithWrongAnnotationsCombination()
+		throws NoSuchMethodException {
+
 		TestScopeChecker testScopeChecker = new TestScopeChecker("RANDOM");
 
 		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
@@ -93,23 +114,6 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 	}
 
 	@Test
-	public void testIsAllowed() throws NoSuchMethodException {
-		TestScopeChecker testScopeChecker = new TestScopeChecker("READ");
-
-		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
-
-		when(
-			resourceInfo.getResourceMethod()
-		).thenReturn(
-			TestEndpointSample.class.getMethod("hello", new Class<?>[0])
-		);
-
-		assertTrue(
-			requestScopeCheckerFilter.isAllowed(
-				testScopeChecker, request, resourceInfo));
-	}
-
-	@Test
 	public void testMethodIsAllowed() throws NoSuchMethodException {
 		TestScopeChecker testScopeChecker = new TestScopeChecker("WRITE");
 
@@ -119,32 +123,6 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 			resourceInfo.getResourceMethod()
 		).thenReturn(
 			TestEndpointSample.class.getMethod("modify", new Class<?>[0])
-		);
-
-		assertTrue(
-			requestScopeCheckerFilter.isAllowed(
-				testScopeChecker, request, resourceInfo));
-	}
-
-	@Test
-	public void testMethodIsAllowedRequiresNoScope()
-		throws NoSuchMethodException {
-
-		TestScopeChecker testScopeChecker = new TestScopeChecker("RANDOM");
-
-		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
-
-		doReturn(
-			TestEndpointSample.class
-		).when(
-			resourceInfo
-		).getResourceClass();
-
-		when(
-			resourceInfo.getResourceMethod()
-		).thenReturn(
-			TestEndpointSample.class.getMethod(
-				"requiresNoScope", new Class<?>[0])
 		);
 
 		assertTrue(
@@ -245,6 +223,32 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 		);
 
 		assertFalse(
+			requestScopeCheckerFilter.isAllowed(
+				testScopeChecker, request, resourceInfo));
+	}
+
+	@Test
+	public void testMethodIsAllowedWithRequiresNoScope()
+		throws NoSuchMethodException {
+
+		TestScopeChecker testScopeChecker = new TestScopeChecker("RANDOM");
+
+		ResourceInfo resourceInfo = Mockito.mock(ResourceInfo.class);
+
+		doReturn(
+			TestEndpointSample.class
+		).when(
+			resourceInfo
+		).getResourceClass();
+
+		when(
+			resourceInfo.getResourceMethod()
+		).thenReturn(
+			TestEndpointSample.class.getMethod(
+				"requiresNoScope", new Class<?>[0])
+		);
+
+		assertTrue(
 			requestScopeCheckerFilter.isAllowed(
 				testScopeChecker, request, resourceInfo));
 	}
