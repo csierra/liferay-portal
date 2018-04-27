@@ -17,6 +17,16 @@ package com.liferay.oauth2.provider.client.test;
 import aQute.bnd.osgi.Analyzer;
 import aQute.bnd.osgi.Jar;
 
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.CookieKeys;
+import com.liferay.portal.kernel.util.Digester;
+import com.liferay.portal.kernel.util.DigesterUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.util.DigesterImpl;
+import com.liferay.portal.util.HttpImpl;
 import com.liferay.shrinkwrap.osgi.api.BndProjectBuilder;
 
 import java.io.ByteArrayOutputStream;
@@ -25,9 +35,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -39,7 +51,9 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -69,6 +83,9 @@ public class BaseClientTest {
 	@BeforeClass
 	public static void setupClass() {
 		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+
+		new HttpUtil().setHttp(new HttpImpl());
+		new DigesterUtil().setDigester(new DigesterImpl());
 	}
 
 	public static Archive<?> getDeployment(
@@ -287,12 +304,75 @@ public class BaseClientTest {
 		};
 	}
 
+	protected BiFunction<String, Invocation.Builder, Response>
+		getAuthorizationCode(String user, String password, String hostname) {
+
+		return (clientId, builder) -> {
+			String authorizationCode = getAuthorizationCode(
+				user, password, hostname,
+				webTarget ->
+					webTarget.queryParam("client_id", clientId).
+						queryParam("response_type", "code"));
+
+			MultivaluedHashMap<String, String> formData =
+				new MultivaluedHashMap<>();
+
+			formData.add("client_id", clientId);
+			formData.add("client_secret", "oauthTestApplicationSecret");
+			formData.add("grant_type", "authorization_code");
+			formData.add("code", authorizationCode);
+
+			return builder.post(Entity.form(formData));
+		};
+	}
+
+	protected BiFunction<String, Invocation.Builder, Response>
+		getAuthorizationCodePKCE(String user, String password, String hostname) {
+
+		return (clientId, builder) -> {
+			String codeVerifier = RandomTestUtil.randomString();
+
+			String base64Digest = DigesterUtil.digestBase64(
+				Digester.SHA_256, codeVerifier);
+
+			String base64UrlDigest = StringUtil.replace(
+				base64Digest, new char[]{CharPool.PLUS, CharPool.SLASH},
+				new char[]{CharPool.MINUS, CharPool.UNDERLINE});
+
+			base64UrlDigest = StringUtil.removeChar(
+				base64UrlDigest, CharPool.EQUAL);
+
+			final String codeChallenge = base64UrlDigest;
+
+			String authorizationCode = getAuthorizationCode(
+				user, password, hostname,
+				webTarget ->
+					webTarget.queryParam("client_id", clientId).
+						queryParam("code_challenge", codeChallenge).
+						queryParam("response_type", "code"));
+
+			MultivaluedHashMap<String, String> formData =
+				new MultivaluedHashMap<>();
+
+			formData.add("client_id", clientId);
+			formData.add("code", authorizationCode);
+			formData.add("code_verifier", codeVerifier);
+			formData.add("grant_type", "authorization_code");
+
+			return builder.post(Entity.form(formData));
+		};
+	}
+
 	protected Invocation.Builder getTokenInvocationBuilder(String hostname)
 		throws URISyntaxException {
 
-		WebTarget tokenTarget = getTokenWebTarget();
+		return getInvocationBuilder(hostname, getTokenWebTarget());
+	}
 
-		Invocation.Builder builder = tokenTarget.request();
+	protected Invocation.Builder getInvocationBuilder(
+		String hostname, WebTarget webTarget) {
+
+		Invocation.Builder builder = webTarget.request();
 
 		if (hostname != null) {
 			builder = builder.header("Host", hostname);
@@ -301,11 +381,130 @@ public class BaseClientTest {
 		return builder;
 	}
 
-	protected WebTarget getTokenWebTarget() throws URISyntaxException {
+	protected WebTarget getOAuth2WebTarget() throws URISyntaxException {
 		Client client = getClient();
 
 		return client.target(
-			_url.toURI()).path("o").path("oauth2").path("token");
+			_url.toURI()).path("o").path("oauth2");
+	}
+
+	protected WebTarget getTokenWebTarget() throws URISyntaxException {
+		return getOAuth2WebTarget().path("token");
+	}
+
+	protected WebTarget getAuthorizeWebTarget() throws URISyntaxException {
+		return getOAuth2WebTarget().path("authorize");
+	}
+
+	protected WebTarget getAuthorizeDecisionWebTarget() throws URISyntaxException {
+		return getAuthorizeWebTarget().path("decision");
+	}
+
+	protected WebTarget getLoginWebTarget() throws URISyntaxException {
+		Client client = getClient();
+
+		return client.target(
+			_url.toURI()).path("c").path("portal").path("login");
+	}
+
+	protected Cookie getAuthenticatedCookie(
+			String login, String password, String hostname)
+		throws URISyntaxException {
+
+		Invocation.Builder loginInvocationBuilder = getInvocationBuilder(
+			hostname, getLoginWebTarget());
+
+		MultivaluedHashMap<String, String> formData =
+			new MultivaluedHashMap<>();
+
+		formData.add("login", login);
+		formData.add("password", password);
+
+		Response loginResponse = loginInvocationBuilder.post(
+			Entity.form(formData));
+
+		NewCookie cookie =
+			loginResponse.getCookies().get(CookieKeys.JSESSIONID);
+
+		if (cookie == null) {
+			return null;
+		}
+
+		return cookie.toCookie();
+	}
+
+	protected String getAuthorizationCode(
+			String login, String password, String hostname,
+			Function<WebTarget, WebTarget> authorizeRequestFunction) {
+
+		try {
+			Invocation.Builder authorizeInvocationBuilder =
+				getInvocationBuilder(
+					hostname, authorizeRequestFunction.apply(
+						getAuthorizeWebTarget()));
+
+			Cookie authenticatedCookie = getAuthenticatedCookie(
+				login, password, hostname);
+
+			Response authorizeResponse =
+				authorizeInvocationBuilder.accept("text/html").
+					cookie(authenticatedCookie).get();
+
+			URI location = authorizeResponse.getLocation();
+
+			if (location == null) {
+				throw new RuntimeException(
+					"Invalid authorization response: " +
+						authorizeResponse.getStatus());
+			}
+
+			Map<String, String[]> parameterMap =
+				HttpUtil.getParameterMap(location.getQuery());
+
+			if (parameterMap.containsKey("error")) {
+				return parameterMap.get("error")[0];
+			}
+
+			MultivaluedHashMap<String, String> formData =
+				new MultivaluedHashMap<>();
+
+			formData.add("oauthDecision", "allow");
+			for (String key : parameterMap.keySet()) {
+				if (!StringUtil.startsWith(key, "oauth2_")) {
+					continue;
+				}
+
+				formData.add(
+					key.substring("oauth2_".length()),
+					parameterMap.get(key)[0]);
+			}
+
+			Invocation.Builder authorizeDecisionInvocationBuilder =
+				getInvocationBuilder(hostname, getAuthorizeDecisionWebTarget());
+
+			Response authorizeDecisionResponse =
+				authorizeDecisionInvocationBuilder.cookie(authenticatedCookie).
+					post(Entity.form(formData));
+
+			location = authorizeDecisionResponse.getLocation();
+
+			if (location == null) {
+				throw new RuntimeException(
+					"Invalid authorization decision response: " +
+						authorizeResponse.getStatus());
+			}
+
+			parameterMap = HttpUtil.getParameterMap(location.getQuery());
+
+			if (parameterMap.containsKey("error")) {
+				return parameterMap.get("error")[0];
+			}
+
+			return parameterMap.get("code")[0];
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static void printDocument(Document doc, OutputStream out) throws

@@ -15,10 +15,7 @@
 package com.liferay.oauth2.provider.client.test;
 
 import com.liferay.oauth2.provider.constants.GrantType;
-import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,10 +26,7 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 /**
  * @author Carlos Sierra Andrés
@@ -74,6 +68,34 @@ public class GrantedFlowsTest extends BaseClientTest {
 			this::getClientCredentials, this::parseTokenString);
 
 		Assert.assertNotNull(tokenString);
+
+		error = getToken(
+			"oauthTestApplicationCode", null,
+			getAuthorizationCodePKCE("test@liferay.com", "test", null),
+			this::parseError);
+
+		Assert.assertEquals("invalid_client", error);
+
+		tokenString = getToken(
+			"oauthTestApplicationCode", null,
+			getAuthorizationCode("test@liferay.com", "test", null),
+			this::parseTokenString);
+
+		Assert.assertNotNull(tokenString);
+
+		error = getToken(
+			"oauthTestApplicationCodePKCE", null,
+			getAuthorizationCode("test@liferay.com", "test", null),
+			this::parseError);
+
+		Assert.assertEquals("invalid_client", error);
+
+		tokenString = getToken(
+			"oauthTestApplicationCodePKCE", null,
+			getAuthorizationCodePKCE("test@liferay.com", "test", null),
+			this::parseTokenString);
+
+		Assert.assertNotNull(tokenString);
 	}
 
 	public static class AnnotatedApplicationBundleActivator
@@ -93,6 +115,16 @@ public class GrantedFlowsTest extends BaseClientTest {
 			createOauth2Application(
 				defaultCompanyId, user, "oauthTestApplicationClient",
 				Collections.singletonList(GrantType.CLIENT_CREDENTIALS),
+				Collections.singletonList("everything"));
+
+			createOauth2Application(
+				defaultCompanyId, user, "oauthTestApplicationCode",
+				Collections.singletonList(GrantType.AUTHORIZATION_CODE),
+				Collections.singletonList("everything"));
+
+			createOauth2Application(
+				defaultCompanyId, user, "oauthTestApplicationCodePKCE", null,
+				Collections.singletonList(GrantType.AUTHORIZATION_CODE_PKCE),
 				Collections.singletonList("everything"));
 		}
 
