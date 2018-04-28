@@ -56,13 +56,13 @@ public class LiferaySubjectCreator implements SubjectCreator {
 				GetterUtil.getLong(userPrincipal.getName()));
 
 			UserSubject userSubject = new UserSubject(
-				user.getLogin(), Long.toString(user.getUserId()));
+				user.getLogin(), String.valueOf(user.getUserId()));
 
 			Map<String, String> properties = userSubject.getProperties();
 
 			properties.put(
 				OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
-				Long.toString(user.getCompanyId()));
+				String.valueOf(user.getCompanyId()));
 
 			return userSubject;
 		}
