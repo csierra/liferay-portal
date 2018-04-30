@@ -296,7 +296,7 @@ public class AnnotationRequestScopeCheckerFilterTest extends PowerMockito {
 		public void requiresNoScope() {
 		}
 
-		@RequiresScope({"READ", "WRITE", "NOTGRANTED"})
+		@RequiresScope({"READ", "NOTGRANTED", "WRITE"})
 		public void requiresTooMany() {
 		}
 
