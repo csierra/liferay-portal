@@ -32,12 +32,13 @@
 
 				for (Map.Entry<String, String> applicationNameDescriptionEntry : applicationsNamesDescriptionsList) {
 					String applicationName = applicationNameDescriptionEntry.getKey();
+					String applicationNameHtmlId = HtmlUtil.getAUICompatibleId(applicationNameDescriptionEntry.getKey());
 
 					String applicationDescription = applicationNameDescriptionEntry.getValue();
 					%>
 
 								<div class="panel panel-secondary">
-									<a aria-controls="appsAccordion<%= applicationName %>" aria-expanded="false" class="collapse-icon collapsed panel-header panel-header-link" data-parent="#appsAccordion" data-toggle="collapse" href="#appsAccordion<%= applicationName %>" id="appsAccordionHeading<%= applicationName %>" role="tab">
+									<a aria-controls="appsAccordion<%= applicationNameHtmlId %>" aria-expanded="false" class="collapse-icon collapsed panel-header panel-header-link" data-parent="#appsAccordion" data-toggle="collapse" href="#appsAccordion<%= applicationNameHtmlId %>" id="appsAccordionHeading<%= applicationNameHtmlId %>" role="tab">
 										<span class="panel-title"><%= HtmlUtil.escape(applicationDescription) %></span>
 										<span class="collapse-icon-closed">
 											<svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-right">
@@ -51,7 +52,7 @@
 										</span>
 									</a>
 
-									<div aria-labelledby="appsAccordionHeading<%= applicationName %>" class="collapse panel-collapse" id="appsAccordion<%= applicationName %>" role="tabpanel">
+									<div aria-labelledby="appsAccordionHeading<%= applicationNameHtmlId %>" class="collapse panel-collapse" id="appsAccordion<%= applicationNameHtmlId %>" role="tabpanel">
 										<div class="panel-body">
 											<%@ include file="/admin/assign_scopes_tab1_app_scopes.jsp" %>
 										</div>
