@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal.feature;
+package com.liferay.oauth2.provider.scope.internal.jaxrs.feature;
 
 import com.liferay.oauth2.provider.scope.RequiresScope;
 
@@ -44,17 +44,14 @@ public class ScopeAnnotationFinder {
 
 		Set<String> scopes = new HashSet<>();
 
-		_find(new HashSet<>(), scopes, true, classResourceInfo);
+		_find(classResourceInfo, true, scopes);
 
 		return scopes;
 	}
 
 	private static void _find(
-		Set<ClassResourceInfo> visitedClassResourceInfos,
-		Set<String> accumulatedScopes, boolean recurse,
-		ClassResourceInfo classResourceInfo) {
-
-		visitedClassResourceInfos.add(classResourceInfo);
+		ClassResourceInfo classResourceInfo, boolean recurse,
+		Set<String> scopes) {
 
 		Class<?> resourceClass = classResourceInfo.getResourceClass();
 
@@ -62,7 +59,7 @@ public class ScopeAnnotationFinder {
 			RequiresScope.class);
 
 		if (declaredAnnotation != null) {
-			Collections.addAll(accumulatedScopes, declaredAnnotation.value());
+			Collections.addAll(scopes, declaredAnnotation.value());
 		}
 
 		MethodDispatcher methodDispatcher =
@@ -74,18 +71,13 @@ public class ScopeAnnotationFinder {
 		for (OperationResourceInfo operationResourceInfo :
 				operationResourceInfos) {
 
-			_find(
-				visitedClassResourceInfos, accumulatedScopes, recurse,
-				operationResourceInfo);
+			_find(operationResourceInfo, recurse, scopes);
 		}
-
-		visitedClassResourceInfos.remove(classResourceInfo);
 	}
 
 	private static void _find(
-		Set<ClassResourceInfo> visitedClassResourceInfos,
-		Set<String> accumulatedScopes, boolean recurse,
-		OperationResourceInfo operationResourceInfo) {
+		OperationResourceInfo operationResourceInfo, boolean recurse,
+		Set<String> scopes) {
 
 		Method annotatedMethod = operationResourceInfo.getAnnotatedMethod();
 
@@ -93,10 +85,10 @@ public class ScopeAnnotationFinder {
 			annotatedMethod.getDeclaredAnnotation(RequiresScope.class);
 
 		if (declaredAnnotation != null) {
-			Collections.addAll(accumulatedScopes, declaredAnnotation.value());
+			Collections.addAll(scopes, declaredAnnotation.value());
 		}
 
-		if (operationResourceInfo.isSubResourceLocator()) {
+		if (recurse && operationResourceInfo.isSubResourceLocator()) {
 			ClassResourceInfo classResourceInfo =
 				operationResourceInfo.getClassResourceInfo();
 
@@ -106,11 +98,7 @@ public class ScopeAnnotationFinder {
 				returnType, returnType);
 
 			if (subresource != null) {
-				if (recurse) {
-					_find(
-						visitedClassResourceInfos, accumulatedScopes, false,
-						subresource);
-				}
+				_find(subresource, false, scopes);
 			}
 		}
 	}

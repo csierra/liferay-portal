@@ -12,33 +12,26 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal.jaxrs;
+package com.liferay.oauth2.provider.scope.internal.jaxrs.feature;
 
-import java.io.IOException;
+import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
+import java.util.Collection;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class RunnableExecutorContainerResponseFilter
-	implements ContainerResponseFilter {
+public class CollectionScopeFinder implements ScopeFinder {
 
-	public RunnableExecutorContainerResponseFilter(Runnable action) {
-		_action = action;
+	public CollectionScopeFinder(Collection<String> scopes) {
+		_scopes = scopes;
 	}
 
 	@Override
-	public void filter(
-			ContainerRequestContext requestContext,
-			ContainerResponseContext responseContext)
-		throws IOException {
-
-		_action.run();
+	public Collection<String> findScopes() {
+		return _scopes;
 	}
 
-	private final Runnable _action;
+	private final Collection<String> _scopes;
 
 }

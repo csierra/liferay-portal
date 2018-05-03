@@ -12,26 +12,13 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal.feature;
-
-import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
-
-import java.util.Collection;
+package com.liferay.oauth2.provider.scope.internal.constants;
 
 /**
- * @author Carlos Sierra Andrés
+ * @author Tomas Polesovsky
  */
-public class CollectionScopeFinder implements ScopeFinder {
+public class OAuth2ProviderScopeConstants {
 
-	public CollectionScopeFinder(Collection<String> scopes) {
-		_scopes = scopes;
-	}
-
-	@Override
-	public Collection<String> findScopes() {
-		return _scopes;
-	}
-
-	private final Collection<String> _scopes;
+	public static final String OSGI_JAXRS_NAME = "osgi.jaxrs.name";
 
 }

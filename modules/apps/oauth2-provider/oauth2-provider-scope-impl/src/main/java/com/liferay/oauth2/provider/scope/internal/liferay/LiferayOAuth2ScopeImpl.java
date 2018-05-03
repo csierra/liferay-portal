@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal.model;
+package com.liferay.oauth2.provider.scope.internal.liferay;
 
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 

@@ -16,11 +16,12 @@ package com.liferay.oauth2.provider.scope.internal.scope.descriptor;
 
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,16 +36,14 @@ public class DefaultScopeDescriptor implements ScopeDescriptor {
 
 	@Override
 	public String describeScope(String scope, Locale locale) {
-		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(locale.toString());
+		String key = StringBundler.concat("oauth2.scope.", scope);
 
-		scope = StringBundler.concat("oauth2.scope.", scope);
-
-		if (!resourceBundle.containsKey(scope)) {
-			return scope;
-		}
-
-		return ResourceBundleUtil.getString(resourceBundle, scope);
+		return GetterUtil.getString(
+			ResourceBundleUtil.getString(
+				_resourceBundleLoader.loadResourceBundle(
+					LocaleUtil.toLanguageId(locale)),
+				key),
+			scope);
 	}
 
 	@Reference(

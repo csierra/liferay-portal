@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal;
+package com.liferay.oauth2.provider.scope.internal.liferay;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -57,7 +57,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * @author Stian Sigvartsen
  */
 @RunWith(PowerMockRunner.class)
-public class ScopeRegistryTest extends PowerMockito {
+public class ScopeLocatorImplTest extends PowerMockito {
 
 	@Test
 	public void testPrefixHandlerFactoryByNameAndCompany() throws Exception {
@@ -69,7 +69,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeLocatorImpl scopeRegistry = builder.withPrefixHandlerFactories(
+		ScopeLocatorImpl scopeLocatorImpl = builder.withPrefixHandlerFactories(
 			propertyAccessor -> defaultPrefixHandler,
 			registrator -> {
 			}
@@ -83,10 +83,10 @@ public class ScopeRegistryTest extends PowerMockito {
 		).build();
 
 		Collection<String> application1ScopeAliases =
-			scopeRegistry.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
+			scopeLocatorImpl.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
 
 		Collection<String> application2ScopeAliases =
-			scopeRegistry.getScopeAliases(_COMPANY_ID, applicationName2);
+			scopeLocatorImpl.getScopeAliases(_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
 			Assert.assertThat(
@@ -103,7 +103,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		builder = new Builder();
 
-		scopeRegistry = builder.withPrefixHandlerFactories(
+		scopeLocatorImpl = builder.withPrefixHandlerFactories(
 			propertyAccessor -> defaultPrefixHandler,
 			registrator -> {
 				registrator.register(
@@ -122,10 +122,10 @@ public class ScopeRegistryTest extends PowerMockito {
 			}
 		).build();
 
-		application1ScopeAliases = scopeRegistry.getScopeAliases(
+		application1ScopeAliases = scopeLocatorImpl.getScopeAliases(
 			_COMPANY_ID, _APPLICATION_NAME);
 
-		application2ScopeAliases = scopeRegistry.getScopeAliases(
+		application2ScopeAliases = scopeLocatorImpl.getScopeAliases(
 			_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
@@ -147,7 +147,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeLocatorImpl scopeRegistry = builder.withScopeFinders(
+		ScopeLocatorImpl scopeLocatorImpl = builder.withScopeFinders(
 			registrator -> {
 				registrator.register(
 					_COMPANY_ID, _APPLICATION_NAME, application1ScopeFinder);
@@ -157,10 +157,10 @@ public class ScopeRegistryTest extends PowerMockito {
 		).build();
 
 		Collection<String> application1ScopeAliases =
-			scopeRegistry.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
+			scopeLocatorImpl.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
 
 		Collection<String> application2ScopesAliasesDefault =
-			scopeRegistry.getScopeAliases(_COMPANY_ID, applicationName2);
+			scopeLocatorImpl.getScopeAliases(_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
 			Assert.assertThat(application1ScopeAliases, hasItem(scope));
@@ -184,7 +184,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeLocatorImpl scopeRegistry = builder.withScopeMappers(
+		ScopeLocatorImpl scopeLocatorImpl = builder.withScopeMappers(
 			defaultScopeMapper,
 			registrator -> {
 			}
@@ -198,10 +198,10 @@ public class ScopeRegistryTest extends PowerMockito {
 		).build();
 
 		Collection<String> application1ScopeAliases =
-			scopeRegistry.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
+			scopeLocatorImpl.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
 
 		Collection<String> application2ScopeAliases =
-			scopeRegistry.getScopeAliases(_COMPANY_ID, applicationName2);
+			scopeLocatorImpl.getScopeAliases(_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
 			Assert.assertThat(application1ScopeAliases, hasItem(scope));
@@ -216,7 +216,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		builder = new Builder();
 
-		scopeRegistry = builder.withScopeMappers(
+		scopeLocatorImpl = builder.withScopeMappers(
 			defaultScopeMapper,
 			registrator -> {
 				registrator.register(null, _APPLICATION_NAME, appScopeMapper);
@@ -232,10 +232,10 @@ public class ScopeRegistryTest extends PowerMockito {
 		).build();
 
 		Collection<String> application1ScopesAliases =
-			scopeRegistry.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
+			scopeLocatorImpl.getScopeAliases(_COMPANY_ID, _APPLICATION_NAME);
 
 		Collection<String> application2ScopesAliases =
-			scopeRegistry.getScopeAliases(_COMPANY_ID, applicationName2);
+			scopeLocatorImpl.getScopeAliases(_COMPANY_ID, applicationName2);
 
 		for (String scope : scopesSet1) {
 			Assert.assertThat(
@@ -263,7 +263,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeLocatorImpl scopeRegistry = builder.withScopeFinders(
+		ScopeLocatorImpl scopeLocatorImpl = builder.withScopeFinders(
 			registrator -> {
 				registrator.register(_COMPANY_ID, _APPLICATION_NAME, service);
 				registrator.register(_COMPANY_ID, applicationName2, service);
@@ -275,14 +275,14 @@ public class ScopeRegistryTest extends PowerMockito {
 		).build();
 
 		Collection<LiferayOAuth2Scope> matchedLiferayOAuth2Scopes =
-			scopeRegistry.getLiferayOAuth2Scopes(
+			scopeLocatorImpl.getLiferayOAuth2Scopes(
 				_COMPANY_ID, "everything", _APPLICATION_NAME);
 
 		Set<String> matchedScopes = _getScopes(matchedLiferayOAuth2Scopes);
 
 		Assert.assertFalse(matchedScopes.contains("everything"));
 
-		matchedLiferayOAuth2Scopes = scopeRegistry.getLiferayOAuth2Scopes(
+		matchedLiferayOAuth2Scopes = scopeLocatorImpl.getLiferayOAuth2Scopes(
 			_COMPANY_ID, "everything.readonly", _APPLICATION_NAME);
 
 		matchedScopes = _getScopes(matchedLiferayOAuth2Scopes);
@@ -302,7 +302,7 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		Builder builder = new Builder();
 
-		ScopeLocatorImpl scopeRegistry = builder.withPrefixHandlerFactories(
+		ScopeLocatorImpl scopeLocatorImpl = builder.withPrefixHandlerFactories(
 			propertyAccessor -> PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
 			registrator -> {
 				registrator.register(
@@ -322,7 +322,7 @@ public class ScopeRegistryTest extends PowerMockito {
 		).build();
 
 		Collection<LiferayOAuth2Scope> matchedLiferayOAuth2Scopes =
-			scopeRegistry.getLiferayOAuth2Scopes(
+			scopeLocatorImpl.getLiferayOAuth2Scopes(
 				_COMPANY_ID, "test/everything", _APPLICATION_NAME);
 
 		Mockito.verify(
@@ -389,7 +389,7 @@ public class ScopeRegistryTest extends PowerMockito {
 					});
 			}
 
-			return _scopeRegistry;
+			return _scopeLocatorImpl;
 		}
 
 		public Builder withPrefixHandlerFactories(
@@ -402,10 +402,10 @@ public class ScopeRegistryTest extends PowerMockito {
 					_prepareScopeServiceTrackerMapMock(
 						defaultPrefixHandlerFactory, configurator);
 
-			_scopeRegistry.setDefaultPrefixHandlerFactory(
+			_scopeLocatorImpl.setDefaultPrefixHandlerFactory(
 				defaultPrefixHandlerFactory);
 
-			_scopeRegistry.setScopedPrefixHandlerFactories(
+			_scopeLocatorImpl.setScopedPrefixHandlerFactories(
 				scopedPrefixHandlerFactories);
 
 			_prefixHandlerFactoriesInitialized = true;
@@ -422,13 +422,13 @@ public class ScopeRegistryTest extends PowerMockito {
 					scopeFinderByNameServiceTrackerMap = Mockito.mock(
 						ServiceTrackerMap.class);
 
-			_scopeRegistry.setScopeFinderByNameServiceTrackerMap(
+			_scopeLocatorImpl.setScopeFinderByNameServiceTrackerMap(
 				scopeFinderByNameServiceTrackerMap);
 
 			ScopedServiceTrackerMap<ScopeFinder> scopedScopeFinder =
 				Mockito.mock(ScopedServiceTrackerMap.class);
 
-			_scopeRegistry.setScopedScopeFinders(scopedScopeFinder);
+			_scopeLocatorImpl.setScopedScopeFinders(scopedScopeFinder);
 
 			configurator.configure(
 				(companyId, applicationName, service) -> {
@@ -474,9 +474,9 @@ public class ScopeRegistryTest extends PowerMockito {
 				_prepareScopeServiceTrackerMapMock(
 					defaultScopeMapper, configurator);
 
-			_scopeRegistry.setDefaultScopeMapper(defaultScopeMapper);
+			_scopeLocatorImpl.setDefaultScopeMapper(defaultScopeMapper);
 
-			_scopeRegistry.setScopedScopeMapper(scopedScopeMapper);
+			_scopeLocatorImpl.setScopedScopeMapper(scopedScopeMapper);
 
 			_scopeMappersInitialized = true;
 
@@ -492,10 +492,10 @@ public class ScopeRegistryTest extends PowerMockito {
 				scopeMatcherFactoriesServiceTrackerMap = Mockito.mock(
 					ServiceTrackerMap.class);
 
-			_scopeRegistry.setDefaultScopeMatcherFactory(
+			_scopeLocatorImpl.setDefaultScopeMatcherFactory(
 				defaultScopeMatcherFactory);
 
-			_scopeRegistry.setScopedScopeMatcherFactories(
+			_scopeLocatorImpl.setScopedScopeMatcherFactories(
 				scopeMatcherFactoriesServiceTrackerMap);
 
 			configurator.configure(
@@ -543,9 +543,10 @@ public class ScopeRegistryTest extends PowerMockito {
 
 		private boolean _prefixHandlerFactoriesInitialized;
 		private boolean _scopeFindersInitialized;
+		private final ScopeLocatorImpl _scopeLocatorImpl =
+			new ScopeLocatorImpl();
 		private boolean _scopeMappersInitialized;
 		private boolean _scopeMatcherFactoriesInitialized;
-		private final ScopeLocatorImpl _scopeRegistry = new ScopeLocatorImpl();
 
 	}
 

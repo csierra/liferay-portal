@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal;
+package com.liferay.oauth2.provider.scope.internal.liferay;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -16,10 +16,10 @@ package com.liferay.oauth2.provider.scope.internal.scope.mapper;
 
 import com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Collections;
@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
-	property = {"default=true"}
+	property = "default=true"
 )
 public class ConfigurableScopeMapper implements ScopeMapper {
 

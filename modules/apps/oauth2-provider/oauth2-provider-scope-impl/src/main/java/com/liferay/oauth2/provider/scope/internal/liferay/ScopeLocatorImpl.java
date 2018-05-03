@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal;
+package com.liferay.oauth2.provider.scope.internal.liferay;
 
-import com.liferay.oauth2.provider.scope.internal.model.LiferayOAuth2ScopeImpl;
+import com.liferay.oauth2.provider.scope.internal.constants.OAuth2ProviderScopeConstants;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
@@ -129,7 +129,8 @@ public class ScopeLocatorImpl implements ScopeLocator {
 		setScopeFinderByNameServiceTrackerMap(
 			ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, ScopeFinder.class, "(osgi.jaxrs.name=*)",
-				new PropertyServiceReferenceMapper<>("osgi.jaxrs.name"),
+				new PropertyServiceReferenceMapper<>(
+					OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME),
 				new ScopeFinderServiceTupleServiceTrackerCustomizer(
 					bundleContext),
 				Comparator.naturalOrder(),
@@ -137,7 +138,8 @@ public class ScopeLocatorImpl implements ScopeLocator {
 
 		setScopedPrefixHandlerFactories(
 			_scopedServiceTrackerMapFactory.create(
-				bundleContext, PrefixHandlerFactory.class, "osgi.jaxrs.name",
+				bundleContext, PrefixHandlerFactory.class,
+				OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME,
 				() -> {
 					if (_defaultPrefixHandlerFactory != null) {
 						return _defaultPrefixHandlerFactory;
@@ -151,12 +153,14 @@ public class ScopeLocatorImpl implements ScopeLocator {
 
 		setScopedScopeFinders(
 			_scopedServiceTrackerMapFactory.create(
-				bundleContext, ScopeFinder.class, "osgi.jaxrs.name", null,
+				bundleContext, ScopeFinder.class,
+				OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME, null,
 				_invocationResultCache::clear));
 
 		setScopedScopeMapper(
 			_scopedServiceTrackerMapFactory.create(
-				bundleContext, ScopeMapper.class, "osgi.jaxrs.name",
+				bundleContext, ScopeMapper.class,
+				OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME,
 				() -> {
 					if (_defaultScopeMapper != null) {
 						return _defaultScopeMapper;

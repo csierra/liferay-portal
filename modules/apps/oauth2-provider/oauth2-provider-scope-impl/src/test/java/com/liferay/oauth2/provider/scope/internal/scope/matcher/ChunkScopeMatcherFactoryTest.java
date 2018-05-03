@@ -12,9 +12,8 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.scope.internal;
+package com.liferay.oauth2.provider.scope.internal.scope.matcher;
 
-import com.liferay.oauth2.provider.scope.internal.scope.matcher.ChunkScopeMatcherFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcher;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 

@@ -18,7 +18,7 @@ import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Carlos Sierra Andrés
  */
 @Component(service = {ScopeChecker.class, ScopeContext.class})
-public class ThreadLocalScopeContextChecker
+public class ThreadLocalScopeContextScopeChecker
 	implements ScopeChecker, ScopeContext {
 
 	@Override

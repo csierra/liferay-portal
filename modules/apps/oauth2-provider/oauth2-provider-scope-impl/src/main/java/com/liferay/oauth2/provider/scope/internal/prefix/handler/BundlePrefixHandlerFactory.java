@@ -18,9 +18,9 @@ import com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHand
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -51,7 +51,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
-	property = {"default=true"}
+	property = "default=true"
 )
 public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 
@@ -62,7 +62,7 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 		List<String> parts = new ArrayList<>(_serviceProperties.size() + 1);
 
 		if (_includeBundleSymbolicName) {
-			long bundleId = Long.parseLong(
+			long bundleId = GetterUtil.getLong(
 				propertyAccessorFunction.apply("service.bundleid").toString());
 
 			Bundle bundle = _bundleContext.getBundle(bundleId);

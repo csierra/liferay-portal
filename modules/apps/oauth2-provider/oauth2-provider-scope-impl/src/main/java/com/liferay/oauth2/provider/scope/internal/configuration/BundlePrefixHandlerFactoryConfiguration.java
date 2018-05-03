@@ -16,14 +16,16 @@ package com.liferay.oauth2.provider.scope.internal.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
 
+import com.liferay.oauth2.provider.scope.internal.constants.OAuth2ProviderScopeConstants;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
-import com.liferay.portal.kernel.util.StringPool;
 
 /**
  * @author Tomas Polesovsky
  */
 @ExtendedObjectClassDefinition(
-	category = "foundation", factoryInstanceLabelAttribute = "osgi.jaxrs.name"
+	category = "foundation",
+	factoryInstanceLabelAttribute = OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME
 )
 @Meta.OCD(
 	factory = true,
@@ -35,7 +37,8 @@ public interface BundlePrefixHandlerFactoryConfiguration {
 
 	@Meta.AD(
 		deflt = "Default", description = "osgi-jaxrs-name-description",
-		id = "osgi.jaxrs.name", name = "osgi-jaxrs-name", required = false
+		id = OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME,
+		name = "osgi-jaxrs-name", required = false
 	)
 	public String osgiJAXRSName();
 
@@ -54,7 +57,7 @@ public interface BundlePrefixHandlerFactoryConfiguration {
 	public String[] excludedScopes();
 
 	@Meta.AD(
-		deflt = "osgi.jaxrs.name",
+		deflt = OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME,
 		description = "service-properties-description",
 		id = "service.properties", name = "service-properties", required = false
 	)
