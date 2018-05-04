@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Sierra Andrés
  */
 @Component
-public class DefaultScopeDescriptorLocator implements ScopeDescriptorLocator {
+public class ScopeDescriptorLocatorImpl implements ScopeDescriptorLocator {
 
 	@Override
 	public ScopeDescriptor getScopeDescriptor(String applicationName) {
