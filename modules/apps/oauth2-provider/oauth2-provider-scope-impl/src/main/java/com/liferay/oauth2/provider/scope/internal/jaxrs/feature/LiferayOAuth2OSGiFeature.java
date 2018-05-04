@@ -80,10 +80,6 @@ import org.osgi.util.tracker.ServiceTracker;
 @Provider
 public class LiferayOAuth2OSGiFeature implements Feature {
 
-	public LiferayOAuth2OSGiFeature() {
-		_factoryBeanListener = new ScopeFinderFactoryBeanListener();
-	}
-
 	@Override
 	public boolean configure(FeatureContext featureContext) {
 		featureContext.register(
@@ -171,7 +167,8 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 	)
 	private volatile ScopeDescriptor _defaultScopeDescriptor;
 
-	private final FactoryBeanListener _factoryBeanListener;
+	private final FactoryBeanListener _factoryBeanListener =
+		new ScopeFinderFactoryBeanListener();
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private ScopeChecker _scopeChecker;
