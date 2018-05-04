@@ -34,7 +34,6 @@ public class ScopeCheckerContainerRequestFilter
 			scopedServiceTrackerMap, ScopeChecker scopeChecker) {
 
 		_scopedServiceTrackerMap = scopedServiceTrackerMap;
-
 		_scopeChecker = scopeChecker;
 	}
 
@@ -49,17 +48,20 @@ public class ScopeCheckerContainerRequestFilter
 				).build());
 		}
 
-		RequestScopeCheckerFilter requestScopeChecker =
+		RequestScopeCheckerFilter requestScopeCheckerFilter =
 			_scopedServiceTrackerMap.getService(
 				getCompanyId(), applicationName);
 
-		if (requestScopeChecker.isAllowed(
+		if (requestScopeCheckerFilter.isAllowed(
 				_scopeChecker, requestContext.getRequest(), _resourceInfo)) {
 
 			return;
 		}
 
-		requestContext.abortWith(Response.status(403).build());
+		requestContext.abortWith(
+			Response.status(
+				403
+			).build());
 	}
 
 	@Context
