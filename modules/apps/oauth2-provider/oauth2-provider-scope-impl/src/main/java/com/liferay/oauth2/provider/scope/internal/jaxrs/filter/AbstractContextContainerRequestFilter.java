@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.scope.internal.jaxrs.filter;
 
 import com.liferay.oauth2.provider.scope.internal.constants.OAuth2ProviderScopeConstants;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
@@ -39,7 +40,7 @@ import org.osgi.framework.ServiceReference;
 public abstract class AbstractContextContainerRequestFilter
 	implements ContainerRequestFilter {
 
-	public String getApplicationName() {
+	protected String getApplicationName() {
 		Bundle bundle = getBundle();
 
 		if (bundle == null) {
@@ -56,13 +57,15 @@ public abstract class AbstractContextContainerRequestFilter
 			Collection<ServiceReference<Application>> serviceReferences =
 				bundleContext.getServiceReferences(
 					Application.class,
-					"(component.name=" + applicationClassName + ")");
+					StringBundler.concat(
+						"(component.name=", applicationClassName, ")"));
 
 			if (!serviceReferences.isEmpty()) {
-				Iterator<ServiceReference<Application>> it =
+				Iterator<ServiceReference<Application>> iterator =
 					serviceReferences.iterator();
 
-				ServiceReference<Application> serviceReference = it.next();
+				ServiceReference<Application> serviceReference =
+					iterator.next();
 
 				return GetterUtil.getString(
 					serviceReference.getProperty(
@@ -71,16 +74,14 @@ public abstract class AbstractContextContainerRequestFilter
 			}
 		}
 		catch (InvalidSyntaxException ise) {
-			return null;
+			throw new IllegalArgumentException(ise);
 		}
 
 		return applicationClassName;
 	}
 
 	public Bundle getBundle() {
-		Class<?> applicationClass = application.getClass();
-
-		return FrameworkUtil.getBundle(applicationClass);
+		return FrameworkUtil.getBundle(application.getClass());
 	}
 
 	public long getCompanyId() {
