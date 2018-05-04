@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.servlet.ProtectedPrincipal;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -55,8 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tomas Polesovsky
  */
 @Component(
-	immediate = true,
-	property = OAuth2ProviderRestEndpointConstants.LIFERAY_OAUTH2_ENDPOINT_PROVIDER + "=true",
+	property = OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_OAUTH2_ENDPOINT_JAXRS_PROVIDER + "=true",
 	service = Object.class
 )
 @PreMatching
@@ -69,14 +69,12 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 	public void filter(ContainerRequestContext requestContext) {
 		UriInfo uriInfo = requestContext.getUriInfo();
 
-		String path = uriInfo.getPath();
-
-		if (!StringUtil.startsWith(path, "authorize")) {
+		if (!StringUtil.startsWith(uriInfo.getPath(), "authorize")) {
 			return;
 		}
 
 		try {
-			User user = _portal.getUser(_request);
+			User user = _portal.getUser(_httpServletRequest);
 
 			if ((user != null) && !user.isDefaultUser()) {
 				SecurityContext securityContext =
@@ -88,7 +86,7 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 						@Override
 						public Principal getUserPrincipal() {
 							return new ProtectedPrincipal(
-								Long.toString(user.getUserId()));
+								String.valueOf(user.getUserId()));
 						}
 
 						@Override
@@ -105,7 +103,9 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 			_log.error("Unable to resolve authenticated user", e);
 
 			requestContext.abortWith(
-				Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
+				Response.status(
+					Response.Status.INTERNAL_SERVER_ERROR
+				).build());
 
 			return;
 		}
@@ -119,13 +119,15 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 			_log.error("Unable to locate configuration", ce);
 
 			throw new WebApplicationException(
-				Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
+				Response.status(
+					Response.Status.INTERNAL_SERVER_ERROR
+				).build());
 		}
 
-		URI requestUri = uriInfo.getRequestUri();
+		URI requestURI = uriInfo.getRequestUri();
 
 		loginURL = _http.addParameter(
-			loginURL, "redirect", requestUri.toASCIIString());
+			loginURL, "redirect", requestURI.toASCIIString());
 
 		requestContext.abortWith(
 			Response.status(
@@ -136,20 +138,20 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 	}
 
 	protected String getLoginURL() throws ConfigurationException {
-		long companyId = _portal.getCompanyId(_request);
+		long companyId = _portal.getCompanyId(_httpServletRequest);
 
-		AuthorizeScreenConfiguration authorizeScreenRedirectConfiguration =
+		AuthorizeScreenConfiguration authorizeScreenConfiguration =
 			_configurationProvider.getConfiguration(
 				AuthorizeScreenConfiguration.class,
 				new CompanyServiceSettingsLocator(
 					companyId, AuthorizeScreenConfiguration.class.getName()));
 
-		String loginURL = authorizeScreenRedirectConfiguration.loginURL();
+		String loginURL = authorizeScreenConfiguration.loginURL();
 
 		if (Validator.isBlank(loginURL)) {
 			StringBundler sb = new StringBundler(4);
 
-			sb.append(_portal.getPortalURL(_request));
+			sb.append(_portal.getPortalURL(_httpServletRequest));
 			sb.append(_portal.getPathContext());
 			sb.append(_portal.getPathMain());
 			sb.append("/portal/login");
@@ -157,7 +159,7 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 			loginURL = sb.toString();
 		}
 		else if (!_http.hasDomain(loginURL)) {
-			String portalURL = _portal.getPortalURL(_request);
+			String portalURL = _portal.getPortalURL(_httpServletRequest);
 
 			loginURL = portalURL + loginURL;
 		}
@@ -174,15 +176,13 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 	@Reference
 	private Http _http;
 
-	private String _loginPageURL;
+	@Context
+	private HttpServletRequest _httpServletRequest;
 
 	@Reference
 	private Portal _portal;
 
-	@Context
-	private HttpServletRequest _request;
-
-	private abstract class PortalCXFSecurityContext
+	private abstract static class PortalCXFSecurityContext
 		implements SecurityContext, org.apache.cxf.security.SecurityContext {
 
 		@Override

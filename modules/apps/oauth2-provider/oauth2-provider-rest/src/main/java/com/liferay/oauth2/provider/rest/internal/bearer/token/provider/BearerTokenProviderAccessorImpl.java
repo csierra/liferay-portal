@@ -35,26 +35,26 @@ public class BearerTokenProviderAccessorImpl
 
 	@Activate
 	public void activate(BundleContext bundleContext) {
-		_scopedBearerTokenProvider = _scopedServiceTrackerMapFactory.create(
+		_scopedServiceTrackerMap = _scopedServiceTrackerMapFactory.create(
 			bundleContext, BearerTokenProvider.class,
-			"liferay.oauth2.client.id", () -> _defaultBearerTokenProvider);
+			"liferay.oauth2.client.id", () -> _bearerTokenProvider);
 	}
 
 	@Override
 	public BearerTokenProvider getBearerTokenProvider(
 		long companyId, String clientId) {
 
-		return _scopedBearerTokenProvider.getService(companyId, clientId);
+		return _scopedServiceTrackerMap.getService(companyId, clientId);
 	}
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY, target = "(name=default)"
 	)
-	private volatile BearerTokenProvider _defaultBearerTokenProvider;
+	private volatile BearerTokenProvider _bearerTokenProvider;
 
 	private ScopedServiceTrackerMap<BearerTokenProvider>
-		_scopedBearerTokenProvider;
+		_scopedServiceTrackerMap;
 
 	@Reference
 	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;

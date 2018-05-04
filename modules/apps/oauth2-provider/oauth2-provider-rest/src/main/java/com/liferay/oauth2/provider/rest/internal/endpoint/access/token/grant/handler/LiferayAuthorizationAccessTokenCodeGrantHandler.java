@@ -21,6 +21,7 @@ import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDa
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -44,26 +45,25 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
-	immediate = true, service = AccessTokenGrantHandler.class
+	service = AccessTokenGrantHandler.class
 )
 public class LiferayAuthorizationAccessTokenCodeGrantHandler
 	extends BaseAccessTokenGrantHandler {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
-			OAuth2ProviderConfiguration.class, properties);
-
 		_authorizationCodeGrantHandler = new AuthorizationCodeGrantHandler();
-
-		_authorizationCodeGrantHandler.setDataProvider(
-			_liferayOAuthDataProvider);
-
-		_authorizationCodeGrantHandler.setExpectCodeVerifierForPublicClients(
-			_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant());
 
 		_authorizationCodeGrantHandler.setCodeVerifierTransformer(
 			new DigestCodeVerifier());
+		_authorizationCodeGrantHandler.setDataProvider(
+			_liferayOAuthDataProvider);
+
+		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
+			OAuth2ProviderConfiguration.class, properties);
+
+		_authorizationCodeGrantHandler.setExpectCodeVerifierForPublicClients(
+			_oAuth2ProviderConfiguration.allowAuthorizationCodePKCEGrant());
 	}
 
 	@Override
@@ -71,6 +71,7 @@ public class LiferayAuthorizationAccessTokenCodeGrantHandler
 		return _authorizationCodeGrantHandler;
 	}
 
+	@Override
 	protected boolean hasPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
@@ -78,7 +79,7 @@ public class LiferayAuthorizationAccessTokenCodeGrantHandler
 
 		if (code == null) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("No code parameter was provided.");
+				_log.debug("No code parameter was provided");
 			}
 
 			return false;
@@ -97,12 +98,14 @@ public class LiferayAuthorizationAccessTokenCodeGrantHandler
 
 		if (!clientsMatch(client, serverAuthorizationCodeGrant.getClient())) {
 
-			// audit: Trying to get other client's code
+			// TODO: Inform the audit service that the user is trying to get a
+			// code belonging to a client other than the authenticated client
 
 			_liferayOAuthDataProvider.removeCodeGrant(code);
 
 			if (_log.isDebugEnabled()) {
-				_log.debug("Client authentication doesn't match code's client");
+				_log.debug(
+					"Authenticated client does not match the code's client");
 			}
 
 			return false;
@@ -112,13 +115,12 @@ public class LiferayAuthorizationAccessTokenCodeGrantHandler
 			_liferayOAuthDataProvider.resolveOAuth2Application(
 				serverAuthorizationCodeGrant.getClient());
 
-		long companyId = oAuth2Application.getCompanyId();
-
 		if (client.isConfidential()) {
 			if (!_oAuth2ProviderConfiguration.allowAuthorizationCodeGrant()) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Auhotization code grant is disabled in " + companyId);
+						OAuthConstants.AUTHORIZATION_CODE_GRANT +
+							" grant is not allowed");
 				}
 
 				return false;
@@ -143,7 +145,9 @@ public class LiferayAuthorizationAccessTokenCodeGrantHandler
 					allowAuthorizationCodePKCEGrant()) {
 
 				if (_log.isDebugEnabled()) {
-					_log.debug("PKCE grant is disabled in " + companyId);
+					_log.debug(
+						OAuthConstants.AUTHORIZATION_CODE_GRANT +
+							" with PKCE grant is not allowed");
 				}
 
 				return false;
@@ -158,8 +162,8 @@ public class LiferayAuthorizationAccessTokenCodeGrantHandler
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Client is not allowed to use " +
-							OAuth2ProviderRestEndpointConstants.
-								AUTHORIZATION_CODE_PKCE_GRANT + " grant");
+							OAuthConstants.AUTHORIZATION_CODE_GRANT +
+								" with PKCE grant");
 				}
 
 				return false;
@@ -168,9 +172,8 @@ public class LiferayAuthorizationAccessTokenCodeGrantHandler
 
 		UserSubject userSubject = serverAuthorizationCodeGrant.getSubject();
 
-		long userId = Long.parseLong(userSubject.getId());
-
-		return hasCreateTokenPermission(userId, oAuth2Application);
+		return hasCreateTokenPermission(
+			GetterUtil.getLong(userSubject.getId()), oAuth2Application);
 	}
 
 	@Override

@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Field names correspond to RFC.
+ *
  * @author Tomas Polesovsky
  */
 public class TokenIntrospection {

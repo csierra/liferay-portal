@@ -36,20 +36,20 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
-	immediate = true, service = AccessTokenGrantHandler.class
+	service = AccessTokenGrantHandler.class
 )
 public class LiferayClientCredentialsAccessTokenGrantHandler
 	extends BaseAccessTokenGrantHandler {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
-			OAuth2ProviderConfiguration.class, properties);
-
 		_clientCredentialsGrantHandler = new ClientCredentialsGrantHandler();
 
 		_clientCredentialsGrantHandler.setDataProvider(
 			_liferayOAuthDataProvider);
+
+		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
+			OAuth2ProviderConfiguration.class, properties);
 	}
 
 	@Override
@@ -57,15 +57,15 @@ public class LiferayClientCredentialsAccessTokenGrantHandler
 		return _clientCredentialsGrantHandler;
 	}
 
+	@Override
 	protected boolean hasPermission(
 		Client client, MultivaluedMap<String, String> params) {
 
 		OAuth2Application oAuth2Application =
 			_liferayOAuthDataProvider.resolveOAuth2Application(client);
 
-		long userId = oAuth2Application.getUserId();
-
-		return hasCreateTokenPermission(userId, oAuth2Application);
+		return hasCreateTokenPermission(
+			oAuth2Application.getUserId(), oAuth2Application);
 	}
 
 	@Override

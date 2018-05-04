@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.security.auth.Authenticator;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.Collections;
@@ -44,34 +45,59 @@ import org.osgi.service.component.annotations.Reference;
 public class LiferayResourceOwnerLoginHandler
 	implements ResourceOwnerLoginHandler {
 
-	public User authenticateUser(String login, String password) {
+	@Override
+	public UserSubject createSubject(String login, String password) {
+		try {
+			User user = authenticateUser(login, password);
+
+			if (user == null) {
+				return null;
+			}
+
+			UserSubject userSubject = new UserSubject(
+				user.getLogin(), String.valueOf(user.getUserId()));
+
+			Map<String, String> properties = userSubject.getProperties();
+
+			properties.put(
+				OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+				String.valueOf(user.getCompanyId()));
+
+			return userSubject;
+		}
+		catch (PortalException pe) {
+			_log.error(pe);
+
+			return null;
+		}
+	}
+
+	protected User authenticateUser(String login, String password) {
+		int authResult = Authenticator.FAILURE;
+
 		Long companyId = CompanyThreadLocal.getCompanyId();
 
 		Company company = _companyLocalService.fetchCompany(companyId);
 
 		String authType = company.getAuthType();
 
-		int authResult = Authenticator.FAILURE;
-
-		Map<String, String[]> headerMap = Collections.emptyMap();
-		Map<String, String[]> parameterMap = Collections.emptyMap();
 		Map<String, Object> resultsMap = new HashMap<>();
 
 		try {
 			if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
 				authResult = _userLocalService.authenticateByEmailAddress(
-					company.getCompanyId(), login, password, headerMap,
-					parameterMap, resultsMap);
+					company.getCompanyId(), login, password,
+					Collections.emptyMap(), Collections.emptyMap(), resultsMap);
 			}
 			else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
 				authResult = _userLocalService.authenticateByScreenName(
-					company.getCompanyId(), login, password, headerMap,
-					parameterMap, resultsMap);
+					company.getCompanyId(), login, password,
+					Collections.emptyMap(), Collections.emptyMap(), resultsMap);
 			}
 			else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
 				authResult = _userLocalService.authenticateByUserId(
-					company.getCompanyId(), Long.parseLong(login), password,
-					headerMap, parameterMap, resultsMap);
+					company.getCompanyId(), GetterUtil.getLong(login), password,
+					Collections.emptyMap(), Collections.emptyMap(), resultsMap);
 			}
 		}
 		catch (PortalException pe) {
@@ -90,36 +116,7 @@ public class LiferayResourceOwnerLoginHandler
 			return null;
 		}
 
-		User user = _userLocalService.fetchUser(userId);
-
-		if (user == null) {
-			return null;
-		}
-
-		return user;
-	}
-
-	@Override
-	public UserSubject createSubject(String login, String password) {
-		try {
-			User user = authenticateUser(login, password);
-
-			UserSubject userSubject = new UserSubject(
-				user.getLogin(), Long.toString(user.getUserId()));
-
-			Map<String, String> properties = userSubject.getProperties();
-
-			properties.put(
-				OAuth2ProviderRestEndpointConstants.COMPANY_ID,
-				Long.toString(user.getCompanyId()));
-
-			return userSubject;
-		}
-		catch (PortalException pe) {
-			_log.error(pe);
-
-			return null;
-		}
+		return _userLocalService.fetchUser(userId);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
