@@ -302,7 +302,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 			for (Class<?> resourceClass : factory.getResourceClasses()) {
 				scopes.addAll(
-					ScopeAnnotationFinder.find(
+					RequiresScopeAnnotationFinder.find(
 						resourceClass, factory.getBus()));
 			}
 

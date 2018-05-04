@@ -35,7 +35,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
  * @author Carlos Sierra Andrés
  * @review
  */
-public class ScopeAnnotationFinder {
+public class RequiresScopeAnnotationFinder {
 
 	public static Collection<String> find(Class<?> clazz, Bus bus) {
 		ClassResourceInfo classResourceInfo =
@@ -55,11 +55,11 @@ public class ScopeAnnotationFinder {
 
 		Class<?> resourceClass = classResourceInfo.getResourceClass();
 
-		RequiresScope declaredAnnotation = resourceClass.getDeclaredAnnotation(
+		RequiresScope requiresScope = resourceClass.getDeclaredAnnotation(
 			RequiresScope.class);
 
-		if (declaredAnnotation != null) {
-			Collections.addAll(scopes, declaredAnnotation.value());
+		if (requiresScope != null) {
+			Collections.addAll(scopes, requiresScope.value());
 		}
 
 		MethodDispatcher methodDispatcher =
@@ -81,11 +81,11 @@ public class ScopeAnnotationFinder {
 
 		Method annotatedMethod = operationResourceInfo.getAnnotatedMethod();
 
-		RequiresScope declaredAnnotation =
+		RequiresScope requiresScope =
 			annotatedMethod.getDeclaredAnnotation(RequiresScope.class);
 
-		if (declaredAnnotation != null) {
-			Collections.addAll(scopes, declaredAnnotation.value());
+		if (requiresScope != null) {
+			Collections.addAll(scopes, requiresScope.value());
 		}
 
 		if (recurse && operationResourceInfo.isSubResourceLocator()) {
