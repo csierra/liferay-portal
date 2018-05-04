@@ -40,6 +40,14 @@ import org.osgi.framework.ServiceReference;
 public abstract class AbstractContextContainerRequestFilter
 	implements ContainerRequestFilter {
 
+	public Bundle getBundle() {
+		return FrameworkUtil.getBundle(application.getClass());
+	}
+
+	public long getCompanyId() {
+		return PortalUtil.getCompanyId(httpServletRequest);
+	}
+
 	protected String getApplicationName() {
 		Bundle bundle = getBundle();
 
@@ -78,14 +86,6 @@ public abstract class AbstractContextContainerRequestFilter
 		}
 
 		return applicationClassName;
-	}
-
-	public Bundle getBundle() {
-		return FrameworkUtil.getBundle(application.getClass());
-	}
-
-	public long getCompanyId() {
-		return PortalUtil.getCompanyId(httpServletRequest);
 	}
 
 	@Context

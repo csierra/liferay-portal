@@ -81,8 +81,8 @@ public class RequiresScopeAnnotationFinder {
 
 		Method annotatedMethod = operationResourceInfo.getAnnotatedMethod();
 
-		RequiresScope requiresScope =
-			annotatedMethod.getDeclaredAnnotation(RequiresScope.class);
+		RequiresScope requiresScope = annotatedMethod.getDeclaredAnnotation(
+			RequiresScope.class);
 
 		if (requiresScope != null) {
 			Collections.addAll(scopes, requiresScope.value());
