@@ -20,6 +20,8 @@ import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -69,6 +71,12 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 
 			if (bundle != null) {
 				strings.add(bundle.getSymbolicName());
+			}
+			else {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"bundle.id in " + _serviceProperties + " is not valid");
+				}
 			}
 		}
 
@@ -155,6 +163,9 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 			return defaultsKey;
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BundlePrefixHandlerFactory.class);
 
 	private BundleContext _bundleContext;
 	private final Map<String, String> _defaults = new HashMap<>();
