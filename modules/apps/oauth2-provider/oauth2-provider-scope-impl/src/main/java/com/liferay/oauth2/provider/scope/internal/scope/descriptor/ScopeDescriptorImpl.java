@@ -43,8 +43,7 @@ public class ScopeDescriptorImpl implements ScopeDescriptor {
 				LocaleUtil.toLanguageId(locale));
 
 		return GetterUtil.getString(
-			ResourceBundleUtil.getString(resourceBundle, key),
-			scope);
+			ResourceBundleUtil.getString(resourceBundle, key), scope);
 	}
 
 	@Reference(

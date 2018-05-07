@@ -37,25 +37,22 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	property = "default=true"
 )
-public class ConfigurableScopeMapper implements ScopeMapper {
+public class ScopeMapperImpl implements ScopeMapper {
 
 	@Override
 	public Set<String> map(String scope) {
-		Set<String> mappedScopes = _mapping.get(scope);
+		Set<String> mappings = _mappingsByScope.get(scope);
 
 		Set<String> result = new HashSet<>();
 
-		if (mappedScopes != null) {
-			result.addAll(mappedScopes);
-		}
-		else {
-			result.add(scope);
+		if (mappings != null) {
+			result.addAll(mappings);
 		}
 
-		if (_passtrough) {
+		if (_passthrough) {
 			result.add(scope);
 		}
 
@@ -69,9 +66,9 @@ public class ConfigurableScopeMapper implements ScopeMapper {
 				ConfigurableUtil.createConfigurable(
 					ConfigurableScopeMapperConfiguration.class, properties);
 
-		_passtrough = configurableScopeMapperConfiguration.passthrough();
+		_passthrough = configurableScopeMapperConfiguration.passthrough();
 
-		for (String mapping : configurableScopeMapperConfiguration.mapping()) {
+		for (String mapping : configurableScopeMapperConfiguration.mappings()) {
 			String[] mappingParts = StringUtil.split(mapping, StringPool.EQUAL);
 
 			if (mappingParts.length != 2) {
@@ -88,18 +85,18 @@ public class ConfigurableScopeMapper implements ScopeMapper {
 			String[] values = StringUtil.split(mappingParts[1]);
 
 			for (String key : keys) {
-				Set<String> keyValuesSet = _mapping.computeIfAbsent(
+				Set<String> set = _mappingsByScope.computeIfAbsent(
 					key, __ -> new HashSet<>());
 
-				Collections.addAll(keyValuesSet, values);
+				Collections.addAll(set, values);
 			}
 		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		ConfigurableScopeMapper.class);
+		ScopeMapperImpl.class);
 
-	private final Map<String, Set<String>> _mapping = new HashMap<>();
-	private boolean _passtrough;
+	private final Map<String, Set<String>> _mappingsByScope = new HashMap<>();
+	private boolean _passthrough;
 
 }

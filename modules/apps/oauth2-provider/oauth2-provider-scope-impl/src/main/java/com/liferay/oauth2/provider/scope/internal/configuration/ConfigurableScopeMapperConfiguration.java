@@ -46,7 +46,7 @@ public interface ConfigurableScopeMapperConfiguration {
 		description = "mapping-description", id = "mapping", name = "mapping",
 		required = false
 	)
-	public String[] mapping();
+	public String[] mappings();
 
 	@Meta.AD(
 		deflt = "false", description = "passthrough-description",
