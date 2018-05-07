@@ -55,7 +55,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	property = "default=true"
 )
-public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
+public class PrefixHandlerFactoryImpl implements PrefixHandlerFactory {
 
 	@Override
 	public PrefixHandler create(
@@ -165,7 +165,7 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		BundlePrefixHandlerFactory.class);
+		PrefixHandlerFactoryImpl.class);
 
 	private BundleContext _bundleContext;
 	private final Map<String, String> _defaults = new HashMap<>();
