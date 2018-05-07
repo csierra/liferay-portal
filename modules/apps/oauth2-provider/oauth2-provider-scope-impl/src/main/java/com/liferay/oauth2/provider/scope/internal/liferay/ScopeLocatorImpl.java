@@ -225,8 +225,8 @@ public class ScopeLocatorImpl implements ScopeLocator {
 		_scopeFinderByNameServiceTrackerMap.close();
 		_scopedPrefixHandlerFactories.close();
 		_scopedScopeFinders.close();
-		_scopedScopeMatcherFactories.close();
 		_scopedScopeMapper.close();
+		_scopedScopeMatcherFactories.close();
 	}
 
 	protected ScopeMatcherFactory getScopeMatcherFactory(long companyId) {
