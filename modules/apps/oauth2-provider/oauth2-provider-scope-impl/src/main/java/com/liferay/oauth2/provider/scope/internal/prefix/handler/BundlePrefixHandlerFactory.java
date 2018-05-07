@@ -59,32 +59,38 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 	public PrefixHandler create(
 		Function<String, Object> propertyAccessorFunction) {
 
-		List<String> parts = new ArrayList<>(_serviceProperties.size() + 1);
+		List<String> strings = new ArrayList<>(_serviceProperties.size() + 1);
 
 		if (_includeBundleSymbolicName) {
 			long bundleId = GetterUtil.getLong(
-				propertyAccessorFunction.apply("service.bundleid").toString());
+				propertyAccessorFunction.apply("service.bundleid"));
 
 			Bundle bundle = _bundleContext.getBundle(bundleId);
 
-			parts.add(bundle.getSymbolicName());
+			if (bundle != null) {
+				strings.add(bundle.getSymbolicName());
+			}
 		}
 
 		for (String serviceProperty : _serviceProperties) {
 			Object value = propertyAccessorFunction.apply(serviceProperty);
 
 			if (Validator.isNotNull(value)) {
-				parts.add(value.toString());
+				strings.add(value.toString());
 			}
 			else {
-				parts.add(_defaults.get(serviceProperty));
+				String defaultValue = _defaults.get(serviceProperty);
+
+				if (Validator.isNotNull(defaultValue)) {
+					strings.add(defaultValue);
+				}
 			}
 		}
 
-		String prefix = StringUtil.merge(parts, _delimiter);
+		String prefix = StringUtil.merge(strings, _delimiter);
 
 		return input -> {
-			if (_excludedScope.contains(input)) {
+			if (_excludedInputs.contains(input)) {
 				return input;
 			}
 
@@ -96,17 +102,19 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
+		_bundleContext = bundleContext;
+
 		BundlePrefixHandlerFactoryConfiguration
 			bundlePrefixHandlerFactoryConfiguration =
 				ConfigurableUtil.createConfigurable(
 					BundlePrefixHandlerFactoryConfiguration.class, properties);
 
-		_bundleContext = bundleContext;
+		_delimiter = bundlePrefixHandlerFactoryConfiguration.delimiter();
 
 		Stream<String> stream = Arrays.stream(
 			bundlePrefixHandlerFactoryConfiguration.excludedScopes());
 
-		_excludedScope = stream.filter(
+		_excludedInputs = stream.filter(
 			e -> !Validator.isBlank(e)
 		).collect(
 			Collectors.toList()
@@ -115,45 +123,43 @@ public class BundlePrefixHandlerFactory implements PrefixHandlerFactory {
 		_includeBundleSymbolicName =
 			bundlePrefixHandlerFactoryConfiguration.includeBundleSymbolicName();
 
-		_delimiter = bundlePrefixHandlerFactoryConfiguration.delimiter();
-
 		for (String serviceProperty :
 				bundlePrefixHandlerFactoryConfiguration.serviceProperties()) {
 
-			String servicePropertyKey;
+			_serviceProperties.add(initializeServiceProperty(serviceProperty));
+		}
+	}
 
-			int indexOfSpace = serviceProperty.indexOf(StringPool.SPACE);
+	protected String initializeServiceProperty(String serviceProperty) {
+		int indexOfSpace = serviceProperty.indexOf(StringPool.SPACE);
 
-			if (indexOfSpace > -1) {
-				servicePropertyKey = serviceProperty.substring(0, indexOfSpace);
+		if (indexOfSpace == -1) {
+			return serviceProperty;
+		}
+		else {
+			String defaultsKey = serviceProperty.substring(0, indexOfSpace);
+			Properties modifiers = new Properties();
 
-				Properties modifiers = new Properties();
-
-				try {
-					modifiers.load(
-						new StringReader(
-							serviceProperty.substring(indexOfSpace)));
-				}
-				catch (IOException ioe) {
-					throw new IllegalArgumentException(ioe);
-				}
-
-				_defaults.put(
-					servicePropertyKey,
-					GetterUtil.getString(modifiers.getProperty("default")));
+			try {
+				modifiers.load(
+					new StringReader(serviceProperty.substring(indexOfSpace)));
 			}
-			else {
-				servicePropertyKey = serviceProperty;
+			catch (IOException ioe) {
+				throw new IllegalArgumentException(ioe);
 			}
 
-			_serviceProperties.add(servicePropertyKey);
+			_defaults.put(
+				defaultsKey,
+				GetterUtil.getString(modifiers.getProperty("default")));
+
+			return defaultsKey;
 		}
 	}
 
 	private BundleContext _bundleContext;
 	private final Map<String, String> _defaults = new HashMap<>();
 	private String _delimiter = StringPool.SLASH;
-	private List<String> _excludedScope;
+	private List<String> _excludedInputs;
 	private boolean _includeBundleSymbolicName;
 	private final Collection<String> _serviceProperties = new ArrayList<>();
 
