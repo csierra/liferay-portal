@@ -39,7 +39,7 @@ public class ThreadLocalScopeContextScopeChecker
 	@Override
 	public boolean checkAllScopes(String... scopes) {
 		if (Validator.isNull(scopes)) {
-			throw new IllegalArgumentException("Scopes can't be null");
+			throw new IllegalArgumentException("Scopes can not be null");
 		}
 
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants = new ArrayList<>(
@@ -57,10 +57,7 @@ public class ThreadLocalScopeContextScopeChecker
 				throw new IllegalArgumentException("Scope can't be null");
 			}
 
-			boolean found = oAuth2ScopeGrants.removeIf(
-				o -> scope.equals(o.getScope()));
-
-			if (!found) {
+			if (!oAuth2ScopeGrants.removeIf(o -> scope.equals(o.getScope()))) {
 				return false;
 			}
 		}
@@ -118,10 +115,10 @@ public class ThreadLocalScopeContextScopeChecker
 
 	@Override
 	public void clear() {
+		_accessTokenThreadLocal.remove();
 		_applicationNameThreadLocal.remove();
 		_bundleSymbolicNameThreadLocal.remove();
 		_companyIdThreadLocal.remove();
-		_accessTokenThreadLocal.remove();
 	}
 
 	@Override
