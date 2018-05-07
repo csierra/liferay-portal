@@ -21,6 +21,8 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -62,19 +64,19 @@ public class ScopedServiceTrackerMapFactoryImpl
 			List<T> services = _servicesByCompanyAndKey.getService(
 				String.join("-", companyIdString, key));
 
-			if ((services != null) && !services.isEmpty()) {
+			if (ListUtil.isNotEmpty(services)) {
 				return services.get(0);
 			}
 
 			services = _servicesByKey.getService(key);
 
-			if ((services != null) && !services.isEmpty()) {
+			if (ListUtil.isNotEmpty(services)) {
 				return services.get(0);
 			}
 
 			services = _servicesByCompany.getService(companyIdString);
 
-			if ((services != null) && !services.isEmpty()) {
+			if (ListUtil.isNotEmpty(services)) {
 				return services.get(0);
 			}
 
@@ -89,14 +91,15 @@ public class ScopedServiceTrackerMapFactoryImpl
 			_onChangeRunnable = onChangeRunnable;
 
 			_servicesByCompany = ServiceTrackerMapFactory.openMultiValueMap(
-				bundleContext, clazz, "(&(companyId=*)(!(" + property + "=*)))",
+				bundleContext, clazz,
+				StringBundler.concat("(&(companyId=*)(!(", property, "=*)))"),
 				new PropertyServiceReferenceMapper<>("companyId"),
 				new ServiceTrackerMapListenerImpl());
 
 			_servicesByCompanyAndKey =
 				ServiceTrackerMapFactory.openMultiValueMap(
 					bundleContext, clazz,
-					"(&(companyId=*)(" + property + "=*))",
+					StringBundler.concat("(&(companyId=*)(", property, "=*))"),
 					(serviceReference, emitter) -> {
 						ServiceReferenceMapper<String, T> companyMapper =
 							new PropertyServiceReferenceMapper<>("companyId");
@@ -114,7 +117,8 @@ public class ScopedServiceTrackerMapFactoryImpl
 
 			_servicesByKey = ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, clazz,
-				"(&(" + property + "=*)(|(!(companyId=*))(companyId=0)))",
+				StringBundler.concat(
+					"(&(", property, "=*)(|(!(companyId=*))(companyId=0)))"),
 				new PropertyServiceReferenceMapper<>(property),
 				new ServiceTrackerMapListenerImpl());
 		}
