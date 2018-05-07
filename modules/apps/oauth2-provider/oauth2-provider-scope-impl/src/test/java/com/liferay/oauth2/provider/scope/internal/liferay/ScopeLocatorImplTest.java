@@ -418,7 +418,7 @@ public class ScopeLocatorImplTest extends PowerMockito {
 			throws IllegalAccessException, IllegalArgumentException {
 
 			ServiceTrackerMap
-				<String, List<ServiceReferenceServiceTuple<?, ScopeFinder>>>
+				<String, ServiceReferenceServiceTuple<?, ScopeFinder>>
 					scopeFinderByNameServiceTrackerMap = Mockito.mock(
 						ServiceTrackerMap.class);
 
@@ -438,19 +438,12 @@ public class ScopeLocatorImplTest extends PowerMockito {
 					ServiceReference<?> serviceReference = Mockito.mock(
 						ServiceReference.class);
 
-					tuples.add(
-						new ServiceReferenceServiceTuple(
-							serviceReference, service));
-
-					tuples.add(
-						new ServiceReferenceServiceTuple(
-							serviceReference, service));
-
 					when(
 						scopeFinderByNameServiceTrackerMap.getService(
 							applicationName)
 					).thenReturn(
-						tuples
+						new ServiceReferenceServiceTuple(
+							serviceReference, service)
 					);
 
 					when(
