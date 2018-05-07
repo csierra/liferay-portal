@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -31,18 +32,18 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(immediate = true, property = "default=true")
-public class DefaultScopeDescriptor implements ScopeDescriptor {
+@Component(property = "default=true")
+public class ScopeDescriptorImpl implements ScopeDescriptor {
 
 	@Override
 	public String describeScope(String scope, Locale locale) {
 		String key = StringBundler.concat("oauth2.scope.", scope);
+		ResourceBundle resourceBundle =
+			_resourceBundleLoader.loadResourceBundle(
+				LocaleUtil.toLanguageId(locale));
 
 		return GetterUtil.getString(
-			ResourceBundleUtil.getString(
-				_resourceBundleLoader.loadResourceBundle(
-					LocaleUtil.toLanguageId(locale)),
-				key),
+			ResourceBundleUtil.getString(resourceBundle, key),
 			scope);
 	}
 
