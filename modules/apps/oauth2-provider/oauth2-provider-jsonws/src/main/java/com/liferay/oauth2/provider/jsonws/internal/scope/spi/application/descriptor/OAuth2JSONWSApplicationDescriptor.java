@@ -12,17 +12,19 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.jsonws.internal.application.descriptor;
+package com.liferay.oauth2.provider.jsonws.internal.scope.spi.application.descriptor;
 
+import com.liferay.oauth2.provider.jsonws.internal.configuration.OAuth2JSONWSConfiguration;
 import com.liferay.oauth2.provider.jsonws.internal.constants.OAuth2JSONWSConstants;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
-import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -30,22 +32,36 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tomas Polesovsky
  */
 @Component(
-	property = "osgi.jaxrs.name=" + OAuth2JSONWSConstants.OSGI_JAXRS_APPLICATION_NAME
+	configurationPid = "com.liferay.oauth2.provider.jsonws.internal.configuration.OAuth2JSONWSConfiguration",
+	property = "osgi.jaxrs.name=" + OAuth2JSONWSConstants.APPLICATION_NAME
 )
 public class OAuth2JSONWSApplicationDescriptor
 	implements ApplicationDescriptor {
 
 	@Override
 	public String describeApplication(Locale locale) {
-		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(
-				LocaleUtil.toLanguageId(locale));
+		String applicationDescription = ResourceBundleUtil.getString(
+			_resourceBundleLoader.loadResourceBundle(locale),
+			_applicationDescription);
 
-		return ResourceBundleUtil.getString(
-			resourceBundle,
-			"oauth2.application.description." +
-				OAuth2JSONWSConstants.OSGI_JAXRS_APPLICATION_NAME);
+		if (applicationDescription == null) {
+			return _applicationDescription;
+		}
+
+		return applicationDescription;
 	}
+
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		OAuth2JSONWSConfiguration oAuth2JSONWSConfiguration =
+			ConfigurableUtil.createConfigurable(
+				OAuth2JSONWSConfiguration.class, properties);
+
+		_applicationDescription =
+			oAuth2JSONWSConfiguration.applicationDescription();
+	}
+
+	private String _applicationDescription;
 
 	@Reference(
 		target = "(bundle.symbolic.name=com.liferay.oauth2.provider.jsonws)"

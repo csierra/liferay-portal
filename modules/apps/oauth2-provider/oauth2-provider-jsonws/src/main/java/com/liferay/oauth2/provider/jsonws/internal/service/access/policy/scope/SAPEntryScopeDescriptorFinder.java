@@ -16,16 +16,16 @@ package com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope;
 
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * @author Tomas Polesovsky
@@ -34,41 +34,34 @@ public class SAPEntryScopeDescriptorFinder
 	implements ScopeDescriptor, ScopeFinder {
 
 	public SAPEntryScopeDescriptorFinder(List<SAPEntryScope> sapEntryScopes) {
-		_sapEntryScopes = sapEntryScopes;
+		for (SAPEntryScope sapEntryScope : sapEntryScopes) {
+			_sapEntryScopes.put(sapEntryScope.getScope(), sapEntryScope);
+		}
 	}
 
 	@Override
 	public String describeScope(String scope, Locale locale) {
-		for (SAPEntryScope sapEntryScope : _sapEntryScopes) {
-			if (Objects.equals(sapEntryScope.getScopeName(), scope)) {
-				String languageId = LocaleUtil.toLanguageId(locale);
+		SAPEntryScope sapEntryScope = _sapEntryScopes.get(scope);
 
-				return LocalizationUtil.getLocalization(
-					sapEntryScope.getTitle(), languageId);
+		if (sapEntryScope == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to get SAP entry scope " + scope);
 			}
+
+			return StringPool.BLANK;
 		}
 
-		if (_log.isWarnEnabled()) {
-			_log.warn("Unable to locate SAPEntry scope " + scope);
-		}
-
-		return scope;
+		return sapEntryScope.getTitle(locale);
 	}
 
 	@Override
 	public Collection<String> findScopes() {
-		Collection<String> scopes = new HashSet<>(_sapEntryScopes.size());
-
-		for (SAPEntryScope sapEntryScope : _sapEntryScopes) {
-			scopes.add(sapEntryScope.getScopeName());
-		}
-
-		return scopes;
+		return new HashSet<>(_sapEntryScopes.keySet());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SAPEntryScopeDescriptorFinder.class);
 
-	private final List<SAPEntryScope> _sapEntryScopes;
+	private final Map<String, SAPEntryScope> _sapEntryScopes = new HashMap<>();
 
 }

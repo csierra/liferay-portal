@@ -41,16 +41,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tomas Polesovsky
  */
 @Component(immediate = true)
-public class OAuth2SAPEntryActivator {
+public class OAuth2JSONWSSAPEntryActivator {
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceRegistration = bundleContext.registerService(
-			PortalInstanceLifecycleListener.class,
-			new PolicyPortalInstanceLifecycleListener(), null);
-	}
-
-	protected void addSAPEntry(long companyId) throws PortalException {
+	public void addSAPEntries(long companyId) throws PortalException {
 		for (String[] sapEntryObjectArray : _SAP_ENTRY_OBJECT_ARRAYS) {
 			String name = sapEntryObjectArray[0];
 			String allowedServiceSignatures = sapEntryObjectArray[1];
@@ -70,6 +63,13 @@ public class OAuth2SAPEntryActivator {
 				allowedServiceSignatures, false, true, name, map,
 				new ServiceContext());
 		}
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_serviceRegistration = bundleContext.registerService(
+			PortalInstanceLifecycleListener.class,
+			new PolicyPortalInstanceLifecycleListener(), null);
 	}
 
 	@Deactivate
@@ -92,7 +92,7 @@ public class OAuth2SAPEntryActivator {
 	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		OAuth2SAPEntryActivator.class);
+		OAuth2JSONWSSAPEntryActivator.class);
 
 	@Reference(
 		target = "(bundle.symbolic.name=com.liferay.oauth2.provider.jsonws)"
@@ -113,7 +113,7 @@ public class OAuth2SAPEntryActivator {
 
 		public void portalInstanceRegistered(Company company) throws Exception {
 			try {
-				addSAPEntry(company.getCompanyId());
+				addSAPEntries(company.getCompanyId());
 			}
 			catch (PortalException pe) {
 				_log.error(

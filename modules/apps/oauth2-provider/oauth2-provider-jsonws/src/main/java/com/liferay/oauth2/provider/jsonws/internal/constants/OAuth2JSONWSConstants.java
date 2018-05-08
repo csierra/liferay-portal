@@ -19,6 +19,6 @@ package com.liferay.oauth2.provider.jsonws.internal.constants;
  */
 public class OAuth2JSONWSConstants {
 
-	public static final String OSGI_JAXRS_APPLICATION_NAME = "JSONWS";
+	public static final String APPLICATION_NAME = "liferay-json-web-services";
 
 }

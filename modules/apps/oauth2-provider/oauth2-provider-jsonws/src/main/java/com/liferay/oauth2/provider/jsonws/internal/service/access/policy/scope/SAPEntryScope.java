@@ -14,39 +14,33 @@
 
 package com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope;
 
+import com.liferay.portal.security.service.access.policy.model.SAPEntry;
+
+import java.util.Locale;
+
 /**
  * @author Tomas Polesovsky
  */
 public class SAPEntryScope {
 
-	public SAPEntryScope(
-		long sapEntryId, String sapEntryName, String scopeName, String title) {
-
-		_sapEntryId = sapEntryId;
-		_sapEntryName = sapEntryName;
-		_scopeName = scopeName;
-		_title = title;
-	}
-
-	public long getSapEntryId() {
-		return _sapEntryId;
+	public SAPEntryScope(SAPEntry sapEntry, String scope) {
+		_sapEntry = sapEntry;
+		_scope = scope;
 	}
 
 	public String getSapEntryName() {
-		return _sapEntryName;
+		return _sapEntry.getName();
 	}
 
-	public String getScopeName() {
-		return _scopeName;
+	public String getScope() {
+		return _scope;
 	}
 
-	public String getTitle() {
-		return _title;
+	public String getTitle(Locale locale) {
+		return _sapEntry.getTitle(locale);
 	}
 
-	private final long _sapEntryId;
-	private final String _sapEntryName;
-	private final String _scopeName;
-	private final String _title;
+	private final SAPEntry _sapEntry;
+	private final String _scope;
 
 }

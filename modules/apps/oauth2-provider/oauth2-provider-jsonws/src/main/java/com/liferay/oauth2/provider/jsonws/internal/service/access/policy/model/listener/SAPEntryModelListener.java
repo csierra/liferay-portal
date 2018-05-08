@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.jsonws.internal.service.access.policy.model.listener;
 
-import com.liferay.oauth2.provider.jsonws.internal.OAuth2JSONWSScopePublisher;
+import com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope.SAPEntryScopeDescriptorFinderRegistrator;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
@@ -30,21 +30,25 @@ import org.osgi.service.component.annotations.Reference;
 public class SAPEntryModelListener extends BaseModelListener<SAPEntry> {
 
 	@Override
-	public void onAfterCreate(SAPEntry model) throws ModelListenerException {
-		_oAuth2JSONWSScopePublisher.publishScopes(model.getCompanyId());
+	public void onAfterCreate(SAPEntry sapEntry) throws ModelListenerException {
+		_sapEntryScopeDescriptorFinderRegistrator.register(
+			sapEntry.getCompanyId());
 	}
 
 	@Override
-	public void onAfterRemove(SAPEntry model) throws ModelListenerException {
-		_oAuth2JSONWSScopePublisher.publishScopes(model.getCompanyId());
+	public void onAfterRemove(SAPEntry sapEntry) throws ModelListenerException {
+		_sapEntryScopeDescriptorFinderRegistrator.register(
+			sapEntry.getCompanyId());
 	}
 
 	@Override
-	public void onAfterUpdate(SAPEntry model) throws ModelListenerException {
-		_oAuth2JSONWSScopePublisher.publishScopes(model.getCompanyId());
+	public void onAfterUpdate(SAPEntry sapEntry) throws ModelListenerException {
+		_sapEntryScopeDescriptorFinderRegistrator.register(
+			sapEntry.getCompanyId());
 	}
 
 	@Reference
-	private OAuth2JSONWSScopePublisher _oAuth2JSONWSScopePublisher;
+	private SAPEntryScopeDescriptorFinderRegistrator
+		_sapEntryScopeDescriptorFinderRegistrator;
 
 }

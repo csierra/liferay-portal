@@ -12,27 +12,28 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.jsonws.internal;
+package com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope;
 
+import com.liferay.oauth2.provider.jsonws.internal.configuration.OAuth2JSONWSConfiguration;
 import com.liferay.oauth2.provider.jsonws.internal.constants.OAuth2JSONWSConstants;
-import com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope.SAPEntryScope;
-import com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope.SAPEntryScopeDescriptorFinder;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -45,49 +46,26 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tomas Polesovsky
  */
 @Component(
-	immediate = true, property = "sap.entry.oauth2.prefix=OAUTH2_",
-	service = OAuth2JSONWSScopePublisher.class
+	configurationPid = "com.liferay.oauth2.provider.jsonws.internal.configuration.OAuth2JSONWSConfiguration",
+	immediate = true, service = SAPEntryScopeDescriptorFinderRegistrator.class
 )
-public class OAuth2JSONWSScopePublisher {
+public class SAPEntryScopeDescriptorFinderRegistrator {
 
-	public List<SAPEntryScope> getPublishedScopes(long companyId) {
-		return new ArrayList<>(_companySAPEntryScopes.get(companyId));
+	public List<SAPEntryScope> getRegisteredSAPEntryScopes(long companyId) {
+		return new ArrayList<>(_registeredSAPEntryScopes.get(companyId));
 	}
 
-	public void publishScopes(long companyId) {
+	public void register(long companyId) {
 		try {
-			List<SAPEntry> sapEntries =
-				_sapEntryLocalService.getCompanySAPEntries(
-					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			List<SAPEntryScope> sapEntryScopes = loadSAPEntryScopes(companyId);
 
-			List<SAPEntryScope> sapEntryScopes = new ArrayList<>(
-				sapEntries.size());
-
-			for (SAPEntry sapEntry : sapEntries) {
-				String sapEntryName = sapEntry.getName();
-
-				if (!StringUtil.startsWith(
-						sapEntryName, _sapEntryOAuth2Prefix)) {
-
-					continue;
-				}
-
-				SAPEntryScope sapEntryScope = new SAPEntryScope(
-					sapEntry.getSapEntryId(), sapEntryName,
-					sapEntryName.substring(_sapEntryOAuth2Prefix.length()),
-					sapEntry.getTitle());
-
-				sapEntryScopes.add(sapEntryScope);
-			}
-
-			Dictionary<String, Object> properties = new Hashtable<>();
+			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 			properties.put("companyId", String.valueOf(companyId));
 			properties.put(
-				"osgi.jaxrs.name",
-				OAuth2JSONWSConstants.OSGI_JAXRS_APPLICATION_NAME);
+				"osgi.jaxrs.name", OAuth2JSONWSConstants.APPLICATION_NAME);
 
-			_sapEntryScopeDescriptorFinderServiceRegistry.compute(
+			_serviceRegistrations.compute(
 				companyId,
 				(key, serviceRegistration) -> {
 					if (serviceRegistration != null) {
@@ -102,15 +80,15 @@ public class OAuth2JSONWSScopePublisher {
 						new SAPEntryScopeDescriptorFinder(sapEntryScopes),
 						properties);
 
-					_companySAPEntryScopes.put(companyId, sapEntryScopes);
+					_registeredSAPEntryScopes.put(companyId, sapEntryScopes);
 
 					return serviceRegistration;
 				});
 		}
 		catch (Exception e) {
 			_log.error(
-				"Unable to get and register SAP entries for company " +
-					companyId,
+				"Unable to register SAP entry scope descriptor finder for " +
+					"company " + companyId,
 				e);
 		}
 	}
@@ -121,34 +99,74 @@ public class OAuth2JSONWSScopePublisher {
 
 		_bundleContext = bundleContext;
 
-		_sapEntryOAuth2Prefix = MapUtil.getString(
-			properties, "sap.entry.oauth2.prefix", _sapEntryOAuth2Prefix);
+		OAuth2JSONWSConfiguration oAuth2JSONWSConfiguration =
+			ConfigurableUtil.createConfigurable(
+				OAuth2JSONWSConfiguration.class, properties);
+
+		_removeSAPEntryOAuth2Prefix =
+			oAuth2JSONWSConfiguration.removeSAPEntryOAuth2Prefix();
+
+		_sapEntryOAuth2Prefix =
+			oAuth2JSONWSConfiguration.sapEntryOAuth2Prefix();
+
+		for (long companyId : _serviceRegistrations.keySet()) {
+			register(companyId);
+		}
 	}
 
 	@Deactivate
 	protected void deactivate() {
 		for (ServiceRegistration serviceRegistration :
-				_sapEntryScopeDescriptorFinderServiceRegistry.values()) {
+				_serviceRegistrations.values()) {
 
 			serviceRegistration.unregister();
 		}
 
-		_sapEntryScopeDescriptorFinderServiceRegistry.clear();
+		_serviceRegistrations.clear();
+	}
+
+	protected boolean isOAuth2ExportedSAPEntry(SAPEntry sapEntry) {
+		return StringUtil.startsWith(sapEntry.getName(), _sapEntryOAuth2Prefix);
+	}
+
+	protected List<SAPEntryScope> loadSAPEntryScopes(long companyId) {
+		List<SAPEntry> sapEntries = _sapEntryLocalService.getCompanySAPEntries(
+			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		Stream<SAPEntry> stream = sapEntries.stream();
+
+		return stream.filter(
+			this::isOAuth2ExportedSAPEntry
+		).map(
+			sapEntry -> new SAPEntryScope(sapEntry, _parseScope(sapEntry))
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	private String _parseScope(SAPEntry sapEntry) {
+		String sapEntryName = sapEntry.getName();
+
+		if (!_removeSAPEntryOAuth2Prefix) {
+			return sapEntryName;
+		}
+
+		return sapEntryName.substring(_sapEntryOAuth2Prefix.length());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		OAuth2JSONWSScopePublisher.class);
+		SAPEntryScopeDescriptorFinderRegistrator.class);
 
 	private BundleContext _bundleContext;
-	private final Map<Long, List<SAPEntryScope>> _companySAPEntryScopes =
+	private final Map<Long, List<SAPEntryScope>> _registeredSAPEntryScopes =
 		new ConcurrentHashMap<>();
+	private boolean _removeSAPEntryOAuth2Prefix = true;
 
 	@Reference
 	private SAPEntryLocalService _sapEntryLocalService;
 
 	private String _sapEntryOAuth2Prefix = "OAUTH2_";
-	private final Map<Long, ServiceRegistration>
-		_sapEntryScopeDescriptorFinderServiceRegistry =
-			new ConcurrentHashMap<>();
+	private final Map<Long, ServiceRegistration> _serviceRegistrations =
+		new ConcurrentHashMap<>();
 
 }

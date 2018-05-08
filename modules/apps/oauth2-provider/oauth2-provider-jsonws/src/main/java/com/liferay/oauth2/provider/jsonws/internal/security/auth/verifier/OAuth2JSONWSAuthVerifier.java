@@ -12,12 +12,12 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.jsonws.internal.auth.verifier;
+package com.liferay.oauth2.provider.jsonws.internal.security.auth.verifier;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
-import com.liferay.oauth2.provider.jsonws.internal.OAuth2JSONWSScopePublisher;
 import com.liferay.oauth2.provider.jsonws.internal.constants.OAuth2JSONWSConstants;
 import com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope.SAPEntryScope;
+import com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope.SAPEntryScopeDescriptorFinderRegistrator;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
@@ -63,9 +63,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Tomas Polesovsky
  */
 @Component(
-	immediate = true,
-	property =
-		{"auth.verifier.OAuth2JSONWSAuthVerifier.urls.includes=/api/jsonws/*"}
+	property = "auth.verifier.OAuth2JSONWSAuthVerifier.urls.includes=/api/jsonws/*"
 )
 public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
@@ -108,11 +106,11 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 			Set<String> scopes = new HashSet<>();
 
-			for (String accessTokenScope : accessToken.getScopes()) {
+			for (String scope : accessToken.getScopes()) {
 				Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
 					_scopeLocator.getLiferayOAuth2Scopes(
-						companyId, accessTokenScope,
-						OAuth2JSONWSConstants.OSGI_JAXRS_APPLICATION_NAME);
+						companyId, scope,
+						OAuth2JSONWSConstants.APPLICATION_NAME);
 
 				for (LiferayOAuth2Scope liferayOAuth2Scope :
 						liferayOAuth2Scopes) {
@@ -122,10 +120,11 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 			}
 
 			List<SAPEntryScope> sapEntryScopes =
-				_oAuth2JSONWSScopePublisher.getPublishedScopes(companyId);
+				_sapEntryScopeDescriptorFinderRegistrator.
+					getRegisteredSAPEntryScopes(companyId);
 
 			for (SAPEntryScope sapEntryScope : sapEntryScopes) {
-				if (scopes.contains(sapEntryScope.getScopeName())) {
+				if (scopes.contains(sapEntryScope.getScope())) {
 					ServiceAccessPolicyThreadLocal.
 						addActiveServiceAccessPolicyName(
 							sapEntryScope.getSapEntryName());
@@ -255,7 +254,8 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	private OAuth2AuthorizationLocalService _oAuth2AuthorizationLocalService;
 
 	@Reference
-	private OAuth2JSONWSScopePublisher _oAuth2JSONWSScopePublisher;
+	private SAPEntryScopeDescriptorFinderRegistrator
+		_sapEntryScopeDescriptorFinderRegistrator;
 
 	@Reference
 	private ScopeLocator _scopeLocator;
