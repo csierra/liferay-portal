@@ -237,7 +237,7 @@ public class BaseClientTest {
 		}
 		catch (JSONException e) {
 			throw new IllegalArgumentException(
-				"The token service returned " + jsonString);
+				"The token service returned " + jsonString + "(" + tokenResponse.getStatus() + ")");
 		}
 	}
 
@@ -557,4 +557,7 @@ public class BaseClientTest {
 	@ArquillianResource
 	protected URL _url;
 
+	public Integer parseStatus(Response response) {
+		return response.getStatus();
+	}
 }

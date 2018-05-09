@@ -69,12 +69,12 @@ public class GrantedFlowsTest extends BaseClientTest {
 
 		Assert.assertNotNull(tokenString);
 
-		error = getToken(
+		int status = getToken(
 			"oauthTestApplicationCode", null,
 			getAuthorizationCodePKCE("test@liferay.com", "test", null),
-			this::parseError);
+			this::parseStatus);
 
-		Assert.assertEquals("invalid_client", error);
+		Assert.assertEquals(401, status);
 
 		tokenString = getToken(
 			"oauthTestApplicationCode", null,
@@ -83,12 +83,12 @@ public class GrantedFlowsTest extends BaseClientTest {
 
 		Assert.assertNotNull(tokenString);
 
-		error = getToken(
+		status = getToken(
 			"oauthTestApplicationCodePKCE", null,
 			getAuthorizationCode("test@liferay.com", "test", null),
-			this::parseError);
+			this::parseStatus);
 
-		Assert.assertEquals("invalid_client", error);
+		Assert.assertEquals(401, status);
 
 		tokenString = getToken(
 			"oauthTestApplicationCodePKCE", null,
