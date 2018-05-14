@@ -27,8 +27,11 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionHelper;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.List;
@@ -44,9 +47,50 @@ public class OAuth2ApplicationServiceImpl
 	public OAuth2Application addOAuth2Application(
 			List<GrantType> allowedGrantTypesList, String clientId,
 			int clientProfile, String clientSecret, String description,
-			List<String> featuresList, String homePageURL, long iconFileEntryId,
-			String name, String privacyPolicyURL, List<String> redirectURIsList,
-			List<String> scopeAliasesList, ServiceContext serviceContext)
+			List<String> featuresList, String homePageURL, boolean icon,
+			byte[] iconBytes, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, List<String> scopeAliasesList,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		ModelResourcePermissionHelper.check(
+			_oAuth2ApplicationModelResourcePermission, getPermissionChecker(),
+			0, 0, OAuth2ProviderActionKeys.ACTION_ADD_APPLICATION);
+
+		User user = getUser();
+
+		if (ArrayUtil.isEmpty(iconBytes)) {
+			return oAuth2ApplicationLocalService.addOAuth2Application(
+				user.getCompanyId(), user.getUserId(), user.getFullName(),
+				allowedGrantTypesList, clientId, clientProfile, clientSecret,
+				description, featuresList, homePageURL, icon, null, name,
+				privacyPolicyURL, redirectURIsList, scopeAliasesList,
+				serviceContext);
+		}
+
+		try (ByteArrayInputStream iconInputStream =
+				new ByteArrayInputStream(iconBytes)) {
+
+			return oAuth2ApplicationLocalService.addOAuth2Application(
+				user.getCompanyId(), user.getUserId(), user.getFullName(),
+				allowedGrantTypesList, clientId, clientProfile, clientSecret,
+				description, featuresList, homePageURL, icon, iconInputStream,
+				name, privacyPolicyURL, redirectURIsList, scopeAliasesList,
+				serviceContext);
+		}
+		catch (IOException ioe) {
+			throw new PortalException(ioe);
+		}
+	}
+
+	@Override
+	public OAuth2Application addOAuth2Application(
+			List<GrantType> allowedGrantTypesList, String clientId,
+			int clientProfile, String clientSecret, String description,
+			List<String> featuresList, String homePageURL, boolean icon,
+			InputStream iconInputStream, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, List<String> scopeAliasesList,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		ModelResourcePermissionHelper.check(
@@ -58,7 +102,7 @@ public class OAuth2ApplicationServiceImpl
 		return oAuth2ApplicationLocalService.addOAuth2Application(
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			allowedGrantTypesList, clientId, clientProfile, clientSecret,
-			description, featuresList, homePageURL, iconFileEntryId, name,
+			description, featuresList, homePageURL, icon, iconInputStream, name,
 			privacyPolicyURL, redirectURIsList, scopeAliasesList,
 			serviceContext);
 	}
@@ -140,7 +184,39 @@ public class OAuth2ApplicationServiceImpl
 
 	@Override
 	public OAuth2Application updateIcon(
-			long oAuth2ApplicationId, InputStream inputStream)
+			long oAuth2ApplicationId, boolean icon, byte[] iconBytes)
+		throws PortalException {
+
+		OAuth2Application oAuth2Application =
+			oAuth2ApplicationLocalService.getOAuth2Application(
+				oAuth2ApplicationId);
+
+		_oAuth2ApplicationModelResourcePermission.check(
+			getPermissionChecker(), oAuth2Application, ActionKeys.UPDATE);
+
+		if (!icon) {
+			return oAuth2ApplicationLocalService.updateIcon(
+				oAuth2ApplicationId, false, null);
+		}
+
+		if (ArrayUtil.isEmpty(iconBytes)) {
+			return oAuth2Application;
+		}
+
+		try (ByteArrayInputStream iconInputStream =
+				new ByteArrayInputStream(iconBytes)) {
+
+			return oAuth2ApplicationLocalService.updateIcon(
+				oAuth2ApplicationId, icon, iconInputStream);
+		}
+		catch (IOException ioe) {
+			throw new PortalException(ioe);
+		}
+	}
+
+	@Override
+	public OAuth2Application updateIcon(
+			long oAuth2ApplicationId, boolean icon, InputStream iconInputStream)
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
@@ -151,7 +227,7 @@ public class OAuth2ApplicationServiceImpl
 			getPermissionChecker(), oAuth2Application, ActionKeys.UPDATE);
 
 		return oAuth2ApplicationLocalService.updateIcon(
-			oAuth2ApplicationId, inputStream);
+			oAuth2ApplicationId, icon, iconInputStream);
 	}
 
 	@Override
@@ -159,9 +235,50 @@ public class OAuth2ApplicationServiceImpl
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
 			String clientId, int clientProfile, String clientSecret,
 			String description, List<String> featuresList, String homePageURL,
-			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
-			ServiceContext serviceContext)
+			boolean icon, byte[] iconBytes, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
+			long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
+		throws PortalException {
+
+		OAuth2Application oAuth2Application =
+			oAuth2ApplicationLocalService.getOAuth2Application(
+				oAuth2ApplicationId);
+
+		_oAuth2ApplicationModelResourcePermission.check(
+			getPermissionChecker(), oAuth2Application, ActionKeys.UPDATE);
+
+		if (ArrayUtil.isEmpty(iconBytes)) {
+			return oAuth2ApplicationLocalService.updateOAuth2Application(
+				oAuth2ApplicationId, allowedGrantTypesList, clientId,
+				clientProfile, clientSecret, description, featuresList,
+				homePageURL, icon, null, name, privacyPolicyURL,
+				redirectURIsList, auth2ApplicationScopeAliasesId,
+				serviceContext);
+		}
+
+		try (ByteArrayInputStream iconInputStream =
+				new ByteArrayInputStream(iconBytes)) {
+
+			return oAuth2ApplicationLocalService.updateOAuth2Application(
+				oAuth2ApplicationId, allowedGrantTypesList, clientId,
+				clientProfile, clientSecret, description, featuresList,
+				homePageURL, icon, iconInputStream, name, privacyPolicyURL,
+				redirectURIsList, auth2ApplicationScopeAliasesId,
+				serviceContext);
+		}
+		catch (IOException ioe) {
+			throw new PortalException(ioe);
+		}
+	}
+
+	@Override
+	public OAuth2Application updateOAuth2Application(
+			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
+			String clientId, int clientProfile, String clientSecret,
+			String description, List<String> featuresList, String homePageURL,
+			boolean icon, InputStream iconInputStream, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
+			long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
@@ -173,8 +290,8 @@ public class OAuth2ApplicationServiceImpl
 
 		return oAuth2ApplicationLocalService.updateOAuth2Application(
 			oAuth2ApplicationId, allowedGrantTypesList, clientId, clientProfile,
-			clientSecret, description, featuresList, homePageURL,
-			iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+			clientSecret, description, featuresList, homePageURL, icon,
+			iconInputStream, name, privacyPolicyURL, redirectURIsList,
 			auth2ApplicationScopeAliasesId, serviceContext);
 	}
 

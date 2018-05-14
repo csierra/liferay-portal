@@ -16,8 +16,13 @@ package com.liferay.oauth2.provider.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.UserConstants;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Arrays;
@@ -48,6 +53,30 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	@Override
 	public List<String> getFeaturesList() {
 		return Arrays.asList(StringUtil.split(getFeatures()));
+	}
+
+	public String getLogoURL(ThemeDisplay themeDisplay) {
+		try {
+			String thumbnailURL = StringPool.BLANK;
+
+			if (getIconFileEntryId() > 0) {
+				FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
+					getIconFileEntryId());
+
+				thumbnailURL = DLUtil.getImagePreviewURL(
+					fileEntry, themeDisplay);
+			}
+
+			return thumbnailURL;
+		}
+		catch (Exception e) {
+
+			// user has no longer access to the application
+			// or problem retrieving thumbnail
+
+			return UserConstants.getPortraitURL(
+				themeDisplay.getPathImage(), true, 0, null);
+		}
 	}
 
 	@Override
