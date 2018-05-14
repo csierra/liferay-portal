@@ -59,6 +59,9 @@ public interface OAuth2Application extends OAuth2ApplicationModel, PersistedMode
 
 	public java.util.List<String> getFeaturesList();
 
+	public String getLogoURL(
+		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay);
+
 	public java.util.List<String> getRedirectURIsList();
 
 	public void setAllowedGrantTypesList(

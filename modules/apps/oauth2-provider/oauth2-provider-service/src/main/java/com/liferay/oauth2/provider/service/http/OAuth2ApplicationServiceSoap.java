@@ -69,7 +69,7 @@ public class OAuth2ApplicationServiceSoap {
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		String clientId, int clientProfile, String clientSecret,
 		String description, java.util.List<String> featuresList,
-		String homePageURL, long iconFileEntryId, String name,
+		String homePageURL, boolean icon, byte[] iconBytes, String name,
 		String privacyPolicyURL, java.util.List<String> redirectURIsList,
 		java.util.List<String> scopeAliasesList,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -77,7 +77,7 @@ public class OAuth2ApplicationServiceSoap {
 		try {
 			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.addOAuth2Application(allowedGrantTypesList,
 					clientId, clientProfile, clientSecret, description,
-					featuresList, homePageURL, iconFileEntryId, name,
+					featuresList, homePageURL, icon, iconBytes, name,
 					privacyPolicyURL, redirectURIsList, scopeAliasesList,
 					serviceContext);
 
@@ -180,12 +180,28 @@ public class OAuth2ApplicationServiceSoap {
 		}
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap updateIcon(
+		long oAuth2ApplicationId, boolean icon, byte[] iconBytes)
+		throws RemoteException {
+		try {
+			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.updateIcon(oAuth2ApplicationId,
+					icon, iconBytes);
+
+			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap updateOAuth2Application(
 		long oAuth2ApplicationId,
 		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
 		String clientId, int clientProfile, String clientSecret,
 		String description, java.util.List<String> featuresList,
-		String homePageURL, long iconFileEntryId, String name,
+		String homePageURL, boolean icon, byte[] iconBytes, String name,
 		String privacyPolicyURL, java.util.List<String> redirectURIsList,
 		long auth2ApplicationScopeAliasesId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -193,8 +209,8 @@ public class OAuth2ApplicationServiceSoap {
 		try {
 			com.liferay.oauth2.provider.model.OAuth2Application returnValue = OAuth2ApplicationServiceUtil.updateOAuth2Application(oAuth2ApplicationId,
 					allowedGrantTypesList, clientId, clientProfile,
-					clientSecret, description, featuresList, homePageURL,
-					iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+					clientSecret, description, featuresList, homePageURL, icon,
+					iconBytes, name, privacyPolicyURL, redirectURIsList,
 					auth2ApplicationScopeAliasesId, serviceContext);
 
 			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.toSoapModel(returnValue);
