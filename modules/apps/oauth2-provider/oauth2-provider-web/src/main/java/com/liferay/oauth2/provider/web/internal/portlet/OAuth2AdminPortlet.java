@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.web.internal.portlet;
 
+import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -22,20 +23,19 @@ import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -182,7 +182,6 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				ParamUtil.get(request, "redirectURIs", StringPool.BLANK)));
 
 		List<String> scopesList = Collections.emptyList();
-		long iconFileEntryId = 0;
 
 		OAuth2Application oAuth2Application;
 
@@ -192,7 +191,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 					_oAuth2ApplicationService.addOAuth2Application(
 						allowedGrantTypes, clientId, clientProfile,
 						clientSecret, description, featuresList, homePageURL,
-						iconFileEntryId, name, privacyPolicyURL,
+						false, (InputStream)null, name, privacyPolicyURL,
 						redirectURIsList, scopesList, serviceContext);
 			}
 			else {
@@ -200,32 +199,40 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 					_oAuth2ApplicationService.getOAuth2Application(
 						oAuth2ApplicationId);
 
-				iconFileEntryId = oAuth2Application.getIconFileEntryId();
+				boolean deleteLogo = ParamUtil.getBoolean(
+					request, "deleteLogo");
+				long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
 
 				long oAuth2ApplicationScopeAliasesId =
 					oAuth2Application.getOAuth2ApplicationScopeAliasesId();
 
-				oAuth2Application =
-					_oAuth2ApplicationService.updateOAuth2Application(
-						oAuth2ApplicationId, allowedGrantTypes, clientId,
-						clientProfile, clientSecret, description, featuresList,
-						homePageURL, iconFileEntryId, name, privacyPolicyURL,
-						redirectURIsList, oAuth2ApplicationScopeAliasesId,
-						serviceContext);
-			}
+				if (fileEntryId > 0) {
+					FileEntry fileEntry = _dlAppLocalService.getFileEntry(
+						fileEntryId);
 
-			UploadPortletRequest uploadPortletRequest =
-				_portal.getUploadPortletRequest(request);
+					try (InputStream iconInputStream =
+					fileEntry.getContentStream()) {
 
-			String sourceFileName = uploadPortletRequest.getFileName("icon");
-
-			if (!Validator.isBlank(sourceFileName)) {
-				try (InputStream inputStream =
-						uploadPortletRequest.getFileAsStream("icon")) {
-
-					_oAuth2ApplicationService.updateIcon(
-						oAuth2Application.getOAuth2ApplicationId(),
-						inputStream);
+						oAuth2Application =
+							_oAuth2ApplicationService.updateOAuth2Application(
+								oAuth2ApplicationId, allowedGrantTypes,
+								clientId, clientProfile, clientSecret,
+								description, featuresList, homePageURL,
+								!deleteLogo, iconInputStream, name,
+								privacyPolicyURL, redirectURIsList,
+								oAuth2ApplicationScopeAliasesId,
+								serviceContext);
+					}
+				}
+				else {
+					oAuth2Application =
+						_oAuth2ApplicationService.updateOAuth2Application(
+							oAuth2ApplicationId, allowedGrantTypes, clientId,
+							clientProfile, clientSecret, description,
+							featuresList, homePageURL, !deleteLogo,
+							(InputStream)null, name, privacyPolicyURL,
+							redirectURIsList, oAuth2ApplicationScopeAliasesId,
+							serviceContext);
 				}
 			}
 		}
@@ -257,6 +264,9 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortlet.class);
+
+	@Reference
+	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;

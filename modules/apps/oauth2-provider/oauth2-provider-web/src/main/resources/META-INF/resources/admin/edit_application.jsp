@@ -35,128 +35,140 @@ String headerTitle = (oAuth2Application == null) ? LanguageUtil.get(request, "ad
 renderResponse.setTitle(headerTitle);
 %>
 
-<div class="container-fluid-1280">
-	<portlet:actionURL name='<%= oAuth2Application == null ? "updateOAuth2Application" : "updateOAuth2Application" %>' var="editOAuth2ApplicationURL" />
+<portlet:actionURL name='<%= oAuth2Application == null ? "updateOAuth2Application" : "updateOAuth2Application" %>' var="editOAuth2ApplicationURL" />
 
-	<aui:form action="<%= editOAuth2ApplicationURL %>" name="fm">
-		<liferay-ui:error exception="<%= DuplicateOAuth2ApplicationClientIdException.class %>" focusField="clientId" message="client-id-already-exists" />
-		<liferay-ui:error exception="<%= OAuth2ApplicationHomePageURLException.class %>" focusField="homePageURL" message="home-page-url-is-invalid" />
-		<liferay-ui:error exception="<%= OAuth2ApplicationHomePageURLSchemeException.class %>" focusField="homePageURL" message="home-page-url-scheme-is-invalid" />
-		<liferay-ui:error exception="<%= OAuth2ApplicationNameException.class %>" focusField="name" message="missing-application-name" />
-		<liferay-ui:error exception="<%= OAuth2ApplicationPrivacyPolicyURLException.class %>" focusField="privacyPolicyURL" message="privacy-policy-url-is-invalid" />
+<aui:form action="<%= editOAuth2ApplicationURL %>" name="fm">
+	<div class="container-fluid container-fluid-max-xl container-view">
+		<div class="sheet">
+			<div class="row">
+				<div class="col-lg-12">
+					<liferay-ui:error exception="<%= DuplicateOAuth2ApplicationClientIdException.class %>" focusField="clientId" message="client-id-already-exists" />
+					<liferay-ui:error exception="<%= OAuth2ApplicationHomePageURLException.class %>" focusField="homePageURL" message="home-page-url-is-invalid" />
+					<liferay-ui:error exception="<%= OAuth2ApplicationHomePageURLSchemeException.class %>" focusField="homePageURL" message="home-page-url-scheme-is-invalid" />
+					<liferay-ui:error exception="<%= OAuth2ApplicationNameException.class %>" focusField="name" message="missing-application-name" />
+					<liferay-ui:error exception="<%= OAuth2ApplicationPrivacyPolicyURLException.class %>" focusField="privacyPolicyURL" message="privacy-policy-url-is-invalid" />
 
-		<liferay-ui:error exception="<%= OAuth2ApplicationPrivacyPolicyURLSchemeException.class %>" focusField="privacyPolicyURL">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationPrivacyPolicyURLSchemeException)errorException).getMessage()) %>" key="privacy-policy-url-scheme-is-invalid" />
-		</liferay-ui:error>
+					<liferay-ui:error exception="<%= OAuth2ApplicationPrivacyPolicyURLSchemeException.class %>" focusField="privacyPolicyURL">
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationPrivacyPolicyURLSchemeException)errorException).getMessage()) %>" key="privacy-policy-url-scheme-is-invalid" />
+					</liferay-ui:error>
 
-		<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIException.class %>" focusField="redirectURIs">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIException)errorException).getMessage()) %>" key="redirect-uri-x-is-invalid" />
-		</liferay-ui:error>
+					<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIException.class %>" focusField="redirectURIs">
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIException)errorException).getMessage()) %>" key="redirect-uri-x-is-invalid" />
+					</liferay-ui:error>
 
-		<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIMissingException.class %>" focusField="redirectURIs">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIMissingException)errorException).getMessage()) %>" key="redirect-uri-is-missing-for-grant-type-x" />
-		</liferay-ui:error>
+					<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIMissingException.class %>" focusField="redirectURIs">
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIMissingException)errorException).getMessage()) %>" key="redirect-uri-is-missing-for-grant-type-x" />
+					</liferay-ui:error>
 
-		<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIFragmentException.class %>" focusField="redirectURIs">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIFragmentException)errorException).getMessage()) %>" key="redirect-uri-x-fragment-is-invalid" />
-		</liferay-ui:error>
+					<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIFragmentException.class %>" focusField="redirectURIs">
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIFragmentException)errorException).getMessage()) %>" key="redirect-uri-x-fragment-is-invalid" />
+					</liferay-ui:error>
 
-		<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIPathException.class %>" focusField="redirectURIs">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIPathException)errorException).getMessage()) %>" key="redirect-uri-x-path-is-invalid" />
-		</liferay-ui:error>
+					<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURIPathException.class %>" focusField="redirectURIs">
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURIPathException)errorException).getMessage()) %>" key="redirect-uri-x-path-is-invalid" />
+					</liferay-ui:error>
 
-		<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURISchemeException.class %>" focusField="redirectURIs">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURISchemeException)errorException).getMessage()) %>" key="redirect-uri-x-scheme-is-invalid" />
-		</liferay-ui:error>
+					<liferay-ui:error exception="<%= OAuth2ApplicationRedirectURISchemeException.class %>" focusField="redirectURIs">
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationRedirectURISchemeException)errorException).getMessage()) %>" key="redirect-uri-x-scheme-is-invalid" />
+					</liferay-ui:error>
 
-		<liferay-ui:error exception="<%= OAuth2ApplicationClientGrantTypeException.class %>">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationClientGrantTypeException)errorException).getMessage()) %>" key="grant-type-x-is-unsupported-for-this-client-type" />
-		</liferay-ui:error>
+					<liferay-ui:error exception="<%= OAuth2ApplicationClientGrantTypeException.class %>">
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuth2ApplicationClientGrantTypeException)errorException).getMessage()) %>" key="grant-type-x-is-unsupported-for-this-client-type" />
+					</liferay-ui:error>
 
-		<aui:model-context bean="<%= oAuth2Application %>" model="<%= OAuth2Application.class %>" />
+					<aui:model-context bean="<%= oAuth2Application %>" model="<%= OAuth2Application.class %>" />
 
-		<aui:fieldset-group markupView="lexicon">
-			<aui:input type="hidden" name="oAuth2ApplicationId"
-				value='<%= oAuth2Application == null ? "" : oAuth2Application.getOAuth2ApplicationId() %>'
-			/>
+					<aui:input name="oAuth2ApplicationId" type="hidden" value='<%= oAuth2Application == null ? "" : oAuth2Application.getOAuth2ApplicationId() %>' />
 
-			<aui:fieldset>
-				<aui:input name="name" required="<%= true %>" />
+					<aui:fieldset>
+						<aui:input name="clientId" required="<%= true %>" />
+						<aui:input name="clientSecret" />
+					</aui:fieldset>
+				</div>
+			</div>
 
-				<aui:field-wrapper>
-					<aui:input inlineField="<%= true %>" label="icon" name="icon" type="file" />
+			<div class="row">
+				<div class="col-lg-9">
+					<aui:fieldset>
+						<aui:input name="name" required="<%= true %>" />
 
-					<c:if test="<%= (oAuth2Application != null) && (oAuth2Application.getIconFileEntryId() > 0) %>">
+						<aui:input name="homePageURL" />
 
-						<%
-						String thumbnailURL = StringPool.BLANK;
+						<aui:input name="description" type="textarea" />
 
-						try {
-							FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(oAuth2Application.getIconFileEntryId());
-							thumbnailURL = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
-						}
-						catch (PortalException e) {
+						<aui:input helpMessage="redirect-uris-help" label="redirect-uris" name="redirectURIs" />
 
-							// user has no longer access to the application
+						<aui:input name="privacyPolicyURL" />
 
-						}
-						%>
+						<aui:select name="clientProfile">
+							<aui:option label="client-profile-0" selected="<%= oAuth2Application == null ? true : oAuth2Application.getClientProfile() == 0 %>" value="0" />
+						</aui:select>
 
-						<img src="<%= thumbnailURL %>" width="64" />
-					</c:if>
-				</aui:field-wrapper>
+						<aui:fieldset label="allowed-grant-types">
 
-				<aui:input name="description" type="textarea" />
-				<aui:input name="homePageURL" />
-				<aui:input name="privacyPolicyURL" />
+							<%
+							List<GrantType> oAuth2Grants = oAuth2AdminPortletDisplayContext.getOAuth2Grants(portletPreferences);
 
-				<aui:select name="clientProfile">
-					<aui:option label="client-profile-0" selected="<%= oAuth2Application == null ? true : oAuth2Application.getClientProfile() == 0 %>" value="0" />
-				</aui:select>
+							for (GrantType grantType : oAuth2Grants) {
+								String grantTypeName = grantType.name();
+							%>
 
-				<aui:input name="clientId" required="<%= true %>" />
-				<aui:input name="clientSecret" />
-				<aui:input helpMessage="redirect-uris-help" label="redirect-uris" name="redirectURIs" />
+								<aui:input checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains(grantType) %>" label="<%= grantTypeName %>" name='<%= "grant-" + grantTypeName %>' type="checkbox" />
 
-				<aui:fieldset label="allowed-grant-types">
+							<%
+							}
+							%>
 
-					<%
-					List<GrantType> oAuth2Grants = oAuth2AdminPortletDisplayContext.getOAuth2Grants(portletPreferences);
+						</aui:fieldset>
 
-					for (GrantType grantType : oAuth2Grants) {
-						String grantTypeName = grantType.name();
-					%>
+						<aui:fieldset label="supported-features">
 
-						<aui:input checked="<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains(grantType) %>" label="<%= grantTypeName %>" name='<%= "grant-" + grantTypeName %>' type="checkbox" />
+							<%
+							String[] oAuth2Features = StringUtil.split(portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
 
-					<%
-					}
-					%>
+							for (String oAuth2Feature : oAuth2Features) {
+								String escapedOAuth2Feature = HtmlUtil.escapeAttribute(oAuth2Feature);
+							%>
 
-				</aui:fieldset>
+								<aui:input checked="<%= oAuth2Application != null && oAuth2Application.getFeaturesList().contains(oAuth2Feature) %>" label="<%= escapedOAuth2Feature %>" name='<%= "feature-" + escapedOAuth2Feature %>' type="checkbox" />
 
-				<aui:fieldset label="supported-features">
+							<%
+							}
+							%>
 
-					<%
-					String[] oAuth2Features = StringUtil.split(portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
+						</aui:fieldset>
+					</aui:fieldset>
 
-					for (String oAuth2Feature : oAuth2Features) {
-						String escapedOAuth2Feature = HtmlUtil.escapeAttribute(oAuth2Feature);
-					%>
+				</div>
 
-						<aui:input checked="<%= oAuth2Application != null && oAuth2Application.getFeaturesList().contains(oAuth2Feature) %>" label="<%= escapedOAuth2Feature %>" name='<%= "feature-" + escapedOAuth2Feature %>' type="checkbox" />
+				<div class="col-lg-3">
+					<aui:fieldset label="icon">
+						<c:if test="<%= oAuth2Application != null %>">
+							<c:choose>
+								<c:when test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
+									<liferay-ui:logo-selector
+										currentLogoURL="<%= oAuth2Application.getLogoURL(themeDisplay) %>"
+										defaultLogo="<%= oAuth2Application.getIconFileEntryId() == 0 %>"
+										tempImageFileName="<%= String.valueOf(oAuth2Application.getClientId()) %>"
+									/>
+								</c:when>
+								<c:otherwise>
+									<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="portrait" />" src="<%= oAuth2Application.getLogoURL(themeDisplay) %>" />
+								</c:otherwise>
+							</c:choose>
+						</c:if>
+					</aui:fieldset>
+				</div>
+			</div>
 
-					<%
-					}
-					%>
-
-				</aui:fieldset>
-			</aui:fieldset>
-		</aui:fieldset-group>
-
-		<aui:button-row>
-			<aui:button cssClass="btn-lg" type="submit" />
-			<aui:button cssClass="btn-lg" href="<%= portletDisplay.getURLBack() %>" type="cancel" />
-		</aui:button-row>
-	</aui:form>
-</div>
+			<div class="row">
+				<div class="col-lg-12">
+					<aui:button-row>
+						<aui:button cssClass="btn-lg" type="submit" />
+						<aui:button cssClass="btn-lg" href="<%= portletDisplay.getURLBack() %>" type="cancel" />
+					</aui:button-row>
+				</div>
+			</div>
+		</div>
+	</div>
+</aui:form>
