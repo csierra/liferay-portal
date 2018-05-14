@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -125,11 +126,11 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			oAuth2Application =
 				_oAuth2ApplicationLocalService.addOAuth2Application(
 					companyId, user.getUserId(), user.getLogin(),
-					availableGrants, clientId, 0,
-					clientSecret, "test oauth application",
+					availableGrants, clientId, 0, clientSecret, 
+					"test oauth application", 
 					Collections.singletonList("token-introspection"),
-					"http://localhost:8080", 0, "test application",
-					"http://localhost:8080",
+					"http://localhost:8080", false, (InputStream)null, 
+					"test application", "http://localhost:8080",
 					Collections.singletonList("http://localhost:8080"),
 					availableScopes, new ServiceContext());
 
