@@ -35,9 +35,12 @@ import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationLocalServiceBaseImpl;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.ImageResolutionException;
+import com.liferay.portal.kernel.exception.ImageTypeException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -48,9 +51,14 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.image.ImageBag;
+import com.liferay.portal.kernel.image.ImageToolUtil;
 
+import java.awt.image.RenderedImage;
+import java.io.IOException;
 import java.io.InputStream;
-
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -73,9 +81,10 @@ public class OAuth2ApplicationLocalServiceImpl
 			long companyId, long userId, String userName,
 			List<GrantType> allowedGrantTypesList, String clientId,
 			int clientProfile, String clientSecret, String description,
-			List<String> featuresList, String homePageURL, long iconFileEntryId,
-			String name, String privacyPolicyURL, List<String> redirectURIsList,
-			List<String> scopeAliasesList, ServiceContext serviceContext)
+			List<String> featuresList, String homePageURL, boolean icon, 
+			InputStream iconInputStream, String name, String privacyPolicyURL, 
+			List<String> redirectURIsList, List<String> scopeAliasesList, 
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		if (allowedGrantTypesList == null) {
@@ -118,7 +127,6 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setDescription(description);
 		oAuth2Application.setFeaturesList(featuresList);
 		oAuth2Application.setHomePageURL(homePageURL);
-		oAuth2Application.setIconFileEntryId(iconFileEntryId);
 		oAuth2Application.setName(name);
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
@@ -140,7 +148,8 @@ public class OAuth2ApplicationLocalServiceImpl
 			OAuth2Application.class.getName(),
 			oAuth2Application.getOAuth2ApplicationId(), false, false, false);
 
-		return oAuth2ApplicationPersistence.update(oAuth2Application);
+		return updateOAuth2ApplicationAndIcon(
+			oAuth2Application, icon, iconInputStream);
 	}
 
 	public void afterPropertiesSet() {
@@ -204,51 +213,13 @@ public class OAuth2ApplicationLocalServiceImpl
 
 	@Override
 	public OAuth2Application updateIcon(
-			long oAuth2ApplicationId, InputStream inputStream)
+			long oAuth2ApplicationId, boolean icon, InputStream inputStream)
 		throws PortalException {
 
 		OAuth2Application oAuth2Application = getOAuth2Application(
 			oAuth2ApplicationId);
 
-		long oldIconFileEntryId = oAuth2Application.getIconFileEntryId();
-
-		Group group = groupLocalService.getCompanyGroup(
-			oAuth2Application.getCompanyId());
-
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setAddGuestPermissions(true);
-
-		Repository repository = PortletFileRepositoryUtil.addPortletRepository(
-			group.getGroupId(), OAuth2ProviderConstants.SERVICE_NAME,
-			serviceContext);
-
-		Folder folder = PortletFileRepositoryUtil.addPortletFolder(
-			userLocalService.getDefaultUserId(oAuth2Application.getCompanyId()),
-			repository.getRepositoryId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "icons",
-			serviceContext);
-
-		String fileName = PortletFileRepositoryUtil.getUniqueFileName(
-			group.getGroupId(), folder.getFolderId(),
-			oAuth2Application.getClientId());
-
-		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-			group.getGroupId(), oAuth2Application.getUserId(),
-			OAuth2Application.class.getName(), oAuth2ApplicationId,
-			OAuth2ProviderConstants.SERVICE_NAME, folder.getFolderId(),
-			inputStream, fileName, null, false);
-
-		oAuth2Application.setIconFileEntryId(fileEntry.getFileEntryId());
-
-		oAuth2Application = updateOAuth2Application(oAuth2Application);
-
-		if (oldIconFileEntryId > 0) {
-			PortletFileRepositoryUtil.deletePortletFileEntry(
-				oldIconFileEntryId);
-		}
-
-		return oAuth2Application;
+		return updateOAuth2ApplicationAndIcon(oAuth2Application, icon, inputStream);
 	}
 
 	@Override
@@ -256,9 +227,9 @@ public class OAuth2ApplicationLocalServiceImpl
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
 			String clientId, int clientProfile, String clientSecret,
 			String description, List<String> featuresList, String homePageURL,
-			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
-			ServiceContext serviceContext)
+			boolean icon, InputStream iconInputStream, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
+			long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
@@ -288,12 +259,11 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setDescription(description);
 		oAuth2Application.setFeaturesList(featuresList);
 		oAuth2Application.setHomePageURL(homePageURL);
-		oAuth2Application.setIconFileEntryId(iconFileEntryId);
 		oAuth2Application.setName(name);
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
 
-		return oAuth2ApplicationPersistence.update(oAuth2Application);
+		return updateOAuth2ApplicationAndIcon(oAuth2Application, icon, iconInputStream);
 	}
 
 	@Override
@@ -364,6 +334,121 @@ public class OAuth2ApplicationLocalServiceImpl
 			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
 
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
+	}
+
+	protected OAuth2Application updateOAuth2ApplicationAndIcon(
+			OAuth2Application oAuth2Application, boolean icon,
+			InputStream inputStream)
+		throws ConfigurationException, PortalException {
+
+		long oldIconFileEntryId = oAuth2Application.getIconFileEntryId();
+
+		if (icon && inputStream == null) {
+			return updateOAuth2Application(oAuth2Application);	
+		}
+		
+		if (!icon) {
+			if (oldIconFileEntryId > 0) {
+				PortletFileRepositoryUtil.deletePortletFileEntry(
+					oldIconFileEntryId);
+			}
+
+			oAuth2Application.setIconFileEntryId(-1);
+			
+			return updateOAuth2Application(oAuth2Application);
+		}
+
+		Group group = groupLocalService.getCompanyGroup(
+			oAuth2Application.getCompanyId());
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setAddGuestPermissions(true);
+
+		Repository repository = PortletFileRepositoryUtil.addPortletRepository(
+			group.getGroupId(), OAuth2ProviderConstants.SERVICE_NAME,
+			serviceContext);
+
+		Folder folder = PortletFileRepositoryUtil.addPortletFolder(
+			userLocalService.getDefaultUserId(oAuth2Application.getCompanyId()),
+			repository.getRepositoryId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "icons",
+			serviceContext);
+
+		String fileName = PortletFileRepositoryUtil.getUniqueFileName(
+			group.getGroupId(), folder.getFolderId(),
+			oAuth2Application.getClientId());
+
+		try (InputStream processedIconInputStream = processIcon(inputStream)) {
+		
+			FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
+				group.getGroupId(), oAuth2Application.getUserId(),
+				OAuth2Application.class.getName(),
+				oAuth2Application.getOAuth2ApplicationId(),
+				OAuth2ProviderConstants.SERVICE_NAME, folder.getFolderId(),
+				processedIconInputStream, fileName, null, false);
+
+			oAuth2Application.setIconFileEntryId(fileEntry.getFileEntryId());
+
+			oAuth2Application = updateOAuth2Application(oAuth2Application);
+
+			if (oldIconFileEntryId > 0) {
+				PortletFileRepositoryUtil.deletePortletFileEntry(
+					oldIconFileEntryId);
+			}
+
+			return oAuth2Application;
+		} 
+		catch (IOException e) {
+			throw new PortalException(e);
+		}
+	}
+	
+	protected InputStream processIcon(InputStream inputStream) 
+		throws ImageResolutionException, ImageTypeException, IOException {
+		
+		int maxHeight = 128;
+		int maxWidth = 128;		
+		
+		ImageBag imageBag = ImageToolUtil.read(inputStream);
+
+		RenderedImage renderedImage = imageBag.getRenderedImage();
+
+		if (renderedImage == null) {
+			throw new ImageTypeException();
+		}
+
+		final RenderedImage processedRenderedImage = ImageToolUtil.scale(
+			renderedImage, maxHeight, maxWidth);
+
+		PipedOutputStream pos = new PipedOutputStream();
+		
+		PipedInputStream pis = new PipedInputStream(pos);
+		
+		Thread thread = new Thread(() -> {
+			try {
+				ImageToolUtil.write(
+					processedRenderedImage, imageBag.getType(), pos);
+			} 
+			catch (IOException e) {
+				//_log.error(e);
+				try {
+					pos.close();
+					pis.close();
+				} 
+				catch (IOException e1) {}
+			}
+			finally {
+				try {
+					pos.close();
+				}
+				catch 
+				(IOException e) {}
+			}
+		});
+		
+		thread.start();
+		
+		return pis;				
 	}
 
 	protected void validate(
