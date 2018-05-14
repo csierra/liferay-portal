@@ -62,10 +62,18 @@ public interface OAuth2ApplicationService extends BaseService {
 	public OAuth2Application addOAuth2Application(
 		List<GrantType> allowedGrantTypesList, String clientId,
 		int clientProfile, String clientSecret, String description,
-		List<String> featuresList, String homePageURL, long iconFileEntryId,
-		String name, String privacyPolicyURL, List<String> redirectURIsList,
-		List<String> scopeAliasesList, ServiceContext serviceContext)
-		throws PortalException;
+		List<String> featuresList, String homePageURL, boolean icon,
+		byte[] iconBytes, String name, String privacyPolicyURL,
+		List<String> redirectURIsList, List<String> scopeAliasesList,
+		ServiceContext serviceContext) throws PortalException;
+
+	public OAuth2Application addOAuth2Application(
+		List<GrantType> allowedGrantTypesList, String clientId,
+		int clientProfile, String clientSecret, String description,
+		List<String> featuresList, String homePageURL, boolean icon,
+		InputStream iconInputStream, String name, String privacyPolicyURL,
+		List<String> redirectURIsList, List<String> scopeAliasesList,
+		ServiceContext serviceContext) throws PortalException;
 
 	public OAuth2Application deleteOAuth2Application(long oAuth2ApplicationId)
 		throws PortalException;
@@ -97,16 +105,27 @@ public interface OAuth2ApplicationService extends BaseService {
 	*/
 	public String getOSGiServiceIdentifier();
 
-	public OAuth2Application updateIcon(long oAuth2ApplicationId,
-		InputStream inputStream) throws PortalException;
+	public OAuth2Application updateIcon(long oAuth2ApplicationId, boolean icon,
+		byte[] iconBytes) throws PortalException;
+
+	public OAuth2Application updateIcon(long oAuth2ApplicationId, boolean icon,
+		InputStream iconInputStream) throws PortalException;
 
 	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
 		List<GrantType> allowedGrantTypesList, String clientId,
 		int clientProfile, String clientSecret, String description,
-		List<String> featuresList, String homePageURL, long iconFileEntryId,
-		String name, String privacyPolicyURL, List<String> redirectURIsList,
-		long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
-		throws PortalException;
+		List<String> featuresList, String homePageURL, boolean icon,
+		byte[] iconBytes, String name, String privacyPolicyURL,
+		List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
+		ServiceContext serviceContext) throws PortalException;
+
+	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
+		List<GrantType> allowedGrantTypesList, String clientId,
+		int clientProfile, String clientSecret, String description,
+		List<String> featuresList, String homePageURL, boolean icon,
+		InputStream iconInputStream, String name, String privacyPolicyURL,
+		List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
+		ServiceContext serviceContext) throws PortalException;
 
 	public OAuth2Application updateScopeAliases(long oAuth2ApplicationId,
 		List<String> scopeAliasesList) throws PortalException;
