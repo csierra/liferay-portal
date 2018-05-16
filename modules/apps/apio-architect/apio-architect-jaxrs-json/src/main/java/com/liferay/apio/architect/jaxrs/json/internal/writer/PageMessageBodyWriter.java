@@ -78,7 +78,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = "liferay.apio.architect.message.body.writer=true"
+	property = {
+		"osgi.jaxrs.extension=true",
+		"osgi.jaxrs.application.select=(liferay.apio.architect.application=true)"
+	}
 )
 @Provider
 public class PageMessageBodyWriter<T>

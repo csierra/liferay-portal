@@ -50,115 +50,14 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Sierra
  * @author Jorge Ferrer
  */
-@ApplicationPath("/")
 @Component(
-	immediate = true, property = "liferay.apio.architect.application=true",
+	immediate = true,
+	property = {
+		"liferay.apio.architect.application=true",
+		"osgi.jaxrs.application.base=/api-whiteboard"
+	},
 	service = Application.class
 )
 public class ApioApplication extends Application {
-
-	@Override
-	public Set<Object> getSingletons() {
-		Set<Object> singletons = new HashSet<>();
-
-		singletons.add(_rootEndpoint);
-
-		singletons.addAll(_messageBodyReaders);
-
-		singletons.addAll(_messageBodyWriters);
-
-		singletons.addAll(_containerResponseFilters);
-
-		singletons.addAll(_exceptionMappers);
-
-		return singletons;
-	}
-
-	@Reference(
-		cardinality = MULTIPLE, policy = DYNAMIC, policyOption = GREEDY,
-		target = "(liferay.apio.architect.container.response.filter=true)"
-	)
-	public void setContainerResponseFilter(
-		ServiceReference<ContainerResponseFilter> serviceReference,
-		ContainerResponseFilter containerResponseFilter) {
-
-		_containerResponseFilters.add(containerResponseFilter);
-	}
-
-	@Reference(
-		cardinality = MULTIPLE, policy = DYNAMIC, policyOption = GREEDY,
-		target = "(liferay.apio.architect.exception.mapper=true)"
-	)
-	public void setExceptionMapper(
-		ServiceReference<ExceptionMapper> serviceReference,
-		ExceptionMapper exceptionMapper) {
-
-		_exceptionMappers.add(exceptionMapper);
-	}
-
-	@Reference(
-		cardinality = MULTIPLE, policy = DYNAMIC, policyOption = GREEDY,
-		target = "(liferay.apio.architect.message.body.reader=true)"
-	)
-	public <T> void setMessageBodyReader(
-		ServiceReference<MessageBodyReader<T>> serviceReference,
-		MessageBodyReader<T> messageBodyReader) {
-
-		_messageBodyReaders.add(messageBodyReader);
-	}
-
-	@Reference(
-		cardinality = MULTIPLE, policy = DYNAMIC, policyOption = GREEDY,
-		target = "(liferay.apio.architect.message.body.writer=true)"
-	)
-	public <T> void setMessageBodyWriter(
-		ServiceReference<MessageBodyWriter<T>> serviceReference,
-		MessageBodyWriter<T> messageBodyWriter) {
-
-		_messageBodyWriters.add(messageBodyWriter);
-	}
-
-	@SuppressWarnings("unused")
-	public <T> void unsetContainerResponseFilter(
-		ServiceReference<ContainerResponseFilter> serviceReference,
-		ContainerResponseFilter containerResponseFilter) {
-
-		_containerResponseFilters.remove(containerResponseFilter);
-	}
-
-	@SuppressWarnings("unused")
-	public void unsetExceptionMapper(
-		ServiceReference<ExceptionMapper> serviceReference,
-		ExceptionMapper exceptionMapper) {
-
-		_exceptionMappers.remove(exceptionMapper);
-	}
-
-	@SuppressWarnings("unused")
-	public <T> void unsetMessageBodyReader(
-		ServiceReference<MessageBodyReader<T>> serviceReference,
-		MessageBodyReader<T> messageBodyReader) {
-
-		_messageBodyReaders.remove(messageBodyReader);
-	}
-
-	@SuppressWarnings("unused")
-	public <T> void unsetMessageBodyWriter(
-		ServiceReference<MessageBodyWriter<T>> serviceReference,
-		MessageBodyWriter<T> messageBodyWriter) {
-
-		_messageBodyWriters.remove(messageBodyWriter);
-	}
-
-	private final List<ContainerResponseFilter> _containerResponseFilters =
-		new ArrayList<>();
-	private final List<ExceptionMapper> _exceptionMappers = new ArrayList<>();
-	private final List<MessageBodyReader> _messageBodyReaders =
-		new ArrayList<>();
-	private final List<MessageBodyWriter> _messageBodyWriters =
-		new ArrayList<>();
-
-	@Reference
-	private RootEndpoint _rootEndpoint;
 
 }
