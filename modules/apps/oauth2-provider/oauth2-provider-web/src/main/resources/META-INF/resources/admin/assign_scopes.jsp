@@ -180,10 +180,10 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 
 	window.<portlet:namespace />recalculateAll = function() {
 
-		var scopeAliasCheckboxes = $('input[name="<portlet:namespace />scope"]');
+		var scopeAliasesCheckboxes = $('input[name="<portlet:namespace />scopeAliases"]');
 
-		for (var i = 0; i < scopeAliasCheckboxes.length; i++) {
-			<portlet:namespace />recalculateDependants(scopeAliasCheckboxes[i]);
+		for (var i = 0; i < scopeAliasesCheckboxes.length; i++) {
+			<portlet:namespace />recalculateDependants(scopeAliasesCheckboxes[i]);
 		}
 	}
 

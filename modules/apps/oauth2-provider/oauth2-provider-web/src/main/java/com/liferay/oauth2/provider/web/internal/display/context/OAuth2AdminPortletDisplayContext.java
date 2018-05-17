@@ -157,7 +157,7 @@ public class OAuth2AdminPortletDisplayContext {
 		try {
 			return PortletPermissionUtil.contains(
 				permissionChecker,
-				OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
+				OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
 				OAuth2AdminActionKeys.VIEW_GRANTED_AUTHORIZATIONS);
 		}
 		catch (PortalException pe) {

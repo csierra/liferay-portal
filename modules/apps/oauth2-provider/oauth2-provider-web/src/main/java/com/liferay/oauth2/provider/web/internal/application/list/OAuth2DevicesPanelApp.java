@@ -38,12 +38,12 @@ public class OAuth2DevicesPanelApp extends BasePanelApp {
 
 	@Override
 	public String getPortletId() {
-		return OAuth2ProviderPortletKeys.OAUTH2_DEVICES_PORTLET;
+		return OAuth2ProviderPortletKeys.OAUTH2_DEVICES;
 	}
 
 	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_DEVICES_PORTLET + ")",
+		target = "(javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_DEVICES + ")",
 		unbind = "-"
 	)
 	public void setPortlet(Portlet portlet) {

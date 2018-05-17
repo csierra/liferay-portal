@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = {
-		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
+		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
 		"mvc.command.name=/admin/assign_scopes"
 	}
 )
@@ -46,20 +47,19 @@ public class AssignScopesMVCActionCommand implements MVCActionCommand {
 
 	@Override
 	public boolean processAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws PortletException {
+			ActionRequest actionRequest, ActionResponse actionResponse) {
 
-		List<String> scopeAliases = new ArrayList<>();
+		String[] scopeAliases = ParamUtil.getStringValues(
+			actionRequest, "scopeAliases");
 
-		Collections.addAll(
-			scopeAliases, actionRequest.getParameterValues("scope"));
+		List<String> scopeAliasesList = Arrays.asList(scopeAliases);
 
 		long oAuth2ApplicationId = ParamUtil.getLong(
 			actionRequest, "oAuth2ApplicationId");
 
 		try {
 			_oAuth2ApplicationService.updateScopeAliases(
-				oAuth2ApplicationId, scopeAliases);
+				oAuth2ApplicationId, scopeAliasesList);
 		}
 		catch (PortalException pe) {
 			if (_log.isWarnEnabled()) {

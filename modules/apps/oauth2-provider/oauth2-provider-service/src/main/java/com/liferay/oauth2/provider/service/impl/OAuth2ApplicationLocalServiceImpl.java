@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.exception.ImageTypeException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -339,27 +338,30 @@ public class OAuth2ApplicationLocalServiceImpl
 	protected OAuth2Application updateOAuth2ApplicationAndIcon(
 			OAuth2Application oAuth2Application, boolean icon,
 			InputStream inputStream)
-		throws ConfigurationException, PortalException {
+		throws PortalException {
+
+		if (icon && inputStream == null) {
+			return oAuth2Application;
+		}
 
 		long oldIconFileEntryId = oAuth2Application.getIconFileEntryId();
 
-		if (icon && inputStream == null) {
-			return updateOAuth2Application(oAuth2Application);	
-		}
-		
 		if (!icon) {
 			if (oldIconFileEntryId > 0) {
 				PortletFileRepositoryUtil.deletePortletFileEntry(
 					oldIconFileEntryId);
+
+				oAuth2Application.setIconFileEntryId(-1);
+
+				oAuth2Application = updateOAuth2Application(oAuth2Application);
 			}
 
-			oAuth2Application.setIconFileEntryId(-1);
-			
-			return updateOAuth2Application(oAuth2Application);
+			return oAuth2Application;
 		}
 
 		Group group = groupLocalService.getCompanyGroup(
 			oAuth2Application.getCompanyId());
+
 		ServiceContext serviceContext = new ServiceContext();
 
 		serviceContext.setAddGuestPermissions(true);
@@ -378,8 +380,7 @@ public class OAuth2ApplicationLocalServiceImpl
 			group.getGroupId(), folder.getFolderId(),
 			oAuth2Application.getClientId());
 
-		try (InputStream processedIconInputStream = processIcon(inputStream)) {
-		
+		try (InputStream processedIconInputStream = scaleIcon(inputStream)) {
 			FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
 				group.getGroupId(), oAuth2Application.getUserId(),
 				OAuth2Application.class.getName(),
@@ -403,7 +404,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		}
 	}
 	
-	protected InputStream processIcon(InputStream inputStream) 
+	protected InputStream scaleIcon(InputStream inputStream)
 		throws ImageResolutionException, ImageTypeException, IOException {
 		
 		int maxHeight = 128;

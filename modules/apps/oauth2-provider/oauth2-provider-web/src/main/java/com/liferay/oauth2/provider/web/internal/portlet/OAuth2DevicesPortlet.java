@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.portlet-title-based-navigation=true",
 		"javax.portlet.init-param.template-path=/devices/",
 		"javax.portlet.init-param.view-template=/devices/view.jsp",
-		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_DEVICES_PORTLET,
+		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_DEVICES,
 		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class

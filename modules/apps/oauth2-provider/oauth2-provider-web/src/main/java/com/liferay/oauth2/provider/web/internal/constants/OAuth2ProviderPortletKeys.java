@@ -19,14 +19,14 @@ package com.liferay.oauth2.provider.web.internal.constants;
  */
 public class OAuth2ProviderPortletKeys {
 
-	public static final String OAUTH2_ADMIN_PORTLET =
+	public static final String OAUTH2_ADMIN =
 		"com_liferay_oauth2_provider_web_internal_portlet_OAuth2AdminPortlet";
 
-	public static final String OAUTH2_AUTHORIZE_PORTLET =
+	public static final String OAUTH2_AUTHORIZE =
 		"com_liferay_oauth2_provider_web_internal_portlet_" +
 			"OAuth2AuthorizePortlet";
 
-	public static final String OAUTH2_DEVICES_PORTLET =
+	public static final String OAUTH2_DEVICES =
 		"com_liferay_oauth2_provider_web_internal_portlet_OAuth2DevicesPortlet";
 
 }
