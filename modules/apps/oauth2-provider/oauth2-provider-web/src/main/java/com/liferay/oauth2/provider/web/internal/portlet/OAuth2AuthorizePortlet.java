@@ -72,7 +72,7 @@ import java.util.Map;
 		"javax.portlet.init-param.portlet-title-based-navigation=true",
 		"javax.portlet.init-param.template-path=/authorize/",
 		"javax.portlet.init-param.view-template=/authorize/authorize.jsp",
-		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_AUTHORIZE_PORTLET,
+		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_AUTHORIZE,
 		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class

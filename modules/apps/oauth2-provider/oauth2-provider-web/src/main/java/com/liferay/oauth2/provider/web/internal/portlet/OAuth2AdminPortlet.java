@@ -71,7 +71,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.portlet-title-based-navigation=true",
 		"javax.portlet.init-param.template-path=/admin/",
 		"javax.portlet.init-param.view-template=/admin/view.jsp",
-		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
+		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
 		"javax.portlet.preferences=classpath:/META-INF/portlet-preferences/default-portlet-preferences.xml",
 		"javax.portlet.resource-bundle=content.Language"
 	},
@@ -200,47 +200,36 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 					_oAuth2ApplicationService.getOAuth2Application(
 						oAuth2ApplicationId);
 
-				boolean deleteLogo = ParamUtil.getBoolean(
-					request, "deleteLogo");
+				boolean icon = false;
+
+				if (ParamUtil.getBoolean(request, "deleteLogo")) {
+					icon = false;
+				}
+
+				InputStream iconInputStream = null;
 
 				long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
+
+				if (fileEntryId > 0) {
+					icon = true;
+
+					FileEntry fileEntry = _dlAppLocalService.getFileEntry(
+						fileEntryId);
+
+					iconInputStream = fileEntry.getContentStream();
+				}
 
 				long oAuth2ApplicationScopeAliasesId =
 					oAuth2Application.getOAuth2ApplicationScopeAliasesId();
 
-				if (fileEntryId > 0) {
-					FileEntry fileEntry = _dlAppLocalService.getFileEntry(
-						fileEntryId);
-
-					try (InputStream iconInputStream =
-							 fileEntry.getContentStream()) {
-
-							_oAuth2ApplicationService.updateOAuth2Application(
-								oAuth2ApplicationId, allowedGrantTypes,
-								clientId, clientProfile, clientSecret,
-								description, featuresList, homePageURL,
-								!deleteLogo, iconInputStream, name,
-								privacyPolicyURL, redirectURIsList,
-								oAuth2ApplicationScopeAliasesId,
-								serviceContext);
-					}
-				}
-				else {
-						_oAuth2ApplicationService.updateOAuth2Application(
-							oAuth2ApplicationId, allowedGrantTypes, clientId,
-							clientProfile, clientSecret, description,
-							featuresList, homePageURL, !deleteLogo,
-							(InputStream)null, name, privacyPolicyURL,
-							redirectURIsList, oAuth2ApplicationScopeAliasesId,
-							serviceContext);
-				}
+				_oAuth2ApplicationService.updateOAuth2Application(
+					oAuth2ApplicationId, allowedGrantTypes, clientId,
+					clientProfile, clientSecret, description,
+					featuresList, homePageURL, icon,
+					iconInputStream, name, privacyPolicyURL,
+					redirectURIsList, oAuth2ApplicationScopeAliasesId,
+					serviceContext);
 			}
-		}
-		catch (IOException ioe) {
-			_log.error(ioe);
-
-			response.setRenderParameter(
-				"mvcPath", "/admin/edit_application.jsp");
 		}
 		catch (PortalException pe) {
 			if (_log.isDebugEnabled()) {

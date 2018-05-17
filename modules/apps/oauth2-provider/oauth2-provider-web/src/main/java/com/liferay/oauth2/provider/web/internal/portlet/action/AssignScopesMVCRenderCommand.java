@@ -35,7 +35,7 @@ import javax.portlet.RenderResponse;
  */
 @Component(
 	property = {
-		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN_PORTLET,
+		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
 		"mvc.command.name=/admin/assign_scopes"
 	}
 )

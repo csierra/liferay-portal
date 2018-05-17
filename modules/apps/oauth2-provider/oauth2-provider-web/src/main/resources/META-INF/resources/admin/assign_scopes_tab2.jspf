@@ -25,7 +25,7 @@
 			<div class="collapse-icon panel-header panel-header-link" id="<portlet:namespace />globalAccordionHeading<%= scopeAlias %>">
 				<div class="custom-checkbox custom-control" style="display: inline-block;">
 					<label>
-						<input onChange="<portlet:namespace />recalculateDependants(this)" value="<%= scopeAlias %>" <%= assignedScopes.contains(scopeAlias) ? "checked " : "" %>class="custom-control-input" name="<portlet:namespace />scope" type="checkbox">
+						<input onChange="<portlet:namespace />recalculateDependants(this)" value="<%= scopeAlias %>" <%= assignedScopes.contains(scopeAlias) ? "checked " : "" %>class="custom-control-input" name="<portlet:namespace />scopeAliases" type="checkbox">
 						<span class="custom-control-label">
 							<span class="custom-control-label-text panel-title"><%= HtmlUtil.escape(scopeAlias) %></span>
 						</span>
