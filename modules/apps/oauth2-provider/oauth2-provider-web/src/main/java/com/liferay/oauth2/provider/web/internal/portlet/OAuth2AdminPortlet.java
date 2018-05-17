@@ -80,8 +80,7 @@ import org.osgi.service.component.annotations.Reference;
 public class OAuth2AdminPortlet extends MVCPortlet {
 
 	public void deleteOAuth2Application(
-			ActionRequest request, ActionResponse response)
-		throws PortalException {
+			ActionRequest request, ActionResponse response) {
 
 		long oAuth2ApplicationId = ParamUtil.getLong(
 			request, "oAuth2ApplicationId");
@@ -91,6 +90,10 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				oAuth2ApplicationId);
 		}
 		catch (PortalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe);
+			}
+
 			SessionErrors.add(request, pe.getClass());
 		}
 	}
@@ -125,42 +128,13 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			ActionRequest request, ActionResponse response)
 		throws PortalException {
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			OAuth2Application.class.getName(), request);
-
 		long oAuth2ApplicationId = ParamUtil.getLong(
 			request, "oAuth2ApplicationId");
 
-		int clientProfile = ParamUtil.getInteger(request, "clientProfile", 0);
-
-		String clientId = ParamUtil.get(request, "clientId", StringPool.BLANK);
-
-		String clientSecret = ParamUtil.get(
-			request, "clientSecret", StringPool.BLANK);
-
-		String name = ParamUtil.get(request, "name", StringPool.BLANK);
-
-		PortletPreferences portletPreferences = request.getPreferences();
-
-		String[] oAuth2Features = StringUtil.split(
-			portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
-
-		List<String> featuresList = new ArrayList<>();
-
-		for (String feature : oAuth2Features) {
-			if (ParamUtil.getBoolean(request, "feature-" + feature, false)) {
-				featuresList.add(feature);
-			}
-		}
-
-		String description = ParamUtil.get(
-			request, "description", StringPool.BLANK);
-
-		String homePageURL = ParamUtil.get(
-			request, "homePageURL", StringPool.BLANK);
-
 		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
 			new OAuth2AdminPortletDisplayContext(_oAuth2ProviderConfiguration);
+
+		PortletPreferences portletPreferences = request.getPreferences();
 
 		List<GrantType> oAuth2Grants =
 			oAuth2AdminPortletDisplayContext.getOAuth2Grants(
@@ -174,6 +148,32 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			}
 		}
 
+		String clientId = ParamUtil.get(request, "clientId", StringPool.BLANK);
+
+		int clientProfile = ParamUtil.getInteger(request, "clientProfile", 0);
+
+		String clientSecret = ParamUtil.get(
+			request, "clientSecret", StringPool.BLANK);
+
+		String description = ParamUtil.get(
+			request, "description", StringPool.BLANK);
+
+		String[] oAuth2Features = StringUtil.split(
+			portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
+
+		List<String> featuresList = new ArrayList<>();
+
+		for (String feature : oAuth2Features) {
+			if (ParamUtil.getBoolean(request, "feature-" + feature, false)) {
+				featuresList.add(feature);
+			}
+		}
+
+		String homePageURL = ParamUtil.get(
+			request, "homePageURL", StringPool.BLANK);
+
+		String name = ParamUtil.get(request, "name", StringPool.BLANK);
+
 		String privacyPolicyURL = ParamUtil.get(
 			request, "privacyPolicyURL", StringPool.BLANK);
 
@@ -183,24 +183,26 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 		List<String> scopesList = Collections.emptyList();
 
-		OAuth2Application oAuth2Application;
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			OAuth2Application.class.getName(), request);
 
 		try {
 			if (oAuth2ApplicationId == 0) {
-				oAuth2Application =
 					_oAuth2ApplicationService.addOAuth2Application(
 						allowedGrantTypes, clientId, clientProfile,
 						clientSecret, description, featuresList, homePageURL,
 						false, (InputStream)null, name, privacyPolicyURL,
-						redirectURIsList, scopesList, serviceContext);
+						redirectURIsList, scopesList,
+						serviceContext);
 			}
 			else {
-				oAuth2Application =
+				OAuth2Application oAuth2Application =
 					_oAuth2ApplicationService.getOAuth2Application(
 						oAuth2ApplicationId);
 
 				boolean deleteLogo = ParamUtil.getBoolean(
 					request, "deleteLogo");
+
 				long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
 
 				long oAuth2ApplicationScopeAliasesId =
@@ -211,9 +213,8 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 						fileEntryId);
 
 					try (InputStream iconInputStream =
-					fileEntry.getContentStream()) {
+							 fileEntry.getContentStream()) {
 
-						oAuth2Application =
 							_oAuth2ApplicationService.updateOAuth2Application(
 								oAuth2ApplicationId, allowedGrantTypes,
 								clientId, clientProfile, clientSecret,
@@ -225,7 +226,6 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 					}
 				}
 				else {
-					oAuth2Application =
 						_oAuth2ApplicationService.updateOAuth2Application(
 							oAuth2ApplicationId, allowedGrantTypes, clientId,
 							clientProfile, clientSecret, description,

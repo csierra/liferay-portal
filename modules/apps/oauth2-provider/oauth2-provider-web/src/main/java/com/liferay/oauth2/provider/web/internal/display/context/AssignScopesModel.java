@@ -14,16 +14,17 @@
 
 package com.liferay.oauth2.provider.web.internal.display.context;
 
+import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
-import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel.ApplicationDescriptor;
-import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel.ApplicationScopeDescriptor;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -36,17 +37,16 @@ import java.util.stream.Stream;
 public class AssignScopesModel {
 
 	public AssignScopesModel(
-		long companyId, ScopeLocator scopeLocator,
-		ApplicationDescriptor applicationDescriptor,
-		ApplicationScopeDescriptor applicationScopeDescriptor) {
+		long companyId, Locale locale, ScopeLocator scopeLocator,
+		ApplicationDescriptorLocator applicationDescriptorLocator,
+		ScopeDescriptorLocator scopeDescriptorLocator) {
 
 		Collection<String> scopeAliases = scopeLocator.getScopeAliases(
 			companyId);
 
 		for (String scopeAlias : scopeAliases) {
 			AuthorizationModel authorizationModel = new AuthorizationModel(
-				scopeAliases.size(), applicationDescriptor,
-				applicationScopeDescriptor);
+				applicationDescriptorLocator, locale, scopeDescriptorLocator);
 
 			Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
 				scopeLocator.getLiferayOAuth2Scopes(companyId, scopeAlias);
@@ -89,7 +89,8 @@ public class AssignScopesModel {
 			}
 		}
 
-		_applicationDescriptor = applicationDescriptor;
+		_applicationDescriptor = applicationDescriptorLocator;
+		_locale = locale;
 	}
 
 	public Map<AuthorizationModel, Relations>
@@ -153,8 +154,10 @@ public class AssignScopesModel {
 	}
 
 	public String getApplicationDescription(String applicationName) {
-		return _applicationDescriptor.describe(
-			CompanyThreadLocal.getCompanyId(), applicationName);
+		ApplicationDescriptor applicationDescriptor =
+			_applicationDescriptor.getApplicationDescriptor(applicationName);
+
+		return applicationDescriptor.describeApplication(_locale);
 	}
 
 	public Set<String> getApplicationNames() {
@@ -175,8 +178,7 @@ public class AssignScopesModel {
 
 		return applicationNamesStream.collect(
 			Collectors.toMap(
-				Function.identity(),
-				applicationName -> getApplicationDescription(applicationName)));
+				Function.identity(), this::getApplicationDescription));
 	}
 
 	public Map<AuthorizationModel, Relations>
@@ -372,7 +374,7 @@ public class AssignScopesModel {
 		return _invertMap(relationsAuthorizationModels);
 	}
 
-	private final ApplicationDescriptor _applicationDescriptor;
+	private final ApplicationDescriptorLocator _applicationDescriptor;
 	private Map<String, Set<AuthorizationModel>>
 		_applicationNamesGlobalAuthorizationModels = new HashMap<>();
 	private Map<String, Set<AuthorizationModel>>
@@ -381,5 +383,6 @@ public class AssignScopesModel {
 		new HashMap<>();
 	private Set<AuthorizationModel> _globalAuthorizationModels =
 		new HashSet<>();
+	private final Locale _locale;
 
 }

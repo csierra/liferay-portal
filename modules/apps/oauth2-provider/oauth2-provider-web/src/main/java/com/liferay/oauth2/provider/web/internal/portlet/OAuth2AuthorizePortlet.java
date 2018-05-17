@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.web.internal.portlet;
 
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
+import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
@@ -37,9 +38,18 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
+import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -47,19 +57,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.portlet.Portlet;
-import javax.portlet.PortletException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tomas Polesovsky
@@ -130,8 +127,7 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 			Locale locale = themeDisplay.getLocale();
 
 			AuthorizationModel authorizationModel = new AuthorizationModel(
-				allowedScopeAliases.size(), buildApplicationDescriptor(locale),
-				buildApplicationScopeDescriptor(locale));
+				_applicationDescriptorLocator, locale, _scopeDescriptorLocator);
 
 			locateLiferayOAuth2Scopes(
 				companyId, allowedScopeAliases, authorizationModel,
@@ -153,28 +149,6 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 	protected void activate(BundleContext bundleContext) {
 		_applicationDescriptors = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, ApplicationDescriptor.class, "osgi.jaxrs.name");
-	}
-
-	protected AuthorizationModel.ApplicationDescriptor
-		buildApplicationDescriptor(Locale locale) {
-
-		return (companyId, applicationName) -> {
-			ApplicationDescriptor applicationDescriptor =
-				_applicationDescriptors.getService(applicationName);
-
-			return applicationDescriptor.describeApplication(locale);
-		};
-	}
-
-	protected AuthorizationModel.ApplicationScopeDescriptor
-		buildApplicationScopeDescriptor(Locale locale) {
-
-		return (companyId, applicationName, internalScope) -> {
-			ScopeDescriptor scopeDescriptor =
-				_scopeDescriptorLocator.getScopeDescriptor(applicationName);
-
-			return scopeDescriptor.describeScope(internalScope, locale);
-		};
 	}
 
 	@Deactivate
@@ -236,6 +210,9 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 
 	@Reference
 	private ScopeDescriptorLocator _scopeDescriptorLocator;
+
+	@Reference
+	private ApplicationDescriptorLocator _applicationDescriptorLocator;
 
 	@Reference
 	private ScopeLocator _scopeFinderLocator;
