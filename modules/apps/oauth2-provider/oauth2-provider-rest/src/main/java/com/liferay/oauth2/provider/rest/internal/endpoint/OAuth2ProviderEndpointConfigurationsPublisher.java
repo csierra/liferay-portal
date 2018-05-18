@@ -84,9 +84,7 @@ public class OAuth2ProviderEndpointConfigurationsPublisher {
 		StringBundler sb = new StringBundler(4);
 
 		sb.append("(&(contextPath=");
-
 		sb.append(_escape(contextPath));
-
 		sb.append(")(service.factoryPid=com.liferay.portal.remote.cxf.common.");
 		sb.append("configuration.CXFEndpointPublisherConfiguration))");
 
