@@ -16,17 +16,9 @@ package com.liferay.oauth2.provider.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
-import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.UserConstants;
-import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,31 +48,6 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 	@Override
 	public List<String> getFeaturesList() {
 		return Arrays.asList(StringUtil.split(getFeatures()));
-	}
-
-	public String getLogoURL(ThemeDisplay themeDisplay) {
-		String logoURL = StringPool.BLANK;
-
-		try {
-			if (getIconFileEntryId() > 0) {
-				FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
-					getIconFileEntryId());
-
-				logoURL = DLUtil.getImagePreviewURL(fileEntry, themeDisplay);
-			}
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e);
-			}
-		}
-
-		if (Validator.isBlank(logoURL)) {
-			logoURL = UserConstants.getPortraitURL(
-				themeDisplay.getPathImage(), true, 0, null);
-		}
-
-		return logoURL;
 	}
 
 	@Override
@@ -118,8 +85,5 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 
 		setRedirectURIs(redirectURIs);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		OAuth2ApplicationImpl.class);
 
 }
