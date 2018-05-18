@@ -14,7 +14,8 @@
  */
 --%>
 <%@ include file="/init.jsp" %>
-<%@ page import="com.liferay.oauth2.provider.constants.GrantType" %><%@
+<%@ page import="com.liferay.frontend.taglib.clay.servlet.taglib.util.JSPCreationMenu" %><%@
+page import="com.liferay.oauth2.provider.constants.GrantType" %><%@
 page import="com.liferay.oauth2.provider.exception.DuplicateOAuth2ApplicationClientIdException" %><%@
 page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationClientGrantTypeException" %><%@
 page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationHomePageURLException" %><%@
