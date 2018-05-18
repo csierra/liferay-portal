@@ -68,10 +68,9 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 		String userName, List<GrantType> allowedGrantTypesList,
 		String clientId, int clientProfile, String clientSecret,
 		String description, List<String> featuresList, String homePageURL,
-		boolean icon, InputStream iconInputStream, String name,
-		String privacyPolicyURL, List<String> redirectURIsList,
-		List<String> scopeAliasesList, ServiceContext serviceContext)
-		throws PortalException;
+		long iconFileEntryId, String name, String privacyPolicyURL,
+		List<String> redirectURIsList, List<String> scopeAliasesList,
+		ServiceContext serviceContext) throws PortalException;
 
 	/**
 	* Adds the o auth2 application to the database. Also notifies the appropriate model listeners.
@@ -241,16 +240,16 @@ public interface OAuth2ApplicationLocalService extends BaseLocalService,
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
-	public OAuth2Application updateIcon(long oAuth2ApplicationId, boolean icon,
+	public OAuth2Application updateIcon(long oAuth2ApplicationId,
 		InputStream inputStream) throws PortalException;
 
 	public OAuth2Application updateOAuth2Application(long oAuth2ApplicationId,
 		List<GrantType> allowedGrantTypesList, String clientId,
 		int clientProfile, String clientSecret, String description,
-		List<String> featuresList, String homePageURL, boolean icon,
-		InputStream iconInputStream, String name, String privacyPolicyURL,
-		List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
-		ServiceContext serviceContext) throws PortalException;
+		List<String> featuresList, String homePageURL, long iconFileEntryId,
+		String name, String privacyPolicyURL, List<String> redirectURIsList,
+		long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Updates the o auth2 application in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
