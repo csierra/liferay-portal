@@ -200,7 +200,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 					_oAuth2ApplicationService.getOAuth2Application(
 						oAuth2ApplicationId);
 
-				boolean icon = false;
+				boolean icon = oAuth2Application.getIconFileEntryId() > 0;
 
 				if (ParamUtil.getBoolean(request, "deleteLogo")) {
 					icon = false;
@@ -222,13 +222,20 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				long oAuth2ApplicationScopeAliasesId =
 					oAuth2Application.getOAuth2ApplicationScopeAliasesId();
 
-				_oAuth2ApplicationService.updateOAuth2Application(
-					oAuth2ApplicationId, allowedGrantTypes, clientId,
-					clientProfile, clientSecret, description,
-					featuresList, homePageURL, icon,
-					iconInputStream, name, privacyPolicyURL,
-					redirectURIsList, oAuth2ApplicationScopeAliasesId,
-					serviceContext);
+				try {
+					_oAuth2ApplicationService.updateOAuth2Application(
+						oAuth2ApplicationId, allowedGrantTypes, clientId,
+						clientProfile, clientSecret, description,
+						featuresList, homePageURL, icon,
+						iconInputStream, name, privacyPolicyURL,
+						redirectURIsList, oAuth2ApplicationScopeAliasesId,
+						serviceContext);
+				}
+				finally {
+					if (fileEntryId > 0) {
+						_dlAppLocalService.deleteFileEntry(fileEntryId);
+					}
+				}
 			}
 		}
 		catch (PortalException pe) {
