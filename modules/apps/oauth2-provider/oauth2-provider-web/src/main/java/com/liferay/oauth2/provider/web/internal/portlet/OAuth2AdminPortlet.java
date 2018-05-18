@@ -191,8 +191,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 					_oAuth2ApplicationService.addOAuth2Application(
 						allowedGrantTypes, clientId, clientProfile,
 						clientSecret, description, featuresList, homePageURL,
-						false, (InputStream)null, name, privacyPolicyURL,
-						redirectURIsList, scopesList,
+						0, name, privacyPolicyURL, redirectURIsList, scopesList,
 						serviceContext);
 			}
 			else {
@@ -200,41 +199,34 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 					_oAuth2ApplicationService.getOAuth2Application(
 						oAuth2ApplicationId);
 
-				boolean icon = oAuth2Application.getIconFileEntryId() > 0;
-
-				if (ParamUtil.getBoolean(request, "deleteLogo")) {
-					icon = false;
-				}
-
-				InputStream iconInputStream = null;
-
-				long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
-
-				if (fileEntryId > 0) {
-					icon = true;
-
-					FileEntry fileEntry = _dlAppLocalService.getFileEntry(
-						fileEntryId);
-
-					iconInputStream = fileEntry.getContentStream();
-				}
+				long iconFileEntryId = oAuth2Application.getIconFileEntryId();
 
 				long oAuth2ApplicationScopeAliasesId =
 					oAuth2Application.getOAuth2ApplicationScopeAliasesId();
 
-				try {
-					_oAuth2ApplicationService.updateOAuth2Application(
-						oAuth2ApplicationId, allowedGrantTypes, clientId,
-						clientProfile, clientSecret, description,
-						featuresList, homePageURL, icon,
-						iconInputStream, name, privacyPolicyURL,
-						redirectURIsList, oAuth2ApplicationScopeAliasesId,
-						serviceContext);
+				_oAuth2ApplicationService.updateOAuth2Application(
+					oAuth2ApplicationId, allowedGrantTypes, clientId,
+					clientProfile, clientSecret, description,
+					featuresList, homePageURL, iconFileEntryId, name,
+					privacyPolicyURL, redirectURIsList,
+					oAuth2ApplicationScopeAliasesId, serviceContext);
+
+				long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
+
+				if (ParamUtil.getBoolean(request, "deleteLogo")) {
+					_oAuth2ApplicationService.updateIcon(
+						oAuth2ApplicationId, null);
 				}
-				finally {
-					if (fileEntryId > 0) {
-						_dlAppLocalService.deleteFileEntry(fileEntryId);
-					}
+				else if (fileEntryId > 0) {
+					FileEntry fileEntry = _dlAppLocalService.getFileEntry(
+						fileEntryId);
+
+					InputStream inputStream = fileEntry.getContentStream();
+
+					_oAuth2ApplicationService.updateIcon(
+						oAuth2ApplicationId, inputStream);
+
+					_dlAppLocalService.deleteFileEntry(fileEntryId);
 				}
 			}
 		}
