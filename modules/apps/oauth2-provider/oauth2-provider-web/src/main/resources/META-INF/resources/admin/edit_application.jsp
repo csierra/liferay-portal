@@ -144,16 +144,34 @@ renderResponse.setTitle(headerTitle);
 				<div class="col-lg-3">
 					<aui:fieldset label="icon">
 						<c:if test="<%= oAuth2Application != null %>">
+							<%
+								String thumbnailURL = StringPool.BLANK;
+								if (oAuth2Application.getIconFileEntryId() > 0) {
+									try {
+										FileEntry fileEntry =
+											DLAppLocalServiceUtil.getFileEntry(
+												oAuth2Application.getIconFileEntryId());
+										thumbnailURL =
+											DLUtil.getThumbnailSrc(fileEntry,
+												themeDisplay);
+									}
+									catch (PortalException e) {
+
+										// user has no longer access to the application
+
+									}
+								}
+							%>
 							<c:choose>
 								<c:when test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
 									<liferay-ui:logo-selector
-										currentLogoURL="<%= oAuth2Application.getLogoURL(themeDisplay) %>"
+										currentLogoURL="<%= thumbnailURL %>"
 										defaultLogo="<%= oAuth2Application.getIconFileEntryId() == 0 %>"
 										tempImageFileName="<%= String.valueOf(oAuth2Application.getClientId()) %>"
 									/>
 								</c:when>
 								<c:otherwise>
-									<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="portrait" />" src="<%= oAuth2Application.getLogoURL(themeDisplay) %>" />
+									<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="portrait" />" src="<%= thumbnailURL %>" />
 								</c:otherwise>
 							</c:choose>
 						</c:if>
