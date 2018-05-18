@@ -18,6 +18,7 @@ import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
+import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,8 +37,7 @@ public class AuthorizationModel {
 
 	public AuthorizationModel(
 		ApplicationDescriptorLocator applicationDescriptorLocator,
-		Locale locale,
-		ScopeDescriptorLocator scopeDescriptorLocator) {
+		Locale locale, ScopeDescriptorLocator scopeDescriptorLocator) {
 
 		this(
 			new HashMap<>(), applicationDescriptorLocator, locale,
@@ -76,8 +76,8 @@ public class AuthorizationModel {
 		}
 
 		AuthorizationModel authorizationModel = new AuthorizationModel(
-			combinedApplicationScopesMap, _applicationDescriptorLocator, _locale,
-			_scopeDescriptorLocator);
+			combinedApplicationScopesMap, _applicationDescriptorLocator,
+			_locale, _scopeDescriptorLocator);
 
 		return authorizationModel;
 	}
@@ -140,7 +140,8 @@ public class AuthorizationModel {
 
 	public String getApplicationDescription(String applicationName) {
 		ApplicationDescriptor applicationDescriptor =
-			_applicationDescriptorLocator.getApplicationDescriptor(applicationName);
+			_applicationDescriptorLocator.getApplicationDescriptor(
+				applicationName);
 
 		return applicationDescriptor.describeApplication(_locale);
 	}
@@ -156,8 +157,7 @@ public class AuthorizationModel {
 
 		return stream.collect(
 			Collectors.toMap(
-				Function.identity(), this::getApplicationDescription)
-		);
+				Function.identity(), this::getApplicationDescription));
 	}
 
 	public Set<String> getApplicationScopeDescription(String applicationName) {
@@ -166,8 +166,11 @@ public class AuthorizationModel {
 		Set<String> applicationScopes = _applicationScopes.get(applicationName);
 
 		for (String applicationScope : applicationScopes) {
+			ScopeDescriptor scopeDescriptor =
+				_scopeDescriptorLocator.getScopeDescriptor(applicationName);
+
 			applicationScopeDescription.add(
-				_scopeDescriptorLocator.getScopeDescriptor(applicationName).describeScope(applicationScope, _locale));
+				scopeDescriptor.describeScope(applicationScope, _locale));
 		}
 
 		return applicationScopeDescription;
@@ -190,8 +193,8 @@ public class AuthorizationModel {
 		}
 
 		AuthorizationModel authorizationModel = new AuthorizationModel(
-			remainingApplicationScopesMap, _applicationDescriptorLocator, _locale,
-			_scopeDescriptorLocator);
+			remainingApplicationScopesMap, _applicationDescriptorLocator,
+			_locale, _scopeDescriptorLocator);
 
 		return authorizationModel;
 	}
@@ -210,8 +213,8 @@ public class AuthorizationModel {
 					Collections.singleton(scope));
 
 				AuthorizationModel authorizationModel = new AuthorizationModel(
-					applicationScopesMap, _applicationDescriptorLocator, _locale,
-					_scopeDescriptorLocator);
+					applicationScopesMap, _applicationDescriptorLocator,
+					_locale, _scopeDescriptorLocator);
 
 				split.add(authorizationModel);
 			}
@@ -249,8 +252,8 @@ public class AuthorizationModel {
 		}
 
 		AuthorizationModel authorizationModel = new AuthorizationModel(
-			remainingApplicationScopesMap, _applicationDescriptorLocator, _locale,
-			_scopeDescriptorLocator);
+			remainingApplicationScopesMap, _applicationDescriptorLocator,
+			_locale, _scopeDescriptorLocator);
 
 		return authorizationModel;
 	}

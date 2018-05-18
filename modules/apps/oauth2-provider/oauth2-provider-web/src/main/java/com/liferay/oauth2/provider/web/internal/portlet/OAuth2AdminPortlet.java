@@ -62,12 +62,11 @@ import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
-import javax.portlet.PortletURL;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import com.liferay.portal.kernel.util.WebKeys;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -92,6 +91,28 @@ import org.osgi.service.component.annotations.Reference;
 	service = Portlet.class
 )
 public class OAuth2AdminPortlet extends MVCPortlet {
+
+	public static String generateClientSecret() {
+		int size = 16;
+
+		int count = (int)Math.ceil((double)size / 8);
+
+		byte[] buffer = new byte[count * 8];
+
+		for (int i = 0; i < count; i++) {
+			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
+		}
+
+		StringBundler sb = new StringBundler(size);
+
+		for (int i = 0; i < size; i++) {
+			sb.append(Integer.toHexString(0xFF & buffer[i]));
+		}
+
+		Matcher matcher = _baseIdPattern.matcher(sb.toString());
+
+		return matcher.replaceFirst("secret-$1-$2-$3-$4-$5");
+	}
 
 	public void deleteOAuth2Application(
 		ActionRequest request, ActionResponse response) {
@@ -119,7 +140,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			ParamUtil.getString(request, "oAuth2ApplicationIds"), 0L);
 
 		try {
-			for(long oAuth2ApplicationId : oAuth2ApplicationIds) {
+			for (long oAuth2ApplicationId : oAuth2ApplicationIds) {
 				_oAuth2ApplicationService.deleteOAuth2Application(
 					oAuth2ApplicationId);
 			}
@@ -131,32 +152,6 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 			SessionErrors.add(request, pe.getClass());
 		}
-	}
-
-	public static String generateClientSecret() {
-		int size = 16;
-
-		int count = (int)Math.ceil((double)size / 8);
-
-		byte[] buffer = new byte[count * 8];
-
-		for (int i = 0; i < count; i++) {
-			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
-		}
-
-		StringBundler sb = new StringBundler(size);
-
-		for (int i = 0; i < size; i++) {
-			sb.append(Integer.toHexString(0xFF & buffer[i]));
-		}
-
-		Matcher matcher = _baseIdPattern.matcher(sb.toString());
-
-		return matcher.replaceFirst("secret-$1-$2-$3-$4-$5");
-	}
-
-	protected ThemeDisplay getThemeDisplay(PortletRequest portletRequest) {
-		return (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 	}
 
 	@Override
@@ -354,6 +349,10 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 	protected void activate(Map<String, Object> properties) {
 		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
 			OAuth2ProviderConfiguration.class, properties);
+	}
+
+	protected ThemeDisplay getThemeDisplay(PortletRequest portletRequest) {
+		return (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -15,6 +15,7 @@
 --%>
 
 <div aria-orientation="vertical" class="panel-group" id="appsAccordion" role="tablist">
+
 	<%
 	Map<String, String> applicationNamesDescriptions = assignScopesModel.getApplicationNamesDescriptions();
 
@@ -33,15 +34,20 @@
 		String applicationNameHtmlId = HtmlUtil.getAUICompatibleId(applicationNameDescriptionEntry.getKey());
 
 		String applicationDescription = applicationNameDescriptionEntry.getValue();
-		%>
+	%>
+
 		<div class="panel panel-secondary">
 			<a aria-controls="<portlet:namespace />appsAccordion<%= applicationNameHtmlId %>" aria-expanded="false" class="collapse-icon collapsed panel-header panel-header-link" data-parent="#<portlet:namespace />appsAccordion" data-toggle="collapse" href="#<portlet:namespace />appsAccordion<%= applicationNameHtmlId %>" id="<portlet:namespace />appsAccordionHeading<%= applicationNameHtmlId %>" role="tab">
 				<span class="panel-title"><%= HtmlUtil.escape(applicationDescription) %></span>
 				<span class="collapse-icon-closed">
-					<clay:icon symbol="angle-right" />
+					<clay:icon
+						symbol="angle-right"
+					/>
 				</span>
 				<span class="collapse-icon-open">
-					<clay:icon symbol="angle-down" />
+					<clay:icon
+						symbol="angle-down"
+					/>
 				</span>
 			</a>
 
@@ -51,7 +57,9 @@
 				</div>
 			</div>
 		</div>
-		<%
+
+	<%
 	}
 	%>
+
 </div>

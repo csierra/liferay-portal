@@ -35,33 +35,44 @@
 				<a aria-controls="<portlet:namespace />globalAccordion<%= scopeAlias %>" aria-expanded="false" class="collapsed" data-parent="#<portlet:namespace />globalAccordion" data-toggle="collapse" href="#<portlet:namespace />globalAccordion<%= scopeAlias %>" role="tab">
 					<span>(details)</span>
 					<span class="collapse-icon-closed">
-						<clay:icon symbol="angle-right" />
+						<clay:icon
+							symbol="angle-right"
+						/>
 					</span>
 					<span class="collapse-icon-open">
-						<clay:icon symbol="angle-down" />
+						<clay:icon
+							symbol="angle-down"
+						/>
 					</span>
 				</a>
 			</div>
 
 			<div aria-labelledby="<portlet:namespace />globalAccordionHeading<%= scopeAlias %>" class="collapse panel-collapse" id="<portlet:namespace />globalAccordion<%= scopeAlias %>" role="tabpanel">
+
 				<%
 				AuthorizationModel authorizationModel = scopeAliasAuthorizationModelEntry.getKey();
-	
+
 				for (String appName : authorizationModel.getApplicationNames()) {
 					String applicationScopeDescription = authorizationModel.getApplicationScopeDescription(appName).stream().collect(Collectors.joining(", "));
 					%>
+
 					<ul>
 						<li>
 							<%= HtmlUtil.escape(assignScopesModel.getApplicationDescription(appName)) %><br />
-							<font size="1">(	<%= HtmlUtil.escape(applicationScopeDescription) %>)</font>
+
+							<font size="1">( <%= HtmlUtil.escape(applicationScopeDescription) %>)</font>
 						</li>
 					</ul>
+
 					<%
 				}
 				%>
+
 			</div>
 		</div>
+
 	<%
 	}
 	%>
+
 </div>

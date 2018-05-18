@@ -21,7 +21,6 @@ import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
-import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
@@ -38,18 +37,9 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 
-import javax.portlet.Portlet;
-import javax.portlet.PortletException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -57,6 +47,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tomas Polesovsky
@@ -195,6 +198,9 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 		}
 	}
 
+	@Reference
+	private ApplicationDescriptorLocator _applicationDescriptorLocator;
+
 	private ServiceTrackerMap<String, ApplicationDescriptor>
 		_applicationDescriptors;
 
@@ -210,9 +216,6 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 
 	@Reference
 	private ScopeDescriptorLocator _scopeDescriptorLocator;
-
-	@Reference
-	private ApplicationDescriptorLocator _applicationDescriptorLocator;
 
 	@Reference
 	private ScopeLocator _scopeFinderLocator;

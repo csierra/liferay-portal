@@ -88,6 +88,7 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 
 				if (oAuth2Application.getIconFileEntryId() > 0) {
 					FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(oAuth2Application.getIconFileEntryId());
+
 					thumbnailURL = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
 				}
 			}
@@ -98,16 +99,19 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 			}
 			%>
 
-			<liferay-ui:search-container-column-image name="icon"
+			<liferay-ui:search-container-column-image
+				name="icon"
 				src="<%= thumbnailURL %>"
 			/>
 
 			<liferay-ui:search-container-column-text
-				name="application-name" value="<%= HtmlUtil.escape(applicationName) %>"
+				name="application-name"
+				value="<%= HtmlUtil.escape(applicationName) %>"
 			/>
 
 			<liferay-ui:search-container-column-text
-				name="application-description" value="<%= HtmlUtil.escape(applicationDescription) %>"
+				name="application-description"
+				value="<%= HtmlUtil.escape(applicationDescription) %>"
 			/>
 
 			<liferay-ui:search-container-column-date
