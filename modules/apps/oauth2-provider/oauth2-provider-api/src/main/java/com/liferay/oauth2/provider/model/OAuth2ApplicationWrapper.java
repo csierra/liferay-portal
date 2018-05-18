@@ -318,12 +318,6 @@ public class OAuth2ApplicationWrapper implements OAuth2Application,
 		return _oAuth2Application.getIconFileEntryId();
 	}
 
-	@Override
-	public String getLogoURL(
-		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay) {
-		return _oAuth2Application.getLogoURL(themeDisplay);
-	}
-
 	/**
 	* Returns the modified date of this o auth2 application.
 	*
