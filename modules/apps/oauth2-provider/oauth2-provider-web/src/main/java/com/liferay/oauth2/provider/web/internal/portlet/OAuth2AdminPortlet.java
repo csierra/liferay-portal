@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -62,9 +63,11 @@ import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletURL;
+import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import com.liferay.portal.kernel.util.WebKeys;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -90,6 +93,46 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class OAuth2AdminPortlet extends MVCPortlet {
 
+	public void deleteOAuth2Application(
+		ActionRequest request, ActionResponse response) {
+
+		long oAuth2ApplicationId = ParamUtil.getLong(
+			request, "oAuth2ApplicationId");
+
+		try {
+			_oAuth2ApplicationService.deleteOAuth2Application(
+				oAuth2ApplicationId);
+		}
+		catch (PortalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe);
+			}
+
+			SessionErrors.add(request, pe.getClass());
+		}
+	}
+
+	public void deleteOAuth2Applications(
+		ActionRequest request, ActionResponse response) {
+
+		long[] oAuth2ApplicationIds = StringUtil.split(
+			ParamUtil.getString(request, "oAuth2ApplicationIds"), 0L);
+
+		try {
+			for(long oAuth2ApplicationId : oAuth2ApplicationIds) {
+				_oAuth2ApplicationService.deleteOAuth2Application(
+					oAuth2ApplicationId);
+			}
+		}
+		catch (PortalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe);
+			}
+
+			SessionErrors.add(request, pe.getClass());
+		}
+	}
+
 	public static String generateClientSecret() {
 		int size = 16;
 
@@ -112,23 +155,8 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		return matcher.replaceFirst("secret-$1-$2-$3-$4-$5");
 	}
 
-	public void deleteOAuth2Application(
-		ActionRequest request, ActionResponse response) {
-
-		long oAuth2ApplicationId = ParamUtil.getLong(
-			request, "oAuth2ApplicationId");
-
-		try {
-			_oAuth2ApplicationService.deleteOAuth2Application(
-				oAuth2ApplicationId);
-		}
-		catch (PortalException pe) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(pe);
-			}
-
-			SessionErrors.add(request, pe.getClass());
-		}
+	protected ThemeDisplay getThemeDisplay(PortletRequest portletRequest) {
+		return (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 	}
 
 	@Override
@@ -137,7 +165,8 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
-			new OAuth2AdminPortletDisplayContext(_oAuth2ProviderConfiguration);
+			new OAuth2AdminPortletDisplayContext(
+				_oAuth2ProviderConfiguration, getThemeDisplay(renderRequest));
 
 		renderRequest.setAttribute(
 			OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT,
@@ -209,7 +238,8 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		String name = ParamUtil.get(request, "name", StringPool.BLANK);
 
 		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
-			new OAuth2AdminPortletDisplayContext(_oAuth2ProviderConfiguration);
+			new OAuth2AdminPortletDisplayContext(
+				_oAuth2ProviderConfiguration, getThemeDisplay(request));
 
 		List<GrantType> oAuth2Grants =
 			oAuth2AdminPortletDisplayContext.getOAuth2Grants(

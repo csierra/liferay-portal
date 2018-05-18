@@ -14,21 +14,28 @@
 
 package com.liferay.oauth2.provider.web.internal.display.context;
 
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalServiceUtil;
+import com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminActionKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
@@ -43,9 +50,19 @@ import javax.portlet.PortletPreferences;
 public class OAuth2AdminPortletDisplayContext {
 
 	public OAuth2AdminPortletDisplayContext(
-		OAuth2ProviderConfiguration oAuth2ProviderConfiguration) {
+		OAuth2ProviderConfiguration oAuth2ProviderConfiguration,
+		ThemeDisplay themeDisplay) {
 
 		_oAuth2ProviderConfiguration = oAuth2ProviderConfiguration;
+		_themeDisplay = themeDisplay;
+	}
+
+	public int getOAuth2AuthorizationsCount(OAuth2Application oAuth2Application)
+		throws PortalException {
+
+		return OAuth2AuthorizationServiceUtil.
+			getApplicationOAuth2AuthorizationsCount(
+				oAuth2Application.getOAuth2ApplicationId());
 	}
 
 	public List<GrantType> getOAuth2Grants(
@@ -87,6 +104,40 @@ public class OAuth2AdminPortletDisplayContext {
 		}
 
 		return result;
+	}
+
+	public int getScopeAliasesSize(OAuth2Application oAuth2Application)
+		throws PortalException {
+
+		long oAuth2ApplicationScopeAliasesId =
+			oAuth2Application.getOAuth2ApplicationScopeAliasesId();
+
+		if (oAuth2ApplicationScopeAliasesId <= 0) {
+			return 0;
+		}
+
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+			OAuth2ApplicationScopeAliasesLocalServiceUtil.
+				getOAuth2ApplicationScopeAliases(
+					oAuth2ApplicationScopeAliasesId);
+
+		List<String> scopeAliasesList =
+			oAuth2ApplicationScopeAliases.getScopeAliasesList();
+
+		return scopeAliasesList.size();
+	}
+
+	public String getThumbnailURL(OAuth2Application oAuth2Application)
+		throws Exception {
+
+		if (oAuth2Application.getIconFileEntryId() <= 0) {
+			return StringPool.BLANK;
+		}
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
+			oAuth2Application.getIconFileEntryId());
+
+		return DLUtil.getThumbnailSrc(fileEntry, _themeDisplay);
 	}
 
 	public boolean hasAddApplicationPermission() {
@@ -156,8 +207,7 @@ public class OAuth2AdminPortletDisplayContext {
 
 		try {
 			return PortletPermissionUtil.contains(
-				permissionChecker,
-				OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
+				permissionChecker, OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
 				OAuth2AdminActionKeys.VIEW_GRANTED_AUTHORIZATIONS);
 		}
 		catch (PortalException pe) {
@@ -175,5 +225,6 @@ public class OAuth2AdminPortletDisplayContext {
 		OAuth2AdminPortletDisplayContext.class);
 
 	private final OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
+	private final ThemeDisplay _themeDisplay;
 
 }

@@ -1,6 +1,4 @@
-<%@ page
-	import="com.liferay.frontend.taglib.clay.servlet.taglib.util.JSPCreationMenu" %>
-<%@ page import="javax.portlet.PortletURL" %><%--
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -16,32 +14,16 @@
  */
 --%>
 
-<%@include file="/admin/init.jsp"%>
+<%@ include file="/admin/init.jsp" %>
 
 <%
-
-String displayStyle = ParamUtil.getString(request, "displayStyle", "list");
-
-boolean orderByAsc = false;
-
-String orderByType = ParamUtil.getString(request, "orderByType", "asc");
-
-if (orderByType.equals("asc")) {
-	orderByAsc = true;
-}
-
-OrderByComparator orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Application", "name", orderByType.equals("asc"));
-
 int oAuth2ApplicationsCount = OAuth2ApplicationServiceUtil.getOAuth2ApplicationsCount(themeDisplay.getCompanyId());
 
-PortletURL sortingURL = renderResponse.createRenderURL();
+OAuth2ApplicationsManagementToolbarDisplayContext oAuth2ApplicationsManagementToolbarDisplayContext = new OAuth2ApplicationsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, currentURLObj);
 
-sortingURL.setParameter("displayStyle", displayStyle);
-sortingURL.setParameter("orderByType", orderByAsc ? "desc" : "asc");
-final PortletURL addOAuth2ApplicationURL = renderResponse.createRenderURL();
+String displayStyle = oAuth2ApplicationsManagementToolbarDisplayContext.getDisplayStyle();
 
-addOAuth2ApplicationURL.setParameter("mvcPath", "/admin/edit_application.jsp");
-addOAuth2ApplicationURL.setParameter("redirect", currentURL);
+String orderByType = oAuth2ApplicationsManagementToolbarDisplayContext.getOrderByType();
 %>
 
 <aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
@@ -51,105 +33,143 @@ addOAuth2ApplicationURL.setParameter("redirect", currentURL);
 </aui:nav-bar>
 
 <clay:management-toolbar
-	creationMenu="<%=
-		new JSPCreationMenu(pageContext) {
-			{
-				addPrimaryDropdownItem(dropdownItem -> dropdownItem.setHref(addOAuth2ApplicationURL.toString()));
-			}
-		}
-	%>"
+	actionDropdownItems="<%= oAuth2ApplicationsManagementToolbarDisplayContext.getActionDropdownItems() %>"
+	creationMenu="<%= oAuth2ApplicationsManagementToolbarDisplayContext.getCreationMenu() %>"
 	disabled="<%= oAuth2ApplicationsCount == 0 %>"
 	namespace="<%= renderResponse.getNamespace() %>"
-	selectable="<%= false %>"
+	searchContainerId="oAuth2ApplicationsSearchContainer"
+	selectable="<%= true %>"
 	showCreationMenu="<%= oAuth2AdminPortletDisplayContext.hasAddApplicationPermission() %>"
 	showSearch="<%= false %>"
-	sortingOrder="<%= orderByType %>"
-	sortingURL="<%= sortingURL.toString() %>"
+	sortingOrder="<%= oAuth2ApplicationsManagementToolbarDisplayContext.getOrderByType() %>"
+	sortingURL="<%= String.valueOf(oAuth2ApplicationsManagementToolbarDisplayContext.getSortingURL()) %>"
+	viewTypeItems="<%= oAuth2ApplicationsManagementToolbarDisplayContext.getViewTypes() %>"
 />
 
 <div class="closed container-fluid-1280">
-	<liferay-ui:search-container
-		emptyResultsMessage="no-applications-were-found"
-		total="<%= oAuth2ApplicationsCount %>"
-	>
+	<aui:form action="<%= currentURLObj %>" method="get" name="fm">
+		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+		<aui:input name="oAuth2ApplicationIds" type="hidden" />
 
-	    <liferay-ui:search-container-results
-	        results="<%= OAuth2ApplicationServiceUtil.getOAuth2Applications(themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"
-		/>
-	
-	    <liferay-ui:search-container-row
-	        className="com.liferay.oauth2.provider.model.OAuth2Application"
-			escapedModel="true"
-			modelVar="oAuth2Application"
+		<liferay-ui:search-container
+			emptyResultsMessage="no-applications-were-found"
+			id="oAuth2ApplicationsSearchContainer"
+			rowChecker="<%= new EmptyOnClickRowChecker(renderResponse) %>"
+			total="<%= oAuth2ApplicationsCount %>"
 		>
-			<%
-				String thumbnailURL = StringPool.BLANK;
-
-				try {
-					if (oAuth2Application.getIconFileEntryId() > 0) {
-						FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(oAuth2Application.getIconFileEntryId());
-						thumbnailURL = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
-					}
-				}
-				catch (PortalException e) {
-				}
-
-			%>
-			<liferay-ui:search-container-column-image
-				name="icon"
-				src="<%= thumbnailURL %>"
+			<liferay-ui:search-container-results
+				results='<%= OAuth2ApplicationServiceUtil.getOAuth2Applications(themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), OrderByComparatorFactoryUtil.create("OAuth2Application", "name", orderByType.equals("asc"))) %>'
 			/>
 
-			<liferay-ui:search-container-column-text
-				href="<%= addOAuth2ApplicationURL %>"
-				property="name"
-			/>
-	        
-	        <liferay-ui:search-container-column-text
-				property="description"
-			/>
-
-			<liferay-ui:search-container-column-text
-				name="granted-authorizations"
-				value="<%= String.valueOf(OAuth2AuthorizationServiceUtil.getApplicationOAuth2AuthorizationsCount(oAuth2Application.getOAuth2ApplicationId())) %>"
-			/>
-
-			<liferay-ui:search-container-column-text
-				name="scopes"
+			<liferay-ui:search-container-row
+				className="com.liferay.oauth2.provider.model.OAuth2Application"
+				escapedModel="<%= true %>"
+				keyProperty="OAuth2ApplicationId"
+				modelVar="oAuth2Application"
 			>
-				<%
-					int scopeAliasesSize = 0;
-					String scopeAliases = "";
+				<portlet:renderURL var="editURL">
+					<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2Application.getOAuth2ApplicationId()) %>" />
+					<portlet:param name="mvcPath" value="/admin/edit_application.jsp" />
+					<portlet:param name="redirect" value="<%= currentURL %>" />
+				</portlet:renderURL>
 
-					if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
-						OAuth2ApplicationScopeAliases
-							oAuth2ApplicationScopeAliases =
-							OAuth2ApplicationScopeAliasesLocalServiceUtil.getOAuth2ApplicationScopeAliases(
-								oAuth2Application.getOAuth2ApplicationScopeAliasesId());
+				<c:choose>
+					<c:when test='<%= displayStyle.equals("descriptive") %>'>
 
-						List<String> scopeAliasesList = oAuth2ApplicationScopeAliases.getScopeAliasesList();
+						<%
+						row.setCssClass("autofit-row-center");
+						%>
 
-						scopeAliasesSize = scopeAliasesList.size();
-						scopeAliases = oAuth2ApplicationScopeAliases.getScopeAliases();
-					}
+						<c:choose>
+							<c:when test="<%= oAuth2Application.getIconFileEntryId() > 0 %>">
+								<liferay-ui:search-container-column-image
+									src="<%= oAuth2AdminPortletDisplayContext.getThumbnailURL(oAuth2Application) %>"
+									toggleRowChecker="<%= true %>"
+								/>
+							</c:when>
+							<c:otherwise>
+								<liferay-ui:search-container-column-image
+									src='<%= themeDisplay.getPathThemeImages() + "/common/portlet.png" %>'
+									toggleRowChecker="<%= true %>"
+								/>
+							</c:otherwise>
+						</c:choose>
 
-					out.println(String.valueOf(scopeAliasesSize));
-				%>
+						<c:choose>
+							<c:when test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
+								<liferay-ui:search-container-column-text
+									colspan="<%= 2 %>"
+									href="<%= editURL %>"
+									property="name"
+								/>
+							</c:when>
+							<c:otherwise>
+								<liferay-ui:search-container-column-text
+									colspan="<%= 2 %>"
+									property="name"
+								/>
+							</c:otherwise>
+						</c:choose>
 
-				<liferay-ui:icon-help message="<%= HtmlUtil.escapeAttribute(scopeAliases) %>" />
+						<liferay-ui:search-container-column-jsp
+							align="right"
+							path="/admin/application_actions.jsp"
+						/>
+					</c:when>
+					<c:otherwise>
+						<c:choose>
+							<c:when test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
+								<liferay-ui:search-container-column-text
+									href="<%= editURL %>"
+									property="name"
+								/>
+							</c:when>
+							<c:otherwise>
+								<liferay-ui:search-container-column-text
+									property="name"
+								/>
+							</c:otherwise>
+						</c:choose>
 
-			</liferay-ui:search-container-column-text>
+						<liferay-ui:search-container-column-text
+							property="description"
+						/>
 
-	        <liferay-ui:search-container-column-jsp
-	            align="right" 
-	            path="/admin/application_actions.jsp"
+						<liferay-ui:search-container-column-text
+							name="authorizations"
+							value="<%= String.valueOf(oAuth2AdminPortletDisplayContext.getOAuth2AuthorizationsCount(oAuth2Application)) %>"
+						/>
+
+						<liferay-ui:search-container-column-text
+							name="scopes"
+							value="<%= String.valueOf(oAuth2AdminPortletDisplayContext.getScopeAliasesSize(oAuth2Application)) %>"
+						/>
+
+						<liferay-ui:search-container-column-jsp
+							align="right"
+							path="/admin/application_actions.jsp"
+						/>
+					</c:otherwise>
+				</c:choose>
+			</liferay-ui:search-container-row>
+
+			<liferay-ui:search-iterator
+				displayStyle="<%= displayStyle %>"
+				markupView="lexicon"
 			/>
-
-	    </liferay-ui:search-container-row>
-
-		<liferay-ui:search-iterator
-			markupView="lexicon"
-		/>
-
-	</liferay-ui:search-container>
+		</liferay-ui:search-container>
+	</aui:form>
 </div>
+
+<aui:script>
+	function <portlet:namespace />deleteOAuth2Applications() {
+		if (confirm('<%= HtmlUtil.escapeJS(LanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries")) %>')) {
+			var form = AUI.$(document.<portlet:namespace />fm);
+
+			form.attr('method', 'post');
+			form.fm('oAuth2ApplicationIds').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
+
+			submitForm(form, '<portlet:actionURL name="deleteOAuth2Applications" />');
+		}
+	}
+</aui:script>
