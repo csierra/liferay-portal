@@ -41,22 +41,29 @@ public class AuthorizationModel {
 		Locale locale, ScopeDescriptorLocator scopeDescriptorLocator) {
 
 		this(
-			new HashMap<>(), applicationDescriptorLocator, locale,
-			scopeDescriptorLocator);
+			new HashMap<>(), applicationDescriptorLocator, new HashSet<>(),
+			locale, scopeDescriptorLocator);
 	}
 
 	public AuthorizationModel(
 		Map<String, Set<String>> applicationScopes,
 		ApplicationDescriptorLocator applicationDescriptorLocator,
+		Set<LiferayOAuth2Scope> liferayOAuth2Scopes,
 		Locale locale, ScopeDescriptorLocator scopeDescriptorLocator) {
 
 		_applicationScopes = applicationScopes;
+		_liferayOAuth2Scopes = liferayOAuth2Scopes;
 		_applicationDescriptorLocator = applicationDescriptorLocator;
 		_locale = locale;
 		_scopeDescriptorLocator = scopeDescriptorLocator;
 	}
 
 	public AuthorizationModel add(AuthorizationModel model2) {
+		Set<LiferayOAuth2Scope> liferayOAuth2Scopes = new HashSet<>();
+
+		liferayOAuth2Scopes.addAll(_liferayOAuth2Scopes);
+		liferayOAuth2Scopes.addAll(model2.getLiferayOAuth2Scopes());
+
 		Map<String, Set<String>> combinedApplicationScopesMap = new HashMap<>(
 			_applicationScopes);
 
@@ -78,13 +85,15 @@ public class AuthorizationModel {
 
 		AuthorizationModel authorizationModel = new AuthorizationModel(
 			combinedApplicationScopesMap, _applicationDescriptorLocator,
-			_locale, _scopeDescriptorLocator);
+			liferayOAuth2Scopes, _locale, _scopeDescriptorLocator);
 
 		return authorizationModel;
 	}
 
 	public void addLiferayOAuth2Scopes(
 		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes) {
+
+		_liferayOAuth2Scopes.addAll(liferayOAuth2Scopes);
 
 		for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
 			Set<String> applicationScopes = _applicationScopes.computeIfAbsent(
@@ -95,6 +104,12 @@ public class AuthorizationModel {
 	}
 
 	public boolean contains(AuthorizationModel model2) {
+		if (!_liferayOAuth2Scopes.containsAll(
+				model2.getLiferayOAuth2Scopes())) {
+
+				return false;
+		}
+
 		for (String applicationName : model2.getApplicationNames()) {
 			if (!_applicationScopes.containsKey(applicationName)) {
 				return false;
@@ -120,6 +135,10 @@ public class AuthorizationModel {
 		}
 
 		AuthorizationModel arm2 = (AuthorizationModel)obj2;
+
+		if (!_liferayOAuth2Scopes.equals(arm2.getLiferayOAuth2Scopes())) {
+			return false;
+		}
 
 		if (!getApplicationNames().equals(arm2.getApplicationNames())) {
 			return false;
@@ -147,79 +166,98 @@ public class AuthorizationModel {
 		return applicationDescriptor.describeApplication(_locale);
 	}
 
+	public String getScopeDescription(LiferayOAuth2Scope liferayOAuth2Scope) {
+		ScopeDescriptor scopeDescriptor =
+			_scopeDescriptorLocator.getScopeDescriptor(
+				liferayOAuth2Scope.getApplicationName());
+
+		return scopeDescriptor.describeScope(
+			liferayOAuth2Scope.getScope(), _locale);
+	}
+
 	public Set<String> getApplicationNames() {
-		return _applicationScopes.keySet();
+		Stream<LiferayOAuth2Scope> stream = _liferayOAuth2Scopes.stream();
+
+		return stream.map(
+			LiferayOAuth2Scope::getApplicationName
+		).collect(
+			Collectors.toSet()
+		);
 	}
 
 	public Map<String, String> getApplicationNamesDescriptions() {
-		Set<String> keySet = _applicationScopes.keySet();
+		Stream<LiferayOAuth2Scope> stream = _liferayOAuth2Scopes.stream();
 
-		Stream<String> stream = keySet.stream();
-
-		return stream.collect(
+		return stream.map(
+			LiferayOAuth2Scope::getApplicationName
+		).collect(
 			Collectors.toMap(
-				Function.identity(), this::getApplicationDescription));
+				Function.identity(), this::getApplicationDescription)
+		);
 	}
 
 	public Set<String> getApplicationScopeDescription(String applicationName) {
-		Set<String> applicationScopeDescription = new HashSet<>();
+		Stream<LiferayOAuth2Scope> stream = _liferayOAuth2Scopes.stream();
 
-		Set<String> applicationScopes = _applicationScopes.get(applicationName);
-
-		for (String applicationScope : applicationScopes) {
-			ScopeDescriptor scopeDescriptor =
-				_scopeDescriptorLocator.getScopeDescriptor(applicationName);
-
-			applicationScopeDescription.add(
-				scopeDescriptor.describeScope(applicationScope, _locale));
-		}
-
-		return applicationScopeDescription;
+		return stream.filter(
+			liferayOAuth2Scope ->
+				applicationName.equals(liferayOAuth2Scope.getApplicationName())
+		).map(
+			this::getScopeDescription
+		).collect(
+			Collectors.toSet()
+		);
 	}
 
 	@Override
 	public int hashCode() {
-		return getApplicationNames().hashCode();
+		return getApplicationNames().hashCode(); // ???
 	}
 
 	public AuthorizationModel reduceToApplication(String applicationName) {
+		Stream<LiferayOAuth2Scope> stream = _liferayOAuth2Scopes.stream();
+
+		Set<LiferayOAuth2Scope> liferayOAuth2Scopes = stream.filter(
+			liferayOAuth2Scope ->
+				applicationName.equals(liferayOAuth2Scope.getApplicationName())
+		).collect(
+			Collectors.toSet()
+		);
+
 		Map<String, Set<String>> applicationScopes = new HashMap<>();
 
 		applicationScopes.put(
 			applicationName, _applicationScopes.get(applicationName));
 
 		AuthorizationModel authorizationModel = new AuthorizationModel(
-			applicationScopes, _applicationDescriptorLocator, _locale,
-			_scopeDescriptorLocator);
+			applicationScopes, _applicationDescriptorLocator,
+			liferayOAuth2Scopes, _locale, _scopeDescriptorLocator);
 
 		return authorizationModel;
 	}
 
 	public Set<AuthorizationModel> splitByApplicationScopes() {
-		Set<AuthorizationModel> split = new HashSet<>();
+		Stream<LiferayOAuth2Scope> stream = _liferayOAuth2Scopes.stream();
 
-		for (Map.Entry<String, Set<String>> applicationScopesEntry :
-				_applicationScopes.entrySet()) {
-
-			for (String scope : applicationScopesEntry.getValue()) {
-				Map<String, Set<String>> applicationScopesMap = new HashMap<>();
-
-				applicationScopesMap.put(
-					applicationScopesEntry.getKey(),
-					Collections.singleton(scope));
-
-				AuthorizationModel authorizationModel = new AuthorizationModel(
-					applicationScopesMap, _applicationDescriptorLocator,
-					_locale, _scopeDescriptorLocator);
-
-				split.add(authorizationModel);
-			}
-		}
-
-		return split;
+		return stream.map(
+			liferayOAuth2Scope -> new AuthorizationModel(
+				Collections.singletonMap(
+					liferayOAuth2Scope.getApplicationName(),
+					Collections.singleton(liferayOAuth2Scope.getScope())),
+				_applicationDescriptorLocator,
+				Collections.singleton(liferayOAuth2Scope), _locale,
+				_scopeDescriptorLocator)
+		).collect(
+			Collectors.toSet()
+		);
 	}
 
 	public AuthorizationModel subtract(AuthorizationModel model2) {
+		Set<LiferayOAuth2Scope> liferayOAuth2Scopes =
+			new HashSet<>(_liferayOAuth2Scopes);
+
+		liferayOAuth2Scopes.removeAll(model2.getLiferayOAuth2Scopes());
+
 		Map<String, Set<String>> remainingApplicationScopesMap =
 			new HashMap<>();
 
@@ -249,17 +287,31 @@ public class AuthorizationModel {
 
 		AuthorizationModel authorizationModel = new AuthorizationModel(
 			remainingApplicationScopesMap, _applicationDescriptorLocator,
-			_locale, _scopeDescriptorLocator);
+			liferayOAuth2Scopes, _locale, _scopeDescriptorLocator);
 
 		return authorizationModel;
 	}
 
 	private Set<String> _getApplicationScopes(String applicationName) {
-		return _applicationScopes.get(applicationName);
+		Stream<LiferayOAuth2Scope> stream = _liferayOAuth2Scopes.stream();
+
+		return stream.filter(
+			liferayOAuth2Scope ->
+				applicationName.equals(liferayOAuth2Scope.getApplicationName())
+		).map(
+			LiferayOAuth2Scope::getScope
+		).collect(
+			Collectors.toSet()
+		);
+	}
+
+	public Set<LiferayOAuth2Scope> getLiferayOAuth2Scopes() {
+		return _liferayOAuth2Scopes;
 	}
 
 	private final ApplicationDescriptorLocator _applicationDescriptorLocator;
 	private final Map<String, Set<String>> _applicationScopes;
+	private Set<LiferayOAuth2Scope> _liferayOAuth2Scopes = new HashSet<>();
 	private final Locale _locale;
 	private final ScopeDescriptorLocator _scopeDescriptorLocator;
 
