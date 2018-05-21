@@ -18,6 +18,8 @@ import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -153,15 +155,14 @@ public class AssignScopesModel {
 	public class Relations {
 
 		public Relations() {
-			_scopeAliases = new HashSet<>();
 			_globalAuthorizationModels = new HashSet<>();
 		}
 
 		public Relations(
-			Set<String> scopeAliases,
+			String scopeAlias,
 			Set<AuthorizationModel> globalAuthorizationModels) {
 
-			_scopeAliases = new HashSet<>(scopeAliases);
+			_scopeAlias = scopeAlias;
 			_globalAuthorizationModels = new HashSet<>(
 				globalAuthorizationModels);
 		}
@@ -173,10 +174,10 @@ public class AssignScopesModel {
 
 			Relations relations2 = (Relations)obj2;
 
-			if (((_scopeAliases == null) &&
-				 (relations2._scopeAliases != null)) ||
-				((_scopeAliases != null) &&
-				 !_scopeAliases.equals(relations2._scopeAliases))) {
+			if (((_scopeAlias == null) &&
+				 (relations2._scopeAlias != null)) ||
+				((_scopeAlias != null) &&
+				 !_scopeAlias.equals(relations2._scopeAlias))) {
 
 				return false;
 			}
@@ -205,8 +206,8 @@ public class AssignScopesModel {
 				globalRelations.stream();
 
 			Set<String> globalScopeAliases =
-				globalRelationsStream.flatMap(
-					relations -> relations.getScopeAliases().stream()
+				globalRelationsStream.map(
+					Relations::getScopeAlias
 				).collect(
 					Collectors.toSet()
 				);
@@ -214,8 +215,8 @@ public class AssignScopesModel {
 			return globalScopeAliases;
 		}
 
-		public Set<String> getScopeAliases() {
-			return _scopeAliases;
+		public String getScopeAlias() {
+			return _scopeAlias;
 		}
 
 		@Override
@@ -224,7 +225,7 @@ public class AssignScopesModel {
 		}
 
 		private Set<AuthorizationModel> _globalAuthorizationModels;
-		private Set<String> _scopeAliases;
+		private String _scopeAlias = StringPool.BLANK;
 
 	}
 
@@ -259,9 +260,7 @@ public class AssignScopesModel {
 				scopeLocator.getLiferayOAuth2Scopes(companyId, scopeAlias));
 
 			_authorizationModelsRelations.put(
-				authorizationModel,
-				new Relations(
-					Collections.singleton(scopeAlias), new HashSet<>()));
+				authorizationModel, new Relations(scopeAlias, new HashSet<>()));
 
 			Set<String> applicationNames =
 				authorizationModel.getApplicationNames();
@@ -318,15 +317,15 @@ public class AssignScopesModel {
 			Relations authorizationModelRelations =
 				authorizationModelsRelationsEntry.getValue();
 
-			Set<String> scopeAliases =
-				authorizationModelRelations.getScopeAliases();
+			String scopeAlias =
+				authorizationModelRelations.getScopeAlias();
 
 			AuthorizationModel authorizationModel =
 				authorizationModelsRelationsEntry.getKey();
 
 			// Preserve AuthorizationModels that are assigned an alias
 
-			if ((scopeAliases != null) && !scopeAliases.isEmpty()) {
+			if (!Validator.isBlank(scopeAlias)) {
 				combinedAuthorizationModelsRelations.put(
 					authorizationModel, authorizationModelRelations);
 				continue;

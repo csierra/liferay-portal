@@ -23,7 +23,7 @@
 		AuthorizationModel authorizationModel = scopeAliasAuthorizationModelEntry.getKey();
 		AssignScopesModel.Relations relations = scopeAliasAuthorizationModelEntry.getValue();
 
-		String scopeAlias = StringUtil.merge(relations.getScopeAliases());
+		String scopeAlias = relations.getScopeAlias();
 
 		Set<String> globalScopeAliases = relations.getGlobalScopeAliases();
 
