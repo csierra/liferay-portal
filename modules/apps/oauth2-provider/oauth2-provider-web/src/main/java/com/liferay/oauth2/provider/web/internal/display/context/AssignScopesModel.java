@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -155,64 +156,41 @@ public class AssignScopesModel {
 	public class Relations {
 
 		public Relations() {
-			_globalAuthorizationModels = new HashSet<>();
 		}
 
-		public Relations(
-			String scopeAlias,
-			Set<AuthorizationModel> globalAuthorizationModels) {
-
+		public Relations(String scopeAlias) {
 			_scopeAlias = scopeAlias;
-			_globalAuthorizationModels = new HashSet<>(
-				globalAuthorizationModels);
 		}
 
-		public boolean equals(Object obj2) {
-			if (!(obj2 instanceof Relations)) {
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+
+			if (o == null || getClass() != o.getClass()) {
 				return false;
 			}
 
-			Relations relations2 = (Relations)obj2;
+			Relations relations = (Relations) o;
 
-			if (((_scopeAlias == null) &&
-				 (relations2._scopeAlias != null)) ||
-				((_scopeAlias != null) &&
-				 !_scopeAlias.equals(relations2._scopeAlias))) {
-
-				return false;
-			}
-
-			if (((_globalAuthorizationModels == null) &&
-				 (relations2._globalAuthorizationModels != null)) ||
-				((_globalAuthorizationModels != null) &&
-				 !_globalAuthorizationModels.equals(
-					 relations2._globalAuthorizationModels))) {
-
-				return false;
-			}
-
-			return true;
+			return Objects.equals(
+				_globalAuthorizationModels,
+				relations._globalAuthorizationModels) &&
+				   Objects.equals(_scopeAlias, relations._scopeAlias);
 		}
 
 		public Set<String> getGlobalScopeAliases() {
-			Map<AuthorizationModel, Relations>
-				globalAuthorizationModelsRelations =
-					getAuthorizationModelsRelations(_globalAuthorizationModels);
+			Stream<AuthorizationModel> stream =
+				_globalAuthorizationModels.stream();
 
-			Collection<Relations> globalRelations =
-				globalAuthorizationModelsRelations.values();
-
-			Stream<Relations> globalRelationsStream =
-				globalRelations.stream();
-
-			Set<String> globalScopeAliases =
-				globalRelationsStream.map(
-					Relations::getScopeAlias
-				).collect(
-					Collectors.toSet()
-				);
-
-			return globalScopeAliases;
+			return stream.map(
+				_authorizationModelsRelations::get
+			).map(
+				Relations::getScopeAlias
+			).collect(
+				Collectors.toSet()
+			);
 		}
 
 		public String getScopeAlias() {
@@ -221,10 +199,11 @@ public class AssignScopesModel {
 
 		@Override
 		public int hashCode() {
-			return _globalAuthorizationModels.hashCode();
+			return Objects.hash(_globalAuthorizationModels, _scopeAlias);
 		}
 
-		private Set<AuthorizationModel> _globalAuthorizationModels;
+		private Set<AuthorizationModel> _globalAuthorizationModels =
+			new HashSet<>();
 		private String _scopeAlias = StringPool.BLANK;
 
 	}
@@ -260,7 +239,7 @@ public class AssignScopesModel {
 				scopeLocator.getLiferayOAuth2Scopes(companyId, scopeAlias));
 
 			_authorizationModelsRelations.put(
-				authorizationModel, new Relations(scopeAlias, new HashSet<>()));
+				authorizationModel, new Relations(scopeAlias));
 
 			Set<String> applicationNames =
 				authorizationModel.getApplicationNames();
