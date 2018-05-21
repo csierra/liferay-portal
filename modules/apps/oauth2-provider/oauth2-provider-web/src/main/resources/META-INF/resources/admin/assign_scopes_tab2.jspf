@@ -21,11 +21,11 @@
 		String scopeAlias = scopeAliasAuthorizationModelEntry.getValue().getScopeAliases().stream().findAny().get();
 		%>
 
-		<div class="panel panel-secondary" id="<portlet:namespace /><%= HtmlUtil.escapeAttribute(scopeAlias) %>">
+		<div class="panel panel-secondary" id="<portlet:namespace /><%= scopeAlias %>">
 			<div class="collapse-icon panel-header panel-header-link" id="<portlet:namespace />globalAccordionHeading<%= scopeAlias %>">
 				<div class="custom-checkbox custom-control" style="display: inline-block;">
 					<label>
-						<input onChange="<portlet:namespace />recalculateDependants(this)" value="<%= scopeAlias %>" <%= assignedScopes.contains(scopeAlias) ? "checked " : "" %>class="custom-control-input" name="<portlet:namespace />scopeAliases" type="checkbox">
+						<input onChange="<portlet:namespace />recalculateDependants(this)" value="<%= HtmlUtil.escapeAttribute(scopeAlias) %>" <%= assignedScopes.contains(scopeAlias) ? "checked " : "" %>class="custom-control-input" name="<portlet:namespace />scopeAliases" type="checkbox">
 						<span class="custom-control-label">
 							<span class="custom-control-label-text panel-title"><%= HtmlUtil.escape(scopeAlias) %></span>
 						</span>
@@ -33,7 +33,7 @@
 				</div>
 
 				<a aria-controls="<portlet:namespace />globalAccordion<%= scopeAlias %>" aria-expanded="false" class="collapsed" data-parent="#<portlet:namespace />globalAccordion" data-toggle="collapse" href="#<portlet:namespace />globalAccordion<%= scopeAlias %>" role="tab">
-					<span>(details)</span>
+					<span>(<liferay-ui:message key="details" />)</span>
 					<span class="collapse-icon-closed">
 						<clay:icon
 							symbol="angle-right"
@@ -52,15 +52,14 @@
 				<%
 				AuthorizationModel authorizationModel = scopeAliasAuthorizationModelEntry.getKey();
 
-				for (String appName : authorizationModel.getApplicationNames()) {
-					String applicationScopeDescription = authorizationModel.getApplicationScopeDescription(appName).stream().collect(Collectors.joining(", "));
+				for (String applicationName : authorizationModel.getApplicationNames()) {
 					%>
 
 					<ul>
 						<li>
-							<%= HtmlUtil.escape(assignScopesModel.getApplicationDescription(appName)) %><br />
+							<%= HtmlUtil.escape(assignScopesModel.getApplicationDescription(applicationName)) %><br />
 
-							<font size="1">( <%= HtmlUtil.escape(applicationScopeDescription) %>)</font>
+							<font size="1">( <%= HtmlUtil.escape(StringUtil.merge(authorizationModel.getApplicationScopeDescription(applicationName))) %>)</font>
 						</li>
 					</ul>
 

@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,15 +83,15 @@ public class AuthorizationModel {
 		return authorizationModel;
 	}
 
-	public void addLiferayOAuth2Scope(LiferayOAuth2Scope liferayOAuth2Scope) {
-		String applicationName = liferayOAuth2Scope.getApplicationName();
+	public void addLiferayOAuth2Scopes(
+		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes) {
 
-		Set<String> applicationScopes = _applicationScopes.computeIfAbsent(
-			applicationName, __ -> new HashSet<>());
+		for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
+			Set<String> applicationScopes = _applicationScopes.computeIfAbsent(
+				liferayOAuth2Scope.getApplicationName(), __ -> new HashSet<>());
 
-		String internalScope = liferayOAuth2Scope.getScope();
-
-		applicationScopes.add(internalScope);
+			applicationScopes.add(liferayOAuth2Scope.getScope());
+		}
 	}
 
 	public boolean contains(AuthorizationModel model2) {
@@ -181,20 +182,15 @@ public class AuthorizationModel {
 		return getApplicationNames().hashCode();
 	}
 
-	public AuthorizationModel reduceToSpecficApplications(
-		Set<String> applicationNames) {
+	public AuthorizationModel reduceToApplication(String applicationName) {
+		Map<String, Set<String>> applicationScopes = new HashMap<>();
 
-		Map<String, Set<String>> remainingApplicationScopesMap =
-			new HashMap<>();
-
-		for (String applicationName : applicationNames) {
-			remainingApplicationScopesMap.put(
-				applicationName, _applicationScopes.get(applicationName));
-		}
+		applicationScopes.put(
+			applicationName, _applicationScopes.get(applicationName));
 
 		AuthorizationModel authorizationModel = new AuthorizationModel(
-			remainingApplicationScopesMap, _applicationDescriptorLocator,
-			_locale, _scopeDescriptorLocator);
+			applicationScopes, _applicationDescriptorLocator, _locale,
+			_scopeDescriptorLocator);
 
 		return authorizationModel;
 	}

@@ -20,12 +20,14 @@
 	Map<AuthorizationModel, AssignScopesModel.Relations> applicationAuthorizationModelsAssignModel = assignScopesModel.buildAssignmentModelForApplication(applicationName);
 
 	for (Map.Entry<AuthorizationModel, AssignScopesModel.Relations> scopeAliasAuthorizationModelEntry : applicationAuthorizationModelsAssignModel.entrySet()) {
-		String scopeAlias = scopeAliasAuthorizationModelEntry.getValue().getScopeAliases().stream().collect(Collectors.joining(","));
-
-		Set<String> masterScopeAliases = scopeAliasAuthorizationModelEntry.getValue().getMasterAuthorizationModelsScopeAliases();
 		AuthorizationModel authorizationModel = scopeAliasAuthorizationModelEntry.getKey();
+		AssignScopesModel.Relations relations = scopeAliasAuthorizationModelEntry.getValue();
 
-		String masterScopeAliasesStr = String.join(" ", masterScopeAliases);
+		String scopeAlias = StringUtil.merge(relations.getScopeAliases());
+
+		Set<String> masterScopeAliases = relations.getMasterAuthorizationModelsScopeAliases();
+
+		String masterScopeAliasesStr = StringUtil.merge(masterScopeAliases, StringPool.SPACE);
 		%>
 
 		<li class="list-group-item list-group-item-flex">
@@ -42,7 +44,7 @@
 				<h4 class="list-group-title text-truncate">
 
 				<%
-				String applicationScopeDescription = authorizationModel.getApplicationScopeDescription(applicationName).stream().collect(Collectors.joining(", "));
+				String applicationScopeDescription = StringUtil.merge(authorizationModel.getApplicationScopeDescription(applicationName));
 				%>
 
 				<%= HtmlUtil.escape(applicationScopeDescription) %>

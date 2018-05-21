@@ -192,9 +192,7 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 				_scopeFinderLocator.getLiferayOAuth2Scopes(
 					companyId, requestedScopeAlias);
 
-			for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
-				authorizationModel.addLiferayOAuth2Scope(liferayOAuth2Scope);
-			}
+			authorizationModel.addLiferayOAuth2Scopes(liferayOAuth2Scopes);
 		}
 	}
 
