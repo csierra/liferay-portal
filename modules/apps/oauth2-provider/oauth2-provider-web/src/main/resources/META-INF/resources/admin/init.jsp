@@ -37,7 +37,9 @@ page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil"
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.AssignScopesModel"%><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel"%><%@
+page import="com.liferay.oauth2.provider.web.internal.display.context.ClientProfile"%><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext" %><%@
+page import="com.liferay.oauth2.provider.web.internal.portlet.OAuth2AdminPortlet"%><%@
 page import="com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
@@ -45,7 +47,10 @@ page import="com.liferay.portal.kernel.security.auth.PrincipalException" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %>
 
+
+
 <%@ page import="java.util.ArrayList" %><%@ 
+page import="java.util.Arrays" %><%@
 page import="java.util.Collections" %><%@
 page import="java.util.Comparator"%><%@
 page import="java.util.HashSet"%><%@
