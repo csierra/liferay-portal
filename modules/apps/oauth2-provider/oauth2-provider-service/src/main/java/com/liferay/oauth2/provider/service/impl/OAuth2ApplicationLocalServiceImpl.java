@@ -437,16 +437,8 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		if (!Validator.isBlank(clientSecret)) {
 			for (GrantType grantType : allowedGrantTypesList) {
-				if (!grantType.isSupportsConfidentialClients()) {
-					throw new
-						OAuth2ApplicationClientGrantTypeException(
-							grantType.name());
-				}
-			}
-		}
-		else {
-			for (GrantType grantType : allowedGrantTypesList) {
-				if (!grantType.isSupportsPublicClients()) {
+				if (grantType.isSupportsConfidentialClients() 
+						&& Validator.isBlank(clientSecret)) {
 					throw new
 						OAuth2ApplicationClientGrantTypeException(
 							grantType.name());
