@@ -25,16 +25,16 @@
 
 		String scopeAlias = StringUtil.merge(relations.getScopeAliases());
 
-		Set<String> masterScopeAliases = relations.getMasterAuthorizationModelsScopeAliases();
+		Set<String> globalScopeAliases = relations.getGlobalScopeAliases();
 
-		String masterScopeAliasesStr = StringUtil.merge(masterScopeAliases, StringPool.SPACE);
+		String globalScopeAliasesStr = StringUtil.merge(globalScopeAliases, StringPool.SPACE);
 		%>
 
 		<li class="list-group-item list-group-item-flex">
 			<div class="autofit-col">
 				<div class="custom-checkbox custom-control">
 					<label>
-						<input aria-labelledby="<portlet:namespace />label<%= HtmlUtil.escape(masterScopeAliasesStr) %>" class="custom-control-input"<%= assignedScopes.contains(scopeAlias) ? " checked " : "" %>data-slave="<%= masterScopeAliasesStr %>"<% if (scopeAlias.length() > 0 ) { %> name="<portlet:namespace />scopeAliases" value="<%= HtmlUtil.escapeAttribute(scopeAlias) %>"<% } else { %> disabled<% } %> type="checkbox">
+						<input aria-labelledby="<portlet:namespace />label<%= HtmlUtil.escape(globalScopeAliasesStr) %>" class="custom-control-input"<%= assignedScopes.contains(scopeAlias) ? " checked " : "" %>data-slave="<%= globalScopeAliasesStr %>"<% if (scopeAlias.length() > 0 ) { %> name="<portlet:namespace />scopeAliases" value="<%= HtmlUtil.escapeAttribute(scopeAlias) %>"<% } else { %> disabled<% } %> type="checkbox">
 						<span class="custom-control-label"></span>
 					</label>
 				</div>
@@ -54,17 +54,17 @@
 				<p class="list-group-subtitle text-truncate"><%= HtmlUtil.escapeAttribute(scopeAlias) %></p>
 
 				<%
-				if (masterScopeAliasesStr.length() > 0) {
+				if (globalScopeAliasesStr.length() > 0) {
 					if (scopeAlias.length() > 0) {
 						%>
 
-						<span><a href ="#1" data-slave="<%= masterScopeAliasesStr %>">CAN be assigned via a global scope</a></span>
+						<span><a href ="#1" data-slave="<%= globalScopeAliasesStr %>">CAN be assigned via a global scope</a></span>
 
 						<%
 					} else {
 						%>
 
-						<span><a href ="#1" data-slave="<%= masterScopeAliasesStr %>">MUST be assigned via a global scope</a></span>
+						<span><a href ="#1" data-slave="<%= globalScopeAliasesStr %>">MUST be assigned via a global scope</a></span>
 
 						<%
 					}
