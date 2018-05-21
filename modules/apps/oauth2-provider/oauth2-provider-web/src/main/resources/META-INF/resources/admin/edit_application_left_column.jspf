@@ -1,0 +1,131 @@
+<%--
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+--%>
+
+<aui:fieldset>
+	<aui:input name="name" required="<%= true %>" />
+
+	<aui:input name="homePageURL" />
+
+	<c:if test="<%= oAuth2Application != null %>">
+		<aui:input name="description" type="textarea" />
+	</c:if>
+
+	<aui:input helpMessage="redirect-uris-help" label="redirect-uris" name="redirectURIs">
+	</aui:input>
+
+	<c:if test="<%= oAuth2Application != null %>">
+		<aui:input name="privacyPolicyURL" />
+	</c:if>
+
+	<aui:select name="clientProfile">
+
+		<%
+		List<ClientProfile> clientProfiles = Arrays.asList(ClientProfile.values());
+		Collections.sort(
+			clientProfiles, new Comparator<ClientProfile>() {
+
+				@Override
+				public int compare(ClientProfile clientProfile1, ClientProfile clientProfile2) {
+					return clientProfile1.id() - clientProfile2.id();
+				}
+
+			});
+
+		for (ClientProfile clientProfile : clientProfiles) {
+		%>
+
+			<aui:option label="<%= clientProfile.name() %>" value="<%= clientProfile.id() %>" />
+
+		<%
+		}
+		%>
+
+	</aui:select>
+
+	<aui:input name="clientType" type="hidden" />
+
+	<aui:fieldset label="allowed-grant-types">
+		<aui:field-wrapper>
+			<div id="<portlet:namespace />allowedGrantTypes">
+
+				<%
+				List<GrantType> oAuth2Grants = oAuth2AdminPortletDisplayContext.getOAuth2Grants(portletPreferences);
+
+				for (GrantType grantType : oAuth2Grants) {
+					Set<String> cssClasses = new HashSet<>();
+
+					for (ClientProfile clientProfile : ClientProfile.values()) {
+						if (clientProfile.grantTypes().contains(grantType)) {
+							cssClasses.add("client-profile-" + clientProfile.id());
+						}
+					}
+
+					String grantTypeName = grantType.name();
+					String cssClassesStr = cssClasses.stream().collect(Collectors.joining(" "));
+				%>
+
+					<div class="allowedGrantType <%= cssClassesStr %>">
+						<div class="custom-checkbox custom-control">
+							<label>
+								<input class="custom-control-input"<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains(grantType) ? " checked" : "" %> data-isredirect="<%= grantType.isRequiresRedirectURI() %>" data-issupportsconfidentialclients="<%= grantType.isSupportsConfidentialClients() %>" name='<%= renderResponse.getNamespace() +"grant-" + grantTypeName %>' type="checkbox">
+								<span class="custom-control-label">
+									<span class="custom-control-label-text">
+										<liferay-ui:message key="<%= grantTypeName %>" />
+									</span>
+								</span>
+							</label>
+						</div>
+					</div>
+
+				<%
+				}
+				%>
+
+			</div>
+		</aui:field-wrapper>
+	</aui:fieldset>
+
+	<c:if test="<%= oAuth2Application != null %>">
+		<aui:fieldset label="supported-features">
+			<aui:field-wrapper>
+
+				<%
+				String[] oAuth2Features = StringUtil.split(portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
+
+				for (String oAuth2Feature : oAuth2Features) {
+					String escapedOAuth2Feature = HtmlUtil.escapeAttribute(oAuth2Feature);
+				%>
+
+					<div class="custom-checkbox custom-control">
+						<label>
+							<input class="custom-control-input"<%= oAuth2Application != null && oAuth2Application.getFeaturesList().contains(oAuth2Feature) ? " checked" : "" %> name='<%= renderResponse.getNamespace() + "feature-" + escapedOAuth2Feature %>' type="checkbox" />
+
+							<span class="custom-control-label">
+								<span class="custom-control-label-text">
+									<liferay-ui:message key="<%= escapedOAuth2Feature %>" />
+								</span>
+							</span>
+						</label>
+					</div>
+
+				<%
+				}
+				%>
+
+			</aui:field-wrapper>
+		</aui:fieldset>
+	</c:if>
+</aui:fieldset>
