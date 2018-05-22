@@ -80,7 +80,7 @@
 					<div class="allowedGrantType <%= cssClassesStr %>">
 						<div class="custom-checkbox custom-control">
 							<label>
-								<input class="custom-control-input"<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains(grantType) ? " checked" : "" %> data-isredirect="<%= grantType.isRequiresRedirectURI() %>" data-issupportsconfidentialclients="<%= grantType.isSupportsConfidentialClients() %>" name='<%= renderResponse.getNamespace() +"grant-" + grantTypeName %>' type="checkbox">
+								<input class="custom-control-input"<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains(grantType) ? " checked" : "" %> data-isredirect="<%= grantType.isRequiresRedirectURI() %>" data-issupportsconfidentialclients="<%= grantType.isSupportsConfidentialClients() %>"  data-issupportspublicclients="<%= grantType.isSupportsPublicClients() %>" name='<%= renderResponse.getNamespace() +"grant-" + grantTypeName %>' type="checkbox">
 								<span class="custom-control-label">
 									<span class="custom-control-label-text">
 										<liferay-ui:message key="<%= grantTypeName %>" />

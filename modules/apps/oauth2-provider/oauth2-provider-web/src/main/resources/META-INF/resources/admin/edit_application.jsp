@@ -243,7 +243,7 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 
 	window.<portlet:namespace />isConfidentialClientRequired = function() {
 		var selectedClientProfile = <portlet:namespace />getSelectedClientProfile();
-		return A.all('#<portlet:namespace />allowedGrantTypes .client-profile-' + selectedClientProfile.val() + ' input:checked[data-issupportsconfidentialclients="true"]').size() > 0;
+		return A.all('#<portlet:namespace />allowedGrantTypes .client-profile-' + selectedClientProfile.val() + ' input:checked[data-issupportsconfidentialclients="true"][data-issupportspublicclients="false"]').size() > 0;
 	}
 
 	window.<portlet:namespace />isRedirectURIRequired = function() {
