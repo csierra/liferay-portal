@@ -14,33 +14,7 @@
  */
 --%>
 
-<%@ include file="/admin/init.jsp" %>
-
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
-long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId");
-
-OAuth2Application oAuth2Application = null;
-
-try {
-	oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
-}
-catch (PrincipalException e) {
-%>
-
-	<liferay-ui:error-principal />
-
-<%
-	return;
-}
-
-portletDisplay.setShowBackIcon(true);
-
-portletDisplay.setURLBack(redirect);
-
-renderResponse.setTitle(LanguageUtil.get(request, "assign-scopes"));
-
 AssignScopesModel assignScopesModel = (AssignScopesModel)request.getAttribute(OAuth2AdminWebKeys.ASSIGN_SCOPES_MODEL);
 
 List<String> assignedScopes = Collections.emptyList();

@@ -14,18 +14,7 @@
  */
 --%>
 
-<%@ include file="/admin/init.jsp" %>
-
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
-portletDisplay.setShowBackIcon(true);
-portletDisplay.setURLBack(redirect);
-
-long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", 0);
-
-OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
-
 request.setAttribute("application_authorizations.jsp-oAuth2Application", oAuth2Application);
 
 renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new String[] {oAuth2Application.getName()}));
@@ -39,7 +28,8 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 %>
 
 <liferay-portlet:renderURL varImpl="portletURL">
-	<portlet:param name="mvcPath" value="/admin/application_authorizations.jsp" />
+	<portlet:param name="appTab" value="authorizations" />
+	<portlet:param name="mvcPath" value="/admin/edit_application.jsp" />
 	<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2ApplicationId) %>" />
 	<portlet:param name="redirect" value="<%= redirect %>" />
 </liferay-portlet:renderURL>
