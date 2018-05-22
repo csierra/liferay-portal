@@ -53,7 +53,6 @@
 
 			<div aria-labelledby="<portlet:namespace />appsAccordionHeading<%= applicationNameHtmlId %>" class="collapse panel-collapse" id="<portlet:namespace />appsAccordion<%= applicationNameHtmlId %>" role="tabpanel">
 				<div class="panel-body">
-
 					<ul class="list-group">
 
 						<%
@@ -88,27 +87,27 @@
 									%>
 
 									<%= HtmlUtil.escape(applicationScopeDescription) %>
-
 								</h4>
 
 								<p class="list-group-subtitle text-truncate"><%= HtmlUtil.escapeAttribute(scopeAlias) %></p>
 
 								<%
-									if (globalScopeAliasesStr.length() > 0) {
-										if (scopeAlias.length() > 0) {
+								if (globalScopeAliasesStr.length() > 0) {
+									if (scopeAlias.length() > 0) {
 								%>
 
-								<span><a href ="#1" data-slave="<%= globalScopeAliasesStr %>">CAN be assigned via a global scope</a></span>
+									<span><a href ="#1" data-slave="<%= globalScopeAliasesStr %>">CAN be assigned via a global scope</a></span>
 
 								<%
-								} else {
-								%>
-
-								<span><a href ="#1" data-slave="<%= globalScopeAliasesStr %>">MUST be assigned via a global scope</a></span>
-
-								<%
-										}
 									}
+									else {
+								%>
+
+									<span><a href ="#1" data-slave="<%= globalScopeAliasesStr %>">MUST be assigned via a global scope</a></span>
+
+								<%
+									}
+								}
 								%>
 
 							</div>

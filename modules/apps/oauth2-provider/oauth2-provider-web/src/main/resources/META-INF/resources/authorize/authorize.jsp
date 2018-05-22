@@ -135,7 +135,7 @@ if (oAuth2Application.getIconFileEntryId() > 0) {
 
 						<aui:input name="oauthDecision" type="hidden" useNamespace="<%= false %>" value="deny" />
 
-						<aui:button id="allow" type="button" value="authorize" />
+						<aui:button id="allow" value="authorize" />
 						<aui:button type="submit" value="cancel" />
 
 						<aui:script>

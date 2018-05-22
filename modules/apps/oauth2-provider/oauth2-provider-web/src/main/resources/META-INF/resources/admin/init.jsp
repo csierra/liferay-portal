@@ -55,6 +55,7 @@ page import="com.liferay.portal.kernel.util.StringUtil" %>
 page import="java.util.Arrays" %><%@
 page import="java.util.Collections" %><%@
 page import="java.util.Comparator"%><%@
+page import="java.util.HashMap" %><%@
 page import="java.util.HashSet"%><%@
 page import="java.util.Map"%><%@
 page import="java.util.Set"%><%@

@@ -80,20 +80,10 @@ String orderByType = oAuth2ApplicationsManagementToolbarDisplayContext.getOrderB
 						row.setCssClass("autofit-row-center");
 						%>
 
-						<c:choose>
-							<c:when test="<%= oAuth2Application.getIconFileEntryId() > 0 %>">
-								<liferay-ui:search-container-column-image
-									src="<%= oAuth2AdminPortletDisplayContext.getThumbnailURL(oAuth2Application) %>"
-									toggleRowChecker="<%= true %>"
-								/>
-							</c:when>
-							<c:otherwise>
-								<liferay-ui:search-container-column-image
-									src='<%= themeDisplay.getPathThemeImages() + "/common/portlet.png" %>'
-									toggleRowChecker="<%= true %>"
-								/>
-							</c:otherwise>
-						</c:choose>
+						<liferay-ui:search-container-column-image
+							src="<%= oAuth2AdminPortletDisplayContext.getThumbnailURL(oAuth2Application) %>"
+							toggleRowChecker="<%= true %>"
+						/>
 
 						<c:choose>
 							<c:when test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
@@ -133,6 +123,11 @@ String orderByType = oAuth2ApplicationsManagementToolbarDisplayContext.getOrderB
 
 						<liferay-ui:search-container-column-text
 							property="description"
+						/>
+
+						<liferay-ui:search-container-column-text
+							name="client-id"
+							property="clientId"
 						/>
 
 						<liferay-ui:search-container-column-text

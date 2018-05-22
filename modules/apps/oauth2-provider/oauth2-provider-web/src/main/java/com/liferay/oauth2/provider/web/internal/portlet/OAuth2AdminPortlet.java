@@ -24,26 +24,20 @@ import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.ClientProfile;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -54,8 +48,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -63,7 +55,6 @@ import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -91,28 +82,6 @@ import org.osgi.service.component.annotations.Reference;
 	service = Portlet.class
 )
 public class OAuth2AdminPortlet extends MVCPortlet {
-
-	public static String generateClientSecret() {
-		int size = 16;
-
-		int count = (int)Math.ceil((double)size / 8);
-
-		byte[] buffer = new byte[count * 8];
-
-		for (int i = 0; i < count; i++) {
-			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
-		}
-
-		StringBundler sb = new StringBundler(size);
-
-		for (int i = 0; i < size; i++) {
-			sb.append(Integer.toHexString(0xFF & buffer[i]));
-		}
-
-		Matcher matcher = _baseIdPattern.matcher(sb.toString());
-
-		return matcher.replaceFirst("secret-$1-$2-$3-$4-$5");
-	}
 
 	public void deleteOAuth2Application(
 		ActionRequest request, ActionResponse response) {
@@ -161,7 +130,8 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
 			new OAuth2AdminPortletDisplayContext(
-				_oAuth2ProviderConfiguration, getThemeDisplay(renderRequest));
+				_oAuth2ApplicationService, _oAuth2ProviderConfiguration,
+				getThemeDisplay(renderRequest));
 
 		renderRequest.setAttribute(
 			OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT,
@@ -216,8 +186,14 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 		PortletPreferences portletPreferences = request.getPreferences();
 
-		String[] oAuth2Features = StringUtil.split(
-			portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
+		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
+			new OAuth2AdminPortletDisplayContext(
+				_oAuth2ApplicationService, _oAuth2ProviderConfiguration,
+				getThemeDisplay(request));
+
+		String[] oAuth2Features =
+			oAuth2AdminPortletDisplayContext.getOAuth2Features(
+				portletPreferences);
 
 		List<String> featuresList = new ArrayList<>();
 
@@ -232,20 +208,18 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 		String name = ParamUtil.get(request, "name", StringPool.BLANK);
 
-		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
-			new OAuth2AdminPortletDisplayContext(
-				_oAuth2ProviderConfiguration, getThemeDisplay(request));
-
 		List<GrantType> oAuth2Grants =
 			oAuth2AdminPortletDisplayContext.getOAuth2Grants(
 				portletPreferences);
 
 		List<GrantType> allowedGrantTypes = new ArrayList<>();
 
-		for (GrantType grantType : oAuth2Grants) {
-			if (clientProfile.grantTypes().contains(grantType) &&
-				ParamUtil.getBoolean(request, "grant-" + grantType.name())) {
+		for (GrantType grantType : clientProfile.grantTypes()) {
+			if (!oAuth2Grants.contains(grantType)) {
+				continue;
+			}
 
+			if (ParamUtil.getBoolean(request, "grant-" + grantType.name())) {
 				allowedGrantTypes.add(grantType);
 			}
 		}
@@ -318,25 +292,10 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 			Class<?> peClass = pe.getClass();
 
 			SessionErrors.add(request, peClass.getName(), pe);
+
+			response.setRenderParameter(
+				"mvcPath", "/admin/edit_application.jsp");
 		}
-
-		LiferayPortletResponse liferayPortletResponse =
-			_portal.getLiferayPortletResponse(response);
-
-		PortletURL renderURL = liferayPortletResponse.createRenderURL();
-
-		renderURL.setParameter("mvcPath", "/admin/edit_application.jsp");
-		renderURL.setParameter(
-			"oAuth2ApplicationId", String.valueOf(oAuth2ApplicationId));
-
-		String redirectStr = GetterUtil.getString(
-			request.getParameter("redirect"));
-
-		if (Validator.isNotNull(redirectStr)) {
-			renderURL.setParameter("redirect", redirectStr);
-		}
-
-		request.setAttribute(WebKeys.REDIRECT, renderURL.toString());
 	}
 
 	@Activate
@@ -351,9 +310,6 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortlet.class);
-
-	private static final Pattern _baseIdPattern = Pattern.compile(
-		"(.{8})(.{4})(.{4})(.{4})(.*)");
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;

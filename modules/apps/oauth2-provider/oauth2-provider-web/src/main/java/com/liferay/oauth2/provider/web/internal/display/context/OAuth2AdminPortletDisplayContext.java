@@ -23,26 +23,35 @@ import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalServiceUtil;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminActionKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.portlet.PortletPreferences;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Tomas Polesovsky
@@ -50,11 +59,53 @@ import javax.portlet.PortletPreferences;
 public class OAuth2AdminPortletDisplayContext {
 
 	public OAuth2AdminPortletDisplayContext(
+		OAuth2ApplicationService oAuth2ApplicationService,
 		OAuth2ProviderConfiguration oAuth2ProviderConfiguration,
 		ThemeDisplay themeDisplay) {
 
+		_oAuth2ApplicationService = oAuth2ApplicationService;
 		_oAuth2ProviderConfiguration = oAuth2ProviderConfiguration;
 		_themeDisplay = themeDisplay;
+	}
+
+	public String generateClientSecret() {
+		int size = 16;
+
+		int count = (int)Math.ceil((double)size / 8);
+
+		byte[] buffer = new byte[count * 8];
+
+		for (int i = 0; i < count; i++) {
+			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
+		}
+
+		StringBundler sb = new StringBundler(size);
+
+		for (int i = 0; i < size; i++) {
+			sb.append(Integer.toHexString(0xFF & buffer[i]));
+		}
+
+		Matcher matcher = _baseIdPattern.matcher(sb.toString());
+
+		return matcher.replaceFirst("secret-$1-$2-$3-$4-$5");
+	}
+
+	public OAuth2Application getApplication(HttpServletRequest request)
+		throws PortalException {
+
+		long oAuth2ApplicationId = ParamUtil.getLong(
+			request, "oAuth2ApplicationId", 0);
+
+		if (oAuth2ApplicationId > 0) {
+			return _oAuth2ApplicationService.getOAuth2Application(
+				oAuth2ApplicationId);
+		}
+
+		return null;
+	}
+
+	public String getDefaultIconURL() {
+		return _themeDisplay.getPathThemeImages() + "/common/portlet.png";
 	}
 
 	public int getOAuth2AuthorizationsCount(OAuth2Application oAuth2Application)
@@ -63,6 +114,11 @@ public class OAuth2AdminPortletDisplayContext {
 		return OAuth2AuthorizationServiceUtil.
 			getApplicationOAuth2AuthorizationsCount(
 				oAuth2Application.getOAuth2ApplicationId());
+	}
+
+	public String[] getOAuth2Features(PortletPreferences portletPreferences) {
+		return StringUtil.split(
+			portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
 	}
 
 	public List<GrantType> getOAuth2Grants(
@@ -131,7 +187,7 @@ public class OAuth2AdminPortletDisplayContext {
 		throws Exception {
 
 		if (oAuth2Application.getIconFileEntryId() <= 0) {
-			return StringPool.BLANK;
+			return getDefaultIconURL();
 		}
 
 		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
@@ -224,6 +280,10 @@ public class OAuth2AdminPortletDisplayContext {
 	private static Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortletDisplayContext.class);
 
+	private static final Pattern _baseIdPattern = Pattern.compile(
+		"(.{8})(.{4})(.{4})(.{4})(.*)");
+
+	private final OAuth2ApplicationService _oAuth2ApplicationService;
 	private final OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
 	private final ThemeDisplay _themeDisplay;
 

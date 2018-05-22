@@ -14,6 +14,14 @@
  */
 --%>
 
+<%@ include file="/admin/init.jsp" %>
+
+<%
+OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getApplication(request);
+%>
+
+<aui:model-context bean="<%= oAuth2Application %>" model="<%= OAuth2Application.class %>" />
+
 <aui:fieldset>
 	<aui:input name="name" required="<%= true %>" />
 
@@ -33,8 +41,8 @@
 	<aui:select name="clientProfile">
 
 		<%
-		List<ClientProfile> clientProfiles = Arrays.asList(ClientProfile.values());
-		Collections.sort(
+		ClientProfile[] clientProfiles = ClientProfile.values();
+		Arrays.sort(
 			clientProfiles, new Comparator<ClientProfile>() {
 
 				@Override
@@ -55,13 +63,13 @@
 
 	</aui:select>
 
-	<aui:input name="clientType" type="hidden" />
-
 	<aui:fieldset label="allowed-grant-types">
 		<aui:field-wrapper>
 			<div id="<portlet:namespace />allowedGrantTypes">
 
 				<%
+				List<GrantType> allowedGrantTypesList = oAuth2Application.getAllowedGrantTypesList();
+
 				List<GrantType> oAuth2Grants = oAuth2AdminPortletDisplayContext.getOAuth2Grants(portletPreferences);
 
 				for (GrantType grantType : oAuth2Grants) {
@@ -73,17 +81,26 @@
 						}
 					}
 
-					String grantTypeName = grantType.name();
-					String cssClassesStr = cssClasses.stream().collect(Collectors.joining(" "));
+					String cssClassesStr = StringUtil.merge(cssClasses, StringPool.SPACE);
+
+					boolean checked = false;
+
+					if ((oAuth2Application != null) && allowedGrantTypesList.contains(grantType)) {
+						checked = true;
+					}
+
+					String name = "grant-" + grantType.name();
+
+					checked = ParamUtil.getBoolean(request, name, checked);
 				%>
 
 					<div class="allowedGrantType <%= cssClassesStr %>">
 						<div class="custom-checkbox custom-control">
 							<label>
-								<input class="custom-control-input"<%= oAuth2Application != null && oAuth2Application.getAllowedGrantTypesList().contains(grantType) ? " checked" : "" %> data-isredirect="<%= grantType.isRequiresRedirectURI() %>" data-issupportsconfidentialclients="<%= grantType.isSupportsConfidentialClients() %>"  data-issupportspublicclients="<%= grantType.isSupportsPublicClients() %>" name='<%= renderResponse.getNamespace() +"grant-" + grantTypeName %>' type="checkbox">
+								<input class="custom-control-input"<%= checked ? " checked" : "" %> data-isredirect="<%= grantType.isRequiresRedirectURI() %>" data-issupportsconfidentialclients="<%= grantType.isSupportsConfidentialClients() %>" data-issupportspublicclients="<%= grantType.isSupportsPublicClients() %>" name='<%= renderResponse.getNamespace() + name %>' type="checkbox">
 								<span class="custom-control-label">
 									<span class="custom-control-label-text">
-										<liferay-ui:message key="<%= grantTypeName %>" />
+										<liferay-ui:message key="<%= grantType.name() %>" />
 									</span>
 								</span>
 							</label>
@@ -103,19 +120,29 @@
 			<aui:field-wrapper>
 
 				<%
-				String[] oAuth2Features = StringUtil.split(portletPreferences.getValue("oAuth2Features", StringPool.BLANK));
+				List<String> oAuth2ApplicationFeaturesList = oAuth2Application.getFeaturesList();
+
+				String[] oAuth2Features = oAuth2AdminPortletDisplayContext.getOAuth2Features(portletPreferences);
 
 				for (String oAuth2Feature : oAuth2Features) {
-					String escapedOAuth2Feature = HtmlUtil.escapeAttribute(oAuth2Feature);
+					boolean checked = false;
+
+					if ((oAuth2Application != null) && oAuth2ApplicationFeaturesList.contains(oAuth2Feature)) {
+						checked = true;
+					}
+
+					String name = "feature-" + oAuth2Feature;
+
+					checked = ParamUtil.getBoolean(request, name, checked);
 				%>
 
 					<div class="custom-checkbox custom-control">
 						<label>
-							<input class="custom-control-input"<%= oAuth2Application != null && oAuth2Application.getFeaturesList().contains(oAuth2Feature) ? " checked" : "" %> name='<%= renderResponse.getNamespace() + "feature-" + escapedOAuth2Feature %>' type="checkbox" />
+							<input class="custom-control-input"<%= checked ? " checked" : "" %> name="<%= renderResponse.getNamespace() + HtmlUtil.escapeAttribute(name) %>" type="checkbox" />
 
 							<span class="custom-control-label">
 								<span class="custom-control-label-text">
-									<liferay-ui:message key="<%= escapedOAuth2Feature %>" />
+									<liferay-ui:message key="<%= HtmlUtil.escape(oAuth2Feature) %>" />
 								</span>
 							</span>
 						</label>

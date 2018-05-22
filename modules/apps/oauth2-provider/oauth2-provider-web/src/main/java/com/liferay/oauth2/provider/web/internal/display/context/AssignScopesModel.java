@@ -22,7 +22,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -77,7 +76,7 @@ public class AssignScopesModel {
 		assignmentModel.putAll(localRelations);
 
 		for (AuthorizationModel globalAuthorizationModel :
-			globalAuthorizationModels) {
+				globalAuthorizationModels) {
 
 			AuthorizationModel applicationAuthorizationModel =
 				globalAuthorizationModel.reduceToApplication(applicationName);
@@ -168,16 +167,21 @@ public class AssignScopesModel {
 				return true;
 			}
 
-			if (o == null || getClass() != o.getClass()) {
+			if ((o == null) || (getClass() != o.getClass())) {
 				return false;
 			}
 
-			Relations relations = (Relations) o;
+			Relations relations = (Relations)o;
 
-			return Objects.equals(
-				_globalAuthorizationModels,
-				relations._globalAuthorizationModels) &&
-				   Objects.equals(_scopeAlias, relations._scopeAlias);
+			if (Objects.equals(
+					_globalAuthorizationModels,
+					relations._globalAuthorizationModels) &&
+				Objects.equals(_scopeAlias, relations._scopeAlias)) {
+
+				return true;
+			}
+
+			return false;
 		}
 
 		public Set<String> getGlobalScopeAliases() {
@@ -296,8 +300,7 @@ public class AssignScopesModel {
 			Relations authorizationModelRelations =
 				authorizationModelsRelationsEntry.getValue();
 
-			String scopeAlias =
-				authorizationModelRelations.getScopeAlias();
+			String scopeAlias = authorizationModelRelations.getScopeAlias();
 
 			AuthorizationModel authorizationModel =
 				authorizationModelsRelationsEntry.getKey();

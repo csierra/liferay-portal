@@ -22,15 +22,13 @@ String redirect = ParamUtil.getString(request, "redirect");
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", -1);
+OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getApplication(request);
 
-OAuth2Application oAuth2Application = null;
+String headerTitle = LanguageUtil.get(request, "add-o-auth2-application");
 
-if (oAuth2ApplicationId > -1) {
-		oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
+if (oAuth2Application != null) {
+	headerTitle = LanguageUtil.format(request, "edit-x", oAuth2Application.getName(), false);
 }
-
-String headerTitle = (oAuth2Application == null) ? LanguageUtil.get(request, "add-o-auth2-application") : LanguageUtil.format(request, "edit-x", oAuth2Application.getName(), false);
 
 renderResponse.setTitle(headerTitle);
 
@@ -38,7 +36,7 @@ String clientId = oAuth2Application == null ? "" : oAuth2Application.getClientId
 String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClientSecret();
 %>
 
-<portlet:actionURL name='<%= oAuth2Application == null ? "updateOAuth2Application" : "updateOAuth2Application" %>' var="editOAuth2ApplicationURL" />
+<portlet:actionURL name="updateOAuth2Application" var="editOAuth2ApplicationURL" />
 
 <aui:form action="<%= editOAuth2ApplicationURL %>" id="<portlet:namespace />oauth2-application-fm" method="post" name="oauth2-application-fm">
 	<div class="container-fluid container-fluid-max-xl container-view">
@@ -111,50 +109,35 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 				<c:choose>
 					<c:when test="<%= oAuth2Application != null %>">
 						<div class="col-lg-9">
-							<%@ include file="/admin/edit_application_left_column.jspf" %>
+							<liferay-util:include page="/admin/edit_application_left_column.jsp" servletContext="<%= application %>" />
 						</div>
 
 						<div class="col-lg-3">
 							<aui:fieldset label="icon">
-								<c:if test="<%= oAuth2Application != null %>">
 
-									<%
-									String thumbnailURL = StringPool.BLANK;
+								<%
+								String thumbnailURL = oAuth2AdminPortletDisplayContext.getThumbnailURL(oAuth2Application);
+								%>
 
-									if (oAuth2Application.getIconFileEntryId() > 0) {
-										try {
-											FileEntry fileEntry =
-												DLAppLocalServiceUtil.getFileEntry(oAuth2Application.getIconFileEntryId());
-
-											thumbnailURL = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
-										}
-										catch (PortalException e) {
-
-											// user has no longer access to the application
-
-										}
-									}
-									%>
-
-									<c:choose>
-										<c:when test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
-											<liferay-ui:logo-selector
-												currentLogoURL="<%= thumbnailURL %>"
-												defaultLogo="<%= oAuth2Application.getIconFileEntryId() == 0 %>"
-												tempImageFileName="<%= String.valueOf(oAuth2Application.getClientId()) %>"
-											/>
-										</c:when>
-										<c:otherwise>
-											<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="portrait" />" src="<%= thumbnailURL %>" />
-										</c:otherwise>
-									</c:choose>
-								</c:if>
+								<c:choose>
+									<c:when test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
+										<liferay-ui:logo-selector
+											currentLogoURL="<%= thumbnailURL %>"
+											defaultLogo="<%= oAuth2Application.getIconFileEntryId() == 0 %>"
+											defaultLogoURL="<%= oAuth2AdminPortletDisplayContext.getDefaultIconURL() %>"
+											tempImageFileName="<%= String.valueOf(oAuth2Application.getClientId()) %>"
+										/>
+									</c:when>
+									<c:otherwise>
+										<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="portrait" />" src="<%= HtmlUtil.escapeAttribute(thumbnailURL) %>" />
+									</c:otherwise>
+								</c:choose>
 							</aui:fieldset>
 						</div>
 					</c:when>
 					<c:otherwise>
 						<div class="col-lg-12">
-							<%@ include file="/admin/edit_application_left_column.jspf" %>
+							<liferay-util:include page="/admin/edit_application_left_column.jsp" servletContext="<%= application %>" />
 						</div>
 					</c:otherwise>
 				</c:choose>
@@ -181,23 +164,24 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 				/>
 
 				<b><liferay-ui:message key="warning" />:</b>
-				<liferay-ui:message key="if-changed-then-the-current-client-id-will-no-longer-work-after-you-save-the-application-details" />
+
+				<liferay-ui:message key="if-changed-old-client-id-will-no-longer-work-after-you-save-the-application-details" />
 			</div>
 
 			<div id="<portlet:namespace />clientIdPadlock" style="flex: 1">
 				<div class="open">
-					<clay:icon symbol="unlock" />Changed
+					<clay:icon symbol="unlock" /><liferay-ui:message key="changed" />
 				</div>
 
 				<div class="closed">
-					<clay:icon symbol="lock" />Unchanged
+					<clay:icon symbol="lock" /><liferay-ui:message key="unchanged" />
 				</div>
 			</div>
 
-			<aui:input label="client-id" name="newClientId" onKeyup='<%= String.format("%1$supdatePadlock('%1$sclientIdPadlock', this.value, '%2$s')", renderResponse.getNamespace(), clientId) %>' type="text" />
+			<aui:input label="client-id" name="newClientId" onKeyup='<%= renderResponse.getNamespace() + "updatePadlock('clientIdPadlock', this.value, '" + HtmlUtil.escapeJS(clientId) + "')" %>' type="text" />
 
 			<aui:button-row>
-				<aui:button href="" icon="icon-undo" onClick='<%= String.format("%1$ssetControlEqualTo('%1$snewClientId', '%1$soriginalClientId')", renderResponse.getNamespace()) %>' value="revert" />
+				<aui:button href="" icon="icon-undo" onClick='<%= renderResponse.getNamespace() + "setControlEqualTo('newClientId', 'originalClientId')" %>' value="revert" />
 			</aui:button-row>
 		</div>
 	</aui:form>
@@ -210,76 +194,77 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 				/>
 
 				<b><liferay-ui:message key="warning" />:</b>
-				<liferay-ui:message key="if-changed-then-the-current-client-secret-will-no-longer-work-after-you-save-the-application-details" />
+				<liferay-ui:message key="if-changed-old-client-secret-will-no-longer-work-after-you-save-the-application-details" />
 			</div>
 
 			<div id="<portlet:namespace />clientSecretPadlock" style="flex: 1">
 				<div class="open">
-					<clay:icon symbol="unlock" />Changed
+					<clay:icon symbol="unlock" /><liferay-ui:message key="changed" />
 				</div>
 
 				<div class="closed">
-					<clay:icon symbol="lock" />Unchanged
+					<clay:icon symbol="lock" /><liferay-ui:message key="unchanged" />
 				</div>
 			</div>
 
-			<aui:input label="client-secret" name="newClientSecret" onKeyup='<%= String.format("%1$supdatePadlock('%1$sclientSecretPadlock', this.value, '%2$s')", renderResponse.getNamespace(), clientSecret) %>' type="text" />
+			<aui:input label="client-secret" name="newClientSecret" onKeyup='<%= renderResponse.getNamespace() + "updatePadlock('clientSecretPadlock', this.value, '" + HtmlUtil.escapeJS(clientId) + "')" %>' type="text" />
 
-			<aui:input name="generatedClientSecret" type="hidden" value="<%= OAuth2AdminPortlet.generateClientSecret() %>" />
+			<aui:input name="generatedClientSecret" type="hidden" value="<%= oAuth2AdminPortletDisplayContext.generateClientSecret() %>" />
 
 			<aui:button-row>
-				<aui:button href="" icon="icon-plus" onClick='<%= String.format("%1$ssetControlEqualTo('%1$snewClientSecret', '%1$sgeneratedClientSecret')", renderResponse.getNamespace()) %>' value="generate-new-secret" />
-				<aui:button href="" icon="icon-undo" onClick='<%= String.format("%1$ssetControlEqualTo('%1$snewClientSecret', '%1$soriginalClientSecret')", renderResponse.getNamespace()) %>' value="revert" />
+				<aui:button href="" icon="icon-plus" onClick='<%= renderResponse.getNamespace() + "setControlEqualTo('newClientSecret', 'generatedClientSecret')" %>' value="generate-new-secret" />
+				<aui:button href="" icon="icon-undo" onClick='<%= renderResponse.getNamespace() + "setControlEqualTo('newClientSecret', 'originalClientSecret')" %>' value="revert" />
 			</aui:button-row>
 		</div>
 	</aui:form>
 </div>
 
 <aui:script use="aui-modal,liferay-form,node">
-
-	window.<portlet:namespace />getSelectedClientProfile = function() {
+	<portlet:namespace />getSelectedClientProfile = function() {
 		return A.one('#<portlet:namespace />clientProfile option:selected');
 	}
 
-	window.<portlet:namespace />isConfidentialClientRequired = function() {
+	<portlet:namespace />isConfidentialClientRequired = function() {
 		var selectedClientProfile = <portlet:namespace />getSelectedClientProfile();
 		return A.all('#<portlet:namespace />allowedGrantTypes .client-profile-' + selectedClientProfile.val() + ' input:checked[data-issupportsconfidentialclients="true"][data-issupportspublicclients="false"]').size() > 0;
 	}
 
-	window.<portlet:namespace />isRedirectURIRequired = function() {
+	<portlet:namespace />isRedirectURIRequired = function() {
 		var selectedClientProfile = <portlet:namespace />getSelectedClientProfile();
 		return A.all('#<portlet:namespace />allowedGrantTypes .client-profile-' + selectedClientProfile.val() + ' input:checked[data-isredirect="true"]').size() > 0;
 	}
 
-	window.<portlet:namespace />setControlEqualTo = function(targetControlId, srcControlId) {
-		var targetControl = A.one('#' + targetControlId);
-		var srcControl = A.one('#' + srcControlId);
+	<portlet:namespace />setControlEqualTo = function(targetControlId, srcControlId) {
+		var targetControl = A.one('#<portlet:namespace />' + targetControlId);
+		var srcControl = A.one('#<portlet:namespace />' + srcControlId);
+
 		<portlet:namespace />updateComponent(targetControl, srcControl.val());
 	}
 
-	window.<portlet:namespace />showEditClientIdModal = function() {
-
+	<portlet:namespace />showEditClientIdModal = function() {
 		var bodyContentDiv = A.one('#<portlet:namespace />edit-client-id-fm');
 		var applyField = A.one('#<portlet:namespace />newClientId');
 		var populateField = A.one('#<portlet:namespace />clientId');
 		var clientIdPadlock = A.one('#<portlet:namespace />clientIdPadlock');
+
 		<portlet:namespace />updateComponent(applyField, populateField.val());
 
 		<portlet:namespace />showModal('Edit Client ID', bodyContentDiv, clientIdPadlock, applyField, populateField);
 	}
 
-	window.<portlet:namespace />showEditClientSecretModal = function(title, bodyContent) {
-
+	<portlet:namespace />showEditClientSecretModal = function() {
 		var bodyContentDiv = A.one('#<portlet:namespace />edit-client-secret-fm');
 		var applyField = A.one('#<portlet:namespace />newClientSecret');
 		var populateField = A.one('#<portlet:namespace />clientSecret')
+
 		<portlet:namespace />updateComponent(applyField, populateField.val());
+
 		var clientSecretPadlock = A.one('#<portlet:namespace />clientSecretPadlock');
 
 		<portlet:namespace />showModal('Edit Client Secret', bodyContentDiv, clientSecretPadlock, applyField, populateField);
 	}
 
-	window.<portlet:namespace />showModal = function(title, bodyContent, footerContent, applyField, populateField) {
+	<portlet:namespace />showModal = function(title, bodyContent, footerContent, applyField, populateField) {
 
 		var modal = new A.Modal(
 			{
@@ -320,19 +305,19 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 		modal.show();
 	}
 
-	window.<portlet:namespace />updateAllowedGrantTypes = function(clientProfile) {
+	<portlet:namespace />updateAllowedGrantTypes = function(clientProfile) {
 		A.all('#<portlet:namespace />allowedGrantTypes .allowedGrantType').hide();
 		A.all('#<portlet:namespace />allowedGrantTypes .allowedGrantType.client-profile-' + clientProfile).show();
 	}
 
-	window.<portlet:namespace />updateComponent = function(component, newValue) {
+	<portlet:namespace />updateComponent = function(component, newValue) {
 		component.val(newValue);
 		component.simulate("keyup");
 		component.simulate("change");
 	}
 
-	window.<portlet:namespace />updatePadlock = function(padlockId, newValue, originalValue) {
-		var padlock = A.one('#' + padlockId);
+	<portlet:namespace />updatePadlock = function(padlockId, newValue, originalValue) {
+		var padlock = A.one('#<portlet:namespace />' + padlockId);
 		if (newValue != originalValue) {
 			padlock.one('div.closed').hide();
 			padlock.one('div.open').show();
@@ -369,7 +354,7 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 			},
 			{
 					body: function(val, fieldNode, ruleValue) {
-							return <portlet:namespace />isRedirectURIRequired();
+						return <portlet:namespace />isRedirectURIRequired();
 					},
 					custom: false,
 					fieldName: '<portlet:namespace />redirectURIs',

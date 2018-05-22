@@ -67,7 +67,6 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 				<aui:input name="oAuth2ApplicationId" type="hidden" value="<%= oAuth2ApplicationId %>" />
 
 				<div class="sheet">
-
 					<ul class="nav nav-underline" role="tablist">
 						<li class="nav-item">
 							<a aria-controls="<portlet:namespace />navResourceScopes" aria-expanded="true" class="active nav-link" data-toggle="tab" href="#<portlet:namespace />navResourceScopes" id="<portlet:namespace />navResourceScopesTab" role="tab">Resource scopes</a>
