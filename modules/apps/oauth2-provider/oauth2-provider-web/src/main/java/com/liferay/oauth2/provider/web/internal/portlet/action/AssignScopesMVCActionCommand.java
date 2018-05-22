@@ -22,14 +22,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -47,7 +44,7 @@ public class AssignScopesMVCActionCommand implements MVCActionCommand {
 
 	@Override
 	public boolean processAction(
-			ActionRequest actionRequest, ActionResponse actionResponse) {
+		ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		String[] scopeAliases = ParamUtil.getStringValues(
 			actionRequest, "scopeAliases");

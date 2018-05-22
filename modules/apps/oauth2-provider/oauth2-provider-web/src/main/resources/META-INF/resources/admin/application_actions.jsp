@@ -35,16 +35,13 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 		<portlet:renderURL var="editURL">
 			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
 
-			<portlet:param name="mvcPath"
-				value="/admin/edit_application.jsp"
-			/>
+			<portlet:param name="mvcPath" value="/admin/edit_application.jsp" />
 
-			<portlet:param name="redirect"
-				value="<%= currentURL %>"
-			/>
+			<portlet:param name="redirect" value="<%= currentURL %>" />
 		</portlet:renderURL>
 
-		<liferay-ui:icon message="edit"
+		<liferay-ui:icon
+			message="edit"
 			url="<%= editURL.toString() %>"
 		/>
 
@@ -54,7 +51,10 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 		</portlet:renderURL>
 
-		<liferay-ui:icon message="assign-scopes" url="<%= assignScopesURL.toString() %>" />
+		<liferay-ui:icon
+			message="assign-scopes"
+			url="<%= assignScopesURL.toString() %>"
+		/>
 	</c:if>
 
 	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission() %>">
@@ -64,7 +64,10 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 		</portlet:renderURL>
 
-		<liferay-ui:icon message="granted-authorizations" url="<%= applicationAuthorizationsURL.toString() %>" />
+		<liferay-ui:icon
+			message="authorizations"
+			url="<%= applicationAuthorizationsURL.toString() %>"
+		/>
 	</c:if>
 
 	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasPermissionsPermission(oauth2application) %>">
@@ -89,6 +92,9 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
 		</portlet:actionURL>
 
-		<liferay-ui:icon-delete message="delete" url="<%= deleteURL.toString() %>" />
+		<liferay-ui:icon-delete
+			message="delete"
+			url="<%= deleteURL.toString() %>"
+		/>
 	</c:if>
 </liferay-ui:icon-menu>

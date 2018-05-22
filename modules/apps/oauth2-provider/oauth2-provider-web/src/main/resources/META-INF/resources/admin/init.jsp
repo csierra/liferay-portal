@@ -14,7 +14,9 @@
  */
 --%>
 <%@ include file="/init.jsp" %>
-<%@ page import="com.liferay.oauth2.provider.constants.GrantType" %><%@
+
+<%@ page import="com.liferay.frontend.taglib.clay.servlet.taglib.util.JSPCreationMenu" %><%@
+page import="com.liferay.oauth2.provider.constants.GrantType" %><%@
 page import="com.liferay.oauth2.provider.exception.DuplicateOAuth2ApplicationClientIdException" %><%@
 page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationClientGrantTypeException" %><%@
 page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationHomePageURLException" %><%@
@@ -37,8 +39,12 @@ page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil"
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.AssignScopesModel"%><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel"%><%@
+page import="com.liferay.oauth2.provider.web.internal.display.context.ClientProfile"%><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext" %><%@
+page import="com.liferay.oauth2.provider.web.internal.display.context.OAuth2ApplicationsManagementToolbarDisplayContext" %><%@
+page import="com.liferay.oauth2.provider.web.internal.portlet.OAuth2AdminPortlet"%><%@
 page import="com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap" %><%@
+page import="com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.security.auth.PrincipalException" %><%@
@@ -46,13 +52,17 @@ page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %>
 
 <%@ page import="java.util.ArrayList" %><%@ 
+page import="java.util.Arrays" %><%@
 page import="java.util.Collections" %><%@
 page import="java.util.Comparator"%><%@
+page import="java.util.HashMap" %><%@
 page import="java.util.HashSet"%><%@
 page import="java.util.Map"%><%@
 page import="java.util.Set"%><%@
 page import="java.util.stream.Collectors"%>
-	
+
+<%@ page import="javax.portlet.PortletURL" %>
+
 <%
 OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = (OAuth2AdminPortletDisplayContext)request.getAttribute(OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT);
 %>

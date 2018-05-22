@@ -23,11 +23,12 @@ import com.liferay.oauth2.provider.web.internal.display.context.AssignScopesMode
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tomas Polesovsky
@@ -60,10 +61,10 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	@Reference
-	private ScopeDescriptorLocator _scopeDescriptorLocator;
+	private ApplicationDescriptorLocator _applicationDescriptorLocator;
 
 	@Reference
-	private ApplicationDescriptorLocator _applicationDescriptorLocator;
+	private ScopeDescriptorLocator _scopeDescriptorLocator;
 
 	@Reference
 	private ScopeLocator _scopeLocator;
