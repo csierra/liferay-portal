@@ -247,12 +247,6 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				ParamUtil.getBoolean(request, "grant-" + grantType.name())) {
 
 				allowedGrantTypes.add(grantType);
-
-				if (grantType.isSupportsConfidentialClients() &&
-					Validator.isBlank(clientSecret)) {
-
-					clientSecret = generateClientSecret();
-				}
 			}
 		}
 
