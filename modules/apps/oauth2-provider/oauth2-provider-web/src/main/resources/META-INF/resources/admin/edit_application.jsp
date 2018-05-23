@@ -169,7 +169,7 @@ String cmd = oAuth2Application == null ? "add" : "update";
 
 				<b><liferay-ui:message key="warning" />:</b>
 
-				<liferay-ui:message key="if-changed-old-client-id-will-no-longer-work-after-you-save-the-application-details" />
+				<liferay-ui:message key="if-changed-clients-with-the-old-client-id-will-no-longer-be-able-to-request-new-tokens-after-you-save-the-application-details" />
 			</div>
 
 			<div id="<portlet:namespace />clientIdPadlock" style="flex: 1">
@@ -198,7 +198,7 @@ String cmd = oAuth2Application == null ? "add" : "update";
 				/>
 
 				<b><liferay-ui:message key="warning" />:</b>
-				<liferay-ui:message key="if-changed-old-client-secret-will-no-longer-work-after-you-save-the-application-details" />
+				<liferay-ui:message key="if-changed-clients-with-the-old-client-secret-will-no-longer-be-able-to-request-new-tokens-after-you-save-the-application-details" />
 			</div>
 
 			<div id="<portlet:namespace />clientSecretPadlock" style="flex: 1">
