@@ -34,16 +34,16 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = PanelApp.class
 )
-public class OAuth2DevicesPanelApp extends BasePanelApp {
+public class OAuth2ConnectedApplicationsPanelApp extends BasePanelApp {
 
 	@Override
 	public String getPortletId() {
-		return OAuth2ProviderPortletKeys.OAUTH2_DEVICES;
+		return OAuth2ProviderPortletKeys.OAUTH2_CONNECTED_APPLICATIONS;
 	}
 
 	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_DEVICES + ")",
+		target = "(javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_CONNECTED_APPLICATIONS + ")",
 		unbind = "-"
 	)
 	public void setPortlet(Portlet portlet) {

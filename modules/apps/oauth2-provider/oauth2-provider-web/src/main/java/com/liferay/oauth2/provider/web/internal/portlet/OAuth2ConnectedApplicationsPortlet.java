@@ -33,21 +33,21 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"com.liferay.portlet.css-class-wrapper=portlet-oauth2-provider-devices",
+		"com.liferay.portlet.css-class-wrapper=portlet-oauth2-provider-connected-applications",
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.preferences-unique-per-layout=false",
-		"javax.portlet.display-name=My OAuth2 Devices",
+		"javax.portlet.display-name=OAuth2 Connected Applications",
 		"javax.portlet.init-param.portlet-title-based-navigation=true",
-		"javax.portlet.init-param.template-path=/devices/",
-		"javax.portlet.init-param.view-template=/devices/view.jsp",
-		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_DEVICES,
+		"javax.portlet.init-param.template-path=/connected_applications/",
+		"javax.portlet.init-param.view-template=/connected_applications/view.jsp",
+		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_CONNECTED_APPLICATIONS,
 		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class
 )
-public class OAuth2DevicesPortlet extends MVCPortlet {
+public class OAuth2ConnectedApplicationsPortlet extends MVCPortlet {
 
 	public void revokeAuthorizationTokens(
 			ActionRequest request, ActionResponse response)

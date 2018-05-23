@@ -26,7 +26,7 @@ public class OAuth2ProviderPortletKeys {
 		"com_liferay_oauth2_provider_web_internal_portlet_" +
 			"OAuth2AuthorizePortlet";
 
-	public static final String OAUTH2_DEVICES =
-		"com_liferay_oauth2_provider_web_internal_portlet_OAuth2DevicesPortlet";
+	public static final String OAUTH2_CONNECTED_APPLICATIONS =
+		"com_liferay_oauth2_provider_web_internal_portlet_OAuth2ConnectedApplicationsPortlet";
 
 }

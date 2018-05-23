@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/devices/init.jsp" %>
+<%@ include file="/connected_applications/init.jsp" %>
 
 <%
 String orderByCol = ParamUtil.getString(request, "orderByCol", "createDate");
@@ -49,7 +49,7 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 
 <div class="container-fluid-1280">
 	<liferay-ui:search-container
-		emptyResultsMessage="no-devices-were-found"
+		emptyResultsMessage="no-connected-applications-were-found"
 		iteratorURL="<%= portletURL %>"
 		total="<%= OAuth2AuthorizationServiceUtil.getUserOAuth2AuthorizationsCount() %>"
 	>
@@ -132,7 +132,7 @@ String orderByType = ParamUtil.getString(request, "orderByType", "desc");
 
 			<liferay-ui:search-container-column-jsp
 				align="right"
-				path="/devices/authorization_actions.jsp"
+				path="/connected_applications/authorization_actions.jsp"
 			/>
 		</liferay-ui:search-container-row>
 
