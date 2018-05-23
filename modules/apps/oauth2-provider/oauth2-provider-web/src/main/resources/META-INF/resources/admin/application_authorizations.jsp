@@ -22,109 +22,126 @@ String redirect = ParamUtil.getString(request, "redirect");
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", 0);
-
-OAuth2Application oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
-
-request.setAttribute("application_authorizations.jsp-oAuth2Application", oAuth2Application);
-
-renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new String[] {oAuth2Application.getName()}));
-
 if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) {
 	return;
 }
 
-String orderByCol = ParamUtil.getString(request, "orderByCol", "createDate");
-String orderByType = ParamUtil.getString(request, "orderByType", "desc");
+long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", 0);
+
+OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getApplication(request);
+
+renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new String[] {oAuth2Application.getName()}));
+
+OAuth2AuthorizationsManagementToolbarDisplayContext oAuth2AuthorizationsManagementToolbarDisplayContext = new OAuth2AuthorizationsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, currentURLObj);
+
+int oAuth2AuthorizationsCount = OAuth2AuthorizationServiceUtil.getApplicationOAuth2AuthorizationsCount(oAuth2ApplicationId);
+
+String orderByType = oAuth2AuthorizationsManagementToolbarDisplayContext.getOrderByType();
 %>
 
-<liferay-portlet:renderURL varImpl="portletURL">
-	<portlet:param name="mvcPath" value="/admin/application_authorizations.jsp" />
-	<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2ApplicationId) %>" />
-	<portlet:param name="redirect" value="<%= redirect %>" />
-</liferay-portlet:renderURL>
-
-<liferay-frontend:management-bar>
-	<liferay-frontend:management-bar-buttons>
-		<liferay-frontend:management-bar-display-buttons
-			displayViews='<%= new String[] {"list"} %>'
-			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
-			selectedDisplayStyle="list"
-		/>
-	</liferay-frontend:management-bar-buttons>
-
-	<liferay-frontend:management-bar-filters>
-		<liferay-frontend:management-bar-navigation
-			navigationKeys='<%= new String[] {"all"} %>'
-			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
-		/>
-
-		<liferay-frontend:management-bar-sort
-			orderByCol="<%= orderByCol %>"
-			orderByType="<%= orderByType %>"
-			orderColumns='<%= new String[] {"createDate"} %>'
-			portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
-		/>
-	</liferay-frontend:management-bar-filters>
-</liferay-frontend:management-bar>
+<clay:management-toolbar
+	actionDropdownItems="<%= oAuth2AuthorizationsManagementToolbarDisplayContext.getActionDropdownItems() %>"
+	disabled="<%= oAuth2AuthorizationsCount == 0 %>"
+	namespace="<%= renderResponse.getNamespace() %>"
+	searchContainerId="oAuth2AuthorizationsSearchContainer"
+	selectable="<%= true %>"
+	showSearch="<%= false %>"
+	sortingOrder="<%= oAuth2AuthorizationsManagementToolbarDisplayContext.getOrderByType() %>"
+	sortingURL="<%= String.valueOf(oAuth2AuthorizationsManagementToolbarDisplayContext.getSortingURL()) %>"
+/>
 
 <div class="container-fluid-1280">
-	<liferay-ui:search-container
-		emptyResultsMessage="no-devices-were-found"
-		iteratorURL="<%= portletURL %>"
-		total="<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2AuthorizationsCount(oAuth2ApplicationId) %>"
-	>
+	<aui:form action="<%= currentURLObj %>" name="fm">
+		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+		<aui:input name="oAuth2ApplicationId" type="hidden" value="<%= oAuth2ApplicationId %>" />
+		<aui:input name="oAuth2AuthorizationIds" type="hidden" />
 
-		<%
-		OrderByComparator orderByComparator = null;
-
-		if (orderByCol.equals("createDate")) {
-			orderByComparator = OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("desc"));
-		}
-		%>
-
-		<liferay-ui:search-container-results
-			results="<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2Authorizations(oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), orderByComparator) %>"
-		/>
-
-		<liferay-ui:search-container-row
-			className="com.liferay.oauth2.provider.model.OAuth2Authorization"
-			escapedModel="<%= true %>"
-			modelVar="oAuth2Authorization"
+		<liferay-ui:search-container
+			emptyResultsMessage="no-authorizations-were-found"
+			id="oAuth2AuthorizationsSearchContainer"
+			iteratorURL="<%= currentURLObj %>"
+			rowChecker="<%= new EmptyOnClickRowChecker(renderResponse) %>"
+			total="<%= oAuth2AuthorizationsCount %>"
 		>
-			<liferay-ui:search-container-column-text
-				property="userId"
+			<liferay-ui:search-container-results
+				results='<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2Authorizations(oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("desc"))) %>'
 			/>
 
-			<liferay-ui:search-container-column-text
-				property="userName"
-			/>
+			<liferay-ui:search-container-row
+				className="com.liferay.oauth2.provider.model.OAuth2Authorization"
+				escapedModel="<%= true %>"
+				keyProperty="OAuth2AuthorizationId"
+				modelVar="oAuth2Authorization"
+			>
+				<liferay-ui:search-container-column-text
+					property="userId"
+				/>
 
-			<liferay-ui:search-container-column-date
-				property="createDate"
-			/>
+				<liferay-ui:search-container-column-text
+					property="userName"
+				/>
 
-			<liferay-ui:search-container-column-date
-				property="accessTokenExpirationDate"
-			/>
+				<liferay-ui:search-container-column-date
+					name="authorization"
+					property="createDate"
+				/>
 
-			<liferay-ui:search-container-column-date
-				property="refreshTokenExpirationDate"
-			/>
+				<liferay-ui:search-container-column-date
+					name="last-access"
+					property="accessTokenCreateDate"
+				/>
 
-			<liferay-ui:search-container-column-text
-				property="remoteIPInfo"
-			/>
+				<%
+				Date expirationDate = oAuth2Authorization.getRefreshTokenExpirationDate();
 
-			<liferay-ui:search-container-column-jsp
-				align="right"
-				path="/admin/application_authorization_actions.jsp"
-			/>
-		</liferay-ui:search-container-row>
+				if (expirationDate == null) {
+					expirationDate = oAuth2Authorization.getAccessTokenExpirationDate();
+				}
+				%>
 
-		<liferay-ui:search-iterator
-			markupView="lexicon"
-			searchContainer="<%= searchContainer %>"
-		/>
-	</liferay-ui:search-container>
+				<liferay-ui:search-container-column-date
+					name="expiration"
+					value="<%= expirationDate %>"
+				/>
+
+				<liferay-ui:search-container-column-text
+					property="remoteIPInfo"
+				/>
+
+				<liferay-ui:search-container-column-jsp
+					align="right"
+					path="/admin/application_authorization_actions.jsp"
+				/>
+			</liferay-ui:search-container-row>
+
+			<liferay-ui:search-iterator
+				markupView="lexicon"
+				searchContainer="<%= searchContainer %>"
+			/>
+		</liferay-ui:search-container>
+	</aui:form>
 </div>
+
+<aui:script>
+	function <portlet:namespace />revokeOAuth2Authorizations() {
+		if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-revoke-the-selected-authorizations-they-will-be-revoked-immediately") %>')) {
+			var form = AUI.$(document.<portlet:namespace />fm);
+
+			form.attr('method', 'post');
+			form.fm('oAuth2AuthorizationIds').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
+
+			submitForm(form, '<portlet:actionURL name="revokeOAuth2Authorizations" />');
+		}
+	}
+
+	function <portlet:namespace />revokeOAuth2Authorization(oAuth2AuthorizationId) {
+		if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-revoke-the-authorization") %>')) {
+			var form = AUI.$(document.<portlet:namespace />fm);
+
+			form.attr('method', 'post');
+			form.fm('oAuth2AuthorizationIds').val(oAuth2AuthorizationId);
+
+			submitForm(form, '<portlet:actionURL name="revokeOAuth2Authorizations" />');
+		}
+	}
+</aui:script>

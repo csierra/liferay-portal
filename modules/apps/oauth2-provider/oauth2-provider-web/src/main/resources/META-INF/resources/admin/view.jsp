@@ -54,6 +54,7 @@ String orderByType = oAuth2ApplicationsManagementToolbarDisplayContext.getOrderB
 		<liferay-ui:search-container
 			emptyResultsMessage="no-applications-were-found"
 			id="oAuth2ApplicationsSearchContainer"
+			iteratorURL="<%= currentURLObj %>"
 			rowChecker="<%= new EmptyOnClickRowChecker(renderResponse) %>"
 			total="<%= oAuth2ApplicationsCount %>"
 		>

@@ -17,7 +17,7 @@
 <%@ include file="/devices/init.jsp" %>
 
 <%
-ResultRow row = (ResultRow)request.getAttribute("SEARCH_CONTAINER_RESULT_ROW");
+ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
 OAuth2Authorization oAuth2Authorization = (OAuth2Authorization)row.getObject();
 %>

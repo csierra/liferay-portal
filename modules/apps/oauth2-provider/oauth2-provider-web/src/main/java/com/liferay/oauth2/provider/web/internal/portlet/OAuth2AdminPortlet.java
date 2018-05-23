@@ -142,7 +142,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
-	public void revokeAuthorizationTokens(
+	public void revokeOAuth2Authorization(
 			ActionRequest request, ActionResponse response)
 		throws PortalException {
 
@@ -151,6 +151,30 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 		_oAuth2AuthorizationService.revokeOAuth2Authorization(
 			oAuth2AuthorizationId);
+	}
+
+	public void revokeOAuth2Authorizations(
+		ActionRequest request, ActionResponse response) {
+
+		long[] oAuth2AuthorizationIds = StringUtil.split(
+			ParamUtil.getString(request, "oAuth2AuthorizationIds"), 0L);
+
+		try {
+			for (long oAuth2AuthorizationId : oAuth2AuthorizationIds) {
+				_oAuth2AuthorizationService.revokeOAuth2Authorization(
+					oAuth2AuthorizationId);
+			}
+		}
+		catch (PortalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe);
+			}
+
+			SessionErrors.add(request, pe.getClass());
+
+			response.setRenderParameter(
+				"mvcPath", "/admin/application_authorizations.jsp");
+		}
 	}
 
 	public void updateOAuth2Application(

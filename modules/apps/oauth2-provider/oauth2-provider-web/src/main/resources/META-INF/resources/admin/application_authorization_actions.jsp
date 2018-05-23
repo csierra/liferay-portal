@@ -17,29 +17,18 @@
 <%@ include file="/admin/init.jsp" %>
 
 <%
-OAuth2Application oAuth2Application = (OAuth2Application)request.getAttribute("application_authorizations.jsp-oAuth2Application");
+OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getApplication(request);
 
-ResultRow row = (ResultRow)request.getAttribute("SEARCH_CONTAINER_RESULT_ROW");
+ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
 OAuth2Authorization oAuth2Authorization = (OAuth2Authorization)row.getObject();
 %>
 
 <c:if test="<%= oAuth2AdminPortletDisplayContext.hasRevokeTokenPermission(oAuth2Application) %>">
-	<liferay-ui:icon-menu
-		direction="left-side"
-		icon="<%= StringPool.BLANK %>"
-		markupView="lexicon"
-		message="<%= StringPool.BLANK %>"
-		showWhenSingleIcon="<%= true %>"
-	>
-		<portlet:actionURL name="revokeAuthorizationTokens" var="revokeURL">
-			<portlet:param name="oAuth2AuthorizationId" value="<%= String.valueOf(oAuth2Authorization.getOAuth2AuthorizationId()) %>" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-		</portlet:actionURL>
+	<portlet:actionURL name="revokeOAuth2Authorization" var="revokeOAuth2AuthorizationURL">
+		<portlet:param name="oAuth2AuthorizationId" value="<%= String.valueOf(oAuth2Authorization.getOAuth2AuthorizationId()) %>" />
+		<portlet:param name="redirect" value="<%= currentURL %>" />
+	</portlet:actionURL>
 
-		<liferay-ui:icon
-			message="revoke-authorization"
-			url="<%= revokeURL.toString() %>"
-		/>
-	</liferay-ui:icon-menu>
+	<aui:button onClick='<%= renderResponse.getNamespace() + "revokeOAuth2Authorization(" + oAuth2Authorization.getOAuth2AuthorizationId() + ")" %>' value="revoke" />
 </c:if>

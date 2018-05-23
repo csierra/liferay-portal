@@ -93,15 +93,19 @@ public class OAuth2AdminPortletDisplayContext {
 	public OAuth2Application getApplication(HttpServletRequest request)
 		throws PortalException {
 
+		if (_oAuth2Application != null) {
+			return _oAuth2Application;
+		}
+
 		long oAuth2ApplicationId = ParamUtil.getLong(
 			request, "oAuth2ApplicationId", 0);
 
 		if (oAuth2ApplicationId > 0) {
-			return _oAuth2ApplicationService.getOAuth2Application(
+			_oAuth2Application = _oAuth2ApplicationService.getOAuth2Application(
 				oAuth2ApplicationId);
 		}
 
-		return null;
+		return _oAuth2Application;
 	}
 
 	public String getDefaultIconURL() {
@@ -283,6 +287,7 @@ public class OAuth2AdminPortletDisplayContext {
 	private static final Pattern _baseIdPattern = Pattern.compile(
 		"(.{8})(.{4})(.{4})(.{4})(.*)");
 
+	private OAuth2Application _oAuth2Application;
 	private final OAuth2ApplicationService _oAuth2ApplicationService;
 	private final OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
 	private final ThemeDisplay _themeDisplay;
