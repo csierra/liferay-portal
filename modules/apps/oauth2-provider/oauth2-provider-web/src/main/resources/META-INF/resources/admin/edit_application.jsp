@@ -1,3 +1,5 @@
+<%@ page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %>
+
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -169,7 +171,7 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 			</div>
 
 			<div id="<portlet:namespace />clientIdPadlock" style="flex: 1">
-				<div class="open">
+				<div class="open" style="display:none">
 					<clay:icon symbol="unlock" /><liferay-ui:message key="changed" />
 				</div>
 
@@ -178,7 +180,7 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 				</div>
 			</div>
 
-			<aui:input label="client-id" name="newClientId" onKeyup='<%= renderResponse.getNamespace() + "updatePadlock('clientIdPadlock', this.value, '" + HtmlUtil.escapeJS(clientId) + "')" %>' type="text" />
+			<aui:input label="client-id" name="newClientId" onKeyup='<%= renderResponse.getNamespace() + "updatePadlock('clientIdPadlock', this.value, '" + HtmlUtil.escapeJS(clientId) + "')" %>' type="text" value="<%= clientId %>" />
 
 			<aui:button-row>
 				<aui:button href="" icon="icon-undo" onClick='<%= renderResponse.getNamespace() + "setControlEqualTo('newClientId', 'originalClientId')" %>' value="revert" />
@@ -198,7 +200,7 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 			</div>
 
 			<div id="<portlet:namespace />clientSecretPadlock" style="flex: 1">
-				<div class="open">
+				<div class="open" style="display:none">
 					<clay:icon symbol="unlock" /><liferay-ui:message key="changed" />
 				</div>
 
@@ -207,19 +209,35 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 				</div>
 			</div>
 
-			<aui:input label="client-secret" name="newClientSecret" onKeyup='<%= renderResponse.getNamespace() + "updatePadlock('clientSecretPadlock', this.value, '" + HtmlUtil.escapeJS(clientId) + "')" %>' type="text" />
-
-			<aui:input name="generatedClientSecret" type="hidden" value="<%= oAuth2AdminPortletDisplayContext.generateClientSecret() %>" />
+			<aui:input label="client-secret" name="newClientSecret" onKeyup='<%= renderResponse.getNamespace() + "updatePadlock('clientSecretPadlock', this.value, '" + HtmlUtil.escapeJS(clientSecret) + "')" %>' type="text" value="<%= clientSecret %>" />
 
 			<aui:button-row>
-				<aui:button href="" icon="icon-plus" onClick='<%= renderResponse.getNamespace() + "setControlEqualTo('newClientSecret', 'generatedClientSecret')" %>' value="generate-new-secret" />
+				<aui:button href="" icon="icon-plus" onClick='<%= renderResponse.getNamespace() + "generateRandomSecret()" %>' value="generate-new-secret" />
 				<aui:button href="" icon="icon-undo" onClick='<%= renderResponse.getNamespace() + "setControlEqualTo('newClientSecret', 'originalClientSecret')" %>' value="revert" />
 			</aui:button-row>
 		</div>
 	</aui:form>
 </div>
 
-<aui:script use="aui-modal,liferay-form,node">
+<aui:script use="aui-io-request,aui-modal,liferay-form,node">
+	<portlet:namespace />generateRandomSecret = function() {
+		var io = A.io.request(
+			'<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/admin/generate_random_secret" />',
+			{
+				dataType: 'string',
+				on: {
+					complete: function(event, id, obj) {
+						var responseText = obj.responseText;
+
+						var newClientSecretField = A.one('#<portlet:namespace />newClientSecret');
+
+						<portlet:namespace />updateComponent(newClientSecretField, responseText);
+					}
+				}
+			}
+		);
+	}
+
 	<portlet:namespace />getSelectedClientProfile = function() {
 		return A.one('#<portlet:namespace />clientProfile option:selected');
 	}
@@ -243,25 +261,20 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 
 	<portlet:namespace />showEditClientIdModal = function() {
 		var bodyContentDiv = A.one('#<portlet:namespace />edit-client-id-fm');
+		var clientIdPadlock = A.one('#<portlet:namespace />clientIdPadlock');
 		var applyField = A.one('#<portlet:namespace />newClientId');
 		var populateField = A.one('#<portlet:namespace />clientId');
-		var clientIdPadlock = A.one('#<portlet:namespace />clientIdPadlock');
 
-		<portlet:namespace />updateComponent(applyField, populateField.val());
-
-		<portlet:namespace />showModal('Edit Client ID', bodyContentDiv, clientIdPadlock, applyField, populateField);
+		<portlet:namespace />showModal('<%= UnicodeLanguageUtil.get(request, "edit-client-id") %>', bodyContentDiv, clientIdPadlock, applyField, populateField);
 	}
 
 	<portlet:namespace />showEditClientSecretModal = function() {
 		var bodyContentDiv = A.one('#<portlet:namespace />edit-client-secret-fm');
+		var clientSecretPadlock = A.one('#<portlet:namespace />clientSecretPadlock');
 		var applyField = A.one('#<portlet:namespace />newClientSecret');
 		var populateField = A.one('#<portlet:namespace />clientSecret')
 
-		<portlet:namespace />updateComponent(applyField, populateField.val());
-
-		var clientSecretPadlock = A.one('#<portlet:namespace />clientSecretPadlock');
-
-		<portlet:namespace />showModal('Edit Client Secret', bodyContentDiv, clientSecretPadlock, applyField, populateField);
+		<portlet:namespace />showModal('<%= UnicodeLanguageUtil.get(request, "edit-client-secret") %>', bodyContentDiv, clientSecretPadlock, applyField, populateField);
 	}
 
 	<portlet:namespace />showModal = function(title, bodyContent, footerContent, applyField, populateField) {
@@ -281,7 +294,7 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 		modal.addToolbar(
 			[
 				{
-					label: 'Cancel',
+					label: '<%= UnicodeLanguageUtil.get(request, "cancel") %>',
 					on: {
 					click:
 						function() {
@@ -291,7 +304,7 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 				},
 				{
 				cssClass: 'btn-primary',
-				label: 'Apply',
+				label: '<%= UnicodeLanguageUtil.get(request, "apply") %>',
 				on: {
 					click:
 						function() {
@@ -312,8 +325,8 @@ String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClie
 
 	<portlet:namespace />updateComponent = function(component, newValue) {
 		component.val(newValue);
-		component.simulate("keyup");
-		component.simulate("change");
+		component.simulate('keyup');
+		component.simulate('change');
 	}
 
 	<portlet:namespace />updatePadlock = function(padlockId, newValue, originalValue) {
