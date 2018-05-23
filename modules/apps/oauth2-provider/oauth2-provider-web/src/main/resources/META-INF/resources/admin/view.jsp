@@ -158,7 +158,7 @@ String orderByType = oAuth2ApplicationsManagementToolbarDisplayContext.getOrderB
 
 <aui:script>
 	function <portlet:namespace />deleteOAuth2Applications() {
-		if (confirm('<%= HtmlUtil.escapeJS(LanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries")) %>')) {
+		if (confirm('<%= HtmlUtil.escapeJS(LanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries-this-action-revokes-all-authorizations-and-associated-tokens")) %>')) {
 			var form = AUI.$(document.<portlet:namespace />fm);
 
 			form.attr('method', 'post');

@@ -19,9 +19,9 @@
 <%
 ResultRow row = (ResultRow)request.getAttribute("SEARCH_CONTAINER_RESULT_ROW");
 
-OAuth2Application oauth2application = (OAuth2Application)row.getObject();
+OAuth2Application oAuth2Application = (OAuth2Application)row.getObject();
 
-String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2ApplicationId());
+String oAuth2ApplicationId = String.valueOf(oAuth2Application.getOAuth2ApplicationId());
 %>
 
 <liferay-ui:icon-menu
@@ -31,7 +31,7 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 	message="<%= StringPool.BLANK %>"
 	showWhenSingleIcon="<%= true %>"
 >
-	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oauth2application) %>">
+	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
 		<portlet:renderURL var="editURL">
 			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
 
@@ -70,10 +70,10 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 		/>
 	</c:if>
 
-	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasPermissionsPermission(oauth2application) %>">
+	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasPermissionsPermission(oAuth2Application) %>">
 		<liferay-security:permissionsURL
 			modelResource="<%= OAuth2Application.class.getName() %>"
-			modelResourceDescription="<%= oauth2application.getName() %>"
+			modelResourceDescription="<%= oAuth2Application.getName() %>"
 			resourcePrimKey="<%= oAuth2ApplicationId %>"
 			var="permissionsURL"
 			windowState="<%= LiferayWindowState.POP_UP.toString() %>"
@@ -87,12 +87,26 @@ String oAuth2ApplicationId = String.valueOf(oauth2application.getOAuth2Applicati
 		/>
 	</c:if>
 
-	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasDeletePermission(oauth2application) %>">
+	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasDeletePermission(oAuth2Application) %>">
 		<portlet:actionURL name="deleteOAuth2Application" var="deleteURL">
 			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
 		</portlet:actionURL>
 
+		<%
+		int authorizationsCount = oAuth2AdminPortletDisplayContext.getOAuth2AuthorizationsCount(oAuth2Application);
+
+		String confirmation = LanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-application-there-are-no-authorizations-or-associated-tokens");
+
+		if (authorizationsCount == 1) {
+			confirmation = LanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-application-this-action-revokes-one-authorization-and-associated-tokens");
+		}
+		else if (authorizationsCount > 0) {
+			confirmation = LanguageUtil.format(request, "are-you-sure-you-want-to-delete-the-application-this-action-revokes-x-authorizations-and-associated-tokens", new String[] {String.valueOf(authorizationsCount)});
+		}
+		%>
+
 		<liferay-ui:icon-delete
+			confirmation="<%= confirmation %>"
 			message="delete"
 			url="<%= deleteURL.toString() %>"
 		/>
