@@ -55,7 +55,7 @@ if (oAuth2Application.getIconFileEntryId() > 0) {
 </style>
 
 <div class="closed consent container-fluid-1280">
-	<aui:form action="<%= replyTo %>" method="POST" name="fm">
+	<aui:form action="<%= replyTo %>" method="post" name="fm">
 		<aui:fieldset-group markupView="lexicon">
 			<div class="panel-body">
 				<div style="display: inline-block; position: relative; left: 64px;">
@@ -93,7 +93,7 @@ if (oAuth2Application.getIconFileEntryId() > 0) {
 
 							<%
 							for (String applicationName : authorizationModel.getApplicationNames()) {
-								String applicationScopeDescription = authorizationModel.getApplicationScopeDescription(applicationName).stream().collect(Collectors.joining(", "));
+								String applicationScopeDescription = StringUtil.merge(authorizationModel.getApplicationScopeDescription(applicationName), ", ");
 							%>
 
 								<li class="list-group-item list-group-item-flex">
@@ -115,7 +115,9 @@ if (oAuth2Application.getIconFileEntryId() > 0) {
 
 						</ul>
 
-						<p class="list-group-subtitle text-truncate">Application <aui:a href="<%= HtmlUtil.escapeAttribute(oAuth2Application.getPrivacyPolicyURL()) %>" target="_blank">privacy policy</aui:a></p>
+						<c:if test="<%= !Validator.isBlank(oAuth2Application.getPrivacyPolicyURL()) %>">
+							<p class="text-truncate"><%= LanguageUtil.format(request, "application-x-privacy-policy-x", new String[] {"<a href=\"" + HtmlUtil.escapeAttribute(oAuth2Application.getPrivacyPolicyURL()) + "\" target=\"_blank\">", "</a>"}) %></p>
+						</c:if>
 					</div>
 
 					<div class="panel-body" style="border-top: 1px solid #e7e7ed;">
@@ -136,13 +138,20 @@ if (oAuth2Application.getIconFileEntryId() > 0) {
 						<aui:input name="oauthDecision" type="hidden" useNamespace="<%= false %>" value="deny" />
 
 						<aui:button id="allow" value="authorize" />
-						<aui:button type="submit" value="cancel" />
+						<aui:button id="cancel" type="submit" value="cancel" />
 
 						<aui:script>
 							$('#<portlet:namespace />allow').on(
 								'click',
 								function() {
 									document.<portlet:namespace/>fm.oauthDecision.value='allow';
+									document.<portlet:namespace/>fm.submit();
+								}
+							);
+							$('#<portlet:namespace />cancel').on(
+								'click',
+								function() {
+									document.<portlet:namespace/>fm.oauthDecision.value='deny';
 									document.<portlet:namespace/>fm.submit();
 								}
 							);
