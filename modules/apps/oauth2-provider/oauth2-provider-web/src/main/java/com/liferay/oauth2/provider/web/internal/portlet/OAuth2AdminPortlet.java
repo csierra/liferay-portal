@@ -240,6 +240,16 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 
 		try {
 			if (oAuth2ApplicationId == 0) {
+				clientId = name;
+
+				for (GrantType grantType : allowedGrantTypes) {
+					if (!grantType.isSupportsPublicClients()) {
+						clientSecret =
+							oAuth2AdminPortletDisplayContext.
+								generateRandomSecret();
+					}
+				}
+
 				OAuth2Application oAuth2Application =
 					_oAuth2ApplicationService.addOAuth2Application(
 						allowedGrantTypes, clientId, clientProfile.id(),

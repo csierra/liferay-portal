@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
+import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
@@ -49,29 +50,15 @@ public class GenerateRandomSecretMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws PortletException {
 
-		int size = 16;
-
-		int count = (int)Math.ceil((double)size / 8);
-
-		byte[] buffer = new byte[count * 8];
-
-		for (int i = 0; i < count; i++) {
-			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
-		}
-
-		StringBundler sb = new StringBundler(size);
-
-		for (int i = 0; i < size; i++) {
-			sb.append(Integer.toHexString(0xFF & buffer[i]));
-		}
+		String randomSecret =
+			OAuth2AdminPortletDisplayContext.generateRandomSecret();
 
 		resourceResponse.setContentType("text/plain");
 
 		try {
 			PrintWriter writer = resourceResponse.getWriter();
-			Matcher matcher = _baseIdPattern.matcher(sb.toString());
 
-			writer.write(matcher.replaceFirst("secret-$1-$2-$3-$4-$5"));
+			writer.write(randomSecret);
 		}
 		catch (IOException ioe) {
 			throw new PortletException(ioe);
@@ -79,8 +66,5 @@ public class GenerateRandomSecretMVCResourceCommand
 
 		return false;
 	}
-
-	private static final Pattern _baseIdPattern = Pattern.compile(
-		"(.{8})(.{4})(.{4})(.{4})(.*)");
 
 }

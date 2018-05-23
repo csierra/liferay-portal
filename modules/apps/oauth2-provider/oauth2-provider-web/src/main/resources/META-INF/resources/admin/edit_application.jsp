@@ -36,11 +36,13 @@ renderResponse.setTitle(headerTitle);
 
 String clientId = oAuth2Application == null ? "" : oAuth2Application.getClientId();
 String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClientSecret();
+String cmd = oAuth2Application == null ? "add" : "update";
 %>
 
 <portlet:actionURL name="updateOAuth2Application" var="editOAuth2ApplicationURL" />
 
 <aui:form action="<%= editOAuth2ApplicationURL %>" id="<portlet:namespace />oauth2-application-fm" method="post" name="oauth2-application-fm">
+	<aui:input name="cmd" type="hidden" value="<%= cmd %>" />
 	<div class="container-fluid container-fluid-max-xl container-view">
 		<div class="sheet">
 			<div class="row">
