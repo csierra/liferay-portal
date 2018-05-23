@@ -22,8 +22,6 @@ int oAuth2ApplicationsCount = OAuth2ApplicationServiceUtil.getOAuth2Applications
 OAuth2ApplicationsManagementToolbarDisplayContext oAuth2ApplicationsManagementToolbarDisplayContext = new OAuth2ApplicationsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, currentURLObj);
 
 String displayStyle = oAuth2ApplicationsManagementToolbarDisplayContext.getDisplayStyle();
-
-String orderByType = oAuth2ApplicationsManagementToolbarDisplayContext.getOrderByType();
 %>
 
 <aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
@@ -36,6 +34,7 @@ String orderByType = oAuth2ApplicationsManagementToolbarDisplayContext.getOrderB
 	actionDropdownItems="<%= oAuth2ApplicationsManagementToolbarDisplayContext.getActionDropdownItems() %>"
 	creationMenu="<%= oAuth2ApplicationsManagementToolbarDisplayContext.getCreationMenu() %>"
 	disabled="<%= oAuth2ApplicationsCount == 0 %>"
+	filterDropdownItems="<%= oAuth2ApplicationsManagementToolbarDisplayContext.getFilterDropdownItems() %>"
 	namespace="<%= renderResponse.getNamespace() %>"
 	searchContainerId="oAuth2ApplicationsSearchContainer"
 	selectable="<%= true %>"
@@ -59,7 +58,7 @@ String orderByType = oAuth2ApplicationsManagementToolbarDisplayContext.getOrderB
 			total="<%= oAuth2ApplicationsCount %>"
 		>
 			<liferay-ui:search-container-results
-				results='<%= OAuth2ApplicationServiceUtil.getOAuth2Applications(themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), OrderByComparatorFactoryUtil.create("OAuth2Application", "name", orderByType.equals("asc"))) %>'
+				results="<%= OAuth2ApplicationServiceUtil.getOAuth2Applications(themeDisplay.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), oAuth2ApplicationsManagementToolbarDisplayContext.getOrderByComparator()) %>"
 			/>
 
 			<liferay-ui:search-container-row

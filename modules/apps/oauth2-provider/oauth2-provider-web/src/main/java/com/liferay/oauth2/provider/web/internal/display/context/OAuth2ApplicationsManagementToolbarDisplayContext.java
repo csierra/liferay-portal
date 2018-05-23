@@ -17,7 +17,9 @@ package com.liferay.oauth2.provider.web.internal.display.context;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -27,11 +29,15 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.portlet.PortletException;
@@ -112,6 +118,44 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 		return displayStyle;
 	}
 
+	public List<DropdownItem> getFilterDropdownItems() {
+		return new DropdownItemList() {
+			{
+				addGroup(
+					dropdownGroupItem -> {
+						dropdownGroupItem.setDropdownItems(
+							_getOrderByDropdownItems());
+						dropdownGroupItem.setLabel(
+							LanguageUtil.get(_request, "order-by"));
+					});
+			}
+		};
+	}
+
+	public String getOrderByCol() {
+		return ParamUtil.getString(_request, "orderByCol", "createDate");
+	}
+
+	public OrderByComparator<OAuth2Application> getOrderByComparator() {
+		String orderByType = getOrderByType();
+		String orderByCol = getOrderByCol();
+
+		String columnName = "name";
+
+		if (orderByCol.equals("createDate")) {
+			columnName = "createDate";
+		}
+		else if (orderByCol.equals("clientId")) {
+			columnName = "clientId";
+		}
+		else if (orderByCol.equals("name")) {
+			columnName = "name";
+		}
+
+		return OrderByComparatorFactoryUtil.create(
+			"OAuth2Application", columnName, orderByType.equals("asc"));
+	}
+
 	public String getOrderByType() {
 		return ParamUtil.getString(_request, "orderByType", "desc");
 	}
@@ -136,10 +180,7 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 			portletURL.setParameter("delta", String.valueOf(delta));
 		}
 
-		String orderByCol = ParamUtil.getString(
-			_request, "orderByCol", "title");
-
-		portletURL.setParameter("orderByCol", orderByCol);
+		portletURL.setParameter("orderByCol", getOrderByCol());
 
 		portletURL.setParameter("orderByType", getOrderByType());
 
@@ -167,6 +208,38 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 		sortingURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
 
 		return sortingURL;
+	}
+
+	private List<DropdownItem> _getOrderByDropdownItems() {
+		return new DropdownItemList() {
+			{
+				final Map<String, String> orderColumnsMap = new HashMap<>();
+
+				orderColumnsMap.put("clientId", "client-id");
+				orderColumnsMap.put("createDate", "createDate");
+				orderColumnsMap.put("name", "name");
+
+				for (Map.Entry<String, String> orderByColEntry :
+						orderColumnsMap.entrySet()) {
+
+					add(
+						SafeConsumer.ignore(
+							dropdownItem -> {
+								String orderByCol = orderByColEntry.getKey();
+
+								dropdownItem.setActive(
+									orderByCol.equals(getOrderByCol()));
+								dropdownItem.setHref(
+									_getCurrentSortingURL(), "orderByCol",
+									orderByCol);
+
+								dropdownItem.setLabel(
+									LanguageUtil.get(
+										_request, orderByColEntry.getValue()));
+							}));
+				}
+			}
+		};
 	}
 
 	private final PortletURL _currentURLObj;

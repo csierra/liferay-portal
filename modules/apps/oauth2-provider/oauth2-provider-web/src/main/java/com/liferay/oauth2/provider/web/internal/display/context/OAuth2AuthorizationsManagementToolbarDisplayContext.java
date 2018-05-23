@@ -16,6 +16,8 @@ package com.liferay.oauth2.provider.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
+import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -24,6 +26,8 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.util.List;
@@ -76,6 +80,40 @@ public class OAuth2AuthorizationsManagementToolbarDisplayContext {
 		return "list";
 	}
 
+	public List<DropdownItem> getFilterDropdownItems() {
+		return new DropdownItemList() {
+			{
+				addGroup(
+					dropdownGroupItem -> {
+						dropdownGroupItem.setDropdownItems(
+							_getOrderByDropdownItems());
+						dropdownGroupItem.setLabel(
+							LanguageUtil.get(_request, "order-by"));
+					});
+			}
+		};
+	}
+
+	public String getOrderByCol() {
+		return ParamUtil.getString(_request, "orderByCol", "createDate");
+	}
+
+	public OrderByComparator<OAuth2Authorization> getOrderByComparator() {
+		String orderByType = getOrderByType();
+		String orderByCol = getOrderByCol();
+
+		String columnName = "createDate";
+
+		for (String orderByColumn : _orderByColumns) {
+			if (orderByCol.equals(orderByColumn)) {
+				columnName = orderByColumn;
+			}
+		}
+
+		return OrderByComparatorFactoryUtil.create(
+			"OAuth2Authorization", columnName, orderByType.equals("asc"));
+	}
+
 	public String getOrderByType() {
 		return ParamUtil.getString(_request, "orderByType", "desc");
 	}
@@ -98,6 +136,32 @@ public class OAuth2AuthorizationsManagementToolbarDisplayContext {
 
 		return sortingURL;
 	}
+
+	private List<DropdownItem> _getOrderByDropdownItems() {
+		return new DropdownItemList() {
+			{
+				for (String orderByCol : _orderByColumns) {
+					add(
+						SafeConsumer.ignore(
+							dropdownItem -> {
+								dropdownItem.setActive(
+									orderByCol.equals(getOrderByCol()));
+								dropdownItem.setHref(
+									_getCurrentSortingURL(), "orderByCol",
+									orderByCol);
+								dropdownItem.setLabel(
+									LanguageUtil.get(_request, orderByCol));
+							}));
+				}
+			}
+		};
+	}
+
+	private static String[] _orderByColumns = {
+		"createDate", "userId", "userName", "accessTokenCreateDate",
+		"accessTokenExpirationDate", "refreshTokenCreateDate",
+		"refreshTokenExpirationDate", "remoteIPInfo"
+	};
 
 	private final PortletURL _currentURLObj;
 	private final LiferayPortletRequest _liferayPortletRequest;

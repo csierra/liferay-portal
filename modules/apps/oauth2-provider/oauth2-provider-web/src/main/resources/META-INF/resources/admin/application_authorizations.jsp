@@ -35,13 +35,12 @@ renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new Str
 OAuth2AuthorizationsManagementToolbarDisplayContext oAuth2AuthorizationsManagementToolbarDisplayContext = new OAuth2AuthorizationsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, currentURLObj);
 
 int oAuth2AuthorizationsCount = OAuth2AuthorizationServiceUtil.getApplicationOAuth2AuthorizationsCount(oAuth2ApplicationId);
-
-String orderByType = oAuth2AuthorizationsManagementToolbarDisplayContext.getOrderByType();
 %>
 
 <clay:management-toolbar
 	actionDropdownItems="<%= oAuth2AuthorizationsManagementToolbarDisplayContext.getActionDropdownItems() %>"
 	disabled="<%= oAuth2AuthorizationsCount == 0 %>"
+	filterDropdownItems="<%= oAuth2AuthorizationsManagementToolbarDisplayContext.getFilterDropdownItems() %>"
 	namespace="<%= renderResponse.getNamespace() %>"
 	searchContainerId="oAuth2AuthorizationsSearchContainer"
 	selectable="<%= true %>"
@@ -64,7 +63,7 @@ String orderByType = oAuth2AuthorizationsManagementToolbarDisplayContext.getOrde
 			total="<%= oAuth2AuthorizationsCount %>"
 		>
 			<liferay-ui:search-container-results
-				results='<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2Authorizations(oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), OrderByComparatorFactoryUtil.create("OAuth2Authorization", "createDate", orderByType.equals("desc"))) %>'
+				results="<%= OAuth2AuthorizationServiceUtil.getApplicationOAuth2Authorizations(oAuth2ApplicationId, searchContainer.getStart(), searchContainer.getEnd(), oAuth2AuthorizationsManagementToolbarDisplayContext.getOrderByComparator()) %>"
 			/>
 
 			<liferay-ui:search-container-row
