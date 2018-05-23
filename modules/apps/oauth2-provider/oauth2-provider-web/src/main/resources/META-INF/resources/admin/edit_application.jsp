@@ -43,6 +43,7 @@ String cmd = oAuth2Application == null ? "add" : "update";
 
 <aui:form action="<%= editOAuth2ApplicationURL %>" id="<portlet:namespace />oauth2-application-fm" method="post" name="oauth2-application-fm">
 	<aui:input name="cmd" type="hidden" value="<%= cmd %>" />
+
 	<div class="container-fluid container-fluid-max-xl container-view">
 		<div class="sheet">
 			<div class="row">

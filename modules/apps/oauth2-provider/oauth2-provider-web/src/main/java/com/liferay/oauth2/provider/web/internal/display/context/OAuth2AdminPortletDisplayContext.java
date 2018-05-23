@@ -58,6 +58,28 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class OAuth2AdminPortletDisplayContext {
 
+	public static String generateRandomSecret() {
+		int size = 16;
+
+		int count = (int)Math.ceil((double)size / 8);
+
+		byte[] buffer = new byte[count * 8];
+
+		for (int i = 0; i < count; i++) {
+			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
+		}
+
+		StringBundler sb = new StringBundler(size);
+
+		for (int i = 0; i < size; i++) {
+			sb.append(Integer.toHexString(0xFF & buffer[i]));
+		}
+
+		Matcher matcher = _baseIdPattern.matcher(sb.toString());
+
+		return matcher.replaceFirst("secret-$1-$2-$3-$4-$5");
+	}
+
 	public OAuth2AdminPortletDisplayContext(
 		OAuth2ApplicationService oAuth2ApplicationService,
 		OAuth2ProviderConfiguration oAuth2ProviderConfiguration,
@@ -81,31 +103,6 @@ public class OAuth2AdminPortletDisplayContext {
 
 		return null;
 	}
-
-	public static String generateRandomSecret() {
-		int size = 16;
-
-		int count = (int)Math.ceil((double)size / 8);
-
-		byte[] buffer = new byte[count * 8];
-
-		for (int i = 0; i < count; i++) {
-			BigEndianCodec.putLong(buffer, i * 8, SecureRandomUtil.nextLong());
-		}
-
-		StringBundler sb = new StringBundler(size);
-
-		for (int i = 0; i < size; i++) {
-			sb.append(Integer.toHexString(0xFF & buffer[i]));
-		}
-
-		Matcher matcher = _baseIdPattern.matcher(sb.toString());
-
-		return matcher.replaceFirst("secret-$1-$2-$3-$4-$5");
-	}
-
-	private static final Pattern _baseIdPattern = Pattern.compile(
-		"(.{8})(.{4})(.{4})(.{4})(.*)");
 
 	public String getDefaultIconURL() {
 		return _themeDisplay.getPathThemeImages() + "/common/portlet.png";
@@ -282,6 +279,9 @@ public class OAuth2AdminPortletDisplayContext {
 
 	private static Log _log = LogFactoryUtil.getLog(
 		OAuth2AdminPortletDisplayContext.class);
+
+	private static final Pattern _baseIdPattern = Pattern.compile(
+		"(.{8})(.{4})(.{4})(.{4})(.*)");
 
 	private final OAuth2ApplicationService _oAuth2ApplicationService;
 	private final OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;

@@ -16,16 +16,10 @@ package com.liferay.oauth2.provider.web.internal.portlet.action;
 
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AdminPortletDisplayContext;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
-import com.liferay.portal.kernel.security.SecureRandomUtil;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.portlet.PortletException;
 import javax.portlet.ResourceRequest;
