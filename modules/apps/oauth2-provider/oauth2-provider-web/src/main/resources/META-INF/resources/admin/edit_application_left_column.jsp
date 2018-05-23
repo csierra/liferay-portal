@@ -68,7 +68,11 @@ OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getApplic
 			<div id="<portlet:namespace />allowedGrantTypes">
 
 				<%
-				List<GrantType> allowedGrantTypesList = oAuth2Application.getAllowedGrantTypesList();
+				List<GrantType> allowedGrantTypesList = new ArrayList<>();
+
+				if (oAuth2Application != null) {
+					allowedGrantTypesList = oAuth2Application.getAllowedGrantTypesList();
+				}
 
 				List<GrantType> oAuth2Grants = oAuth2AdminPortletDisplayContext.getOAuth2Grants(portletPreferences);
 
@@ -120,7 +124,11 @@ OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getApplic
 			<aui:field-wrapper>
 
 				<%
-				List<String> oAuth2ApplicationFeaturesList = oAuth2Application.getFeaturesList();
+				List<String> oAuth2ApplicationFeaturesList = new ArrayList<>();
+
+				if (oAuth2Application != null) {
+					oAuth2ApplicationFeaturesList = oAuth2Application.getFeaturesList();
+				}
 
 				String[] oAuth2Features = oAuth2AdminPortletDisplayContext.getOAuth2Features(portletPreferences);
 
