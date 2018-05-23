@@ -69,7 +69,9 @@ import org.osgi.service.component.annotations.Reference;
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	immediate = true,
 	property = {
+		"com.liferay.portlet.css-class-wrapper=portlet-oauth2-provider-admin",
 		"com.liferay.portlet.display-category=category.hidden",
+		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.preferences-company-wide=true",
 		"javax.portlet.display-name=OAuth2 Admin",
 		"javax.portlet.init-param.portlet-title-based-navigation=true",

@@ -1,0 +1,24 @@
+.portlet-oauth2-provider-admin {
+	.modal-dialog {
+		max-width: 90%;
+	}
+}
+.portlet-oauth2-provider-authorize {
+	.consent .user-icon, .consent .app-icon {
+		height: 64px;
+		width: 64px;
+	}
+
+	.consent .list-group-item {
+		border-left: 0;
+		border-right: 0;
+	}
+
+	.consent .list-group :first-child {
+		border-top: 0;
+	}
+
+	.consent .list-group :last-child {
+		border-bottom: 0;
+	}
+}

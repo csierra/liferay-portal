@@ -52,12 +52,6 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 }
 %>
 
-<style>
-	.modal-dialog {
-		max-width: 90%;
-	}
-</style>
-
 <div class="container-fluid container-fluid-max-xl container-view">
 	<div class="row">
 		<div class="col-lg-12">

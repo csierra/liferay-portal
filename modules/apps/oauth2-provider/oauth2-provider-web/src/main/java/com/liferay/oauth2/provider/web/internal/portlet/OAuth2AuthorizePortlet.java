@@ -68,7 +68,9 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"com.liferay.portlet.application-type=full-page-application",
+		"com.liferay.portlet.css-class-wrapper=portlet-oauth2-provider-authorize",
 		"com.liferay.portlet.display-category=category.hidden",
+		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"javax.portlet.display-name=OAuth2 Authorize Portlet",

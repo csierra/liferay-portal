@@ -34,26 +34,6 @@ if (oAuth2Application.getIconFileEntryId() > 0) {
 }
 %>
 
-<style>
-	.consent .user-icon, .consent .app-icon {
-		height: 64px;
-		width: 64px;
-	}
-
-	.consent .list-group-item {
-		border-left: 0;
-		border-right: 0;
-	}
-
-	.consent .list-group :first-child {
-		border-top: 0;
-	}
-
-	.consent .list-group :last-child {
-		border-bottom: 0;
-	}
-</style>
-
 <div class="closed consent container-fluid-1280">
 	<aui:form action="<%= replyTo %>" method="post" name="fm">
 		<aui:fieldset-group markupView="lexicon">
