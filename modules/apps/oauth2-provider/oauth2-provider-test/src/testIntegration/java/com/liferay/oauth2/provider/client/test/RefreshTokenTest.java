@@ -19,12 +19,12 @@ import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -61,16 +61,17 @@ public class RefreshTokenTest extends BaseClientTest {
 		JSONObject jsonObject = getToken(
 			"oauthTestApplication", null,
 			getResourceOwnerPassword("test@liferay.com", "test"),
-			this::parseJsonObject);
+			this::parseJSONObject);
 
 		WebTarget webTarget = getWebTarget("/annotated");
 
-		String tokenString = jsonObject.getString("access_token");
+		String accessToken = jsonObject.getString("access_token");
 
-		Invocation.Builder builder = authorize(
-			webTarget.request(), tokenString);
+		Invocation.Builder invocationBuilder = authorize(
+			webTarget.request(), accessToken);
 
-		Assert.assertEquals("everything.readonly", builder.get(String.class));
+		Assert.assertEquals(
+			"everything.readonly", invocationBuilder.get(String.class));
 
 		WebTarget tokenWebTarget = getTokenWebTarget();
 
@@ -87,15 +88,16 @@ public class RefreshTokenTest extends BaseClientTest {
 		String newTokenString = parseTokenString(
 			tokenBuilder.post(Entity.form(formData)));
 
-		Assert.assertNotEquals(newTokenString, tokenString);
+		Assert.assertNotEquals(newTokenString, accessToken);
 
-		builder = authorize(webTarget.request(), newTokenString);
+		invocationBuilder = authorize(webTarget.request(), newTokenString);
 
-		Assert.assertEquals("everything.readonly", builder.get(String.class));
+		Assert.assertEquals(
+			"everything.readonly", invocationBuilder.get(String.class));
 
-		builder = authorize(webTarget.request(), tokenString);
+		invocationBuilder = authorize(webTarget.request(), accessToken);
 
-		Response response = builder.get();
+		Response response = invocationBuilder.get();
 
 		Assert.assertEquals(403, response.getStatus());
 	}
@@ -109,7 +111,7 @@ public class RefreshTokenTest extends BaseClientTest {
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
-			Dictionary<String, Object> properties = new Hashtable<>();
+			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 			properties.put("oauth2.scopechecker.type", "annotations");
 

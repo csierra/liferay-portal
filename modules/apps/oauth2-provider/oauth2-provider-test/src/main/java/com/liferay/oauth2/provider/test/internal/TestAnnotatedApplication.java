@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.test.internal;
 
-import com.liferay.oauth2.provider.scope.*;
+import com.liferay.oauth2.provider.scope.RequiresScope;
 
 import java.util.Collections;
 import java.util.Set;

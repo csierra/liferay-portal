@@ -19,11 +19,11 @@ import com.liferay.oauth2.provider.test.internal.TestApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -54,15 +54,16 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 
 	@Test
 	public void test() throws Exception {
-		WebTarget applicationTarget = getWebTarget("/annotated");
+		WebTarget webTarget = getWebTarget("/annotated");
 
-		Invocation.Builder builder = authorize(
-			applicationTarget.request(),
+		Invocation.Builder invocationBuilder = authorize(
+			webTarget.request(),
 			getToken(
 				"oauthTestApplication", null,
 				getClientCredentials("everything"), this::parseTokenString));
 
-		Assert.assertEquals("everything.readonly", builder.get(String.class));
+		Assert.assertEquals(
+			"everything.readonly", invocationBuilder.get(String.class));
 
 		String scopeString = getToken(
 			"oauthTestApplication", null,
@@ -82,30 +83,34 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
 			Dictionary<String, Object> annotatedApplicationProperties =
-				new Hashtable<>();
+				new HashMapDictionary<>();
 
 			annotatedApplicationProperties.put(
 				"oauth2.scopechecker.type", "annotations");
 
 			Dictionary<String, Object> scopeMapperProperties =
-				new Hashtable<>();
+				new HashMapDictionary<>();
 
 			scopeMapperProperties.put(
 				"osgi.jaxrs.name", TestApplication.class.getName());
 
 			createConfigurationFactory(
-				"com.liferay.oauth2.provider.scope.internal." +
-				"configuration.ConfigurableScopeMapperConfiguration",
+				"com.liferay.oauth2.provider.scope.internal.configuration." +
+					"ConfigurableScopeMapperConfiguration",
 				scopeMapperProperties);
-			Hashtable<String, Object> properties = new Hashtable<>();
+
+			HashMapDictionary<String, Object> properties =
+				new HashMapDictionary<>();
 
 			properties.put("osgi.jaxrs.name", TestApplication.class.getName());
 
 			registerJaxRsApplication(
 				new TestApplication(), "methods", properties);
+
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated",
 				annotatedApplicationProperties);
+
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Collections.singletonList("everything"));

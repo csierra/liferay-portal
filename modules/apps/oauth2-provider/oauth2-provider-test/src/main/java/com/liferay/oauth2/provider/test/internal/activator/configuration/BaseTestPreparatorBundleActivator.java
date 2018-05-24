@@ -146,7 +146,7 @@ public abstract class BaseTestPreparatorBundleActivator
 		Application application, String path,
 		Dictionary<String, Object> properties) {
 
-		if (properties == null || properties.isEmpty()) {
+		if ((properties == null) || properties.isEmpty()) {
 			properties = new HashMapDictionary<>();
 		}
 
@@ -257,7 +257,8 @@ public abstract class BaseTestPreparatorBundleActivator
 		catch (Exception e) {
 			e.printStackTrace();
 
-			return () -> {};
+			return () -> {
+			};
 		}
 
 		if (configuration == null) {
@@ -287,33 +288,32 @@ public abstract class BaseTestPreparatorBundleActivator
 					"aries.jax.rs.whiteboard.internal.cxf." +
 						"CxfJaxrsServiceRegistrator))";
 
-		ServiceTracker<?, ?> tracker =
-			new ServiceTracker<>(
-				_bundleContext, _bundleContext.createFilter(filter),
-				new ServiceTrackerCustomizer<Object, Object>() {
+		ServiceTracker<?, ?> tracker = new ServiceTracker<>(
+			_bundleContext, _bundleContext.createFilter(filter),
+			new ServiceTrackerCustomizer<Object, Object>() {
 
-					@Override
-					public Object addingService(
-						ServiceReference<Object> reference) {
+				@Override
+				public Object addingService(
+					ServiceReference<Object> reference) {
 
-						countDownLatch.countDown();
+					countDownLatch.countDown();
 
-						return reference;
-					}
+					return reference;
+				}
 
-					@Override
-					public void modifiedService(
-						ServiceReference<Object> reference, Object service) {
-					}
+				@Override
+				public void modifiedService(
+					ServiceReference<Object> reference, Object service) {
+				}
 
-					@Override
-					public void removedService(
-						ServiceReference<Object> reference, Object service) {
+				@Override
+				public void removedService(
+					ServiceReference<Object> reference, Object service) {
 
-						countDownLatch.countDown();
-					}
+					countDownLatch.countDown();
+				}
 
-				});
+			});
 
 		tracker.open();
 
@@ -330,9 +330,9 @@ public abstract class BaseTestPreparatorBundleActivator
 		}
 	}
 
-	protected BundleContext _bundleContext;
 	protected ArrayList<AutoCloseable> autoCloseables;
 
+	private BundleContext _bundleContext;
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 
 }

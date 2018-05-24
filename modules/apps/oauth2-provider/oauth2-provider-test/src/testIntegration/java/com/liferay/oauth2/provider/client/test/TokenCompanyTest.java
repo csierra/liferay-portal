@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.client.test;
 
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 
@@ -72,14 +71,9 @@ public class TokenCompanyTest extends BaseClientTest {
 
 			Company company = createCompany("myhostdefaultuser");
 
-			try {
-				createOAuth2Application(
-					company.getCompanyId(), company.getDefaultUser(),
-					"oauthTestApplicationDefault");
-			}
-			catch (PortalException pe) {
-				throw new IllegalArgumentException(pe);
-			}
+			createOAuth2Application(
+				company.getCompanyId(), company.getDefaultUser(),
+				"oauthTestApplicationDefault");
 		}
 
 	}

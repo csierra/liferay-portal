@@ -56,32 +56,33 @@ public class JsonWebServiceTest extends BaseClientTest {
 		WebTarget jsonWebTarget = getJsonWebTarget(
 			"company", "get-company-by-virtual-host");
 
-		Invocation.Builder builder = jsonWebTarget.request();
+		Invocation.Builder invocationBuilder = jsonWebTarget.request();
 
 		MultivaluedMap<String, String> formData = new MultivaluedHashMap<>();
 
 		formData.putSingle("virtualHost", "testcompany.xyz");
 
 		Assert.assertEquals(
-			403, builder.post(Entity.form(formData)).getStatus());
+			403, invocationBuilder.post(Entity.form(formData)).getStatus());
 
 		String tokenString = getToken(
 			"oauthTestApplicationRO", null,
 			getResourceOwnerPassword("test@liferay.com", "test"),
 			this::parseTokenString);
 
-		builder = authorize(jsonWebTarget.request(), tokenString);
+		invocationBuilder = authorize(jsonWebTarget.request(), tokenString);
 
-		Response response = builder.post(Entity.form(formData));
+		Response response = invocationBuilder.post(Entity.form(formData));
 
-		JSONObject jsonObject = new JSONObject(
+		JSONObject responseJSONObject = new JSONObject(
 			response.readEntity(String.class));
 
-		Assert.assertEquals("testcompany", jsonObject.getString("webId"));
+		Assert.assertEquals(
+			"testcompany", responseJSONObject.getString("webId"));
 
 		jsonWebTarget = getJsonWebTarget("region", "add-region");
 
-		builder = authorize(jsonWebTarget.request(), tokenString);
+		invocationBuilder = authorize(jsonWebTarget.request(), tokenString);
 
 		formData = new MultivaluedHashMap<>();
 
@@ -90,18 +91,18 @@ public class JsonWebServiceTest extends BaseClientTest {
 		formData.putSingle("name", "'aName'");
 		formData.putSingle("active", "true");
 
-		response = builder.post(Entity.form(formData));
+		response = invocationBuilder.post(Entity.form(formData));
 
 		Assert.assertEquals(403, response.getStatus());
 
-		builder = authorize(
+		invocationBuilder = authorize(
 			jsonWebTarget.request(),
 			getToken(
 				"oauthTestApplicationRW", null,
 				getResourceOwnerPassword("test@liferay.com", "test"),
 				this::parseTokenString));
 
-		response = builder.post(Entity.form(formData));
+		response = invocationBuilder.post(Entity.form(formData));
 
 		String responseString = response.readEntity(String.class);
 
@@ -118,9 +119,11 @@ public class JsonWebServiceTest extends BaseClientTest {
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
 			createCompany("testcompany");
+
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationRO",
 				Collections.singletonList("everything.readonly"));
+
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationRW",
 				Collections.singletonList("everything"));

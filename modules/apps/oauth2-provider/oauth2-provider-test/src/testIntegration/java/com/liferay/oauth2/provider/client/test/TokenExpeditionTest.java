@@ -18,10 +18,10 @@ import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -55,7 +55,7 @@ public class TokenExpeditionTest extends BaseClientTest {
 	public void test() throws Exception {
 		WebTarget tokenWebTarget = getTokenWebTarget();
 
-		Invocation.Builder builder = tokenWebTarget.request();
+		Invocation.Builder invocationBuilder = tokenWebTarget.request();
 
 		MultivaluedHashMap<String, String> formData =
 			new MultivaluedHashMap<>();
@@ -64,7 +64,8 @@ public class TokenExpeditionTest extends BaseClientTest {
 		formData.add("client_secret", "");
 		formData.add("grant_type", "client_credentials");
 
-		String error = parseError(builder.post(Entity.form(formData)));
+		String error = parseError(
+			invocationBuilder.post(Entity.form(formData)));
 
 		Assert.assertEquals("invalid_client", error);
 
@@ -74,7 +75,7 @@ public class TokenExpeditionTest extends BaseClientTest {
 		formData.add("client_secret", "wrong");
 		formData.add("grant_type", "client_credentials");
 
-		error = parseError(builder.post(Entity.form(formData)));
+		error = parseError(invocationBuilder.post(Entity.form(formData)));
 
 		Assert.assertEquals("invalid_client", error);
 
@@ -84,7 +85,7 @@ public class TokenExpeditionTest extends BaseClientTest {
 		formData.add("client_secret", "");
 		formData.add("grant_type", "client_credentials");
 
-		error = parseError(builder.post(Entity.form(formData)));
+		error = parseError(invocationBuilder.post(Entity.form(formData)));
 
 		Assert.assertEquals("invalid_client", error);
 
@@ -94,7 +95,7 @@ public class TokenExpeditionTest extends BaseClientTest {
 		formData.add("client_secret", "wrong");
 		formData.add("grant_type", "client_credentials");
 
-		error = parseError(builder.post(Entity.form(formData)));
+		error = parseError(invocationBuilder.post(Entity.form(formData)));
 
 		Assert.assertEquals("invalid_client", error);
 
@@ -104,7 +105,7 @@ public class TokenExpeditionTest extends BaseClientTest {
 		formData.add("client_secret", "oauthTestApplicationSecret");
 		formData.add("grant_type", "client_credentials");
 
-		error = parseError(builder.post(Entity.form(formData)));
+		error = parseError(invocationBuilder.post(Entity.form(formData)));
 
 		Assert.assertEquals("invalid_client", error);
 
@@ -117,21 +118,24 @@ public class TokenExpeditionTest extends BaseClientTest {
 		WebTarget webTarget = getWebTarget("/annotated");
 
 		String tokenString = parseTokenString(
-			builder.post(Entity.form(formData)));
+			invocationBuilder.post(Entity.form(formData)));
 
-		builder = authorize(webTarget.request(), tokenString);
+		invocationBuilder = authorize(webTarget.request(), tokenString);
 
-		Assert.assertEquals("everything.readonly", builder.get(String.class));
+		Assert.assertEquals(
+			"everything.readonly", invocationBuilder.get(String.class));
 
-		builder = webTarget.request().header("Authorization", "Bearer ");
+		invocationBuilder =
+			webTarget.request().header("Authorization", "Bearer ");
 
-		Response response = builder.get();
+		Response response = invocationBuilder.get();
 
 		Assert.assertEquals(403, response.getStatus());
 
-		builder = webTarget.request().header("Authorization", "Bearer wrong");
+		invocationBuilder =
+			webTarget.request().header("Authorization", "Bearer wrong");
 
-		response = builder.get();
+		response = invocationBuilder.get();
 
 		Assert.assertEquals(403, response.getStatus());
 	}
@@ -145,7 +149,7 @@ public class TokenExpeditionTest extends BaseClientTest {
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
-			Dictionary<String, Object> properties = new Hashtable<>();
+			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 			properties.put("oauth2.scopechecker.type", "annotations");
 

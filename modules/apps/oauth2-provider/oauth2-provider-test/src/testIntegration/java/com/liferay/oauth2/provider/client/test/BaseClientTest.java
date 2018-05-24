@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
@@ -71,6 +71,9 @@ import org.junit.BeforeClass;
 
 import org.osgi.framework.BundleActivator;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 public class BaseClientTest {
 
 	public static Archive<?> getDeployment(
@@ -89,8 +92,8 @@ public class BaseClientTest {
 			File file = new File(javaClassPath);
 
 			if (file.isDirectory() ||
-				javaClassPath.toLowerCase().endsWith(".zip") ||
-				javaClassPath.toLowerCase().endsWith(".jar")) {
+				StringUtil.endsWith(javaClassPath, ".zip") ||
+				StringUtil.endsWith(javaClassPath, ".jar")) {
 
 				bndProjectBuilder.addClassPath(file);
 			}
@@ -154,7 +157,7 @@ public class BaseClientTest {
 	}
 
 	@BeforeClass
-	public static void setupClass() {
+	public static void setUpClass() {
 		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 
 		new HttpUtil().setHttp(new HttpImpl());
@@ -170,9 +173,9 @@ public class BaseClientTest {
 	}
 
 	protected Invocation.Builder authorize(
-		Invocation.Builder builder, String token) {
+		Invocation.Builder invocataionBuilder, String token) {
 
-		return builder.header("Authorization", "Bearer " + token);
+		return invocataionBuilder.header("Authorization", "Bearer " + token);
 	}
 
 	protected Cookie getAuthenticatedCookie(
@@ -204,12 +207,14 @@ public class BaseClientTest {
 	protected BiFunction<String, Invocation.Builder, Response>
 		getAuthorizationCode(String user, String password, String hostname) {
 
-		return (clientId, builder) -> {
+		return (clientId, invocationBuilder) -> {
 			String authorizationCode = getAuthorizationCode(
 				user, password, hostname,
-				webTarget ->
-					webTarget.queryParam("client_id", clientId).
-						queryParam("response_type", "code"));
+				webTarget -> webTarget.queryParam(
+					"client_id", clientId
+				).queryParam(
+					"response_type", "code"
+				));
 
 			MultivaluedHashMap<String, String> formData =
 				new MultivaluedHashMap<>();
@@ -219,7 +224,7 @@ public class BaseClientTest {
 			formData.add("grant_type", "authorization_code");
 			formData.add("code", authorizationCode);
 
-			return builder.post(Entity.form(formData));
+			return invocationBuilder.post(Entity.form(formData));
 		};
 	}
 
@@ -230,15 +235,17 @@ public class BaseClientTest {
 		try {
 			Invocation.Builder authorizeInvocationBuilder =
 				getInvocationBuilder(
-					hostname, authorizeRequestFunction.apply(
-						getAuthorizeWebTarget()));
+					hostname,
+					authorizeRequestFunction.apply(getAuthorizeWebTarget()));
 
 			Cookie authenticatedCookie = getAuthenticatedCookie(
 				login, password, hostname);
 
-			Response authorizeResponse =
-				authorizeInvocationBuilder.accept("text/html").
-					cookie(authenticatedCookie).get();
+			Response authorizeResponse = authorizeInvocationBuilder.accept(
+				"text/html"
+			).cookie(
+				authenticatedCookie
+			).get();
 
 			URI location = authorizeResponse.getLocation();
 
@@ -260,14 +267,15 @@ public class BaseClientTest {
 
 			formData.add("oauthDecision", "allow");
 
-			for (String key : parameterMap.keySet()) {
+			for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+				String key = entry.getKey();
+
 				if (!StringUtil.startsWith(key, "oauth2_")) {
 					continue;
 				}
 
 				formData.add(
-					key.substring("oauth2_".length()),
-					parameterMap.get(key)[0]);
+					key.substring("oauth2_".length()), entry.getValue()[0]);
 			}
 
 			Invocation.Builder authorizeDecisionInvocationBuilder =
@@ -302,7 +310,7 @@ public class BaseClientTest {
 		getAuthorizationCodePKCE(
 			String user, String password, String hostname) {
 
-		return (clientId, builder) -> {
+		return (clientId, invocationBuilder) -> {
 			String codeVerifier = RandomTestUtil.randomString();
 
 			String base64Digest = DigesterUtil.digestBase64(
@@ -319,10 +327,13 @@ public class BaseClientTest {
 
 			String authorizationCode = getAuthorizationCode(
 				user, password, hostname,
-				webTarget ->
-					webTarget.queryParam("client_id", clientId).
-						queryParam("code_challenge", codeChallenge).
-						queryParam("response_type", "code"));
+				webTarget -> webTarget.queryParam(
+					"client_id", clientId
+				).queryParam(
+					"code_challenge", codeChallenge
+				).queryParam(
+					"response_type", "code"
+				));
 
 			MultivaluedHashMap<String, String> formData =
 				new MultivaluedHashMap<>();
@@ -332,7 +343,7 @@ public class BaseClientTest {
 			formData.add("code_verifier", codeVerifier);
 			formData.add("grant_type", "authorization_code");
 
-			return builder.post(Entity.form(formData));
+			return invocationBuilder.post(Entity.form(formData));
 		};
 	}
 
@@ -349,7 +360,7 @@ public class BaseClientTest {
 	protected BiFunction<String, Invocation.Builder, Response>
 		getClientCredentials(String scope) {
 
-		return (clientId, builder) -> {
+		return (clientId, invocationBuilder) -> {
 			MultivaluedHashMap<String, String> formData =
 				new MultivaluedHashMap<>();
 
@@ -358,12 +369,12 @@ public class BaseClientTest {
 			formData.add("grant_type", "client_credentials");
 			formData.add("scope", scope);
 
-			return builder.post(Entity.form(formData));
+			return invocationBuilder.post(Entity.form(formData));
 		};
 	}
 
 	protected Response getClientCredentials(
-		String clientId, Invocation.Builder builder) {
+		String clientId, Invocation.Builder invocationBuilder) {
 
 		MultivaluedHashMap<String, String> formData =
 			new MultivaluedHashMap<>();
@@ -372,19 +383,19 @@ public class BaseClientTest {
 		formData.add("client_secret", "oauthTestApplicationSecret");
 		formData.add("grant_type", "client_credentials");
 
-		return builder.post(Entity.form(formData));
+		return invocationBuilder.post(Entity.form(formData));
 	}
 
 	protected Invocation.Builder getInvocationBuilder(
 		String hostname, WebTarget webTarget) {
 
-		Invocation.Builder builder = webTarget.request();
+		Invocation.Builder invocationBuilder = webTarget.request();
 
 		if (hostname != null) {
-			builder = builder.header("Host", hostname);
+			invocationBuilder = invocationBuilder.header("Host", hostname);
 		}
 
-		return builder;
+		return invocationBuilder;
 	}
 
 	protected WebTarget getJsonWebTarget(String... paths)
@@ -392,34 +403,45 @@ public class BaseClientTest {
 
 		Client client = getClient();
 
-		WebTarget target = client.target(_url.toURI());
+		WebTarget webTarget = client.target(_url.toURI());
 
-		target = target.path("api").path("jsonws");
+		webTarget = webTarget.path("api");
+		webTarget = webTarget.path("jsonws");
 
 		for (String path : paths) {
-			target = target.path(path);
+			webTarget = webTarget.path(path);
 		}
 
-		return target;
+		return webTarget;
 	}
 
 	protected WebTarget getLoginWebTarget() throws URISyntaxException {
 		Client client = getClient();
 
-		return client.target(
-			_url.toURI()).path("c").path("portal").path("login");
+		WebTarget webTarget = client.target(_url.toURI());
+
+		webTarget = webTarget.path("c");
+		webTarget = webTarget.path("portal");
+		webTarget = webTarget.path("login");
+
+		return webTarget;
 	}
 
 	protected WebTarget getOAuth2WebTarget() throws URISyntaxException {
 		Client client = getClient();
 
-		return client.target(_url.toURI()).path("o").path("oauth2");
+		WebTarget webTarget = client.target(_url.toURI());
+
+		webTarget = webTarget.path("o");
+		webTarget = webTarget.path("oauth2");
+
+		return webTarget;
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>
 		getResourceOwnerPassword(String user, String password) {
 
-		return (clientId, builder) -> {
+		return (clientId, invocationBuilder) -> {
 			MultivaluedHashMap<String, String> formData =
 				new MultivaluedHashMap<>();
 
@@ -429,14 +451,14 @@ public class BaseClientTest {
 			formData.add("username", user);
 			formData.add("password", password);
 
-			return builder.post(Entity.form(formData));
+			return invocationBuilder.post(Entity.form(formData));
 		};
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>
 		getResourceOwnerPassword(String user, String password, String scope) {
 
-		return (clientId, builder) -> {
+		return (clientId, invocationBuilder) -> {
 			MultivaluedHashMap<String, String> formData =
 				new MultivaluedHashMap<>();
 
@@ -447,7 +469,7 @@ public class BaseClientTest {
 			formData.add("password", password);
 			formData.add("scope", scope);
 
-			return builder.post(Entity.form(formData));
+			return invocationBuilder.post(Entity.form(formData));
 		};
 	}
 
@@ -464,9 +486,11 @@ public class BaseClientTest {
 	}
 
 	protected <T> T getToken(
-		String clientId, String hostname,
-		BiFunction<String, Invocation.Builder, Response> credentialsBiFunction,
-		Function<Response, T> tokenParser) throws URISyntaxException {
+			String clientId, String hostname,
+			BiFunction<String, Invocation.Builder, Response>
+				credentialsBiFunction,
+			Function<Response, T> tokenParser)
+		throws URISyntaxException {
 
 		return tokenParser.apply(
 			credentialsBiFunction.apply(
@@ -504,7 +528,7 @@ public class BaseClientTest {
 	}
 
 	protected String parseJsonField(Response response, String field) {
-		JSONObject jsonObject = parseJsonObject(response);
+		JSONObject jsonObject = parseJSONObject(response);
 
 		try {
 			return jsonObject.getString(field);
@@ -515,7 +539,7 @@ public class BaseClientTest {
 		}
 	}
 
-	protected JSONObject parseJsonObject(Response response) {
+	protected JSONObject parseJSONObject(Response response) {
 		String json = response.readEntity(String.class);
 
 		try {
@@ -536,6 +560,6 @@ public class BaseClientTest {
 	}
 
 	@ArquillianResource
-	protected URL _url;
+	private URL _url;
 
 }

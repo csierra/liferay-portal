@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
  * any later version.
- * <p>
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +37,9 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 
+/**
+ * @author Carlos Sierra Andrés
+ */
 public class TestUtils {
 
 	public static Configuration configurationExists(
@@ -154,7 +156,8 @@ public class TestUtils {
 
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 
-		Hashtable<String, Object> registrationProperties = new Hashtable<>();
+		HashMapDictionary<String, Object> registrationProperties =
+			new HashMapDictionary<>();
 
 		registrationProperties.put(Constants.SERVICE_PID, pid);
 
@@ -224,13 +227,15 @@ public class TestUtils {
 
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 
-		Hashtable<String, Object> registrationProperties = new Hashtable<>();
+		HashMapDictionary<String, Object> registrationProperties =
+			new HashMapDictionary<>();
 
 		registrationProperties.put(Constants.SERVICE_PID, pid);
 
 		ServiceRegistration<ManagedService> serviceRegistration =
 			bundleContext.registerService(
-				ManagedService.class, incomingProperties -> {
+				ManagedService.class,
+				incomingProperties -> {
 					if (Validator.isNull(incomingProperties)) {
 						return;
 					}

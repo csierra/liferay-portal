@@ -19,12 +19,12 @@ import com.liferay.oauth2.provider.test.internal.TestApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -94,14 +94,14 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
 			Dictionary<String, Object> testApplicationProperties =
-				new Hashtable<>();
+				new HashMapDictionary<>();
 
 			testApplicationProperties.put("prefix", "methods");
 			testApplicationProperties.put(
 				"osgi.jaxrs.name", TestApplication.class.getName());
 
 			Dictionary<String, Object> annotatedApplicationProperties =
-				new Hashtable<>();
+				new HashMapDictionary<>();
 
 			annotatedApplicationProperties.put(
 				"oauth2.scopechecker.type", "annotations");
@@ -109,46 +109,53 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 			annotatedApplicationProperties.put(
 				"osgi.jaxrs.name", TestAnnotatedApplication.class.getName());
 
-			Hashtable<String, Object> scopeMapperProperties = new Hashtable<>();
+			HashMapDictionary<String, Object> scopeMapperProperties =
+				new HashMapDictionary<>();
 
 			scopeMapperProperties.put(
 				"osgi.jaxrs.name", TestApplication.class.getName());
 
-			Hashtable<String, Object> bundlePrefixProperties =
-				new Hashtable<>();
+			HashMapDictionary<String, Object> bundlePrefixProperties =
+				new HashMapDictionary<>();
 
 			bundlePrefixProperties.put(
 				"osgi.jaxrs.name",
 				new String[] {
 					"com.liferay.oauth2.provider.test.internal.TestApplication",
 					"com.liferay.oauth2.provider.test.internal." +
-					"TestAnnotatedApplication"
+						"TestAnnotatedApplication"
 				});
 
 			bundlePrefixProperties.put(
 				"service.properties", new String[] {"prefix"});
+
 			bundlePrefixProperties.put("include.bundle.symbolic.name", false);
 
 			createConfigurationFactory(
-				"com.liferay.oauth2.provider.scope.internal." +
-				"configuration.ConfigurableScopeMapperConfiguration",
+				"com.liferay.oauth2.provider.scope.internal.configuration." +
+					"ConfigurableScopeMapperConfiguration",
 				scopeMapperProperties);
+
 			createConfigurationFactory(
-				"com.liferay.oauth2.provider.scope.internal." +
-				"configuration.BundlePrefixHandlerFactoryConfiguration",
+				"com.liferay.oauth2.provider.scope.internal.configuration." +
+					"BundlePrefixHandlerFactoryConfiguration",
 				bundlePrefixProperties);
+
 			registerJaxRsApplication(
 				new TestApplication(), "methods", testApplicationProperties);
+
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated",
 				annotatedApplicationProperties);
+
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Arrays.asList("annotations/everything", "methods/everything"));
+
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationWrong",
 				Collections.singletonList("everything"));
-			}
+		}
 
 	}
 

@@ -18,10 +18,10 @@ import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -53,20 +53,21 @@ public class AnnotatedApplicationClientTest extends BaseClientTest {
 	public void test() throws Exception {
 		WebTarget applicationTarget = getWebTarget("/annotated");
 
-		Invocation.Builder builder = authorize(
+		Invocation.Builder invocationBuilder = authorize(
 			applicationTarget.request(),
 			getToken(
 				"oauthTestApplicationAfter", null,
 				getResourceOwnerPassword("test@liferay.com", "test"),
 				this::parseTokenString));
 
-		Assert.assertEquals("everything.readonly", builder.get(String.class));
+		Assert.assertEquals(
+			"everything.readonly", invocationBuilder.get(String.class));
 
-		builder = authorize(
+		invocationBuilder = authorize(
 			applicationTarget.request(),
 			getToken("oauthTestApplicationBefore"));
 
-		Response response = builder.get();
+		Response response = invocationBuilder.get();
 
 		Assert.assertEquals(403, response.getStatus());
 	}
@@ -80,14 +81,16 @@ public class AnnotatedApplicationClientTest extends BaseClientTest {
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
-			Dictionary<String, Object> properties = new Hashtable<>();
+			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 			properties.put("oauth2.scopechecker.type", "annotations");
 
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationBefore");
+
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated", properties);
+
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationAfter");
 		}
