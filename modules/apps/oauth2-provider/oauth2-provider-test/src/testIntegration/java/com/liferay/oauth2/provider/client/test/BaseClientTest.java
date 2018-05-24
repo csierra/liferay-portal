@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.DigesterImpl;
 import com.liferay.portal.util.HttpImpl;
@@ -33,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URI;
@@ -68,7 +68,9 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -89,14 +91,16 @@ public class BaseClientTest {
 	}
 
 	public static Archive<?> getDeployment(
-		Class<? extends BundleActivator> bundleActivator) throws Exception {
+			Class<? extends BundleActivator> bundleActivatorClass)
+		throws Exception {
 
 		BndProjectBuilder bndProjectBuilder = ShrinkWrap.create(
 			BndProjectBuilder.class);
 
 		String javaClassPathString = System.getProperty("java.class.path");
 
-		String[] javaClassPaths = javaClassPathString.split(File.pathSeparator);
+		String[] javaClassPaths = StringUtil.split(
+			javaClassPathString, File.pathSeparator);
 
 		for (String javaClassPath : javaClassPaths) {
 			File file = new File(javaClassPath);
@@ -119,7 +123,7 @@ public class BaseClientTest {
 			JavaArchive.class
 		);
 
-		javaArchive.addClass(bundleActivator);
+		javaArchive.addClass(bundleActivatorClass);
 
 		ZipExporter zipExporter = javaArchive.as(ZipExporter.class);
 
@@ -132,18 +136,33 @@ public class BaseClientTest {
 
 		analyzer.setJar(jar);
 
-		Manifest firstPassManifest = new Manifest(
-			javaArchive.get("META-INF/MANIFEST.MF").getAsset().openStream());
 
-		firstPassManifest.getMainAttributes().remove(new Attributes.Name("Import-Package"));
+		Node manifestNode = javaArchive.get("META-INF/MANIFEST.MF");
 
-		firstPassManifest.getMainAttributes().putValue("Bundle-Activator", bundleActivator.getName());
-		analyzer.mergeManifest(firstPassManifest);
+		Asset asset = manifestNode.getAsset();
+
+		try (InputStream inputStream = asset.openStream()) {
+			Manifest manifest = new Manifest(inputStream);
+
+			Attributes attributes = manifest.getMainAttributes();
+
+			attributes.remove(new Attributes.Name("Import-Package"));
+
+			attributes.putValue(
+				"Bundle-Activator", bundleActivatorClass.getName());
+
+			analyzer.mergeManifest(manifest);
+		}
+
 		Manifest manifest = analyzer.calcManifest();
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		manifest.write(baos);
-		ByteArrayAsset byteArrayAsset = new ByteArrayAsset(baos.toByteArray());
+		ByteArrayOutputStream byteArrayOutputStream =
+			new ByteArrayOutputStream();
+
+		manifest.write(byteArrayOutputStream);
+
+		ByteArrayAsset byteArrayAsset = new ByteArrayAsset(
+			byteArrayOutputStream.toByteArray());
 
 		javaArchive.delete("META-INF/MANIFEST.MF");
 
@@ -161,9 +180,9 @@ public class BaseClientTest {
 	}
 
 	protected Invocation.Builder authorize(
-		Invocation.Builder builder, String tokenString) {
+		Invocation.Builder builder, String token) {
 
-		return builder.header("Authorization", "Bearer " + tokenString);
+		return builder.header("Authorization", "Bearer " + token);
 	}
 
 	protected String getToken(String clientId) throws URISyntaxException {
@@ -180,69 +199,52 @@ public class BaseClientTest {
 
 	protected <T> T getToken(
 		String clientId, String hostname,
-		BiFunction<String, Invocation.Builder, Response> credentials,
+		BiFunction<String, Invocation.Builder, Response> credentialsBiFunction,
 		Function<Response, T> tokenParser) throws URISyntaxException {
 
 		return tokenParser.apply(
-			credentials.apply(clientId, getTokenInvocationBuilder(hostname)));
+			credentialsBiFunction.apply(
+				clientId, getTokenInvocationBuilder(hostname)));
 	}
 
-	protected String parseTokenString(Response tokenResponse) {
-		String jsonString = tokenResponse.readEntity(String.class);
+	protected String parseTokenString(Response response) {
+		return parseJsonField(response, "access_token");
+	}
+
+	protected JSONObject parseJsonObject(Response response) {
+		String json = response.readEntity(String.class);
 
 		try {
-			JSONObject jsonObject = new JSONObject(jsonString);
-
-			return jsonObject.getString("access_token");
+			return new JSONObject(json);
 		}
 		catch (JSONException e) {
 			throw new IllegalArgumentException(
-				"The token service returned " + jsonString);
+				"The token service returned " + json);
 		}
 	}
 
-	protected JSONObject parseJsonObject(Response tokenResponse) {
-		String jsonString = tokenResponse.readEntity(String.class);
-
-		try {
-			return  new JSONObject(jsonString);
-		}
-		catch (JSONException e) {
-			throw new IllegalArgumentException(
-				"The token service returned " + jsonString);
-		}
+	protected String parseScopeString(Response response) {
+		return parseJsonField(response, "scope");
 	}
 
-	protected String parseScopeString(Response tokenResponse) {
-		String jsonString = tokenResponse.readEntity(String.class);
-
-		try {
-			JSONObject jsonObject = new JSONObject(jsonString);
-
-			return jsonObject.getString("scope");
-		}
-		catch (JSONException e) {
-			throw new IllegalArgumentException(
-				"The token service returned " + jsonString);
-		}
+	protected String parseError(Response response) {
+		return parseJsonField(response, "error");
 	}
 
-	protected String parseError(Response tokenResponse) {
-		String jsonString = tokenResponse.readEntity(String.class);
+	protected String parseJsonField(Response response, String field) {
+		JSONObject jsonObject = parseJsonObject(response);
 
 		try {
-			JSONObject jsonObject = new JSONObject(jsonString);
-
-			return jsonObject.getString("error");
+			return jsonObject.getString(field);
 		}
 		catch (JSONException e) {
 			throw new IllegalArgumentException(
-				"The token service returned " + jsonString);
+				"The token service returned " + jsonObject.toString());
 		}
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>
-	getClientCredentials(String scope) {
+		getClientCredentials(String scope) {
 
 		return (clientId, builder) -> {
 			MultivaluedHashMap<String, String> formData =
@@ -259,6 +261,7 @@ public class BaseClientTest {
 
 	protected Response getClientCredentials(
 		String clientId, Invocation.Builder builder) {
+
 		MultivaluedHashMap<String, String> formData =
 			new MultivaluedHashMap<>();
 
@@ -327,7 +330,8 @@ public class BaseClientTest {
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>
-		getAuthorizationCodePKCE(String user, String password, String hostname) {
+		getAuthorizationCodePKCE(
+			String user, String password, String hostname) {
 
 		return (clientId, builder) -> {
 			String codeVerifier = RandomTestUtil.randomString();
@@ -411,7 +415,7 @@ public class BaseClientTest {
 			String login, String password, String hostname)
 		throws URISyntaxException {
 
-		Invocation.Builder loginInvocationBuilder = getInvocationBuilder(
+		Invocation.Builder invocationBuilder = getInvocationBuilder(
 			hostname, getLoginWebTarget());
 
 		MultivaluedHashMap<String, String> formData =
@@ -420,11 +424,12 @@ public class BaseClientTest {
 		formData.add("login", login);
 		formData.add("password", password);
 
-		Response loginResponse = loginInvocationBuilder.post(
+		Response response = invocationBuilder.post(
 			Entity.form(formData));
 
-		NewCookie cookie =
-			loginResponse.getCookies().get(CookieKeys.JSESSIONID);
+		Map<String, NewCookie> cookies = response.getCookies();
+
+		NewCookie cookie = cookies.get(CookieKeys.JSESSIONID);
 
 		if (cookie == null) {
 			return null;
@@ -469,6 +474,7 @@ public class BaseClientTest {
 				new MultivaluedHashMap<>();
 
 			formData.add("oauthDecision", "allow");
+
 			for (String key : parameterMap.keySet()) {
 				if (!StringUtil.startsWith(key, "oauth2_")) {
 					continue;
@@ -506,28 +512,12 @@ public class BaseClientTest {
 			throw new RuntimeException(e);
 		}
 	}
-
-	public static void printDocument(Document doc, OutputStream out) throws
-		IOException, TransformerException {
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer transformer = tf.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-		transformer.setOutputProperty(
-			"{http://xml.apache.org/xslt}indent-amount", "4");
-
-		transformer.transform(new DOMSource(doc),
-			new StreamResult(new OutputStreamWriter(out, "UTF-8")));
-	}
-
 	protected WebTarget getWebTarget(String... paths)
 		throws URISyntaxException {
 
 		Client client = getClient();
 
-		WebTarget target = client.target(getUrl().toURI());
+		WebTarget target = client.target(_url.toURI());
 
 		target = target.path("o").path("oauth2-test");
 
@@ -543,7 +533,7 @@ public class BaseClientTest {
 
 		Client client = getClient();
 
-		WebTarget target = client.target(getUrl().toURI());
+		WebTarget target = client.target(_url.toURI());
 
 		target = target.path("api").path("jsonws");
 
