@@ -71,10 +71,10 @@ import org.osgi.service.component.annotations.Reference;
 public class OAuth2AdminPortlet extends MVCPortlet {
 
 	public void deleteOAuth2Application(
-		ActionRequest request, ActionResponse response) {
+		ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		long oAuth2ApplicationId = ParamUtil.getLong(
-			request, "oAuth2ApplicationId");
+			actionRequest, "oAuth2ApplicationId");
 
 		try {
 			_oAuth2ApplicationService.deleteOAuth2Application(
@@ -85,15 +85,15 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				_log.debug(pe);
 			}
 
-			SessionErrors.add(request, pe.getClass());
+			SessionErrors.add(actionRequest, pe.getClass());
 		}
 	}
 
 	public void deleteOAuth2Applications(
-		ActionRequest request, ActionResponse response) {
+		ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		long[] oAuth2ApplicationIds = StringUtil.split(
-			ParamUtil.getString(request, "oAuth2ApplicationIds"), 0L);
+			ParamUtil.getString(actionRequest, "oAuth2ApplicationIds"), 0L);
 
 		try {
 			for (long oAuth2ApplicationId : oAuth2ApplicationIds) {
@@ -106,7 +106,7 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				_log.debug(pe);
 			}
 
-			SessionErrors.add(request, pe.getClass());
+			SessionErrors.add(actionRequest, pe.getClass());
 		}
 	}
 
@@ -128,21 +128,21 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 	}
 
 	public void revokeOAuth2Authorization(
-			ActionRequest request, ActionResponse response)
+			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws PortalException {
 
 		long oAuth2AuthorizationId = ParamUtil.getLong(
-			request, "oAuth2AuthorizationId");
+			actionRequest, "oAuth2AuthorizationId");
 
 		_oAuth2AuthorizationService.revokeOAuth2Authorization(
 			oAuth2AuthorizationId);
 	}
 
 	public void revokeOAuth2Authorizations(
-		ActionRequest request, ActionResponse response) {
+		ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		long[] oAuth2AuthorizationIds = StringUtil.split(
-			ParamUtil.getString(request, "oAuth2AuthorizationIds"), 0L);
+			ParamUtil.getString(actionRequest, "oAuth2AuthorizationIds"), 0L);
 
 		try {
 			for (long oAuth2AuthorizationId : oAuth2AuthorizationIds) {
@@ -155,9 +155,9 @@ public class OAuth2AdminPortlet extends MVCPortlet {
 				_log.debug(pe);
 			}
 
-			SessionErrors.add(request, pe.getClass());
+			SessionErrors.add(actionRequest, pe.getClass());
 
-			response.setRenderParameter(
+			actionResponse.setRenderParameter(
 				"mvcPath", "/admin/application_authorizations.jsp");
 		}
 	}
