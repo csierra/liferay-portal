@@ -20,20 +20,23 @@ import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTes
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
+
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Carlos Sierra Andrés
@@ -51,7 +54,6 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 
 	@Test
 	public void test() throws Exception {
-
 		String tokenString = getToken("oauthTestApplication");
 
 		WebTarget applicationTarget = getWebTarget("/methods");
@@ -117,14 +119,14 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 
 			bundlePrefixProperties.put(
 				"osgi.jaxrs.name",
-				new String[]{
+				new String[] {
 					"com.liferay.oauth2.provider.test.internal.TestApplication",
 					"com.liferay.oauth2.provider.test.internal." +
 					"TestAnnotatedApplication"
 				});
 
 			bundlePrefixProperties.put(
-				"service.properties", new String[]{"prefix"});
+				"service.properties", new String[] {"prefix"});
 			bundlePrefixProperties.put("include.bundle.symbolic.name", false);
 
 			createConfigurationFactory(
@@ -142,11 +144,12 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 				annotatedApplicationProperties);
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
-				Arrays.asList(
-					"annotations/everything", "methods/everything"));
+				Arrays.asList("annotations/everything", "methods/everything"));
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationWrong",
-				Collections.singletonList("everything"));		}
+				Collections.singletonList("everything"));
+			}
+
 	}
 
 }

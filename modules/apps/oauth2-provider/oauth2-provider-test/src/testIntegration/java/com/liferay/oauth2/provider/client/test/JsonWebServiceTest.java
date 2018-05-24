@@ -18,14 +18,8 @@ import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTes
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import org.codehaus.jettison.json.JSONObject;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import java.util.Collections;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -33,7 +27,17 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.util.Collections;
+
+import org.codehaus.jettison.json.JSONObject;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Carlos Sierra Andrés
@@ -54,8 +58,7 @@ public class JsonWebServiceTest extends BaseClientTest {
 
 		Invocation.Builder builder = jsonWebTarget.request();
 
-		MultivaluedMap<String, String> formData =
-			new MultivaluedHashMap<>();
+		MultivaluedMap<String, String> formData = new MultivaluedHashMap<>();
 
 		formData.putSingle("virtualHost", "testcompany.xyz");
 

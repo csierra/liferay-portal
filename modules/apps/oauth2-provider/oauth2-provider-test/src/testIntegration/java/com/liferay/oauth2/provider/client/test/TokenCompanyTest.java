@@ -18,10 +18,12 @@ import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTes
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,8 +51,7 @@ public class TokenCompanyTest extends BaseClientTest {
 			"invalid_grant",
 			getToken(
 				"oauthTestApplicationDefault", "myhostdefaultuser.xyz",
-				this::getClientCredentials,
-				this::parseError));
+				this::getClientCredentials, this::parseError));
 	}
 
 	public static class AnnotatedApplicationBundleActivator
@@ -76,10 +77,9 @@ public class TokenCompanyTest extends BaseClientTest {
 					company.getCompanyId(), company.getDefaultUser(),
 					"oauthTestApplicationDefault");
 			}
-			catch (PortalException e) {
-				throw new IllegalArgumentException(e);
+			catch (PortalException pe) {
+				throw new IllegalArgumentException(pe);
 			}
-
 		}
 
 	}

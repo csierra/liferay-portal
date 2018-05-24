@@ -29,16 +29,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.Configuration;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import javax.ws.rs.core.Application;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,23 +39,30 @@ import java.util.ListIterator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.Application;
+
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.Configuration;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
+
 /**
  * @author Carlos Sierra Andrés
  */
-public abstract class BaseTestPreparatorBundleActivator implements BundleActivator {
+public abstract class BaseTestPreparatorBundleActivator
+	implements BundleActivator {
 
-	protected BundleContext _bundleContext;
+	public User addAdminUser(Company company) throws Exception {
+		User user = UserTestUtil.addCompanyAdminUser(company);
 
-	public OAuth2Application createOAuth2Application(
-			long companyId, User user, String clientId)
-		throws PortalException {
+		autoCloseables.add(
+			() -> UserLocalServiceUtil.deleteUser(user.getUserId()));
 
-		return createOAuth2Application(
-			companyId, user, clientId,
-			Arrays.asList(
-				GrantType.CLIENT_CREDENTIALS,
-				GrantType.RESOURCE_OWNER_PASSWORD),
-			Arrays.asList("everything", "everything.readonly"));
+		return user;
 	}
 
 	public User addUser(Company company) throws Exception {
@@ -76,13 +74,27 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		return user;
 	}
 
-	public User addAdminUser(Company company) throws Exception {
-		User user = UserTestUtil.addCompanyAdminUser(company);
+	public Company createCompany(String hostName) throws PortalException {
+		Company company = CompanyLocalServiceUtil.addCompany(
+			hostName, hostName + ".xyz", hostName + ".xyz", false, 0, true);
 
 		autoCloseables.add(
-			() -> UserLocalServiceUtil.deleteUser(user.getUserId()));
+			() -> CompanyLocalServiceUtil.deleteCompany(
+				company.getCompanyId()));
 
-		return user;
+		return company;
+	}
+
+	public OAuth2Application createOAuth2Application(
+			long companyId, User user, String clientId)
+		throws PortalException {
+
+		return createOAuth2Application(
+			companyId, user, clientId,
+			Arrays.asList(
+				GrantType.CLIENT_CREDENTIALS,
+				GrantType.RESOURCE_OWNER_PASSWORD),
+			Arrays.asList("everything", "everything.readonly"));
 	}
 
 	public OAuth2Application createOAuth2Application(
@@ -111,8 +123,8 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			OAuth2Application oAuth2Application =
 				_oAuth2ApplicationLocalService.addOAuth2Application(
 					companyId, user.getUserId(), user.getLogin(),
-					availableGrants, clientId, 0, clientSecret, 
-					"test oauth application", 
+					availableGrants, clientId, 0, clientSecret,
+					"test oauth application",
 					Collections.singletonList("token_introspection"),
 					"http://localhost:8080", 0, "test application",
 					"http://localhost:8080",
@@ -130,20 +142,9 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		}
 	}
 
-	public Company createCompany(String hostName) throws PortalException {
-		Company company = CompanyLocalServiceUtil.addCompany(
-			hostName, hostName + ".xyz", hostName + ".xyz", false, 0, true);
-
-		autoCloseables.add(
-			() -> CompanyLocalServiceUtil.deleteCompany(
-				company.getCompanyId()));
-
-		return company;
-	}
-
 	public ServiceRegistration<Application> registerJaxRsApplication(
-			Application application, String path,
-			Dictionary<String, Object> properties) {
+		Application application, String path,
+		Dictionary<String, Object> properties) {
 
 		if (properties == null || properties.isEmpty()) {
 			properties = new HashMapDictionary<>();
@@ -163,56 +164,6 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		return serviceRegistration;
 	}
 
-	protected OAuth2Application createOAuth2Application(
-			long companyId, User user, String clientId,
-			List<String> availableScopes)
-		throws PortalException {
-
-		return createOAuth2Application(
-			companyId, user, clientId,
-			Arrays.asList(
-				GrantType.CLIENT_CREDENTIALS,
-				GrantType.RESOURCE_OWNER_PASSWORD),
-			availableScopes);
-	}
-
-	protected ServiceRegistration<PrefixHandlerFactory> registerPrefixHandler(
-		PrefixHandler prefixHandler, Dictionary<String, Object> properties) {
-
-		ServiceRegistration<PrefixHandlerFactory> serviceRegistration =
-			_bundleContext.registerService(
-				PrefixHandlerFactory.class, key -> prefixHandler,
-				properties);
-
-		autoCloseables.add(serviceRegistration::unregister);
-
-		return serviceRegistration;
-	}
-
-	protected ServiceRegistration<ScopeMapper> registerScopeMapper(
-		ScopeMapper scopeMapper, Dictionary<String, Object> properties) {
-
-		ServiceRegistration<ScopeMapper> serviceRegistration =
-			_bundleContext.registerService(
-				ScopeMapper.class, scopeMapper, properties);
-
-		autoCloseables.add(serviceRegistration::unregister);
-
-		return serviceRegistration;
-	}
-
-	protected Configuration createConfigurationFactory(
-		String factoryPid, Dictionary<String, Object> properties) {
-
-		Configuration factoryConfiguration =
-			TestUtils.createFactoryConfiguration(
-				_bundleContext, factoryPid, properties);
-
-		autoCloseables.add(factoryConfiguration::delete);
-
-		return factoryConfiguration;
-	}
-
 	@Override
 	public void start(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
@@ -226,8 +177,6 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			e.printStackTrace();
 		}
 	}
-
-	protected abstract void prepareTest() throws Exception;
 
 	@Override
 	public void stop(BundleContext bundleContext) {
@@ -246,11 +195,59 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		}
 	}
 
-	protected ArrayList<AutoCloseable> autoCloseables;
-	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
+	protected Configuration createConfigurationFactory(
+		String factoryPid, Dictionary<String, Object> properties) {
+
+		Configuration factoryConfiguration =
+			TestUtils.createFactoryConfiguration(
+				_bundleContext, factoryPid, properties);
+
+		autoCloseables.add(factoryConfiguration::delete);
+
+		return factoryConfiguration;
+	}
+
+	protected OAuth2Application createOAuth2Application(
+			long companyId, User user, String clientId,
+			List<String> availableScopes)
+		throws PortalException {
+
+		return createOAuth2Application(
+			companyId, user, clientId,
+			Arrays.asList(
+				GrantType.CLIENT_CREDENTIALS,
+				GrantType.RESOURCE_OWNER_PASSWORD),
+			availableScopes);
+	}
+
+	protected abstract void prepareTest() throws Exception;
+
+	protected ServiceRegistration<PrefixHandlerFactory> registerPrefixHandler(
+		PrefixHandler prefixHandler, Dictionary<String, Object> properties) {
+
+		ServiceRegistration<PrefixHandlerFactory> serviceRegistration =
+			_bundleContext.registerService(
+				PrefixHandlerFactory.class, key -> prefixHandler, properties);
+
+		autoCloseables.add(serviceRegistration::unregister);
+
+		return serviceRegistration;
+	}
+
+	protected ServiceRegistration<ScopeMapper> registerScopeMapper(
+		ScopeMapper scopeMapper, Dictionary<String, Object> properties) {
+
+		ServiceRegistration<ScopeMapper> serviceRegistration =
+			_bundleContext.registerService(
+				ScopeMapper.class, scopeMapper, properties);
+
+		autoCloseables.add(serviceRegistration::unregister);
+
+		return serviceRegistration;
+	}
 
 	protected Runnable updateOrCreateConfiguration(
-			String pid, Dictionary<String, ?> properties) {
+		String pid, Dictionary<String, ?> properties) {
 
 		Configuration configuration = null;
 
@@ -292,9 +289,9 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 
 		ServiceTracker<?, ?> tracker =
 			new ServiceTracker<>(
-				_bundleContext,
-				_bundleContext.createFilter(filter),
+				_bundleContext, _bundleContext.createFilter(filter),
 				new ServiceTrackerCustomizer<Object, Object>() {
+
 					@Override
 					public Object addingService(
 						ServiceReference<Object> reference) {
@@ -306,18 +303,16 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 
 					@Override
 					public void modifiedService(
-						ServiceReference<Object> reference,
-						Object service) {
-
+						ServiceReference<Object> reference, Object service) {
 					}
 
 					@Override
 					public void removedService(
-						ServiceReference<Object> reference,
-						Object service) {
+						ServiceReference<Object> reference, Object service) {
 
 						countDownLatch.countDown();
 					}
+
 				});
 
 		tracker.open();
@@ -327,11 +322,17 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		try {
 			countDownLatch.await(30, TimeUnit.SECONDS);
 		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
+		catch (InterruptedException ie) {
+			ie.printStackTrace();
 		}
 		finally {
 			tracker.close();
 		}
 	}
+
+	protected BundleContext _bundleContext;
+	protected ArrayList<AutoCloseable> autoCloseables;
+
+	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
+
 }

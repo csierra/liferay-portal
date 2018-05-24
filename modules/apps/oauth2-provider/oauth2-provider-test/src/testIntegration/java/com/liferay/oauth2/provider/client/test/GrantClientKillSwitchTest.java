@@ -19,17 +19,19 @@ import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTes
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 /**
  * @author Carlos Sierra Andrés
@@ -63,12 +65,12 @@ public class GrantClientKillSwitchTest extends BaseClientTest {
 				() -> {
 					Hashtable<String, Object> properties = new Hashtable<>();
 
-					properties.put("oauth2.allow.client.credentials.grant", false);
+					properties.put(
+						"oauth2.allow.client.credentials.grant", false);
 
 					Runnable runnable = updateOrCreateConfiguration(
 						"com.liferay.oauth2.provider.configuration." +
-						"OAuth2ProviderConfiguration",
-						properties);
+						"OAuth2ProviderConfiguration", properties);
 
 					autoCloseables.add(() -> waitForFramework(runnable));
 				});

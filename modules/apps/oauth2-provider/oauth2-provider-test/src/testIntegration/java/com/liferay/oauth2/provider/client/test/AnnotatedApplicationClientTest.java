@@ -90,7 +90,6 @@ public class AnnotatedApplicationClientTest extends BaseClientTest {
 				new TestAnnotatedApplication(), "annotated", properties);
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationAfter");
-
 		}
 
 	}

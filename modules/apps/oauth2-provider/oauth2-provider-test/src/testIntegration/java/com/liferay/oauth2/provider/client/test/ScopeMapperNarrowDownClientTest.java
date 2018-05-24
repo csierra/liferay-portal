@@ -20,27 +20,30 @@ import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTes
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Hashtable;
-
 /**
  * @author Carlos Sierra Andrés
  */
+@Ignore("TODO: We still need to fix this one")
 @RunAsClient
 @RunWith(Arquillian.class)
-@Ignore("TODO: We still need to fix this one")
 public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 
 	@Deployment
@@ -57,8 +60,7 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 			applicationTarget.request(),
 			getToken(
 				"oauthTestApplication", null,
-				getClientCredentials("everything"),
-				this::parseTokenString));
+				getClientCredentials("everything"), this::parseTokenString));
 
 		Assert.assertEquals("everything.readonly", builder.get(String.class));
 
@@ -97,8 +99,7 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 				scopeMapperProperties);
 			Hashtable<String, Object> properties = new Hashtable<>();
 
-			properties.put(
-				"osgi.jaxrs.name", TestApplication.class.getName());
+			properties.put("osgi.jaxrs.name", TestApplication.class.getName());
 
 			registerJaxRsApplication(
 				new TestApplication(), "methods", properties);
@@ -109,6 +110,7 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 				defaultCompanyId, user, "oauthTestApplication",
 				Collections.singletonList("everything"));
 		}
+
 	}
 
 }

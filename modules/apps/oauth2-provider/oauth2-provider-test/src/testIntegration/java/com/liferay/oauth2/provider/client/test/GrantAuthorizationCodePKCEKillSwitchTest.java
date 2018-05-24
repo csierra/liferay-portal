@@ -20,18 +20,20 @@ import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTes
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
+
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Carlos Sierra Andrés
@@ -55,7 +57,6 @@ public class GrantAuthorizationCodePKCEKillSwitchTest extends BaseClientTest {
 				"oauthTestApplicationCodePKCE", null,
 				getAuthorizationCodePKCE("test@liferay.com", "test", null),
 				this::parseError));
-
 	}
 
 	public static class GrantKillClientCredentialsSwitchTestPreparator
@@ -72,8 +73,7 @@ public class GrantAuthorizationCodePKCEKillSwitchTest extends BaseClientTest {
 
 					Runnable runnable = updateOrCreateConfiguration(
 						"com.liferay.oauth2.provider.configuration." +
-						"OAuth2ProviderConfiguration",
-						properties);
+						"OAuth2ProviderConfiguration", properties);
 
 					autoCloseables.add(() -> waitForFramework(runnable));
 				});

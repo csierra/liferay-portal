@@ -17,7 +17,6 @@ package com.liferay.oauth2.provider.test.internal;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.Application;

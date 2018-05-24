@@ -24,7 +24,6 @@ public class TestJsonWebService {
 	}
 
 	public void setString(String string) {
-
 	}
 
 }

@@ -85,8 +85,7 @@ public class AnnotationsAndHttpApplicationClientTest extends BaseClientTest {
 
 			Hashtable<String, Object> properties = new Hashtable<>();
 
-			properties.put(
-				"osgi.jaxrs.name", TestApplication.class.getName());
+			properties.put("osgi.jaxrs.name", TestApplication.class.getName());
 
 			registerJaxRsApplication(
 				new TestApplication(), "methods", properties);
@@ -99,8 +98,7 @@ public class AnnotationsAndHttpApplicationClientTest extends BaseClientTest {
 						return Collections.singleton("everything.readonly");
 					}
 					else if (input.equals("POST")) {
-						return Collections.singleton(
-							"everything.writeonly");
+						return Collections.singleton("everything.writeonly");
 					}
 
 					return Collections.singleton(input);
