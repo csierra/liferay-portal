@@ -135,7 +135,7 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 					companyId, user.getUserId(), user.getLogin(),
 					availableGrants, clientId, 0, clientSecret, 
 					"test oauth application", 
-					Collections.singletonList("token-introspection"),
+					Collections.singletonList("token_introspection"),
 					"http://localhost:8080", 0, "test application",
 					"http://localhost:8080",
 					Collections.singletonList("http://localhost:8080"),
