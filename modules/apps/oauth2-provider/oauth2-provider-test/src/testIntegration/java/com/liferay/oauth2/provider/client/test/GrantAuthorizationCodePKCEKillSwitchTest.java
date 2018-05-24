@@ -28,15 +28,10 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceReference;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Carlos Sierra Andrés
@@ -80,7 +75,7 @@ public class GrantAuthorizationCodePKCEKillSwitchTest extends BaseClientTest {
 						"OAuth2ProviderConfiguration",
 						properties);
 
-					_autoCloseables.add(() -> waitForFramework(runnable));
+					autoCloseables.add(() -> waitForFramework(runnable));
 				});
 
 			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
@@ -94,7 +89,7 @@ public class GrantAuthorizationCodePKCEKillSwitchTest extends BaseClientTest {
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated", properties);
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationCodePKCE", null,
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE_PKCE),
 				Collections.singletonList("everything"));

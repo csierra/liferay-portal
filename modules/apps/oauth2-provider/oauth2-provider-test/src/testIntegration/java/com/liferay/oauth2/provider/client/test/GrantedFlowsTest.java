@@ -107,22 +107,22 @@ public class GrantedFlowsTest extends BaseClientTest {
 
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationPassword",
 				Collections.singletonList(GrantType.RESOURCE_OWNER_PASSWORD),
 				Collections.singletonList("everything"));
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationClient",
 				Collections.singletonList(GrantType.CLIENT_CREDENTIALS),
 				Collections.singletonList("everything"));
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationCode",
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE),
 				Collections.singletonList("everything"));
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationCodePKCE", null,
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE_PKCE),
 				Collections.singletonList("everything"));

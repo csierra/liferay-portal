@@ -16,11 +16,8 @@ package com.liferay.oauth2.provider.client.test;
 
 import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
-import com.liferay.portal.kernel.concurrent.test.TestUtil;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -82,14 +79,14 @@ public class IsolationAcrossCompaniesTest extends BaseClientTest {
 
 			Company company1 = createCompany("host1");
 
-			createOauth2Application(
+			createOAuth2Application(
 				company1.getCompanyId(),
 				UserTestUtil.getAdminUser(company1.getCompanyId()),
 				"oauthTestApplication");
 
 			Company company2 = createCompany("host2");
 
-			createOauth2Application(
+			createOAuth2Application(
 				company2.getCompanyId(),
 				UserTestUtil.getAdminUser(company2.getCompanyId()),
 				"oauthTestApplication");

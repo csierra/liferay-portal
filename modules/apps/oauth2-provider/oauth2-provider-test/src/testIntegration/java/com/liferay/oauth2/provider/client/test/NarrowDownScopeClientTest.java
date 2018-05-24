@@ -94,7 +94,7 @@ public class NarrowDownScopeClientTest extends BaseClientTest {
 			registerJaxRsApplication(
 				new TestApplication(), "methods", properties);
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Arrays.asList("HEAD", "GET", "OPTIONS", "POST"));
 		}

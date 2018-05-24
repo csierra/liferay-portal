@@ -84,11 +84,11 @@ public class AnnotatedApplicationClientTest extends BaseClientTest {
 
 			properties.put("oauth2.scopechecker.type", "annotations");
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationBefore");
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated", properties);
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationAfter");
 
 		}

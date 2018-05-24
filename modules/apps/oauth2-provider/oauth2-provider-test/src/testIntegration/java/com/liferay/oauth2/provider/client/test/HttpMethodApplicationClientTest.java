@@ -96,15 +96,15 @@ public class HttpMethodApplicationClientTest extends BaseClientTest {
 
 			properties.put("oauth2.test.application", true);
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationBefore",
 				Arrays.asList("GET", "POST"));
 			registerJaxRsApplication(
 				new TestApplication(), "methods", properties);
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationAfter",
 				Arrays.asList("GET", "POST"));
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationWrong",
 				Collections.singletonList("everything"));
 		}

@@ -112,7 +112,7 @@ public class RefreshTokenTest extends BaseClientTest {
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated", properties);
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Arrays.asList(
 					GrantType.RESOURCE_OWNER_PASSWORD, GrantType.REFRESH_TOKEN),

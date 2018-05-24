@@ -60,19 +60,19 @@ public class TokenCompanyTest extends BaseClientTest {
 		protected void prepareTest() throws Exception {
 			User user = addUser(createCompany("myhost"));
 
-			createOauth2Application(
+			createOAuth2Application(
 				user.getCompanyId(), user, "oauthTestApplication");
 
 			User adminUser = addAdminUser(createCompany("myhostallowed"));
 
-			createOauth2Application(
+			createOAuth2Application(
 				adminUser.getCompanyId(), adminUser,
 				"oauthTestApplicationAllowed");
 
 			Company company = createCompany("myhostdefaultuser");
 
 			try {
-				createOauth2Application(
+				createOAuth2Application(
 					company.getCompanyId(), company.getDefaultUser(),
 					"oauthTestApplicationDefault");
 			}

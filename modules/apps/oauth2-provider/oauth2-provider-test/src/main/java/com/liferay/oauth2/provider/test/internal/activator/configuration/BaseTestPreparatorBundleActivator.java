@@ -21,45 +21,32 @@ import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.test.internal.TestUtils;
-import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import javax.ws.rs.core.Application;
-
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.endpoint.ServerRegistry;
-
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.http.context.ServletContextHelper;
-import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+
+import javax.ws.rs.core.Application;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Carlos Sierra Andrés
@@ -68,11 +55,11 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 
 	protected BundleContext _bundleContext;
 
-	public OAuth2Application createOauth2Application(
-		final long companyId, User user, String clientId)
+	public OAuth2Application createOAuth2Application(
+			long companyId, User user, String clientId)
 		throws PortalException {
 
-		return createOauth2Application(
+		return createOAuth2Application(
 			companyId, user, clientId,
 			Arrays.asList(
 				GrantType.CLIENT_CREDENTIALS,
@@ -83,7 +70,7 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 	public User addUser(Company company) throws Exception {
 		User user = UserTestUtil.addUser(company);
 
-		_autoCloseables.add(
+		autoCloseables.add(
 			() -> UserLocalServiceUtil.deleteUser(user.getUserId()));
 
 		return user;
@@ -92,25 +79,25 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 	public User addAdminUser(Company company) throws Exception {
 		User user = UserTestUtil.addCompanyAdminUser(company);
 
-		_autoCloseables.add(
+		autoCloseables.add(
 			() -> UserLocalServiceUtil.deleteUser(user.getUserId()));
 
 		return user;
 	}
 
-	public OAuth2Application createOauth2Application(
-		final long companyId, User user, String clientId,
-		List<GrantType> availableGrants, List<String> availableScopes)
+	public OAuth2Application createOAuth2Application(
+			long companyId, User user, String clientId,
+			List<GrantType> availableGrants, List<String> availableScopes)
 		throws PortalException {
 
-		return createOauth2Application(
+		return createOAuth2Application(
 			companyId, user, clientId, "oauthTestApplicationSecret",
 			availableGrants, availableScopes);
 	}
 
-	public OAuth2Application createOauth2Application(
-		final long companyId, User user, String clientId, String clientSecret,
-		List<GrantType> availableGrants, List<String> availableScopes)
+	public OAuth2Application createOAuth2Application(
+			long companyId, User user, String clientId, String clientSecret,
+			List<GrantType> availableGrants, List<String> availableScopes)
 		throws PortalException {
 
 		ServiceReference<OAuth2ApplicationLocalService> serviceReference =
@@ -120,17 +107,8 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		_oAuth2ApplicationLocalService = _bundleContext.getService(
 			serviceReference);
 
-		final OAuth2Application oAuth2Application;
-
 		try {
-			/**long companyId, long userId,
-			 String userName, List<GrantType> allowedGrantTypesList,
-			 String clientId, int clientProfile, String clientSecret,
-			 String description, List<String> featuresList, String homePageURL,
-			 long iconFileEntryId, String name, String privacyPolicyURL,
-			 List<String> redirectURIsList, List<String> scopeAliasesList,
-			 ServiceContext serviceContext*/
-			oAuth2Application =
+			OAuth2Application oAuth2Application =
 				_oAuth2ApplicationLocalService.addOAuth2Application(
 					companyId, user.getUserId(), user.getLogin(),
 					availableGrants, clientId, 0, clientSecret, 
@@ -139,10 +117,9 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 					"http://localhost:8080", 0, "test application",
 					"http://localhost:8080",
 					Collections.singletonList("http://localhost:8080"),
-					availableScopes, new ServiceContext()
-					);
+					availableScopes, new ServiceContext());
 
-			_autoCloseables.add(
+			autoCloseables.add(
 				() -> _oAuth2ApplicationLocalService.deleteOAuth2Application(
 					oAuth2Application.getOAuth2ApplicationId()));
 
@@ -151,14 +128,13 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		finally {
 			_bundleContext.ungetService(serviceReference);
 		}
-
 	}
 
 	public Company createCompany(String hostName) throws PortalException {
 		Company company = CompanyLocalServiceUtil.addCompany(
 			hostName, hostName + ".xyz", hostName + ".xyz", false, 0, true);
 
-		_autoCloseables.add(
+		autoCloseables.add(
 			() -> CompanyLocalServiceUtil.deleteCompany(
 				company.getCompanyId()));
 
@@ -166,13 +142,11 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 	}
 
 	public ServiceRegistration<Application> registerJaxRsApplication(
-		Application application, String path,
-		Dictionary<String, Object> properties)
-
-		throws InterruptedException {
+			Application application, String path,
+			Dictionary<String, Object> properties) {
 
 		if (properties == null || properties.isEmpty()) {
-			properties = new Hashtable<>();
+			properties = new HashMapDictionary<>();
 		}
 
 		properties.put("oauth2.test.application", "true");
@@ -184,36 +158,17 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			_bundleContext.registerService(
 				Application.class, application, properties);
 
-		_autoCloseables.add(serviceRegistration::unregister);
+		autoCloseables.add(serviceRegistration::unregister);
 
 		return serviceRegistration;
 	}
 
-	public ServiceRegistration<Object> registerJsonWebService(
-		String name, String path, Object service,
-		Dictionary<String, Object> properties) {
+	protected OAuth2Application createOAuth2Application(
+			long companyId, User user, String clientId,
+			List<String> availableScopes)
+		throws PortalException {
 
-		if (properties == null || properties.isEmpty()) {
-			properties = new Hashtable<>();
-		}
-
-		properties.put("json.web.service.context.name", name);
-		properties.put("json.web.service.context.path", path);
-
-		ServiceRegistration<Object> serviceRegistration =
-			_bundleContext.registerService(
-				Object.class, service, properties);
-
-		_autoCloseables.add(serviceRegistration::unregister);
-
-		return serviceRegistration;
-	}
-
-	protected OAuth2Application createOauth2Application(
-		long companyId, User user, String clientId,
-		List<String> availableScopes) throws PortalException {
-
-		return createOauth2Application(
+		return createOAuth2Application(
 			companyId, user, clientId,
 			Arrays.asList(
 				GrantType.CLIENT_CREDENTIALS,
@@ -222,28 +177,26 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 	}
 
 	protected ServiceRegistration<PrefixHandlerFactory> registerPrefixHandler(
-		PrefixHandler prefixHandler,
-		Dictionary<String, Object> prefixHandlerProperties) {
+		PrefixHandler prefixHandler, Dictionary<String, Object> properties) {
 
 		ServiceRegistration<PrefixHandlerFactory> serviceRegistration =
 			_bundleContext.registerService(
-				PrefixHandlerFactory.class, __ -> prefixHandler,
-				prefixHandlerProperties);
+				PrefixHandlerFactory.class, key -> prefixHandler,
+				properties);
 
-		_autoCloseables.add(serviceRegistration::unregister);
+		autoCloseables.add(serviceRegistration::unregister);
 
 		return serviceRegistration;
 	}
 
 	protected ServiceRegistration<ScopeMapper> registerScopeMapper(
-		ScopeMapper scopeMapper,
-		Hashtable<String, Object> scopeMapperProperties) {
+		ScopeMapper scopeMapper, Dictionary<String, Object> properties) {
 
 		ServiceRegistration<ScopeMapper> serviceRegistration =
 			_bundleContext.registerService(
-				ScopeMapper.class, scopeMapper, scopeMapperProperties);
+				ScopeMapper.class, scopeMapper, properties);
 
-		_autoCloseables.add(serviceRegistration::unregister);
+		autoCloseables.add(serviceRegistration::unregister);
 
 		return serviceRegistration;
 	}
@@ -255,36 +208,31 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 			TestUtils.createFactoryConfiguration(
 				_bundleContext, factoryPid, properties);
 
-		_autoCloseables.add(factoryConfiguration::delete);
+		autoCloseables.add(factoryConfiguration::delete);
 
 		return factoryConfiguration;
 	}
 
 	@Override
-	public void start(BundleContext bundleContext) throws Exception {
+	public void start(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
 
-		_autoCloseables = new ArrayList<>();
-
-		ServiceReference<ConfigurationAdmin> serviceReference =
-			bundleContext.getServiceReference(ConfigurationAdmin.class);
+		autoCloseables = new ArrayList<>();
 
 		try {
 			prepareTest();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-
-			bundleContext.ungetService(serviceReference);
 		}
 	}
 
 	protected abstract void prepareTest() throws Exception;
 
 	@Override
-	public void stop(BundleContext bundleContext) throws Exception {
-		ListIterator<AutoCloseable> listIterator = _autoCloseables.listIterator(
-			_autoCloseables.size());
+	public void stop(BundleContext bundleContext) {
+		ListIterator<AutoCloseable> listIterator = autoCloseables.listIterator(
+			autoCloseables.size());
 
 		while (listIterator.hasPrevious()) {
 			AutoCloseable previous = listIterator.previous();
@@ -298,19 +246,20 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 		}
 	}
 
-	protected ArrayList<AutoCloseable> _autoCloseables;
+	protected ArrayList<AutoCloseable> autoCloseables;
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 
 	protected Runnable updateOrCreateConfiguration(
 			String pid, Dictionary<String, ?> properties) {
 
-		Configuration configuration;
+		Configuration configuration = null;
 
 		try {
-			configuration = TestUtils.configurationExists(
-				_bundleContext, pid);
+			configuration = TestUtils.configurationExists(_bundleContext, pid);
 		}
 		catch (Exception e) {
+			e.printStackTrace();
+
 			return () -> {};
 		}
 
@@ -332,14 +281,19 @@ public abstract class BaseTestPreparatorBundleActivator implements BundleActivat
 
 	protected void waitForFramework(Runnable runnable)
 		throws InvalidSyntaxException {
+
 		CountDownLatch countDownLatch = new CountDownLatch(52);
+
+		String filter =
+			"(&(component.name=com.liferay.oauth2.provider.rest.internal." +
+				"endpoint.OAuth2EndpointApplication)(objectClass=org.apache." +
+					"aries.jax.rs.whiteboard.internal.cxf." +
+						"CxfJaxrsServiceRegistrator))";
 
 		ServiceTracker<?, ?> tracker =
 			new ServiceTracker<>(
 				_bundleContext,
-				_bundleContext.createFilter(
-					("(&(component.name=com.liferay.oauth2.provider.rest." +
-						 "internal.endpoint.OAuth2EndpointApplication)(objectClass=org.apache.aries.jax.rs.whiteboard.internal.cxf.CxfJaxrsServiceRegistrator))")),
+				_bundleContext.createFilter(filter),
 				new ServiceTrackerCustomizer<Object, Object>() {
 					@Override
 					public Object addingService(

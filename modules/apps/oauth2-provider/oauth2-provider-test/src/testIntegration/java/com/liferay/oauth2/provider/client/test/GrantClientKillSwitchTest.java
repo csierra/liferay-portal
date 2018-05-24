@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -28,16 +27,9 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceReference;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import javax.ws.rs.core.Response;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 /**
  * @author Carlos Sierra Andrés
@@ -78,7 +70,7 @@ public class GrantClientKillSwitchTest extends BaseClientTest {
 						"OAuth2ProviderConfiguration",
 						properties);
 
-					_autoCloseables.add(() -> waitForFramework(runnable));
+					autoCloseables.add(() -> waitForFramework(runnable));
 				});
 
 			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
@@ -91,7 +83,7 @@ public class GrantClientKillSwitchTest extends BaseClientTest {
 
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated", properties);
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication");
 		}
 

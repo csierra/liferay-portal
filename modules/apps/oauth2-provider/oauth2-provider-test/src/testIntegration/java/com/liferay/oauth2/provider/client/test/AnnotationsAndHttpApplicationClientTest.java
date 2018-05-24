@@ -106,7 +106,7 @@ public class AnnotationsAndHttpApplicationClientTest extends BaseClientTest {
 					return Collections.singleton(input);
 				},
 				properties);
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Collections.singletonList("everything"));
 		}

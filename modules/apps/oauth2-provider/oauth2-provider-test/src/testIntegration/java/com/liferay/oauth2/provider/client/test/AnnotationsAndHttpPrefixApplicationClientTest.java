@@ -140,11 +140,11 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated",
 				annotatedApplicationProperties);
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Arrays.asList(
 					"annotations/everything", "methods/everything"));
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationWrong",
 				Collections.singletonList("everything"));		}
 	}

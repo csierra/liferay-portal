@@ -80,7 +80,7 @@ public class AnnotatedApplicationPrefixHandlerClientTest
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated", properties);
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Collections.singletonList("test/everything"));
 		}

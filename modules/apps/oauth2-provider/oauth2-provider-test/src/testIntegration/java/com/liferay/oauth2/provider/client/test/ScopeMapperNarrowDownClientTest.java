@@ -105,7 +105,7 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTest {
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated",
 				annotatedApplicationProperties);
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Collections.singletonList("everything"));
 		}

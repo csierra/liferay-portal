@@ -115,10 +115,10 @@ public class JsonWebServiceTest extends BaseClientTest {
 			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
 			createCompany("testcompany");
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationRO",
 				Collections.singletonList("everything.readonly"));
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationRW",
 				Collections.singletonList("everything"));
 		}

@@ -149,7 +149,7 @@ public class TokenExpeditionTest extends BaseClientTest {
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated", properties);
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication");
 		}
 
