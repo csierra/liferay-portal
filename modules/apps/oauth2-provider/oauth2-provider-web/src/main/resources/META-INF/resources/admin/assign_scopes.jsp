@@ -38,7 +38,7 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 
 			<aui:form action="<%= assignScopesURL %>" name="fm">
 				<div class="sheet">
-					<ul class="nav nav-underline" role="tablist">
+					<ul class="nav nav-underline" id="<portlet:namespace />navScopeTypes" role="tablist" style="display: none;">
 						<li class="nav-item">
 							<a aria-controls="<portlet:namespace />navResourceScopes" aria-expanded="true" class="active nav-link" data-toggle="tab" href="#<portlet:namespace />navResourceScopes" id="<portlet:namespace />navResourceScopesTab" role="tab">
 								<liferay-ui:message key="resource-scopes" />
@@ -72,6 +72,10 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 </div>
 
 <aui:script use="node,aui-modal,event-outside">
+
+	if (A.all('#<portlet:namespace />navGlobalScopes .panel').size() > 0) {
+		A.one('#<portlet:namespace />navScopeTypes').show();
+	}
 
 	var appsAccordion = A.one('#appsAccordion');
 
