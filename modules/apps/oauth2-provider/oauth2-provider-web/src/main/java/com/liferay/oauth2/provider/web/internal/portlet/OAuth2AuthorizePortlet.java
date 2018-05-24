@@ -155,17 +155,6 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 		super.doView(renderRequest, renderResponse);
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_applicationDescriptors = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, ApplicationDescriptor.class, "osgi.jaxrs.name");
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_applicationDescriptors.close();
-	}
-
 	protected Map<String, String> getOAuth2Parameters(
 		HttpServletRequest request) {
 
@@ -205,9 +194,6 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 
 	@Reference
 	private ApplicationDescriptorLocator _applicationDescriptorLocator;
-
-	private ServiceTrackerMap<String, ApplicationDescriptor>
-		_applicationDescriptors;
 
 	@Reference
 	private OAuth2ApplicationScopeAliasesLocalService
