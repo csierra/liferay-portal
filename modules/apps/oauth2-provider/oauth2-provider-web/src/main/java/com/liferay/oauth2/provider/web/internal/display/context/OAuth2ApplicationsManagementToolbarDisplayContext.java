@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -38,28 +37,23 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Tomas Polesovsky
  */
-public class OAuth2ApplicationsManagementToolbarDisplayContext {
+public class OAuth2ApplicationsManagementToolbarDisplayContext
+	extends BaseOAuth2ManagementToolbarDisplayContext {
 
 	public OAuth2ApplicationsManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
 		PortletURL currentURLObj) {
 
-		_liferayPortletRequest = liferayPortletRequest;
-		_liferayPortletResponse = liferayPortletResponse;
-		_currentURLObj = currentURLObj;
-
-		_request = _liferayPortletRequest.getHttpServletRequest();
+		super(
+			liferayPortletRequest.getHttpServletRequest(),
+			liferayPortletRequest, liferayPortletResponse, currentURLObj);
 
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
 			liferayPortletRequest);
@@ -72,10 +66,11 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 			dropdownItem -> {
 				dropdownItem.setHref(
 					StringBundler.concat(
-						"javascript:", _liferayPortletResponse.getNamespace(),
+						"javascript:", liferayPortletResponse.getNamespace(),
 						"deleteOAuth2Applications();"));
 				dropdownItem.setIcon("trash");
-				dropdownItem.setLabel(LanguageUtil.get(_request, "delete"));
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "delete"));
 				dropdownItem.setQuickAction(true);
 			});
 
@@ -88,18 +83,20 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 		creationMenu.addPrimaryDropdownItem(
 			dropdownItem -> {
 				dropdownItem.setHref(
-					_liferayPortletResponse.createRenderURL(), "mvcPath",
+					liferayPortletResponse.createRenderURL(), "mvcPath",
 					"/admin/edit_application.jsp", "redirect",
-					_currentURLObj.toString());
+					currentURLObj.toString());
 				dropdownItem.setLabel(
-					LanguageUtil.get(_request, "add-o-auth2-application"));
+					LanguageUtil.get(
+						httpServletRequest, "add-o-auth2-application"));
 			});
 
 		return creationMenu;
 	}
 
 	public String getDisplayStyle() {
-		String displayStyle = ParamUtil.getString(_request, "displayStyle");
+		String displayStyle = ParamUtil.getString(
+			httpServletRequest, "displayStyle");
 
 		if (Validator.isNull(displayStyle)) {
 			displayStyle = _portalPreferences.getValue(
@@ -111,7 +108,7 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 				OAuth2ProviderPortletKeys.OAUTH2_ADMIN, "entries-display-style",
 				displayStyle);
 
-			_request.setAttribute(
+			httpServletRequest.setAttribute(
 				WebKeys.SINGLE_PAGE_APPLICATION_CLEAR_CACHE, Boolean.TRUE);
 		}
 
@@ -126,14 +123,10 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 						dropdownGroupItem.setDropdownItems(
 							_getOrderByDropdownItems());
 						dropdownGroupItem.setLabel(
-							LanguageUtil.get(_request, "order-by"));
+							LanguageUtil.get(httpServletRequest, "order-by"));
 					});
 			}
 		};
-	}
-
-	public String getOrderByCol() {
-		return ParamUtil.getString(_request, "orderByCol", "createDate");
 	}
 
 	public OrderByComparator<OAuth2Application> getOrderByComparator() {
@@ -156,25 +149,11 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 			"OAuth2Application", columnName, orderByType.equals("asc"));
 	}
 
-	public String getOrderByType() {
-		return ParamUtil.getString(_request, "orderByType", "desc");
-	}
-
-	public PortletURL getSortingURL() throws PortletException {
-		PortletURL currentSortingURL = _getCurrentSortingURL();
-
-		currentSortingURL.setParameter(
-			"orderByType",
-			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
-
-		return currentSortingURL;
-	}
-
 	public ViewTypeItemList getViewTypes() {
-		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 		int delta = ParamUtil.getInteger(
-			_request, SearchContainer.DEFAULT_DELTA_PARAM);
+			httpServletRequest, SearchContainer.DEFAULT_DELTA_PARAM);
 
 		if (delta > 0) {
 			portletURL.setParameter("delta", String.valueOf(delta));
@@ -185,7 +164,7 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 		portletURL.setParameter("orderByType", getOrderByType());
 
 		int cur = ParamUtil.getInteger(
-			_request, SearchContainer.DEFAULT_CUR_PARAM);
+			httpServletRequest, SearchContainer.DEFAULT_CUR_PARAM);
 
 		if (cur > 0) {
 			portletURL.setParameter("cur", String.valueOf(cur));
@@ -199,15 +178,6 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 			}
 
 		};
-	}
-
-	private PortletURL _getCurrentSortingURL() throws PortletException {
-		PortletURL sortingURL = PortletURLUtil.clone(
-			_currentURLObj, _liferayPortletResponse);
-
-		sortingURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
-
-		return sortingURL;
 	}
 
 	private List<DropdownItem> _getOrderByDropdownItems() {
@@ -230,22 +200,19 @@ public class OAuth2ApplicationsManagementToolbarDisplayContext {
 								dropdownItem.setActive(
 									orderByCol.equals(getOrderByCol()));
 								dropdownItem.setHref(
-									_getCurrentSortingURL(), "orderByCol",
+									getCurrentSortingURL(), "orderByCol",
 									orderByCol);
 
 								dropdownItem.setLabel(
 									LanguageUtil.get(
-										_request, orderByColEntry.getValue()));
+										httpServletRequest,
+										orderByColEntry.getValue()));
 							}));
 				}
 			}
 		};
 	}
 
-	private final PortletURL _currentURLObj;
-	private final LiferayPortletRequest _liferayPortletRequest;
-	private final LiferayPortletResponse _liferayPortletResponse;
 	private final PortalPreferences _portalPreferences;
-	private final HttpServletRequest _request;
 
 }

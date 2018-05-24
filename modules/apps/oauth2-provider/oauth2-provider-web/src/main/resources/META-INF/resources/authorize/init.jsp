@@ -28,5 +28,5 @@ page import="java.util.stream.Collectors"%>
 
 <%
 OAuth2AuthorizePortletDisplayContext oAuth2AuthorizePortletDisplayContext = (OAuth2AuthorizePortletDisplayContext)request.getAttribute(
-	OAuth2ProviderWebKeys.AUTHORIZE_DISPLAY_CONTEXT);
+	OAuth2ProviderWebKeys.OAUTH2_AUTHORIZE_PORTLET_DISPLAY_CONTEXT);
 %>

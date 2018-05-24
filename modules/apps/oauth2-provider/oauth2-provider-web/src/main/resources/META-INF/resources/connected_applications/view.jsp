@@ -63,7 +63,7 @@ int userOAuth2AuthorizationsCount = OAuth2AuthorizationServiceUtil.getUserOAuth2
 				%>
 
 				<liferay-ui:search-container-column-image
-					src="<%= oAuth2ConnectedApplicationsManagementToolbarDisplayContext.getThumbnailURL(oAuth2Application) %>"
+					src="<%= oAuth2ConnectedApplicationsPortletDisplayContext.getThumbnailURL(oAuth2Application) %>"
 					toggleRowChecker="<%= true %>"
 				/>
 

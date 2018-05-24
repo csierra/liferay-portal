@@ -14,13 +14,8 @@
 
 package com.liferay.oauth2.provider.web.internal.display.context;
 
-import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
-import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 
 import java.util.HashMap;
@@ -29,18 +24,15 @@ import java.util.Map;
 /**
  * @author Tomas Polesovsky
  */
-public class OAuth2AuthorizePortletDisplayContext {
+public class OAuth2AuthorizePortletDisplayContext
+	extends BaseOAuth2PortletDisplayContext {
 
 	public OAuth2AuthorizePortletDisplayContext(ThemeDisplay themeDisplay) {
-		_themeDisplay = themeDisplay;
+		super.themeDisplay = themeDisplay;
 	}
 
 	public AuthorizationModel getAuthorizationModel() {
 		return _authorizationModel;
-	}
-
-	public String getDefaultIconURL() {
-		return _themeDisplay.getPathThemeImages() + "/common/portlet.png";
 	}
 
 	public OAuth2Application getOAuth2Application() {
@@ -51,49 +43,11 @@ public class OAuth2AuthorizePortletDisplayContext {
 		return _oAuth2Parameters;
 	}
 
-	public String getThumbnailURL() throws Exception {
-		OAuth2Application oAuth2Application = getOAuth2Application();
-
-		if (oAuth2Application.getIconFileEntryId() <= 0) {
-			return getDefaultIconURL();
-		}
-
-		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
-			oAuth2Application.getIconFileEntryId());
-
-		return DLUtil.getThumbnailSrc(fileEntry, _themeDisplay);
-	}
-
 	public boolean hasCreateTokenApplicationPermission(
 		OAuth2Application oAuth2Application) {
 
 		return hasPermission(
 			oAuth2Application, OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN);
-	}
-
-	public boolean hasPermission(
-		OAuth2Application oAuth2Application, String actionId) {
-
-		PermissionChecker permissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-
-		if (permissionChecker.hasOwnerPermission(
-				oAuth2Application.getCompanyId(),
-				OAuth2Application.class.getName(),
-				oAuth2Application.getOAuth2ApplicationId(),
-				oAuth2Application.getUserId(), actionId)) {
-
-			return true;
-		}
-
-		if (permissionChecker.hasPermission(
-				0, OAuth2Application.class.getName(),
-				oAuth2Application.getOAuth2ApplicationId(), actionId)) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	public void setAuthorizationModel(AuthorizationModel authorizationModel) {
@@ -111,6 +65,5 @@ public class OAuth2AuthorizePortletDisplayContext {
 	private AuthorizationModel _authorizationModel;
 	private OAuth2Application _oAuth2Application;
 	private Map<String, String> _oAuth2Parameters = new HashMap<>();
-	private final ThemeDisplay _themeDisplay;
 
 }

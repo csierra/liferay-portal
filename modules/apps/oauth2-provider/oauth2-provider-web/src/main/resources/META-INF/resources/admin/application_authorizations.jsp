@@ -28,7 +28,7 @@ if (!oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission()) 
 
 long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId", 0);
 
-OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getApplication(request);
+OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
 
 renderResponse.setTitle(LanguageUtil.format(request, "x-authorizations", new String[] {oAuth2Application.getName()}));
 

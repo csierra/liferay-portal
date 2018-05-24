@@ -1,11 +1,10 @@
 $grayLineColor: #E7E7ED;
 $grayTextColor: #6B6C7E;
 
-.portlet-oauth2-provider-admin {
-	.modal-dialog {
-		max-width: 90%;
-	}
+.assign-scopes-modal {
+	max-width: 100%;
 }
+
 .portlet-oauth2-provider-authorize {
 	.consent {
 		.panel-body {

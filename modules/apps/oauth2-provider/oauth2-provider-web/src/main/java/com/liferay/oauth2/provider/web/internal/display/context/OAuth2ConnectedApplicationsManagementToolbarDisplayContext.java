@@ -14,59 +14,36 @@
 
 package com.liferay.oauth2.provider.web.internal.display.context;
 
-import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
-import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
-import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.PortalPreferences;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Tomas Polesovsky
  */
-public class OAuth2ConnectedApplicationsManagementToolbarDisplayContext {
+public class OAuth2ConnectedApplicationsManagementToolbarDisplayContext
+	extends BaseOAuth2ManagementToolbarDisplayContext {
 
 	public OAuth2ConnectedApplicationsManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
 		PortletURL currentURLObj) {
 
-		_liferayPortletRequest = liferayPortletRequest;
-		_liferayPortletResponse = liferayPortletResponse;
-		_currentURLObj = currentURLObj;
-
-		_request = _liferayPortletRequest.getHttpServletRequest();
-
-		_themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
-			liferayPortletRequest);
+		super(
+			liferayPortletRequest.getHttpServletRequest(),
+			liferayPortletRequest, liferayPortletResponse, currentURLObj);
 	}
 
 	public List<DropdownItem> getActionDropdownItems() {
@@ -76,41 +53,34 @@ public class OAuth2ConnectedApplicationsManagementToolbarDisplayContext {
 			dropdownItem -> {
 				dropdownItem.setHref(
 					StringBundler.concat(
-						"javascript:", _liferayPortletResponse.getNamespace(),
+						"javascript:", liferayPortletResponse.getNamespace(),
 						"removeAccess();"));
 				dropdownItem.setIcon("trash");
 				dropdownItem.setLabel(
-					LanguageUtil.get(_request, "remove-access"));
+					LanguageUtil.get(httpServletRequest, "remove-access"));
 				dropdownItem.setQuickAction(true);
 			});
 
 		return dropdownItems;
 	}
 
-	public String getDefaultIconURL() {
-		return _themeDisplay.getPathThemeImages() + "/common/portlet.png";
-	}
-
-	public String getDisplayStyle() {
-		return "list";
-	}
-
 	public List<DropdownItem> getFilterDropdownItems() {
 		return new DropdownItemList() {
 			{
+				Map<String, String> orderColumnsMap = new HashMap<>();
+
+				orderColumnsMap.put("createDate", "createDate");
+				orderColumnsMap.put("oAuth2ApplicationId", "application-name");
+
 				addGroup(
 					dropdownGroupItem -> {
 						dropdownGroupItem.setDropdownItems(
-							_getOrderByDropdownItems());
+							getOrderByDropdownItems(orderColumnsMap));
 						dropdownGroupItem.setLabel(
-							LanguageUtil.get(_request, "order-by"));
+							LanguageUtil.get(httpServletRequest, "order-by"));
 					});
 			}
 		};
-	}
-
-	public String getOrderByCol() {
-		return ParamUtil.getString(_request, "orderByCol", "createDate");
 	}
 
 	public OrderByComparator<OAuth2Authorization> getOrderByComparator() {
@@ -129,79 +99,5 @@ public class OAuth2ConnectedApplicationsManagementToolbarDisplayContext {
 		return OrderByComparatorFactoryUtil.create(
 			"OAuth2Authorization", columnName, orderByType.equals("asc"));
 	}
-
-	public String getOrderByType() {
-		return ParamUtil.getString(_request, "orderByType", "desc");
-	}
-
-	public PortletURL getSortingURL() throws PortletException {
-		PortletURL currentSortingURL = _getCurrentSortingURL();
-
-		currentSortingURL.setParameter(
-			"orderByType",
-			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
-
-		return currentSortingURL;
-	}
-
-	public String getThumbnailURL(OAuth2Application oAuth2Application)
-		throws Exception {
-
-		if (oAuth2Application.getIconFileEntryId() <= 0) {
-			return getDefaultIconURL();
-		}
-
-		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
-			oAuth2Application.getIconFileEntryId());
-
-		return DLUtil.getThumbnailSrc(fileEntry, _themeDisplay);
-	}
-
-	private PortletURL _getCurrentSortingURL() throws PortletException {
-		PortletURL sortingURL = PortletURLUtil.clone(
-			_currentURLObj, _liferayPortletResponse);
-
-		sortingURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
-
-		return sortingURL;
-	}
-
-	private List<DropdownItem> _getOrderByDropdownItems() {
-		return new DropdownItemList() {
-			{
-				final Map<String, String> orderColumnsMap = new HashMap<>();
-
-				orderColumnsMap.put("createDate", "createDate");
-				orderColumnsMap.put("oAuth2ApplicationId", "application-name");
-
-				for (Map.Entry<String, String> orderByColEntry :
-						orderColumnsMap.entrySet()) {
-
-					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								String orderByCol = orderByColEntry.getKey();
-
-								dropdownItem.setActive(
-									orderByCol.equals(getOrderByCol()));
-								dropdownItem.setHref(
-									_getCurrentSortingURL(), "orderByCol",
-									orderByCol);
-
-								dropdownItem.setLabel(
-									LanguageUtil.get(
-										_request, orderByColEntry.getValue()));
-							}));
-				}
-			}
-		};
-	}
-
-	private final PortletURL _currentURLObj;
-	private final LiferayPortletRequest _liferayPortletRequest;
-	private final LiferayPortletResponse _liferayPortletResponse;
-	private final PortalPreferences _portalPreferences;
-	private final HttpServletRequest _request;
-	private final ThemeDisplay _themeDisplay;
 
 }

@@ -22,11 +22,11 @@ String redirect = ParamUtil.getString(request, "redirect");
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-OAuth2Application oAuth2Application = oAuth2ConnectionApplicationsPortletDisplayContext.getOAuth2Application();
+OAuth2Application oAuth2Application = oAuth2ConnectedApplicationsPortletDisplayContext.getOAuth2Application();
 
 renderResponse.setTitle(oAuth2Application.getName());
 
-AuthorizationModel authorizationModel = oAuth2ConnectionApplicationsPortletDisplayContext.getAuthorizationModel();
+AuthorizationModel authorizationModel = oAuth2ConnectedApplicationsPortletDisplayContext.getAuthorizationModel();
 %>
 
 <div class="container-fluid-1280 view-application">
@@ -40,7 +40,7 @@ AuthorizationModel authorizationModel = oAuth2ConnectionApplicationsPortletDispl
 			<div class="panel-body">
 				<liferay-ui:icon
 					cssClass="app-icon"
-					src="<%= oAuth2ConnectionApplicationsPortletDisplayContext.getThumbnailURL() %>"
+					src="<%= oAuth2ConnectedApplicationsPortletDisplayContext.getThumbnailURL() %>"
 				/>
 
 				<h1 class="name">

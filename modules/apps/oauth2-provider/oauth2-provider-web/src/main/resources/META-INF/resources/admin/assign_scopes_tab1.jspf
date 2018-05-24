@@ -96,14 +96,22 @@
 									if (scopeAlias.length() > 0) {
 								%>
 
-									<span><a href ="#1" data-slave="<%= globalScopeAliasesStr %>">CAN be assigned via a global scope</a></span>
+									<span>
+										<a data-slave="<%= globalScopeAliasesStr %>" href="#1">
+											<liferay-ui:message key="can-be-assigned-via-a-global-scope" />
+										</a>
+									</span>
 
 								<%
 									}
 									else {
 								%>
 
-									<span><a href ="#1" data-slave="<%= globalScopeAliasesStr %>">MUST be assigned via a global scope</a></span>
+									<span>
+										<a data-slave="<%= globalScopeAliasesStr %>" href="#1">
+											<liferay-ui:message key="must-be-assigned-via-a-global-scope" />
+										</a>
+									</span>
 
 								<%
 									}

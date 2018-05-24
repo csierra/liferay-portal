@@ -30,5 +30,5 @@ page import="com.liferay.oauth2.provider.web.internal.display.context.Authorizat
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderWebKeys" %>
 
 <%
-OAuth2ConnectedApplicationsPortletDisplayContext oAuth2ConnectionApplicationsPortletDisplayContext = (OAuth2ConnectedApplicationsPortletDisplayContext)request.getAttribute(OAuth2ProviderWebKeys.OAUTH2_CONNECTED_APPLICATIONS_PORTLET_DISPLAY_CONTEXT);
+OAuth2ConnectedApplicationsPortletDisplayContext oAuth2ConnectedApplicationsPortletDisplayContext = (OAuth2ConnectedApplicationsPortletDisplayContext)request.getAttribute(OAuth2ProviderWebKeys.OAUTH2_CONNECTED_APPLICATIONS_PORTLET_DISPLAY_CONTEXT);
 %>

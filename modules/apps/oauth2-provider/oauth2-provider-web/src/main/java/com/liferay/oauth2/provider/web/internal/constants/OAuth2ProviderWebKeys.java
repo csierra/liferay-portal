@@ -19,14 +19,15 @@ package com.liferay.oauth2.provider.web.internal.constants;
  */
 public class OAuth2ProviderWebKeys {
 
-	public static final String ADMIN_DISPLAY_CONTEXT = "admin.display.context";
+	public static final String ASSIGN_SCOPES_MODEL = "ASSIGN_SCOPES_MODEL";
 
-	public static final String ASSIGN_SCOPES_MODEL = "assign.scopes.model";
+	public static final String AUTHORIZATION_MODEL = "AUTHORIZATION_MODEL";
 
-	public static final String AUTHORIZATION_MODEL = "authorization.model";
+	public static final String OAUTH2_ADMIN_PORTLET_DISPLAY_CONTEXT =
+		"OAUTH2_ADMIN_PORTLET_DISPLAY_CONTEXT";
 
-	public static final String AUTHORIZE_DISPLAY_CONTEXT =
-		"authorize.display.context";
+	public static final String OAUTH2_AUTHORIZE_PORTLET_DISPLAY_CONTEXT =
+		"OAUTH2_AUTHORIZE_PORTLET_DISPLAY_CONTEXT";
 
 	public static final String
 		OAUTH2_CONNECTED_APPLICATIONS_PORTLET_DISPLAY_CONTEXT =

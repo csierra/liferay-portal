@@ -14,14 +14,8 @@
 
 package com.liferay.oauth2.provider.web.internal.display.context;
 
-import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
-import com.liferay.document.library.kernel.util.DLUtil;
-import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.PortletRequest;
@@ -29,7 +23,8 @@ import javax.portlet.PortletRequest;
 /**
  * @author Tomas Polesovsky
  */
-public class OAuth2ConnectedApplicationsPortletDisplayContext {
+public class OAuth2ConnectedApplicationsPortletDisplayContext
+	extends BaseOAuth2PortletDisplayContext {
 
 	public OAuth2ConnectedApplicationsPortletDisplayContext(
 		AuthorizationModel authorizationModel, PortletRequest portletRequest,
@@ -38,15 +33,16 @@ public class OAuth2ConnectedApplicationsPortletDisplayContext {
 		this(portletRequest);
 
 		_authorizationModel = authorizationModel;
-		_oAuth2ApplicationService = oAuth2ApplicationService;
+
+		super.oAuth2ApplicationService = oAuth2ApplicationService;
 	}
 
 	public OAuth2ConnectedApplicationsPortletDisplayContext(
 		PortletRequest portletRequest) {
 
-		_portletRequest = portletRequest;
+		super.portletRequest = portletRequest;
 
-		_themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+		super.themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -54,34 +50,6 @@ public class OAuth2ConnectedApplicationsPortletDisplayContext {
 		return _authorizationModel;
 	}
 
-	public String getDefaultIconURL() {
-		return _themeDisplay.getPathThemeImages() + "/common/portlet.png";
-	}
-
-	public OAuth2Application getOAuth2Application() throws PortalException {
-		long oAuth2ApplicationId = ParamUtil.getLong(
-			_portletRequest, "oAuth2ApplicationId");
-
-		return _oAuth2ApplicationService.getOAuth2Application(
-			oAuth2ApplicationId);
-	}
-
-	public String getThumbnailURL() throws Exception {
-		OAuth2Application oAuth2Application = getOAuth2Application();
-
-		if (oAuth2Application.getIconFileEntryId() <= 0) {
-			return getDefaultIconURL();
-		}
-
-		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
-			oAuth2Application.getIconFileEntryId());
-
-		return DLUtil.getThumbnailSrc(fileEntry, _themeDisplay);
-	}
-
 	private AuthorizationModel _authorizationModel;
-	private OAuth2ApplicationService _oAuth2ApplicationService;
-	private PortletRequest _portletRequest;
-	private ThemeDisplay _themeDisplay;
 
 }

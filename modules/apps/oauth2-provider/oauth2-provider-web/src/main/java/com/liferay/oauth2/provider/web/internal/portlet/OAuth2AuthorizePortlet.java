@@ -97,12 +97,14 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 		HttpServletRequest request = _portal.getOriginalServletRequest(
 			_portal.getHttpServletRequest(renderRequest));
 
-		OAuth2AuthorizePortletDisplayContext context =
-			new OAuth2AuthorizePortletDisplayContext(themeDisplay);
+		OAuth2AuthorizePortletDisplayContext
+			oAuth2AuthorizePortletDisplayContext =
+				new OAuth2AuthorizePortletDisplayContext(themeDisplay);
 
 		Map<String, String> oAuth2Parameters = getOAuth2Parameters(request);
 
-		context.setOAuth2Parameters(oAuth2Parameters);
+		oAuth2AuthorizePortletDisplayContext.setOAuth2Parameters(
+			oAuth2Parameters);
 
 		String clientId = oAuth2Parameters.get("client_id");
 
@@ -111,7 +113,8 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 				_oAuth2ApplicationService.fetchOAuth2Application(
 					companyId, clientId);
 
-			context.setOAuth2Application(oAuth2Application);
+			oAuth2AuthorizePortletDisplayContext.setOAuth2Application(
+				oAuth2Application);
 
 			List<String> allowedScopeAliases = Collections.emptyList();
 
@@ -138,10 +141,12 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 				companyId, allowedScopeAliases, authorizationModel,
 				requestedScopeAliases);
 
-			context.setAuthorizationModel(authorizationModel);
+			oAuth2AuthorizePortletDisplayContext.setAuthorizationModel(
+				authorizationModel);
 
 			renderRequest.setAttribute(
-				OAuth2ProviderWebKeys.AUTHORIZE_DISPLAY_CONTEXT, context);
+				OAuth2ProviderWebKeys.OAUTH2_AUTHORIZE_PORTLET_DISPLAY_CONTEXT,
+				oAuth2AuthorizePortletDisplayContext);
 		}
 		catch (PortalException pe) {
 			throw new PortletException(pe);

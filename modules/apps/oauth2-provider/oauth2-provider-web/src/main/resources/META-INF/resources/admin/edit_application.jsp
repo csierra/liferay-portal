@@ -22,26 +22,23 @@ String redirect = ParamUtil.getString(request, "redirect");
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getApplication(request);
+OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
 
 String headerTitle = LanguageUtil.get(request, "add-o-auth2-application");
 
 if (oAuth2Application != null) {
-	headerTitle = LanguageUtil.format(request, "edit-x", oAuth2Application.getName(), false);
+	headerTitle = oAuth2Application.getName();
 }
 
 renderResponse.setTitle(headerTitle);
 
 String clientId = oAuth2Application == null ? "" : oAuth2Application.getClientId();
 String clientSecret = oAuth2Application == null ? "" : oAuth2Application.getClientSecret();
-String cmd = oAuth2Application == null ? "add" : "update";
 %>
 
-<portlet:actionURL name="updateOAuth2Application" var="editOAuth2ApplicationURL" />
+<portlet:actionURL name="/admin/update_oauth2_application" var="updateOAuth2ApplicationURL" />
 
-<aui:form action="<%= editOAuth2ApplicationURL %>" id="<portlet:namespace />oauth2-application-fm" method="post" name="oauth2-application-fm">
-	<aui:input name="cmd" type="hidden" value="<%= cmd %>" />
-
+<aui:form action="<%= updateOAuth2ApplicationURL %>" id="<portlet:namespace />oauth2-application-fm" method="post" name="oauth2-application-fm">
 	<div class="container-fluid container-fluid-max-xl container-view">
 		<div class="sheet">
 			<div class="row">
@@ -358,23 +355,23 @@ String cmd = oAuth2Application == null ? "add" : "update";
 
 	var oldFieldRules = form.get('fieldRules');
 	var newFieldRules = [
-			{
-					body: function(val, fieldNode, ruleValue) {
-						return <portlet:namespace />isConfidentialClientRequired();
-					},
-					custom: false,
-					fieldName: '<portlet:namespace />clientSecret',
-					validatorName: 'required'
+		{
+			body: function(val, fieldNode, ruleValue) {
+				return <portlet:namespace />isConfidentialClientRequired();
 			},
-			{
-					body: function(val, fieldNode, ruleValue) {
-						return <portlet:namespace />isRedirectURIRequired();
-					},
-					custom: false,
-					fieldName: '<portlet:namespace />redirectURIs',
-					validatorName: 'required'
-			}
-		];
+			custom: false,
+			fieldName: '<portlet:namespace />clientSecret',
+			validatorName: 'required'
+		},
+		{
+			body: function(val, fieldNode, ruleValue) {
+				return <portlet:namespace />isRedirectURIRequired();
+			},
+			custom: false,
+			fieldName: '<portlet:namespace />redirectURIs',
+			validatorName: 'required'
+		}
+	];
 
 	var fieldRules = oldFieldRules.concat(newFieldRules);
 

@@ -310,6 +310,7 @@ public class AssignScopesModel {
 			if (!Validator.isBlank(scopeAlias)) {
 				combinedAuthorizationModelsRelations.put(
 					authorizationModel, authorizationModelRelations);
+
 				continue;
 			}
 

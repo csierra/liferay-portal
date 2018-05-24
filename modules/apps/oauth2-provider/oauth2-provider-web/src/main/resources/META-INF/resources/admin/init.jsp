@@ -66,6 +66,5 @@ page import="java.util.stream.Collectors"%>
 <%@ page import="javax.portlet.PortletURL" %>
 
 <%
-OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = (OAuth2AdminPortletDisplayContext)request.getAttribute(
-	OAuth2ProviderWebKeys.ADMIN_DISPLAY_CONTEXT);
+OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = (OAuth2AdminPortletDisplayContext)request.getAttribute(OAuth2ProviderWebKeys.OAUTH2_ADMIN_PORTLET_DISPLAY_CONTEXT);
 %>

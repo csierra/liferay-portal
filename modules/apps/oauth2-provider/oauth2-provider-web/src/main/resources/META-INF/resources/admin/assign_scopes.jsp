@@ -21,22 +21,9 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 long oAuth2ApplicationId = ParamUtil.getLong(request, "oAuth2ApplicationId");
 
-OAuth2Application oAuth2Application = null;
-
-try {
-	oAuth2Application = OAuth2ApplicationServiceUtil.getOAuth2Application(oAuth2ApplicationId);
-}
-catch (PrincipalException e) {
-%>
-
-	<liferay-ui:error-principal />
-
-<%
-	return;
-}
+OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
 
 portletDisplay.setShowBackIcon(true);
-
 portletDisplay.setURLBack(redirect);
 
 renderResponse.setTitle(LanguageUtil.get(request, "assign-scopes"));
@@ -55,18 +42,22 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 <div class="container-fluid container-fluid-max-xl container-view">
 	<div class="row">
 		<div class="col-lg-12">
-			<portlet:actionURL name="/admin/assign_scopes" var="updateScopesURL" />
+			<portlet:actionURL name="/admin/assign_scopes" var="assignScopesURL" />
 
-			<aui:form action="<%= updateScopesURL %>" name="fm">
+			<aui:form action="<%= assignScopesURL %>" name="fm">
 				<aui:input name="oAuth2ApplicationId" type="hidden" value="<%= oAuth2ApplicationId %>" />
 
 				<div class="sheet">
 					<ul class="nav nav-underline" role="tablist">
 						<li class="nav-item">
-							<a aria-controls="<portlet:namespace />navResourceScopes" aria-expanded="true" class="active nav-link" data-toggle="tab" href="#<portlet:namespace />navResourceScopes" id="<portlet:namespace />navResourceScopesTab" role="tab">Resource scopes</a>
+							<a aria-controls="<portlet:namespace />navResourceScopes" aria-expanded="true" class="active nav-link" data-toggle="tab" href="#<portlet:namespace />navResourceScopes" id="<portlet:namespace />navResourceScopesTab" role="tab">
+								<liferay-ui:message key="resource-scopes" />
+							</a>
 						</li>
 						<li class="nav-item">
-							<a aria-controls="<portlet:namespace />navGlobalScopes" class="nav-link" data-toggle="tab" href="#<portlet:namespace />navGlobalScopes" id="<portlet:namespace />navGlobalScopesTab" role="tab">Global scopes</a>
+							<a aria-controls="<portlet:namespace />navGlobalScopes" class="nav-link" data-toggle="tab" href="#<portlet:namespace />navGlobalScopes" id="<portlet:namespace />navGlobalScopesTab" role="tab">
+								<liferay-ui:message key="global-scopes" />
+							</a>
 						</li>
 					</ul>
 
@@ -82,7 +73,7 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 
 					<aui:button-row>
 						<aui:button cssClass="btn-lg" type="submit" />
-						<aui:button cssClass="btn-lg" href="<%= portletDisplay.getURLBack() %>" type="cancel" />
+						<aui:button cssClass="btn-lg" href="<%= PortalUtil.escapeRedirect(redirect) %>" type="cancel" />
 					</aui:button-row>
 				</div>
 			</aui:form>
@@ -97,12 +88,13 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 	var modal = new A.Modal(
 		{
 			centered: true,
+			cssClass: 'assign-scopes-modal',
 			visible: false,
 			zIndex: Liferay.zIndex.OVERLAY,
 			modal: true,
 			width: 1000,
 			bodyContent: '<div id="<portlet:namespace />modalBody"/>',
-			headerContent: 'Choose one of the following global scopes that include this resource scope...'
+			headerContent: '<%= UnicodeLanguageUtil.get(request, "choose-one-of-the-following-global-scopes-that-include-this-resource-scope") %>'
 		}
 	).render();
 

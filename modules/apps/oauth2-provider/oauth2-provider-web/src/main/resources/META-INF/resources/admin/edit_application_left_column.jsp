@@ -17,7 +17,7 @@
 <%@ include file="/admin/init.jsp" %>
 
 <%
-OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getApplication(request);
+OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
 %>
 
 <aui:model-context bean="<%= oAuth2Application %>" model="<%= OAuth2Application.class %>" />
