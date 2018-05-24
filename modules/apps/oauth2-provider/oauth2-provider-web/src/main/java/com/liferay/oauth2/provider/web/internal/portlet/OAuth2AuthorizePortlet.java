@@ -23,8 +23,8 @@ import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
-import com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
+import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderWebKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
@@ -98,7 +98,7 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 			_portal.getHttpServletRequest(renderRequest));
 
 		OAuth2AuthorizePortletDisplayContext context =
-			new OAuth2AuthorizePortletDisplayContext();
+			new OAuth2AuthorizePortletDisplayContext(themeDisplay);
 
 		Map<String, String> oAuth2Parameters = getOAuth2Parameters(request);
 
@@ -141,7 +141,7 @@ public class OAuth2AuthorizePortlet extends MVCPortlet {
 			context.setAuthorizationModel(authorizationModel);
 
 			renderRequest.setAttribute(
-				OAuth2AdminWebKeys.AUTHORIZE_DISPLAY_CONTEXT, context);
+				OAuth2ProviderWebKeys.AUTHORIZE_DISPLAY_CONTEXT, context);
 		}
 		catch (PortalException pe) {
 			throw new PortletException(pe);

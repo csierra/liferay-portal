@@ -41,7 +41,7 @@ portletDisplay.setURLBack(redirect);
 
 renderResponse.setTitle(LanguageUtil.get(request, "assign-scopes"));
 
-AssignScopesModel assignScopesModel = (AssignScopesModel)request.getAttribute(OAuth2AdminWebKeys.ASSIGN_SCOPES_MODEL);
+AssignScopesModel assignScopesModel = (AssignScopesModel)request.getAttribute(OAuth2ProviderWebKeys.ASSIGN_SCOPES_MODEL);
 
 List<String> assignedScopes = Collections.emptyList();
 

@@ -36,7 +36,7 @@ page import="com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService" %><%@ 
 page import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil" %><%@ 
-page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2AdminWebKeys" %><%@
+page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderWebKeys" %><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.AssignScopesModel"%><%@
 page import="com.liferay.oauth2.provider.web.internal.display.context.AuthorizationModel"%><%@
 page import="com.liferay.oauth2.provider.web.internal.constants.ClientProfile"%><%@
@@ -66,5 +66,6 @@ page import="java.util.stream.Collectors"%>
 <%@ page import="javax.portlet.PortletURL" %>
 
 <%
-OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = (OAuth2AdminPortletDisplayContext)request.getAttribute(OAuth2AdminWebKeys.ADMIN_DISPLAY_CONTEXT);
+OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext = (OAuth2AdminPortletDisplayContext)request.getAttribute(
+	OAuth2ProviderWebKeys.ADMIN_DISPLAY_CONTEXT);
 %>

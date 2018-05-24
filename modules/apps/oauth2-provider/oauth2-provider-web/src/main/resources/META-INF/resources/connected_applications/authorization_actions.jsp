@@ -29,13 +29,25 @@ OAuth2Authorization oAuth2Authorization = (OAuth2Authorization)row.getObject();
 	message="<%= StringPool.BLANK %>"
 	showWhenSingleIcon="<%= true %>"
 >
-	<portlet:actionURL name="revokeAuthorizationTokens" var="revokeURL">
+	<portlet:renderURL var="viewURL">
+		<portlet:param name="mvcRenderCommandName" value="/connected_applications/view_application" />
+		<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2Authorization.getOAuth2ApplicationId()) %>" />
+		<portlet:param name="oAuth2AuthorizationId" value="<%= String.valueOf(oAuth2Authorization.getOAuth2AuthorizationId()) %>" />
+		<portlet:param name="redirect" value="<%= currentURL %>" />
+	</portlet:renderURL>
+
+	<liferay-ui:icon
+		message="view"
+		url="<%= viewURL.toString() %>"
+	/>
+
+	<portlet:actionURL name="revokeOAuth2Authorization" var="revokeOAuth2AuthorizationURL">
 		<portlet:param name="oAuth2AuthorizationId" value="<%= String.valueOf(oAuth2Authorization.getOAuth2AuthorizationId()) %>" />
 		<portlet:param name="redirect" value="<%= currentURL %>" />
 	</portlet:actionURL>
 
-	<liferay-ui:icon
-		message="revoke-authorization"
-		url="<%= revokeURL.toString() %>"
+	<liferay-ui:icon-delete
+		message="remove-access"
+		url="<%= revokeOAuth2AuthorizationURL.toString() %>"
 	/>
 </liferay-ui:icon-menu>

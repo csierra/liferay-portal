@@ -27,6 +27,7 @@ public class OAuth2ProviderPortletKeys {
 			"OAuth2AuthorizePortlet";
 
 	public static final String OAUTH2_CONNECTED_APPLICATIONS =
-		"com_liferay_oauth2_provider_web_internal_portlet_OAuth2ConnectedApplicationsPortlet";
+		"com_liferay_oauth2_provider_web_internal_portlet_" +
+			"OAuth2ConnectedApplicationsPortlet";
 
 }
