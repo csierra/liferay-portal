@@ -73,6 +73,29 @@ public class DLAPIOAuth2SupportTest extends BaseClientTest {
 		return deployment;
 	}
 
+	@Test
+	public void testSomething() throws Exception {
+		String tokenString = getToken("oauthTestApplication");
+
+		WebTarget webTarget = getWebTarget("file-entry-url");
+
+		Invocation.Builder builder = authorize(
+			webTarget.request(), tokenString);
+
+		String fileEntryRelativeUrl = builder.get(String.class);
+
+		WebTarget fileEntryTarget = _getRootWebTarget(fileEntryRelativeUrl);
+
+		Invocation.Builder fileEntryBuilder = authorize(
+			fileEntryTarget.request(), tokenString);
+
+		Response response = fileEntryBuilder.get();
+
+		Assert.assertEquals(200, response.getStatus());
+		Assert.assertEquals(
+			"image/jpeg", response.getHeaderString("Content-Type"));
+	}
+
 	public static class DLAPIOAuth2SupportTestPreparator
 		extends BaseTestPreparatorBundleActivator {
 
@@ -130,6 +153,14 @@ public class DLAPIOAuth2SupportTest extends BaseClientTest {
 					fileEntry.getFileEntryId()));
 		}
 
+	}
+
+	private WebTarget _getRootWebTarget(String path) throws URISyntaxException {
+		Client client = getClient();
+
+		WebTarget webTarget = client.target(getUrl().toURI());
+
+		return webTarget.path(path);
 	}
 
 }
