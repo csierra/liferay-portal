@@ -40,8 +40,8 @@ page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="java.util.List" %><%@
-page import="java.util.Map"%><%@
-page import="java.util.Set"%>
+page import="java.util.Map" %><%@
+page import="java.util.Set" %>
 
 <%@ page import="com.liferay.portal.kernel.exception.PortalException" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletURLUtil" %><%@
