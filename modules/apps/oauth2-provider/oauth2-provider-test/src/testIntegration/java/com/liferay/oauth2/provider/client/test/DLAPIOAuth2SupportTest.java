@@ -17,7 +17,7 @@ package com.liferay.oauth2.provider.client.test;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.oauth2.provider.test.internal.TestFileEntryUrlApplication;
-import com.liferay.oauth2.provider.test.internal.activator.configuration.BaseTestPreparatorBundleActivator;
+import com.liferay.oauth2.provider.test.internal.activator.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -106,7 +106,7 @@ public class DLAPIOAuth2SupportTest extends BaseClientTest {
 
 		private byte[] _getFileBytes() throws IOException {
 			URL url =
-				_bundleContext.getBundle().getEntry("META-INF/test-image.jpg");
+				bundleContext.getBundle().getEntry("META-INF/test-image.jpg");
 
 			InputStream inputStream = url.openStream();
 
@@ -115,9 +115,9 @@ public class DLAPIOAuth2SupportTest extends BaseClientTest {
 
 		private void _saveTestFile() throws Exception {
 			ServiceReference<DLAppLocalService> serviceReference =
-				_bundleContext.getServiceReference(DLAppLocalService.class);
+				bundleContext.getServiceReference(DLAppLocalService.class);
 
-			DLAppLocalService dlAppLocalService = _bundleContext.getService(
+			DLAppLocalService dlAppLocalService = bundleContext.getService(
 				serviceReference);
 
 			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
@@ -144,11 +144,11 @@ public class DLAPIOAuth2SupportTest extends BaseClientTest {
 				new TestFileEntryUrlApplication(donwloadUrlRelative),
 				"file-entry-url", properties);
 
-			createOauth2Application(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Collections.singletonList("GET"));
 
-			_autoCloseables.add(
+			autoCloseables.add(
 				() -> dlAppLocalService.deleteFileEntry(
 					fileEntry.getFileEntryId()));
 		}
@@ -158,7 +158,7 @@ public class DLAPIOAuth2SupportTest extends BaseClientTest {
 	private WebTarget _getRootWebTarget(String path) throws URISyntaxException {
 		Client client = getClient();
 
-		WebTarget webTarget = client.target(getUrl().toURI());
+		WebTarget webTarget = client.target(url.toURI());
 
 		return webTarget.path(path);
 	}

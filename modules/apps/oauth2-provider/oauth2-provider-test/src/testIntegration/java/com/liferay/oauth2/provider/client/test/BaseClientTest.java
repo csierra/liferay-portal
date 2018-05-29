@@ -405,7 +405,7 @@ public class BaseClientTest {
 
 		Client client = getClient();
 
-		WebTarget webTarget = client.target(_url.toURI());
+		WebTarget webTarget = client.target(url.toURI());
 
 		webTarget = webTarget.path("api");
 		webTarget = webTarget.path("jsonws");
@@ -420,7 +420,7 @@ public class BaseClientTest {
 	protected WebTarget getLoginWebTarget() throws URISyntaxException {
 		Client client = getClient();
 
-		WebTarget webTarget = client.target(_url.toURI());
+		WebTarget webTarget = client.target(url.toURI());
 
 		webTarget = webTarget.path("c");
 		webTarget = webTarget.path("portal");
@@ -432,7 +432,7 @@ public class BaseClientTest {
 	protected WebTarget getOAuth2WebTarget() throws URISyntaxException {
 		Client client = getClient();
 
-		WebTarget webTarget = client.target(_url.toURI());
+		WebTarget webTarget = client.target(url.toURI());
 
 		webTarget = webTarget.path("o");
 		webTarget = webTarget.path("oauth2");
@@ -516,7 +516,7 @@ public class BaseClientTest {
 
 		Client client = getClient();
 
-		WebTarget target = client.target(_url.toURI());
+		WebTarget target = client.target(url.toURI());
 
 		target = target.path("o");
 		target = target.path("oauth2-test");
@@ -565,6 +565,6 @@ public class BaseClientTest {
 	}
 
 	@ArquillianResource
-	private URL _url;
+	protected URL url;
 
 }
