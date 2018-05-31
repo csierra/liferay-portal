@@ -50,6 +50,7 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
@@ -99,14 +100,11 @@ public abstract class BaseClientTestCase {
 			}
 		}
 
-		Analyzer analyzer = new Analyzer();
 		File bndFile = new File("bnd.bnd");
 
-		JavaArchive javaArchive = bndProjectBuilder.setBndFile(
-			bndFile
-		).as(
-			JavaArchive.class
-		);
+		bndProjectBuilder = bndProjectBuilder.setBndFile(bndFile);
+
+		JavaArchive javaArchive = bndProjectBuilder.as(JavaArchive.class);
 
 		javaArchive.addClass(bundleActivatorClass);
 
@@ -115,6 +113,7 @@ public abstract class BaseClientTestCase {
 		Jar jar = new Jar(
 			javaArchive.getName(), zipExporter.exportAsInputStream());
 
+		Analyzer analyzer = new Analyzer();
 		Properties analyzerProperties = new Properties();
 
 		analyzerProperties.putAll(analyzer.loadProperties(bndFile));
@@ -173,9 +172,9 @@ public abstract class BaseClientTestCase {
 	}
 
 	protected Invocation.Builder authorize(
-		Invocation.Builder invocataionBuilder, String token) {
+		Invocation.Builder invocationBuilder, String token) {
 
-		return invocataionBuilder.header("Authorization", "Bearer " + token);
+		return invocationBuilder.header("Authorization", "Bearer " + token);
 	}
 
 	protected Cookie getAuthenticatedCookie(
@@ -185,8 +184,7 @@ public abstract class BaseClientTestCase {
 		Invocation.Builder invocationBuilder = getInvocationBuilder(
 			hostname, getLoginWebTarget());
 
-		MultivaluedHashMap<String, String> formData =
-			new MultivaluedHashMap<>();
+		MultivaluedMap<String, String> formData = new MultivaluedHashMap<>();
 
 		formData.add("login", login);
 		formData.add("password", password);
@@ -216,7 +214,7 @@ public abstract class BaseClientTestCase {
 					"response_type", "code"
 				));
 
-			MultivaluedHashMap<String, String> formData =
+			MultivaluedMap<String, String> formData =
 				new MultivaluedHashMap<>();
 
 			formData.add("client_id", clientId);
@@ -260,7 +258,7 @@ public abstract class BaseClientTestCase {
 				return parameterMap.get("error")[0];
 			}
 
-			MultivaluedHashMap<String, String> formData =
+			MultivaluedMap<String, String> formData =
 				new MultivaluedHashMap<>();
 
 			formData.add("oauthDecision", "allow");
@@ -306,7 +304,7 @@ public abstract class BaseClientTestCase {
 
 	protected BiFunction<String, Invocation.Builder, Response>
 		getAuthorizationCodePKCE(
-			String user, String password, String hostname) {
+			String userName, String password, String hostname) {
 
 		return (clientId, invocationBuilder) -> {
 			String codeVerifier = RandomTestUtil.randomString();
@@ -324,7 +322,7 @@ public abstract class BaseClientTestCase {
 			final String codeChallenge = base64UrlDigest;
 
 			String authorizationCode = getAuthorizationCode(
-				user, password, hostname,
+				userName, password, hostname,
 				webTarget -> webTarget.queryParam(
 					"client_id", clientId
 				).queryParam(
@@ -333,7 +331,7 @@ public abstract class BaseClientTestCase {
 					"response_type", "code"
 				));
 
-			MultivaluedHashMap<String, String> formData =
+			MultivaluedMap<String, String> formData =
 				new MultivaluedHashMap<>();
 
 			formData.add("client_id", clientId);
@@ -363,7 +361,7 @@ public abstract class BaseClientTestCase {
 		getClientCredentials(String scope) {
 
 		return (clientId, invocationBuilder) -> {
-			MultivaluedHashMap<String, String> formData =
+			MultivaluedMap<String, String> formData =
 				new MultivaluedHashMap<>();
 
 			formData.add("client_id", clientId);
@@ -378,8 +376,7 @@ public abstract class BaseClientTestCase {
 	protected Response getClientCredentials(
 		String clientId, Invocation.Builder invocationBuilder) {
 
-		MultivaluedHashMap<String, String> formData =
-			new MultivaluedHashMap<>();
+		MultivaluedMap<String, String> formData = new MultivaluedHashMap<>();
 
 		formData.add("client_id", clientId);
 		formData.add("client_secret", "oauthTestApplicationSecret");
@@ -408,6 +405,7 @@ public abstract class BaseClientTestCase {
 		WebTarget webTarget = client.target(_url.toURI());
 
 		webTarget = webTarget.path("api");
+
 		webTarget = webTarget.path("jsonws");
 
 		for (String path : paths) {
@@ -423,7 +421,9 @@ public abstract class BaseClientTestCase {
 		WebTarget webTarget = client.target(_url.toURI());
 
 		webTarget = webTarget.path("c");
+
 		webTarget = webTarget.path("portal");
+
 		webTarget = webTarget.path("login");
 
 		return webTarget;
@@ -435,22 +435,23 @@ public abstract class BaseClientTestCase {
 		WebTarget webTarget = client.target(_url.toURI());
 
 		webTarget = webTarget.path("o");
+
 		webTarget = webTarget.path("oauth2");
 
 		return webTarget;
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>
-		getResourceOwnerPassword(String user, String password) {
+		getResourceOwnerPassword(String userName, String password) {
 
 		return (clientId, invocationBuilder) -> {
-			MultivaluedHashMap<String, String> formData =
+			MultivaluedMap<String, String> formData =
 				new MultivaluedHashMap<>();
 
 			formData.add("client_id", clientId);
 			formData.add("client_secret", "oauthTestApplicationSecret");
 			formData.add("grant_type", "password");
-			formData.add("username", user);
+			formData.add("username", userName);
 			formData.add("password", password);
 
 			return invocationBuilder.post(Entity.form(formData));
@@ -458,16 +459,17 @@ public abstract class BaseClientTestCase {
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>
-		getResourceOwnerPassword(String user, String password, String scope) {
+		getResourceOwnerPassword(
+			String userName, String password, String scope) {
 
 		return (clientId, invocationBuilder) -> {
-			MultivaluedHashMap<String, String> formData =
+			MultivaluedMap<String, String> formData =
 				new MultivaluedHashMap<>();
 
 			formData.add("client_id", clientId);
 			formData.add("client_secret", "oauthTestApplicationSecret");
 			formData.add("grant_type", "password");
-			formData.add("username", user);
+			formData.add("username", userName);
 			formData.add("password", password);
 			formData.add("scope", scope);
 
@@ -519,6 +521,7 @@ public abstract class BaseClientTestCase {
 		WebTarget target = client.target(_url.toURI());
 
 		target = target.path("o");
+
 		target = target.path("oauth2-test");
 
 		for (String path : paths) {
@@ -532,11 +535,11 @@ public abstract class BaseClientTestCase {
 		return parseJsonField(response, "error");
 	}
 
-	protected String parseJsonField(Response response, String field) {
+	protected String parseJsonField(Response response, String fieldName) {
 		JSONObject jsonObject = parseJSONObject(response);
 
 		try {
-			return jsonObject.getString(field);
+			return jsonObject.getString(fieldName);
 		}
 		catch (JSONException jsone) {
 			throw new IllegalArgumentException(

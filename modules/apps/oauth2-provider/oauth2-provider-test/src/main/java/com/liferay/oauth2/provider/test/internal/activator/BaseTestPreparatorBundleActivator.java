@@ -20,9 +20,12 @@ import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
@@ -78,25 +81,15 @@ public abstract class BaseTestPreparatorBundleActivator
 			prepareTest();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_cleanUp();
+
+			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
 	public void stop(BundleContext bundleContext) {
-		ListIterator<AutoCloseable> listIterator = autoCloseables.listIterator(
-			autoCloseables.size());
-
-		while (listIterator.hasPrevious()) {
-			AutoCloseable previous = listIterator.previous();
-
-			try {
-				previous.close();
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		_cleanUp();
 	}
 
 	protected User addAdminUser(Company company) throws Exception {
@@ -216,12 +209,12 @@ public abstract class BaseTestPreparatorBundleActivator
 	protected Configuration createFactoryConfiguration(
 		String factoryPid, Dictionary<String, Object> properties) {
 
-		Configuration factoryConfiguration = createFactoryConfiguration(
+		Configuration configuration = createFactoryConfiguration(
 			bundleContext, factoryPid, properties);
 
-		autoCloseables.add(factoryConfiguration::delete);
+		autoCloseables.add(configuration::delete);
 
-		return factoryConfiguration;
+		return configuration;
 	}
 
 	protected OAuth2Application createOAuth2Application(
@@ -299,10 +292,9 @@ public abstract class BaseTestPreparatorBundleActivator
 
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 
-		HashMapDictionary<String, Object> registrationProperties =
-			new HashMapDictionary<>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
-		registrationProperties.put(Constants.SERVICE_PID, pid);
+		properties.put(Constants.SERVICE_PID, pid);
 
 		ServiceRegistration<ManagedService> serviceRegistration =
 			bundleContext.registerService(
@@ -312,7 +304,7 @@ public abstract class BaseTestPreparatorBundleActivator
 						countDownLatch.countDown();
 					}
 				},
-				registrationProperties);
+				properties);
 
 		try {
 			ServiceReference<ConfigurationAdmin> serviceReference =
@@ -349,7 +341,7 @@ public abstract class BaseTestPreparatorBundleActivator
 			expectedModificationsCount);
 
 		ServiceTracker<JaxrsServiceRuntime, Object> serviceTracker =
-			new ServiceTracker<>(
+			ServiceTrackerFactory.open(
 				bundleContext, JaxrsServiceRuntime.class,
 				new ServiceTrackerCustomizer<JaxrsServiceRuntime, Object>() {
 
@@ -376,8 +368,6 @@ public abstract class BaseTestPreparatorBundleActivator
 
 				});
 
-		serviceTracker.open();
-
 		runnable.run();
 
 		try {
@@ -389,7 +379,8 @@ public abstract class BaseTestPreparatorBundleActivator
 						countDownLatch.getCount()));
 			}
 		}
-		catch (Exception e) {
+		catch (InterruptedException ie) {
+			throw new RuntimeException(ie);
 		}
 		finally {
 			serviceTracker.close();
@@ -455,9 +446,9 @@ public abstract class BaseTestPreparatorBundleActivator
 		}
 
 		properties.put("oauth2.test.application", "true");
+		properties.put("osgi.jaxrs.application.base", "/oauth2-test/" + path);
 		properties.put(
 			"osgi.jaxrs.extension.select", "(liferay.extension=OAuth2)");
-		properties.put("osgi.jaxrs.application.base", "/oauth2-test/" + path);
 
 		ServiceRegistration<Application> serviceRegistration =
 			bundleContext.registerService(
@@ -498,7 +489,7 @@ public abstract class BaseTestPreparatorBundleActivator
 
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 
-		HashMapDictionary<String, Object> registrationProperties =
+		Dictionary<String, Object> registrationProperties =
 			new HashMapDictionary<>();
 
 		registrationProperties.put(Constants.SERVICE_PID, servicePid);
@@ -567,10 +558,7 @@ public abstract class BaseTestPreparatorBundleActivator
 			configuration = getConfiguration(bundleContext, servicePid);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
-
-			return () -> {
-			};
+			throw new RuntimeException(e);
 		}
 
 		if (configuration == null) {
@@ -591,6 +579,25 @@ public abstract class BaseTestPreparatorBundleActivator
 
 	protected ArrayList<AutoCloseable> autoCloseables;
 	protected BundleContext bundleContext;
+
+	private void _cleanUp() {
+		ListIterator<AutoCloseable> listIterator = autoCloseables.listIterator(
+			autoCloseables.size());
+
+		while (listIterator.hasPrevious()) {
+			AutoCloseable previousAutoCloseable = listIterator.previous();
+
+			try {
+				previousAutoCloseable.close();
+			}
+			catch (Exception e) {
+				_log.error(e);
+			}
+		}
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseTestPreparatorBundleActivator.class);
 
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 
