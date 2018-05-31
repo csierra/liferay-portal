@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
@@ -342,7 +343,10 @@ public abstract class BaseTestPreparatorBundleActivator
 	}
 
 	protected void executeAndWaitForReadiness(Runnable runnable) {
-		CountDownLatch countDownLatch = new CountDownLatch(23);
+		int expectedModificationsCount = 23;
+
+		CountDownLatch countDownLatch = new CountDownLatch(
+			expectedModificationsCount);
 
 		ServiceTracker<JaxrsServiceRuntime, Object> serviceTracker =
 			new ServiceTracker<>(
@@ -379,7 +383,10 @@ public abstract class BaseTestPreparatorBundleActivator
 		try {
 			if (!countDownLatch.await(10, TimeUnit.MINUTES)) {
 				throw new IllegalStateException(
-					"timeout waiting for fromework to be ready");
+					StringBundler.concat(
+						"Expected modifications count ",
+						expectedModificationsCount, " didn't match ",
+						countDownLatch.getCount()));
 			}
 		}
 		catch (Exception e) {
