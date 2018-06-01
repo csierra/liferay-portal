@@ -49,7 +49,7 @@ public class JsonWebServiceTest extends BaseClientTestCase {
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			JsonWebServiceTestPreparator.class);
+			JsonWebServiceTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -109,7 +109,7 @@ public class JsonWebServiceTest extends BaseClientTestCase {
 		Assert.assertTrue(responseString.contains("No Country exists with"));
 	}
 
-	public static class JsonWebServiceTestPreparator
+	public static class JsonWebServiceTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override

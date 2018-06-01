@@ -41,7 +41,7 @@ public class GrantedFlowsTest extends BaseClientTestCase {
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			AnnotatedApplicationBundleActivator.class);
+			AnnotatedApplicationTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -101,7 +101,7 @@ public class GrantedFlowsTest extends BaseClientTestCase {
 		Assert.assertNotNull(tokenString);
 	}
 
-	public static class AnnotatedApplicationBundleActivator
+	public static class AnnotatedApplicationTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override

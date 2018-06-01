@@ -49,7 +49,7 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTestCase {
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			ScopeMapperNarrowDownClientTestPreparator.class);
+			ScopeMapperNarrowDownClientTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTestCase {
 		Assert.assertEquals("everything.readonly", scopeString);
 	}
 
-	public static class ScopeMapperNarrowDownClientTestPreparator
+	public static class ScopeMapperNarrowDownClientTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override

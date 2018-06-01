@@ -48,7 +48,7 @@ public class AnnotationsAndHttpApplicationClientTest
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			AnnotationsAndHttpBundleActivator.class);
+			AnnotationsAndHttpTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -69,7 +69,7 @@ public class AnnotationsAndHttpApplicationClientTest
 		Assert.assertEquals("everything.readonly", builder.get(String.class));
 	}
 
-	public static class AnnotationsAndHttpBundleActivator
+	public static class AnnotationsAndHttpTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override

@@ -42,7 +42,8 @@ public class GrantResourceOwnerKillSwitchTest extends BaseClientTestCase {
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			GrantKillClientCredentialsSwitchTestPreparator.class);
+			GrantKillClientCredentialsSwitchTestPreparatorBundleActivator.
+				class);
 	}
 
 	@Test
@@ -55,8 +56,9 @@ public class GrantResourceOwnerKillSwitchTest extends BaseClientTestCase {
 				this::parseError));
 	}
 
-	public static class GrantKillClientCredentialsSwitchTestPreparator
-		extends BaseTestPreparatorBundleActivator {
+	public static class
+		GrantKillClientCredentialsSwitchTestPreparatorBundleActivator
+			extends BaseTestPreparatorBundleActivator {
 
 		@Override
 		protected void prepareTest() throws Exception {

@@ -47,7 +47,8 @@ public class AnnotatedApplicationPrefixHandlerClientTest
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			AnnotatedApplicationPrefixHandlerBundleActivator.class);
+			AnnotatedApplicationPrefixHandlerTestPreparatorBundleActivator.
+				class);
 	}
 
 	@Test
@@ -60,8 +61,9 @@ public class AnnotatedApplicationPrefixHandlerClientTest
 		Assert.assertEquals("everything.readonly", builder.get(String.class));
 	}
 
-	public static class AnnotatedApplicationPrefixHandlerBundleActivator
-		extends BaseTestPreparatorBundleActivator {
+	public static class
+		AnnotatedApplicationPrefixHandlerTestPreparatorBundleActivator
+			extends BaseTestPreparatorBundleActivator {
 
 		@Override
 		protected void prepareTest() throws Exception {

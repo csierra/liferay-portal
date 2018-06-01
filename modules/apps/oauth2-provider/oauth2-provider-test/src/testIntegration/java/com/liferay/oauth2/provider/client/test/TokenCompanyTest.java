@@ -37,7 +37,7 @@ public class TokenCompanyTest extends BaseClientTestCase {
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			AnnotatedApplicationBundleActivator.class);
+			AnnotatedApplicationTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -53,7 +53,7 @@ public class TokenCompanyTest extends BaseClientTestCase {
 				this::getClientCredentials, this::parseError));
 	}
 
-	public static class AnnotatedApplicationBundleActivator
+	public static class AnnotatedApplicationTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override

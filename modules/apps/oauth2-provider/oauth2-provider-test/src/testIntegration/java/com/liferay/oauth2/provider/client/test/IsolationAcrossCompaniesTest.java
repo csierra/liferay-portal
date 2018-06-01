@@ -45,7 +45,7 @@ public class IsolationAcrossCompaniesTest extends BaseClientTestCase {
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			IsolationAccrossCompaniesTestPreparator.class);
+			IsolationAccrossCompaniesTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -68,7 +68,7 @@ public class IsolationAcrossCompaniesTest extends BaseClientTestCase {
 		Assert.assertEquals(400, response.getStatus());
 	}
 
-	public static class IsolationAccrossCompaniesTestPreparator
+	public static class IsolationAccrossCompaniesTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override

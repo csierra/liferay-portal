@@ -49,7 +49,7 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			AnnotationsAndHttpPrefixBundleActivator.class);
+			AnnotationsAndHttpPrefixTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 		Assert.assertEquals(403, builder.get().getStatus());
 	}
 
-	public static class AnnotationsAndHttpPrefixBundleActivator
+	public static class AnnotationsAndHttpPrefixTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override

@@ -49,7 +49,7 @@ public class TokenExpeditionTest extends BaseClientTestCase {
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			TokenExpeditionTestPreparator.class);
+			TokenExpeditionTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -140,7 +140,7 @@ public class TokenExpeditionTest extends BaseClientTestCase {
 		Assert.assertEquals(403, response.getStatus());
 	}
 
-	public static class TokenExpeditionTestPreparator
+	public static class TokenExpeditionTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override

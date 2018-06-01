@@ -44,7 +44,7 @@ public class NarrowDownScopeClientTest extends BaseClientTestCase {
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			NarrowDownScopeTestPreparator.class);
+			NarrowDownScopeTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class NarrowDownScopeClientTest extends BaseClientTestCase {
 				this::parseError));
 	}
 
-	public static class NarrowDownScopeTestPreparator
+	public static class NarrowDownScopeTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override

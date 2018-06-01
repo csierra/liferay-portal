@@ -50,7 +50,7 @@ public class HttpMethodApplicationClientTest extends BaseClientTestCase {
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			MethodApplicationBundleActivator.class);
+			MethodApplicationTestPreparatorBundleActivator.class);
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class HttpMethodApplicationClientTest extends BaseClientTestCase {
 		Assert.assertEquals(403, response.getStatus());
 	}
 
-	public static class MethodApplicationBundleActivator
+	public static class MethodApplicationTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override
