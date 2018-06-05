@@ -239,65 +239,53 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 				Predicate<String> urlPatternPredicate =
 					checkPattern.getUrlPatternPredicate();
 
-				if (urlPatternPredicate.test(path)) {
-					Predicate<String> methodPatternPredicate =
-						checkPattern.getMethodPatternPredicate();
-
-					if (methodPatternPredicate.test(request.getMethod())) {
-						String[] scopes = checkPattern.getScopes();
-
-						if (requiresNoScope(scopes)) {
-							if (_log.isDebugEnabled()) {
-								_log.debug(
-									StringBundler.concat(
-										"Path  ", path,
-										" was approved, doesn't require any ",
-										"scope"));
-							}
-
-							return;
-						}
-
-						if (!_scopeChecker.checkAllScopes(scopes)) {
-							if (_log.isDebugEnabled()) {
-								_log.debug(
-									StringBundler.concat(
-										"Path ", path, " was disallowed. ",
-										"Token doesn't include all scopes ",
-										StringUtil.merge(scopes)));
-							}
-
-							abortRequest(containerRequestContext);
-
-							return;
-						}
-
-						if (_log.isDebugEnabled()) {
-							_log.debug("Path " + path + " was approved");
-						}
-
-						return;
-					}
+				if (!urlPatternPredicate.test(path)) {
+					continue;
 				}
+
+				Predicate<String> methodPatternPredicate =
+					checkPattern.getMethodPatternPredicate();
+
+				if (!methodPatternPredicate.test(request.getMethod())) {
+					continue;
+				}
+
+				String[] scopes = checkPattern.getScopes();
+
+				if (requiresNoScope(scopes)) {
+					_logDebug(
+						"Path  ", path,
+						" was approved, doesn't require any scope");
+
+					return;
+				}
+
+				if (!_scopeChecker.checkAllScopes(scopes)) {
+					_logDebug(
+						"Path ", path,
+						" was disallowed. Token doesn't include all scopes",
+						StringUtil.merge(scopes));
+
+					abortRequest(containerRequestContext);
+
+					return;
+				}
+
+				_logDebug("Path ", path, " was approved");
+
+				return;
 			}
 
 			if (!_allowUnmatched) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						StringBundler.concat(
-							"Path ", path, " was disallowed, doesn't match ",
-							"any pattern"));
-				}
+				_logDebug(
+					"Path ", path, " was disallowed, doesn't match ",
+					"any pattern");
 
 				abortRequest(containerRequestContext);
 			}
 			else {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						StringBundler.concat(
-							"Path ", path, " was approved, doesn't match any ",
-							"pattern"));
-				}
+				_logDebug(
+					"Path ", path, " was approved, doesn't match any pattern");
 			}
 		}
 
@@ -322,6 +310,14 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 			}
 
 			return false;
+		}
+
+		private void _logDebug(String... message) {
+			if (!_log.isDebugEnabled()) {
+				return;
+			}
+
+			_log.debug(new StringBundler(message));
 		}
 
 		@Context
