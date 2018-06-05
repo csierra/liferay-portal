@@ -22,17 +22,15 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-
-import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -94,6 +92,9 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 					ConfigurableScopeCheckerFeatureConfiguration.class,
 					properties);
 
+		_allowUnmatched =
+			configurableCheckerFeatureConfiguration.allowUnmatched();
+
 		for (String pattern :
 				configurableCheckerFeatureConfiguration.patterns()) {
 
@@ -126,9 +127,6 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 				throw new IllegalArgumentException(pse);
 			}
 		}
-
-		_allowUnmatched =
-			configurableCheckerFeatureConfiguration.allowUnmatched();
 	}
 
 	@Override
@@ -168,7 +166,10 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 	protected Dictionary<String, Object> buildProperties(
 		Configuration configuration) {
 
-		Dictionary<String, Object> properties = new Hashtable<>(
+		HashMapDictionary<String, Object> properties =
+			new HashMapDictionary<>();
+
+		properties.putAll(
 			(Map<String, Object>)configuration.getProperty(
 				"osgi.jaxrs.application.serviceProperties"));
 
@@ -228,9 +229,7 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 		implements ContainerRequestFilter {
 
 		@Override
-		public void filter(ContainerRequestContext containerRequestContext)
-			throws IOException {
-
+		public void filter(ContainerRequestContext containerRequestContext) {
 			Request request = containerRequestContext.getRequest();
 
 			String path = StringPool.SLASH + _uriInfo.getPath();
