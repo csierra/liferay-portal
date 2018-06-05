@@ -80,51 +80,8 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Provider
 public class ConfigurableScopeCheckerFeature implements Feature {
 
-	@Override
-	public boolean configure(FeatureContext context) {
-		if (_checkPatterns.isEmpty()) {
-			return false;
-		}
-
-		Map<Class<?>, Integer> contracts = new HashMap<>();
-
-		contracts.put(
-			ContainerRequestFilter.class, Priorities.AUTHORIZATION - 8);
-
-		context.register(
-			new ConfigurableCheckerContainerRequestFilter(), contracts);
-
-		Configuration configuration = context.getConfiguration();
-
-		Stream<CheckPattern> stream = _checkPatterns.stream();
-
-		_serviceRegistration = _bundleContext.registerService(
-			ScopeFinder.class,
-			new CollectionScopeFinder(
-				stream.flatMap(
-					c -> Arrays.stream(c.getScopes())
-				).filter(
-					Validator::isNotNull
-				).collect(
-					Collectors.toSet()
-				)
-			),
-			buildProperties(configuration));
-
-		return true;
-	}
-
-	protected void abortRequest(
-		ContainerRequestContext containerRequestContext) {
-
-		containerRequestContext.abortWith(
-			Response.status(
-				403
-			).build());
-	}
-
 	@Activate
-	protected void activate(
+	public void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
 		_bundleContext = bundleContext;
@@ -168,6 +125,40 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 			configurableCheckerFeatureConfiguration.allowUnmatched();
 	}
 
+	@Override
+	public boolean configure(FeatureContext context) {
+		if (_checkPatterns.isEmpty()) {
+			return false;
+		}
+
+		Map<Class<?>, Integer> contracts = new HashMap<>();
+
+		contracts.put(
+			ContainerRequestFilter.class, Priorities.AUTHORIZATION - 8);
+
+		context.register(
+			new ConfigurableCheckerContainerRequestFilter(), contracts);
+
+		Configuration configuration = context.getConfiguration();
+
+		Stream<CheckPattern> stream = _checkPatterns.stream();
+
+		_serviceRegistration = _bundleContext.registerService(
+			ScopeFinder.class,
+			new CollectionScopeFinder(
+				stream.flatMap(
+					c -> Arrays.stream(c.getScopes())
+				).filter(
+					Validator::isNotNull
+				).collect(
+					Collectors.toSet()
+				)
+			),
+			buildProperties(configuration));
+
+		return true;
+	}
+
 	protected Dictionary<String, Object> buildProperties(
 		Configuration configuration) {
 
@@ -185,20 +176,6 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 		if (_serviceRegistration != null) {
 			_serviceRegistration.unregister();
 		}
-	}
-
-	protected boolean requiresNoScope(String[] scopes) {
-		if (ArrayUtil.isEmpty(scopes)) {
-			return true;
-		}
-
-		if (scopes.length == 1) {
-			if (Validator.isNull(scopes[0])) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -279,6 +256,29 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 			if (!_allowUnmatched) {
 				abortRequest(containerRequestContext);
 			}
+		}
+
+		protected void abortRequest(
+			ContainerRequestContext containerRequestContext) {
+
+			containerRequestContext.abortWith(
+				Response.status(
+					403
+				).build());
+		}
+
+		protected boolean requiresNoScope(String[] scopes) {
+			if (ArrayUtil.isEmpty(scopes)) {
+				return true;
+			}
+
+			if (scopes.length == 1) {
+				if (Validator.isNull(scopes[0])) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		@Context
