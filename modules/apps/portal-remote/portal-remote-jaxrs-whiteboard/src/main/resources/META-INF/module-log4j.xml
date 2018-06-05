@@ -9,4 +9,8 @@
 	<category name="org.apache.cxf">
 		<priority value="INFO" />
 	</category>
+
+	<category name="org.apache.cxf.endpoint.ServerImpl">
+		<priority value="WARN" />
+	</category>
 </log4j:configuration>
