@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest.internal.jaxrs.feature;
 
-import com.liferay.oauth2.provider.rest.internal.jaxrs.feature.configuration.ConfigurableCheckerFeatureConfiguration;
+import com.liferay.oauth2.provider.rest.internal.jaxrs.feature.configuration.ConfigurableScopeCheckerFeatureConfiguration;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.petra.string.StringPool;
@@ -58,6 +58,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -66,6 +67,8 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Carlos Sierra Andrés
  */
 @Component(
+	configurationPid = "com.liferay.oauth2.provider.rest.internal.jaxrs.feature.configuration.ConfigurableScopeCheckerFeatureConfiguration",
+	configurationPolicy = ConfigurationPolicy.REQUIRE,
 	property = {
 		"osgi.jaxrs.extension=true",
 		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.OAuth2)",
@@ -129,7 +132,8 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 		ConfigurableScopeCheckerFeatureConfiguration
 			configurableCheckerFeatureConfiguration =
 				ConfigurableUtil.createConfigurable(
-					ConfigurableCheckerFeatureConfiguration.class, properties);
+					ConfigurableScopeCheckerFeatureConfiguration.class,
+					properties);
 
 		for (String pattern :
 				configurableCheckerFeatureConfiguration.patterns()) {
