@@ -236,17 +236,7 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 			String path = StringPool.SLASH + _uriInfo.getPath();
 
 			for (CheckPattern checkPattern : _checkPatterns) {
-				Predicate<String> urlPatternPredicate =
-					checkPattern.getUrlPatternPredicate();
-
-				if (!urlPatternPredicate.test(path)) {
-					continue;
-				}
-
-				Predicate<String> methodPatternPredicate =
-					checkPattern.getMethodPatternPredicate();
-
-				if (!methodPatternPredicate.test(request.getMethod())) {
+				if (!matches(checkPattern, path, request)) {
 					continue;
 				}
 
@@ -260,18 +250,21 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 					return;
 				}
 
-				if (!_scopeChecker.checkAllScopes(scopes)) {
+				if (_scopeChecker.checkAllScopes(scopes)) {
 					_logDebug(
 						"Path ", path,
-						" was disallowed. Token doesn't include all scopes",
+						" was approved, token includes all scopes ",
 						StringUtil.merge(scopes));
-
-					abortRequest(containerRequestContext);
 
 					return;
 				}
 
-				_logDebug("Path ", path, " was approved");
+				_logDebug(
+					"Path ", path,
+					" was disallowed. Token doesn't include all scopes",
+					StringUtil.merge(scopes));
+
+				abortRequest(containerRequestContext);
 
 				return;
 			}
@@ -296,6 +289,26 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 				Response.status(
 					403
 				).build());
+		}
+
+		protected boolean matches(
+			CheckPattern checkPattern, String path, Request request) {
+
+			Predicate<String> urlPatternPredicate =
+				checkPattern.getUrlPatternPredicate();
+
+			if (!urlPatternPredicate.test(path)) {
+				return false;
+			}
+
+			Predicate<String> methodPatternPredicate =
+				checkPattern.getMethodPatternPredicate();
+
+			if (!methodPatternPredicate.test(request.getMethod())) {
+				return false;
+			}
+
+			return true;
 		}
 
 		protected boolean requiresNoScope(String[] scopes) {
