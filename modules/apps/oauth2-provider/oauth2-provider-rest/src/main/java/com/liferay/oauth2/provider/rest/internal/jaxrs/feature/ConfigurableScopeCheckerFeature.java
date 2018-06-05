@@ -22,6 +22,8 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
@@ -98,12 +100,16 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 			String[] split = pattern.split("::");
 
 			if (split.length != 3) {
+				_log.error(
+					StringBundler.concat(
+						"Incorrect syntax of ", pattern,
+						" 3 sequences of :: are expected"));
+
 				return;
 			}
 
 			String methodPatternString = split[0];
 			String urlPatternString = split[1];
-
 			String scopesString = split[2];
 
 			String[] scopes = scopesString.split(StringPool.COMMA);
@@ -115,7 +121,7 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 						Pattern.compile(urlPatternString), scopes));
 			}
 			catch (PatternSyntaxException pse) {
-				_log.error("Invalid pattern in " + properties, pse);
+				_log.error("Invalid pattern in " + pattern, pse);
 
 				throw new IllegalArgumentException(pse);
 			}
@@ -241,11 +247,33 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 						String[] scopes = checkPattern.getScopes();
 
 						if (requiresNoScope(scopes)) {
+							if (_log.isDebugEnabled()) {
+								_log.debug(
+									StringBundler.concat(
+										"Path  ", path,
+										" was approved, doesn't require any ",
+										"scope"));
+							}
+
 							return;
 						}
 
 						if (!_scopeChecker.checkAllScopes(scopes)) {
+							if (_log.isDebugEnabled()) {
+								_log.debug(
+									StringBundler.concat(
+										"Path ", path, " was disallowed. ",
+										"Token doesn't include all scopes ",
+										StringUtil.merge(scopes)));
+							}
+
 							abortRequest(containerRequestContext);
+
+							return;
+						}
+
+						if (_log.isDebugEnabled()) {
+							_log.debug("Path " + path + " was approved");
 						}
 
 						return;
@@ -254,7 +282,22 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 			}
 
 			if (!_allowUnmatched) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						StringBundler.concat(
+							"Path ", path, " was disallowed, doesn't match ",
+							"any pattern"));
+				}
+
 				abortRequest(containerRequestContext);
+			}
+			else {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						StringBundler.concat(
+							"Path ", path, " was approved, doesn't match any ",
+							"pattern"));
+				}
 			}
 		}
 
