@@ -257,15 +257,6 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 
 					return;
 				}
-
-				_logDebug(
-					"Path ", path,
-					" was disallowed. Token doesn't include all scopes",
-					StringUtil.merge(scopes));
-
-				abortRequest(containerRequestContext);
-
-				return;
 			}
 
 			if (!_allowUnmatched) {
