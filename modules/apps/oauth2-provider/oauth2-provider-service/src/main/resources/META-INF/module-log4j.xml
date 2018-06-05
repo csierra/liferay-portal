@@ -5,9 +5,11 @@
 	<category name="com.liferay.oauth2.provider.internal.security.permission.resource">
 		<priority value="INFO" />
 	</category>
+
 	<category name="com.liferay.oauth2.provider.model.impl">
 		<priority value="INFO" />
 	</category>
+
 	<category name="com.liferay.oauth2.provider.service">
 		<priority value="INFO" />
 	</category>
