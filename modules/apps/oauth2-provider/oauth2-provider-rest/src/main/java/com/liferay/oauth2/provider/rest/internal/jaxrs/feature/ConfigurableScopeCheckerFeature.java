@@ -234,8 +234,8 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 			String path = StringPool.SLASH + _uriInfo.getPath();
 
 			for (CheckPattern checkPattern : _checkPatterns) {
-				if (matches(checkPattern, path, request)) {
-					abortRequest(containerRequestContext);
+				if (!matches(checkPattern, path, request)) {
+					continue;
 				}
 
 				String[] scopes = checkPattern.getScopes();
@@ -272,7 +272,7 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 							"patterns"));
 				}
 
-
+				abortRequest(containerRequestContext);
 			}
 			else {
 				if (_log.isDebugEnabled()) {
@@ -280,8 +280,6 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 						"Path " + path +
 							" was approved, does not match any patterns");
 				}
-
-				abortRequest(containerRequestContext);
 			}
 		}
 
