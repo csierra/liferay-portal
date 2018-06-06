@@ -168,7 +168,7 @@ public class JaxrsServiceRuntimeOSGiCommands {
 		else if (failedApplicationDTO.failureReason ==
 					DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE) {
 
-			sb.append(" can't be got by the whiteboard");
+			sb.append(" can't be retrieved by the whiteboard");
 		}
 		else if (failedApplicationDTO.failureReason ==
 					DTOConstants.FAILURE_REASON_UNKNOWN) {
@@ -200,7 +200,7 @@ public class JaxrsServiceRuntimeOSGiCommands {
 		else if (failedExtensionDTO.failureReason ==
 					DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE) {
 
-			sb.append(" does not signal a valid extension type");
+			sb.append(" is not a valid extension type");
 		}
 		else if (failedExtensionDTO.failureReason ==
 					DTOConstants.
@@ -217,7 +217,7 @@ public class JaxrsServiceRuntimeOSGiCommands {
 		else if (failedExtensionDTO.failureReason ==
 					DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE) {
 
-			sb.append(" can't be got by the whiteboard");
+			sb.append(" can't be retrieved by the whiteboard");
 		}
 		else if (failedExtensionDTO.failureReason ==
 					DTOConstants.FAILURE_REASON_UNKNOWN) {
@@ -264,7 +264,7 @@ public class JaxrsServiceRuntimeOSGiCommands {
 		else if (failedResourceDTO.failureReason ==
 					DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE) {
 
-			sb.append(" can't be got by the whiteboard");
+			sb.append(" can't be retrieved by the whiteboard");
 		}
 		else if (failedResourceDTO.failureReason ==
 					DTOConstants.FAILURE_REASON_UNKNOWN) {
