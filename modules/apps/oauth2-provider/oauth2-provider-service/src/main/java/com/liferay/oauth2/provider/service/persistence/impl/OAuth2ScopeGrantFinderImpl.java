@@ -18,7 +18,9 @@ import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantImpl;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
-import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
+import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
@@ -28,10 +30,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,25 +45,14 @@ public class OAuth2ScopeGrantFinderImpl
 		OAuth2ScopeGrantFinder.class.getName() + ".findByC_A_B_A";
 
 	public void afterPropertiesSet() {
-		try {
-			try (Connection con = DataAccess.getConnection()) {
-				DatabaseMetaData metaData = con.getMetaData();
+		DB db = DBManagerUtil.getDB();
 
-				String dbName = metaData.getDatabaseProductName();
+		DBType dbType = db.getDBType();
 
-				if (dbName.startsWith("MySQL")) {
-					_supportsCLOB = false;
-				}
-				else if (dbName.startsWith("PostgreSQL")) {
-					_supportsCLOB = false;
-				}
-				else if (dbName.startsWith("Sybase") || dbName.equals("ASE")) {
-					_supportsCLOB = false;
-				}
-			}
-		}
-		catch (SQLException sqle) {
-			_log.error("Unable to get SQL connection metadata", sqle);
+		if ((dbType == DBType.MARIADB) || (dbType == DBType.MYSQL) ||
+			(dbType == DBType.POSTGRESQL) || (dbType == DBType.SYBASE)) {
+
+			_supportsCLOB = false;
 		}
 	}
 
