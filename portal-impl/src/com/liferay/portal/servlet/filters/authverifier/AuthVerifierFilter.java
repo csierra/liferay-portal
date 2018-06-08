@@ -17,6 +17,8 @@ package com.liferay.portal.servlet.filters.authverifier;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.access.control.AccessControlUtil;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
@@ -25,6 +27,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -184,6 +187,16 @@ public class AuthVerifierFilter extends BasePortalFilter {
 			accessControlContext.setRequest(protectedServletRequest);
 
 			Class<?> clazz = getClass();
+
+			Company company = PortalUtil.getCompany(request);
+
+			User user = company.getDefaultUser();
+
+			if ((userId == user.getUserId()) && !_guestAllowed) {
+				_log.error("Guest is not allowed");
+
+				return;
+			}
 
 			processFilter(
 				clazz.getName(), protectedServletRequest, response,
