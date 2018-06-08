@@ -15,9 +15,8 @@
 package com.liferay.oauth2.provider.rest.internal.jaxrs.feature;
 
 import com.liferay.oauth2.provider.scope.ScopeChecker;
+import com.liferay.oauth2.provider.scope.liferay.BaseScopeCheckerContainerRequestFilter;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
-
-import java.io.IOException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,7 +67,8 @@ public class HttpMethodFeature implements Feature {
 		contracts.put(
 			ContainerRequestFilter.class, Priorities.AUTHORIZATION - 8);
 
-		context.register((ContainerRequestFilter)this::filter, contracts);
+		context.register(
+			new HttpContainerScopeCheckerContainerRequestFilter(), contracts);
 
 		Configuration configuration = context.getConfiguration();
 
@@ -83,19 +83,6 @@ public class HttpMethodFeature implements Feature {
 					"osgi.jaxrs.application.serviceProperties")));
 
 		return true;
-	}
-
-	public void filter(ContainerRequestContext containerRequestContext)
-		throws IOException {
-
-		Request request = containerRequestContext.getRequest();
-
-		if (!_scopeChecker.checkScope(request.getMethod())) {
-			containerRequestContext.abortWith(
-				Response.status(
-					Response.Status.FORBIDDEN
-				).build());
-		}
 	}
 
 	@Activate
@@ -116,5 +103,25 @@ public class HttpMethodFeature implements Feature {
 	private ScopeChecker _scopeChecker;
 
 	private ServiceRegistration<ScopeFinder> _serviceRegistration;
+
+	private class HttpContainerScopeCheckerContainerRequestFilter
+		extends BaseScopeCheckerContainerRequestFilter {
+
+		public boolean doFilter(
+			ContainerRequestContext containerRequestContext) {
+
+			Request request = containerRequestContext.getRequest();
+
+			if (!_scopeChecker.checkScope(request.getMethod())) {
+				containerRequestContext.abortWith(
+					Response.status(
+						Response.Status.FORBIDDEN
+					).build());
+			}
+
+			return true;
+		}
+
+	}
 
 }
