@@ -41,7 +41,6 @@ import org.junit.runner.RunWith;
 /**
  * @author Carlos Sierra Andrés
  */
-@Ignore("TODO: We still need to fix this one")
 @RunAsClient
 @RunWith(Arquillian.class)
 public class ScopeMapperNarrowDownClientTest extends BaseClientTestCase {
