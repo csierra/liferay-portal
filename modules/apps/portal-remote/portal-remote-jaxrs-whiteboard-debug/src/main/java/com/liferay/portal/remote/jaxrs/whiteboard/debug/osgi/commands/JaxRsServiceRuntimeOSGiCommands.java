@@ -149,7 +149,7 @@ public class JaxRsServiceRuntimeOSGiCommands {
 				DTOConstants.FAILURE_REASON_DUPLICATE_NAME) {
 
 			sb.append(" is clashing with another service (");
-			sb.append(failedApplicationDTO.name);
+			sb.append(failedApplicationDTO.serviceId);
 			sb.append(")");
 		}
 		else if (failedApplicationDTO.failureReason ==
@@ -194,7 +194,7 @@ public class JaxRsServiceRuntimeOSGiCommands {
 				DTOConstants.FAILURE_REASON_DUPLICATE_NAME) {
 
 			sb.append(" is clashing with another service (");
-			sb.append(failedExtensionDTO.name);
+			sb.append(failedExtensionDTO.serviceId);
 			sb.append(")");
 		}
 		else if (failedExtensionDTO.failureReason ==
@@ -246,7 +246,7 @@ public class JaxRsServiceRuntimeOSGiCommands {
 				DTOConstants.FAILURE_REASON_DUPLICATE_NAME) {
 
 			sb.append(" is clashing with another service (");
-			sb.append(failedResourceDTO.name);
+			sb.append(failedResourceDTO.serviceId);
 			sb.append(")");
 		}
 		else if (failedResourceDTO.failureReason ==
