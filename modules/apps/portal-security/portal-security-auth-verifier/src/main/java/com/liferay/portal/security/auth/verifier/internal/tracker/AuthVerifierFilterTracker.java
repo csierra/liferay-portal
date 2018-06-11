@@ -17,10 +17,12 @@ package com.liferay.portal.security.auth.verifier.internal.tracker;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.servlet.filters.authverifier.AuthVerifierFilter;
 
 import java.util.Dictionary;
+import java.util.Map;
 
 import javax.servlet.Filter;
 
@@ -38,7 +40,12 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Marta Medio
  */
-@Component(immediate = true)
+@Component(
+	immediate = true,
+	property = {
+		"servlet.context.helper.select.filter=(com.liferay.auth.verifier.filter.enabled=true)
+	}
+)
 public class AuthVerifierFilterTracker {
 
 	public static final String AUTH_VERIFIER_PROPERTY_PREFIX = "auth.verifier.";
@@ -47,11 +54,16 @@ public class AuthVerifierFilterTracker {
 		AUTH_VERIFIER_PROPERTY_PREFIX.length();
 
 	@Activate
-	protected void activate(BundleContext bundleContext) {
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
 		_bundleContext = bundleContext;
 
+		String servletContextHelperSelectFilterString = MapUtil.getString(
+			properties, "servlet.context.helper.select.filter");
+
 		String filterString = StringBundler.concat(
-			"(&(com.liferay.auth.verifier.filter.enabled=true)(",
+			"(&" + servletContextHelperSelectFilterString + "(",
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME, "=*)",
 			"(objectClass=", ServletContextHelper.class.getName(), "))");
 
