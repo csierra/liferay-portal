@@ -15,6 +15,10 @@
 package com.liferay.portal.security.auth.verifier.internal.tracker;
 
 import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.osgi.util.StringPlus;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -22,6 +26,8 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.servlet.filters.authverifier.AuthVerifierFilter;
 
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -43,6 +49,9 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 @Component(
 	immediate = true,
 	property = {
+		"default.registration.property=filter.init.auth.verifier.OAuth2RestAuthVerifier.urls.includes=*",
+		"default.registration.property=filter.init.guest.allowed=false",
+		"default.whiteboard.property=" + HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_SERVLET + "=cxf-servlet",
 		"servlet.context.helper.select.filter=(com.liferay.auth.verifier.filter.enabled=true)
 	}
 )
@@ -58,6 +67,12 @@ public class AuthVerifierFilterTracker {
 		BundleContext bundleContext, Map<String, Object> properties) {
 
 		_bundleContext = bundleContext;
+
+		_defaultRegistrationProperties = processDefaultProperties(
+			StringPlus.asList(properties.get("default.registration.property")));
+
+		_defaultWhiteboardProperties = processDefaultProperties(
+			StringPlus.asList(properties.get("default.whiteboard.property")));
 
 		String servletContextHelperSelectFilterString = MapUtil.getString(
 			properties, "servlet.context.helper.select.filter");
@@ -77,7 +92,50 @@ public class AuthVerifierFilterTracker {
 		_serviceTracker.close();
 	}
 
+	protected Dictionary<String, Object> processDefaultProperties(
+		List<String> defaultProperties) {
+
+		Dictionary<String, Object> registrationProperties =
+			new HashMapDictionary<>();
+
+		for (String defaultRegistrationProperty : defaultProperties) {
+			int indexOf = defaultRegistrationProperty.indexOf(StringPool.EQUAL);
+
+			if (indexOf == -1) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Invalid property string " +
+							defaultRegistrationProperty);
+				}
+
+				continue;
+			}
+
+			String propertyKey = defaultRegistrationProperty.substring(
+				0, indexOf);
+
+			String propertyValue;
+
+			if (indexOf < defaultRegistrationProperty.length()) {
+				propertyValue = defaultRegistrationProperty.substring(
+					indexOf + 1);
+			}
+			else {
+				propertyValue = StringPool.BLANK;
+			}
+
+			registrationProperties.put(propertyKey, propertyValue);
+		}
+
+		return registrationProperties;
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AuthVerifierFilterTracker.class);
+
 	private BundleContext _bundleContext;
+	private Dictionary<String, Object> _defaultRegistrationProperties;
+	private Dictionary<String, Object> _defaultWhiteboardProperties;
 	private ServiceTracker<?, ?> _serviceTracker;
 
 	private class ServletContextHelperServiceTrackerCustomizer
@@ -116,6 +174,24 @@ public class AuthVerifierFilterTracker {
 
 			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
+			Enumeration<String> registrationKeys =
+				_defaultRegistrationProperties.keys();
+
+			Enumeration<String> whiteboardKeys =
+				_defaultWhiteboardProperties.keys();
+
+			while (registrationKeys.hasMoreElements()) {
+				String key = registrationKeys.nextElement();
+
+				properties.put(key, _defaultRegistrationProperties.get(key));
+			}
+
+			while (whiteboardKeys.hasMoreElements()) {
+				String key = whiteboardKeys.nextElement();
+
+				properties.put(key, _defaultWhiteboardProperties.get(key));
+			}
+
 			for (String key : serviceReference.getPropertyKeys()) {
 				if (key.startsWith(AUTH_VERIFIER_PROPERTY_PREFIX)) {
 					properties.put(
@@ -138,12 +214,6 @@ public class AuthVerifierFilterTracker {
 				StringBundler.concat(
 					"(", HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME,
 					"=", contextName, ")"));
-
-			properties.put(
-				HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_NAME,
-				AuthVerifierFilter.class.getName());
-			properties.put(
-				HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_PATTERN, "/*");
 
 			return properties;
 		}
