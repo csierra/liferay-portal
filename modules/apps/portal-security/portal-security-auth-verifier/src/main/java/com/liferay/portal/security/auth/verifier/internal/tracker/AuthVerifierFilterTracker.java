@@ -139,9 +139,8 @@ public class AuthVerifierFilterTracker {
 	private ServiceTracker<?, ?> _serviceTracker;
 
 	private class ServletContextHelperServiceTrackerCustomizer
-		implements
-			ServiceTrackerCustomizer
-				<ServletContextHelper, ServiceRegistration<?>> {
+		implements ServiceTrackerCustomizer
+			<ServletContextHelper, ServiceRegistration<?>> {
 
 		@Override
 		public ServiceRegistration<?> addingService(
