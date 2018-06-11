@@ -80,8 +80,6 @@ import org.osgi.util.tracker.ServiceTracker;
 @Provider
 public class LiferayOAuth2OSGiFeature implements Feature {
 
-	private org.osgi.framework.Filter _authVerifierApplicationSelectFilter;
-
 	@Override
 	public boolean configure(FeatureContext featureContext) {
 		Configuration configuration = featureContext.getConfiguration();
@@ -113,7 +111,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			(ContainerResponseFilter)(a, b) -> _scopeContext.clear(),
 			Priorities.AUTHORIZATION - 9);
 
-		if ((_authVerifierApplicationSelectFilter != null)  &&
+		if ((_authVerifierApplicationSelectFilter != null) &&
 			_authVerifierApplicationSelectFilter.matches(
 				applicationProperties)) {
 
@@ -140,8 +138,8 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 
 		_bundleContext = componentContext.getBundleContext();
 
-		String authVerifierApplicationSelectFilterString =
-			MapUtil.getString(properties, "auth.verifier.application.select");
+		String authVerifierApplicationSelectFilterString = MapUtil.getString(
+			properties, "auth.verifier.application.select");
 
 		if (Validator.isNotNull(authVerifierApplicationSelectFilterString)) {
 			try {
@@ -162,9 +160,6 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			}
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LiferayOAuth2OSGiFeature.class);
 
 	@Deactivate
 	protected void deactivate() {
@@ -237,9 +232,13 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				properties));
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayOAuth2OSGiFeature.class);
+
 	@Context
 	private Application _application;
 
+	private org.osgi.framework.Filter _authVerifierApplicationSelectFilter;
 	private Bundle _bundle;
 	private BundleContext _bundleContext;
 
