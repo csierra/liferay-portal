@@ -16,9 +16,10 @@ package com.liferay.oauth2.provider.client.test;
 
 import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
 import com.liferay.oauth2.provider.test.internal.activator.BaseTestPreparatorBundleActivator;
-import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Dictionary;
 
@@ -40,35 +41,45 @@ import org.junit.runner.RunWith;
  */
 @RunAsClient
 @RunWith(Arquillian.class)
-public class IsolationAcrossCompaniesTest extends BaseClientTestCase {
+public class AnnotatedApplicationClientGuestAllowedTest
+	extends BaseClientTestCase {
 
 	@Deployment
 	public static Archive<?> getDeployment() throws Exception {
 		return BaseClientTestCase.getDeployment(
-			IsolationAccrossCompaniesTestPreparatorBundleActivator.class);
+			AnnotatedApplicationTestPreparatorBundleActivator.class);
 	}
 
 	@Test
 	public void test() throws Exception {
-		WebTarget webTarget = getWebTarget("/annotated");
+		String invalidToken = "Invalid Token";
 
-		String tokenString = getToken("oauthTestApplication", "host1.xyz");
+		WebTarget webTarget = getWebTarget("/annotated-guest-not-allowed");
 
-		Invocation.Builder builder = authorize(
-			webTarget.request(), tokenString);
+		webTarget = webTarget.path("/no-scope");
 
-		builder = builder.header("Host", "host1.xyz");
+		Invocation.Builder invocationBuilder = authorize(
+			webTarget.request(), invalidToken);
 
-		Assert.assertEquals("everything.readonly", builder.get(String.class));
+		Response response = invocationBuilder.get();
 
-		builder = builder.header("Host", "host2.xyz");
+		Assert.assertEquals(403, response.getStatus());
 
-		Response response = builder.get();
+		invocationBuilder = authorize(
+			webTarget.request(), getToken("oauthTestApplication"));
 
-		Assert.assertEquals(400, response.getStatus());
+		Assert.assertEquals("no-scope", invocationBuilder.get(String.class));
+
+		webTarget = getWebTarget("/annotated-guest-allowed");
+
+		webTarget = webTarget.path("/no-scope");
+
+		invocationBuilder = authorize(webTarget.request(), invalidToken);
+
+		Assert.assertEquals("no-scope", invocationBuilder.get(String.class));
 	}
 
-	public static class IsolationAccrossCompaniesTestPreparatorBundleActivator
+	public static class AnnotatedApplicationTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
 		@Override
@@ -76,23 +87,27 @@ public class IsolationAcrossCompaniesTest extends BaseClientTestCase {
 			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 			properties.put("oauth2.scopechecker.type", "annotations");
+			properties.put("auth.verifier.guest.allowed", false);
 
 			registerJaxRsApplication(
-				new TestAnnotatedApplication(), "annotated", properties);
+				new TestAnnotatedApplication(), "annotated-guest-not-allowed",
+				properties);
 
-			Company company1 = createCompany("host1");
+			properties = new HashMapDictionary<>();
+
+			properties.put("oauth2.scopechecker.type", "annotations");
+			properties.put("auth.verifier.guest.allowed", true);
+
+			registerJaxRsApplication(
+				new TestAnnotatedApplication(), "annotated-guest-allowed",
+				properties);
+
+			long defaultCompanyId = PortalUtil.getDefaultCompanyId();
+
+			User user = UserTestUtil.getAdminUser(defaultCompanyId);
 
 			createOAuth2Application(
-				company1.getCompanyId(),
-				UserTestUtil.getAdminUser(company1.getCompanyId()),
-				"oauthTestApplication");
-
-			Company company2 = createCompany("host2");
-
-			createOAuth2Application(
-				company2.getCompanyId(),
-				UserTestUtil.getAdminUser(company2.getCompanyId()),
-				"oauthTestApplication");
+				defaultCompanyId, user, "oauthTestApplication");
 		}
 
 	}
