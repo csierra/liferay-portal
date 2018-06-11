@@ -50,7 +50,9 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 	immediate = true,
 	property = {
 		"default.registration.property=filter.init.auth.verifier.OAuth2RestAuthVerifier.urls.includes=*",
-		"servlet.context.helper.select.filter=(&(!(liferay.auth.verifier=false))(osgi.jaxrs.name=*))",
+		"default.registration.property=filter.init.guest.allowed=false",
+		"default.whiteboard.property=" + HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_SERVLET + "=cxf-servlet",
+		"servlet.context.helper.select.filter=(&(!(liferay.auth.verifier=false))(osgi.jaxrs.name=*))"
 	}
 )
 public class AuthVerifierFilterTracker {
@@ -60,17 +62,17 @@ public class AuthVerifierFilterTracker {
 	public static final int AUTH_VERIFIER_PROPERTY_PREFIX_LENGTH =
 		AUTH_VERIFIER_PROPERTY_PREFIX.length();
 
-	private Dictionary<String, Object> _defaultRegistrationProperties;
-
 	@Activate
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
 		_bundleContext = bundleContext;
 
-		_defaultRegistrationProperties = processDefaultRegistrationProperties(
-			StringPlus.asList(
-				properties.get("default.registration.property")));
+		_defaultRegistrationProperties = processDefaultProperties(
+			StringPlus.asList(properties.get("default.registration.property")));
+
+		_defaultWhiteboardProperties = processDefaultProperties(
+			StringPlus.asList(properties.get("default.whiteboard.property")));
 
 		String servletContextHelperSelectFilterString = MapUtil.getString(
 			properties, "servlet.context.helper.select.filter");
@@ -85,18 +87,21 @@ public class AuthVerifierFilterTracker {
 			new ServletContextHelperServiceTrackerCustomizer());
 	}
 
-	protected Dictionary<String, Object> processDefaultRegistrationProperties(
-		List<String> defaultRegistrationProperties) {
+	@Deactivate
+	protected void deactivate() {
+		_serviceTracker.close();
+	}
+
+	protected Dictionary<String, Object> processDefaultProperties(
+		List<String> defaultProperties) {
 
 		Dictionary<String, Object> registrationProperties =
 			new HashMapDictionary<>();
 
-		for (String defaultRegistrationProperty :
-				defaultRegistrationProperties) {
-
+		for (String defaultRegistrationProperty : defaultProperties) {
 			int indexOf = defaultRegistrationProperty.indexOf(StringPool.EQUAL);
 
-			if ((indexOf == -1)) {
+			if (indexOf == -1) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Invalid property string " +
@@ -125,21 +130,17 @@ public class AuthVerifierFilterTracker {
 		return registrationProperties;
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTracker.close();
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		AuthVerifierFilterTracker.class);
 
 	private BundleContext _bundleContext;
+	private Dictionary<String, Object> _defaultRegistrationProperties;
+	private Dictionary<String, Object> _defaultWhiteboardProperties;
 	private ServiceTracker<?, ?> _serviceTracker;
 
 	private class ServletContextHelperServiceTrackerCustomizer
-		implements
-			ServiceTrackerCustomizer
-				<ServletContextHelper, ServiceRegistration<?>> {
+		implements ServiceTrackerCustomizer
+			<ServletContextHelper, ServiceRegistration<?>> {
 
 		@Override
 		public ServiceRegistration<?> addingService(
@@ -172,12 +173,22 @@ public class AuthVerifierFilterTracker {
 
 			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
-			Enumeration<String> keys = _defaultRegistrationProperties.keys();
+			Enumeration<String> registrationKeys =
+				_defaultRegistrationProperties.keys();
 
-			while (keys.hasMoreElements()) {
-				String key = keys.nextElement();
+			Enumeration<String> whiteboardKeys =
+				_defaultWhiteboardProperties.keys();
+
+			while (registrationKeys.hasMoreElements()) {
+				String key = registrationKeys.nextElement();
 
 				properties.put(key, _defaultRegistrationProperties.get(key));
+			}
+
+			while (whiteboardKeys.hasMoreElements()) {
+				String key = whiteboardKeys.nextElement();
+
+				properties.put(key, _defaultWhiteboardProperties.get(key));
 			}
 
 			for (String key : serviceReference.getPropertyKeys()) {
@@ -202,16 +213,6 @@ public class AuthVerifierFilterTracker {
 				StringBundler.concat(
 					"(", HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME,
 					"=", contextName, ")"));
-
-			properties.put(
-				HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_NAME,
-				AuthVerifierFilter.class.getName());
-			properties.put(
-				HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_PATTERN,
-				new String[]{"/*"});
-			properties.put(
-				HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_SERVLET,
-				"cxf-servlet");
 
 			return properties;
 		}
