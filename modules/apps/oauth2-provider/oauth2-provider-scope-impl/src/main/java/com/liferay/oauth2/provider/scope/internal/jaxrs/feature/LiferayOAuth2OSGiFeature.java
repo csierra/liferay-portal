@@ -70,9 +70,9 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 @Component(
 	property = {
-		"auth.verifier.application.select=(com.liferay.auth.verifier.filter.enabled=true)",
+		"auth.verifier.application.select=(!(osgi.jaxrs.name=*))",
 		"liferay.extension=OAuth2",
-		"osgi.jaxrs.application.select=(osgi.jaxrs.extension.select=\\(liferay.extension=OAuth2\\))",
+		"osgi.jaxrs.application.select=(!(liferay.oauth2=false))",
 		"osgi.jaxrs.extension=true", "osgi.jaxrs.name=Liferay.OAuth2"
 	},
 	scope = ServiceScope.PROTOTYPE
