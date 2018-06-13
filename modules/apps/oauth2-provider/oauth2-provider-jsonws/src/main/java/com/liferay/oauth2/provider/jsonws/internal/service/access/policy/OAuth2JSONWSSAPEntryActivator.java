@@ -81,7 +81,7 @@ public class OAuth2JSONWSSAPEntryActivator {
 
 	private static final String[][] _SAP_ENTRY_OBJECT_ARRAYS = {
 		{
-			"OAUTH2_documents_download",
+			"OAUTH2_everything.readonly.download.documents",
 			"com.liferay.document.library.kernel.service.DLAppService#get*\n" +
 				"com.liferay.portal.kernel.service.ImageService#get*"
 		},
@@ -91,7 +91,7 @@ public class OAuth2JSONWSSAPEntryActivator {
 		},
 		{"OAUTH2_everything", "*"},
 		{
-			"OAUTH2_userprofile",
+			"OAUTH2_everything.readonly.userprofile",
 			"com.liferay.portal.kernel.service.UserService#getCurrentUser"
 		}
 	};
