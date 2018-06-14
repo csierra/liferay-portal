@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.jsonws.internal.service.access.policy;
 
 import com.liferay.oauth2.provider.jsonws.internal.configuration.OAuth2JSONWSConfiguration;
-import com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope.SAPEntryScopeDescriptorFinderRegistrator;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
