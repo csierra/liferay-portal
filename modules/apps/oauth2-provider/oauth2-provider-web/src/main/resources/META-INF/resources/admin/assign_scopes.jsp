@@ -17,6 +17,14 @@
 <%@ include file="/admin/init.jsp" %>
 
 <%
+Function<String, String> escapeFunction = new Function<String, String>() {
+
+	public String apply(String str) {
+		return HtmlUtil.escape(str);
+	}
+
+};
+
 String redirect = ParamUtil.getString(request, "redirect");
 
 OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
