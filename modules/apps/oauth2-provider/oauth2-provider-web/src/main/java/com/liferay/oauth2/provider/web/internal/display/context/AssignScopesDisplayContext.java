@@ -24,7 +24,8 @@ import com.liferay.oauth2.provider.web.internal.AssignableScopes;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -156,22 +157,12 @@ public class AssignScopesDisplayContext
 			Collectors.toList()
 		);
 
-		StringBundler sb = new StringBundler(scopesList.size() * 2 - 1);
-
-		Iterator<String> iterator = scopesList.iterator();
-
-		if (!iterator.hasNext()) {
+		if (ListUtil.isEmpty(scopesList)) {
 			return StringPool.BLANK;
 		}
-
-		sb.append(iterator.next());
-
-		while (iterator.hasNext()) {
-			sb.append(separator);
-			sb.append(iterator.next());
+		else {
+			return StringUtil.merge(scopesList, separator);
 		}
-
-		return sb.toString();
 	}
 
 	public Map<AssignableScopes, Relations>
