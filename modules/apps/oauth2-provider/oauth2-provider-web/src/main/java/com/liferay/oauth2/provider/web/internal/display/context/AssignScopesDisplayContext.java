@@ -23,6 +23,7 @@ import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.web.internal.AssignableScopes;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -136,6 +137,40 @@ public class AssignScopesDisplayContext
 		}
 
 		return applicationNamesDescriptions;
+	}
+
+	public String getApplicationScopeDescription(
+		String applicationName, AssignableScopes assignableScopes,
+		String separator, Function<String, String> escapeFunction) {
+
+		Set<String> applicationScopeDescription =
+			assignableScopes.getApplicationScopeDescription(applicationName);
+
+		Stream<String> stream = applicationScopeDescription.stream();
+
+		List<String> scopesList = stream.sorted(
+		).map(
+			escapeFunction
+		).collect(
+			Collectors.toList()
+		);
+
+		StringBundler sb = new StringBundler(scopesList.size() * 2 - 1);
+
+		Iterator<String> iterator = scopesList.iterator();
+
+		if (!iterator.hasNext()) {
+			return StringPool.BLANK;
+		}
+
+		sb.append(iterator.next());
+
+		while (iterator.hasNext()) {
+			sb.append(separator);
+			sb.append(iterator.next());
+		}
+
+		return sb.toString();
 	}
 
 	public Map<AssignableScopes, Relations>
