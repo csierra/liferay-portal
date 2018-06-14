@@ -143,7 +143,7 @@ public class AssignScopesDisplayContext
 
 	public String getApplicationScopeDescription(
 		String applicationName, AssignableScopes assignableScopes,
-		String separator) {
+		String delimiter) {
 
 		Set<String> applicationScopeDescription =
 			assignableScopes.getApplicationScopeDescription(applicationName);
@@ -161,7 +161,7 @@ public class AssignScopesDisplayContext
 			return StringPool.BLANK;
 		}
 		else {
-			return StringUtil.merge(scopesList, separator);
+			return StringUtil.merge(scopesList, delimiter);
 		}
 	}
 
