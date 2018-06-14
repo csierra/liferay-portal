@@ -23,6 +23,7 @@ import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.web.internal.AssignableScopes;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -141,7 +142,7 @@ public class AssignScopesDisplayContext
 
 	public String getApplicationScopeDescription(
 		String applicationName, AssignableScopes assignableScopes,
-		String separator, Function<String, String> escapeFunction) {
+		String separator) {
 
 		Set<String> applicationScopeDescription =
 			assignableScopes.getApplicationScopeDescription(applicationName);
@@ -150,7 +151,7 @@ public class AssignScopesDisplayContext
 
 		List<String> scopesList = stream.sorted(
 		).map(
-			escapeFunction
+			HtmlUtil::escape
 		).collect(
 			Collectors.toList()
 		);
