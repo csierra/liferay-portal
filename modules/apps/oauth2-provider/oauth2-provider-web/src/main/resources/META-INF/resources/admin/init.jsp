@@ -52,8 +52,7 @@ page import="com.liferay.portal.kernel.util.Validator" %>
 page import="java.util.Collections" %><%@
 page import="java.util.Date" %><%@
 page import="java.util.HashMap" %><%@
-page import="java.util.HashSet" %><%@
-page import="java.util.function.Function" %>
+page import="java.util.HashSet" %>
 
 <%@ page import="javax.portlet.PortletURL" %>
 

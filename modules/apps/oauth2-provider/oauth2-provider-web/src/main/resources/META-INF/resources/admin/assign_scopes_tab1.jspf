@@ -17,14 +17,6 @@
 <div aria-orientation="vertical" class="panel-group" id="appsAccordion" role="tablist">
 
 	<%
-	Function<String, String> escapeFunction = new Function<String, String>() {
-
-		public String apply(String str) {
-			return HtmlUtil.escape(str);
-		}
-
-	};
-
 	List<Map.Entry<String, String>> applicationsNamesDescriptionsList = assignScopesDisplayContext.getSortedApplicationNamesDescriptions();
 
 	for (Map.Entry<String, String> applicationNameDescriptionEntry : applicationsNamesDescriptionsList) {
@@ -88,7 +80,7 @@
 								<div class="autofit-col autofit-col-expand">
 									<h4 class="list-group-title text-truncate">
 										<label for="<portlet:namespace /><%= id %>">
-											<%= assignScopesDisplayContext.getApplicationScopeDescription(applicationName, assignableScopes, "<br />+ ", escapeFunction) %>
+											<%= assignScopesDisplayContext.getApplicationScopeDescription(applicationName, assignableScopes, "<br />+ ") %>
 										</label>
 									</h4>
 
