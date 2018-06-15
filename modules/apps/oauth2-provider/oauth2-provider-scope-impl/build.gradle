@@ -1,3 +1,5 @@
+task deployConfigs(type: Copy)
+
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
@@ -25,4 +27,17 @@ dependencies {
 	compileOnly project(":core:petra:petra-string")
 
 	testCompile group: "junit", name: "junit", version: "4.12"
+}
+
+deploy {
+	finalizedBy deployConfigs
+}
+
+deployConfigs {
+	ext {
+		autoClean = false
+	}
+
+	from "configs"
+	into new File(liferay.liferayHome, "osgi/configs")
 }

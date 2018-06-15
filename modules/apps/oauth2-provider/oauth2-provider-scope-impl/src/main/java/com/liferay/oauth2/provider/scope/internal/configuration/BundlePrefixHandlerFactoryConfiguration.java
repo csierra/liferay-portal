@@ -36,14 +36,14 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface BundlePrefixHandlerFactoryConfiguration {
 
 	@Meta.AD(
-		deflt = "Default", description = "osgi-jaxrs-name-description",
+		description = "osgi-jaxrs-name-description",
 		id = OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME,
-		name = "osgi-jaxrs-name", required = false
+		name = "osgi-jaxrs-name", required = true
 	)
 	public String osgiJAXRSName();
 
 	@Meta.AD(
-		deflt = "true",
+		deflt = "false",
 		description = "include-bundle-symbolic-name-description",
 		id = "include.bundle.symbolic.name",
 		name = "include-bundle-symbolic-name", required = false
@@ -51,13 +51,12 @@ public interface BundlePrefixHandlerFactoryConfiguration {
 	public boolean includeBundleSymbolicName();
 
 	@Meta.AD(
-		deflt = "", description = "excluded-scopes-description",
-		id = "excluded.scopes", name = "excluded-scopes", required = false
+		description = "excluded-scopes-description", id = "excluded.scopes",
+		name = "excluded-scopes", required = false
 	)
 	public String[] excludedScopes();
 
 	@Meta.AD(
-		deflt = OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME,
 		description = "service-properties-description",
 		id = "service.properties", name = "service-properties", required = false
 	)

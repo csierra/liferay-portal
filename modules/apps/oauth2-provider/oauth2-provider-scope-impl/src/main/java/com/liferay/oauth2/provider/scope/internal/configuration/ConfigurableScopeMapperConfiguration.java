@@ -35,14 +35,13 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface ConfigurableScopeMapperConfiguration {
 
 	@Meta.AD(
-		deflt = "Default", description = "osgi-jaxrs-name-description",
+		description = "osgi-jaxrs-name-description",
 		id = OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME,
-		name = "osgi-jaxrs-name", required = false
+		name = "osgi-jaxrs-name", required = true
 	)
 	public String osgiJAXRSName();
 
 	@Meta.AD(
-		deflt = "GET\\,HEAD\\,OPTIONS=everything.readonly,PUT\\,POST\\,PATCH\\,DELETE=everything\\,everything.writeonly",
 		description = "mapping-description", id = "mapping", name = "mapping",
 		required = false
 	)
