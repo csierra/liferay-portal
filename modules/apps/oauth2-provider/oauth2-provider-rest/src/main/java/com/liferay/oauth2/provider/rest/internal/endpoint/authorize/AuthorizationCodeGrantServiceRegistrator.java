@@ -65,13 +65,15 @@ public class AuthorizationCodeGrantServiceRegistrator {
 
 				@Override
 				protected Response deliverOOBResponse(
-					OOBAuthorizationResponse response) {
+					OOBAuthorizationResponse oobAuthorizationResponse) {
 
 					_log.error(
 						"No redirect_uri specified in request for client " +
-							response.getClientId());
+							oobAuthorizationResponse.getClientId());
 
-					return Response.status(500).build();
+					return Response.status(
+						500
+					).build();
 				}
 
 			};
