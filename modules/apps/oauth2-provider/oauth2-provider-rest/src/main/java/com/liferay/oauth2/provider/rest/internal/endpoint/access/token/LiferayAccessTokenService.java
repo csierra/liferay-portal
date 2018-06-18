@@ -15,15 +15,15 @@
 package com.liferay.oauth2.provider.rest.internal.endpoint.access.token;
 
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,27 +54,45 @@ public class LiferayAccessTokenService extends AccessTokenService {
 
 		Client client = authenticateClientIfNeeded(params);
 
+		MessageContext messageContext = getMessageContext();
+
+		HttpServletRequest httpServletRequest =
+			messageContext.getHttpServletRequest();
+
 		MultivaluedMap<String, Object> headers = response.getHeaders();
 
-		List hostUris = new ArrayList<>();
+		boolean originAllowed = false;
+
+		String origin = httpServletRequest.getHeader("Origin");
 
 		for (String redirectUri : client.getRedirectUris()) {
 			try {
 				URI uri = new URI(redirectUri);
+				URI originUri = new URI(origin);
 
-				String host = uri.getScheme() + "://" + uri.getHost();
+				String uriHost = uri.getHost();
+				String originHost = originUri.getHost();
 
-				hostUris.add(host);
+				if (originHost.equals(uriHost)) {
+					originAllowed = true;
+
+					break;
+				}
 			}
 			catch (URISyntaxException urise) {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Invalid redirectURI: " + redirectUri, urise);
+				}
 			}
 		}
 
-		headers.put(
-			"Accept", Arrays.asList("application/x-www-form-urlencoded"));
-		headers.put("Access-Control-Allow-Origin", hostUris);
-		headers.put("Access-Control-Allow-Methods", Arrays.asList("POST"));
-		headers.put("Content-Type", Arrays.asList("application/json"));
+		if (originAllowed) {
+			headers.put(
+				"Accept", Arrays.asList("application/x-www-form-urlencoded"));
+			headers.put("Access-Control-Allow-Origin", Arrays.asList(origin));
+			headers.put("Access-Control-Allow-Methods", Arrays.asList("POST"));
+			headers.put("Content-Type", Arrays.asList("application/json"));
+		}
 
 		return response;
 	}
@@ -102,6 +120,9 @@ public class LiferayAccessTokenService extends AccessTokenService {
 			remoteHost = inetAddress.getCanonicalHostName();
 		}
 		catch (UnknownHostException uhe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unknown Host: " + remoteAddr, uhe);
+			}
 		}
 
 		properties.put(
@@ -113,5 +134,8 @@ public class LiferayAccessTokenService extends AccessTokenService {
 
 		return client;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayAccessTokenService.class);
 
 }

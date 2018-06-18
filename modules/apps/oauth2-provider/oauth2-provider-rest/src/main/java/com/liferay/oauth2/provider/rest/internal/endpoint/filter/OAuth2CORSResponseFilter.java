@@ -65,10 +65,10 @@ public class OAuth2CORSResponseFilter implements ContainerResponseFilter {
 			return;
 		}
 
-		URI originURI = null;
+		URI originUri = null;
 
 		try {
-			originURI = new URI(origin);
+			originUri = new URI(origin);
 		}
 		catch (URISyntaxException urise) {
 			if (_log.isDebugEnabled()) {
@@ -122,7 +122,10 @@ public class OAuth2CORSResponseFilter implements ContainerResponseFilter {
 			try {
 				URI uri = new URI(redirectURI);
 
-				if (originURI.equals(uri)) {
+				String originHost = originUri.getHost();
+				String uriHost = uri.getHost();
+
+				if (originHost.equals(uriHost)) {
 					originAllowed = true;
 
 					break;
