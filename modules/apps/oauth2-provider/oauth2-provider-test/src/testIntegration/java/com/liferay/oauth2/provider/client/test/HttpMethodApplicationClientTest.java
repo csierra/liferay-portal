@@ -95,6 +95,23 @@ public class HttpMethodApplicationClientTest extends BaseClientTestCase {
 
 			properties.put("oauth2.test.application", true);
 
+			Dictionary<String, Object> scopeMapperProperties =
+				new HashMapDictionary<>();
+
+			scopeMapperProperties.put(
+				"osgi.jaxrs.name", TestApplication.class.getName());
+			scopeMapperProperties.put(
+				"mapping",
+				new String[] {
+					"GET,HEAD,OPTIONS=everything.read",
+					"PUT,POST,PATCH,DELETE=everything,everything.write"
+				});
+
+			createFactoryConfiguration(
+				"com.liferay.oauth2.provider.scope.internal.configuration." +
+					"ConfigurableScopeMapperConfiguration",
+				scopeMapperProperties);
+
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplicationBefore",
 				Arrays.asList("GET", "POST"));
