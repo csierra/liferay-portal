@@ -1,0 +1,3 @@
+Bundle-Name: Liferay Portal Security CORS
+Bundle-SymbolicName: com.liferay.portal.security.cors
+Bundle-Version: 1.0.0
