@@ -51,8 +51,8 @@ public interface BundlePrefixHandlerFactoryConfiguration {
 	public boolean includeBundleSymbolicName();
 
 	@Meta.AD(
-		description = "excluded-scopes-description", id = "excluded.scopes",
-		name = "excluded-scopes", required = false
+		deflt = "", description = "excluded-scopes-description",
+		id = "excluded.scopes", name = "excluded-scopes", required = false
 	)
 	public String[] excludedScopes();
 

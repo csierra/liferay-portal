@@ -42,8 +42,8 @@ public interface ConfigurableScopeMapperConfiguration {
 	public String osgiJAXRSName();
 
 	@Meta.AD(
-		description = "mapping-description", id = "mapping", name = "mapping",
-		required = false
+		deflt = "", description = "mapping-description", id = "mapping",
+		name = "mapping", required = false
 	)
 	public String[] mappings();
 
