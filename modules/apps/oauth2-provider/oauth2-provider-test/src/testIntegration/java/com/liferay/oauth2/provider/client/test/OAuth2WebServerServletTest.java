@@ -135,6 +135,7 @@ public class OAuth2WebServerServletTest extends BaseClientTestCase {
 
 			properties.put(
 				"osgi.jaxrs.name", TestPreviewURLApplication.class.getName());
+			properties.put("oauth2.scopechecker.type", "annotations");
 
 			registerJaxRsApplication(
 				new TestPreviewURLApplication(previewURL), "preview-url",
@@ -143,7 +144,8 @@ public class OAuth2WebServerServletTest extends BaseClientTestCase {
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Collections.singletonList(GrantType.CLIENT_CREDENTIALS),
-				Arrays.asList(new String[] {"GET", "documents_download"}));
+				Arrays.asList(
+					new String[] {"everything.read.documents.download"}));
 		}
 
 	}

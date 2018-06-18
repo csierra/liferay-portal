@@ -52,8 +52,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL,
-	property = "default=true"
+	configurationPolicy = ConfigurationPolicy.REQUIRE
 )
 public class PrefixHandlerFactoryImpl implements PrefixHandlerFactory {
 

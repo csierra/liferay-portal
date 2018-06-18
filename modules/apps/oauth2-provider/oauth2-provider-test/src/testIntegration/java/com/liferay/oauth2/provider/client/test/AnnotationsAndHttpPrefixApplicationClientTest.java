@@ -114,6 +114,12 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 
 			scopeMapperProperties.put(
 				"osgi.jaxrs.name", TestApplication.class.getName());
+			scopeMapperProperties.put(
+				"mapping",
+				new String[] {
+					"GET,HEAD,OPTIONS=everything.read",
+					"PUT,POST,PATCH,DELETE=everything,everything.write"
+				});
 
 			Dictionary<String, Object> bundlePrefixProperties =
 				new HashMapDictionary<>();

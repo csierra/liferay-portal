@@ -14,6 +14,8 @@
 
 package com.liferay.oauth2.provider.test.internal;
 
+import com.liferay.oauth2.provider.scope.RequiresNoScope;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -30,6 +32,7 @@ public class TestPreviewURLApplication extends Application {
 	}
 
 	@GET
+	@RequiresNoScope()
 	public String getPreviewURL() {
 		return _previewURL;
 	}
