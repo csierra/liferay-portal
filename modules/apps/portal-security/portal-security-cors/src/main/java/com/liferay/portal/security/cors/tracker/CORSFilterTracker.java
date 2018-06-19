@@ -54,6 +54,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 		"default.registration.property=filter.init.access.control.headers.allowed=*",
 		"default.registration.property=filter.init.access.control.methods.allowed=*",
 		"default.registration.property=filter.init.access.control.origin.allowed=*",
+		"default.registration.property=filter.init.allow.allowed=*",
 		"default.registration.property=filter.init.override.allowed=true",
 		"default.registration.property=filter.init.preflight.allowed=true",
 		"default.whiteboard.property=" + HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_SERVLET + "=cxf-servlet",

@@ -47,6 +47,10 @@ public class CORSFilter extends BasePortalFilter {
 	public static final String ACCESS_CONTROL_ALLOW_ORIGIN =
 		"Access-Control-Allow-Origin";
 
+	public static final String ACCEPT_CONTENT = "Accept";
+
+	public static final String ALLOW_REQUEST = "Allow";
+
 	@Override
 	public void init(FilterConfig filterConfig) {
 		super.init(filterConfig);
@@ -74,6 +78,16 @@ public class CORSFilter extends BasePortalFilter {
 
 			_initParametersMap.remove("override.allowed");
 
+			if (_initParametersMap.containsKey("accept.allowed")) {
+				_acceptedContent = GetterUtil.getString(
+					_initParametersMap.get("accept.allowed"), null);
+			}
+
+			if (_initParametersMap.containsKey("allow.allowed")) {
+				_allowedRequest = GetterUtil.getString(
+					_initParametersMap.get("allow.allowed"), null);
+			}
+
 			if (_initParametersMap.containsKey(
 					"access.control.headers.allowed")) {
 
@@ -96,11 +110,6 @@ public class CORSFilter extends BasePortalFilter {
 				_accessControlOrigin = GetterUtil.getString(
 					_initParametersMap.get("access.control.origin.allowed"),
 					null);
-			}
-
-			if (_initParametersMap.containsKey("accept.allowed")) {
-				_acceptedContent = GetterUtil.getString(
-					_initParametersMap.get("accept.allowed"), null);
 			}
 		}
 	}
@@ -169,13 +178,15 @@ public class CORSFilter extends BasePortalFilter {
 		response.setHeader(ACCESS_CONTROL_ALLOW_HEADERS, _accessControlHeaders);
 		response.setHeader(ACCESS_CONTROL_ALLOW_METHODS, _accessControlMethods);
 
-		response.setHeader("Accept", _acceptedContent);
+		response.setHeader(ACCEPT_CONTENT, _acceptedContent);
+		response.setHeader(ALLOW_REQUEST, _allowedRequest);
 	}
 
 	private String _acceptedContent;
 	private String _accessControlHeaders;
 	private String _accessControlMethods;
 	private String _accessControlOrigin;
+	private String _allowedRequest;
 	private boolean _corsPreflightAllowed = true;
 	private final Map<String, Object> _initParametersMap = new HashMap<>();
 	private boolean _overrideAllowed = true;

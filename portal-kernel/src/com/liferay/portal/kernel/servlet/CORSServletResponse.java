@@ -34,6 +34,10 @@ public class CORSServletResponse extends HttpServletResponseWrapper {
 	public static final String ACCESS_CONTROL_ALLOW_ORIGIN =
 		"Access-Control-Allow-Origin";
 
+	public static final String ACCEPT_CONTENT = "Accept";
+
+	public static final String ALLOW_REQUEST = "Allow";
+
 	public CORSServletResponse(HttpServletResponse response) {
 		super(response);
 	}
@@ -43,7 +47,9 @@ public class CORSServletResponse extends HttpServletResponseWrapper {
 		if (!name.equals(ACCESS_CONTROL_ALLOW_ORIGIN) &&
 			!name.equals(ACCESS_CONTROL_ALLOW_HEADERS) &&
 			!name.equals(ACCESS_CONTROL_ALLOW_METHODS) &&
-			!name.equals(ACCESS_CONTROL_ALLOW_CREDENTIALS)) {
+			!name.equals(ACCESS_CONTROL_ALLOW_CREDENTIALS) &&
+			!name.equals(ACCEPT_CONTENT) &&
+			!name.equals(ALLOW_REQUEST)) {
 
 			super.setHeader(name, value);
 		}
