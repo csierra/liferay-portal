@@ -37,8 +37,8 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL,
-	property = "default=true"
+	configurationPolicy = ConfigurationPolicy.REQUIRE,
+	property = "osgi.jaxrs.name=Default"
 )
 public class ScopeMapperImpl implements ScopeMapper {
 
