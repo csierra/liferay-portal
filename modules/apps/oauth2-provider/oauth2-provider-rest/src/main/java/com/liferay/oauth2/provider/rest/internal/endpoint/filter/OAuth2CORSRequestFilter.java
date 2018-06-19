@@ -32,10 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
 
 import org.osgi.service.component.annotations.Component;
@@ -48,17 +45,14 @@ import org.osgi.service.component.annotations.Component;
 	property = {
 		"osgi.jaxrs.extension=true",
 		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.OAuth2)",
-		"osgi.jaxrs.name=OAuth2CORSResponseFilter"
+		"osgi.jaxrs.name=OAuth2CORSRequestFilter"
 	}
 )
 @Provider
-public class OAuth2CORSResponseFilter implements ContainerResponseFilter {
+public class OAuth2CORSRequestFilter implements ContainerRequestFilter {
 
 	@Override
-	public void filter(
-		ContainerRequestContext requestContext,
-		ContainerResponseContext responseContext) {
-
+	public void filter(ContainerRequestContext requestContext) {
 		String origin = requestContext.getHeaderString("Origin");
 
 		if (Validator.isBlank(origin)) {
@@ -75,9 +69,6 @@ public class OAuth2CORSResponseFilter implements ContainerResponseFilter {
 				_log.debug("Invalid origin sent by browser: " + origin, urise);
 			}
 
-			responseContext.setEntity(null);
-			responseContext.setStatusInfo(Response.Status.FORBIDDEN);
-
 			return;
 		}
 
@@ -87,9 +78,6 @@ public class OAuth2CORSResponseFilter implements ContainerResponseFilter {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Unable to find OAuth2 application");
 			}
-
-			responseContext.setEntity(null);
-			responseContext.setStatusInfo(Response.Status.FORBIDDEN);
 
 			return;
 		}
@@ -107,9 +95,6 @@ public class OAuth2CORSResponseFilter implements ContainerResponseFilter {
 						oAuth2Application.getClientId(), " from origin ",
 						origin));
 			}
-
-			responseContext.setEntity(null);
-			responseContext.setStatusInfo(Response.Status.FORBIDDEN);
 
 			return;
 		}
@@ -142,22 +127,7 @@ public class OAuth2CORSResponseFilter implements ContainerResponseFilter {
 			}
 		}
 
-		if (originAllowed) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					StringBundler.concat(
-						"CORS was allowed for client ",
-						oAuth2Application.getClientId(), " and origin: ",
-						origin));
-			}
-
-			MultivaluedMap<String, Object> headers =
-				responseContext.getHeaders();
-
-			headers.putSingle("Access-Control-Allow-Origin", origin);
-			headers.putSingle("Access-Control-Allow-Headers", "*");
-		}
-		else {
+		if (!originAllowed) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(
@@ -166,8 +136,7 @@ public class OAuth2CORSResponseFilter implements ContainerResponseFilter {
 						origin));
 			}
 
-			responseContext.setEntity(null);
-			responseContext.setStatusInfo(Response.Status.FORBIDDEN);
+			return;
 		}
 	}
 
@@ -194,6 +163,6 @@ public class OAuth2CORSResponseFilter implements ContainerResponseFilter {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		OAuth2CORSResponseFilter.class);
+		OAuth2CORSRequestFilter.class);
 
 }
