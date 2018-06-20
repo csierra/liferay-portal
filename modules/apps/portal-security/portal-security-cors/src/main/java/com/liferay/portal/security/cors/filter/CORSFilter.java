@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.servlet.CORSServletResponse;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
 import java.util.Enumeration;
@@ -35,6 +34,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class CORSFilter extends BasePortalFilter {
 
+	public static final String ACCEPT_CONTENT = "Accept";
+
 	public static final String ACCESS_CONTROL_ALLOW_CREDENTIALS =
 		"Access-Control-Allow-Credentials";
 
@@ -46,8 +47,6 @@ public class CORSFilter extends BasePortalFilter {
 
 	public static final String ACCESS_CONTROL_ALLOW_ORIGIN =
 		"Access-Control-Allow-Origin";
-
-	public static final String ACCEPT_CONTENT = "Accept";
 
 	public static final String ALLOW_REQUEST = "Allow";
 
@@ -65,6 +64,39 @@ public class CORSFilter extends BasePortalFilter {
 			_initParametersMap.put(name, value);
 		}
 
+		if (_initParametersMap.containsKey(
+				"access.control.credentials.allowed")) {
+
+			_accessControlCredentials = GetterUtil.getString(
+				_initParametersMap.get("access.control.credentials.allowed"),
+				null);
+		}
+
+		if (_initParametersMap.containsKey("access.control.headers.allowed")) {
+			_accessControlHeaders = GetterUtil.getString(
+				_initParametersMap.get("access.control.headers.allowed"), null);
+		}
+
+		if (_initParametersMap.containsKey("access.control.methods.allowed")) {
+			_accessControlMethods = GetterUtil.getString(
+				_initParametersMap.get("access.control.methods.allowed"), null);
+		}
+
+		if (_initParametersMap.containsKey("access.control.origin.allowed")) {
+			_accessControlOrigin = GetterUtil.getString(
+				_initParametersMap.get("access.control.origin.allowed"), null);
+		}
+
+		if (_initParametersMap.containsKey("accept.allowed")) {
+			_acceptedContent = GetterUtil.getString(
+				_initParametersMap.get("accept.allowed"), null);
+		}
+
+		if (_initParametersMap.containsKey("allow.allowed")) {
+			_allowedRequest = GetterUtil.getString(
+				_initParametersMap.get("allow.allowed"), null);
+		}
+
 		if (_initParametersMap.containsKey("preflight.allowed")) {
 			_corsPreflightAllowed = GetterUtil.getBoolean(
 				_initParametersMap.get("preflight.allowed"), true);
@@ -77,40 +109,6 @@ public class CORSFilter extends BasePortalFilter {
 				_initParametersMap.get("override.allowed"), true);
 
 			_initParametersMap.remove("override.allowed");
-
-			if (_initParametersMap.containsKey("accept.allowed")) {
-				_acceptedContent = GetterUtil.getString(
-					_initParametersMap.get("accept.allowed"), null);
-			}
-
-			if (_initParametersMap.containsKey("allow.allowed")) {
-				_allowedRequest = GetterUtil.getString(
-					_initParametersMap.get("allow.allowed"), null);
-			}
-
-			if (_initParametersMap.containsKey(
-					"access.control.headers.allowed")) {
-
-				_accessControlHeaders = GetterUtil.getString(
-					_initParametersMap.get("access.control.headers.allowed"),
-					null);
-			}
-
-			if (_initParametersMap.containsKey(
-					"access.control.methods.allowed")) {
-
-				_accessControlMethods = GetterUtil.getString(
-					_initParametersMap.get("access.control.methods.allowed"),
-					null);
-			}
-
-			if (_initParametersMap.containsKey(
-					"access.control.origin.allowed")) {
-
-				_accessControlOrigin = GetterUtil.getString(
-					_initParametersMap.get("access.control.origin.allowed"),
-					null);
-			}
 		}
 	}
 
@@ -147,42 +145,27 @@ public class CORSFilter extends BasePortalFilter {
 			return false;
 		}
 
-		String origin = request.getHeader("Origin");
-
-		if (Validator.isBlank(origin)) {
-			return false;
-		}
-
-		String accessControlRequestMethod = request.getHeader(
-			"Access-Control-Request-Method");
-
-		if (Validator.isBlank(accessControlRequestMethod)) {
-			return false;
-		}
-
-		String accessControlRequestHeaders = request.getHeader(
-			"Access-Control-Request-Headers");
-
-		response.setHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-		response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, origin);
 		response.setHeader(
-			ACCESS_CONTROL_ALLOW_HEADERS, accessControlRequestHeaders);
-		response.setHeader(
-			ACCESS_CONTROL_ALLOW_METHODS, accessControlRequestMethod);
+			ACCESS_CONTROL_ALLOW_CREDENTIALS, _accessControlCredentials);
+		response.setHeader(ACCESS_CONTROL_ALLOW_HEADERS, _accessControlHeaders);
+		response.setHeader(ACCESS_CONTROL_ALLOW_METHODS, _accessControlMethods);
+		response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, _accessControlOrigin);
 
 		return true;
 	}
 
 	private void _setConfiguredHeaders(HttpServletResponse response) {
-		response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, _accessControlOrigin);
+		response.setHeader(
+			ACCESS_CONTROL_ALLOW_CREDENTIALS, _accessControlCredentials);
 		response.setHeader(ACCESS_CONTROL_ALLOW_HEADERS, _accessControlHeaders);
 		response.setHeader(ACCESS_CONTROL_ALLOW_METHODS, _accessControlMethods);
-
+		response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, _accessControlOrigin);
 		response.setHeader(ACCEPT_CONTENT, _acceptedContent);
 		response.setHeader(ALLOW_REQUEST, _allowedRequest);
 	}
 
 	private String _acceptedContent;
+	private String _accessControlCredentials;
 	private String _accessControlHeaders;
 	private String _accessControlMethods;
 	private String _accessControlOrigin;

@@ -51,6 +51,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 	immediate = true,
 	property = {
 		"default.registration.property=filter.init.accept.allowed=*",
+		"default.registration.property=filter.init.access.control.credentials.allowed=*",
 		"default.registration.property=filter.init.access.control.headers.allowed=*",
 		"default.registration.property=filter.init.access.control.methods.allowed=*",
 		"default.registration.property=filter.init.access.control.origin.allowed=*",
