@@ -64,6 +64,11 @@ public class CORSFilter extends BasePortalFilter {
 			_initParametersMap.put(name, value);
 		}
 
+		if (_initParametersMap.containsKey("accept.allowed")) {
+			_acceptedContent = GetterUtil.getString(
+				_initParametersMap.get("accept.allowed"), null);
+		}
+
 		if (_initParametersMap.containsKey(
 				"access.control.credentials.allowed")) {
 
@@ -85,11 +90,6 @@ public class CORSFilter extends BasePortalFilter {
 		if (_initParametersMap.containsKey("access.control.origin.allowed")) {
 			_accessControlOrigin = GetterUtil.getString(
 				_initParametersMap.get("access.control.origin.allowed"), null);
-		}
-
-		if (_initParametersMap.containsKey("accept.allowed")) {
-			_acceptedContent = GetterUtil.getString(
-				_initParametersMap.get("accept.allowed"), null);
 		}
 
 		if (_initParametersMap.containsKey("allow.allowed")) {
@@ -122,14 +122,21 @@ public class CORSFilter extends BasePortalFilter {
 			return;
 		}
 
+		HttpServletResponse httpServletResponse;
+
 		if (_overrideAllowed) {
-			_setConfiguredHeaders(response);
-			response = new CORSServletResponse(response);
+			httpServletResponse = response;
 		}
+		else {
+			httpServletResponse = new CORSServletResponse(response);
+		}
+
+		_setConfiguredHeaders(response);
 
 		Class<?> clazz = getClass();
 
-		processFilter(clazz.getName(), request, response, filterChain);
+		processFilter(
+			clazz.getName(), request, httpServletResponse, filterChain);
 	}
 
 	private boolean _isApplyCORSPreflight(
@@ -155,12 +162,12 @@ public class CORSFilter extends BasePortalFilter {
 	}
 
 	private void _setConfiguredHeaders(HttpServletResponse response) {
+		response.setHeader(ACCEPT_CONTENT, _acceptedContent);
 		response.setHeader(
 			ACCESS_CONTROL_ALLOW_CREDENTIALS, _accessControlCredentials);
 		response.setHeader(ACCESS_CONTROL_ALLOW_HEADERS, _accessControlHeaders);
 		response.setHeader(ACCESS_CONTROL_ALLOW_METHODS, _accessControlMethods);
 		response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, _accessControlOrigin);
-		response.setHeader(ACCEPT_CONTENT, _acceptedContent);
 		response.setHeader(ALLOW_REQUEST, _allowedRequest);
 	}
 
