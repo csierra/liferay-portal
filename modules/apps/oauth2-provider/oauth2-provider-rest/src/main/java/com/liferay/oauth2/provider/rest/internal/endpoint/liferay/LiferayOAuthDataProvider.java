@@ -298,7 +298,7 @@ public class LiferayOAuthDataProvider
 	}
 
 	@Override
-	public Client getClient(String clientId) {
+	public Client doGetClient(String clientId) {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
 		OAuth2Application oAuth2Application =
