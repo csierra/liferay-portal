@@ -88,9 +88,12 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.webserver.WebServerServletTokenUtil;
 import com.liferay.portal.kernel.xml.SAXReader;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
 
 import java.util.Collections;
@@ -1214,17 +1217,29 @@ public class TemplateContextHelper {
 
 		@Override
 		public byte[] URLtoByteArray(Options options) throws IOException {
+			if (isLocalNetwork(options.getLocation())) {
+				return new byte[0];
+			}
+
 			return _http.URLtoByteArray(options);
 		}
 
 		@Override
 		public byte[] URLtoByteArray(String location) throws IOException {
+			if (isLocalNetwork(location)) {
+				return new byte[0];
+			}
+
 			return _http.URLtoByteArray(location);
 		}
 
 		@Override
 		public byte[] URLtoByteArray(String location, boolean post)
 			throws IOException {
+
+			if (isLocalNetwork(location)) {
+				return new byte[0];
+			}
 
 			return _http.URLtoByteArray(location, post);
 		}
@@ -1233,12 +1248,20 @@ public class TemplateContextHelper {
 		public InputStream URLtoInputStream(Options options)
 			throws IOException {
 
+			if (isLocalNetwork(options.getLocation())) {
+				return new ByteArrayInputStream(new byte[0]);
+			}
+
 			return _http.URLtoInputStream(options);
 		}
 
 		@Override
 		public InputStream URLtoInputStream(String location)
 			throws IOException {
+
+			if (isLocalNetwork(location)) {
+				return new ByteArrayInputStream(new byte[0]);
+			}
 
 			return _http.URLtoInputStream(location);
 		}
@@ -1247,16 +1270,28 @@ public class TemplateContextHelper {
 		public InputStream URLtoInputStream(String location, boolean post)
 			throws IOException {
 
+			if (isLocalNetwork(location)) {
+				return new ByteArrayInputStream(new byte[0]);
+			}
+
 			return _http.URLtoInputStream(location, post);
 		}
 
 		@Override
 		public String URLtoString(Options options) throws IOException {
+			if (isLocalNetwork(options.getLocation())) {
+				return StringPool.BLANK;
+			}
+
 			return _http.URLtoString(options);
 		}
 
 		@Override
 		public String URLtoString(String location) throws IOException {
+			if (isLocalNetwork(location)) {
+				return StringPool.BLANK;
+			}
+
 			return _http.URLtoString(location);
 		}
 
@@ -1264,12 +1299,45 @@ public class TemplateContextHelper {
 		public String URLtoString(String location, boolean post)
 			throws IOException {
 
+			if (isLocalNetwork(location)) {
+				return StringPool.BLANK;
+			}
+
 			return _http.URLtoString(location, post);
 		}
 
 		@Override
 		public String URLtoString(URL url) throws IOException {
+			if (isLocalNetwork(url.toString())) {
+				return StringPool.BLANK;
+			}
+
 			return _http.URLtoString(url);
+		}
+
+		protected boolean isLocalNetwork(String location) {
+			try {
+				URI uri = new URI(location);
+
+				InetAddress inetAddress = InetAddress.getByName(uri.getHost());
+
+				if (inetAddress.isAnyLocalAddress() ||
+					inetAddress.isLinkLocalAddress() ||
+					inetAddress.isLoopbackAddress() ||
+					inetAddress.isSiteLocalAddress()) {
+
+					return true;
+				}
+
+				return false;
+			}
+			catch (Exception e) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(e, e);
+				}
+			}
+
+			return true;
 		}
 
 		private final Http _http;
