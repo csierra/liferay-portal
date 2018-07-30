@@ -71,6 +71,7 @@ import com.liferay.portal.kernel.util.GetterUtil_IW;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.InetAddressUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ListMergeable;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -92,8 +93,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.net.InetAddress;
-import java.net.URI;
 import java.net.URL;
 
 import java.util.Collections;
@@ -1328,35 +1327,12 @@ public class TemplateContextHelper {
 			return _http.URLtoString(url);
 		}
 
-		protected boolean isLocalNetwork(String location) {
-			try {
-				URI uri = new URI(location);
-
-				InetAddress inetAddress = InetAddress.getByName(uri.getHost());
-
-				if (inetAddress.isAnyLocalAddress() ||
-					inetAddress.isLinkLocalAddress() ||
-					inetAddress.isLoopbackAddress() ||
-					inetAddress.isSiteLocalAddress()) {
-
-					return true;
-				}
-
-				return false;
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(e, e);
-				}
-			}
-
-			return true;
-		}
-
 		protected boolean isLocalNetworkAccessDenied(String location)
 			throws IOException {
 
-			if (_disableLocalNetworkAccess && isLocalNetwork(location)) {
+			if (_disableLocalNetworkAccess &&
+				InetAddressUtil.isLocalNetwork(location)) {
+
 				return true;
 			}
 
