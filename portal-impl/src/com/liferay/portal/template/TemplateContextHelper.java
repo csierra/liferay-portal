@@ -533,6 +533,14 @@ public class TemplateContextHelper {
 			_log.error(se, se);
 		}
 
+		try {
+			variables.put(
+				"httpUtilUnsafe", new HttpWrapper(HttpUtil.getHttp(), false));
+		}
+		catch (SecurityException se) {
+			_log.error(se, se);
+		}
+
 		// Image tool util
 
 		try {
@@ -898,7 +906,12 @@ public class TemplateContextHelper {
 	private static class HttpWrapper implements Http {
 
 		public HttpWrapper(Http http) {
+			this(http, true);
+		}
+
+		public HttpWrapper(Http http, boolean disableLocalNetworkAccess) {
 			_http = http;
+			_disableLocalNetworkAccess = disableLocalNetworkAccess;
 		}
 
 		@Override
@@ -1217,7 +1230,7 @@ public class TemplateContextHelper {
 
 		@Override
 		public byte[] URLtoByteArray(Options options) throws IOException {
-			if (isLocalNetwork(options.getLocation())) {
+			if (isLocalNetworkAccessDenied(options.getLocation())) {
 				return new byte[0];
 			}
 
@@ -1226,7 +1239,7 @@ public class TemplateContextHelper {
 
 		@Override
 		public byte[] URLtoByteArray(String location) throws IOException {
-			if (isLocalNetwork(location)) {
+			if (isLocalNetworkAccessDenied(location)) {
 				return new byte[0];
 			}
 
@@ -1237,7 +1250,7 @@ public class TemplateContextHelper {
 		public byte[] URLtoByteArray(String location, boolean post)
 			throws IOException {
 
-			if (isLocalNetwork(location)) {
+			if (isLocalNetworkAccessDenied(location)) {
 				return new byte[0];
 			}
 
@@ -1248,7 +1261,7 @@ public class TemplateContextHelper {
 		public InputStream URLtoInputStream(Options options)
 			throws IOException {
 
-			if (isLocalNetwork(options.getLocation())) {
+			if (isLocalNetworkAccessDenied(options.getLocation())) {
 				return new ByteArrayInputStream(new byte[0]);
 			}
 
@@ -1259,7 +1272,7 @@ public class TemplateContextHelper {
 		public InputStream URLtoInputStream(String location)
 			throws IOException {
 
-			if (isLocalNetwork(location)) {
+			if (isLocalNetworkAccessDenied(location)) {
 				return new ByteArrayInputStream(new byte[0]);
 			}
 
@@ -1270,7 +1283,7 @@ public class TemplateContextHelper {
 		public InputStream URLtoInputStream(String location, boolean post)
 			throws IOException {
 
-			if (isLocalNetwork(location)) {
+			if (isLocalNetworkAccessDenied(location)) {
 				return new ByteArrayInputStream(new byte[0]);
 			}
 
@@ -1279,7 +1292,7 @@ public class TemplateContextHelper {
 
 		@Override
 		public String URLtoString(Options options) throws IOException {
-			if (isLocalNetwork(options.getLocation())) {
+			if (isLocalNetworkAccessDenied(options.getLocation())) {
 				return StringPool.BLANK;
 			}
 
@@ -1288,7 +1301,7 @@ public class TemplateContextHelper {
 
 		@Override
 		public String URLtoString(String location) throws IOException {
-			if (isLocalNetwork(location)) {
+			if (isLocalNetworkAccessDenied(location)) {
 				return StringPool.BLANK;
 			}
 
@@ -1299,7 +1312,7 @@ public class TemplateContextHelper {
 		public String URLtoString(String location, boolean post)
 			throws IOException {
 
-			if (isLocalNetwork(location)) {
+			if (isLocalNetworkAccessDenied(location)) {
 				return StringPool.BLANK;
 			}
 
@@ -1308,7 +1321,7 @@ public class TemplateContextHelper {
 
 		@Override
 		public String URLtoString(URL url) throws IOException {
-			if (isLocalNetwork(url.toString())) {
+			if (isLocalNetworkAccessDenied(url.toString())) {
 				return StringPool.BLANK;
 			}
 
@@ -1340,6 +1353,17 @@ public class TemplateContextHelper {
 			return true;
 		}
 
+		protected boolean isLocalNetworkAccessDenied(String location)
+			throws IOException {
+
+			if (_disableLocalNetworkAccess && isLocalNetwork(location)) {
+				return true;
+			}
+
+			return false;
+		}
+
+		private final boolean _disableLocalNetworkAccess;
 		private final Http _http;
 
 	}
