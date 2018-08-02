@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -363,7 +364,7 @@ public class OAuth2ApplicationLocalServiceImpl
 			);
 		}
 
-		if ((scopeAliasesList == null) || scopeAliasesList.isEmpty()) {
+		if (ListUtil.isEmpty(scopeAliasesList)) {
 			oAuth2Application.setModifiedDate(new Date());
 			oAuth2Application.setOAuth2ApplicationScopeAliasesId(0);
 
