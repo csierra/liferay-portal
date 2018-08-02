@@ -133,22 +133,30 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 	@Override
 	public OAuth2ApplicationScopeAliases updateOAuth2ApplicationScopeAliases(
-		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases) {
+			long companyId, long userId, String userName,
+			long oAuth2ApplicationId, List<String> scopeAliasesList)
+		throws PortalException {
 
-		if (_hasUpToDateScopeGrants(oAuth2ApplicationScopeAliases)) {
-			return oAuth2ApplicationScopeAliases;
-		}
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+			oAuth2ApplicationScopeAliasesLocalService.
+				fetchOAuth2ApplicationScopeAliases(
+					oAuth2ApplicationId, scopeAliasesList);
 
-		try {
+		if (oAuth2ApplicationScopeAliases != null) {
+			if (_hasUpToDateScopeGrants(oAuth2ApplicationScopeAliases)) {
+				return oAuth2ApplicationScopeAliases;
+			}
+
 			return addOAuth2ApplicationScopeAliases(
-				oAuth2ApplicationScopeAliases.getCompanyId(),
-				oAuth2ApplicationScopeAliases.getUserId(),
-				oAuth2ApplicationScopeAliases.getUserName(),
+				companyId, userId, userName,
 				oAuth2ApplicationScopeAliases.getOAuth2ApplicationId(),
 				oAuth2ApplicationScopeAliases.getScopeAliasesList());
 		}
-		catch (PortalException pe) {
-			throw new IllegalArgumentException(pe);
+		else {
+			return oAuth2ApplicationScopeAliasesLocalService.
+				addOAuth2ApplicationScopeAliases(
+					companyId, userId, userName, oAuth2ApplicationId,
+					scopeAliasesList);
 		}
 	}
 
