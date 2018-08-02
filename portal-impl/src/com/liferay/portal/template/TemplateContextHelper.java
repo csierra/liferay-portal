@@ -1228,9 +1228,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", options.getLocation(),
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoByteArray(options);
@@ -1242,9 +1242,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", location,
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoByteArray(location);
@@ -1258,9 +1258,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", location,
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoByteArray(location, post);
@@ -1274,9 +1274,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", options.getLocation(),
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoInputStream(options);
@@ -1290,9 +1290,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", location,
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoInputStream(location);
@@ -1306,9 +1306,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", location,
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoInputStream(location, post);
@@ -1320,9 +1320,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", options.getLocation(),
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoString(options);
@@ -1334,9 +1334,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", location,
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoString(location);
@@ -1350,9 +1350,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", location,
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoString(location, post);
@@ -1364,9 +1364,9 @@ public class TemplateContextHelper {
 				throw new IOException(
 					StringBundler.concat(
 						"Denied access to resource ", url.toString(),
-						" using $httpUtil variable from a template. ",
-						"Please use restricted variable $httpUtilUnsafe ",
-						"to access local network."));
+						" using $httpUtil variable from a template. Please ",
+						"use restricted variable $httpUtilUnsafe to access ",
+						"local network."));
 			}
 
 			return _http.URLtoString(url);
