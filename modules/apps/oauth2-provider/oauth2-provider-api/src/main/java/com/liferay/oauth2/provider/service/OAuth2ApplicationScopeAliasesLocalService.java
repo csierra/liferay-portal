@@ -236,6 +236,10 @@ public interface OAuth2ApplicationScopeAliasesLocalService
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	public OAuth2ApplicationScopeAliases updateOAuth2ApplicationScopeAliases(
+		long companyId, long userId, String userName, long oAuth2ApplicationId,
+		List<String> scopeAliasesList) throws PortalException;
+
 	/**
 	* Updates the o auth2 application scope aliases in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*

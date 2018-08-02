@@ -271,6 +271,15 @@ public class OAuth2ApplicationScopeAliasesLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases updateOAuth2ApplicationScopeAliases(
+		long companyId, long userId, String userName, long oAuth2ApplicationId,
+		java.util.List<String> scopeAliasesList)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateOAuth2ApplicationScopeAliases(companyId, userId,
+			userName, oAuth2ApplicationId, scopeAliasesList);
+	}
+
 	/**
 	* Updates the o auth2 application scope aliases in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
