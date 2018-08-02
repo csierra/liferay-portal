@@ -375,14 +375,15 @@ public class OAuth2ApplicationLocalServiceImpl
 				fetchOAuth2ApplicationScopeAliases(
 					oAuth2ApplicationId, scopeAliasesList);
 
-		if ((oAuth2ApplicationScopeAliases != null) &&
-			!oAuth2ApplicationScopeAliasesLocalService.hasUpToDateScopeGrants(
-				oAuth2ApplicationScopeAliases)) {
+		if (oAuth2ApplicationScopeAliases != null) {
+			oAuth2ApplicationScopeAliases.setUserId(userId);
+			oAuth2ApplicationScopeAliases.setUserName(userName);
 
-			oAuth2ApplicationScopeAliases = null;
+			oAuth2ApplicationScopeAliasesLocalService.
+				updateOAuth2ApplicationScopeAliases(
+					oAuth2ApplicationScopeAliases);
 		}
-
-		if (oAuth2ApplicationScopeAliases == null) {
+		else {
 			oAuth2ApplicationScopeAliases =
 				oAuth2ApplicationScopeAliasesLocalService.
 					addOAuth2ApplicationScopeAliases(
