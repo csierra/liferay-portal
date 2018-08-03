@@ -352,6 +352,10 @@ public class OAuth2ApplicationLocalServiceImpl
 			oAuth2ApplicationPersistence.findByPrimaryKey(oAuth2ApplicationId);
 
 		if (ListUtil.isEmpty(scopeAliasesList)) {
+			if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() == 0) {
+				return oAuth2Application;
+			}
+
 			oAuth2Application.setModifiedDate(new Date());
 			oAuth2Application.setOAuth2ApplicationScopeAliasesId(0);
 
