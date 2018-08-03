@@ -132,7 +132,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
 
-		if ((scopeAliasesList != null) && !scopeAliasesList.isEmpty()) {
+		if (ListUtil.isNotEmpty(scopeAliasesList)) {
 			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
 				oAuth2ApplicationScopeAliasesLocalService.
 					addOAuth2ApplicationScopeAliases(
