@@ -39,14 +39,14 @@ public class OAuth2ApplicationScopeAliasesImpl
 
 	@Override
 	public void setScopeAliases(String scopeAliases) {
-		super.setScopeAliases(scopeAliases);
+		scopeAliases = StringUtil.merge(
+			ListUtil.sort(
+				ListUtil.filter(
+					ListUtil.fromString(scopeAliases, " "),
+					Validator::isNotNull)),
+			StringPool.SPACE);
 
-		if (scopeAliases != null) {
-			setScopeAliasesHash(scopeAliases.hashCode());
-		}
-		else {
-			setScopeAliasesHash(0);
-		}
+		_setScopeAliases(scopeAliases);
 	}
 
 	@Override
@@ -56,7 +56,18 @@ public class OAuth2ApplicationScopeAliasesImpl
 				ListUtil.filter(scopeAliasesList, Validator::isNotNull)),
 			StringPool.SPACE);
 
-		setScopeAliases(scopeAliases);
+		_setScopeAliases(scopeAliases);
+	}
+
+	private void _setScopeAliases(String scopeAliases) {
+		super.setScopeAliases(scopeAliases);
+
+		if (scopeAliases != null) {
+			setScopeAliasesHash(scopeAliases.hashCode());
+		}
+		else {
+			setScopeAliasesHash(0);
+		}
 	}
 
 }
