@@ -42,7 +42,7 @@ public class OAuth2ApplicationScopeAliasesImpl
 		scopeAliases = StringUtil.merge(
 			ListUtil.sort(
 				ListUtil.filter(
-					ListUtil.fromString(scopeAliases, " "),
+					ListUtil.fromString(scopeAliases, StringPool.SPACE),
 					Validator::isNotNull)),
 			StringPool.SPACE);
 
