@@ -371,9 +371,10 @@ public class OAuth2ApplicationLocalServiceImpl
 			oAuth2ApplicationScopeAliases.setUserId(userId);
 			oAuth2ApplicationScopeAliases.setUserName(userName);
 
-			oAuth2ApplicationScopeAliasesLocalService.
-				updateOAuth2ApplicationScopeAliases(
-					oAuth2ApplicationScopeAliases);
+			oAuth2ApplicationScopeAliases =
+				oAuth2ApplicationScopeAliasesLocalService.
+					updateOAuth2ApplicationScopeAliases(
+						oAuth2ApplicationScopeAliases);
 		}
 		else {
 			oAuth2ApplicationScopeAliases =
