@@ -39,14 +39,8 @@ public class OAuth2ApplicationScopeAliasesImpl
 
 	@Override
 	public void setScopeAliases(String scopeAliases) {
-		scopeAliases = StringUtil.merge(
-			ListUtil.sort(
-				ListUtil.filter(
-					ListUtil.fromString(scopeAliases, StringPool.SPACE),
-					Validator::isNotNull)),
-			StringPool.SPACE);
-
-		_setScopeAliases(scopeAliases);
+		setScopeAliasesList(
+			ListUtil.fromString(scopeAliases, StringPool.SPACE));
 	}
 
 	@Override
