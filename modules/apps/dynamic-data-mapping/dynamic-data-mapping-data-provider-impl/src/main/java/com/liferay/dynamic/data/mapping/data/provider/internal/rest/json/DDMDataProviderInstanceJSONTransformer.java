@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONTransformer;
 import com.liferay.portal.kernel.util.StringUtil;
+
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -37,40 +38,39 @@ public class DDMDataProviderInstanceJSONTransformer extends ObjectTransformer {
 
 	@Override
 	public void transform(JSONContext jsonContext, Object object) {
-		DDMDataProviderInstance dDMDataProviderInstance =
+		DDMDataProviderInstance ddmDataProviderInstance =
 			(DDMDataProviderInstance)object;
 
-		if (!StringUtil.equals(dDMDataProviderInstance.getType(), "rest")) {
+		if (!StringUtil.equals(ddmDataProviderInstance.getType(), "rest")) {
 			super.transform(jsonContext, object);
 
 			return;
 		}
 
-		String definition = dDMDataProviderInstance.getDefinition();
-
 		try {
-			JSONObject rootJSONObject = JSONFactoryUtil.createJSONObject(
-				definition);
+			JSONObject definitionJSONObject = JSONFactoryUtil.createJSONObject(
+				ddmDataProviderInstance.getDefinition());
 
-			JSONArray currentJSONArray = rootJSONObject.getJSONArray(
+			JSONArray fieldValuesJSONArray = definitionJSONObject.getJSONArray(
 				"fieldValues");
 
 			JSONArray newJSONArray = JSONFactoryUtil.createJSONArray();
 
-			for (int i = 0; i < currentJSONArray.length(); i++) {
-				JSONObject jsonObject = currentJSONArray.getJSONObject(i);
+			for (int i = 0; i < fieldValuesJSONArray.length(); i++) {
+				JSONObject fieldValueJSONObject =
+					fieldValuesJSONArray.getJSONObject(i);
 
-				Object name = jsonObject.get("name");
+				if (!StringUtil.equals(
+						fieldValueJSONObject.getString("name"), "password")) {
 
-				if (!name.equals("password")) {
-					newJSONArray.put(jsonObject);
+					newJSONArray.put(fieldValueJSONObject);
 				}
 			}
 
-			rootJSONObject.put("fieldValues", newJSONArray);
+			definitionJSONObject.put("fieldValues", newJSONArray);
 
-			dDMDataProviderInstance.setDefinition(
-				rootJSONObject.toJSONString());
+			ddmDataProviderInstance.setDefinition(
+				definitionJSONObject.toJSONString());
 		}
 		catch (JSONException jsone) {
 			throw new RuntimeException(jsone);
