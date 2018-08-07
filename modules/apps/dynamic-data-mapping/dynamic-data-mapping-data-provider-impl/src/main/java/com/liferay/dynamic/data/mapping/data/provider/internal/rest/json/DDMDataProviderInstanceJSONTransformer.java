@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.dynamic.data.mapping.internal.json;
+package com.liferay.dynamic.data.mapping.data.provider.internal.rest.json;
 
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.portal.json.transformer.ObjectTransformer;
@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONTransformer;
 import com.liferay.portal.kernel.util.StringUtil;
-
 import org.osgi.service.component.annotations.Component;
 
 /**
