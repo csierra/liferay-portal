@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONTransformer;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -39,6 +40,12 @@ public class DDMDataProviderInstanceJSONTransformer extends ObjectTransformer {
 	public void transform(JSONContext jsonContext, Object object) {
 		DDMDataProviderInstance dDMDataProviderInstance =
 			(DDMDataProviderInstance)object;
+
+		if (!StringUtil.equals(dDMDataProviderInstance.getType(), "rest")) {
+			super.transform(jsonContext, object);
+
+			return;
+		}
 
 		String definition = dDMDataProviderInstance.getDefinition();
 
