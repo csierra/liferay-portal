@@ -21,10 +21,18 @@ import com.liferay.portal.kernel.json.JSONContext;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONTransformer;
+
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Stian Sigvartsen
  */
+@Component(
+	immediate = true,
+	property = "model.class.name=com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance",
+	service = JSONTransformer.class
+)
 public class DDMDataProviderInstanceJSONTransformer extends ObjectTransformer {
 
 	@Override
