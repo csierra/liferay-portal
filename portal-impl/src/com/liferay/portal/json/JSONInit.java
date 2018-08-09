@@ -115,6 +115,8 @@ public class JSONInit {
 			(jsonContext, object) -> {
 				if (object == null) {
 					objectTypeJsonSerializer.serialize(jsonContext, object);
+
+					return;
 				}
 
 				Class<?> objectClass = object.getClass();
@@ -124,10 +126,12 @@ public class JSONInit {
 						JSONTransformer jsonTransformer =
 							_serviceTrackerMap.getService(modelClassName);
 
-						jsonTransformer.transform(
-							new JoddJSONContext(jsonContext), object);
+						if (jsonTransformer != null) {
+							jsonTransformer.transform(
+								new JoddJSONContext(jsonContext), object);
 
-						return;
+							return;
+						}
 					}
 				}
 
