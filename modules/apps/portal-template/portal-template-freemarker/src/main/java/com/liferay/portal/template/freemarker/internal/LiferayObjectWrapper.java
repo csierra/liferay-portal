@@ -131,7 +131,8 @@ public class LiferayObjectWrapper extends DefaultObjectWrapper {
 				if (_log.isInfoEnabled()) {
 					_log.info(
 						StringBundler.concat(
-							"Unable to find restricted class ", restrictedClassName,
+							"Unable to find restricted class ",
+							restrictedClassName,
 							". Registering as package name"),
 						cnfe);
 				}
