@@ -15,10 +15,12 @@
 package com.liferay.portal.layoutconfiguration.util.velocity;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.portlet.PortletContainerException;
 import com.liferay.portal.kernel.portlet.PortletContainerUtil;
 import com.liferay.portal.kernel.portlet.PortletJSONUtil;
 import com.liferay.portal.kernel.portlet.PortletProvider;
@@ -175,11 +177,16 @@ public class TemplateProcessor implements ColumnProcessor {
 		BufferCacheServletResponse bufferCacheServletResponse =
 			new BufferCacheServletResponse(_response);
 
-		PortletContainerUtil.renderHeaders(
-			_request, bufferCacheServletResponse, _portlet);
+		try {
+			PortletContainerUtil.renderHeaders(
+				_request, bufferCacheServletResponse, _portlet);
 
-		PortletContainerUtil.render(
-			_request, bufferCacheServletResponse, _portlet);
+			PortletContainerUtil.render(
+				_request, bufferCacheServletResponse, _portlet);
+		} catch (Exception e){
+			// Catch Initial Exception
+			throw e;
+		}
 
 		return bufferCacheServletResponse.getString();
 	}
