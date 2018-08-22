@@ -53,7 +53,9 @@ public class LiferayMethodExceptionEventHandler
 
 		_log.error(sb.toString(), e);
 
-		return null;
+		//return null;
+		throw e;
+
 	}
 
 	protected String getKeyValuePair(Class<?> clazz) {
