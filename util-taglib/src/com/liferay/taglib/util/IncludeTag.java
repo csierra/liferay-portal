@@ -224,9 +224,10 @@ public class IncludeTag extends AttributesTagSupport {
 
 			LogUtil.log(_log, e, message);
 
-			if (e instanceof JspException) {
+			/*if (e instanceof JspException) {
 				throw (JspException)e;
-			}
+			}*/
+			throw new JspException(e);
 		}
 	}
 
