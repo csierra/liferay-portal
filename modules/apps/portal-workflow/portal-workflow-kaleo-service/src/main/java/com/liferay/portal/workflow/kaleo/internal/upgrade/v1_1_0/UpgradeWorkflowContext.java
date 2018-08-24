@@ -14,6 +14,7 @@
 
 package com.liferay.portal.workflow.kaleo.internal.upgrade.v1_1_0;
 
+import com.liferay.portal.json.jabsorb.serializer.LiferayJSONSerializer;
 import com.liferay.portal.kernel.model.PortletPreferencesIds;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
@@ -52,7 +53,7 @@ public class UpgradeWorkflowContext extends UpgradeProcess {
 
 	protected JSONSerializer getJSONSerializer() throws Exception {
 		if (_jsonSerializer == null) {
-			_jsonSerializer = new JSONSerializer();
+			_jsonSerializer = new LiferayJSONSerializer();
 
 			_jsonSerializer.registerDefaultSerializers();
 
