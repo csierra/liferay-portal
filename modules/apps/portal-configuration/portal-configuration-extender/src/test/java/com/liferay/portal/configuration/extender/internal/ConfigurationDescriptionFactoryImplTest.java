@@ -36,7 +36,7 @@ public class ConfigurationDescriptionFactoryImplTest {
 		ConfigurationDescriptionFactory configurationDescriptionFactory =
 			new ConfigurationDescriptionFactoryImpl();
 
-		String configurationContent = "key=value\nanotherKey=anotherValue";
+		String configurationContent = "key=\"value\"\nanotherKey=\"anotherValue\"";
 
 		ConfigurationDescription configurationDescription =
 			configurationDescriptionFactory.create(
@@ -96,7 +96,7 @@ public class ConfigurationDescriptionFactoryImplTest {
 		ConfigurationDescriptionFactory configurationDescriptionFactory =
 			new ConfigurationDescriptionFactoryImpl();
 
-		String configurationContent = "key=value\nanotherKey=anotherValue";
+		String configurationContent = "key=\"value\"\nanotherKey=\"anotherValue\"";
 
 		ConfigurationDescription configurationDescription =
 			configurationDescriptionFactory.create(
