@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.apache.felix.cm.file.ConfigurationHandler;
 import org.apache.felix.utils.log.Logger;
 
 import org.jboss.arquillian.junit.Arquillian;
@@ -99,7 +100,7 @@ public class ConfiguratorExtensionTest {
 			_configurationAdmin, new Logger(_bundleContext), "aBundle",
 			Arrays.<NamedConfigurationContent>asList(
 				new StringSingleNamedConfigurationContent(
-					"test.pid", "key=value")),
+					"test.pid", "key=\"value\"")),
 			Arrays.asList(
 				new ConfigurationDescriptionFactory() {
 
@@ -139,7 +140,7 @@ public class ConfiguratorExtensionTest {
 		_startExtension(
 			"aBundle",
 			new StringFactoryNamedConfigurationContent(
-				"test.factory.pid", "default", "key=value"));
+				"test.factory.pid", "default", "key=\"value\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -164,7 +165,7 @@ public class ConfiguratorExtensionTest {
 		_startExtension(
 			"aBundle",
 			new StringFactoryNamedConfigurationContent(
-				"test.factory.pid", "default", "key=value2"));
+				"test.factory.pid", "default", "key=\"value2\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -186,9 +187,9 @@ public class ConfiguratorExtensionTest {
 		_startExtension(
 			"aBundle",
 			new StringFactoryNamedConfigurationContent(
-				"test.factory.pid", "default", "key=value"),
+				"test.factory.pid", "default", "key=\"value\""),
 			new StringFactoryNamedConfigurationContent(
-				"test.factory.pid", "default2", "key=value"));
+				"test.factory.pid", "default2", "key=\"value\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -204,9 +205,9 @@ public class ConfiguratorExtensionTest {
 		_startExtension(
 			"aBundle",
 			new StringFactoryNamedConfigurationContent(
-				"test.factory.pid", "default", "key=value"),
+				"test.factory.pid", "default", "key=\"value\""),
 			new StringFactoryNamedConfigurationContent(
-				"test.factory.pid", "default", "key=value2"));
+				"test.factory.pid", "default", "key=\"value2\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -227,12 +228,12 @@ public class ConfiguratorExtensionTest {
 		_startExtension(
 			"aBundle",
 			new StringFactoryNamedConfigurationContent(
-				"test.factory.pid", "default", "key=value"));
+				"test.factory.pid", "default", "key=\"value\""));
 
 		_startExtension(
 			"otherBundle",
 			new StringFactoryNamedConfigurationContent(
-				"test.factory.pid", "default", "key=value"));
+				"test.factory.pid", "default", "key=\"value\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -245,7 +246,7 @@ public class ConfiguratorExtensionTest {
 	public void testSingleConfiguration() throws Exception {
 		_startExtension(
 			"aBundle",
-			new StringSingleNamedConfigurationContent("test.pid", "key=value"));
+			new StringSingleNamedConfigurationContent("test.pid", "key=\"value\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -271,7 +272,7 @@ public class ConfiguratorExtensionTest {
 		_startExtension(
 			"aBundle",
 			new StringSingleNamedConfigurationContent(
-				"test.pid", "key=value2"));
+				"test.pid", "key=\"value2\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -291,9 +292,9 @@ public class ConfiguratorExtensionTest {
 
 		_startExtension(
 			"aBundle",
-			new StringSingleNamedConfigurationContent("test.pid", "key=value"),
+			new StringSingleNamedConfigurationContent("test.pid", "key=\"value\""),
 			new StringSingleNamedConfigurationContent(
-				"test.pid", "key=value2"));
+				"test.pid", "key=\"value2\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -313,12 +314,12 @@ public class ConfiguratorExtensionTest {
 
 		_startExtension(
 			"aBundle",
-			new StringSingleNamedConfigurationContent("test.pid", "key=value"));
+			new StringSingleNamedConfigurationContent("test.pid", "key=\"value\""));
 
 		_startExtension(
 			"otherBundle",
 			new StringSingleNamedConfigurationContent(
-				"test.pid", "key=value2"));
+				"test.pid", "key=\"value2\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -336,9 +337,9 @@ public class ConfiguratorExtensionTest {
 	public void testSingleConfigurationWithMultipleContents() throws Exception {
 		_startExtension(
 			"aBundle",
-			new StringSingleNamedConfigurationContent("test.pid", "key=value"),
+			new StringSingleNamedConfigurationContent("test.pid", "key=\"value\""),
 			new StringSingleNamedConfigurationContent(
-				"test.pid2", "key=value"));
+				"test.pid2", "key=\"value\""));
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			null);
@@ -393,8 +394,8 @@ public class ConfiguratorExtensionTest {
 						public Dictionary<String, Object> get() {
 							try {
 								Dictionary<?, ?> properties =
-									PropertiesUtil.load(
-										ssncc.getInputStream(), "UTF-8");
+									ConfigurationHandler.read(
+										ssncc.getInputStream());
 
 								return (Dictionary<String, Object>)properties;
 							}
@@ -418,8 +419,8 @@ public class ConfiguratorExtensionTest {
 						public Dictionary<String, Object> get() {
 							try {
 								Dictionary<?, ?> properties =
-									PropertiesUtil.load(
-										sfncc.getInputStream(), "UTF-8");
+									ConfigurationHandler.read(
+										sfncc.getInputStream());
 
 								return (Dictionary<String, Object>)properties;
 							}

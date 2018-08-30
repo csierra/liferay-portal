@@ -14,7 +14,6 @@
 
 package com.liferay.portal.configuration.extender.internal;
 
-import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.Supplier;
 
 import java.io.IOException;
@@ -22,6 +21,7 @@ import java.io.InputStream;
 
 import java.util.Dictionary;
 
+import org.apache.felix.cm.file.ConfigurationHandler;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -87,8 +87,8 @@ public class ConfigurationDescriptionFactoryImpl
 		private Dictionary<String, Object> _loadProperties()
 			throws IOException {
 
-			Dictionary<?, ?> properties = PropertiesUtil.load(
-				_inputStream, "UTF-8");
+			Dictionary<?, ?> properties = ConfigurationHandler.read(
+				_inputStream);
 
 			return (Dictionary<String, Object>)properties;
 		}

@@ -64,6 +64,9 @@ public class ConfiguratorExtension implements Extension {
 			catch (IOException ioe) {
 				continue;
 			}
+			catch (RuntimeException re) {
+				continue;
+			}
 		}
 	}
 
