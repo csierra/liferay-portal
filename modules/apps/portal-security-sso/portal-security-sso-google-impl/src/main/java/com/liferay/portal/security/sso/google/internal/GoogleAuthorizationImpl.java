@@ -401,7 +401,7 @@ public class GoogleAuthorizationImpl implements GoogleAuthorization {
 		Company company = _companyLocalService.getCompany(companyId);
 		
 		if (!company.isStrangers()) {
-			throw new StrangersNotAllowedException();
+			throw new StrangersNotAllowedException(companyId);
 		}		
 		
 		String emailAddress = userinfoplus.getEmail();
