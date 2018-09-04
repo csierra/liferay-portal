@@ -26,18 +26,24 @@ import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.CompanyMxException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.UserEmailAddressException;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServiceBeanMethodInvocationFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -46,7 +52,11 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.sso.google.GoogleAuthorization;
 import com.liferay.portal.security.sso.google.configuration.GoogleAuthorizationConfiguration;
 import com.liferay.portal.security.sso.google.constants.GoogleConstants;
+import com.liferay.portal.security.sso.google.exception.StrangersNotAllowedException;
 import com.liferay.portal.security.sso.google.internal.constants.GoogleWebKeys;
+import com.liferay.portal.util.PrefsPropsUtil;
+import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.lang.reflect.Method;
 
@@ -55,6 +65,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import javax.portlet.PortletPreferences;
 import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Component;
@@ -252,6 +263,7 @@ public class GoogleAuthorizationImpl implements GoogleAuthorization {
 			user = updateUser(user, userinfoplus);
 		}
 		else {
+			_checkAllowUserCreation(companyId, userinfoplus);
 			user = addUser(companyId, userinfoplus);
 
 			session.setAttribute(
@@ -382,6 +394,26 @@ public class GoogleAuthorizationImpl implements GoogleAuthorization {
 			contact.getJobTitle(), groupIds, organizationIds, roleIds,
 			userGroupRoles, userGroupIds, serviceContext);
 	}
+	
+	private void _checkAllowUserCreation(long companyId, Userinfoplus userinfoplus) 
+		throws PortalException {
+		
+		Company company = _companyLocalService.getCompany(companyId);
+		
+		if (!company.isStrangers()) {
+			throw new StrangersNotAllowedException();
+		}		
+		
+		String emailAddress = userinfoplus.getEmail();
+
+		if (company.hasCompanyMx(emailAddress)) {
+
+			if (!company.isStrangersWithMx()) {
+				throw new UserEmailAddressException.MustNotUseCompanyMx(
+					emailAddress);
+			}
+		}
+	}
 
 	private static final String _ONLINE_ACCESS_TYPE = "online";
 
@@ -392,5 +424,8 @@ public class GoogleAuthorizationImpl implements GoogleAuthorization {
 
 	@Reference
 	private UserLocalService _userLocalService;
+	
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
 }
