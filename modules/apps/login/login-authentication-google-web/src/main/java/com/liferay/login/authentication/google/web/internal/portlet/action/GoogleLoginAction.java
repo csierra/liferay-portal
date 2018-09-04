@@ -35,6 +35,7 @@ import com.liferay.portal.security.sso.google.GoogleAuthorization;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.portlet.MutableRenderParameters;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -141,8 +142,12 @@ public class GoogleLoginAction extends BaseStrutsAction {
 		PortletURL portletURL = PortletURLFactoryUtil.create(
 			request, PortletKeys.LOGIN, PortletRequest.RENDER_PHASE);
 
-		portletURL.setParameter(
+		MutableRenderParameters renderParameters =
+			portletURL.getRenderParameters();
+
+		renderParameters.setValue(
 			"mvcRenderCommandName", "/login/google_login_error");
+
 		portletURL.setWindowState(LiferayWindowState.POP_UP);
 
 		response.sendRedirect(portletURL.toString());
