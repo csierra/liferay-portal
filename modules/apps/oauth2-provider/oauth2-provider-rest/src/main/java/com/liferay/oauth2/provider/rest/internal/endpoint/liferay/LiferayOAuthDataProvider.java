@@ -317,33 +317,6 @@ public class LiferayOAuthDataProvider
 	}
 
 	@Override
-	public Client getClient(String clientId) {
-		long companyId = CompanyThreadLocal.getCompanyId();
-
-		OAuth2Application oAuth2Application =
-			_oAuth2ApplicationLocalService.fetchOAuth2Application(
-				companyId, clientId);
-
-		if (oAuth2Application == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					StringBundler.concat(
-						"Remote client ", _getRemoteIP(),
-						" tried to use a nonexistent OAuth 2 client ID ",
-						clientId));
-			}
-
-			return null;
-		}
-
-		MessageContext messageContext = getMessageContext();
-
-		messageContext.put(OAuthConstants.CLIENT_ID, clientId);
-
-		return populateClient(oAuth2Application);
-	}
-
-	@Override
 	public List<Client> getClients(UserSubject resourceOwner) {
 		throw new UnsupportedOperationException();
 	}
@@ -732,6 +705,33 @@ public class LiferayOAuthDataProvider
 		userSubject.setLogin(refreshToken.getUserName());
 
 		return cxfRefreshToken;
+	}
+
+	@Override
+	protected Client doGetClient(String clientId) {
+		long companyId = CompanyThreadLocal.getCompanyId();
+
+		OAuth2Application oAuth2Application =
+			_oAuth2ApplicationLocalService.fetchOAuth2Application(
+				companyId, clientId);
+
+		if (oAuth2Application == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					StringBundler.concat(
+						"Remote client ", _getRemoteIP(),
+						" tried to use a nonexistent OAuth 2 client ID ",
+						clientId));
+			}
+
+			return null;
+		}
+
+		MessageContext messageContext = getMessageContext();
+
+		messageContext.put(OAuthConstants.CLIENT_ID, clientId);
+
+		return populateClient(oAuth2Application);
 	}
 
 	@Override
