@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.internal.upgrade;
 
 import com.liferay.oauth2.provider.internal.upgrade.v1_1_0.UpgradeOAuth2ScopeGrant;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
+import com.liferay.registry.Registry;
 
 import org.osgi.service.component.annotations.Component;
 
