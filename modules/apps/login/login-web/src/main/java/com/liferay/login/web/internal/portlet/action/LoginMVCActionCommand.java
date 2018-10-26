@@ -152,6 +152,8 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			}
 
 			postProcessAuthFailure(actionRequest, actionResponse);
+
+			hideDefaultErrorMessage(actionRequest);
 		}
 	}
 
