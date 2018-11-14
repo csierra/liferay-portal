@@ -59,7 +59,7 @@ public class AuditStorageServiceBundleActivator implements BundleActivator {
 
 								@Override
 								protected String getOldBundleSymbolicName() {
-									return "audit-portle";
+									return "audit-portlet";
 								}
 
 							};
