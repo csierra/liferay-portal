@@ -27,9 +27,7 @@ public class AuditStorageServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
-		registry.register(
-			"com.liferay.portal.security.audit.storage.service", "0.0.1",
-			"1.0.0", new DummyUpgradeStep());
+		registry.register("0.0.1", "1.0.0", new DummyUpgradeStep());
 	}
 
 }
