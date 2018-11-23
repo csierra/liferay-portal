@@ -33,6 +33,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -98,18 +100,31 @@ public abstract class BaseClientTestCase {
 		String login, String password, String hostname) {
 
 		Invocation.Builder invocationBuilder = getInvocationBuilder(
-			hostname, getLoginWebTarget());
+			hostname, getPortalWebTarget());
+
+		Response response = invocationBuilder.get();
+
+		String pAuthToken = parsePAuthToken(response);
+
+		Map<String, NewCookie> cookies = response.getCookies();
+
+		NewCookie cookie = cookies.get(CookieKeys.JSESSIONID);
+
+		invocationBuilder = getInvocationBuilder(hostname, getLoginWebTarget());
+
+		invocationBuilder.cookie(cookie);
 
 		MultivaluedMap<String, String> formData = new MultivaluedHashMap<>();
 
 		formData.add("login", login);
 		formData.add("password", password);
+		formData.add("p_auth", pAuthToken);
 
-		Response response = invocationBuilder.post(Entity.form(formData));
+		response = invocationBuilder.post(Entity.form(formData));
 
-		Map<String, NewCookie> cookies = response.getCookies();
+		cookies = response.getCookies();
 
-		NewCookie cookie = cookies.get(CookieKeys.JSESSIONID);
+		cookie = cookies.get(CookieKeys.JSESSIONID);
 
 		if (cookie == null) {
 			return null;
@@ -408,6 +423,12 @@ public abstract class BaseClientTestCase {
 		return webTarget;
 	}
 
+	protected WebTarget getPortalWebTarget() {
+		Client client = getClient();
+
+		return client.target(_getPortalURL());
+	}
+
 	protected BiFunction<String, Invocation.Builder, Response>
 		getResourceOwnerPasswordBiFunction(String userName, String password) {
 
@@ -555,6 +576,16 @@ public abstract class BaseClientTestCase {
 		}
 	}
 
+	protected String parsePAuthToken(Response response) {
+		String bodyContent = response.readEntity(String.class);
+
+		Matcher matcher = _pAuthTokenPattern.matcher(bodyContent);
+
+		matcher.find();
+
+		return matcher.group(1);
+	}
+
 	protected String parseScopeString(Response response) {
 		return parseJsonField(response, "scope");
 	}
@@ -571,6 +602,9 @@ public abstract class BaseClientTestCase {
 			throw new RuntimeException(urise);
 		}
 	}
+
+	private static final Pattern _pAuthTokenPattern = Pattern.compile(
+		"Liferay.authToken\\s*=\\s*'([^']*)';");
 
 	@ArquillianResource
 	private URL _url;
