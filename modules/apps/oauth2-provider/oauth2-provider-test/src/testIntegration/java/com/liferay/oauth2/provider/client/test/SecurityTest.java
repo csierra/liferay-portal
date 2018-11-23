@@ -91,7 +91,6 @@ public class SecurityTest extends BaseClientTestCase {
 	/**
 	 * OAUTH2-96
 	 */
-	@Ignore
 	@Test
 	public void testPreventCSRFUsingPKCE() {
 		String authorizationCode = getCodeResponse(
@@ -120,7 +119,6 @@ public class SecurityTest extends BaseClientTestCase {
 	/**
 	 * OAUTH2-96
 	 */
-	@Ignore
 	@Test
 	public void testPreventCSRFUsingStateParam() {
 		String state = "csrf_token";
@@ -143,7 +141,6 @@ public class SecurityTest extends BaseClientTestCase {
 	/**
 	 * OAUTH2-97
 	 */
-	@Ignore
 	@Test
 	public void testPreventOpenRedirect() {
 		Assert.assertEquals(
@@ -161,7 +158,6 @@ public class SecurityTest extends BaseClientTestCase {
 				this::parseError));
 	}
 
-	@Ignore
 	@Test
 	public void testRedirectUriMustMatch() {
 		String authorizationCode = getCodeResponse(
