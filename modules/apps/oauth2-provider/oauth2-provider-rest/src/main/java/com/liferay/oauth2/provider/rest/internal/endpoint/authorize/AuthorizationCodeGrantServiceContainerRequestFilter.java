@@ -125,8 +125,15 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 
 		URI requestURI = uriInfo.getRequestUri();
 
-		loginURL = _http.addParameter(
-			loginURL, "redirect", requestURI.toASCIIString());
+		String requestURIStr = requestURI.toASCIIString();
+
+		String portalURL = _portal.getPortalURL(_httpServletRequest);
+
+		if (requestURIStr.startsWith(portalURL)) {
+			requestURIStr = requestURIStr.substring(portalURL.length());
+		}
+
+		loginURL = _http.addParameter(loginURL, "redirect", requestURIStr);
 
 		containerRequestContext.abortWith(
 			Response.status(
