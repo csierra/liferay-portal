@@ -22,6 +22,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 
+import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
@@ -30,6 +31,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	property = {
+		Constants.SERVICE_RANKING + ":Integer=" + (Integer.MAX_VALUE - 10),
 		"osgi.jaxrs.application.select=(component.name=com.liferay.oauth2.provider.rest.internal.endpoint.OAuth2EndpointApplication)",
 		"osgi.jaxrs.extension=true", "osgi.jaxrs.name=OAuthJSONProvider"
 	},
