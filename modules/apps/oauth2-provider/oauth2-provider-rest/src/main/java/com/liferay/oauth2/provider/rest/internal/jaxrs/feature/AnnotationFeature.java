@@ -118,8 +118,8 @@ public class AnnotationFeature implements Feature {
 			RequiresNoScope requiresNoScope = resourceMethod.getAnnotation(
 				RequiresNoScope.class);
 
-			RequiresScope requiresScope = resourceMethod.getAnnotation(
-				RequiresScope.class);
+			RequiresScope requiresScope =
+				RequiresScopeAnnotationFinder.getRequiresScope(resourceMethod);
 
 			if ((requiresNoScope != null) && (requiresScope != null)) {
 				StringBundler sb = new StringBundler(6);
@@ -149,7 +149,8 @@ public class AnnotationFeature implements Feature {
 			requiresNoScope = resourceClass.getAnnotation(
 				RequiresNoScope.class);
 
-			requiresScope = resourceClass.getAnnotation(RequiresScope.class);
+			requiresScope = RequiresScopeAnnotationFinder.getRequiresScope(
+				resourceClass);
 
 			if ((requiresNoScope != null) && (requiresScope != null)) {
 				StringBundler sb = new StringBundler(4);
