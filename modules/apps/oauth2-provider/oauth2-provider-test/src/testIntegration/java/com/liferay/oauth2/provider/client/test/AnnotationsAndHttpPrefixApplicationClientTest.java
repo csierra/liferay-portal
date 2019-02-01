@@ -104,7 +104,7 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 				new HashMapDictionary<>();
 
 			annotatedApplicationProperties.put(
-				"oauth2.scopechecker.type", "annotations");
+				"oauth2.scope.checker.type", "annotations");
 			annotatedApplicationProperties.put("prefix", "annotations");
 			annotatedApplicationProperties.put(
 				"osgi.jaxrs.name", TestAnnotatedApplication.class.getName());

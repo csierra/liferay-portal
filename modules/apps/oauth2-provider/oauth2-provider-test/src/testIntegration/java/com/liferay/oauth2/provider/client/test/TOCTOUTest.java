@@ -229,7 +229,7 @@ public class TOCTOUTest extends BaseClientTestCase {
 
 			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
-			properties.put("oauth2.scopechecker.type", "annotations");
+			properties.put("oauth2.scope.checker.type", "annotations");
 
 			registerJaxRsApplication(
 				new TestRunnablePostHandlingApplication(

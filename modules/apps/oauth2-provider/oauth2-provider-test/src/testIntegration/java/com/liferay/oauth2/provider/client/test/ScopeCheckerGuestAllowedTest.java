@@ -94,7 +94,7 @@ public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
 			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 			properties.put("auth.verifier.guest.allowed", true);
-			properties.put("oauth2.scopechecker.type", "annotations");
+			properties.put("oauth2.scope.checker.type", "annotations");
 
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated-guest-allowed",
@@ -102,7 +102,7 @@ public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
 
 			properties = new HashMapDictionary<>();
 
-			properties.put("oauth2.scopechecker.type", "annotations");
+			properties.put("oauth2.scope.checker.type", "annotations");
 
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated-guest-default",
@@ -111,7 +111,7 @@ public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
 			properties = new HashMapDictionary<>();
 
 			properties.put("auth.verifier.guest.allowed", false);
-			properties.put("oauth2.scopechecker.type", "annotations");
+			properties.put("oauth2.scope.checker.type", "annotations");
 
 			registerJaxRsApplication(
 				new TestAnnotatedApplication(), "annotated-guest-not-allowed",
@@ -140,14 +140,14 @@ public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
 			properties = new HashMapDictionary<>();
 
 			properties.put("auth.verifier.guest.allowed", true);
-			properties.put("oauth2.scopechecker.type", "http.method");
+			properties.put("oauth2.scope.checker.type", "http.method");
 
 			registerJaxRsApplication(
 				new TestApplication(), "methods-guest-allowed", properties);
 
 			properties = new HashMapDictionary<>();
 
-			properties.put("oauth2.scopechecker.type", "http.method");
+			properties.put("oauth2.scope.checker.type", "http.method");
 
 			registerJaxRsApplication(
 				new TestApplication(), "methods-guest-default", properties);
@@ -155,7 +155,7 @@ public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
 			properties = new HashMapDictionary<>();
 
 			properties.put("auth.verifier.guest.allowed", false);
-			properties.put("oauth2.scopechecker.type", "http.method");
+			properties.put("oauth2.scope.checker.type", "http.method");
 
 			registerJaxRsApplication(
 				new TestApplication(), "methods-guest-not-allowed", properties);

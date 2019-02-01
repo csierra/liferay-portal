@@ -82,7 +82,7 @@ public class AnnotationsAndHttpApplicationClientTest
 				new HashMapDictionary<>();
 
 			annotatedApplicationProperties.put(
-				"oauth2.scopechecker.type", "annotations");
+				"oauth2.scope.checker.type", "annotations");
 
 			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
