@@ -15,7 +15,6 @@
 package com.liferay.portal.servlet.filters.secure;
 
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
-import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
@@ -69,16 +68,7 @@ public class NonceUtil {
 
 	@SuppressWarnings("unused")
 	private static void _addNonce(NonceDelayed nonceDelayed) {
-		boolean enabled = ClusterInvokeThreadLocal.isEnabled();
-
-		ClusterInvokeThreadLocal.setEnabled(true);
-
-		try {
-			_nonceDelayQueue.put(nonceDelayed);
-		}
-		finally {
-			ClusterInvokeThreadLocal.setEnabled(enabled);
-		}
+		_nonceDelayQueue.put(nonceDelayed);
 	}
 
 	private static void _addNonceAndNotify(NonceDelayed nonceDelayed) {
@@ -110,16 +100,7 @@ public class NonceUtil {
 	private static boolean _removeNonce(NonceDelayed nonceDelayed) {
 		_cleanUp();
 
-		boolean enabled = ClusterInvokeThreadLocal.isEnabled();
-
-		ClusterInvokeThreadLocal.setEnabled(true);
-
-		try {
-			return _nonceDelayQueue.remove(nonceDelayed);
-		}
-		finally {
-			ClusterInvokeThreadLocal.setEnabled(enabled);
-		}
+		return _nonceDelayQueue.remove(nonceDelayed);
 	}
 
 	private static boolean _removeNonceAndNotify(NonceDelayed nonceDelayed) {
