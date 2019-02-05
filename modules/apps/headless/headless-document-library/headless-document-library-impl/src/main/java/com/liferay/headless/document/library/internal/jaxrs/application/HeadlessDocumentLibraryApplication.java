@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Component;
 		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.Vulcan.PaginationContextProvider)",
 		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.Vulcan.PortalExceptionMapper)",
 		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.Vulcan.PrincipalExceptionMapper)",
-		"osgi.jaxrs.name=headless-document-library-application.rest"
+		"osgi.jaxrs.name=headless-document-library-application"
 	},
 	service = Application.class
 )
