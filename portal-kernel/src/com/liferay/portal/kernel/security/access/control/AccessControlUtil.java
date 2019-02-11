@@ -16,6 +16,8 @@ package com.liferay.portal.kernel.security.access.control;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.internal.security.access.control.AllowedIPAddressesValidator;
+import com.liferay.portal.kernel.internal.security.access.control.AllowedIPAddressesValidatorFactory;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
@@ -66,8 +68,13 @@ public class AccessControlUtil {
 
 		String remoteAddr = request.getRemoteAddr();
 
-		if (hostsAllowed.contains(remoteAddr)) {
-			return true;
+		for (String hostAllowed : hostsAllowed) {
+			AllowedIPAddressesValidator allowedIPAddressesValidator =
+				AllowedIPAddressesValidatorFactory.create(hostAllowed);
+
+			if (allowedIPAddressesValidator.isAllowedIPAddress(remoteAddr)) {
+				return true;
+			}
 		}
 
 		Set<String> computerAddresses = PortalUtil.getComputerAddresses();
