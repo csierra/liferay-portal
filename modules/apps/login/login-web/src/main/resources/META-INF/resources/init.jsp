@@ -96,7 +96,8 @@ page import="com.liferay.portal.security.auth.ScreenNameValidatorFactory" %><%@
 page import="com.liferay.portal.util.PropsValues" %>
 
 <%@ page import="java.util.Calendar" %><%@
-page import="java.util.Date" %>
+page import="java.util.Date" %><%@
+page import="java.util.TimeZone" %>
 
 <%@ page import="javax.portlet.WindowState" %>
 
