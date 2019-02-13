@@ -394,7 +394,8 @@ public class ScopeLocatorImplTest extends PowerMockito {
 
 			if (!_prefixHandlerFactoriesInitialized) {
 				withPrefixHandlerFactories(
-					propertyAccessor -> PrefixHandler.PASS_THROUGH_PREFIX_HANDLER,
+					propertyAccessor ->
+						PrefixHandler.PASS_THROUGH_PREFIX_HANDLER,
 					registrator -> {
 					});
 			}
