@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -97,7 +96,7 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 	public PrefixHandler create(
 		Function<String, Object> propertyAccessorFunction) {
 
-		return _prefixHandler;
+		return PrefixHandler.PASS_THROUGH_PREFIX_HANDLER;
 	}
 
 	@Override
@@ -155,8 +154,7 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 				"https://analytics.liferay.com", 0, _APPLICATION_NAME, null,
 				Collections.singletonList(
 					"https://analytics.liferay.com/oauth/receive"),
-				ListUtil.toList(_scopeAliasesList, _prefixHandler::addPrefix),
-				new ServiceContext());
+				_scopeAliasesList, new ServiceContext());
 
 		Class<?> clazz = getClass();
 
