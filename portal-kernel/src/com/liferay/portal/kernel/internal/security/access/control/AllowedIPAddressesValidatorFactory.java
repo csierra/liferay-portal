@@ -158,21 +158,20 @@ public final class AllowedIPAddressesValidatorFactory {
 
 			_allowedIpAddressBytes = _allowedIpAddress.getAddress();
 
-			if (_hasNetmaskFilter(ipAddressAndNetmask)) {
-				String maskFilter = GetterUtil.getString(
-					ipAddressAndNetmask[1]);
+			if (_hasNetmask(ipAddressAndNetmask)) {
+				String netmask = GetterUtil.getString(ipAddressAndNetmask[1]);
 
-				if (Validator.isNumber(maskFilter)) {
-					_netmask = _getNetmaskFromCIDR(maskFilter);
+				if (Validator.isNumber(netmask)) {
+					_netmask = _getNetmaskFromCIDR(netmask);
 				}
 				else {
-					_netmask = _getNetmaskFromDotNotation(maskFilter);
+					_netmask = _getNetmaskFromDotNotation(netmask);
 				}
 			}
 		}
 
-		private byte[] _getNetmaskFromCIDR(String maskFilter) {
-			int cidr = GetterUtil.getInteger(maskFilter);
+		private byte[] _getNetmaskFromCIDR(String netmask) {
+			int cidr = GetterUtil.getInteger(netmask);
 
 			int netmaskBytes = cidr / 8;
 
@@ -190,15 +189,15 @@ public final class AllowedIPAddressesValidatorFactory {
 			return bytesNetmask;
 		}
 
-		private byte[] _getNetmaskFromDotNotation(String maskFilter)
+		private byte[] _getNetmaskFromDotNotation(String netmask)
 			throws UnknownHostException {
 
-			InetAddress inetAddress = InetAddress.getByName(maskFilter);
+			InetAddress inetAddress = InetAddress.getByName(netmask);
 
 			return inetAddress.getAddress();
 		}
 
-		private boolean _hasNetmaskFilter(String[] ipAddressAndNetmask) {
+		private boolean _hasNetmask(String[] ipAddressAndNetmask) {
 			if (ipAddressAndNetmask.length > 1) {
 				return true;
 			}
