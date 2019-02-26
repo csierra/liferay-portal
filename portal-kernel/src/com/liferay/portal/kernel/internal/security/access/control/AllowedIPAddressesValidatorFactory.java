@@ -82,19 +82,6 @@ public final class AllowedIPAddressesValidatorFactory {
 			return new byte[4];
 		}
 
-		@Override
-		public boolean isValidCIDRNetmask(int cidrNetmask) {
-			if ((cidrNetmask >= 0) && (cidrNetmask <= 32)) {
-				return true;
-			}
-
-			return false;
-		}
-
-		@Override
-		public boolean isValidDotNotationNetmask(String dotNotationNetmask) {
-			return Validator.isIPv4Address(dotNotationNetmask);
-		}
 
 	}
 
@@ -104,20 +91,6 @@ public final class AllowedIPAddressesValidatorFactory {
 		@Override
 		public byte[] getEmptyNetmask() {
 			return new byte[16];
-		}
-
-		@Override
-		public boolean isValidCIDRNetmask(int cidrNetmask) {
-			if ((cidrNetmask >= 0) && (cidrNetmask <= 128)) {
-				return true;
-			}
-
-			return false;
-		}
-
-		@Override
-		public boolean isValidDotNotationNetmask(String dotNotationNetmask) {
-			return Validator.isIPv6Address(dotNotationNetmask);
 		}
 
 		protected AllowedIPv6AddressesValidator(
@@ -173,11 +146,6 @@ public final class AllowedIPAddressesValidatorFactory {
 
 			return false;
 		}
-
-		protected abstract boolean isValidCIDRNetmask(int cidrNetmask);
-
-		protected abstract boolean isValidDotNotationNetmask(
-			String dotNotationNetmask);
 
 		private BaseAllowedIPAddressesValidator(
 				InetAddress inetAddress, String[] ipAddressAndNetmask)
