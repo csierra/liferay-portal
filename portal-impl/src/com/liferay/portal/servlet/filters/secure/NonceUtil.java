@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.Time;
@@ -106,7 +107,7 @@ public class NonceUtil {
 		while (!clusterResponses.isEmpty()) {
 			ClusterNodeResponse clusterNodeResponse = clusterResponses.poll();
 
-			if ((boolean)clusterNodeResponse.getResult()) {
+			if (GetterUtil.getBoolean(clusterNodeResponse.getResult())) {
 				return true;
 			}
 		}
