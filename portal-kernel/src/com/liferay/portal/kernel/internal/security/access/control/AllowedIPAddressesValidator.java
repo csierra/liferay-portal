@@ -26,7 +26,7 @@ public interface AllowedIPAddressesValidator {
 
 	public boolean isSameProtocol(byte[] ipAddressBytes);
 
-	public boolean isValidCIDRNetmask(int cidr);
+	public boolean isValidCIDRNetmask(int cidrNetmask);
 
 	public boolean isValidDotNotationNetmask(String dotNotationNetmask);
 
