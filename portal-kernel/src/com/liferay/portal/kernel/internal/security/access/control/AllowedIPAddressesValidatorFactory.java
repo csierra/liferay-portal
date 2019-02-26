@@ -193,9 +193,9 @@ public final class AllowedIPAddressesValidatorFactory {
 		private byte[] _getNetmaskFromDotNotation(String maskFilter)
 			throws UnknownHostException {
 
-			InetAddress address = InetAddress.getByName(maskFilter);
+			InetAddress inetAddress = InetAddress.getByName(maskFilter);
 
-			return address.getAddress();
+			return inetAddress.getAddress();
 		}
 
 		private boolean _hasNetmaskFilter(String[] ipAddressAndNetmask) {
