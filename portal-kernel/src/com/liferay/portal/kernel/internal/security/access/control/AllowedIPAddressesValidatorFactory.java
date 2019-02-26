@@ -31,6 +31,10 @@ import java.net.UnknownHostException;
 public final class AllowedIPAddressesValidatorFactory {
 
 	public static AllowedIPAddressesValidator create(String filter) {
+		if (Validator.isNull(filter)) {
+			return _NULL_IP_ADDRESS_VALIDATOR;
+		}
+
 		String[] ipAddressAndNetmask = StringUtil.split(
 			filter, StringPool.SLASH);
 
