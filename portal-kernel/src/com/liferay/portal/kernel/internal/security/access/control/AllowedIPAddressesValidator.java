@@ -20,14 +20,6 @@ package com.liferay.portal.kernel.internal.security.access.control;
 */
 public interface AllowedIPAddressesValidator {
 
-	public byte[] getEmptyNetmask();
-
 	public boolean isAllowedIPAddress(String ipAddress);
-
-	public boolean isSameProtocol(byte[] ipAddressBytes);
-
-	public boolean isValidCIDRNetmask(int cidrNetmask);
-
-	public boolean isValidDotNotationNetmask(String dotNotationNetmask);
 
 }

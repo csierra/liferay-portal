@@ -68,27 +68,7 @@ public final class AllowedIPAddressesValidatorFactory {
 		implements AllowedIPAddressesValidator {
 
 		@Override
-		public byte[] getEmptyNetmask() {
-			return new byte[0];
-		}
-
-		@Override
 		public boolean isAllowedIPAddress(String ipAddress) {
-			return false;
-		}
-
-		@Override
-		public boolean isSameProtocol(byte[] ipAddressBytes) {
-			return false;
-		}
-
-		@Override
-		public boolean isValidCIDRNetmask(int cidrNetmask) {
-			return false;
-		}
-
-		@Override
-		public boolean isValidDotNotationNetmask(String dotNotationNetmask) {
 			return false;
 		}
 
@@ -191,8 +171,9 @@ public final class AllowedIPAddressesValidatorFactory {
 			return true;
 		}
 
-		@Override
-		public boolean isSameProtocol(byte[] ipAddressBytes) {
+		protected abstract byte[] getEmptyNetmask();
+
+		protected boolean isSameProtocol(byte[] ipAddressBytes) {
 			if (_allowedIpAddressBytes.length == ipAddressBytes.length) {
 				return true;
 			}
@@ -200,7 +181,12 @@ public final class AllowedIPAddressesValidatorFactory {
 			return false;
 		}
 
-		protected BaseAllowedIPAddressesValidator(
+		protected abstract boolean isValidCIDRNetmask(int cidrNetmask);
+
+		protected abstract boolean isValidDotNotationNetmask(
+			String dotNotationNetmask);
+
+		private BaseAllowedIPAddressesValidator(
 				InetAddress inetAddress, String[] ipAddressAndNetmask)
 			throws UnknownHostException {
 
