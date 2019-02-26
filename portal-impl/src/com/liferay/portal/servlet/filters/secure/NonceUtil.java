@@ -69,14 +69,18 @@ public class NonceUtil {
 	public static boolean verify(String nonce) {
 		_cleanUp();
 
-		if (_checkInLocalNode(nonce) || _checkInCluster(nonce)) {
+		if (_verifyInLocalNode(nonce) || _verifyInCluster(nonce)) {
 			return true;
 		}
 
 		return false;
 	}
 
-	private static boolean _checkInCluster(String nonce) {
+	private static void _cleanUp() {
+		while (_nonceDelayQueue.poll() != null);
+	}
+
+	private static boolean _verifyInCluster(String nonce) {
 		if (!ClusterExecutorUtil.isEnabled()) {
 			return false;
 		}
@@ -123,14 +127,10 @@ public class NonceUtil {
 		return false;
 	}
 
-	private static boolean _checkInLocalNode(String nonce) {
+	private static boolean _verifyInLocalNode(String nonce) {
 		_cleanUp();
 
 		return _nonceDelayQueue.remove(new NonceDelayed(nonce));
-	}
-
-	private static void _cleanUp() {
-		while (_nonceDelayQueue.poll() != null);
 	}
 
 	private static final long _NONCE_EXPIRATION =
