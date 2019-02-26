@@ -46,13 +46,13 @@ public final class AllowedIPAddressesValidatorFactory {
 					ipAddressAndNetmask);
 			}
 			else {
-				return new AllowedIPAddressesDummyValidator();
+				return _NULL_IP_ADDRESS_VALIDATOR;
 			}
 		}
 		catch (Exception e) {
 			_log.error("Invalid configured address: ", e);
 
-			return new AllowedIPAddressesDummyValidator();
+			return _NULL_IP_ADDRESS_VALIDATOR;
 		}
 	}
 
@@ -61,18 +61,11 @@ public final class AllowedIPAddressesValidatorFactory {
 		0b11111100, 0b11111110, 0b11111111
 	};
 
+	private static final AllowedIPAddressesValidator
+		_NULL_IP_ADDRESS_VALIDATOR = a -> false;
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		AllowedIPAddressesValidatorFactory.class);
-
-	private static class AllowedIPAddressesDummyValidator
-		implements AllowedIPAddressesValidator {
-
-		@Override
-		public boolean isAllowedIPAddress(String ipAddress) {
-			return false;
-		}
-
-	}
 
 	private static class AllowedIPv4AddressesValidator
 		extends BaseAllowedIPAddressesValidator {
