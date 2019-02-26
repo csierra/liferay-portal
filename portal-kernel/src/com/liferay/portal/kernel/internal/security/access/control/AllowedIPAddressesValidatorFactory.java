@@ -74,18 +74,17 @@ public final class AllowedIPAddressesValidatorFactory {
 	private static class AllowedIPv4AddressesValidator
 		extends BaseAllowedIPAddressesValidator {
 
-		public AllowedIPv4AddressesValidator(
-				InetAddress inetAddress, String[] ipAddressAndNetmask)
-			throws UnknownHostException {
-
-			super(inetAddress, ipAddressAndNetmask);
-		}
-
 		@Override
 		public byte[] getEmptyNetmask() {
 			return new byte[4];
 		}
 
+		private AllowedIPv4AddressesValidator(
+				InetAddress inetAddress, String[] ipAddressAndNetmask)
+			throws UnknownHostException {
+
+			super(inetAddress, ipAddressAndNetmask);
+		}
 
 	}
 
@@ -97,7 +96,7 @@ public final class AllowedIPAddressesValidatorFactory {
 			return new byte[16];
 		}
 
-		protected AllowedIPv6AddressesValidator(
+		private AllowedIPv6AddressesValidator(
 				InetAddress inetAddress, String[] ipAddressAndNetmask)
 			throws UnknownHostException {
 
