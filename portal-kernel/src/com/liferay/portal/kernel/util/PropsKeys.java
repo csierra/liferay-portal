@@ -3779,6 +3779,9 @@ public interface PropsKeys {
 
 	public static final String WEBDAV_IGNORE = "webdav.ignore";
 
+	public static final String WEBDAV_NONCE_CLUSTER_TIMEOUT =
+		"webdav.nonce.cluster.timeout";
+
 	public static final String WEBDAV_NONCE_EXPIRATION =
 		"webdav.nonce.expiration";
 
