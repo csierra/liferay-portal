@@ -53,7 +53,6 @@ public abstract class BaseWorkflowLogResourceImpl
 	@Override
 	@Path("/workflow-logs/{workflow-log-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
 	public WorkflowLog getWorkflowLog(
 			@PathParam("workflow-log-id") Long workflowLogId)
 		throws Exception {
