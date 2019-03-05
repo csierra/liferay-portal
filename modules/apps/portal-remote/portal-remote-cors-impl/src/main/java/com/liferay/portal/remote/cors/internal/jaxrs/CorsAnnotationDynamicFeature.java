@@ -20,12 +20,16 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.remote.cors.annotation.CORS;
 import com.liferay.portal.remote.cors.internal.CorsSupport;
 
+import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.FeatureContext;
@@ -55,42 +59,10 @@ public class CorsAnnotationDynamicFeature implements DynamicFeature {
 		if (cors != null) {
 			CorsSupport corsSupport = getCorsSupport(cors);
 
-			context.register(buildCorsPreflightRequestFilter(corsSupport));
+			context.register(
+				new CorsPreflighContainerRequestFilter(corsSupport));
 			context.register(buildCorsResponseFilter(corsSupport));
 		}
-	}
-
-	protected ContainerRequestFilter buildCorsPreflightRequestFilter(
-		CorsSupport corsSupport) {
-
-		return containerRequestContext -> {
-			MultivaluedMap<String, String> requestHeaders =
-				containerRequestContext.getHeaders();
-
-			if (corsSupport.isCorsRequest(requestHeaders::getFirst)) {
-				if (StringUtil.equals(
-						containerRequestContext.getMethod(), "OPTIONS")) {
-
-					if (corsSupport.isValidCorsPreflightRequest(
-							requestHeaders::getFirst)) {
-
-						Response.ResponseBuilder responseBuilder =
-							Response.ok();
-
-						Response response = responseBuilder.build();
-
-						MultivaluedMap<String, String> responseHeaders =
-							response.getStringHeaders();
-
-						corsSupport.writeResponseHeaders(
-							requestHeaders::getFirst,
-							responseHeaders::addFirst);
-
-						containerRequestContext.abortWith(response);
-					}
-				}
-			}
-		};
 	}
 
 	protected ContainerResponseFilter buildCorsResponseFilter(
@@ -105,8 +77,8 @@ public class CorsAnnotationDynamicFeature implements DynamicFeature {
 						containerRequestContext.getMethod(),
 						requestHeaders::getFirst)) {
 
-					MultivaluedMap<String, String> responseHeaders =
-						containerResponseContext.getStringHeaders();
+					MultivaluedMap<String, Object> responseHeaders =
+						containerResponseContext.getHeaders();
 
 					corsSupport.writeResponseHeaders(
 						requestHeaders::getFirst, responseHeaders::addFirst);
@@ -150,5 +122,44 @@ public class CorsAnnotationDynamicFeature implements DynamicFeature {
 
 	@Context
 	private ResourceInfo _resourceInfo;
+
+	@PreMatching
+	private static class CorsPreflighContainerRequestFilter
+		implements ContainerRequestFilter {
+
+		public CorsPreflighContainerRequestFilter(CorsSupport corsSupport) {
+			_corsSupport = corsSupport;
+		}
+
+		@Override
+		public void filter(ContainerRequestContext containerRequestContext)
+			throws IOException {
+
+			MultivaluedMap<String, String> requestHeaders =
+				containerRequestContext.getHeaders();
+
+			if (_corsSupport.isCorsRequest(requestHeaders::getFirst)) {
+				if (StringUtil.equals(
+						containerRequestContext.getMethod(), "OPTIONS")) {
+
+					if (_corsSupport.isValidCorsPreflightRequest(
+							requestHeaders::getFirst)) {
+
+						Response.ResponseBuilder responseBuilder =
+							Response.ok();
+
+						_corsSupport.writeResponseHeaders(
+							requestHeaders::getFirst, responseBuilder::header);
+
+						containerRequestContext.abortWith(
+							responseBuilder.build());
+					}
+				}
+			}
+		}
+
+		private final CorsSupport _corsSupport;
+
+	}
 
 }
