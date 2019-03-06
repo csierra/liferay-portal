@@ -12,23 +12,26 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.internal.endpoint;
+package com.liferay.portal.remote.cors.annotation;
 
-import javax.ws.rs.core.Application;
-
-import org.osgi.service.component.annotations.Component;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(
-	immediate = true,
-	property = {
-		"liferay.auth.verifier=false", "liferay.cors.annotation=true",
-		"liferay.oauth2=false", "osgi.jaxrs.application.base=/oauth2",
-		"osgi.jaxrs.name=Liferay.OAuth2.Application"
-	},
-	service = Application.class
-)
-public class OAuth2EndpointApplication extends Application {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface CORS {
+
+	boolean allowCredentials() default true;
+
+	String[] allowHeaders() default {"*"};
+
+	String allowOrigin() default "*";
+
+	String[] allowMethods() default {"*"};
+
 }

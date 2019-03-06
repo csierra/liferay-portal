@@ -12,23 +12,32 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.rest.internal.endpoint;
+package com.liferay.portal.remote.cors.test;
 
+import com.liferay.portal.remote.cors.annotation.CORS;
+
+import java.util.Collections;
+import java.util.Set;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
- * @author Carlos Sierra Andrés
+ * @author Marta Medio
  */
-@Component(
-	immediate = true,
-	property = {
-		"liferay.auth.verifier=false", "liferay.cors.annotation=true",
-		"liferay.oauth2=false", "osgi.jaxrs.application.base=/oauth2",
-		"osgi.jaxrs.name=Liferay.OAuth2.Application"
-	},
-	service = Application.class
-)
-public class OAuth2EndpointApplication extends Application {
+@CORS
+@Path("/cors-app")
+public class CorsTestApplication extends Application {
+
+	@Override
+	public Set<Object> getSingletons() {
+		return Collections.<Object>singleton(this);
+	}
+
+	@GET
+	public String getString() {
+		return "get";
+	}
+
 }
