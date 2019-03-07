@@ -40,6 +40,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import org.osgi.framework.BundleContext;
@@ -96,6 +97,15 @@ public class ResourceConfigFileFeature implements Feature {
 		}
 	}
 
+	private static final ContainerRequestFilter
+		_FORBIDDEN_CONTAINER_REQUEST_FILTER =
+			containerRequestContext -> containerRequestContext.abortWith(
+				ResourceConfigFileFeature._FORBIDDEN_RESPONSE);
+
+	private static final Response _FORBIDDEN_RESPONSE = Response.status(
+		Response.Status.FORBIDDEN
+	).build();
+
 	private BundleContext _bundleContext;
 	private final Map<String, Map<String, String>> _resourceClassMethodScope =
 		new HashMap<>();
@@ -117,6 +127,8 @@ public class ResourceConfigFileFeature implements Feature {
 			Map<String, String> methodScopes = getMethodScopes(resourceClass);
 
 			if (methodScopes == null) {
+				featureContext.register(_FORBIDDEN_CONTAINER_REQUEST_FILTER);
+
 				return;
 			}
 
@@ -125,6 +137,8 @@ public class ResourceConfigFileFeature implements Feature {
 			String scope = methodScopes.get(resourceMethod.toString());
 
 			if (scope == null) {
+				featureContext.register(_FORBIDDEN_CONTAINER_REQUEST_FILTER);
+
 				return;
 			}
 
