@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Configuration;
@@ -97,6 +98,23 @@ public class ResourceConfigFileFeature implements Feature {
 		}
 	}
 
+	private ContainerRequestFilter _getScopeContainerRequestFilter(
+		String scope) {
+
+		return _scopeContainerRequestFilters.computeIfAbsent(
+			scope,
+			ignored -> new BaseScopeCheckerContainerRequestFilter() {
+
+				@Override
+				protected boolean isContainerRequestContextAllowed(
+					ContainerRequestContext containerRequestContext) {
+
+					return _scopeChecker.checkScope(scope);
+				}
+
+			});
+	}
+
 	private static final ContainerRequestFilter
 		_FORBIDDEN_CONTAINER_REQUEST_FILTER =
 			containerRequestContext -> containerRequestContext.abortWith(
@@ -113,6 +131,8 @@ public class ResourceConfigFileFeature implements Feature {
 	@Reference
 	private ScopeChecker _scopeChecker;
 
+	private final Map<String, ContainerRequestFilter>
+		_scopeContainerRequestFilters = new HashMap<>();
 	private Set<String> _scopes;
 	private ServiceRegistration<ScopeFinder> _serviceRegistration;
 
@@ -144,17 +164,7 @@ public class ResourceConfigFileFeature implements Feature {
 
 			_scopes.add(scope);
 
-			featureContext.register(
-				new BaseScopeCheckerContainerRequestFilter() {
-
-					@Override
-					protected boolean isContainerRequestContextAllowed(
-						ContainerRequestContext containerRequestContext) {
-
-						return _scopeChecker.checkScope(scope);
-					}
-
-				});
+			featureContext.register(_getScopeContainerRequestFilter(scope));
 		}
 
 		protected Map<String, String> getMethodScopes(Class<?> resourceClass) {
