@@ -19,6 +19,7 @@ import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,7 +62,8 @@ import org.osgi.service.component.annotations.ServiceScope;
 		"osgi.jaxrs.application.select=(|(oauth2.scope.checker.type=resource.config)(oauth2.scopechecker.type=resource.config))",
 		"osgi.jaxrs.extension=true",
 		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.OAuth2)",
-		"osgi.jaxrs.name=Liferay.OAuth2.Resource.Config.checker"
+		"osgi.jaxrs.name=Liferay.OAuth2.Resource.Config.checker",
+		"requires.no.scope.keyword=##REQUIRES_NO_SCOPE##"
 	},
 	scope = ServiceScope.PROTOTYPE, service = Feature.class
 )
@@ -85,10 +88,15 @@ public class ResourceConfigFileFeature implements Feature {
 	}
 
 	@Activate
-	protected void activate(BundleContext bundleContext) {
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
 		_bundleContext = bundleContext;
 
 		_scopes = new HashSet<>();
+
+		_requiresNoScopeKeyword = MapUtil.getString(
+			properties, "requires.no.scope.keyword");
 	}
 
 	@Deactivate
@@ -125,6 +133,7 @@ public class ResourceConfigFileFeature implements Feature {
 	).build();
 
 	private BundleContext _bundleContext;
+	private String _requiresNoScopeKeyword;
 	private final Map<String, Map<String, String>> _resourceClassMethodScope =
 		new HashMap<>();
 
@@ -159,6 +168,10 @@ public class ResourceConfigFileFeature implements Feature {
 			if (scope == null) {
 				featureContext.register(_FORBIDDEN_CONTAINER_REQUEST_FILTER);
 
+				return;
+			}
+
+			if (Objects.equals(_requiresNoScopeKeyword, scope)) {
 				return;
 			}
 
