@@ -16,8 +16,8 @@ package com.liferay.portal.remote.cors.internal.servlet.filters;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
-import com.liferay.portal.remote.cors.configuration.PortalCorsConfiguration;
-import com.liferay.portal.remote.cors.internal.CorsSupport;
+import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
+import com.liferay.portal.remote.cors.internal.CORSSupport;
 
 import java.util.Dictionary;
 import java.util.Map;
@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Deactivate;
  * @author Tomas Polesovsky
  */
 @Component(
-	configurationPid = "com.liferay.portal.remote.cors.configuration.PortalCorsConfiguration",
+	configurationPid = "com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	service = {}
 )
@@ -45,16 +45,16 @@ public class ConfigurablePortalCORSServletFilterPublisher {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		PortalCorsConfiguration portalCorsConfiguration =
+		PortalCORSConfiguration portalCORSConfiguration =
 			ConfigurableUtil.createConfigurable(
-				PortalCorsConfiguration.class, properties);
+				PortalCORSConfiguration.class, properties);
 
-		if (!portalCorsConfiguration.enabled()) {
+		if (!portalCORSConfiguration.enabled()) {
 			return;
 		}
 
-		Map<String, String> corsHeaders = CorsSupport.buildCorsHeaders(
-			portalCorsConfiguration.headers());
+		Map<String, String> corsHeaders = CORSSupport.buildCorsHeaders(
+			portalCORSConfiguration.headers());
 
 		CORSServletFilter corsServletFilter = new CORSServletFilter();
 
@@ -67,9 +67,9 @@ public class ConfigurablePortalCORSServletFilterPublisher {
 		filterProperties.put("servlet-context-name", "");
 		filterProperties.put(
 			"servlet-filter-name",
-			"CORS Servlet Filter for " + portalCorsConfiguration.name());
+			"CORS Servlet Filter for " + portalCORSConfiguration.name());
 		filterProperties.put(
-			"url-pattern", portalCorsConfiguration.filterMappingURLPatterns());
+			"url-pattern", portalCORSConfiguration.filterMappingURLPatterns());
 
 		_serviceRegistration = bundleContext.registerService(
 			Filter.class, corsServletFilter, filterProperties);
