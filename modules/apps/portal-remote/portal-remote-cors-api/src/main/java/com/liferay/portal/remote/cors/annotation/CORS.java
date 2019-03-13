@@ -30,9 +30,9 @@ public @interface CORS {
 
 	public String[] allowHeaders() default {"*"};
 
-	public String allowOrigin() default "*";
-
 	public String[] allowMethods() default {"*"};
+
+	public String allowOrigin() default "*";
 
 	public String[] exposeHeaders() default {"*"};
 

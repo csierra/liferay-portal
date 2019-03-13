@@ -54,26 +54,26 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 
 	@Override
 	public void configure(ResourceInfo resourceInfo, FeatureContext context) {
-		CORS cors = getCors(resourceInfo);
+		CORS cors = getCORS(resourceInfo);
 
 		if (cors != null) {
-			CORSSupport corsSupport = getCorsSupport(cors);
+			CORSSupport corsSupport = getCORSSupport(cors);
 
 			context.register(
-				new CorsPreflighContainerRequestFilter(corsSupport));
-			context.register(buildCorsResponseFilter(corsSupport));
+				new CORSPreflighContainerRequestFilter(corsSupport));
+			context.register(buildCORSResponseFilter(corsSupport));
 		}
 	}
 
-	protected ContainerResponseFilter buildCorsResponseFilter(
+	protected ContainerResponseFilter buildCORSResponseFilter(
 		CORSSupport corsSupport) {
 
 		return (containerRequestContext, containerResponseContext) -> {
 			MultivaluedMap<String, String> requestHeaders =
 				containerRequestContext.getHeaders();
 
-			if (corsSupport.isCorsRequest(requestHeaders::getFirst)) {
-				if (corsSupport.isValidCorsRequest(
+			if (corsSupport.isCORSRequest(requestHeaders::getFirst)) {
+				if (corsSupport.isValidCORSRequest(
 						containerRequestContext.getMethod(),
 						requestHeaders::getFirst)) {
 
@@ -87,13 +87,13 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 		};
 	}
 
-	protected CORS getCors(ResourceInfo resourceInfo) {
+	protected CORS getCORS(ResourceInfo resourceInfo) {
 		return AnnotationLocator.locate(
 			resourceInfo.getResourceMethod(), resourceInfo.getResourceClass(),
 			CORS.class);
 	}
 
-	protected CORSSupport getCorsSupport(CORS cors) {
+	protected CORSSupport getCORSSupport(CORS cors) {
 		CORSSupport corsSupport = new CORSSupport();
 
 		Map<String, String> corsHeaders = new HashMap<>();
@@ -115,7 +115,7 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 		corsHeaders.put(
 			CORSSupport.ACCESS_CONTROL_MAX_AGE, String.valueOf(cors.maxAge()));
 
-		corsSupport.setCorsHeaders(corsHeaders);
+		corsSupport.setCORSHeaders(corsHeaders);
 
 		return corsSupport;
 	}
@@ -124,10 +124,10 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 	private ResourceInfo _resourceInfo;
 
 	@PreMatching
-	private static class CorsPreflighContainerRequestFilter
+	private static class CORSPreflighContainerRequestFilter
 		implements ContainerRequestFilter {
 
-		public CorsPreflighContainerRequestFilter(CORSSupport corsSupport) {
+		public CORSPreflighContainerRequestFilter(CORSSupport corsSupport) {
 			_corsSupport = corsSupport;
 		}
 
@@ -138,11 +138,11 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 			MultivaluedMap<String, String> requestHeaders =
 				containerRequestContext.getHeaders();
 
-			if (_corsSupport.isCorsRequest(requestHeaders::getFirst)) {
+			if (_corsSupport.isCORSRequest(requestHeaders::getFirst)) {
 				if (StringUtil.equals(
 						containerRequestContext.getMethod(), "OPTIONS")) {
 
-					if (_corsSupport.isValidCorsPreflightRequest(
+					if (_corsSupport.isValidCORSPreflightRequest(
 							requestHeaders::getFirst)) {
 
 						Response.ResponseBuilder responseBuilder =

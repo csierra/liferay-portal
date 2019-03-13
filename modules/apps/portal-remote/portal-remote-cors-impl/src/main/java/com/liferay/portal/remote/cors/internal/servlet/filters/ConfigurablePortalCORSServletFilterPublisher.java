@@ -53,12 +53,12 @@ public class ConfigurablePortalCORSServletFilterPublisher {
 			return;
 		}
 
-		Map<String, String> corsHeaders = CORSSupport.buildCorsHeaders(
+		Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 			portalCORSConfiguration.headers());
 
 		CORSServletFilter corsServletFilter = new CORSServletFilter();
 
-		corsServletFilter.setCorsHeaders(corsHeaders);
+		corsServletFilter.setCORSHeaders(corsHeaders);
 
 		Dictionary<String, Object> filterProperties = new HashMapDictionary<>();
 

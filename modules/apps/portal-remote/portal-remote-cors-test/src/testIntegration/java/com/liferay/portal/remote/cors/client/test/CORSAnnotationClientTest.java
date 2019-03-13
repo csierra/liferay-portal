@@ -47,7 +47,7 @@ public class CORSAnnotationClientTest extends BaseCORSClientTestCase {
 	}
 
 	@Test
-	public void testCorsApplication() {
+	public void testCORSApplication() {
 		WebTarget webTarget = getWebTarget("/test/cors-app");
 
 		Invocation.Builder invocationBuilder = webTarget.request();

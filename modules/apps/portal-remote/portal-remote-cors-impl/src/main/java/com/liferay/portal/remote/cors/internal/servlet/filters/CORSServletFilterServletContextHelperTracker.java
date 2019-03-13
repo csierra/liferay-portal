@@ -63,7 +63,7 @@ public class CORSServletFilterServletContextHelperTracker {
 			ConfigurableUtil.createConfigurable(
 				WebContextCORSConfiguration.class, properties);
 
-		_corsHeaders = CORSSupport.buildCorsHeaders(
+		_corsHeaders = CORSSupport.buildCORSHeaders(
 			webContextCORSConfiguration.headers());
 		_filterMappingUrlPatterns =
 			webContextCORSConfiguration.filterMappingURLPatterns();
@@ -98,7 +98,7 @@ public class CORSServletFilterServletContextHelperTracker {
 
 			CORSServletFilter corsServletFilter = new CORSServletFilter();
 
-			corsServletFilter.setCorsHeaders(_corsHeaders);
+			corsServletFilter.setCORSHeaders(_corsHeaders);
 
 			return _bundleContext.registerService(
 				Filter.class, corsServletFilter,

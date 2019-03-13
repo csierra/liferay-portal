@@ -56,7 +56,7 @@ public class CORSSupport {
 
 	public static final String ORIGIN = "Origin";
 
-	public static Map<String, String> buildCorsHeaders(
+	public static Map<String, String> buildCORSHeaders(
 		String[] corsHeaderStrings) {
 
 		Map<String, String> headers = new HashMap<>();
@@ -82,7 +82,7 @@ public class CORSSupport {
 		return headers;
 	}
 
-	public boolean isCorsRequest(
+	public boolean isCORSRequest(
 		Function<String, String> requestHeaderAccessorFunction) {
 
 		String origin = requestHeaderAccessorFunction.apply(ORIGIN);
@@ -94,7 +94,7 @@ public class CORSSupport {
 		return true;
 	}
 
-	public boolean isValidCorsPreflightRequest(
+	public boolean isValidCORSPreflightRequest(
 		Function<String, String> requestHeaderAccessorFunction) {
 
 		String origin = requestHeaderAccessorFunction.apply(ORIGIN);
@@ -125,7 +125,7 @@ public class CORSSupport {
 		return true;
 	}
 
-	public boolean isValidCorsRequest(
+	public boolean isValidCORSRequest(
 		String httpMethod,
 		Function<String, String> requestHeaderAccessorFunction) {
 
@@ -173,7 +173,7 @@ public class CORSSupport {
 		return false;
 	}
 
-	public void setCorsHeaders(Map<String, String> corsHeaders) {
+	public void setCORSHeaders(Map<String, String> corsHeaders) {
 		_corsHeaders.putAll(corsHeaders);
 	}
 

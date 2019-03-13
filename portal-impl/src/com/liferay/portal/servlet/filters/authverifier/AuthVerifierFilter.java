@@ -133,7 +133,7 @@ public class AuthVerifierFilter extends BasePortalFilter {
 			return;
 		}
 
-		if (_isCorsPreflightRequest(request)) {
+		if (_isCORSPreflightRequest(request)) {
 			Class<?> clazz = getClass();
 
 			processFilter(clazz.getName(), request, response, filterChain);
@@ -263,7 +263,7 @@ public class AuthVerifierFilter extends BasePortalFilter {
 		return true;
 	}
 
-	private boolean _isCorsPreflightRequest(HttpServletRequest request) {
+	private boolean _isCORSPreflightRequest(HttpServletRequest request) {
 		if (StringUtil.equals(request.getMethod(), "OPTIONS") &&
 			Validator.isNotNull(request.getHeader("Origin"))) {
 

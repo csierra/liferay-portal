@@ -48,7 +48,7 @@ public class CORSServletFilter implements Filter {
 
 		HttpServletRequest request = (HttpServletRequest)servletRequest;
 
-		if (corsSupport.isCorsRequest(request::getHeader)) {
+		if (corsSupport.isCORSRequest(request::getHeader)) {
 			try {
 				processCORSRequest(
 					request, (HttpServletResponse)servletResponse, filterChain);
@@ -72,7 +72,7 @@ public class CORSServletFilter implements Filter {
 		throws Exception {
 
 		if (StringUtil.equals(HttpMethods.OPTIONS, request.getMethod())) {
-			if (corsSupport.isValidCorsPreflightRequest(request::getHeader)) {
+			if (corsSupport.isValidCORSPreflightRequest(request::getHeader)) {
 				corsSupport.writeResponseHeaders(
 					request::getHeader, response::setHeader);
 			}
@@ -80,7 +80,7 @@ public class CORSServletFilter implements Filter {
 			return;
 		}
 
-		if (corsSupport.isValidCorsRequest(
+		if (corsSupport.isValidCORSRequest(
 				request.getMethod(), request::getHeader)) {
 
 			corsSupport.writeResponseHeaders(
@@ -90,8 +90,8 @@ public class CORSServletFilter implements Filter {
 		filterChain.doFilter(request, response);
 	}
 
-	public void setCorsHeaders(Map<String, String> corsHeaders) {
-		corsSupport.setCorsHeaders(corsHeaders);
+	public void setCORSHeaders(Map<String, String> corsHeaders) {
+		corsSupport.setCORSHeaders(corsHeaders);
 	}
 
 	protected final CORSSupport corsSupport = new CORSSupport();
