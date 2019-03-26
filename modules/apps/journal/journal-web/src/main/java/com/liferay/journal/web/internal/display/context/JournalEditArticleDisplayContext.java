@@ -443,14 +443,20 @@ public class JournalEditArticleDisplayContext {
 		return _redirect;
 	}
 
-	public long getReferringPlid() {
-		if (_referringPlid != null) {
-			return _referringPlid;
+	public long getRefererPlid() {
+		if (_refererPlid != null) {
+			return _refererPlid;
 		}
 
-		_referringPlid = ParamUtil.getLong(_request, "referringPlid");
+		long refererPlid = ParamUtil.getLong(_request, "referringPlid");
 
-		return _referringPlid;
+		if (refererPlid == 0) {
+			refererPlid = ParamUtil.getLong(_request, "refererPlid");
+		}
+
+		_refererPlid = refererPlid;
+
+		return _refererPlid;
 	}
 
 	public String getReferringPortletResource() {
@@ -744,7 +750,7 @@ public class JournalEditArticleDisplayContext {
 	private Boolean _neverReview;
 	private String _portletResource;
 	private String _redirect;
-	private Long _referringPlid;
+	private Long _refererPlid;
 	private String _referringPortletResource;
 	private final HttpServletRequest _request;
 	private Boolean _showHeader;
