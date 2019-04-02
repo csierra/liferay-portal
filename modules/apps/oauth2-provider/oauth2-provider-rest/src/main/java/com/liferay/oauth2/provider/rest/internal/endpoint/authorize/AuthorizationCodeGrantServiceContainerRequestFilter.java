@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -183,11 +182,9 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 			return false;
 		}
 
-		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
-			user);
-
 		if (_oAuth2ApplicationModelResourcePermission.contains(
-				permissionChecker, oAuth2Application, ActionKeys.VIEW)) {
+				_permissionCheckerFactory.create(user), oAuth2Application,
+				ActionKeys.VIEW)) {
 
 			return true;
 		}
