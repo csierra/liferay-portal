@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
@@ -30,7 +31,10 @@ import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderWebKeys;
 import com.liferay.oauth2.provider.web.internal.display.context.OAuth2AuthorizePortletDisplayContext;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -140,6 +144,24 @@ public class ViewAuthorizationRequestMVCRenderCommand
 				OAuth2ProviderWebKeys.OAUTH2_AUTHORIZE_PORTLET_DISPLAY_CONTEXT,
 				oAuth2AuthorizePortletDisplayContext);
 		}
+		catch (NoSuchOAuth2ApplicationException nsoaae) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsoaae, nsoaae);
+			}
+
+			SessionErrors.add(renderRequest, "clientIdInvalid");
+
+			return "/authorize/error.jsp";
+		}
+		catch (PrincipalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
+			SessionErrors.add(renderRequest, pe.getClass());
+
+			return "/authorize/error.jsp";
+		}
 		catch (PortalException pe) {
 			throw new PortletException(pe);
 		}
@@ -196,6 +218,9 @@ public class ViewAuthorizationRequestMVCRenderCommand
 
 		assignableScopes.addLiferayOAuth2Scopes(liferayOAuth2Scopes);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ViewAuthorizationRequestMVCRenderCommand.class);
 
 	@Reference
 	private ApplicationDescriptorLocator _applicationDescriptorLocator;
