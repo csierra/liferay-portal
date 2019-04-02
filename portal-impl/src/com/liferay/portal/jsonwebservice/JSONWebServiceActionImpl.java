@@ -165,6 +165,10 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 		if (parameterType.isArray()) {
 			List<?> list = null;
 
+			if (parameterType.isInstance(value)) {
+				return value;
+			}
+
 			if (value instanceof List) {
 				list = (List<?>)value;
 			}
