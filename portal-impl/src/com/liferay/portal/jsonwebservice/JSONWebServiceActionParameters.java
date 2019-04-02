@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -201,8 +202,8 @@ public class JSONWebServiceActionParameters {
 			uploadServletRequest = (UploadServletRequest)request;
 		}
 
-		List<String> parameterNames = Collections.list(
-			request.getParameterNames());
+		List<String> parameterNames = new HashSet<>(
+			Collections.list(request.getParameterNames()));
 
 		if (uploadServletRequest != null) {
 			Map<String, FileItem[]> multipartParameterMap =
