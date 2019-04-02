@@ -217,7 +217,15 @@ public class JSONWebServiceActionParameters {
 			if ((uploadServletRequest != null) &&
 				(uploadServletRequest.getFileName(parameterName) != null)) {
 
-				value = uploadServletRequest.getFile(parameterName, true);
+				String[] fileNames = uploadServletRequest.getFileNames(
+					parameterName);
+
+				if (fileNames.length == 1) {
+					value = uploadServletRequest.getFile(parameterName, true);
+				}
+				else {
+					value = uploadServletRequest.getFiles(parameterName);
+				}
 			}
 			else {
 				String[] parameterValues = request.getParameterValues(
