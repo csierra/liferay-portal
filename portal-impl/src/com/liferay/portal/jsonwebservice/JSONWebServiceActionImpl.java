@@ -163,11 +163,11 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 		Class<?>[] genericParameterTypes) {
 
 		if (parameterType.isArray()) {
-			List<?> list = null;
-
 			if (parameterType.isInstance(value)) {
 				return value;
 			}
+
+			List<?> list = null;
 
 			if (value instanceof List) {
 				list = (List<?>)value;
