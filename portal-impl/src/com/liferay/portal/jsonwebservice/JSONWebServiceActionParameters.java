@@ -202,7 +202,7 @@ public class JSONWebServiceActionParameters {
 			uploadServletRequest = (UploadServletRequest)request;
 		}
 
-		List<String> parameterNames = new HashSet<>(
+		Set<String> parameterNames = new HashSet<>(
 			Collections.list(request.getParameterNames()));
 
 		if (uploadServletRequest != null) {
