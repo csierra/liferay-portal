@@ -19,6 +19,7 @@ import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderWebKeys;
@@ -60,10 +61,11 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 		AssignScopesDisplayContext assignScopesDisplayContext =
 			new AssignScopesDisplayContext(
-				_oAuth2ApplicationService, _oAuth2ProviderConfiguration,
-				renderRequest, getThemeDisplay(renderRequest),
-				_applicationDescriptorLocator, _scopeDescriptorLocator,
-				_scopeLocator, _dlURLHelper);
+				_oAuth2ApplicationService,
+				_oAuth2ApplicationScopeAliasesLocalService,
+				_oAuth2ProviderConfiguration, renderRequest,
+				getThemeDisplay(renderRequest), _applicationDescriptorLocator,
+				_scopeDescriptorLocator, _scopeLocator, _dlURLHelper);
 
 		renderRequest.setAttribute(
 			OAuth2ProviderWebKeys.OAUTH2_ADMIN_PORTLET_DISPLAY_CONTEXT,
@@ -87,6 +89,10 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 	@Reference
 	private DLURLHelper _dlURLHelper;
+
+	@Reference
+	private OAuth2ApplicationScopeAliasesLocalService
+		_oAuth2ApplicationScopeAliasesLocalService;
 
 	@Reference
 	private OAuth2ApplicationService _oAuth2ApplicationService;
