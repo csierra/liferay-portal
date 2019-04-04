@@ -21,6 +21,7 @@ import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.web.internal.AssignableScopes;
 import com.liferay.petra.string.StringBundler;
@@ -56,6 +57,8 @@ public class AssignScopesDisplayContext
 
 	public AssignScopesDisplayContext(
 		OAuth2ApplicationService oAuth2ApplicationService,
+		OAuth2ApplicationScopeAliasesLocalService
+			oAuth2ApplicationScopeAliasesLocalService,
 		OAuth2ProviderConfiguration oAuth2ProviderConfiguration,
 		PortletRequest portletRequest, ThemeDisplay themeDisplay,
 		ApplicationDescriptorLocator applicationDescriptorLocator,
@@ -63,8 +66,9 @@ public class AssignScopesDisplayContext
 		ScopeLocator scopeLocator, DLURLHelper dlURLHelper) {
 
 		super(
-			oAuth2ApplicationService, oAuth2ProviderConfiguration,
-			portletRequest, themeDisplay, dlURLHelper);
+			oAuth2ApplicationService, oAuth2ApplicationScopeAliasesLocalService,
+			oAuth2ProviderConfiguration, portletRequest, themeDisplay,
+			dlURLHelper);
 
 		_applicationDescriptorLocator = applicationDescriptorLocator;
 		_locale = themeDisplay.getLocale();
