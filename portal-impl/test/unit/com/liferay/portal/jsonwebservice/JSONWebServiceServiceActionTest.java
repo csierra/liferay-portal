@@ -17,6 +17,8 @@ package com.liferay.portal.jsonwebservice;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceAction;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceActionsManagerUtil;
 import com.liferay.portal.kernel.servlet.HttpMethods;
+import com.liferay.portal.kernel.test.FinalizeManagerUtil;
+import com.liferay.portal.kernel.test.GCUtil;
 import com.liferay.portal.kernel.upload.FileItem;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -37,6 +39,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -84,6 +87,13 @@ public class JSONWebServiceServiceActionTest
 
 		jsonWebServiceActionsManagerUtil.setJSONWebServiceActionsManager(
 			new JSONWebServiceActionsManagerImpl());
+	}
+
+	@After
+	public void tearDown() throws InterruptedException {
+		GCUtil.gc(true);
+
+		FinalizeManagerUtil.drainPendingFinalizeActions();
 	}
 
 	@Test
