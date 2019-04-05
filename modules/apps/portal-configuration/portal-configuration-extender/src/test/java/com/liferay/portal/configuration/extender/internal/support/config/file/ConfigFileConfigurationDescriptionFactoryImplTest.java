@@ -20,7 +20,6 @@ import com.liferay.portal.configuration.extender.internal.ConfigurationDescripti
 import com.liferay.portal.configuration.extender.internal.FactoryConfigurationDescription;
 import com.liferay.portal.configuration.extender.internal.NamedConfigurationContent;
 import com.liferay.portal.configuration.extender.internal.SingleConfigurationDescription;
-import com.liferay.portal.kernel.util.Supplier;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -28,6 +27,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import java.util.Dictionary;
+import java.util.function.Supplier;
 
 import org.junit.Assert;
 import org.junit.Test;

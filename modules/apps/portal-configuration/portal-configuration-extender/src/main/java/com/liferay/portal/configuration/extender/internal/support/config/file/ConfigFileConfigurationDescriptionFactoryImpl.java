@@ -19,12 +19,12 @@ import com.liferay.portal.configuration.extender.internal.ConfigurationDescripti
 import com.liferay.portal.configuration.extender.internal.FactoryConfigurationDescription;
 import com.liferay.portal.configuration.extender.internal.NamedConfigurationContent;
 import com.liferay.portal.configuration.extender.internal.SingleConfigurationDescription;
-import java.util.function.Supplier;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.Dictionary;
+import java.util.function.Supplier;
 
 import org.apache.felix.cm.file.ConfigurationHandler;
 
@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(immediate = true)
+@Component(immediate = true, service = ConfigurationDescriptionFactory.class)
 public class ConfigFileConfigurationDescriptionFactoryImpl
 	implements ConfigurationDescriptionFactory {
 
@@ -63,14 +63,12 @@ public class ConfigFileConfigurationDescriptionFactoryImpl
 				new PropertiesSupplier(
 					namedConfigurationContent.getInputStream()));
 		}
-		else {
-			pid = name;
 
-			return new SingleConfigurationDescription(
-				pid,
-				new PropertiesSupplier(
-					namedConfigurationContent.getInputStream()));
-		}
+		pid = name;
+
+		return new SingleConfigurationDescription(
+			pid,
+			new PropertiesSupplier(namedConfigurationContent.getInputStream()));
 	}
 
 	private class PropertiesSupplier

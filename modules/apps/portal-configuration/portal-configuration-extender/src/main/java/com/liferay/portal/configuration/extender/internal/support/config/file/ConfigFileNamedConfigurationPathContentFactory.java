@@ -19,7 +19,6 @@ import com.liferay.portal.configuration.extender.internal.NamedConfigurationCont
 import com.liferay.portal.configuration.extender.internal.NamedConfigurationContentFactory;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MappingEnumeration;
-import com.liferay.portal.kernel.util.MappingEnumeration.Mapper;
 
 import java.net.URL;
 
@@ -32,7 +31,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(immediate = true)
+@Component(immediate = true, service = NamedConfigurationContentFactory.class)
 public class ConfigFileNamedConfigurationPathContentFactory
 	implements NamedConfigurationContentFactory {
 
@@ -52,7 +51,8 @@ public class ConfigFileNamedConfigurationPathContentFactory
 		return ListUtil.fromEnumeration(
 			new MappingEnumeration<>(
 				entries,
-				new Mapper<URL, NamedConfigurationContent>() {
+				new MappingEnumeration.Mapper
+					<URL, NamedConfigurationContent>() {
 
 					@Override
 					public NamedConfigurationContent map(URL url) {
