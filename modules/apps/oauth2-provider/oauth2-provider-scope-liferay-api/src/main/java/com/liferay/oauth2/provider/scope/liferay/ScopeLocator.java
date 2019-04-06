@@ -26,6 +26,9 @@ import java.util.Collection;
  */
 public interface ScopeLocator {
 
+	public LiferayOAuth2Scope getLiferayOAuth2Scope(
+		long companyId, String applicationName, String scope);
+
 	/**
 	 * Returns the application exported scopes matching the given portal
 	 * instance's scopes alias.
