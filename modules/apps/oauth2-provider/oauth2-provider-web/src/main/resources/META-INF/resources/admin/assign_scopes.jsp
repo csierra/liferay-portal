@@ -22,12 +22,6 @@ String redirect = ParamUtil.getString(request, "redirect");
 OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
 
 AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayContext)oAuth2AdminPortletDisplayContext;
-
-List<String> assignedScopes = Collections.emptyList();
-
-if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
-	assignedScopes = OAuth2ApplicationScopeAliasesLocalServiceUtil.getScopeAliasesList(oAuth2Application.getOAuth2ApplicationScopeAliasesId());
-}
 %>
 
 <div class="container-fluid container-fluid-max-xl container-view">

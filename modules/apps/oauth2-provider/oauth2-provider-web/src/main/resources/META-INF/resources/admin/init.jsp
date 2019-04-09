@@ -32,7 +32,6 @@ page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIM
 page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURIPathException" %><%@
 page import="com.liferay.oauth2.provider.exception.OAuth2ApplicationRedirectURISchemeException" %><%@
 page import="com.liferay.oauth2.provider.model.OAuth2Authorization" %><%@
-page import="com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil" %><%@
 page import="com.liferay.oauth2.provider.web.internal.AssignableScopes" %><%@
 page import="com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderWebKeys" %><%@
