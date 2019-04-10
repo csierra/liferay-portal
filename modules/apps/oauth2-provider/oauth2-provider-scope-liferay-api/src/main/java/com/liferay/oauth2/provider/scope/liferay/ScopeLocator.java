@@ -14,6 +14,8 @@
 
 package com.liferay.oauth2.provider.scope.liferay;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.util.Collection;
 
 /**
@@ -24,6 +26,7 @@ import java.util.Collection;
  *
  * @author Carlos Sierra Andrés
  */
+@ProviderType
 public interface ScopeLocator {
 
 	public LiferayOAuth2Scope getLiferayOAuth2Scope(
