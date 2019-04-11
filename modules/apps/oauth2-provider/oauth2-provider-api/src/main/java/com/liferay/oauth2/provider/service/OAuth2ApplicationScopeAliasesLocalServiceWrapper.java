@@ -232,6 +232,20 @@ public class OAuth2ApplicationScopeAliasesLocalServiceWrapper
 			fetchOAuth2ApplicationScopeAliases(oAuth2ApplicationScopeAliasesId);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases
+		fetchOAuth2ApplicationScopeAliases(
+			long oAuth2ApplicationId, java.util.List<String> scopeAliasesList) {
+
+		return _oAuth2ApplicationScopeAliasesLocalService.
+			fetchOAuth2ApplicationScopeAliases(
+				oAuth2ApplicationId, scopeAliasesList);
+	}
+
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
