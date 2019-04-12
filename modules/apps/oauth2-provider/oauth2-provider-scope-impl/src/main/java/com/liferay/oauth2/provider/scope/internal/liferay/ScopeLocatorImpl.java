@@ -74,10 +74,8 @@ public class ScopeLocatorImpl implements ScopeLocator {
 			return null;
 		}
 
-		ServiceReference<?> serviceReference =
-			serviceReferenceServiceTuple.getServiceReference();
-
-		Bundle bundle = getBundle(serviceReference);
+		Bundle bundle = getBundle(
+			serviceReferenceServiceTuple.getServiceReference());
 
 		return new LiferayOAuth2ScopeImpl(applicationName, bundle, scope);
 	}
