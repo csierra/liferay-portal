@@ -420,13 +420,13 @@ public class AssignScopesDisplayContext
 				oAuth2ApplicationScopeAliasesId, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS, null);
 
-		Map<String, AssignableScopes> grantedScopeAliasesAssignableScopes =
+		Map<String, AssignableScopes> scopeAliasesAssignableScopes =
 			new HashMap<>();
 
 		for (OAuth2ScopeGrant oAuth2ScopeGrant : oAuth2ScopeGrants) {
 			for (String scopeAlias : oAuth2ScopeGrant.getScopeAliasesList()) {
 				AssignableScopes assignableScopes =
-					grantedScopeAliasesAssignableScopes.computeIfAbsent(
+					scopeAliasesAssignableScopes.computeIfAbsent(
 						scopeAlias,
 						x -> new AssignableScopes(
 							applicationDescriptorLocator, _locale,
@@ -440,7 +440,7 @@ public class AssignScopesDisplayContext
 			}
 		}
 
-		return grantedScopeAliasesAssignableScopes;
+		return scopeAliasesAssignableScopes;
 	}
 
 	protected Map<AssignableScopes, Relations> getAssignableScopesRelations(
