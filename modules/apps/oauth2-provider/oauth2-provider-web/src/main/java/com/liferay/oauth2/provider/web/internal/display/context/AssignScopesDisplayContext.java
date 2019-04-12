@@ -85,11 +85,10 @@ public class AssignScopesDisplayContext
 		OAuth2Application oAuth2Application = getOAuth2Application();
 
 		Map<String, AssignableScopes> assignedScopeAliasesAssignableScopes =
-			getAssignedAssignableScopes(
+			getAssignableScopesByScopeAlias(
 				oAuth2Application.getOAuth2ApplicationScopeAliasesId(),
-				applicationDescriptorLocator,
-				oAuth2ScopeGrantLocalService, scopeDescriptorLocator,
-				scopeLocator, themeDisplay);
+				applicationDescriptorLocator, oAuth2ScopeGrantLocalService,
+				scopeDescriptorLocator, scopeLocator, themeDisplay);
 
 		Set<String> scopeAliases = new HashSet<>(
 			scopeLocator.getScopeAliases(themeDisplay.getCompanyId()));
@@ -112,8 +111,7 @@ public class AssignScopesDisplayContext
 				assignedAssignableScopes =
 					assignedScopeAliasesAssignableScopes.remove(scopeAlias);
 
-				relations = getRelations(
-					null, assignedAssignableScopes);
+				relations = getRelations(null, assignedAssignableScopes);
 
 				assignableScopes = assignedAssignableScopes;
 				applicationNames =
@@ -122,8 +120,7 @@ public class AssignScopesDisplayContext
 			else {
 				assignableScopes.addLiferayOAuth2Scopes(liferayOAuth2Scopes);
 
-				relations = getRelations(
-					scopeAlias, assignableScopes);
+				relations = getRelations(scopeAlias, assignableScopes);
 
 				assignedAssignableScopes =
 					assignedScopeAliasesAssignableScopes.remove(scopeAlias);
@@ -411,21 +408,7 @@ public class AssignScopesDisplayContext
 
 	}
 
-	protected Map<AssignableScopes, Relations> getAssignableScopesRelations(
-		Set<AssignableScopes> assignableScopes) {
-
-		Stream<AssignableScopes> assignableScopesStream =
-			assignableScopes.stream();
-
-		return assignableScopesStream.filter(
-			_assignableScopesRelations::containsKey
-		).collect(
-			Collectors.toMap(
-				Function.identity(), _assignableScopesRelations::get)
-		);
-	}
-
-	protected Map<String, AssignableScopes> getAssignedAssignableScopes(
+	protected Map<String, AssignableScopes> getAssignableScopesByScopeAlias(
 		long oAuth2ApplicationScopeAliasesId,
 		ApplicationDescriptorLocator applicationDescriptorLocator,
 		OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService,
@@ -458,6 +441,20 @@ public class AssignScopesDisplayContext
 		}
 
 		return grantedScopeAliasesAssignableScopes;
+	}
+
+	protected Map<AssignableScopes, Relations> getAssignableScopesRelations(
+		Set<AssignableScopes> assignableScopes) {
+
+		Stream<AssignableScopes> assignableScopesStream =
+			assignableScopes.stream();
+
+		return assignableScopesStream.filter(
+			_assignableScopesRelations::containsKey
+		).collect(
+			Collectors.toMap(
+				Function.identity(), _assignableScopesRelations::get)
+		);
 	}
 
 	protected Relations getRelations(
