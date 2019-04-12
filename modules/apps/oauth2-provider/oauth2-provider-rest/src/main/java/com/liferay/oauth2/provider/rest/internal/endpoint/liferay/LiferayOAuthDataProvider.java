@@ -57,6 +57,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -989,25 +991,21 @@ public class LiferayOAuthDataProvider
 				oAuth2ApplicationScopeAliasesId, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS, null);
 
-		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes = new ArrayList<>(
-			oAuth2ScopeGrants.size());
-
 		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
 
-		stream.filter(
-			oa2sg -> !Collections.disjoint(
-				oa2sg.getScopeAliasesList(), scopeAliases)
+		return stream.filter(
+			oAuth2ScopeGrant -> !Collections.disjoint(
+				oAuth2ScopeGrant.getScopeAliasesList(), scopeAliases)
 		).map(
-			oa2sg -> _scopeFinderLocator.getLiferayOAuth2Scope(
-				oa2sg.getCompanyId(), oa2sg.getApplicationName(),
-				oa2sg.getScope())
+			oAuth2ScopeGrant -> _scopeFinderLocator.getLiferayOAuth2Scope(
+				oAuth2ScopeGrant.getCompanyId(),
+				oAuth2ScopeGrant.getApplicationName(),
+				oAuth2ScopeGrant.getScope())
 		).filter(
-			Validator::isNotNull
-		).forEach(
-			liferayOAuth2Scopes::add
+			Objects::nonNull
+		).collect(
+			Collectors.toList()
 		);
-
-		return liferayOAuth2Scopes;
 	}
 
 	private String _getRemoteIP() {
