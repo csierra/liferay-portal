@@ -158,7 +158,7 @@ public class AssignScopesDisplayContext
 					(assignedApplicationNames.size() > 1);
 			}
 
-			_indexAssignedableScopes(
+			_indexAssignableScopes(
 				assignableScopes, applicationNames,
 				indexAsGlobalAssignableScopes);
 		}
@@ -489,7 +489,7 @@ public class AssignScopesDisplayContext
 		return ret;
 	}
 
-	private void _indexAssignedableScopes(
+	private void _indexAssignableScopes(
 		AssignableScopes assignableScopes, Set<String> assignedApplicationNames,
 		boolean indexAsGlobalAssignableScopes) {
 
