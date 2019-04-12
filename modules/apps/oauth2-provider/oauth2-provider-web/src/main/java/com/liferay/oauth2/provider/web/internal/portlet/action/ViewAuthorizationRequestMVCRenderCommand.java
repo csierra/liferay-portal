@@ -214,7 +214,7 @@ public class ViewAuthorizationRequestMVCRenderCommand
 				oAuth2ScopeGrant.getScopeAliasesList(),
 				requestedScopeAliasesSet)
 		).map(
-			oAuth2ScopeGrant -> _scopeFinderLocator.getLiferayOAuth2Scope(
+			oAuth2ScopeGrant -> _scopeLocator.getLiferayOAuth2Scope(
 				oAuth2ScopeGrant.getCompanyId(),
 				oAuth2ScopeGrant.getApplicationName(),
 				oAuth2ScopeGrant.getScope())
@@ -249,6 +249,6 @@ public class ViewAuthorizationRequestMVCRenderCommand
 	private ScopeDescriptorLocator _scopeDescriptorLocator;
 
 	@Reference
-	private ScopeLocator _scopeFinderLocator;
+	private ScopeLocator _scopeLocator;
 
 }
