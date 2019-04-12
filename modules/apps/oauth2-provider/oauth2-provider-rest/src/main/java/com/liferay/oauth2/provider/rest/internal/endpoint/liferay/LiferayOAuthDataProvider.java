@@ -19,6 +19,7 @@ import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
+import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.rest.internal.endpoint.authorize.configuration.OAuth2AuthorizationFlowConfiguration;
 import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRESTEndpointConstants;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
@@ -34,6 +35,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -49,13 +51,13 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -979,6 +981,35 @@ public class LiferayOAuthDataProvider
 			});
 	}
 
+	private Collection<LiferayOAuth2Scope> _getLiferayOAuth2Scopes(
+		long oAuth2ApplicationScopeAliasesId, List<String> scopeAliases) {
+
+		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
+			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
+				oAuth2ApplicationScopeAliasesId, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes = new ArrayList<>(
+			oAuth2ScopeGrants.size());
+
+		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
+
+		stream.filter(
+			oa2sg -> !Collections.disjoint(
+				oa2sg.getScopeAliasesList(), scopeAliases)
+		).map(
+			oa2sg -> _scopeFinderLocator.getLiferayOAuth2Scope(
+				oa2sg.getCompanyId(), oa2sg.getApplicationName(),
+				oa2sg.getScope())
+		).filter(
+			Validator::isNotNull
+		).forEach(
+			liferayOAuth2Scopes::add
+		);
+
+		return liferayOAuth2Scopes;
+	}
+
 	private String _getRemoteIP() {
 		MessageContext messageContext = getMessageContext();
 
@@ -1054,21 +1085,16 @@ public class LiferayOAuthDataProvider
 				serverAccessToken.getTokenKey(), createDate, expirationDate,
 				remoteAddr + ", " + remoteHost, null, null, null);
 
-		Set<LiferayOAuth2Scope> liferayOAuth2Scopes = new HashSet<>();
-
-		List<String> scopesList = OAuthUtils.convertPermissionsToScopeList(
-			serverAccessToken.getScopes());
-
-		for (String scope : scopesList) {
-			liferayOAuth2Scopes.addAll(
-				_scopeFinderLocator.getLiferayOAuth2Scopes(
-					oAuth2Application.getCompanyId(), scope));
-		}
+		List<String> scopeAliasesList =
+			OAuthUtils.convertPermissionsToScopeList(
+				serverAccessToken.getScopes());
 
 		try {
 			_oAuth2ScopeGrantLocalService.grantLiferayOAuth2Scopes(
 				oAuth2Authorization.getOAuth2AuthorizationId(),
-				liferayOAuth2Scopes);
+				_getLiferayOAuth2Scopes(
+					oAuth2Authorization.getOAuth2ApplicationScopeAliasesId(),
+					scopeAliasesList));
 		}
 		catch (PortalException pe) {
 			_log.error("Unable to find authorization " + oAuth2Authorization);
