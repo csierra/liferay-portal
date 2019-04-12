@@ -387,8 +387,11 @@ public class OAuth2ApplicationLocalServiceImpl
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationPersistence.findByPrimaryKey(oAuth2ApplicationId);
 
+		long oAuth2ApplicationScopeAliasesId =
+			oAuth2Application.getOAuth2ApplicationScopeAliasesId();
+
 		if (ListUtil.isEmpty(scopeAliasesList)) {
-			if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() == 0) {
+			if (oAuth2ApplicationScopeAliasesId == 0) {
 				return oAuth2Application;
 			}
 
@@ -398,10 +401,26 @@ public class OAuth2ApplicationLocalServiceImpl
 			return oAuth2ApplicationPersistence.update(oAuth2Application);
 		}
 
-		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
-			_oAuth2ApplicationScopeAliasesLocalService.
-				fetchOAuth2ApplicationScopeAliases(
-					oAuth2ApplicationId, scopeAliasesList);
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases = null;
+
+		if (oAuth2ApplicationScopeAliasesId != 0) {
+			List<String> applicationScopeAliasesList =
+				_oAuth2ApplicationScopeAliasesLocalService.getScopeAliasesList(
+					oAuth2ApplicationScopeAliasesId);
+
+			Set<String> scopeAliasesSet = new HashSet<>(scopeAliasesList);
+
+			if (applicationScopeAliasesList.size() == scopeAliasesSet.size()) {
+				scopeAliasesSet.removeAll(applicationScopeAliasesList);
+
+				if (scopeAliasesSet.isEmpty()) {
+					oAuth2ApplicationScopeAliases =
+						_oAuth2ApplicationScopeAliasesLocalService.
+							fetchOAuth2ApplicationScopeAliases(
+								oAuth2ApplicationScopeAliasesId);
+				}
+			}
+		}
 
 		if (oAuth2ApplicationScopeAliases != null) {
 			oAuth2ApplicationScopeAliases.setUserId(userId);
@@ -420,7 +439,7 @@ public class OAuth2ApplicationLocalServiceImpl
 						oAuth2ApplicationId, scopeAliasesList);
 		}
 
-		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() !=
+		if (oAuth2ApplicationScopeAliasesId !=
 				oAuth2ApplicationScopeAliases.
 					getOAuth2ApplicationScopeAliasesId()) {
 
