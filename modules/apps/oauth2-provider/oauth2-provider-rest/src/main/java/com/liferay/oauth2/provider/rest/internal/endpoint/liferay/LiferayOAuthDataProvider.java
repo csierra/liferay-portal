@@ -34,14 +34,12 @@ import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -1112,12 +1110,6 @@ public class LiferayOAuthDataProvider
 	private volatile BearerTokenProviderAccessor _bearerTokenProviderAccessor;
 
 	@Reference
-	private ConfigurationProvider _configurationProvider;
-
-	@Reference
-	private MultiVMPool _multiVMPool;
-
-	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
 
 	@Reference
@@ -1133,9 +1125,6 @@ public class LiferayOAuthDataProvider
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
-
-	@Reference
-	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 
 	@Reference
 	private ScopeLocator _scopeLocator;
