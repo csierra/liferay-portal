@@ -106,7 +106,6 @@ public class AssignScopesDisplayContext
 
 			AssignableScopes assignedAssignableScopes = null;
 			Relations relations;
-
 			Set<String> applicationNames;
 
 			if (liferayOAuth2Scopes.isEmpty()) {
