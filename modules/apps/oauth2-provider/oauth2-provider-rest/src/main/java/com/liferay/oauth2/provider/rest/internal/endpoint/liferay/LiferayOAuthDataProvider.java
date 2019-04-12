@@ -26,7 +26,6 @@ import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenPro
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
-import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService;
@@ -587,13 +586,14 @@ public class LiferayOAuthDataProvider
 	@Activate
 	@SuppressWarnings("unchecked")
 	protected void activate(Map<String, Object> properties) {
-		_oAuth2AuthorizeFlowConfiguration = ConfigurableUtil.createConfigurable(
-			OAuth2AuthorizationFlowConfiguration.class, properties);
+		_oAuth2AuthorizationFlowConfiguration =
+			ConfigurableUtil.createConfigurable(
+				OAuth2AuthorizationFlowConfiguration.class, properties);
 		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
 			OAuth2ProviderConfiguration.class, properties);
 
 		setGrantLifetime(
-			_oAuth2AuthorizeFlowConfiguration.authorizationCodeGrantTTL());
+			_oAuth2AuthorizationFlowConfiguration.authorizationCodeGrantTTL());
 	}
 
 	@Override
@@ -1116,11 +1116,12 @@ public class LiferayOAuthDataProvider
 	private OAuth2ApplicationScopeAliasesLocalService
 		_oAuth2ApplicationScopeAliasesLocalService;
 
+	private OAuth2AuthorizationFlowConfiguration
+		_oAuth2AuthorizationFlowConfiguration;
+
 	@Reference
 	private OAuth2AuthorizationLocalService _oAuth2AuthorizationLocalService;
 
-	private OAuth2AuthorizationFlowConfiguration
-		_oAuth2AuthorizeFlowConfiguration;
 	private OAuth2ProviderConfiguration _oAuth2ProviderConfiguration;
 
 	@Reference
