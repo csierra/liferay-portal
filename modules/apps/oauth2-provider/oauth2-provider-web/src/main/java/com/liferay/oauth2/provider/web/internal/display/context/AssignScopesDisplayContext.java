@@ -112,7 +112,7 @@ public class AssignScopesDisplayContext
 				assignedAssignableScopes =
 					assignedScopeAliasesAssignableScopes.remove(scopeAlias);
 
-				relations = registerAssignableScopes(
+				relations = getRelations(
 					null, assignedAssignableScopes);
 
 				assignableScopes = assignedAssignableScopes;
@@ -122,7 +122,7 @@ public class AssignScopesDisplayContext
 			else {
 				assignableScopes.addLiferayOAuth2Scopes(liferayOAuth2Scopes);
 
-				relations = registerAssignableScopes(
+				relations = getRelations(
 					scopeAlias, assignableScopes);
 
 				assignedAssignableScopes =
@@ -460,18 +460,18 @@ public class AssignScopesDisplayContext
 		return grantedScopeAliasesAssignableScopes;
 	}
 
-	protected Relations registerAssignableScopes(
+	protected Relations getRelations(
 		String scopeAlias, AssignableScopes assignableScopes) {
 
-		Relations relations = _assignableScopesRelations.compute(
+		return _assignableScopesRelations.compute(
 			assignableScopes,
-			(key, existingValue) -> {
-				if (existingValue != null) {
+			(key, relations) -> {
+				if (relations != null) {
 					if (Validator.isNotNull(scopeAlias)) {
-						existingValue._scopeAliases.add(scopeAlias);
+						relations._scopeAliases.add(scopeAlias);
 					}
 
-					return existingValue;
+					return relations;
 				}
 
 				if (Validator.isNotNull(scopeAlias)) {
@@ -480,8 +480,6 @@ public class AssignScopesDisplayContext
 
 				return new Relations(Collections.emptySet());
 			});
-
-		return relations;
 	}
 
 	private static <K, V> Map<V, K> _invertMap(Map<K, V> map) {
