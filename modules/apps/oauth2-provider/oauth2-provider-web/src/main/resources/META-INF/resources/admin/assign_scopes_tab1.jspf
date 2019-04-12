@@ -68,7 +68,7 @@
 							<li class="list-group-item list-group-item-flex<c:if test="<%= scopeAliases.isEmpty() && globalScopeAliases.isEmpty() %>"> removed-scope</c:if>">
 								<div class="autofit-col">
 									<c:choose>
-										<c:when test="<%= scopeAliases.isEmpty() && assignedScopeAliases.isEmpty() %>">
+										<c:when test="<%= assignedScopeAliases.isEmpty() && scopeAliases.isEmpty() %>">
 											<aui:input data="<%= data %>" disabled="<%= true %>" id="<%= id %>" label="" name="<%= id %>" onClick="return false;" title="<%= HtmlUtil.escapeAttribute(scopeAliases.toString()) %>" type="checkbox" />
 										</c:when>
 										<c:otherwise>
