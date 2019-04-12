@@ -997,7 +997,7 @@ public class LiferayOAuthDataProvider
 			oAuth2ScopeGrant -> !Collections.disjoint(
 				oAuth2ScopeGrant.getScopeAliasesList(), scopeAliases)
 		).map(
-			oAuth2ScopeGrant -> _scopeFinderLocator.getLiferayOAuth2Scope(
+			oAuth2ScopeGrant -> _scopeLocator.getLiferayOAuth2Scope(
 				oAuth2ScopeGrant.getCompanyId(),
 				oAuth2ScopeGrant.getApplicationName(),
 				oAuth2ScopeGrant.getScope())
@@ -1138,7 +1138,7 @@ public class LiferayOAuthDataProvider
 	private ScopedServiceTrackerMapFactory _scopedServiceTrackerMapFactory;
 
 	@Reference
-	private ScopeLocator _scopeFinderLocator;
+	private ScopeLocator _scopeLocator;
 
 	@Reference
 	private ServerAuthorizationCodeGrantProvider
