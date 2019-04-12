@@ -19,36 +19,12 @@
 <%@ include file="/html/common/init.jsp" %>
 
 <%
-String referer = null;
+	String referer = null;
+	ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-String refererParam = PortalUtil.escapeRedirect(request.getParameter(WebKeys.REFERER));
-String refererRequest = (String)request.getAttribute(WebKeys.REFERER);
+	Future<String> result = executorService.submit(new RefererUtil(request, themeDisplay));
 
-String refererSession = null;
-
-HttpSession session = request.getSession(false);
-
-if (session != null) {
-	refererSession = (String)session.getAttribute(WebKeys.REFERER);
-}
-
-if (Validator.isNotNull(refererParam)) {
-	referer = refererParam;
-}
-else if (Validator.isNotNull(refererRequest)) {
-	referer = refererRequest;
-}
-else if (Validator.isNotNull(refererSession)) {
-	referer = refererSession;
-}
-else if (themeDisplay != null) {
-	referer = themeDisplay.getPathMain();
-}
-else {
-	referer = PortalUtil.getPathMain();
-}
-
-if ((session != null) && !CookieKeys.hasSessionId(request) && Validator.isNotNull(referer)) {
-	referer = PortalUtil.getURLWithSessionId(referer, session.getId());
-}
+	if (result.isDone()) {
+		referer = result.get();
+	}
 %>
