@@ -73,6 +73,7 @@
 		<finder name="OAuth2ApplicationId" return-type="Collection">
 			<finder-column name="oAuth2ApplicationId" />
 		</finder>
+		<reference entity="OAuth2Application" package-path="com.liferay.oauth2.provider" />
 	</entity>
 	<entity json-enabled="false" local-service="true" name="OAuth2Authorization" remote-service="true">
 
