@@ -84,12 +84,10 @@ public class AssignScopesDisplayContext
 
 		OAuth2Application oAuth2Application = getOAuth2Application();
 
-		long oAuth2ApplicationScopeAliasesId =
-			oAuth2Application.getOAuth2ApplicationScopeAliasesId();
-
 		Map<String, AssignableScopes> assignedScopeAliasesAssignableScopes =
 			getAssignedAssignableScopes(
-				oAuth2ApplicationScopeAliasesId, applicationDescriptorLocator,
+				oAuth2Application.getOAuth2ApplicationScopeAliasesId(),
+				applicationDescriptorLocator,
 				oAuth2ScopeGrantLocalService, scopeDescriptorLocator,
 				scopeLocator, themeDisplay);
 
