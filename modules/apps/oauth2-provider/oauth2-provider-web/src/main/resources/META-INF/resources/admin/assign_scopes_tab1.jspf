@@ -169,6 +169,7 @@
 
 										<%
 										Set<String> relatedScopeAliases = new HashSet<>(scopeAliases);
+
 										relatedScopeAliases.addAll(assignedScopeAliases);
 										relatedScopeAliases.addAll(globalScopeAliases);
 
