@@ -79,9 +79,7 @@ public class AssignableScopes {
 			return;
 		}
 
-		Stream<LiferayOAuth2Scope> stream = liferayOAuth2Scopes.stream();
-
-		stream.forEach(this::addLiferayOAuth2Scope);
+		liferayOAuth2Scopes.forEach(this::addLiferayOAuth2Scope);
 	}
 
 	public boolean contains(AssignableScopes assignableScopes) {
