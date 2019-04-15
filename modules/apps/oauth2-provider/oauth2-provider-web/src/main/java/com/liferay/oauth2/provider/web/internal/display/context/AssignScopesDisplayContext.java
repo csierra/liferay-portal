@@ -104,8 +104,8 @@ public class AssignScopesDisplayContext
 					themeDisplay.getCompanyId(), scopeAlias);
 
 			AssignableScopes assignedAssignableScopes = null;
-			Relations relations;
-			Set<String> applicationNames;
+			Relations relations = null;
+			Set<String> applicationNames = null;
 
 			if (liferayOAuth2Scopes.isEmpty()) {
 				assignedAssignableScopes =
@@ -535,17 +535,13 @@ public class AssignScopesDisplayContext
 
 			Relations relations = assignableScopesRelationsEntry.getValue();
 
-			Set<String> scopeAliases = relations.getScopeAliases();
-			Set<String> assignedScopeAliases =
-				relations.getAssignedScopeAliases();
-
 			AssignableScopes assignableScopes =
 				assignableScopesRelationsEntry.getKey();
 
 			// Preserve assignable scopes that are assigned an alias
 
-			if (!SetUtil.isEmpty(scopeAliases) ||
-				!SetUtil.isEmpty(assignedScopeAliases)) {
+			if (!SetUtil.isEmpty(relations.getAssignedScopeAliases()) ||
+				!SetUtil.isEmpty(relations.getScopeAliases())) {
 
 				combinedAssignableScopesRelations.put(
 					assignableScopes, relations);

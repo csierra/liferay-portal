@@ -118,16 +118,16 @@ public class ViewConnectedApplicationsMVCRenderCommand
 			}
 		}
 
+		AssignableScopes assignableScopes = new AssignableScopes(
+			_applicationDescriptorLocator, themeDisplay.getLocale(),
+			_scopeDescriptorLocator);
+
 		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
 			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
 				oAuth2Authorization.getOAuth2ApplicationScopeAliasesId(),
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
-
-		AssignableScopes assignableScopes = new AssignableScopes(
-			_applicationDescriptorLocator, themeDisplay.getLocale(),
-			_scopeDescriptorLocator);
 
 		stream.map(
 			oAuth2ScopeGrant -> _scopeLocator.getLiferayOAuth2Scope(
