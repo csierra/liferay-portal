@@ -27,6 +27,7 @@ import java.util.Collection;
 import org.osgi.framework.Bundle;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
@@ -39,6 +40,10 @@ public class ThreadLocalScopeContextScopeChecker
 
 	@Override
 	public boolean checkAllScopes(String... scopes) {
+		if (_oAuth2ScopeGrantLocalService == null) {
+			throw new IllegalStateException();
+		}
+
 		if (Validator.isNull(scopes)) {
 			throw new IllegalArgumentException("Scopes are null");
 		}
@@ -68,6 +73,10 @@ public class ThreadLocalScopeContextScopeChecker
 
 	@Override
 	public boolean checkAnyScope(String... scopes) {
+		if (_oAuth2ScopeGrantLocalService == null) {
+			throw new IllegalStateException();
+		}
+
 		if (Validator.isNull(scopes)) {
 			throw new IllegalArgumentException("Scopes are null");
 		}
@@ -95,6 +104,10 @@ public class ThreadLocalScopeContextScopeChecker
 
 	@Override
 	public boolean checkScope(String scope) {
+		if (_oAuth2ScopeGrantLocalService == null) {
+			throw new IllegalStateException();
+		}
+
 		if (Validator.isNull(scope)) {
 			throw new IllegalArgumentException("Scope is null");
 		}
@@ -152,6 +165,7 @@ public class ThreadLocalScopeContextScopeChecker
 		ThreadLocal.withInitial(() -> 0L);
 
 	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
 		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
