@@ -48,7 +48,7 @@ public class OAuth2ScopeGrantLocalServiceImpl
 			String applicationName, String bundleSymbolicName, String scope)
 		throws DuplicateOAuth2ScopeGrantException {
 
-		throw new RuntimeException("Unsupported");
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
