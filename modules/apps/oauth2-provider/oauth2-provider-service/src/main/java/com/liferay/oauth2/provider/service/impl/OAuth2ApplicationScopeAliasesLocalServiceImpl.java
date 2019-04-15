@@ -59,11 +59,11 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			long oAuth2ApplicationId, List<String> scopeAliasesList)
 		throws PortalException {
 
-		if (scopeAliasesList.stream().anyMatch(
-				scopeAlias -> scopeAlias.indexOf(' ') > -1)) {
-
-			throw new PortalException(
-				"Scope aliases cannot contain space characters");
+		for (String scopeAlias : scopeAliasesList) {
+			if (scopeAlias.contains(" ")) {
+				throw new PortalException(
+					"Scope aliases cannot contain spaces");
+			}
 		}
 
 		Map<LiferayOAuth2Scope, List<String>> liferayOAuth2ScopesScopeAliases =
