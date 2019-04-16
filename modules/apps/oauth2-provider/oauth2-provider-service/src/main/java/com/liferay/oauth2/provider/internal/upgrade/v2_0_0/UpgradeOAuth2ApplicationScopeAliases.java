@@ -62,19 +62,19 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 		Map<LiferayOAuth2Scope, Set<String>> liferayOAuth2ScopeScopeAliases =
 			new HashMap<>();
 
-		List<String> scopeAliasesList = new ArrayList<>(
+		List<String> scopeAliases = new ArrayList<>(
 			_scopeLocator.getScopeAliases(companyId));
 
-		for (String scopeAlias : scopeAliasesList) {
+		for (String scopeAlias : scopeAliases) {
 			for (LiferayOAuth2Scope liferayOAuth2Scope :
 					_scopeLocator.getLiferayOAuth2Scopes(
 						companyId, scopeAlias)) {
 
-				Set<String> scopeAliases =
+				Set<String> set =
 					liferayOAuth2ScopeScopeAliases.computeIfAbsent(
 						liferayOAuth2Scope, x -> new HashSet<>());
 
-				scopeAliases.add(scopeAlias);
+				set.add(scopeAlias);
 			}
 		}
 
@@ -83,10 +83,10 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 				_getApplicationScopeAliases(companyId)) {
 
 			while (applicationScopeAliasesResultSet.next()) {
-				String scopeAliases =
+				String scopeAliasesString =
 					applicationScopeAliasesResultSet.getString("scopeAliases");
 
-				if (Validator.isNull(scopeAliases)) {
+				if (Validator.isNull(scopeAliasesString)) {
 					continue;
 				}
 
@@ -95,7 +95,7 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 						"oA2AScopeAliasesId");
 
 				Set<String> assignedScopeAliases = SetUtil.fromArray(
-					StringUtil.split(scopeAliases, StringPool.SPACE));
+					StringUtil.split(scopeAliasesString, StringPool.SPACE));
 
 				_upgradeOAuth2ScopeGrants(
 					oAuth2ApplicationScopeAliasesId, companyId,
