@@ -120,7 +120,7 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 		return preparedStatement.executeQuery();
 	}
 
-	private ResultSet _getOAuth2ScopeGrants(
+	private ResultSet _getOAuth2ScopeGrantResultSet(
 			long oAuth2ApplicationScopeAliasesId)
 		throws SQLException {
 
@@ -163,16 +163,15 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 			Set<String> assignedScopeAliases)
 		throws SQLException {
 
-		try (ResultSet oAuth2ScopeGrantResultSet = _getOAuth2ScopeGrants(
+		try (ResultSet resultSet = _getOAuth2ScopeGrantResultSet(
 				oAuth2ApplicationScopeAliasesId)) {
 
-			while (oAuth2ScopeGrantResultSet.next()) {
-				long oAuth2ScopeGrantId = oAuth2ScopeGrantResultSet.getLong(
+			while (resultSet.next()) {
+				long oAuth2ScopeGrantId = resultSet.getLong(
 					"oAuth2ScopeGrantId");
 
-				String applicationName = oAuth2ScopeGrantResultSet.getString(
-					"applicationName");
-				String scope = oAuth2ScopeGrantResultSet.getString("scope");
+				String applicationName = resultSet.getString("applicationName");
+				String scope = resultSet.getString("scope");
 
 				LiferayOAuth2Scope liferayOAuth2Scope =
 					_scopeLocator.getLiferayOAuth2Scope(
