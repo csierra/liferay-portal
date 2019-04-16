@@ -42,9 +42,7 @@ public class PortalSessionAuthVerifierPublisher
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		if (!properties.containsKey("checkCSRFToken")) {
-			properties.put("checkCSRFToken", false);
-		}
+		properties.putIfAbsent("checkCSRFToken", false);
 
 		super.activate(bundleContext, properties);
 	}
