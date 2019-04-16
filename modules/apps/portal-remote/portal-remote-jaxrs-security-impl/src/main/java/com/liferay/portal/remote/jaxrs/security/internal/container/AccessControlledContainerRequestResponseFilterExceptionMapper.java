@@ -51,9 +51,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Component(
 	property = {
 		"osgi.jaxrs.application.select=(!(liferay.access.control.disable=true))",
-		"osgi.jaxrs.extension=true",
-		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=jaxb-json)",
-		"osgi.jaxrs.name=Liferay.Access.Control"
+		"osgi.jaxrs.extension=true", "osgi.jaxrs.name=Liferay.Access.Control"
 	},
 	scope = ServiceScope.PROTOTYPE,
 	service = {
