@@ -150,8 +150,8 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 				StringUtil.merge(
 					ListUtil.sort(new ArrayList<>(scopeAliases)),
 					StringPool.SPACE));
-
 			preparedStatement.setLong(2, oAuth2ScopeGrantId);
+
 			preparedStatement.execute();
 		}
 	}
