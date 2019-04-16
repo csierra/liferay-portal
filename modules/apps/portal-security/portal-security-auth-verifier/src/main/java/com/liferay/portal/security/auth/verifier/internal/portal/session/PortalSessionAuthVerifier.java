@@ -14,13 +14,19 @@
 
 package com.liferay.portal.security.auth.verifier.internal.portal.session;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.AuthException;
+import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Properties;
@@ -55,6 +61,27 @@ public class PortalSessionAuthVerifier implements AuthVerifier {
 				return authVerifierResult;
 			}
 
+			boolean checkCSRFToken = GetterUtil.getBoolean(
+				properties.get("checkCSRFToken"), true);
+
+			if (checkCSRFToken) {
+				String csrfOrigin = request.getRequestURI();
+
+				try {
+					AuthTokenUtil.checkCSRFToken(request, csrfOrigin);
+				}
+				catch (PrincipalException pe) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							StringBundler.concat(
+								"Unable to verify CSRF token for ", csrfOrigin,
+								": ", pe.getMessage()));
+					}
+
+					return authVerifierResult;
+				}
+			}
+
 			authVerifierResult.setPasswordBasedAuthentication(true);
 			authVerifierResult.setState(AuthVerifierResult.State.SUCCESS);
 			authVerifierResult.setUserId(user.getUserId());
@@ -68,5 +95,8 @@ public class PortalSessionAuthVerifier implements AuthVerifier {
 			throw new AuthException(se);
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortalSessionAuthVerifier.class);
 
 }
