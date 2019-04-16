@@ -14,7 +14,6 @@
 
 package com.liferay.oauth2.provider.internal.upgrade.v2_0_0;
 
-import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2ApplicationScopeAliasesTable;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.petra.string.StringPool;
@@ -57,10 +56,6 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 		for (Company company : _companyLocalService.getCompanies()) {
 			upgradeCompany(company.getCompanyId());
 		}
-
-		alter(
-			OAuth2ApplicationScopeAliasesTable.class,
-			new AlterTableDropColumn("scopeAliases"));
 	}
 
 	protected void upgradeCompany(long companyId) throws Exception {
