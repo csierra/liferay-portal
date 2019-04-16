@@ -59,7 +59,7 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 	}
 
 	protected void upgradeCompany(long companyId) throws Exception {
-		Map<LiferayOAuth2Scope, Set<String>> liferayOAuth2ScopesScopeAliases =
+		Map<LiferayOAuth2Scope, Set<String>> liferayOAuth2ScopeScopeAliases =
 			new HashMap<>();
 
 		List<String> scopeAliasesList = new ArrayList<>(
@@ -71,7 +71,7 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 						companyId, scopeAlias)) {
 
 				Set<String> scopeAliases =
-					liferayOAuth2ScopesScopeAliases.computeIfAbsent(
+					liferayOAuth2ScopeScopeAliases.computeIfAbsent(
 						liferayOAuth2Scope, x -> new HashSet<>());
 
 				scopeAliases.add(scopeAlias);
@@ -99,7 +99,7 @@ public class UpgradeOAuth2ApplicationScopeAliases extends UpgradeProcess {
 
 				_upgradeOAuth2ScopeGrants(
 					oAuth2ApplicationScopeAliasesId, companyId,
-					liferayOAuth2ScopesScopeAliases, assignedScopeAliases);
+					liferayOAuth2ScopeScopeAliases, assignedScopeAliases);
 			}
 		}
 	}
