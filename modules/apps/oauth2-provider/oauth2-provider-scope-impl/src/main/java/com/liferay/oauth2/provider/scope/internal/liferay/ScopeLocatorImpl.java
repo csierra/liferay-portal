@@ -63,6 +63,24 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class ScopeLocatorImpl implements ScopeLocator {
 
 	@Override
+	public LiferayOAuth2Scope getLiferayOAuth2Scope(
+		long companyId, String applicationName, String scope) {
+
+		ServiceReferenceServiceTuple<?, ScopeFinder>
+			serviceReferenceServiceTuple =
+				_scopeFinderByNameServiceTrackerMap.getService(applicationName);
+
+		if (serviceReferenceServiceTuple == null) {
+			return null;
+		}
+
+		Bundle bundle = getBundle(
+			serviceReferenceServiceTuple.getServiceReference());
+
+		return new LiferayOAuth2ScopeImpl(applicationName, bundle, scope);
+	}
+
+	@Override
 	public Collection<LiferayOAuth2Scope> getLiferayOAuth2Scopes(
 		long companyId, String scopesAlias) {
 

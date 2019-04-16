@@ -12,14 +12,21 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.model.impl;
+package com.liferay.oauth2.provider.internal.upgrade.v2_0_0;
 
-import aQute.bnd.annotation.ProviderType;
+import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2ScopeGrantTable;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author Stian Sigvartsen
  */
-@ProviderType
-public class OAuth2ApplicationScopeAliasesImpl
-	extends OAuth2ApplicationScopeAliasesBaseImpl {
+public class UpgradeOAuth2ScopeGrant2 extends UpgradeProcess {
+
+	@Override
+	protected void doUpgrade() throws Exception {
+		alter(
+			OAuth2ScopeGrantTable.class,
+			new AlterTableAddColumn("scopeAliases TEXT null"));
+	}
+
 }

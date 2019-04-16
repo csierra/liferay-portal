@@ -15,14 +15,15 @@
 package com.liferay.oauth2.provider.web.internal.portlet.action;
 
 import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
+import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
+import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.oauth2.provider.web.internal.AssignableScopes;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderWebKeys;
@@ -37,8 +38,10 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -119,23 +122,21 @@ public class ViewConnectedApplicationsMVCRenderCommand
 			_applicationDescriptorLocator, themeDisplay.getLocale(),
 			_scopeDescriptorLocator);
 
-		long oAuth2ApplicationScopeAliasesId =
-			oAuth2Authorization.getOAuth2ApplicationScopeAliasesId();
+		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
+			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
+				oAuth2Authorization.getOAuth2ApplicationScopeAliasesId(),
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
-		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
-			_oAuth2ApplicationScopeAliasesLocalService.
-				fetchOAuth2ApplicationScopeAliases(
-					oAuth2ApplicationScopeAliasesId);
+		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
 
-		if (oAuth2ApplicationScopeAliases != null) {
-			for (String scopeAlias :
-					oAuth2ApplicationScopeAliases.getScopeAliasesList()) {
-
-				assignableScopes.addLiferayOAuth2Scopes(
-					_scopeLocator.getLiferayOAuth2Scopes(
-						themeDisplay.getCompanyId(), scopeAlias));
-			}
-		}
+		stream.map(
+			oAuth2ScopeGrant -> _scopeLocator.getLiferayOAuth2Scope(
+				oAuth2ScopeGrant.getCompanyId(),
+				oAuth2ScopeGrant.getApplicationName(),
+				oAuth2ScopeGrant.getScope())
+		).forEach(
+			assignableScopes::addLiferayOAuth2Scope
+		);
 
 		OAuth2ConnectedApplicationsPortletDisplayContext
 			oAuth2ConnectedApplicationsPortletDisplayContext =
@@ -169,6 +170,9 @@ public class ViewConnectedApplicationsMVCRenderCommand
 
 	@Reference
 	private OAuth2AuthorizationService _oAuth2AuthorizationService;
+
+	@Reference
+	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
 
 	@Reference
 	private ScopeDescriptorLocator _scopeDescriptorLocator;
