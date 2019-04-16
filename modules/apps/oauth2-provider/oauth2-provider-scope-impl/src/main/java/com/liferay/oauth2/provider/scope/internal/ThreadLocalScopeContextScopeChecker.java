@@ -40,9 +40,7 @@ public class ThreadLocalScopeContextScopeChecker
 
 	@Override
 	public boolean checkAllScopes(String... scopes) {
-		if (_oAuth2ScopeGrantLocalService == null) {
-			throw new IllegalStateException();
-		}
+		_checkOAuth2ScopeGrantLocalService();
 
 		if (Validator.isNull(scopes)) {
 			throw new IllegalArgumentException("Scopes are null");
@@ -73,9 +71,7 @@ public class ThreadLocalScopeContextScopeChecker
 
 	@Override
 	public boolean checkAnyScope(String... scopes) {
-		if (_oAuth2ScopeGrantLocalService == null) {
-			throw new IllegalStateException();
-		}
+		_checkOAuth2ScopeGrantLocalService();
 
 		if (Validator.isNull(scopes)) {
 			throw new IllegalArgumentException("Scopes are null");
@@ -104,9 +100,7 @@ public class ThreadLocalScopeContextScopeChecker
 
 	@Override
 	public boolean checkScope(String scope) {
-		if (_oAuth2ScopeGrantLocalService == null) {
-			throw new IllegalStateException();
-		}
+		_checkOAuth2ScopeGrantLocalService();
 
 		if (Validator.isNull(scope)) {
 			throw new IllegalArgumentException("Scope is null");
@@ -153,6 +147,14 @@ public class ThreadLocalScopeContextScopeChecker
 	@Override
 	public void setCompanyId(long companyId) {
 		_companyIdThreadLocal.set(companyId);
+	}
+
+	private void _checkOAuth2ScopeGrantLocalService() {
+		if (_oAuth2ScopeGrantLocalService == null) {
+			throw new IllegalStateException(
+				"ScopeChecker dependency upon OAuth2ScopeGrantLocalService " +
+					"is not satisfied");
+		}
 	}
 
 	private final ThreadLocal<String> _accessTokenThreadLocal =
