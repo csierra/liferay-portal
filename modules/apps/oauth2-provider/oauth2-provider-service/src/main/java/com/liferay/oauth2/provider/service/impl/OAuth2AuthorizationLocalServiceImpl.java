@@ -41,6 +41,7 @@ public class OAuth2AuthorizationLocalServiceImpl
 	/**
 	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addOAuth2Authorization(long, long, String, long,long, String, Date, Date, String, String, String, Date, Date)}
 	 */
+	@Deprecated
 	@Override
 	public OAuth2Authorization addOAuth2Authorization(
 		long companyId, long userId, String userName, long oAuth2ApplicationId,
