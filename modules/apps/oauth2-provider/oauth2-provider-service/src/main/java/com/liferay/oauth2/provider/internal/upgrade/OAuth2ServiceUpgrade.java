@@ -17,6 +17,7 @@ package com.liferay.oauth2.provider.internal.upgrade;
 import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.UpgradeOAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2ApplicationScopeAliasesTable;
 import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2ScopeGrantTable;
+import com.liferay.oauth2.provider.internal.upgrade.v2_1_0.util.OAuth2AuthorizationTable;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
@@ -44,10 +45,16 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"1.1.0", "1.2.0",
 			getAddColumnsUpgradeProcess(
+				OAuth2AuthorizationTable.class,
+				"remoteHostInfo VARCHAR(255) null"));
+
+		registry.register(
+			"1.2.0", "1.3.0",
+			getAddColumnsUpgradeProcess(
 				OAuth2ScopeGrantTable.class, "scopeAliases TEXT null"));
 
 		registry.register(
-			"1.2.0", "2.0.0",
+			"1.3.0", "2.0.0",
 			new UpgradeOAuth2ApplicationScopeAliases(
 				_companyLocalService, _scopeLocator),
 			getDropColumnsUpgradeProcess(
