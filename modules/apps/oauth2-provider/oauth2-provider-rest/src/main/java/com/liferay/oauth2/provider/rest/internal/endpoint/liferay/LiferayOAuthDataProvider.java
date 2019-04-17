@@ -1079,7 +1079,7 @@ public class LiferayOAuthDataProvider
 				oAuth2Application.getOAuth2ApplicationId(),
 				oAuth2Application.getOAuth2ApplicationScopeAliasesId(),
 				serverAccessToken.getTokenKey(), createDate, expirationDate,
-				remoteAddr + ", " + remoteHost, null, null, null);
+				remoteHost, remoteAddr, null, null, null);
 
 		List<String> scopeAliasesList =
 			OAuthUtils.convertPermissionsToScopeList(
