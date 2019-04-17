@@ -39,6 +39,7 @@ public class OAuth2AuthorizationLocalServiceWrapper
 	/**
 	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addOAuth2Authorization(long, long, String, long,long, String, Date, Date, String, String, String, Date, Date)}
 	 */
+	@Deprecated
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2Authorization
 		addOAuth2Authorization(
