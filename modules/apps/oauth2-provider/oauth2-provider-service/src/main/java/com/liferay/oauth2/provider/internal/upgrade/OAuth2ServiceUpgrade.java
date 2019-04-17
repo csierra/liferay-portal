@@ -19,11 +19,13 @@ import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2Applicatio
 import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2ScopeGrantTable;
 import com.liferay.oauth2.provider.internal.upgrade.v2_1_0.util.OAuth2AuthorizationTable;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.osgi.service.component.annotations.Component;
@@ -31,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Carlos Sierra Andrés
+ * @author Stian Sigvartsen
  */
 @Component(service = UpgradeStepRegistrator.class)
 public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
@@ -39,8 +42,10 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 	public void register(Registry registry) {
 		registry.register(
 			"1.0.0", "1.1.0",
-			new com.liferay.oauth2.provider.internal.upgrade.v1_1_0.
-				UpgradeOAuth2ScopeGrant());
+			getAlterColumnsUpgradeProcess(
+				com.liferay.oauth2.provider.internal.upgrade.v1_1_0.util.
+					OAuth2ScopeGrantTable.class,
+				"scope VARCHAR(240) null"));
 
 		registry.register(
 			"1.1.0", "1.2.0",
@@ -78,6 +83,23 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 		};
 	}
 
+	protected UpgradeProcess getAlterColumnsUpgradeProcess(
+		Class<?> tableClass, String... columnDefinitions) {
+
+		return new UpgradeProcess() {
+
+			@Override
+			protected void doUpgrade() throws Exception {
+				alter(
+					tableClass,
+					_getAlterablesWithArguments(
+						UpgradeProcess.AlterColumnType::new,
+						columnDefinitions));
+			}
+
+		};
+	}
+
 	protected UpgradeProcess getDropColumnsUpgradeProcess(
 		Class<?> tableClass, String... tableNames) {
 
@@ -101,6 +123,23 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 			alterableStrings
 		).map(
 			alterableFunction
+		).toArray(
+			UpgradeProcess.Alterable[]::new
+		);
+	}
+
+	private UpgradeProcess.Alterable[] _getAlterablesWithArguments(
+		BiFunction<String, String, UpgradeProcess.Alterable>
+			alterableBiFunction,
+		String... alterableStrings) {
+
+		return Arrays.stream(
+			alterableStrings
+		).map(
+			entry -> entry.split(StringPool.SPACE, 2)
+		).map(
+			alterableString -> alterableBiFunction.apply(
+				alterableString[0], alterableString[1])
 		).toArray(
 			UpgradeProcess.Alterable[]::new
 		);
