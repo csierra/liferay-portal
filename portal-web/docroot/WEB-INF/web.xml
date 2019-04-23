@@ -1013,7 +1013,7 @@
 	</welcome-file-list>
 	<error-page>
 		<error-code>403</error-code>
-		<location>/errors/forbidden.jsp</location>
+		<location>/errors/code.jsp</location>
 	</error-page>
 	<error-page>
 		<error-code>404</error-code>
