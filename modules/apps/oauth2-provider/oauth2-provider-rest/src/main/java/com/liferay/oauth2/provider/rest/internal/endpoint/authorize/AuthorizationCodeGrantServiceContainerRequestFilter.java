@@ -168,10 +168,19 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 			requestURIString = requestURIString.substring(portalURL.length());
 		}
 
-		for (String param : queryParameters.keySet()) {
-			requestURIString = setParameter(
-				requestURIString, param, queryParameters.getFirst(param));
-		}
+		requestURIString = setParameter(
+			requestURIString, "client_id",
+			queryParameters.getFirst("client_id"));
+		requestURIString = setParameter(
+			requestURIString, "scope", queryParameters.getFirst("scope"));
+		requestURIString = setParameter(
+			requestURIString, "redirect_uri",
+			queryParameters.getFirst("redirect_uri"));
+		requestURIString = setParameter(
+			requestURIString, "response_type",
+			queryParameters.getFirst("response_type"));
+		requestURIString = setParameter(
+			requestURIString, "state", queryParameters.getFirst("state"));
 
 		loginURL = _http.addParameter(loginURL, "redirect", requestURIString);
 
