@@ -18,7 +18,6 @@ import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.rest.internal.endpoint.authorize.configuration.AuthorizeScreenConfiguration;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -50,7 +49,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
@@ -154,33 +152,13 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 
 		URI requestURI = uriInfo.getRequestUri();
 
-		MultivaluedMap<String, String> queryParameters =
-			uriInfo.getQueryParameters(true);
-
 		String requestURIString = requestURI.toASCIIString();
-
-		requestURIString = requestURIString.replaceFirst(
-			"\\?.*", StringPool.BLANK);
 
 		String portalURL = _portal.getPortalURL(_httpServletRequest);
 
 		if (requestURIString.startsWith(portalURL)) {
 			requestURIString = requestURIString.substring(portalURL.length());
 		}
-
-		requestURIString = setParameter(
-			requestURIString, "client_id",
-			queryParameters.getFirst("client_id"));
-		requestURIString = setParameter(
-			requestURIString, "scope", queryParameters.getFirst("scope"));
-		requestURIString = setParameter(
-			requestURIString, "redirect_uri",
-			queryParameters.getFirst("redirect_uri"));
-		requestURIString = setParameter(
-			requestURIString, "response_type",
-			queryParameters.getFirst("response_type"));
-		requestURIString = setParameter(
-			requestURIString, "state", queryParameters.getFirst("state"));
 
 		loginURL = _http.addParameter(loginURL, "redirect", requestURIString);
 
@@ -242,14 +220,6 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 		}
 
 		return loginURL;
-	}
-
-	protected String setParameter(String url, String name, String value) {
-		if (Validator.isBlank(value)) {
-			return url;
-		}
-
-		return _http.addParameter(url, name, value);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
