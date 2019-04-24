@@ -18,6 +18,8 @@
 
 <%
 OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
+
+SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayContext(request, renderRequest, renderResponse);
 %>
 
 <aui:model-context bean="<%= oAuth2Application %>" model="<%= OAuth2Application.class %>" />
@@ -96,6 +98,50 @@ OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2
 
 					<div class="allowedGrantType <%= cssClassesStr %>">
 						<aui:input checked="<%= checked %>" data="<%= data %>" label="<%= grantType.name() %>" name="<%= name %>" type="checkbox" />
+
+						<c:if test="<%= grantType.equals(GrantType.CLIENT_CREDENTIALS) %>">
+							<div class="main-content-body">
+								<aui:input name="userId" type="hidden" />
+								<span class="h6"><liferay-ui:message key="userName" /></span><aui:input disabled="<%= true %>" label="" name="fullName" type="text" />
+
+								<div class="button-holder">
+									<aui:button cssClass="modify-link" id="selectUserButton" value="select" />
+								</div>
+							</div>
+
+							<aui:script use="aui-base,aui-io">
+								var selectUserButton = document.getElementById('<portlet:namespace />selectUserButton');
+
+								if (selectUserButton) {
+									selectUserButton.addEventListener(
+										'click',
+										function(event) {
+											Liferay.Util.selectEntity(
+												{
+													dialog: {
+														modal: true,
+														destroyOnHide: true
+													},
+													eventName: '<%= selectUsersDisplayContext.getEventName() %>',
+													id: '<%= selectUsersDisplayContext.getEventName() %>',
+													title: '<liferay-ui:message key="users" />',
+													uri: '<%= selectUsersDisplayContext.getPortletURL() %>'
+												},
+												function(event) {
+													var fullName = event.fullname;
+													var userId = event.userid;
+
+													A.one('#<portlet:namespace />fullName').val(fullName);
+													A.one('#<portlet:namespace />userId').val(userId);
+
+												}
+											);
+										}
+									);
+								}
+
+							</aui:script>
+						</c:if>
 					</div>
 
 					<%
