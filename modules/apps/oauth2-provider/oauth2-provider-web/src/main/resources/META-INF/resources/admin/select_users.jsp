@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/META-INF/resources/admin/init.jsp" %>
+<%@ include file="/admin/init.jsp" %>
 
 <%
 SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayContext(request, renderRequest, renderResponse);
