@@ -100,7 +100,7 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 						<aui:input checked="<%= checked %>" data="<%= data %>" label="<%= grantType.name() %>" name="<%= name %>" type="checkbox" />
 
 						<c:if test="<%= grantType.equals(GrantType.CLIENT_CREDENTIALS) %>">
-							<div class="main-content-body">
+							<div class="main-content-body" id="<portlet:namespace />userSelection">
 								<aui:input name="userId" type="hidden" />
 								<span class="h6"><liferay-ui:message key="userName" /></span><aui:input disabled="<%= true %>" label="" name="fullName" type="text" />
 
@@ -110,6 +110,8 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 							</div>
 
 							<aui:script use="aui-base,aui-io">
+								Liferay.Util.toggleBoxes('<portlet:namespace /><%= name %>', '<portlet:namespace />userSelection');
+
 								var selectUserButton = document.getElementById('<portlet:namespace />selectUserButton');
 
 								if (selectUserButton) {
