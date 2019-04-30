@@ -151,6 +151,11 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 					<aui:script use="aui-base,aui-io">
 						var selectUserButton = document.getElementById('<portlet:namespace />selectUserButton');
 
+						<%
+						String jsEscapedEventName = HtmlUtil.escapeJS(selectUsersDisplayContext.getEventName());
+						PortletURL selectUsersPortletURL = selectUsersDisplayContext.getPortletURL();
+						%>
+
 						if (selectUserButton) {
 							selectUserButton.addEventListener(
 								'click',
@@ -161,10 +166,10 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 												modal: true,
 												destroyOnHide: true
 											},
-											eventName: '<%= selectUsersDisplayContext.getEventName() %>',
-											id: '<%= selectUsersDisplayContext.getEventName() %>',
+											eventName: '<%= jsEscapedEventName %>',
+											id: '<%= jsEscapedEventName %>',
 											title: '<liferay-ui:message key="users" />',
-											uri: '<%= selectUsersDisplayContext.getPortletURL() %>'
+											uri: '<%= HtmlUtil.escapeJS(selectUsersPortletURL.toString()) %>'
 										},
 										function(event) {
 											A.one('#<portlet:namespace />clientCredentialUserId').val(event.userid);
