@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.oauth2.provider.internal.upgrade.v1_3_0.util;
+package com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util;
 
 import java.sql.Types;
 
