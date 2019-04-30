@@ -22,6 +22,7 @@ OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2
 SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayContext(request, renderRequest, renderResponse);
 
 String clientCredentialsCheckboxName = null;
+User currentUser = PortalUtil.getUser(request);
 %>
 
 <aui:model-context bean="<%= oAuth2Application %>" model="<%= OAuth2Application.class %>" />
@@ -155,20 +156,20 @@ String clientCredentialsCheckboxName = null;
 					</aui:field-wrapper>
 					
 					<aui:script use="aui-base,aui-io">
+						if (A.one('#<portlet:namespace />clientCredentialUserId').empty()) {
+							A.one('#<portlet:namespace />clientCredentialUserId').val('<%= currentUser.getUserId() %>');
+							A.one('#<portlet:namespace />clientCredentialUserName').val('<%= currentUser.getScreenName() %>');
+						}
+					
 						var removeUserButton = document.getElementById('<portlet:namespace />removeUserButton');
 
 						if (removeUserButton) {
-							if (A.one('#<portlet:namespace />clientCredentialUserName').val() == ""){
-								removeUserButton.disabled = true;
-							}
 
 							removeUserButton.addEventListener(
 								'click',
 								function(event) {
-									A.one('#<portlet:namespace />clientCredentialUserId').val("");
-									A.one('#<portlet:namespace />clientCredentialUserName').val("");
-
-									removeUserButton.disabled = true;
+									A.one('#<portlet:namespace />clientCredentialUserId').val('<%= currentUser.getUserId() %>');
+									A.one('#<portlet:namespace />clientCredentialUserName').val('<%= currentUser.getScreenName() %>');
 								}
 							);
 						}
@@ -198,9 +199,6 @@ String clientCredentialsCheckboxName = null;
 										function(event) {
 											A.one('#<portlet:namespace />clientCredentialUserId').val(event.userid);
 											A.one('#<portlet:namespace />clientCredentialUserName').val(event.screenname);
-
-											removeUserButton.disabled = false;
-
 										}
 									);
 								}
