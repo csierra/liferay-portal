@@ -50,7 +50,7 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 				%>
 
 				<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
-					<%= HtmlUtil.escape(userRow.getScreenName()) %>
+					<%= userRow.getScreenName() %>
 				</aui:a>
 			</liferay-ui:search-container-column-text>
 
