@@ -20,6 +20,8 @@
 OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
 
 SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayContext(request, renderRequest, renderResponse);
+
+String clientCredentialsCheckboxName = null;
 %>
 
 <aui:model-context bean="<%= oAuth2Application %>" model="<%= OAuth2Application.class %>" />
@@ -89,6 +91,10 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 
 							String name = "grant-" + grantType.name();
 
+							if (grantType.equals(GrantType.CLIENT_CREDENTIALS)) {
+								clientCredentialsCheckboxName = name;
+							}
+
 							checked = ParamUtil.getBoolean(request, name, checked);
 
 							Map<String, Object> data = new HashMap<>();
@@ -101,7 +107,7 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 							<div class="allowedGrantType <%= cssClassesStr %>">
 								<c:choose>
 									<c:when test="<%= grantType.equals(GrantType.CLIENT_CREDENTIALS) %>">
-										<aui:input checked="<%= checked %>" data="<%= data %>" helpMessage="the-client-will-impersonate-the-default-user" label="<%= grantType.name() %>" name="<%= name %>" type="checkbox" />
+										<aui:input checked="<%= checked %>" data="<%= data %>" helpMessage="the-client-will-impersonate-the-default-user" label="<%= grantType.name() %>" name="<%= clientCredentialsCheckboxName %>" type="checkbox" />
 									</c:when>
 									<c:otherwise>
 										<aui:input checked="<%= checked %>" data="<%= data %>" label="<%= grantType.name() %>" name="<%= name %>" type="checkbox" />
@@ -135,19 +141,38 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 				</aui:field-wrapper>
 		</div>
 
-		<c:if test="<%= oAuth2Application != null %>">
-			<div class="col-lg-6">
+		<c:if test="<%= clientCredentialsCheckboxName != null %>">
+			<div class="col-lg-6" id="<portlet:namespace />userSelection">
 				<h3 class="sheet-subtitle"><liferay-ui:message key="default-user" /></h3>
-					<div id="<portlet:namespace />userSelection">
 						<aui:input name="clientCredentialUserId" type="hidden" />
 						<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" />
 
 						<div class="button-holder">
-							<aui:button cssClass="modify-link" id="selectUserButton" value="select" />
+							<aui:button id="selectUserButton" value="select" />
+							<aui:button id="removeUserButton" value="remove" />
 						</div>
-					</div>
 
 					<aui:script use="aui-base,aui-io">
+						Liferay.Util.toggleBoxes('<portlet:namespace /><%= clientCredentialsCheckboxName %>', '<portlet:namespace />userSelection');
+
+						var removeUserButton = document.getElementById('<portlet:namespace />removeUserButton');
+
+						if (removeUserButton) {
+							if (A.one('#<portlet:namespace />clientCredentialUserName').val() == ""){
+								removeUserButton.disabled = true;
+							}
+
+							removeUserButton.addEventListener(
+								'click',
+								function(event) {
+									A.one('#<portlet:namespace />clientCredentialUserId').val("");
+									A.one('#<portlet:namespace />clientCredentialUserName').val("");
+
+									removeUserButton.disabled = true;
+								}
+							);
+						}
+
 						var selectUserButton = document.getElementById('<portlet:namespace />selectUserButton');
 
 						<%
@@ -173,6 +198,8 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 										function(event) {
 											A.one('#<portlet:namespace />clientCredentialUserId').val(event.userid);
 											A.one('#<portlet:namespace />clientCredentialUserName').val(event.screenname);
+
+											removeUserButton.disabled = false;
 
 										}
 									);
