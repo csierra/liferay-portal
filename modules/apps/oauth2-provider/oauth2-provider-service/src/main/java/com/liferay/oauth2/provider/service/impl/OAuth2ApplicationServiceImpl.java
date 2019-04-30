@@ -60,6 +60,12 @@ public class OAuth2ApplicationServiceImpl
 
 		User user = getUser();
 
+		if (clientCredentialUserId != user.getUserId()) {
+			ModelResourcePermissionHelper.check(
+				_userModelResourcePermission, getPermissionChecker(), 0,
+				clientCredentialUserId, ActionKeys.IMPERSONATE);
+		}
+
 		return oAuth2ApplicationLocalService.addOAuth2Application(
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			allowedGrantTypesList, clientId, clientProfile, clientSecret,
@@ -199,6 +205,18 @@ public class OAuth2ApplicationServiceImpl
 		_oAuth2ApplicationModelResourcePermission.check(
 			getPermissionChecker(), oAuth2Application, ActionKeys.UPDATE);
 
+		if (clientCredentialUserId !=
+				oAuth2Application.getClientCredentialUserId()) {
+
+			User user = getUser();
+
+			if (clientCredentialUserId != user.getUserId()) {
+				ModelResourcePermissionHelper.check(
+					_userModelResourcePermission, getPermissionChecker(), 0,
+					clientCredentialUserId, ActionKeys.IMPERSONATE);
+			}
+		}
+
 		return oAuth2ApplicationLocalService.updateOAuth2Application(
 			oAuth2ApplicationId, allowedGrantTypesList, clientId, clientProfile,
 			clientSecret, description, featuresList, homePageURL,
@@ -256,5 +274,10 @@ public class OAuth2ApplicationServiceImpl
 	)
 	private ModelResourcePermission<OAuth2Application>
 		_oAuth2ApplicationModelResourcePermission;
+
+	@Reference(
+		target = "(model.class.name=com.liferay.portal.kernel.model.User)"
+	)
+	private ModelResourcePermission<User> _userModelResourcePermission;
 
 }
