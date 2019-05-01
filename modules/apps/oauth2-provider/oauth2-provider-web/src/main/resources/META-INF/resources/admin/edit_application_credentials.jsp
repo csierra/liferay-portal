@@ -362,11 +362,17 @@ String clientSecret = (oAuth2Application == null) ? "" : oAuth2Application.getCl
 
 	<portlet:namespace />updateClientCredentialsSection = function() {
 		var clientCredentialsSection = A.one('#<portlet:namespace />clientCredentialsSection');
+		var allowedGrantTypesSection = A.one('#<portlet:namespace />allowedGrantTypesSection');
+		
 		if (<portlet:namespace />isClientCredentialsSectionRequired()) {
-			clientCredentialsSection.show();
+			clientCredentialsSection.show();	
+			allowedGrantTypesSection.addClass('col-lg-7');
+			allowedGrantTypesSection.removeClass('col-lg-12');
 		}
 		else {
 			clientCredentialsSection.hide();
+			allowedGrantTypesSection.addClass('col-lg-12');
+			allowedGrantTypesSection.removeClass('col-lg-7');
 		}
 	}
 
