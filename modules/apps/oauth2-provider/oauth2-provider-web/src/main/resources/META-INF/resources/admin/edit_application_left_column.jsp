@@ -57,7 +57,7 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 
 	<div class="row">
 		<div class="col-lg-6">
-			<aui:fieldset label="allowed-grant-types">
+			<h3 class="sheet-subtitle"><liferay-ui:message key="allowed-grant-types" /></h3>
 				<aui:field-wrapper>
 					<div id="<portlet:namespace />allowedGrantTypes">
 
@@ -133,12 +133,11 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 
 					</div>
 				</aui:field-wrapper>
-			</aui:fieldset>
 		</div>
 
 		<c:if test="<%= oAuth2Application != null %>">
 			<div class="col-lg-6">
-				<aui:fieldset helpMessage="the-user-to-impersonate-when-the-authorization-type-has-no-user-context" label="default-user">
+				<h3 class="sheet-subtitle"><liferay-ui:message key="default-user" /></h3>
 					<div id="<portlet:namespace />userSelection">
 						<aui:input name="clientCredentialUserId" type="hidden" />
 						<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" />
@@ -182,13 +181,12 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 						}
 
 					</aui:script>
-				</aui:fieldset>
 			</div>
 		</c:if>
 	</div>
 
 	<c:if test="<%= oAuth2Application != null %>">
-		<aui:fieldset label="supported-features">
+		<h3 class="sheet-subtitle"><liferay-ui:message key="supported-features" /></h3>	
 			<aui:field-wrapper>
 
 				<%
@@ -221,6 +219,5 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 				%>
 
 			</aui:field-wrapper>
-		</aui:fieldset>
 	</c:if>
 </aui:fieldset>
