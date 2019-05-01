@@ -108,7 +108,7 @@ User currentUser = PortalUtil.getUser(request);
 							<div class="allowedGrantType <%= cssClassesStr %>">
 								<c:choose>
 									<c:when test="<%= grantType.equals(GrantType.CLIENT_CREDENTIALS) %>">
-										<aui:input onchange='<%= renderResponse.getNamespace() + "updateClientCredentialsSection();" %>' checked="<%= checked %>" data="<%= data %>" helpMessage="the-client-will-impersonate-the-default-user" label="<%= grantType.name() %>" name="<%= clientCredentialsCheckboxName %>" type="checkbox" />
+										<aui:input onchange='<%= renderResponse.getNamespace() + "updateClientCredentialsSection();" %>' checked="<%= checked %>" data="<%= data %>" helpMessage="the-client-will-impersonate-the-selected-client-credential-user-but-will-be-restricted-to-the-selected-scopes" label="<%= grantType.name() %>" name="<%= clientCredentialsCheckboxName %>" type="checkbox" />
 									</c:when>
 									<c:otherwise>
 										<aui:input checked="<%= checked %>" data="<%= data %>" label="<%= grantType.name() %>" name="<%= name %>" type="checkbox" />
@@ -144,7 +144,7 @@ User currentUser = PortalUtil.getUser(request);
 
 		<c:if test="<%= clientCredentialsCheckboxName != null %>">
 			<div class="col-lg-5" id="<portlet:namespace />clientCredentialsSection">
-				<h3 class="sheet-subtitle"><liferay-ui:message key="default-user" /></h3>
+				<h3 class="sheet-subtitle"><liferay-ui:message key="client-credentials-user" /></h3>
 					<aui:field-wrapper>
 						<c:choose>
 							<c:when test="<%= oAuth2Application != null %>">
@@ -158,16 +158,16 @@ User currentUser = PortalUtil.getUser(request);
 						</c:choose>
 						<div class="btn-group button-holder">
 							<aui:button id="selectUserButton" value="select" />
-							<aui:button id="removeUserButton" value="remove" />
+							<aui:button id="useSignedInUserButton" value="use-signed-in-user" />
 						</div>
 					</aui:field-wrapper>
 					
 					<aui:script use="aui-base,aui-io">
-						var removeUserButton = document.getElementById('<portlet:namespace />removeUserButton');
+						var useSignedInUserButton = document.getElementById('<portlet:namespace />useSignedInUserButton');
 
-						if (removeUserButton) {
+						if (useSignedInUserButton) {
 
-							removeUserButton.addEventListener(
+							useSignedInUserButton.addEventListener(
 								'click',
 								function(event) {
 									A.one('#<portlet:namespace />clientCredentialUserId').val('<%= currentUser.getUserId() %>');
