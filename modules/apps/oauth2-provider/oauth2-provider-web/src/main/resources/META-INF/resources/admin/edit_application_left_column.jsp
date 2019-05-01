@@ -107,7 +107,7 @@ String clientCredentialsCheckboxName = null;
 							<div class="allowedGrantType <%= cssClassesStr %>">
 								<c:choose>
 									<c:when test="<%= grantType.equals(GrantType.CLIENT_CREDENTIALS) %>">
-										<aui:input checked="<%= checked %>" data="<%= data %>" helpMessage="the-client-will-impersonate-the-default-user" label="<%= grantType.name() %>" name="<%= clientCredentialsCheckboxName %>" type="checkbox" />
+										<aui:input onchange='<%= renderResponse.getNamespace() + "updateClientCredentialsSection();" %>' checked="<%= checked %>" data="<%= data %>" helpMessage="the-client-will-impersonate-the-default-user" label="<%= grantType.name() %>" name="<%= clientCredentialsCheckboxName %>" type="checkbox" />
 									</c:when>
 									<c:otherwise>
 										<aui:input checked="<%= checked %>" data="<%= data %>" label="<%= grantType.name() %>" name="<%= name %>" type="checkbox" />
@@ -142,7 +142,7 @@ String clientCredentialsCheckboxName = null;
 		</div>
 
 		<c:if test="<%= clientCredentialsCheckboxName != null %>">
-			<div class="col-lg-6" id="<portlet:namespace />userSelection">
+			<div class="col-lg-6" id="<portlet:namespace />clientCredentialsSection">
 				<h3 class="sheet-subtitle"><liferay-ui:message key="default-user" /></h3>
 						<aui:input name="clientCredentialUserId" type="hidden" />
 						<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" />
@@ -153,8 +153,6 @@ String clientCredentialsCheckboxName = null;
 						</div>
 
 					<aui:script use="aui-base,aui-io">
-						Liferay.Util.toggleBoxes('<portlet:namespace /><%= clientCredentialsCheckboxName %>', '<portlet:namespace />userSelection');
-
 						var removeUserButton = document.getElementById('<portlet:namespace />removeUserButton');
 
 						if (removeUserButton) {
