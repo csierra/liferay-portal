@@ -58,7 +58,7 @@ String clientCredentialsCheckboxName = null;
 	</aui:select>
 
 	<div class="row">
-		<div class="col-lg-6">
+		<div class="col-lg-7" id="<portlet:namespace />allowedGrantTypesSection">
 			<h3 class="sheet-subtitle"><liferay-ui:message key="allowed-grant-types" /></h3>
 				<aui:field-wrapper>
 					<div id="<portlet:namespace />allowedGrantTypes">
@@ -142,16 +142,18 @@ String clientCredentialsCheckboxName = null;
 		</div>
 
 		<c:if test="<%= clientCredentialsCheckboxName != null %>">
-			<div class="col-lg-6" id="<portlet:namespace />clientCredentialsSection">
+			<div class="col-lg-5" id="<portlet:namespace />clientCredentialsSection">
 				<h3 class="sheet-subtitle"><liferay-ui:message key="default-user" /></h3>
+					<aui:field-wrapper>
 						<aui:input name="clientCredentialUserId" type="hidden" />
 						<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" />
 
-						<div class="button-holder">
+						<div class="btn-group button-holder">
 							<aui:button id="selectUserButton" value="select" />
 							<aui:button id="removeUserButton" value="remove" />
 						</div>
-
+					</aui:field-wrapper>
+					
 					<aui:script use="aui-base,aui-io">
 						var removeUserButton = document.getElementById('<portlet:namespace />removeUserButton');
 
