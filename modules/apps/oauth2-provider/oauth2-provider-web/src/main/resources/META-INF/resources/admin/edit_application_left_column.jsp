@@ -146,9 +146,16 @@ User currentUser = PortalUtil.getUser(request);
 			<div class="col-lg-5" id="<portlet:namespace />clientCredentialsSection">
 				<h3 class="sheet-subtitle"><liferay-ui:message key="default-user" /></h3>
 					<aui:field-wrapper>
-						<aui:input name="clientCredentialUserId" type="hidden" />
-						<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" />
-
+						<c:choose>
+							<c:when test="<%= oAuth2Application != null %>">
+								<aui:input name="clientCredentialUserId" type="hidden" value="<%= oAuth2Application.getClientCredentialUserId() %>" />
+								<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" value="<%= HtmlUtil.escapeAttribute(oAuth2Application.getClientCredentialUserName()) %>"/>
+							</c:when>
+							<c:otherwise>
+								<aui:input name="clientCredentialUserId" type="hidden" value="<%= currentUser.getUserId() %>" />
+								<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" value="<%= HtmlUtil.escapeAttribute(currentUser.getScreenName()) %>"/>							
+							</c:otherwise>
+						</c:choose>
 						<div class="btn-group button-holder">
 							<aui:button id="selectUserButton" value="select" />
 							<aui:button id="removeUserButton" value="remove" />
@@ -156,11 +163,6 @@ User currentUser = PortalUtil.getUser(request);
 					</aui:field-wrapper>
 					
 					<aui:script use="aui-base,aui-io">
-						if (A.one('#<portlet:namespace />clientCredentialUserId').empty()) {
-							A.one('#<portlet:namespace />clientCredentialUserId').val('<%= currentUser.getUserId() %>');
-							A.one('#<portlet:namespace />clientCredentialUserName').val('<%= currentUser.getScreenName() %>');
-						}
-					
 						var removeUserButton = document.getElementById('<portlet:namespace />removeUserButton');
 
 						if (removeUserButton) {
