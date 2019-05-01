@@ -232,6 +232,11 @@ String clientSecret = (oAuth2Application == null) ? "" : oAuth2Application.getCl
 		return A.one('#<portlet:namespace />clientProfile option:selected');
 	}
 
+	<portlet:namespace />isClientCredentialsSectionRequired = function() {
+		var selectedClientProfile = <portlet:namespace />getSelectedClientProfile();
+		return A.all('#<portlet:namespace />allowedGrantTypes .client-profile-' + selectedClientProfile.val() + ' input:checked[name=<%= renderResponse.getNamespace() + "grant-" + GrantType.CLIENT_CREDENTIALS.name() %>]').size() > 0;
+	}
+
 	<portlet:namespace />isConfidentialClientRequired = function() {
 		var selectedClientProfile = <portlet:namespace />getSelectedClientProfile();
 		return A.all('#<portlet:namespace />allowedGrantTypes .client-profile-' + selectedClientProfile.val() + ' input:checked[data-issupportsconfidentialclients="true"][data-issupportspublicclients="false"]').size() > 0;
@@ -352,6 +357,17 @@ String clientSecret = (oAuth2Application == null) ? "" : oAuth2Application.getCl
 		A.all('#<portlet:namespace />allowedGrantTypes .allowedGrantType.client-profile-' + clientProfile).show();
 
 		<portlet:namespace />requiredRedirectURIs();
+		<portlet:namespace />updateClientCredentialsSection();
+	}
+
+	<portlet:namespace />updateClientCredentialsSection = function() {
+		var clientCredentialsSection = A.one('#<portlet:namespace />clientCredentialsSection');
+		if (<portlet:namespace />isClientCredentialsSectionRequired()) {
+			clientCredentialsSection.show();
+		}
+		else {
+			clientCredentialsSection.hide();
+		}
 	}
 
 	<portlet:namespace />updateComponent = function(component, newValue) {
