@@ -406,6 +406,26 @@ public class OAuth2ApplicationLocalServiceImpl
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 
+	public OAuth2Application updateOAuth2Application(
+			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
+			String clientId, int clientProfile, String clientSecret,
+			String description, List<String> featuresList, String homePageURL,
+			long iconFileEntryId, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		OAuth2Application oAuth2Application =
+			oAuth2ApplicationPersistence.findByPrimaryKey(oAuth2ApplicationId);
+
+		return updateOAuth2Application(
+			oAuth2ApplicationId, allowedGrantTypesList, clientId, clientProfile,
+			clientSecret, description, featuresList, homePageURL,
+			iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+			auth2ApplicationScopeAliasesId,
+			oAuth2Application.getClientCredentialUserId(), serviceContext);
+	}
+
 	@Override
 	public OAuth2Application updateScopeAliases(
 			long userId, String userName, long oAuth2ApplicationId,
