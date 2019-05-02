@@ -61,190 +61,194 @@ User currentUser = PortalUtil.getUser(request);
 	<div class="row">
 		<div class="col-lg-7" id="<portlet:namespace />allowedGrantTypesSection">
 			<h3 class="sheet-subtitle"><liferay-ui:message key="allowed-grant-types" /></h3>
-				<aui:field-wrapper>
-					<div id="<portlet:namespace />allowedGrantTypes">
 
-						<%
-						List<GrantType> allowedGrantTypesList = new ArrayList<>();
+			<aui:field-wrapper>
+				<div id="<portlet:namespace />allowedGrantTypes">
 
-						if (oAuth2Application != null) {
-							allowedGrantTypesList = oAuth2Application.getAllowedGrantTypesList();
+					<%
+					List<GrantType> allowedGrantTypesList = new ArrayList<>();
+
+					if (oAuth2Application != null) {
+						allowedGrantTypesList = oAuth2Application.getAllowedGrantTypesList();
+					}
+
+					List<GrantType> oAuth2Grants = oAuth2AdminPortletDisplayContext.getGrantTypes(portletPreferences);
+
+					for (GrantType grantType : oAuth2Grants) {
+						Set<String> cssClasses = new HashSet<>();
+
+						for (ClientProfile clientProfile : ClientProfile.values()) {
+							if (clientProfile.grantTypes().contains(grantType)) {
+								cssClasses.add("client-profile-" + clientProfile.id());
+							}
 						}
 
-						List<GrantType> oAuth2Grants = oAuth2AdminPortletDisplayContext.getGrantTypes(portletPreferences);
+						String cssClassesStr = StringUtil.merge(cssClasses, StringPool.SPACE);
 
-						for (GrantType grantType : oAuth2Grants) {
-							Set<String> cssClasses = new HashSet<>();
+						boolean checked = false;
 
-							for (ClientProfile clientProfile : ClientProfile.values()) {
-								if (clientProfile.grantTypes().contains(grantType)) {
-									cssClasses.add("client-profile-" + clientProfile.id());
+						if ((oAuth2Application == null) || allowedGrantTypesList.contains(grantType)) {
+							checked = true;
+						}
+
+						String name = "grant-" + grantType.name();
+
+						if (grantType.equals(GrantType.CLIENT_CREDENTIALS)) {
+							clientCredentialsCheckboxName = name;
+						}
+
+						checked = ParamUtil.getBoolean(request, name, checked);
+
+						Map<String, Object> data = new HashMap<>();
+
+						data.put("isredirect", grantType.isRequiresRedirectURI());
+						data.put("issupportsconfidentialclients", grantType.isSupportsConfidentialClients());
+						data.put("issupportspublicclients", grantType.isSupportsPublicClients());
+					%>
+
+						<div class="allowedGrantType <%= cssClassesStr %>">
+							<c:choose>
+								<c:when test="<%= grantType.equals(GrantType.CLIENT_CREDENTIALS) %>">
+									<aui:input checked="<%= checked %>" data="<%= data %>" helpMessage="the-client-will-impersonate-the-selected-client-credential-user-but-will-be-restricted-to-the-selected-scopes" label="<%= grantType.name() %>" name="<%= clientCredentialsCheckboxName %>" onchange='<%= renderResponse.getNamespace() + "updateClientCredentialsSection();" %>' type="checkbox" />
+								</c:when>
+								<c:otherwise>
+									<aui:input checked="<%= checked %>" data="<%= data %>" label="<%= grantType.name() %>" name="<%= name %>" type="checkbox" />
+								</c:otherwise>
+							</c:choose>
+						</div>
+
+						<%
+						if (grantType.isRequiresRedirectURI()) {
+						%>
+
+							<script>
+								var allowedAuthorizationTypeCheckbox = document.getElementById('<portlet:namespace /><%= name %>');
+
+								if (allowedAuthorizationTypeCheckbox) {
+									allowedAuthorizationTypeCheckbox.addEventListener(
+										'click',
+										function(event) {
+											<portlet:namespace />requiredRedirectURIs();
+										}
+									);
 								}
-							}
+							</script>
 
-							String cssClassesStr = StringUtil.merge(cssClasses, StringPool.SPACE);
-
-							boolean checked = false;
-
-							if ((oAuth2Application == null) || allowedGrantTypesList.contains(grantType)) {
-								checked = true;
-							}
-
-							String name = "grant-" + grantType.name();
-
-							if (grantType.equals(GrantType.CLIENT_CREDENTIALS)) {
-								clientCredentialsCheckboxName = name;
-							}
-
-							checked = ParamUtil.getBoolean(request, name, checked);
-
-							Map<String, Object> data = new HashMap<>();
-
-							data.put("isredirect", grantType.isRequiresRedirectURI());
-							data.put("issupportsconfidentialclients", grantType.isSupportsConfidentialClients());
-							data.put("issupportspublicclients", grantType.isSupportsPublicClients());
-						%>
-
-							<div class="allowedGrantType <%= cssClassesStr %>">
-								<c:choose>
-									<c:when test="<%= grantType.equals(GrantType.CLIENT_CREDENTIALS) %>">
-										<aui:input onchange='<%= renderResponse.getNamespace() + "updateClientCredentialsSection();" %>' checked="<%= checked %>" data="<%= data %>" helpMessage="the-client-will-impersonate-the-selected-client-credential-user-but-will-be-restricted-to-the-selected-scopes" label="<%= grantType.name() %>" name="<%= clientCredentialsCheckboxName %>" type="checkbox" />
-									</c:when>
-									<c:otherwise>
-										<aui:input checked="<%= checked %>" data="<%= data %>" label="<%= grantType.name() %>" name="<%= name %>" type="checkbox" />
-									</c:otherwise>
-								</c:choose>
-							</div>
-
-							<%
-							if (grantType.isRequiresRedirectURI()) {
-							%>
-
-								<script>
-									var allowedAuthorizationTypeCheckbox = document.getElementById('<portlet:namespace /><%= name %>');
-
-									if (allowedAuthorizationTypeCheckbox) {
-										allowedAuthorizationTypeCheckbox.addEventListener(
-											'click',
-											function(event) {
-												<portlet:namespace />requiredRedirectURIs();
-											}
-										);
-									}
-								</script>
-
-						<%
-							}
+					<%
 						}
-						%>
+					}
+					%>
 
-					</div>
-				</aui:field-wrapper>
+				</div>
+			</aui:field-wrapper>
 		</div>
 
 		<c:if test="<%= clientCredentialsCheckboxName != null %>">
 			<div class="col-lg-5" id="<portlet:namespace />clientCredentialsSection">
 				<h3 class="sheet-subtitle"><liferay-ui:message key="client-credentials-user" /></h3>
-					<aui:field-wrapper>
-						<c:choose>
-							<c:when test="<%= oAuth2Application != null %>">
-								<aui:input name="clientCredentialUserId" type="hidden" value="<%= oAuth2Application.getClientCredentialUserId() %>" />
-								<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" value="<%= HtmlUtil.escapeAttribute(oAuth2Application.getClientCredentialUserName()) %>"/>
-							</c:when>
-							<c:otherwise>
-								<aui:input name="clientCredentialUserId" type="hidden" value="<%= currentUser.getUserId() %>" />
-								<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" value="<%= HtmlUtil.escapeAttribute(currentUser.getScreenName()) %>"/>							
-							</c:otherwise>
-						</c:choose>
-						<div class="btn-group button-holder">
-							<aui:button id="selectUserButton" value="select" />
-							<aui:button id="useSignedInUserButton" value="use-signed-in-user" />
-						</div>
-					</aui:field-wrapper>
-					
-					<aui:script use="aui-base,aui-io">
-						var useSignedInUserButton = document.getElementById('<portlet:namespace />useSignedInUserButton');
 
-						if (useSignedInUserButton) {
+				<aui:field-wrapper>
+					<c:choose>
+						<c:when test="<%= oAuth2Application != null %>">
+							<aui:input name="clientCredentialUserId" type="hidden" value="<%= oAuth2Application.getClientCredentialUserId() %>" />
+							<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" value="<%= HtmlUtil.escapeAttribute(oAuth2Application.getClientCredentialUserName()) %>" />
+						</c:when>
+						<c:otherwise>
+							<aui:input name="clientCredentialUserId" type="hidden" value="<%= currentUser.getUserId() %>" />
+							<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" value="<%= HtmlUtil.escapeAttribute(currentUser.getScreenName()) %>" />
+						</c:otherwise>
+					</c:choose>
 
-							useSignedInUserButton.addEventListener(
-								'click',
-								function(event) {
-									A.one('#<portlet:namespace />clientCredentialUserId').val('<%= currentUser.getUserId() %>');
-									A.one('#<portlet:namespace />clientCredentialUserName').val('<%= currentUser.getScreenName() %>');
-								}
-							);
-						}
+					<div class="btn-group button-holder">
+						<aui:button id="selectUserButton" value="select" />
+						<aui:button id="useSignedInUserButton" value="use-signed-in-user" />
+					</div>
+				</aui:field-wrapper>
 
-						var selectUserButton = document.getElementById('<portlet:namespace />selectUserButton');
+				<aui:script use="aui-base,aui-io">
+					var useSignedInUserButton = document.getElementById('<portlet:namespace />useSignedInUserButton');
 
-						<%
-						String jsEscapedEventName = HtmlUtil.escapeJS(selectUsersDisplayContext.getEventName());
-						PortletURL selectUsersPortletURL = selectUsersDisplayContext.getPortletURL();
-						%>
+					if (useSignedInUserButton) {
 
-						if (selectUserButton) {
-							selectUserButton.addEventListener(
-								'click',
-								function(event) {
-									Liferay.Util.selectEntity(
-										{
-											dialog: {
-												modal: true,
-												destroyOnHide: true
-											},
-											eventName: '<%= jsEscapedEventName %>',
-											id: '<%= jsEscapedEventName %>',
-											title: '<liferay-ui:message key="users" />',
-											uri: '<%= HtmlUtil.escapeJS(selectUsersPortletURL.toString()) %>'
+						useSignedInUserButton.addEventListener(
+							'click',
+							function(event) {
+								A.one('#<portlet:namespace />clientCredentialUserId').val('<%= currentUser.getUserId() %>');
+								A.one('#<portlet:namespace />clientCredentialUserName').val('<%= currentUser.getScreenName() %>');
+							}
+						);
+					}
+
+					var selectUserButton = document.getElementById('<portlet:namespace />selectUserButton');
+
+					<%
+					String jsEscapedEventName = HtmlUtil.escapeJS(selectUsersDisplayContext.getEventName());
+					PortletURL selectUsersPortletURL = selectUsersDisplayContext.getPortletURL();
+					%>
+
+					if (selectUserButton) {
+						selectUserButton.addEventListener(
+							'click',
+							function(event) {
+								Liferay.Util.selectEntity(
+									{
+										dialog: {
+											modal: true,
+											destroyOnHide: true
 										},
-										function(event) {
-											A.one('#<portlet:namespace />clientCredentialUserId').val(event.userid);
-											A.one('#<portlet:namespace />clientCredentialUserName').val(event.screenname);
-										}
-									);
-								}
-							);
-						}
+										eventName: '<%= jsEscapedEventName %>',
+										id: '<%= jsEscapedEventName %>',
+										title: '<liferay-ui:message key="users" />',
+										uri: '<%= HtmlUtil.escapeJS(selectUsersPortletURL.toString()) %>'
+									},
+									function(event) {
+										A.one('#<portlet:namespace />clientCredentialUserId').val(event.userid);
+										A.one('#<portlet:namespace />clientCredentialUserName').val(event.screenname);
+									}
+								);
+							}
+						);
+					}
 
-					</aui:script>
+				</aui:script>
 			</div>
 		</c:if>
 	</div>
 
 	<c:if test="<%= oAuth2Application != null %>">
-		<h3 class="sheet-subtitle"><liferay-ui:message key="supported-features" /></h3>	
-			<aui:field-wrapper>
+		<h3 class="sheet-subtitle"><liferay-ui:message key="supported-features" /></h3>
 
-				<%
-				List<String> oAuth2ApplicationFeaturesList = new ArrayList<>();
+		<aui:field-wrapper>
 
-				if (oAuth2Application != null) {
-					oAuth2ApplicationFeaturesList = oAuth2Application.getFeaturesList();
+			<%
+			List<String> oAuth2ApplicationFeaturesList = new ArrayList<>();
+
+			if (oAuth2Application != null) {
+				oAuth2ApplicationFeaturesList = oAuth2Application.getFeaturesList();
+			}
+
+			String[] oAuth2Features = oAuth2AdminPortletDisplayContext.getOAuth2Features(portletPreferences);
+
+			for (String oAuth2Feature : oAuth2Features) {
+				boolean checked = false;
+
+				if ((oAuth2Application != null) && oAuth2ApplicationFeaturesList.contains(oAuth2Feature)) {
+					checked = true;
 				}
 
-				String[] oAuth2Features = oAuth2AdminPortletDisplayContext.getOAuth2Features(portletPreferences);
+				String name = "feature-" + oAuth2Feature;
 
-				for (String oAuth2Feature : oAuth2Features) {
-					boolean checked = false;
+				checked = ParamUtil.getBoolean(request, name, checked);
+			%>
 
-					if ((oAuth2Application != null) && oAuth2ApplicationFeaturesList.contains(oAuth2Feature)) {
-						checked = true;
-					}
+				<div class="supportedFeature">
+					<aui:input checked="<%= checked %>" label="<%= HtmlUtil.escape(oAuth2Feature) %>" name="<%= name %>" type="checkbox" />
+				</div>
 
-					String name = "feature-" + oAuth2Feature;
+			<%
+			}
+			%>
 
-					checked = ParamUtil.getBoolean(request, name, checked);
-				%>
-
-					<div class="supportedFeature">
-						<aui:input checked="<%= checked %>" label="<%= HtmlUtil.escape(oAuth2Feature) %>" name="<%= name %>" type="checkbox" />
-					</div>
-
-				<%
-				}
-				%>
-
-			</aui:field-wrapper>
+		</aui:field-wrapper>
 	</c:if>
 </aui:fieldset>
