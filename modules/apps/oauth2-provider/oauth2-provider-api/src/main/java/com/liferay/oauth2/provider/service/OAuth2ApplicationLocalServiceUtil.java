@@ -367,6 +367,27 @@ public class OAuth2ApplicationLocalServiceUtil {
 			serviceContext);
 	}
 
+	public static com.liferay.oauth2.provider.model.OAuth2Application
+			updateOAuth2Application(
+				long oAuth2ApplicationId,
+				java.util.List<com.liferay.oauth2.provider.constants.GrantType>
+					allowedGrantTypesList,
+				String clientId, int clientProfile, String clientSecret,
+				String description, java.util.List<String> featuresList,
+				String homePageURL, long iconFileEntryId, String name,
+				String privacyPolicyURL,
+				java.util.List<String> redirectURIsList,
+				long auth2ApplicationScopeAliasesId,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().updateOAuth2Application(
+			oAuth2ApplicationId, allowedGrantTypesList, clientId, clientProfile,
+			clientSecret, description, featuresList, homePageURL,
+			iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+			auth2ApplicationScopeAliasesId, serviceContext);
+	}
+
 	/**
 	 * Updates the o auth2 application in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *

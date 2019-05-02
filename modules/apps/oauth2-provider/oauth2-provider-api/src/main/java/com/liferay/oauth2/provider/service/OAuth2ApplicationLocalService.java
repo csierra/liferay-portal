@@ -277,6 +277,15 @@ public interface OAuth2ApplicationLocalService
 			long clientCredentialUserId, ServiceContext serviceContext)
 		throws PortalException;
 
+	public OAuth2Application updateOAuth2Application(
+			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
+			String clientId, int clientProfile, String clientSecret,
+			String description, List<String> featuresList, String homePageURL,
+			long iconFileEntryId, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
+			ServiceContext serviceContext)
+		throws PortalException;
+
 	/**
 	 * Updates the o auth2 application in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
