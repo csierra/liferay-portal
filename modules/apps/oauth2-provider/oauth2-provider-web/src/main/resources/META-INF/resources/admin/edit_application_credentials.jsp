@@ -105,23 +105,23 @@ String clientSecret = (oAuth2Application == null) ? "" : oAuth2Application.getCl
 						<div class="col-lg-3">
 							<h3 class="sheet-subtitle"><liferay-ui:message key="icon" /></h3>
 
-								<%
-								String thumbnailURL = oAuth2AdminPortletDisplayContext.getThumbnailURL(oAuth2Application);
-								%>
+							<%
+							String thumbnailURL = oAuth2AdminPortletDisplayContext.getThumbnailURL(oAuth2Application);
+							%>
 
-								<c:choose>
-									<c:when test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
-										<liferay-ui:logo-selector
-											currentLogoURL="<%= thumbnailURL %>"
-											defaultLogo="<%= oAuth2Application.getIconFileEntryId() == 0 %>"
-											defaultLogoURL="<%= oAuth2AdminPortletDisplayContext.getDefaultIconURL() %>"
-											tempImageFileName="<%= String.valueOf(oAuth2Application.getClientId()) %>"
-										/>
-									</c:when>
-									<c:otherwise>
-										<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="portrait" />" src="<%= HtmlUtil.escapeAttribute(thumbnailURL) %>" />
-									</c:otherwise>
-								</c:choose>
+							<c:choose>
+								<c:when test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
+									<liferay-ui:logo-selector
+										currentLogoURL="<%= thumbnailURL %>"
+										defaultLogo="<%= oAuth2Application.getIconFileEntryId() == 0 %>"
+										defaultLogoURL="<%= oAuth2AdminPortletDisplayContext.getDefaultIconURL() %>"
+										tempImageFileName="<%= String.valueOf(oAuth2Application.getClientId()) %>"
+									/>
+								</c:when>
+								<c:otherwise>
+									<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="portrait" />" src="<%= HtmlUtil.escapeAttribute(thumbnailURL) %>" />
+								</c:otherwise>
+							</c:choose>
 						</div>
 					</c:when>
 					<c:otherwise>
@@ -363,9 +363,9 @@ String clientSecret = (oAuth2Application == null) ? "" : oAuth2Application.getCl
 	<portlet:namespace />updateClientCredentialsSection = function() {
 		var clientCredentialsSection = A.one('#<portlet:namespace />clientCredentialsSection');
 		var allowedGrantTypesSection = A.one('#<portlet:namespace />allowedGrantTypesSection');
-		
+
 		if (<portlet:namespace />isClientCredentialsSectionRequired()) {
-			clientCredentialsSection.show();	
+			clientCredentialsSection.show();
 			allowedGrantTypesSection.addClass('col-lg-7');
 			allowedGrantTypesSection.removeClass('col-lg-12');
 		}
