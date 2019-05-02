@@ -20,7 +20,6 @@ import com.liferay.document.library.kernel.store.Store;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.exception.DuplicateOAuth2ApplicationClientIdException;
-import com.liferay.oauth2.provider.exception.InvalidClientCredentialUserIdException;
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.exception.OAuth2ApplicationClientGrantTypeException;
 import com.liferay.oauth2.provider.exception.OAuth2ApplicationHomePageURLException;
@@ -56,12 +55,8 @@ import com.liferay.portal.kernel.repository.RepositoryFactory;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.permission.UserPermissionUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -145,9 +140,9 @@ public class OAuth2ApplicationLocalServiceImpl
 		}
 
 		validate(
-			companyId, userId, allowedGrantTypesList, clientId, clientProfile,
-			clientSecret, homePageURL, name, privacyPolicyURL, redirectURIsList,
-			clientCredentialUserId);
+			companyId, allowedGrantTypesList, clientId, clientProfile,
+			clientSecret, homePageURL, name, privacyPolicyURL,
+			redirectURIsList);
 
 		long oAuth2ApplicationId = counterLocalService.increment(
 			OAuth2Application.class.getName());
@@ -385,10 +380,9 @@ public class OAuth2ApplicationLocalServiceImpl
 		}
 
 		validate(
-			oAuth2Application.getCompanyId(), oAuth2Application.getUserId(),
-			oAuth2ApplicationId, allowedGrantTypesList, clientId, clientProfile,
-			clientSecret, homePageURL, name, privacyPolicyURL, redirectURIsList,
-			clientCredentialUserId);
+			oAuth2Application.getCompanyId(), oAuth2ApplicationId,
+			allowedGrantTypesList, clientId, clientProfile, clientSecret,
+			homePageURL, name, privacyPolicyURL, redirectURIsList);
 
 		User user = _userLocalService.getUser(clientCredentialUserId);
 
@@ -470,24 +464,23 @@ public class OAuth2ApplicationLocalServiceImpl
 	}
 
 	protected void validate(
-			long companyId, long userId, List<GrantType> allowedGrantTypesList,
+			long companyId, List<GrantType> allowedGrantTypesList,
 			String clientId, int clientProfile, String clientSecret,
 			String homePageURL, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, long clientCredentialUserId)
+			List<String> redirectURIsList)
 		throws PortalException {
 
 		validate(
-			companyId, userId, 0, allowedGrantTypesList, clientId,
-			clientProfile, clientSecret, homePageURL, name, privacyPolicyURL,
-			redirectURIsList, clientCredentialUserId);
+			companyId, 0, allowedGrantTypesList, clientId, clientProfile,
+			clientSecret, homePageURL, name, privacyPolicyURL,
+			redirectURIsList);
 	}
 
 	protected void validate(
-			long companyId, long userId, long oAuth2ApplicationId,
+			long companyId, long oAuth2ApplicationId,
 			List<GrantType> allowedGrantTypesList, String clientId,
 			int clientProfile, String clientSecret, String homePageURL,
-			String name, String privacyPolicyURL, List<String> redirectURIsList,
-			long clientCredentialUserId)
+			String name, String privacyPolicyURL, List<String> redirectURIsList)
 		throws PortalException {
 
 		if (!Validator.isBlank(clientSecret)) {
@@ -505,23 +498,6 @@ public class OAuth2ApplicationLocalServiceImpl
 						grantType.name());
 				}
 			}
-		}
-
-		User clientCredentialUser = _userLocalService.getUser(
-			clientCredentialUserId);
-
-		User user = _userLocalService.getUser(userId);
-
-		PermissionChecker permissionChecker =
-			PermissionCheckerFactoryUtil.create(user);
-
-		if ((clientCredentialUserId != userId) &&
-			!UserPermissionUtil.contains(
-				permissionChecker, clientCredentialUser.getUserId(),
-				clientCredentialUser.getOrganizationIds(),
-				ActionKeys.IMPERSONATE)) {
-
-			throw new InvalidClientCredentialUserIdException();
 		}
 
 		if (!Validator.isBlank(clientId)) {
