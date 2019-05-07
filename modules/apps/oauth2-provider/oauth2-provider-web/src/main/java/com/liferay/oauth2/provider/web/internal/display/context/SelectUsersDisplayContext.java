@@ -135,15 +135,16 @@ public class SelectUsersDisplayContext {
 	public PortletURL getPortletURL() {
 		PortletURL portletURL = _renderResponse.createRenderURL();
 
-		portletURL.setParameter("eventName", getEventName());
-		portletURL.setParameter("groupId", String.valueOf(getGroupId()));
 		portletURL.setParameter("mvcPath", "/admin/select_users.jsp");
+		portletURL.setParameter("groupId", String.valueOf(getGroupId()));
 
 		String displayStyle = getDisplayStyle();
 
 		if (Validator.isNotNull(displayStyle)) {
 			portletURL.setParameter("displayStyle", displayStyle);
 		}
+
+		portletURL.setParameter("eventName", getEventName());
 
 		String keywords = getKeywords();
 
