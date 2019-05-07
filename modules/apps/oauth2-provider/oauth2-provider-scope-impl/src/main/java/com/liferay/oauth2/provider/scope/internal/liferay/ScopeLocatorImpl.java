@@ -288,7 +288,8 @@ public class ScopeLocatorImpl implements ScopeLocator {
 		setScopeFindersScopedServiceTrackerMap(
 			_scopedServiceTrackerMapFactory.create(
 				bundleContext, ScopeFinder.class,
-				OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME, () -> null));
+				OAuth2ProviderScopeConstants.OSGI_JAXRS_NAME,
+				() -> Collections::emptySet));
 		setScopeLocatorConfigurationProvidersScopedServiceTrackerMap(
 			_scopedServiceTrackerMapFactory.create(
 				bundleContext, ScopeLocatorConfigurationProvider.class,
