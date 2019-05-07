@@ -76,6 +76,9 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 	public boolean processAction(
 		ActionRequest request, ActionResponse response) {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		long oAuth2ApplicationId = ParamUtil.getLong(
 			request, "oAuth2ApplicationId");
 
@@ -118,13 +121,6 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 		}
 
 		String clientId = ParamUtil.get(request, "clientId", StringPool.BLANK);
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		long clientCredentialUserId = ParamUtil.get(
-			request, "clientCredentialUserId", themeDisplay.getUserId());
-
 		String clientSecret = ParamUtil.get(
 			request, "clientSecret", StringPool.BLANK);
 		String description = ParamUtil.get(
@@ -138,6 +134,8 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 			StringUtil.splitLines(
 				ParamUtil.get(request, "redirectURIs", StringPool.BLANK)));
 		List<String> scopeAliasesList = Collections.emptyList();
+		long clientCredentialUserId = ParamUtil.get(
+			request, "clientCredentialUserId", themeDisplay.getUserId());
 
 		try {
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
