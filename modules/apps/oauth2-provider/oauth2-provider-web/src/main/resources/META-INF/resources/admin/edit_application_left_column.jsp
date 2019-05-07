@@ -18,8 +18,6 @@
 
 <%
 OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
-
-String clientCredentialsCheckboxName = null;
 %>
 
 <aui:model-context bean="<%= oAuth2Application %>" model="<%= OAuth2Application.class %>" />
@@ -58,6 +56,10 @@ String clientCredentialsCheckboxName = null;
 	<div class="row">
 		<div class="col-lg-7" id="<portlet:namespace />allowedGrantTypesSection">
 			<h3 class="sheet-subtitle"><liferay-ui:message key="allowed-grant-types" /></h3>
+
+			<%
+			String clientCredentialsCheckboxName = null;
+			%>
 
 			<aui:field-wrapper>
 				<div id="<portlet:namespace />allowedGrantTypes">
