@@ -19,7 +19,6 @@ import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
-import com.liferay.oauth2.provider.shortcut.internal.constants.OAuth2ProviderShortcutConstants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
@@ -31,22 +30,9 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * @author Shinn Lok
  */
-@Component(
-	immediate = true,
-	property = {
-		"osgi.jaxrs.name=" + OAuth2ProviderShortcutConstants.APPLICATION_NAME,
-		"sap.scope.finder=true"
-	},
-	service = {
-		ApplicationDescriptor.class, PrefixHandlerFactory.class,
-		ScopeFinder.class, ScopeMapper.class
-	}
-)
 public class OAuth2ProviderShortcutScopeFinder
 	implements ApplicationDescriptor, PrefixHandlerFactory, ScopeFinder,
 			   ScopeMapper {

@@ -18,9 +18,13 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
+import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
+import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.shortcut.internal.constants.OAuth2ProviderShortcutConstants;
+import com.liferay.oauth2.provider.shortcut.internal.spi.scope.finder.OAuth2ProviderShortcutScopeFinder;
 import com.liferay.oauth2.provider.util.OAuth2SecureRandomGenerator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -43,6 +47,7 @@ import com.liferay.portal.kernel.service.UserGroupService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -56,14 +61,18 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -117,7 +126,7 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 	}
 
 	@Activate
-	protected void activate() {
+	protected void activate(BundleContext bundleContext) {
 		Stream<String[]> stream = Arrays.stream(_SAP_ENTRY_OBJECT_ARRAYS);
 
 		_scopeAliasesList = stream.map(
@@ -126,6 +135,26 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 		).collect(
 			Collectors.toList()
 		);
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put(
+			"osgi.jaxrs.name",
+			OAuth2ProviderShortcutConstants.APPLICATION_NAME);
+		properties.put("sap.scope.finder", true);
+
+		_serviceRegistration = bundleContext.registerService(
+			new String[] {
+				ApplicationDescriptor.class.getName(),
+				PrefixHandlerFactory.class.getName(),
+				ScopeFinder.class.getName(), ScopeMapper.class.getName()
+			},
+			new OAuth2ProviderShortcutScopeFinder(), properties);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceRegistration.unregister();
 	}
 
 	private void _addSAPEntries(long companyId, long userId)
@@ -241,11 +270,7 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 	private SAPEntryLocalService _sapEntryLocalService;
 
 	private List<String> _scopeAliasesList;
-
-	@Reference(
-		target = "(osgi.jaxrs.name=" + OAuth2ProviderShortcutConstants.APPLICATION_NAME + ")"
-	)
-	private ScopeFinder _scopeFinder;
+	private ServiceRegistration<?> _serviceRegistration;
 
 	@Reference
 	private UserLocalService _userLocalService;
