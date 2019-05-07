@@ -150,16 +150,19 @@ OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2
 					<c:choose>
 						<c:when test="<%= oAuth2Application != null %>">
 							<aui:input name="clientCredentialUserId" type="hidden" value="<%= oAuth2Application.getClientCredentialUserId() %>" />
+
 							<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" value="<%= HtmlUtil.escapeAttribute(oAuth2Application.getClientCredentialUserName()) %>" />
 						</c:when>
 						<c:otherwise>
 							<aui:input name="clientCredentialUserId" type="hidden" value="<%= user.getUserId() %>" />
+
 							<aui:input disabled="<%= true %>" label="" name="clientCredentialUserName" type="text" value="<%= HtmlUtil.escapeAttribute(user.getScreenName()) %>" />
 						</c:otherwise>
 					</c:choose>
 
 					<div class="btn-group button-holder">
 						<aui:button id="selectUserButton" value="select" />
+
 						<aui:button id="useSignedInUserButton" value="use-signed-in-user" />
 					</div>
 				</aui:field-wrapper>
