@@ -19,8 +19,6 @@
 <%
 OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
 
-SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayContext(request, renderRequest, renderResponse);
-
 String clientCredentialsCheckboxName = null;
 %>
 
@@ -180,11 +178,6 @@ String clientCredentialsCheckboxName = null;
 
 					var selectUserButton = document.getElementById('<portlet:namespace />selectUserButton');
 
-					<%
-					String jsEscapedEventName = HtmlUtil.escapeJS(selectUsersDisplayContext.getEventName());
-					PortletURL selectUsersPortletURL = selectUsersDisplayContext.getPortletURL();
-					%>
-
 					if (selectUserButton) {
 						selectUserButton.addEventListener(
 							'click',
@@ -195,10 +188,16 @@ String clientCredentialsCheckboxName = null;
 											modal: true,
 											destroyOnHide: true
 										},
-										eventName: '<%= jsEscapedEventName %>',
-										id: '<%= jsEscapedEventName %>',
+
+										<%
+										SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayContext(request, renderRequest, renderResponse);
+										%>
+
+										eventName: '<%= HtmlUtil.escapeJS(selectUsersDisplayContext.getEventName()) %>',
+										id: '<%= HtmlUtil.escapeJS(selectUsersDisplayContext.getEventName()) %>',
+
 										title: '<liferay-ui:message key="users" />',
-										uri: '<%= HtmlUtil.escapeJS(selectUsersPortletURL.toString()) %>'
+										uri: '<%= HtmlUtil.escapeJS(String.valueOf(selectUsersDisplayContext.getPortletURL())) %>'
 									},
 									function(event) {
 										A.one('#<portlet:namespace />clientCredentialUserId').val(event.userid);
