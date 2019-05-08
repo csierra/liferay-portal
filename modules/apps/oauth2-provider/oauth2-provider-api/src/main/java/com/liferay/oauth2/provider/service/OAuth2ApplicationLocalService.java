@@ -74,6 +74,10 @@ public interface OAuth2ApplicationLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	public OAuth2Application addOAuth2Application(
 			long companyId, long userId, String userName,
 			List<GrantType> allowedGrantTypesList, String clientId,
@@ -277,6 +281,10 @@ public interface OAuth2ApplicationLocalService
 			long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	public OAuth2Application updateOAuth2Application(
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
 			String clientId, int clientProfile, String clientSecret,
