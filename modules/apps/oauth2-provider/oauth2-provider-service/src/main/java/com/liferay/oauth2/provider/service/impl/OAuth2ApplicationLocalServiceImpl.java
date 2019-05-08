@@ -108,11 +108,11 @@ public class OAuth2ApplicationLocalServiceImpl
 	@Override
 	public OAuth2Application addOAuth2Application(
 			long companyId, long userId, String userName,
-			List<GrantType> allowedGrantTypesList, String clientId,
-			int clientProfile, String clientSecret, String description,
-			List<String> featuresList, String homePageURL, long iconFileEntryId,
-			String name, String privacyPolicyURL, List<String> redirectURIsList,
-			List<String> scopeAliasesList, long clientCredentialUserId,
+			List<GrantType> allowedGrantTypesList, long clientCredentialUserId,
+			String clientId, int clientProfile, String clientSecret,
+			String description, List<String> featuresList, String homePageURL,
+			long iconFileEntryId, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, List<String> scopeAliasesList,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -202,10 +202,10 @@ public class OAuth2ApplicationLocalServiceImpl
 		throws PortalException {
 
 		return addOAuth2Application(
-			companyId, userId, userName, allowedGrantTypesList, clientId,
-			clientProfile, clientSecret, description, featuresList, homePageURL,
-			iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
-			scopeAliasesList, userId, serviceContext);
+			companyId, userId, userName, allowedGrantTypesList, userId,
+			clientId, clientProfile, clientSecret, description, featuresList,
+			homePageURL, iconFileEntryId, name, privacyPolicyURL,
+			redirectURIsList, scopeAliasesList, serviceContext);
 	}
 
 	@Override
@@ -360,11 +360,11 @@ public class OAuth2ApplicationLocalServiceImpl
 	@Override
 	public OAuth2Application updateOAuth2Application(
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
-			String clientId, int clientProfile, String clientSecret,
-			String description, List<String> featuresList, String homePageURL,
-			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
-			long clientCredentialUserId, ServiceContext serviceContext)
+			long clientCredentialUserId, String clientId, int clientProfile,
+			String clientSecret, String description, List<String> featuresList,
+			String homePageURL, long iconFileEntryId, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
+			long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
@@ -419,11 +419,11 @@ public class OAuth2ApplicationLocalServiceImpl
 			oAuth2ApplicationPersistence.findByPrimaryKey(oAuth2ApplicationId);
 
 		return updateOAuth2Application(
-			oAuth2ApplicationId, allowedGrantTypesList, clientId, clientProfile,
-			clientSecret, description, featuresList, homePageURL,
+			oAuth2ApplicationId, allowedGrantTypesList,
+			oAuth2Application.getClientCredentialUserId(), clientId,
+			clientProfile, clientSecret, description, featuresList, homePageURL,
 			iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
-			auth2ApplicationScopeAliasesId,
-			oAuth2Application.getClientCredentialUserId(), serviceContext);
+			auth2ApplicationScopeAliasesId, serviceContext);
 	}
 
 	@Override

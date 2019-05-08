@@ -66,11 +66,11 @@ public interface OAuth2ApplicationLocalService
 	 */
 	public OAuth2Application addOAuth2Application(
 			long companyId, long userId, String userName,
-			List<GrantType> allowedGrantTypesList, String clientId,
-			int clientProfile, String clientSecret, String description,
-			List<String> featuresList, String homePageURL, long iconFileEntryId,
-			String name, String privacyPolicyURL, List<String> redirectURIsList,
-			List<String> scopeAliasesList, long clientCredentialUserId,
+			List<GrantType> allowedGrantTypesList, long clientCredentialUserId,
+			String clientId, int clientProfile, String clientSecret,
+			String description, List<String> featuresList, String homePageURL,
+			long iconFileEntryId, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, List<String> scopeAliasesList,
 			ServiceContext serviceContext)
 		throws PortalException;
 
@@ -270,11 +270,11 @@ public interface OAuth2ApplicationLocalService
 
 	public OAuth2Application updateOAuth2Application(
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
-			String clientId, int clientProfile, String clientSecret,
-			String description, List<String> featuresList, String homePageURL,
-			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
-			long clientCredentialUserId, ServiceContext serviceContext)
+			long clientCredentialUserId, String clientId, int clientProfile,
+			String clientSecret, String description, List<String> featuresList,
+			String homePageURL, long iconFileEntryId, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
+			long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
 		throws PortalException;
 
 	public OAuth2Application updateOAuth2Application(

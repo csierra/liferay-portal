@@ -57,11 +57,11 @@ public interface OAuth2ApplicationService extends BaseService {
 	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service. Add custom service methods to <code>com.liferay.oauth2.provider.service.impl.OAuth2ApplicationServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public OAuth2Application addOAuth2Application(
-			List<GrantType> allowedGrantTypesList, String clientId,
-			int clientProfile, String clientSecret, String description,
-			List<String> featuresList, String homePageURL, long iconFileEntryId,
-			String name, String privacyPolicyURL, List<String> redirectURIsList,
-			List<String> scopeAliasesList, long clientCredentialUserId,
+			List<GrantType> allowedGrantTypesList, long clientCredentialUserId,
+			String clientId, int clientProfile, String clientSecret,
+			String description, List<String> featuresList, String homePageURL,
+			long iconFileEntryId, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, List<String> scopeAliasesList,
 			ServiceContext serviceContext)
 		throws PortalException;
 
@@ -111,11 +111,11 @@ public interface OAuth2ApplicationService extends BaseService {
 
 	public OAuth2Application updateOAuth2Application(
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
-			String clientId, int clientProfile, String clientSecret,
-			String description, List<String> featuresList, String homePageURL,
-			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, long auth2ApplicationScopeAliasesId,
-			long clientCredentialUserId, ServiceContext serviceContext)
+			long clientCredentialUserId, String clientId, int clientProfile,
+			String clientSecret, String description, List<String> featuresList,
+			String homePageURL, long iconFileEntryId, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
+			long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
 		throws PortalException;
 
 	public OAuth2Application updateOAuth2Application(

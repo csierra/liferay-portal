@@ -155,11 +155,10 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 
 				OAuth2Application oAuth2Application =
 					_oAuth2ApplicationService.addOAuth2Application(
-						allowedGrantTypesList, clientId, clientProfile.id(),
-						clientSecret, description, featuresList, homePageURL, 0,
-						name, privacyPolicyURL, redirectURIsList,
-						scopeAliasesList, clientCredentialUserId,
-						serviceContext);
+						allowedGrantTypesList, clientCredentialUserId, clientId,
+						clientProfile.id(), clientSecret, description,
+						featuresList, homePageURL, 0, name, privacyPolicyURL,
+						redirectURIsList, scopeAliasesList, serviceContext);
 
 				response.setRenderParameter(
 					"oAuth2ApplicationId",
@@ -175,11 +174,11 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 					oAuth2Application.getOAuth2ApplicationScopeAliasesId();
 
 				_oAuth2ApplicationService.updateOAuth2Application(
-					oAuth2ApplicationId, allowedGrantTypesList, clientId,
-					clientProfile.id(), clientSecret, description, featuresList,
-					homePageURL, iconFileEntryId, name, privacyPolicyURL,
-					redirectURIsList, oAuth2ApplicationScopeAliasesId,
-					clientCredentialUserId, serviceContext);
+					oAuth2ApplicationId, allowedGrantTypesList,
+					clientCredentialUserId, clientId, clientProfile.id(),
+					clientSecret, description, featuresList, homePageURL,
+					iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+					oAuth2ApplicationScopeAliasesId, serviceContext);
 
 				long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
 
