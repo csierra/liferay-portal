@@ -1,4 +1,5 @@
 dependencies {
+	compileOnly group: "javax.xml.ws", name: "jaxws-api", version: "2.3.1"
 	compileOnly project(":core:registry-api")
 }
 
