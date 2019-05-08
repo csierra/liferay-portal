@@ -68,23 +68,22 @@ public class OAuth2ApplicationServiceSoap {
 			addOAuth2Application(
 				java.util.List<com.liferay.oauth2.provider.constants.GrantType>
 					allowedGrantTypesList,
-				String clientId, int clientProfile, String clientSecret,
-				String description, java.util.List<String> featuresList,
-				String homePageURL, long iconFileEntryId, String name,
-				String privacyPolicyURL,
+				long clientCredentialUserId, String clientId, int clientProfile,
+				String clientSecret, String description,
+				java.util.List<String> featuresList, String homePageURL,
+				long iconFileEntryId, String name, String privacyPolicyURL,
 				java.util.List<String> redirectURIsList,
 				java.util.List<String> scopeAliasesList,
-				long clientCredentialUserId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 
 		try {
 			com.liferay.oauth2.provider.model.OAuth2Application returnValue =
 				OAuth2ApplicationServiceUtil.addOAuth2Application(
-					allowedGrantTypesList, clientId, clientProfile,
-					clientSecret, description, featuresList, homePageURL,
-					iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
-					scopeAliasesList, clientCredentialUserId, serviceContext);
+					allowedGrantTypesList, clientCredentialUserId, clientId,
+					clientProfile, clientSecret, description, featuresList,
+					homePageURL, iconFileEntryId, name, privacyPolicyURL,
+					redirectURIsList, scopeAliasesList, serviceContext);
 
 			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.
 				toSoapModel(returnValue);
@@ -96,6 +95,10 @@ public class OAuth2ApplicationServiceSoap {
 		}
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap
 			addOAuth2Application(
 				java.util.List<com.liferay.oauth2.provider.constants.GrantType>
@@ -249,24 +252,23 @@ public class OAuth2ApplicationServiceSoap {
 				long oAuth2ApplicationId,
 				java.util.List<com.liferay.oauth2.provider.constants.GrantType>
 					allowedGrantTypesList,
-				String clientId, int clientProfile, String clientSecret,
-				String description, java.util.List<String> featuresList,
-				String homePageURL, long iconFileEntryId, String name,
-				String privacyPolicyURL,
+				long clientCredentialUserId, String clientId, int clientProfile,
+				String clientSecret, String description,
+				java.util.List<String> featuresList, String homePageURL,
+				long iconFileEntryId, String name, String privacyPolicyURL,
 				java.util.List<String> redirectURIsList,
 				long auth2ApplicationScopeAliasesId,
-				long clientCredentialUserId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 
 		try {
 			com.liferay.oauth2.provider.model.OAuth2Application returnValue =
 				OAuth2ApplicationServiceUtil.updateOAuth2Application(
-					oAuth2ApplicationId, allowedGrantTypesList, clientId,
-					clientProfile, clientSecret, description, featuresList,
-					homePageURL, iconFileEntryId, name, privacyPolicyURL,
-					redirectURIsList, auth2ApplicationScopeAliasesId,
-					clientCredentialUserId, serviceContext);
+					oAuth2ApplicationId, allowedGrantTypesList,
+					clientCredentialUserId, clientId, clientProfile,
+					clientSecret, description, featuresList, homePageURL,
+					iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+					auth2ApplicationScopeAliasesId, serviceContext);
 
 			return com.liferay.oauth2.provider.model.OAuth2ApplicationSoap.
 				toSoapModel(returnValue);
@@ -278,6 +280,10 @@ public class OAuth2ApplicationServiceSoap {
 		}
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	public static com.liferay.oauth2.provider.model.OAuth2ApplicationSoap
 			updateOAuth2Application(
 				long oAuth2ApplicationId,

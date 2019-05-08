@@ -59,13 +59,12 @@ public class OAuth2ApplicationServiceHttp {
 				HttpPrincipal httpPrincipal,
 				java.util.List<com.liferay.oauth2.provider.constants.GrantType>
 					allowedGrantTypesList,
-				String clientId, int clientProfile, String clientSecret,
-				String description, java.util.List<String> featuresList,
-				String homePageURL, long iconFileEntryId, String name,
-				String privacyPolicyURL,
+				long clientCredentialUserId, String clientId, int clientProfile,
+				String clientSecret, String description,
+				java.util.List<String> featuresList, String homePageURL,
+				long iconFileEntryId, String name, String privacyPolicyURL,
 				java.util.List<String> redirectURIsList,
 				java.util.List<String> scopeAliasesList,
-				long clientCredentialUserId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -75,10 +74,11 @@ public class OAuth2ApplicationServiceHttp {
 				_addOAuth2ApplicationParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, allowedGrantTypesList, clientId, clientProfile,
-				clientSecret, description, featuresList, homePageURL,
-				iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
-				scopeAliasesList, clientCredentialUserId, serviceContext);
+				methodKey, allowedGrantTypesList, clientCredentialUserId,
+				clientId, clientProfile, clientSecret, description,
+				featuresList, homePageURL, iconFileEntryId, name,
+				privacyPolicyURL, redirectURIsList, scopeAliasesList,
+				serviceContext);
 
 			Object returnObj = null;
 
@@ -432,13 +432,12 @@ public class OAuth2ApplicationServiceHttp {
 				HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
 				java.util.List<com.liferay.oauth2.provider.constants.GrantType>
 					allowedGrantTypesList,
-				String clientId, int clientProfile, String clientSecret,
-				String description, java.util.List<String> featuresList,
-				String homePageURL, long iconFileEntryId, String name,
-				String privacyPolicyURL,
+				long clientCredentialUserId, String clientId, int clientProfile,
+				String clientSecret, String description,
+				java.util.List<String> featuresList, String homePageURL,
+				long iconFileEntryId, String name, String privacyPolicyURL,
 				java.util.List<String> redirectURIsList,
 				long auth2ApplicationScopeAliasesId,
-				long clientCredentialUserId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -448,11 +447,11 @@ public class OAuth2ApplicationServiceHttp {
 				_updateOAuth2ApplicationParameterTypes9);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, oAuth2ApplicationId, allowedGrantTypesList, clientId,
-				clientProfile, clientSecret, description, featuresList,
-				homePageURL, iconFileEntryId, name, privacyPolicyURL,
-				redirectURIsList, auth2ApplicationScopeAliasesId,
-				clientCredentialUserId, serviceContext);
+				methodKey, oAuth2ApplicationId, allowedGrantTypesList,
+				clientCredentialUserId, clientId, clientProfile, clientSecret,
+				description, featuresList, homePageURL, iconFileEntryId, name,
+				privacyPolicyURL, redirectURIsList,
+				auth2ApplicationScopeAliasesId, serviceContext);
 
 			Object returnObj = null;
 
@@ -580,10 +579,10 @@ public class OAuth2ApplicationServiceHttp {
 
 	private static final Class<?>[] _addOAuth2ApplicationParameterTypes0 =
 		new Class[] {
-			java.util.List.class, String.class, int.class, String.class,
-			String.class, java.util.List.class, String.class, long.class,
-			String.class, String.class, java.util.List.class,
-			java.util.List.class, long.class,
+			java.util.List.class, long.class, String.class, int.class,
+			String.class, String.class, java.util.List.class, String.class,
+			long.class, String.class, String.class, java.util.List.class,
+			java.util.List.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _addOAuth2ApplicationParameterTypes1 =
@@ -614,10 +613,10 @@ public class OAuth2ApplicationServiceHttp {
 	};
 	private static final Class<?>[] _updateOAuth2ApplicationParameterTypes9 =
 		new Class[] {
-			long.class, java.util.List.class, String.class, int.class,
-			String.class, String.class, java.util.List.class, String.class,
-			long.class, String.class, String.class, java.util.List.class,
-			long.class, long.class,
+			long.class, java.util.List.class, long.class, String.class,
+			int.class, String.class, String.class, java.util.List.class,
+			String.class, long.class, String.class, String.class,
+			java.util.List.class, long.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _updateOAuth2ApplicationParameterTypes10 =
