@@ -191,6 +191,10 @@ public class OAuth2ApplicationLocalServiceImpl
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	@Override
 	public OAuth2Application addOAuth2Application(
 			long companyId, long userId, String userName,
@@ -406,6 +410,10 @@ public class OAuth2ApplicationLocalServiceImpl
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	public OAuth2Application updateOAuth2Application(
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
 			String clientId, int clientProfile, String clientSecret,

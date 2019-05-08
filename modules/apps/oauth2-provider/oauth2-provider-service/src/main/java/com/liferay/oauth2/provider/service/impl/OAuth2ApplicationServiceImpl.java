@@ -82,6 +82,10 @@ public class OAuth2ApplicationServiceImpl
 			scopeAliasesList, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	@Override
 	public OAuth2Application addOAuth2Application(
 			List<GrantType> allowedGrantTypesList, String clientId,
@@ -239,6 +243,10 @@ public class OAuth2ApplicationServiceImpl
 			redirectURIsList, auth2ApplicationScopeAliasesId, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	@Override
 	public OAuth2Application updateOAuth2Application(
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
