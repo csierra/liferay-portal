@@ -66,7 +66,7 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"2.0.0", "3.0.0",
 			getAddColumnsUpgradeProcess(
-				OAuth2ApplicationTable.class, "clientCredentialUserId long"),
+				OAuth2ApplicationTable.class, "clientCredentialUserId LONG"),
 			getAddColumnsUpgradeProcess(
 				OAuth2ApplicationTable.class,
 				"clientCredentialUserName VARCHAR(255) null"),
