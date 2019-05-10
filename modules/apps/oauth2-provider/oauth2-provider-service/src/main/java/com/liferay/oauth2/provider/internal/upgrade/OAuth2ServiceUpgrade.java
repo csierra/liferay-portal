@@ -69,7 +69,7 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 				OAuth2ApplicationTable.class, "clientCredentialUserId LONG"),
 			getAddColumnsUpgradeProcess(
 				OAuth2ApplicationTable.class,
-				"clientCredentialUserName VARCHAR(255) null"),
+				"clientCredentialUserName VARCHAR(75) null"),
 			getRunSQLUpgradeProcess(
 				StringBundler.concat(
 					"update OAuth2Application set ",
