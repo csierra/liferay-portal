@@ -73,8 +73,8 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 			getRunSQLUpgradeProcess(
 				StringBundler.concat(
 					"update OAuth2Application set ",
-					"clientCredentialUserId = userId, ",
-					"clientCredentialUserName = userName")));
+					"clientCredentialUserId=userId, clientCredentialUserName=",
+					"userName")));
 	}
 
 	protected UpgradeProcess getAddColumnsUpgradeProcess(
