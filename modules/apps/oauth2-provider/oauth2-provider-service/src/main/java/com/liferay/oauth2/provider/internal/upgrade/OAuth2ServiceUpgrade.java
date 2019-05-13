@@ -21,11 +21,8 @@ import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2Applicatio
 import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2ScopeGrantTable;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
-
-import java.util.Arrays;
-import java.util.function.Function;
+import com.liferay.portal.upgrade.util.UpgradeStepFactory;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,88 +42,33 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register(
 			"1.1.0", "1.2.0",
-			getAddColumnsUpgradeProcess(
+			UpgradeStepFactory.addColumns(
 				OAuth2AuthorizationTable.class,
 				"remoteHostInfo VARCHAR(255) null"));
 
 		registry.register(
 			"1.2.0", "1.3.0",
-			getAddColumnsUpgradeProcess(
+			UpgradeStepFactory.addColumns(
 				OAuth2ScopeGrantTable.class, "scopeAliases TEXT null"));
 
 		registry.register(
 			"1.3.0", "2.0.0",
 			new UpgradeOAuth2ApplicationScopeAliases(
 				_companyLocalService, _scopeLocator),
-			getDropColumnsUpgradeProcess(
+			UpgradeStepFactory.dropColumns(
 				OAuth2ApplicationScopeAliasesTable.class, "scopeAliases",
 				"scopeAliasesHash"));
 
 		registry.register(
 			"2.0.0", "3.0.0",
-			getAddColumnsUpgradeProcess(
+			UpgradeStepFactory.addColumns(
 				OAuth2ApplicationTable.class, "clientCredentialUserId LONG"),
-			getAddColumnsUpgradeProcess(
+			UpgradeStepFactory.addColumns(
 				OAuth2ApplicationTable.class,
 				"clientCredentialUserName VARCHAR(75) null"),
-			getRunSQLUpgradeProcess(
+			UpgradeStepFactory.runSql(
 				"update OAuth2Application set clientCredentialUserId = " +
 					"userId, clientCredentialUserName = userName"));
-	}
-
-	protected UpgradeProcess getAddColumnsUpgradeProcess(
-		Class<?> tableClass, String... columnDefinitions) {
-
-		return new UpgradeProcess() {
-
-			@Override
-			protected void doUpgrade() throws Exception {
-				alter(
-					tableClass,
-					_getAlterables(
-						AlterTableAddColumn::new, columnDefinitions));
-			}
-
-		};
-	}
-
-	protected UpgradeProcess getDropColumnsUpgradeProcess(
-		Class<?> tableClass, String... tableNames) {
-
-		return new UpgradeProcess() {
-
-			@Override
-			protected void doUpgrade() throws Exception {
-				alter(
-					tableClass,
-					_getAlterables(AlterTableDropColumn::new, tableNames));
-			}
-
-		};
-	}
-
-	protected UpgradeProcess getRunSQLUpgradeProcess(String sql) {
-		return new UpgradeProcess() {
-
-			@Override
-			protected void doUpgrade() throws Exception {
-				runSQL(sql);
-			}
-
-		};
-	}
-
-	private UpgradeProcess.Alterable[] _getAlterables(
-		Function<String, UpgradeProcess.Alterable> alterableFunction,
-		String... alterableStrings) {
-
-		return Arrays.stream(
-			alterableStrings
-		).map(
-			alterableFunction
-		).toArray(
-			UpgradeProcess.Alterable[]::new
-		);
 	}
 
 	@Reference
