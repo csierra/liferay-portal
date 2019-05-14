@@ -199,7 +199,7 @@ public class SalesforceStreamingClientImpl
 				if (message.get("exception") != null) {
 					Exception e = (Exception)message.get("exception");
 
-					e.printStackTrace();
+					_logger.error(e.getMessage(), e);
 				}
 
 				_bayeuxClient.disconnect();
