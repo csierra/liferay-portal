@@ -20,6 +20,8 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.template.soy.util.SoyHTMLSanitizer;
 import com.liferay.taglib.servlet.PageContextFactoryUtil;
@@ -61,7 +63,7 @@ public class CaptchaDDMFormFieldTemplateContextContributor
 			html = renderCaptchaTag(ddmFormField, ddmFormFieldRenderingContext);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.error(e, e);
 		}
 
 		parameters.put("html", _soyHTMLSanitizer.sanitize(html));
@@ -96,6 +98,9 @@ public class CaptchaDDMFormFieldTemplateContextContributor
 
 		return unsyncStringWriter.toString();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CaptchaDDMFormFieldTemplateContextContributor.class);
 
 	@Reference
 	private SoyHTMLSanitizer _soyHTMLSanitizer;

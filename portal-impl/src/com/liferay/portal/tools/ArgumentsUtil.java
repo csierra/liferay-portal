@@ -14,6 +14,8 @@
 
 package com.liferay.portal.tools;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -100,7 +102,9 @@ public class ArgumentsUtil {
 			throw e;
 		}
 
-		e.printStackTrace();
+		_log.error(e, e);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(ArgumentsUtil.class);
 
 }
