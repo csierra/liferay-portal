@@ -262,7 +262,7 @@ public class I18nFilter extends BasePortalFilter {
 		}
 		catch (PortalException pe) {
 			if (_log.isDebugEnabled()) {
-				pe.printStackTrace();
+				_log.debug(pe.getMessage(), pe);
 			}
 
 			return StringPool.BLANK;

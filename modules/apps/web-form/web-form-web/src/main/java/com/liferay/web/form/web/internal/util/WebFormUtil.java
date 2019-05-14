@@ -183,7 +183,7 @@ public class WebFormUtil {
 				br.close();
 			}
 			catch (IOException ioe) {
-				ioe.printStackTrace();
+				_log.error(ioe, ioe);
 			}
 		}
 		else {
