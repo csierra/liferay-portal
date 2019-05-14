@@ -138,10 +138,10 @@ try {
 	ue.printStackTrace();
 }*/
 catch (PortletException pe) {
-	pe.printStackTrace();
+	_log.error(pe);
 }
 catch (RuntimeException re) {
-	re.printStackTrace();
+	_log.error(re);
 }
 
 LiferayRenderRequest liferayRenderRequest = RenderRequestFactory.create(request, portlet, invokerPortlet, portletCtx, windowState, portletMode, portletPreferences, plid);

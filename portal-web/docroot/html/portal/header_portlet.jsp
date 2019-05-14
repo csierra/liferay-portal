@@ -27,10 +27,10 @@ try {
 	}
 }
 catch (PortletException pe) {
-	pe.printStackTrace();
+	_log.error(pe);
 }
 catch (RuntimeException re) {
-	re.printStackTrace();
+	_log.error(re);
 }
 
 if ((invokerPortlet == null) || !invokerPortlet.isHeaderPortlet()) {

@@ -196,7 +196,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "session-id-x", sessionId, 
 								catch (Exception e) {
 									userSessionAlive = false;
 
-									e.printStackTrace();
+									_log.error(e);
 								}
 							}
 							%>
@@ -214,3 +214,6 @@ renderResponse.setTitle(LanguageUtil.format(request, "session-id-x", sessionId, 
 		</c:otherwise>
 	</c:choose>
 </aui:form>
+<%!
+	private static Log _log = LogFactoryUtil.getLog("com_liferay_monitoring_web.edit_session_jsp");
+%>
