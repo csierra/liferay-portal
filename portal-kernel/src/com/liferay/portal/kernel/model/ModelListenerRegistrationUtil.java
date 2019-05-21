@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.model;
 
+import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
+import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.portal.kernel.bean.ClassLoaderBeanHandler;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.registry.Filter;
@@ -108,7 +110,8 @@ public class ModelListenerRegistrationUtil {
 		new ModelListenerRegistrationUtil();
 
 	private final ConcurrentMap<Class<?>, List<ModelListener<?>>>
-		_modelListeners = new ConcurrentHashMap<>();
+		_modelListeners = new ConcurrentReferenceKeyHashMap<>(
+			FinalizeManager.WEAK_REFERENCE_FACTORY);
 	private final Map<String, ServiceRegistration<?>> _serviceRegistrations =
 		new ConcurrentHashMap<>();
 	private final ServiceTracker<ModelListener<?>, ModelListener<?>>
