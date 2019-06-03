@@ -170,6 +170,8 @@ Import-Package:\
 	\
 	!com.sun.*,\
 	\
+	!javax.cache.*,\
+	\
 	!javax.enterprise.context.spi,\
 	!javax.enterprise.event,\
 	!javax.enterprise.inject.spi,\
@@ -202,6 +204,7 @@ Import-Package:\
 	\
 	!org.relaxng.datatype.*,\
 	\
+	!org.slf4j.impl.*,\
 	!org.slf4j.spi.*,\
 	\
 	!org.springframework.*,\
