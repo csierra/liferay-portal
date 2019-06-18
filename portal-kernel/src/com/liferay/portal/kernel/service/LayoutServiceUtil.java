@@ -661,7 +661,7 @@ public class LayoutServiceUtil {
 	 To see how the URL is normalized when accessed see {@link
 	 com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
 	 String)}.
-	 * @param hasIconImage whether the icon image will be updated
+	 * @param hasIconImage if the layout has a custom icon image
 	 * @param iconBytes the byte array of the layout's new icon image
 	 * @param serviceContext the service context to be applied. Can set the
 	 modification date and expando bridge attributes for the layout.
