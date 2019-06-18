@@ -1872,7 +1872,7 @@ public class OrganizationLocalServiceImpl
 	 * @param  countryId the primary key of the organization's country
 	 * @param  statusId the organization's workflow status
 	 * @param  comments the comments about the organization
-	 * @param  logo whether to update the ogranization's logo
+	 * @param  hasLogo whether to update the ogranization's logo
 	 * @param  logoBytes the new logo image data
 	 * @param  site whether the organization is to be associated with a main
 	 *         site
@@ -1886,7 +1886,7 @@ public class OrganizationLocalServiceImpl
 	public Organization updateOrganization(
 			long companyId, long organizationId, long parentOrganizationId,
 			String name, String type, long regionId, long countryId,
-			long statusId, String comments, boolean logo, byte[] logoBytes,
+			long statusId, String comments, boolean hasLogo, byte[] logoBytes,
 			boolean site, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -1916,7 +1916,7 @@ public class OrganizationLocalServiceImpl
 		organization.setComments(comments);
 
 		PortalUtil.updateImageId(
-			organization, logo, logoBytes, "logoId",
+			organization, hasLogo, logoBytes, "logoId",
 			_userFileUploadsSettings.getImageMaxSize(),
 			_userFileUploadsSettings.getImageMaxHeight(),
 			_userFileUploadsSettings.getImageMaxWidth());
