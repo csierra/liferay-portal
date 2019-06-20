@@ -14,6 +14,7 @@
 
 package com.liferay.portal.security.auth;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -292,9 +293,22 @@ public class AuthVerifierPipeline {
 					if (_log.isDebugEnabled()) {
 						Class<?> authVerifierClass = authVerifier.getClass();
 
-						_log.debug(
-							"Auth verifier " + authVerifierClass.getName() +
-								" returned a not active user");
+						if (user == null) {
+							_log.debug(
+								StringBundler.concat(
+									"Auth verifier ",
+									authVerifierClass.getName(),
+									" returned null user",
+									authVerifierResult.getUserId()));
+						}
+						else {
+							_log.debug(
+								StringBundler.concat(
+									"Auth verifier ",
+									authVerifierClass.getName(),
+									" returned inactive user",
+									authVerifierResult.getUserId()));
+						}
 					}
 
 					continue;
