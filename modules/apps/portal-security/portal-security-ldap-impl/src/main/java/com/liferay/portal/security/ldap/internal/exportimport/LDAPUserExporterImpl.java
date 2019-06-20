@@ -28,6 +28,7 @@ import com.liferay.portal.security.exportimport.UserExporter;
 import com.liferay.portal.security.exportimport.UserOperation;
 import com.liferay.portal.security.ldap.GroupConverterKeys;
 import com.liferay.portal.security.ldap.PortalLDAP;
+import com.liferay.portal.security.ldap.SafeLDAPContext;
 import com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration;
 import com.liferay.portal.security.ldap.configuration.ConfigurationProvider;
 import com.liferay.portal.security.ldap.exportimport.Modifications;
@@ -100,7 +101,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 		long ldapServerId = _portalLDAP.getLdapServerId(
 			companyId, user.getScreenName(), user.getEmailAddress());
 
-		LdapContext ldapContext = _portalLDAP.getContext(
+		LdapContext ldapContext = _portalLDAP.getSafeLDAPContext(
 			ldapServerId, companyId);
 
 		try {
@@ -185,10 +186,10 @@ public class LDAPUserExporterImpl implements UserExporter {
 		long ldapServerId = _portalLDAP.getLdapServerId(
 			companyId, user.getScreenName(), user.getEmailAddress());
 
-		LdapContext ldapContext = _portalLDAP.getContext(
+		SafeLDAPContext safeLDAPContext = _portalLDAP.getSafeLDAPContext(
 			ldapServerId, companyId);
 
-		if (ldapContext == null) {
+		if (safeLDAPContext == null) {
 			return;
 		}
 
@@ -199,14 +200,14 @@ public class LDAPUserExporterImpl implements UserExporter {
 		Properties userMappings = _ldapSettings.getUserMappings(
 			ldapServerId, companyId);
 
-		Binding binding = _portalLDAP.getGroup(
+		Binding userGroupBinding = _portalLDAP.getGroup(
 			ldapServerId, companyId, userGroup.getName());
 
-		if (binding == null) {
+		if (userGroupBinding == null) {
 			if (userOperation == UserOperation.ADD) {
 				addGroup(
-					ldapServerId, ldapContext, userGroup, user, groupMappings,
-					userMappings);
+					ldapServerId, safeLDAPContext, userGroup, user,
+					groupMappings, userMappings);
 			}
 			else {
 				if (_log.isWarnEnabled()) {
@@ -219,9 +220,8 @@ public class LDAPUserExporterImpl implements UserExporter {
 			return;
 		}
 
-		Name name = new CompositeName();
-
-		name.add(binding.getNameInNamespace());
+		Name userGroupDNName = LDAPUtil.asLdapName(
+			userGroupBinding.getNameInNamespace());
 
 		try {
 			Modifications modifications =
@@ -231,7 +231,8 @@ public class LDAPUserExporterImpl implements UserExporter {
 
 			ModificationItem[] modificationItems = modifications.getItems();
 
-			ldapContext.modifyAttributes(name, modificationItems);
+			safeLDAPContext.modifyAttributes(
+				userGroupDNName, modificationItems);
 		}
 		catch (SchemaViolationException sve) {
 			if (_log.isInfoEnabled()) {
@@ -241,21 +242,20 @@ public class LDAPUserExporterImpl implements UserExporter {
 					sve);
 			}
 
-			String fullGroupDN = binding.getNameInNamespace();
-
 			Attributes attributes = _portalLDAP.getGroupAttributes(
-				ldapServerId, companyId, ldapContext, fullGroupDN, true);
+				ldapServerId, companyId, safeLDAPContext, userGroupDNName,
+				true);
 
 			Attribute groupMembers = attributes.get(
 				groupMappings.getProperty(GroupConverterKeys.USER));
 
 			if ((groupMembers != null) && (groupMembers.size() == 1)) {
-				ldapContext.unbind(name);
+				safeLDAPContext.unbind(userGroupDNName);
 			}
 		}
 		finally {
-			if (ldapContext != null) {
-				ldapContext.close();
+			if (safeLDAPContext != null) {
+				safeLDAPContext.close();
 			}
 
 			if (_log.isDebugEnabled()) {
@@ -287,7 +287,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 		long ldapServerId = _portalLDAP.getLdapServerId(
 			companyId, user.getScreenName(), user.getEmailAddress());
 
-		LdapContext ldapContext = _portalLDAP.getContext(
+		LdapContext ldapContext = _portalLDAP.getSafeLDAPContext(
 			ldapServerId, companyId);
 
 		try {
@@ -311,7 +311,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 			else {
 				Attributes attributes = _portalLDAP.getUserAttributes(
 					ldapServerId, companyId, ldapContext,
-					binding.getNameInNamespace());
+					LDAPUtil.asLdapName(binding.getNameInNamespace()));
 
 				String modifyTimestamp = LDAPUtil.getAttributeString(
 					attributes, "modifyTimestamp");
