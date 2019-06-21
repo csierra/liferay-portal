@@ -65,7 +65,7 @@ public class FragmentRendererPortalInstanceLifecycleListener
 
 		User user = _userLocalService.getDefaultUser(company.getCompanyId());
 
-		oAuth2Application = _oAuth2ApplicationLocalService.addOAuth2Application(
+		_oAuth2ApplicationLocalService.addOAuth2Application(
 			company.getCompanyId(), user.getUserId(), user.getScreenName(),
 			new ArrayList<GrantType>() {
 				{
@@ -76,12 +76,12 @@ public class FragmentRendererPortalInstanceLifecycleListener
 			user.getUserId(), _clientId, ClientProfile.NATIVE_APPLICATION.id(),
 			StringPool.BLANK, null, null, null, 0, _applicationName, null,
 			Collections.emptyList(),
-			builder -> builder.forApplication(
-				"liferay-json-web-services",
-				scopeAssigner -> scopeAssigner.assignScope(
-					"everything.read",
-					"liferay-json-web-services.fragments.everything.read")
-			).build(),
+			oauth2ScopeBuilder -> oauth2ScopeBuilder.forApplication(
+				"liferay-json-web-services"
+			).assignScope(
+				"everything.read",
+				"liferay-json-web-services.fragments.everything.read"
+			),
 			new ServiceContext());
 	}
 
