@@ -43,8 +43,8 @@ public class OAuth2ApplicationScopeAliasesLocalServiceWrapper
 			addOAuth2ApplicationScopeAliases(
 				long companyId, long userId, String userName,
 				long oAuth2ApplicationId,
-				java.util.function.Function<OAuth2Scope.Builder, OAuth2Scope>
-					builderFunction)
+				java.util.function.Function
+					<OAuth2Scope.Builder, OAuth2Scope.Finished> builderFunction)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _oAuth2ApplicationScopeAliasesLocalService.
