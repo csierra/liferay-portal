@@ -16,7 +16,6 @@ package com.liferay.oauth2.provider.service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * @author Stian Sigvartsen
@@ -25,24 +24,20 @@ public final class OAuth2Scope {
 
 	public interface Builder {
 
-		public default OAuth2Scope build() {
-			return new OAuth2Scope();
-		}
-
-		public Builder forApplication(
-			String applicationName,
-			Function<ScopeAssigner, ScopeAssigner> scopeAssignerFunction);
+		public ScopeAssigner forApplication(String applicationName);
 
 		public interface ScopeAssigner {
 
-			public default ScopeAssigner assignScope(String scope) {
+			public default <T extends ScopeAssigner & Finished> T assignScope(
+				String scope) {
+
 				return assignScope(scope, Collections.singletonList(scope));
 			}
 
-			public ScopeAssigner assignScope(
+			public <T extends ScopeAssigner & Finished> T assignScope(
 				String scope, List<String> scopeAliases);
 
-			public default ScopeAssigner assignScope(
+			public default <T extends ScopeAssigner & Finished> T assignScope(
 				String scope, String scopeAlias) {
 
 				return assignScope(
@@ -53,7 +48,7 @@ public final class OAuth2Scope {
 
 	}
 
-	private OAuth2Scope() {
+	public interface Finished {
 	}
 
 }
