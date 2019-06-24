@@ -142,11 +142,10 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 			Map<String, Object> settings = authVerifierResult.getSettings();
 
 			settings.put(
+				BearerTokenProvider.AccessToken.class.getName(), accessToken);
+			settings.put(
 				ServiceAccessPolicy.SERVICE_ACCESS_POLICY_NAMES,
 				serviceAccessPolicyNames);
-
-			settings.put(
-				BearerTokenProvider.AccessToken.class.getName(), accessToken);
 
 			authVerifierResult.setState(AuthVerifierResult.State.SUCCESS);
 			authVerifierResult.setUserId(accessToken.getUserId());
