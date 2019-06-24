@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationScopes;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
@@ -76,12 +77,12 @@ public class FragmentRendererPortalInstanceLifecycleListener
 			user.getUserId(), _clientId, ClientProfile.NATIVE_APPLICATION.id(),
 			StringPool.BLANK, null, null, null, 0, _applicationName, null,
 			Collections.emptyList(),
-			oauth2ScopeBuilder -> oauth2ScopeBuilder.forApplication(
-				"liferay-json-web-services"
-			).assignScope(
-				"everything.read",
-				"liferay-json-web-services.fragments.everything.read"
-			),
+			OAuth2ApplicationScopes.create(
+				OAuth2ApplicationScopes.ApplicationScopes.create(
+					"liferay-json-web-services",
+					OAuth2ApplicationScopes.ApplicationScope.create(
+						"liferay-json-web-services.fragments.everything.read",
+						"everything.read"))),
 			new ServiceContext());
 	}
 
