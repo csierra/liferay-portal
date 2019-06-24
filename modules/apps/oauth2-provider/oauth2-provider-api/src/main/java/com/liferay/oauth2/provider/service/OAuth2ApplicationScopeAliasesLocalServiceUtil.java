@@ -44,13 +44,11 @@ public class OAuth2ApplicationScopeAliasesLocalServiceUtil {
 				addOAuth2ApplicationScopeAliases(
 					long companyId, long userId, String userName,
 					long oAuth2ApplicationId,
-					java.util.function.Function
-						<OAuth2Scope.Builder, OAuth2Scope.Finished>
-							builderFunction)
+					java.util.List<String> scopeAliasesList)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().addOAuth2ApplicationScopeAliases(
-			companyId, userId, userName, oAuth2ApplicationId, builderFunction);
+			companyId, userId, userName, oAuth2ApplicationId, scopeAliasesList);
 	}
 
 	public static
@@ -58,11 +56,12 @@ public class OAuth2ApplicationScopeAliasesLocalServiceUtil {
 				addOAuth2ApplicationScopeAliases(
 					long companyId, long userId, String userName,
 					long oAuth2ApplicationId,
-					java.util.List<String> scopeAliasesList)
+					OAuth2ApplicationScopes oAuth2ApplicationScopes)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().addOAuth2ApplicationScopeAliases(
-			companyId, userId, userName, oAuth2ApplicationId, scopeAliasesList);
+			companyId, userId, userName, oAuth2ApplicationId,
+			oAuth2ApplicationScopes);
 	}
 
 	/**

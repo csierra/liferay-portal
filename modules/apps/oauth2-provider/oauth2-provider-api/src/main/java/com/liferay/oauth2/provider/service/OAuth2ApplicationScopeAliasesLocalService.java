@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -63,13 +62,13 @@ public interface OAuth2ApplicationScopeAliasesLocalService
 	 */
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
 			long companyId, long userId, String userName,
-			long oAuth2ApplicationId,
-			Function<OAuth2Scope.Builder, OAuth2Scope.Finished> builderFunction)
+			long oAuth2ApplicationId, List<String> scopeAliasesList)
 		throws PortalException;
 
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
 			long companyId, long userId, String userName,
-			long oAuth2ApplicationId, List<String> scopeAliasesList)
+			long oAuth2ApplicationId,
+			OAuth2ApplicationScopes oAuth2ApplicationScopes)
 		throws PortalException;
 
 	/**
