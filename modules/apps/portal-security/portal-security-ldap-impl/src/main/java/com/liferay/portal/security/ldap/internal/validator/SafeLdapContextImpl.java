@@ -510,7 +510,7 @@ public class SafeLdapContextImpl implements SafeLdapContext {
 
 	protected void warn() {
 		if (_log.isDebugEnabled()) {
-			_log.debug("Unsafe LDAP Search method used");
+			_log.debug("Unsafe LDAP Search method used", new Exception());
 		}
 		else if (_log.isWarnEnabled()) {
 			_log.warn("Unsafe LDAP Search method used");
