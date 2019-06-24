@@ -93,7 +93,6 @@ public class DisabledUserClientTest extends BaseClientTestCase {
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Arrays.asList("GET"));
-
 			createOAuth2Application(
 				defaultCompanyId, disabledUser, "oauthTestApplicationDisabled",
 				Arrays.asList("GET"));
