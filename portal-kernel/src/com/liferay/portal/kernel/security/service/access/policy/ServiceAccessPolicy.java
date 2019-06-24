@@ -23,7 +23,7 @@ import java.util.Locale;
 public interface ServiceAccessPolicy {
 
 	public static final String SERVICE_ACCESS_POLICY_NAMES =
-		ServiceAccessPolicy.class.getName() + ".names";
+		ServiceAccessPolicy.class.getName() + "#NAMES";
 
 	public List<String> getAllowedServiceSignaturesList();
 
