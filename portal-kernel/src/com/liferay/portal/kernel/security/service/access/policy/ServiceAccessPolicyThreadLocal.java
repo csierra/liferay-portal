@@ -20,10 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Mika Koivisto
+ * @author     Mika Koivisto
  * @deprecated As of Mueller (7.2.x), replaced by {@link
- *             com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult#getSettings()}
- *             with key {@link ServiceAccessPolicy#SERVICE_ACCESS_POLICY_NAMES}
+ *             com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult#getSettings(
+ *             )} with key {@link
+ *             ServiceAccessPolicy#SERVICE_ACCESS_POLICY_NAMES}
  */
 @Deprecated
 public class ServiceAccessPolicyThreadLocal {
