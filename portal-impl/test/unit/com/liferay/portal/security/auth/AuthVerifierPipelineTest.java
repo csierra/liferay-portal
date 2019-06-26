@@ -15,9 +15,11 @@
 package com.liferay.portal.security.auth;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.Registry;
@@ -30,6 +32,13 @@ import java.util.Objects;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.mockito.Mockito;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
@@ -37,6 +46,8 @@ import org.springframework.mock.web.MockServletContext;
 /**
  * @author Peter Fellwock
  */
+@PrepareForTest(UserLocalServiceUtil.class)
+@RunWith(PowerMockRunner.class)
 public class AuthVerifierPipelineTest {
 
 	@Test
@@ -44,6 +55,22 @@ public class AuthVerifierPipelineTest {
 		RegistryUtil.setRegistry(new BasicRegistryImpl());
 
 		Registry registry = RegistryUtil.getRegistry();
+
+		User user = Mockito.mock(User.class);
+
+		Mockito.when(
+			user.isActive()
+		).thenReturn(
+			true
+		);
+
+		PowerMockito.mockStatic(UserLocalServiceUtil.class);
+
+		Mockito.when(
+			UserLocalServiceUtil.fetchUser(Mockito.anyLong())
+		).thenReturn(
+			user
+		);
 
 		AuthVerifierResult authVerifierResult = new AuthVerifierResult();
 
