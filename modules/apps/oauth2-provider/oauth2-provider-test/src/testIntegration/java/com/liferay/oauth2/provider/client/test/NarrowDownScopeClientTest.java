@@ -27,6 +27,13 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.function.Function;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -64,13 +71,23 @@ public class NarrowDownScopeClientTest extends BaseClientTestCase {
 				getClientCredentialsResponseBiFunction("GET"),
 				this::parseScopeString));
 
-		Assert.assertEquals(
-			"GET",
-			getToken(
-				"oauthTestApplication", null,
-				getResourceOwnerPasswordBiFunction(
-					"test@liferay.com", "test", "GET"),
-				this::parseScopeString));
+		Response response = getToken(
+			"oauthTestApplication", null,
+			getResourceOwnerPasswordBiFunction(
+				"test@liferay.com", "test", "GET"),
+			Function.identity());
+
+		Assert.assertEquals("GET", parseScopeString(response));
+
+		WebTarget methods = getWebTarget("methods");
+
+		Invocation.Builder builder = authorize(
+			methods.request(), parseTokenString(response));
+
+		Response postResponse = builder.post(
+			Entity.entity("", MediaType.TEXT_PLAIN_TYPE));
+
+		Assert.assertEquals(403, postResponse.getStatus());
 
 		String scopeString = getToken(
 			"oauthTestApplication", null,
