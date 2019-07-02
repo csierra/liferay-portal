@@ -39,6 +39,15 @@ public class ScopeDescriptorLocatorImpl implements ScopeDescriptorLocator {
 		return _scopedServiceTrackerMap.getService(companyId, applicationName);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
+	@Override
+	public ScopeDescriptor getScopeDescriptor(String applicationName) {
+		return _scopedServiceTrackerMap.getService(0, applicationName);
+	}
+
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_scopedServiceTrackerMap = _scopedServiceTrackerMapFactory.create(
