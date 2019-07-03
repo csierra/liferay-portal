@@ -87,11 +87,6 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 		OAuth2Authorization oAuth2Authorization = getOAuth2Authorization(
 			accessControlContext);
 
-		List<OAuth2ScopeGrant> oAuth2AuthorizationOAuth2ScopeGrants =
-			_oAuth2ScopeGrantLocalService.
-				getOAuth2AuthorizationOAuth2ScopeGrants(
-					oAuth2Authorization.getOAuth2AuthorizationId());
-
 		try {
 			BearerTokenProvider.AccessToken accessToken = getAccessToken(
 				oAuth2Authorization);
@@ -116,6 +111,11 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 			if (!bearerTokenProvider.isValid(accessToken)) {
 				return authVerifierResult;
 			}
+
+			List<OAuth2ScopeGrant> oAuth2AuthorizationOAuth2ScopeGrants =
+				_oAuth2ScopeGrantLocalService.
+					getOAuth2AuthorizationOAuth2ScopeGrants(
+						oAuth2Authorization.getOAuth2AuthorizationId());
 
 			List<String> scopes = oAuth2AuthorizationOAuth2ScopeGrants.stream(
 			).filter(
