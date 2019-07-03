@@ -119,8 +119,8 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 			List<String> scopes = oAuth2AuthorizationOAuth2ScopeGrants.stream(
 			).filter(
-				loa2s -> _jaxRsApplicationNames.contains(
-					loa2s.getApplicationName())
+				oAuth2ScopeGrant -> _jaxRsApplicationNames.contains(
+					oAuth2ScopeGrant.getApplicationName())
 			).map(
 				OAuth2ScopeGrant::getScope
 			).collect(
