@@ -796,13 +796,10 @@ public class LayoutTypePortletImpl
 
 	@Override
 	public boolean isCustomizable() {
-		for (String columnId : getColumns()) {
-			if (isColumnCustomizable(columnId)) {
-				return true;
-			}
-		}
+		String customizableString = getTypeSettingsProperty(
+			LayoutConstants.CUSTOMIZABLE_LAYOUT);
 
-		return false;
+		return GetterUtil.getBoolean(customizableString);
 	}
 
 	@Override
