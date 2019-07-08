@@ -1385,7 +1385,7 @@ public class LayoutTypePortletImpl
 			return null;
 		}
 
-		if (isCustomizable()) {
+		if (isColumnCustomizable(columnId)) {
 			if (isColumnDisabled(columnId) &&
 				!columnId.startsWith(_NESTED_PORTLETS_NAMESPACE)) {
 
