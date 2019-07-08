@@ -796,10 +796,10 @@ public class LayoutTypePortletImpl
 
 	@Override
 	public boolean isCustomizable() {
-	String customizableString = getTypeSettingsProperty(
-		LayoutConstants.CUSTOMIZABLE_LAYOUT);
+		String customizableString = getTypeSettingsProperty(
+			LayoutConstants.CUSTOMIZABLE_LAYOUT);
 
-	return  GetterUtil.getBoolean(customizableString);
+		return GetterUtil.getBoolean(customizableString);
 	}
 
 	@Override
@@ -1385,7 +1385,7 @@ public class LayoutTypePortletImpl
 			return null;
 		}
 
-		if (isCustomizable()) {
+		if (isColumnCustomizable(columnId)) {
 			if (isColumnDisabled(columnId) &&
 				!columnId.startsWith(_NESTED_PORTLETS_NAMESPACE)) {
 
