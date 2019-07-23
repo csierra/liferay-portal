@@ -17,6 +17,8 @@ package com.liferay.portal.remote.jaxrs.whiteboard.debug.osgi.commands;
 import com.liferay.osgi.util.StringPlus;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Arrays;
 
@@ -36,6 +38,7 @@ import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * @author Carlos Sierra Andrés
@@ -60,6 +63,12 @@ public class JaxRsServiceRuntimeOSGiCommands {
 			System.out.println();
 
 			printApplicationDTO(applicationDTO);
+		}
+
+		if (ArrayUtil.isNotEmpty(runtimeDTO.failedApplicationDTOs)) {
+			System.out.println();
+
+			System.out.println("Failed application report:");
 		}
 
 		for (FailedApplicationDTO failedApplicationDTO :
@@ -173,6 +182,17 @@ public class JaxRsServiceRuntimeOSGiCommands {
 		sb.append("    Application with service ID ");
 		sb.append(failedApplicationDTO.serviceId);
 
+		ServiceReference<?> serviceReference = getServiceReference(
+			failedApplicationDTO.serviceId);
+
+		String jaxRsName = GetterUtil.getString(
+			serviceReference.getProperty(JaxrsWhiteboardConstants.JAX_RS_NAME));
+
+		if (Validator.isNotNull(jaxRsName)) {
+			sb.append(" and name ");
+			sb.append(jaxRsName);
+		}
+
 		if (failedApplicationDTO.failureReason ==
 				DTOConstants.FAILURE_REASON_DUPLICATE_NAME) {
 
@@ -184,7 +204,11 @@ public class JaxRsServiceRuntimeOSGiCommands {
 					DTOConstants.
 						FAILURE_REASON_REQUIRED_EXTENSIONS_UNAVAILABLE) {
 
-			sb.append(" has unresolved dependencies on extensions");
+			sb.append(" has unresolved dependencies on extensions: ");
+			sb.append(
+				StringPlus.asList(
+					serviceReference.getProperty(
+						JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT)));
 		}
 		else if (failedApplicationDTO.failureReason ==
 					DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE) {
