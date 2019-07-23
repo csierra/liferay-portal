@@ -288,7 +288,7 @@ public class JaxRsServiceRuntimeOSGiCommands {
 			if (serviceReference != null) {
 				sb.append(
 					serviceReference.getProperty(
-						"osgi.jaxrs.application.select"));
+						JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT));
 			}
 		}
 		else if (failedExtensionDTO.failureReason ==
@@ -304,7 +304,7 @@ public class JaxRsServiceRuntimeOSGiCommands {
 				sb.append(
 					StringPlus.asList(
 						serviceReference.getProperty(
-							"osgi.jaxrs.extension.select")));
+							JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT)));
 			}
 		}
 		else if (failedExtensionDTO.failureReason ==
@@ -354,7 +354,7 @@ public class JaxRsServiceRuntimeOSGiCommands {
 			if (serviceReference != null) {
 				sb.append(
 					serviceReference.getProperty(
-						"osgi.jaxrs.application.select"));
+						JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT));
 			}
 		}
 		else if (failedResourceDTO.failureReason ==
@@ -370,7 +370,7 @@ public class JaxRsServiceRuntimeOSGiCommands {
 				sb.append(
 					StringPlus.asList(
 						serviceReference.getProperty(
-							"osgi.jaxrs.extension.select")));
+							JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT)));
 			}
 		}
 		else if (failedResourceDTO.failureReason ==
