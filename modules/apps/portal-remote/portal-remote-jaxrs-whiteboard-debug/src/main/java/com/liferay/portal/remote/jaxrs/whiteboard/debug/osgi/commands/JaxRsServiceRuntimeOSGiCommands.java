@@ -192,7 +192,7 @@ public class JaxRsServiceRuntimeOSGiCommands {
 		FailedApplicationDTO failedApplicationDTO,
 		ApplicationDTO[] applicationDTOS) {
 
-		StringBundler sb = new StringBundler(5);
+		StringBundler sb = new StringBundler(8);
 
 		sb.append("    Application with service ID ");
 		sb.append(failedApplicationDTO.serviceId);
