@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -85,22 +86,41 @@ public class JaxRsServiceRuntimeOSGiCommands {
 			System.out.println("Extensions report:");
 		}
 
+		Stream<ApplicationDTO> applicationDTOStream = Arrays.stream(
+			runtimeDTO.applicationDTOs);
+
+		ExtensionDTO[] extensionDTOS = applicationDTOStream.flatMap(
+			adto -> Arrays.stream(adto.extensionDTOs)
+		).distinct(
+		).toArray(
+			ExtensionDTO[]::new
+		);
+
 		for (FailedExtensionDTO failedExtensionDTO :
 				runtimeDTO.failedExtensionDTOs) {
 
-			printFailedExtensionDTO(failedExtensionDTO);
+			printFailedExtensionDTO(failedExtensionDTO, extensionDTOS);
 		}
 
 		if (ArrayUtil.isNotEmpty(runtimeDTO.failedResourceDTOs)) {
 			System.out.println();
 
 			System.out.println("Resources report:");
-		}
 
-		for (FailedResourceDTO failedResourceDTO :
-				runtimeDTO.failedResourceDTOs) {
+			applicationDTOStream = Arrays.stream(runtimeDTO.applicationDTOs);
 
-			printFailedResourceDTO(failedResourceDTO);
+			ResourceDTO[] resourcesDTOs = applicationDTOStream.flatMap(
+				adto -> Arrays.stream(adto.resourceDTOs)
+			).distinct(
+			).toArray(
+				ResourceDTO[]::new
+			);
+
+			for (FailedResourceDTO failedResourceDTO :
+					runtimeDTO.failedResourceDTOs) {
+
+				printFailedResourceDTO(failedResourceDTO, resourcesDTOs);
+			}
 		}
 	}
 
@@ -254,9 +274,9 @@ public class JaxRsServiceRuntimeOSGiCommands {
 	}
 
 	protected void printFailedExtensionDTO(
-		FailedExtensionDTO failedExtensionDTO) {
+		FailedExtensionDTO failedExtensionDTO, ExtensionDTO[] extensionDTOS) {
 
-		StringBundler sb = new StringBundler(8);
+		StringBundler sb = new StringBundler(9);
 
 		sb.append("    Extension ");
 		sb.append(failedExtensionDTO.name);
@@ -267,9 +287,16 @@ public class JaxRsServiceRuntimeOSGiCommands {
 		if (failedExtensionDTO.failureReason ==
 				DTOConstants.FAILURE_REASON_DUPLICATE_NAME) {
 
-			sb.append(" is clashing with another service (");
-			sb.append(failedExtensionDTO.serviceId);
-			sb.append(")");
+			sb.append(" is clashing with another service");
+
+			BaseDTO baseDTO = getDTOByName(
+				extensionDTOS, failedExtensionDTO.name);
+
+			if (baseDTO != null) {
+				sb.append(" (");
+				sb.append(failedExtensionDTO.serviceId);
+				sb.append(")");
+			}
 		}
 		else if (failedExtensionDTO.failureReason ==
 					DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE) {
@@ -326,8 +353,10 @@ public class JaxRsServiceRuntimeOSGiCommands {
 		System.out.println(sb.toString());
 	}
 
-	protected void printFailedResourceDTO(FailedResourceDTO failedResourceDTO) {
-		StringBundler sb = new StringBundler(8);
+	protected void printFailedResourceDTO(
+		FailedResourceDTO failedResourceDTO, ResourceDTO[] resourceDTOS) {
+
+		StringBundler sb = new StringBundler(9);
 
 		sb.append("    Resource ");
 		sb.append(failedResourceDTO.name);
@@ -338,9 +367,16 @@ public class JaxRsServiceRuntimeOSGiCommands {
 		if (failedResourceDTO.failureReason ==
 				DTOConstants.FAILURE_REASON_DUPLICATE_NAME) {
 
-			sb.append(" is clashing with another service (");
-			sb.append(failedResourceDTO.serviceId);
-			sb.append(")");
+			sb.append(" is clashing with another service");
+
+			BaseDTO baseDTO = getDTOByName(
+				resourceDTOS, failedResourceDTO.name);
+
+			if (baseDTO != null) {
+				sb.append(" (");
+				sb.append(failedResourceDTO.serviceId);
+				sb.append(")");
+			}
 		}
 		else if (failedResourceDTO.failureReason ==
 					DTOConstants.
