@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
@@ -74,7 +75,8 @@ public class JaxRsServiceRuntimeOSGiCommands {
 		for (FailedApplicationDTO failedApplicationDTO :
 				runtimeDTO.failedApplicationDTOs) {
 
-			printFailedApplicationDTO(failedApplicationDTO);
+			printFailedApplicationDTO(
+				failedApplicationDTO, runtimeDTO.applicationDTOs);
 		}
 
 		if (ArrayUtil.isNotEmpty(runtimeDTO.failedExtensionDTOs)) {
@@ -105,6 +107,18 @@ public class JaxRsServiceRuntimeOSGiCommands {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
+	}
+
+	protected BaseDTO getDTOByName(
+		BaseDTO[] applicationDTOS, String jaxRsName) {
+
+		for (BaseDTO applicationDTO : applicationDTOS) {
+			if (jaxRsName.equals(applicationDTO.name)) {
+				return applicationDTO;
+			}
+		}
+
+		return null;
 	}
 
 	protected ServiceReference<?> getServiceReference(long serviceId) {
@@ -175,7 +189,8 @@ public class JaxRsServiceRuntimeOSGiCommands {
 	}
 
 	protected void printFailedApplicationDTO(
-		FailedApplicationDTO failedApplicationDTO) {
+		FailedApplicationDTO failedApplicationDTO,
+		ApplicationDTO[] applicationDTOS) {
 
 		StringBundler sb = new StringBundler(5);
 
@@ -196,9 +211,16 @@ public class JaxRsServiceRuntimeOSGiCommands {
 		if (failedApplicationDTO.failureReason ==
 				DTOConstants.FAILURE_REASON_DUPLICATE_NAME) {
 
-			sb.append(" is clashing with another service (");
-			sb.append(failedApplicationDTO.serviceId);
-			sb.append(")");
+			sb.append(" is clashing with another service");
+
+			BaseDTO applicationDTOByName = getDTOByName(
+				applicationDTOS, jaxRsName);
+
+			if (applicationDTOByName != null) {
+				sb.append(" (");
+				sb.append(applicationDTOByName.serviceId);
+				sb.append(")");
+			}
 		}
 		else if (failedApplicationDTO.failureReason ==
 					DTOConstants.
