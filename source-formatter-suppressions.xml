@@ -119,5 +119,10 @@
 
 		<suppress checks="JSONPackageJSONCheck" files="modules/apps/analytics/analytics-client-js/package\.json" />
 		<suppress checks="JSONPackageJSONCheck" files="modules/apps/segments/segments-web/package\.json" />
+
+		<!-- Temporary suppressions for adding tests for existing portal auth filters -->
+
+		<suppress checks="NewFileCheck" files="portal-impl/test/integration/com/liferay/portal/servlet/filters/authverifier/AuthVerifierFilterTest\.java" />
+		<suppress checks="NewFileCheck" files="portal-impl/test/integration/com/liferay/portal/servlet/filters/secure/BaseAuthFilterTest\.java" />
 	</source-check>
 </suppressions>
