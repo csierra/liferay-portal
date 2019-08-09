@@ -365,6 +365,10 @@ public class PropsUtil {
 		SystemProperties.set(
 			PropsKeys.DEFAULT_LIFERAY_HOME, _getDefaultLiferayHome());
 
+		SystemProperties.set(
+			PropsKeys.JAVAX_XML_BIND_JAXBCONTEXT_FACTORY,
+			"com.sun.xml.bind.v2.ContextFactory");
+		
 		// Global shared lib directory
 
 		String globalSharedLibDir = _getLibDir(Servlet.class);
@@ -435,6 +439,7 @@ public class PropsUtil {
 
 		SystemProperties.set(
 			"ehcache.disk.store.dir", liferayHome + "/data/ehcache");
+
 
 		if (GetterUtil.getBoolean(
 				SystemProperties.get("company-id-properties"))) {

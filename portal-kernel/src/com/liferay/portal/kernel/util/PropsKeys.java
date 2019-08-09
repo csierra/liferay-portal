@@ -1623,6 +1623,9 @@ public interface PropsKeys {
 	public static final String JAVASCRIPT_SINGLE_PAGE_APPLICATION_TIMEOUT =
 		"javascript.single.page.application.timeout";
 
+	public static final String JAVAX_XML_BIND_JAXBCONTEXT_FACTORY =
+		"javax.xml.bind.JAXBContextFactory";
+
 	public static final String JDBC_DEFAULT_DRIVER_CLASS_NAME =
 		"jdbc.default.driverClassName";
 
