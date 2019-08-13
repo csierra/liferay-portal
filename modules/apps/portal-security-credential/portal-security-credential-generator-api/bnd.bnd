@@ -1,0 +1,4 @@
+Bundle-Name: Liferay Portal Security Credential Generator API
+Bundle-SymbolicName: com.liferay.portal.security.credential.generator.api
+Bundle-Version: 1.0.0
+Export-Package: com.liferay.portal.security.credential.generator.registry
