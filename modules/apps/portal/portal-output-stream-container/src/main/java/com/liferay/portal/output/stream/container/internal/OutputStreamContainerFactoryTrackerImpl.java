@@ -157,17 +157,6 @@ public class OutputStreamContainerFactoryTrackerImpl
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		Logger rootLogger = Logger.getRootLogger();
-
-		_writerAppender = new WriterAppender(
-			new SimpleLayout(), new ThreadLocalWriter());
-
-		_writerAppender.setThreshold(Level.ALL);
-
-		_writerAppender.activateOptions();
-
-		rootLogger.addAppender(_writerAppender);
-
 		_outputStreamContainerFactories =
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, OutputStreamContainerFactory.class, "name");
@@ -175,14 +164,8 @@ public class OutputStreamContainerFactoryTrackerImpl
 
 	@Deactivate
 	protected void deactivate() {
-		Logger rootLogger = Logger.getRootLogger();
-
 		if (_outputStreamContainerFactories != null) {
 			_outputStreamContainerFactories.close();
-		}
-
-		if (rootLogger != null) {
-			rootLogger.removeAppender(_writerAppender);
 		}
 	}
 
@@ -207,7 +190,6 @@ public class OutputStreamContainerFactoryTrackerImpl
 	)
 	private volatile OutputStreamContainerFactory _outputStreamContainerFactory;
 
-	private WriterAppender _writerAppender;
 	private final ThreadLocal<Writer> _writerThreadLocal = new ThreadLocal<>();
 
 	private class ThreadLocalWriter extends Writer {
