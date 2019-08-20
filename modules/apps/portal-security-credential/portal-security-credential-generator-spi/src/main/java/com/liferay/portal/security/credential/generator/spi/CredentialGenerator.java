@@ -24,6 +24,13 @@ public interface CredentialGenerator {
 
 	public String generateSalt(AlgorithmEntry algorithm) throws Exception;
 
+	/**
+	 * Simple String comparison between two secrets is vunlerable to timing attack, use {@link CredentialEntry#timingAttackProofEquals(String)} when a comparison is needed
+	 *
+	 * @param Password the given password to to encrypted
+	 * @param Meta the credential meta used to encrypt the given password
+	 * @return The generated secret
+	 */
 	public String generateSecret(String password, CredentialMeta meta)
 		throws Exception;
 

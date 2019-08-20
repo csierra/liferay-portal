@@ -36,4 +36,32 @@ public class CredentialEntryImpl extends CredentialEntryBaseImpl {
 	public CredentialEntryImpl() {
 	}
 
+	/**
+	 * Test if this given secret is the same as this credential's secret by using a timing-attack-proof comparison algorithm
+	 * See http://bryanavery.co.uk/cryptography-net-avoiding-timing-attack/
+	 *
+	 * @param SecretToCompare the given secret to be compared with
+	 * @return The result of if two secrets are the same
+	 */
+	@Override
+	public boolean timingAttackProofEquals(String secretToCompare) {
+		String secretSelf = getSecret();
+
+		byte[] self = secretSelf.getBytes();
+
+		byte[] input = secretToCompare.getBytes();
+
+		int diff = self.length ^ input.length;
+
+		for (int i = 0; (i < self.length) && (i < input.length); ++i) {
+			diff |= self[i] ^ input[i];
+		}
+
+		if (diff == 0) {
+			return true;
+		}
+
+		return false;
+	}
+
 }
