@@ -37,6 +37,8 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
+import com.liferay.portal.kernel.security.permission.RoleCollection;
+import com.liferay.portal.kernel.security.permission.RoleContributor;
 import com.liferay.portal.kernel.security.permission.UserBag;
 import com.liferay.portal.kernel.security.permission.UserBagFactoryUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
@@ -56,6 +58,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.registry.collections.ServiceTrackerCollections;
+import com.liferay.registry.collections.ServiceTrackerList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -116,7 +120,8 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	@Override
 	public long[] getRoleIds(long userId, long groupId) {
 		try {
-			return doGetRoleIds(userId, groupId);
+			return invokeRoleContributors(
+				doGetRoleIds(userId, groupId), userId, groupId);
 		}
 		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
@@ -767,6 +772,26 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		}
 
 		return _hasUserPermissionImpl(group, name, primKey, roleIds, actionId);
+	}
+
+	protected long[] invokeRoleContributors(
+			long[] roleIds, long userId, long groupId)
+		throws PortalException {
+
+		if (_roleContributors.isEmpty()) {
+			return roleIds;
+		}
+
+		RoleCollection roleCollection = new RoleCollection(
+			RoleLocalServiceUtil.getRoles(roleIds));
+
+		for (RoleContributor roleContributor : _roleContributors) {
+			roleContributor.contribute(roleCollection, userId, groupId);
+		}
+
+		roleCollection.sort();
+
+		return roleCollection.toRoleIds();
 	}
 
 	protected boolean isCompanyAdminImpl(long companyId) throws Exception {
@@ -1532,5 +1557,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		AdvancedPermissionChecker.class);
 
 	private long _guestGroupId;
+	private final ServiceTrackerList<RoleContributor> _roleContributors =
+		ServiceTrackerCollections.openList(RoleContributor.class);
 
 }
