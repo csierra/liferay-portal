@@ -27,7 +27,6 @@ import java.util.function.Predicate;
 /**
  * @author Raymond Augé
  */
-@SuppressWarnings("serial")
 public class RoleCollectionImpl implements RoleCollection {
 
 	public RoleCollectionImpl(
