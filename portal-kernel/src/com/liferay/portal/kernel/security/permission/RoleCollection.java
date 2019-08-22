@@ -14,29 +14,25 @@
 
 package com.liferay.portal.kernel.security.permission;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.util.ListUtil;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Collection;
+import java.util.function.Predicate;
 
 /**
- * @author Raymond Augé
+ * @author Carlos Sierra Andrés
  */
-@SuppressWarnings("serial")
-public class RoleCollection extends ArrayList<Role> {
+public interface RoleCollection {
 
-	public RoleCollection(List<Role> roles) {
-		addAll(roles);
-	}
+	public boolean addAll(Collection<Role> roles);
 
-	public void sort() {
-		super.sort(Comparator.naturalOrder());
-	}
+	public boolean addAll(long[] roleIds) throws PortalException;
 
-	public long[] toRoleIds() {
-		return ListUtil.toLongArray(this, Role::getRoleId);
-	}
+	public boolean addRole(Role role);
+
+	public boolean addRoleId(long roleId) throws PortalException;
+
+	public boolean removeIf(Predicate<Role> predicate);
 
 }
