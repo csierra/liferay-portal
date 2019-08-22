@@ -59,6 +59,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerList;
 
@@ -84,11 +85,14 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	public AdvancedPermissionChecker() {
 		_roleContributors = ServiceTrackerCollections.openList(
 			RoleContributor.class);
+		_forbiddenDynamicRoleNames = Arrays.asList(
+			PropsValues.PERMISSION_DYNAMIC_FORBIDDEN_ROLE_NAMES);
 	}
 
 	@Override
 	public AdvancedPermissionChecker clone() {
-		return new AdvancedPermissionChecker(_roleContributors);
+		return new AdvancedPermissionChecker(
+			_roleContributors, _forbiddenDynamicRoleNames);
 	}
 
 	@Override
@@ -797,7 +801,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			new RoleCollectionKey(roleIds, groupId, userId),
 			key -> {
 				RoleCollectionImpl roleCollection = new RoleCollectionImpl(
-					_getRoles(roleIds), Collections.emptyList(),
+					_getRoles(roleIds), _forbiddenDynamicRoleNames,
 					RoleLocalServiceUtil.getService());
 
 				for (RoleContributor roleContributor : _roleContributors) {
@@ -1343,9 +1347,11 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	protected static final String RESULTS_SEPARATOR = "_RESULTS_SEPARATOR_";
 
 	private AdvancedPermissionChecker(
-		ServiceTrackerList<RoleContributor> roleContributors) {
+		ServiceTrackerList<RoleContributor> roleContributors,
+		List<String> forbiddenDynamicRoleNames) {
 
 		_roleContributors = roleContributors;
+		_forbiddenDynamicRoleNames = forbiddenDynamicRoleNames;
 	}
 
 	private List<Role> _getRoles(long[] roleIds) {
@@ -1591,6 +1597,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			AdvancedPermissionChecker.class + "._roleIdsThreadLocal",
 			HashMap::new, true);
 
+	private final List<String> _forbiddenDynamicRoleNames;
 	private long _guestGroupId;
 	private final ServiceTrackerList<RoleContributor> _roleContributors;
 

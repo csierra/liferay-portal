@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.security.permission;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Role;
 
-import java.util.Collection;
 import java.util.function.Predicate;
 
 /**
@@ -25,11 +24,7 @@ import java.util.function.Predicate;
  */
 public interface RoleCollection {
 
-	public boolean addAll(Collection<Role> roles);
-
 	public boolean addAll(long[] roleIds) throws PortalException;
-
-	public boolean addRole(Role role);
 
 	public boolean addRoleId(long roleId) throws PortalException;
 

@@ -2637,6 +2637,9 @@ public interface PropsKeys {
 
 	public static final String PASSWORDS_TOOLKIT = "passwords.toolkit";
 
+	public static final String PERMISSION_DYNAMIC_FORBIDDEN_ROLE_NAMES =
+		"permissions.dynamic.forbidden.role.names";
+
 	public static final String PERMISSIONS_CHECK_GUEST_ENABLED =
 		"permissions.check.guest.enabled";
 

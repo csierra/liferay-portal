@@ -31,23 +31,12 @@ import java.util.function.Predicate;
 public class RoleCollectionImpl implements RoleCollection {
 
 	public RoleCollectionImpl(
-		Collection<Role> roles, Collection<Role> forbiddenRoles,
+		Collection<Role> roles, List<String> forbiddenRoleNames,
 		RoleLocalService roleLocalService) {
 
 		_roles = new ArrayList<>(roles);
-		_forbiddenRoles = forbiddenRoles;
+		_forbiddenRoleNames = forbiddenRoleNames;
 		_roleLocalService = roleLocalService;
-	}
-
-	@Override
-	public boolean addAll(Collection<Role> roles) {
-		boolean changed = false;
-
-		for (Role role : roles) {
-			changed = changed | addRole(role);
-		}
-
-		return changed;
 	}
 
 	@Override
@@ -62,22 +51,8 @@ public class RoleCollectionImpl implements RoleCollection {
 	}
 
 	@Override
-	public boolean addRole(Role role) {
-		if (role == null) {
-			throw new IllegalArgumentException("Role can not be null");
-		}
-
-		if (_forbiddenRoles.contains(role)) {
-			throw new IllegalArgumentException(
-				"Role " + role + " can not be dynamically contributed");
-		}
-
-		return _roles.add(role);
-	}
-
-	@Override
 	public boolean addRoleId(long roleId) throws PortalException {
-		return _roles.add(_roleLocalService.getRole(roleId));
+		return _addRole(_roleLocalService.getRole(roleId));
 	}
 
 	@Override
@@ -89,7 +64,16 @@ public class RoleCollectionImpl implements RoleCollection {
 		return _roles;
 	}
 
-	private final Collection<Role> _forbiddenRoles;
+	private boolean _addRole(Role role) {
+		if (_forbiddenRoleNames.contains(role.getName())) {
+			throw new IllegalArgumentException(
+				"Role " + role + " can not be dynamically contributed");
+		}
+
+		return _roles.add(role);
+	}
+
+	private final List<String> _forbiddenRoleNames;
 	private final RoleLocalService _roleLocalService;
 	private final List<Role> _roles;
 
