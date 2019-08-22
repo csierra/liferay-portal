@@ -77,9 +77,14 @@ import org.apache.commons.lang.time.StopWatch;
  */
 public class AdvancedPermissionChecker extends BasePermissionChecker {
 
+	public AdvancedPermissionChecker() {
+		_roleContributors = ServiceTrackerCollections.openList(
+			RoleContributor.class);
+	}
+
 	@Override
 	public AdvancedPermissionChecker clone() {
-		return new AdvancedPermissionChecker();
+		return new AdvancedPermissionChecker(_roleContributors);
 	}
 
 	@Override
@@ -1327,6 +1332,12 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	@Deprecated
 	protected static final String RESULTS_SEPARATOR = "_RESULTS_SEPARATOR_";
 
+	private AdvancedPermissionChecker(
+		ServiceTrackerList<RoleContributor> roleContributors) {
+
+		_roleContributors = roleContributors;
+	}
+
 	private boolean _hasGuestPermission(
 		Group group, String name, String primKey, String actionId) {
 
@@ -1557,7 +1568,6 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		AdvancedPermissionChecker.class);
 
 	private long _guestGroupId;
-	private final ServiceTrackerList<RoleContributor> _roleContributors =
-		ServiceTrackerCollections.openList(RoleContributor.class);
+	private final ServiceTrackerList<RoleContributor> _roleContributors;
 
 }
