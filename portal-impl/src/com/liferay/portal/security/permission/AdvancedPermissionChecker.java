@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
-import com.liferay.portal.kernel.security.permission.RoleCollection;
 import com.liferay.portal.kernel.security.permission.RoleContributor;
 import com.liferay.portal.kernel.security.permission.UserBag;
 import com.liferay.portal.kernel.security.permission.UserBagFactoryUtil;
@@ -65,6 +64,7 @@ import com.liferay.registry.collections.ServiceTrackerList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -791,8 +791,9 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		return cache.computeIfAbsent(
 			new RoleCollectionKey(roleIds, groupId, userId),
 			key -> {
-				RoleCollection roleCollection = new RoleCollection(
-					_getRoles(roleIds));
+				RoleCollectionImpl roleCollection = new RoleCollectionImpl(
+					_getRoles(roleIds), Collections.emptyList(),
+					RoleLocalServiceUtil.getService());
 
 				for (RoleContributor roleContributor : _roleContributors) {
 					roleContributor.contribute(roleCollection, userId, groupId);
