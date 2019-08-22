@@ -81,9 +81,14 @@ import org.apache.commons.lang.time.StopWatch;
  */
 public class AdvancedPermissionChecker extends BasePermissionChecker {
 
+	public AdvancedPermissionChecker() {
+		_roleContributors = ServiceTrackerCollections.openList(
+			RoleContributor.class);
+	}
+
 	@Override
 	public AdvancedPermissionChecker clone() {
-		return new AdvancedPermissionChecker();
+		return new AdvancedPermissionChecker(_roleContributors);
 	}
 
 	@Override
@@ -799,7 +804,8 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 					roleContributor.contribute(roleCollection, userId, groupId);
 				}
 
-				return roleCollection.toRoleIds();
+				return ListUtil.toLongArray(
+					roleCollection.getRoleList(), Role::getRoleId);
 			});
 	}
 
@@ -1336,6 +1342,12 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	@Deprecated
 	protected static final String RESULTS_SEPARATOR = "_RESULTS_SEPARATOR_";
 
+	private AdvancedPermissionChecker(
+		ServiceTrackerList<RoleContributor> roleContributors) {
+
+		_roleContributors = roleContributors;
+	}
+
 	private List<Role> _getRoles(long[] roleIds) {
 		try {
 			return RoleLocalServiceUtil.getRoles(roleIds);
@@ -1580,8 +1592,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			HashMap::new, true);
 
 	private long _guestGroupId;
-	private final ServiceTrackerList<RoleContributor> _roleContributors =
-		ServiceTrackerCollections.openList(RoleContributor.class);
+	private final ServiceTrackerList<RoleContributor> _roleContributors;
 
 	private static class RoleCollectionKey {
 
