@@ -57,12 +57,12 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -80,11 +80,14 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	public AdvancedPermissionChecker() {
 		_roleContributors = ServiceTrackerCollections.openList(
 			RoleContributor.class);
+		_forbiddenDynamicRoleNames = Arrays.asList(
+			PropsValues.PERMISSION_DYNAMIC_FORBIDDEN_ROLE_NAMES);
 	}
 
 	@Override
 	public AdvancedPermissionChecker clone() {
-		return new AdvancedPermissionChecker(_roleContributors);
+		return new AdvancedPermissionChecker(
+			_roleContributors, _forbiddenDynamicRoleNames);
 	}
 
 	@Override
@@ -788,7 +791,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		}
 
 		RoleCollectionImpl roleCollection = new RoleCollectionImpl(
-			RoleLocalServiceUtil.getRoles(roleIds), Collections.emptyList(),
+			RoleLocalServiceUtil.getRoles(roleIds), _forbiddenDynamicRoleNames,
 			RoleLocalServiceUtil.getService());
 
 		for (RoleContributor roleContributor : _roleContributors) {
@@ -1333,9 +1336,11 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	protected static final String RESULTS_SEPARATOR = "_RESULTS_SEPARATOR_";
 
 	private AdvancedPermissionChecker(
-		ServiceTrackerList<RoleContributor> roleContributors) {
+		ServiceTrackerList<RoleContributor> roleContributors,
+		List<String> forbiddenDynamicRoleNames) {
 
 		_roleContributors = roleContributors;
+		_forbiddenDynamicRoleNames = forbiddenDynamicRoleNames;
 	}
 
 	private boolean _hasGuestPermission(
@@ -1567,6 +1572,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AdvancedPermissionChecker.class);
 
+	private final List<String> _forbiddenDynamicRoleNames;
 	private long _guestGroupId;
 	private final ServiceTrackerList<RoleContributor> _roleContributors;
 
