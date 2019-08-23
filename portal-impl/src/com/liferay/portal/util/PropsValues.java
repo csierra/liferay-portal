@@ -2300,9 +2300,6 @@ public class PropsValues {
 				PropsKeys.
 					PASSWORDS_PASSWORDPOLICYTOOLKIT_VALIDATOR_CHARSET_UPPERCASE);
 
-	public static final String[] PERMISSION_DYNAMIC_FORBIDDEN_ROLE_NAMES =
-		PropsUtil.getArray(PropsKeys.PERMISSION_DYNAMIC_FORBIDDEN_ROLE_NAMES);
-
 	public static final boolean PERMISSIONS_CHECK_GUEST_ENABLED =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.PERMISSIONS_CHECK_GUEST_ENABLED));
