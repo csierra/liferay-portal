@@ -21,8 +21,10 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * @author Raymond Augé
@@ -34,6 +36,7 @@ public class RoleCollectionImpl implements RoleCollection {
 		RoleLocalService roleLocalService) {
 
 		_roles = new ArrayList<>(roles);
+		_initialRoles = Collections.unmodifiableList(_roles);
 		_forbiddenRoleNames = forbiddenRoleNames;
 		_roleLocalService = roleLocalService;
 	}
@@ -59,8 +62,20 @@ public class RoleCollectionImpl implements RoleCollection {
 		return _roles.removeIf(predicate);
 	}
 
+	@Override
+	public List<Role> getInitialRoles() {
+		return _initialRoles;
+	}
+
 	protected List<Role> getRoleList() {
 		return _roles;
+	}
+
+	@Override
+	public boolean hasRoleId(long roleId) {
+		Stream<Role> stream = _roles.stream();
+
+		return stream.anyMatch(role -> role.getRoleId() == roleId);
 	}
 
 	private boolean _addRole(Role role) {
@@ -73,6 +88,7 @@ public class RoleCollectionImpl implements RoleCollection {
 	}
 
 	private final List<String> _forbiddenRoleNames;
+	private final List<Role> _initialRoles;
 	private final RoleLocalService _roleLocalService;
 	private final List<Role> _roles;
 
