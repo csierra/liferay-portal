@@ -1407,7 +1407,8 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 
 			return ResourceLocalServiceUtil.hasUserPermissions(
 				defaultUserId, groupId, resources, actionId,
-				getGuestUserRoleIds());
+				invokeRoleContributors(
+					getGuestUserRoleIds(), defaultUserId, groupId));
 		}
 		catch (NoSuchResourcePermissionException nsrpe) {
 			throw new IllegalArgumentException(
