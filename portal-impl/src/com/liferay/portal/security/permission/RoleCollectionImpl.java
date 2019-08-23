@@ -32,12 +32,10 @@ import java.util.stream.Stream;
 public class RoleCollectionImpl implements RoleCollection {
 
 	public RoleCollectionImpl(
-		Collection<Role> roles, List<String> forbiddenRoleNames,
-		RoleLocalService roleLocalService) {
+		Collection<Role> roles, RoleLocalService roleLocalService) {
 
 		_roles = new ArrayList<>(roles);
 		_initialRoles = Collections.unmodifiableList(_roles);
-		_forbiddenRoleNames = forbiddenRoleNames;
 		_roleLocalService = roleLocalService;
 	}
 
@@ -54,7 +52,7 @@ public class RoleCollectionImpl implements RoleCollection {
 
 	@Override
 	public boolean addRoleId(long roleId) throws PortalException {
-		return _addRole(_roleLocalService.getRole(roleId));
+		return _roles.add(_roleLocalService.getRole(roleId));
 	}
 
 	@Override
@@ -78,16 +76,6 @@ public class RoleCollectionImpl implements RoleCollection {
 		return stream.anyMatch(role -> role.getRoleId() == roleId);
 	}
 
-	private boolean _addRole(Role role) {
-		if (_forbiddenRoleNames.contains(role.getName())) {
-			throw new IllegalArgumentException(
-				"Role " + role + " can not be dynamically contributed");
-		}
-
-		return _roles.add(role);
-	}
-
-	private final List<String> _forbiddenRoleNames;
 	private final List<Role> _initialRoles;
 	private final RoleLocalService _roleLocalService;
 	private final List<Role> _roles;
