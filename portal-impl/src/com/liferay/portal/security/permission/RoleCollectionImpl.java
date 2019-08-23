@@ -18,10 +18,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.security.permission.RoleCollection;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -35,7 +35,7 @@ public class RoleCollectionImpl implements RoleCollection {
 		Collection<Role> roles, RoleLocalService roleLocalService) {
 
 		_roles = new ArrayList<>(roles);
-		_initialRoles = Collections.unmodifiableList(_roles);
+		_initialRoles = new ArrayList<>(roles);
 		_roleLocalService = roleLocalService;
 	}
 
@@ -57,12 +57,12 @@ public class RoleCollectionImpl implements RoleCollection {
 
 	@Override
 	public boolean removeIf(Predicate<Role> predicate) {
-		return _roles.removeIf(predicate);
+		return _roles.removeIf(role -> predicate.test((Role)role.clone()));
 	}
 
 	@Override
 	public List<Role> getInitialRoles() {
-		return _initialRoles;
+		return ListUtil.toList(_initialRoles, role -> (Role)role.clone());
 	}
 
 	protected List<Role> getRoleList() {
