@@ -30,9 +30,9 @@ public interface RoleCollection {
 
 	public boolean addRoleId(long roleId) throws PortalException;
 
-	public boolean hasRoleId(long roleId);
-
 	public List<Role> getInitialRoles();
+
+	public boolean hasRoleId(long roleId);
 
 	public boolean removeIf(Predicate<Role> predicate);
 

@@ -56,24 +56,28 @@ public class RoleCollectionImpl implements RoleCollection {
 	}
 
 	@Override
-	public boolean removeIf(Predicate<Role> predicate) {
-		return _roles.removeIf(role -> predicate.test((Role)role.clone()));
-	}
-
-	@Override
 	public List<Role> getInitialRoles() {
 		return ListUtil.toList(_initialRoles, role -> (Role)role.clone());
-	}
-
-	protected List<Role> getRoleList() {
-		return _roles;
 	}
 
 	@Override
 	public boolean hasRoleId(long roleId) {
 		Stream<Role> stream = _roles.stream();
 
-		return stream.anyMatch(role -> role.getRoleId() == roleId);
+		if (stream.anyMatch(role -> role.getRoleId() == roleId)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean removeIf(Predicate<Role> predicate) {
+		return _roles.removeIf(role -> predicate.test((Role)role.clone()));
+	}
+
+	protected List<Role> getRoleList() {
+		return _roles;
 	}
 
 	private final List<Role> _initialRoles;
