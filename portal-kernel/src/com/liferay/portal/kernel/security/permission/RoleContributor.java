@@ -15,11 +15,10 @@
 package com.liferay.portal.kernel.security.permission;
 
 /**
- * RoleContributors are invoked during permission checking allowing the
- * calculated roles to be altered dynamically. In order to support such dynamic
- * behavior RoleContributors are invoked without the benefit of external
- * caching. In this respect implementations must make every attempt to be as
- * efficient as possible or risk performance degradation.
+ * RoleContributors are invoked during permission checking allowing the roles
+ * calculated from persisted assignment and inheritance to be altered
+ * dynamically. Implementations must make every attempt to be as efficient as
+ * possible or risk potentially dramatic performance degradation.
  *
  * @author Raymond Augé
  */
@@ -28,10 +27,9 @@ public interface RoleContributor {
 	/**
 	 * Contribute to the collection of user roles.
 	 *
-	 * @param roleCollection the pre-calculated collection of roles
+	 * @param roleCollection the managed collection of roles
 	 * @param userId the current userId
 	 * @param groupId the current groupId
-	 * @return modified, and sorted, array of roleIds
 	 */
 	public void contribute(
 		RoleCollection roleCollection, long userId, long groupId);
