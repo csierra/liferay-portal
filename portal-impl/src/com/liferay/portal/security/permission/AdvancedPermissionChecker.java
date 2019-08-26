@@ -793,13 +793,14 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		Map<RoleCollectionKey, long[]> cache = _roleIdsThreadLocal.get();
 
 		return cache.computeIfAbsent(
-			new RoleCollectionKey(roleIds, groupId, userId),
+			new RoleCollectionKey(groupId, userId),
 			key -> {
 				RoleCollectionImpl roleCollection = new RoleCollectionImpl(
-					_getRoles(roleIds), RoleLocalServiceUtil.getService());
+					_getRoles(roleIds), groupId, this,
+					RoleLocalServiceUtil.getService());
 
 				for (RoleContributor roleContributor : _roleContributors) {
-					roleContributor.contribute(roleCollection, userId, groupId);
+					roleContributor.contribute(roleCollection);
 				}
 
 				return ListUtil.toLongArray(
@@ -1595,8 +1596,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 
 	private static class RoleCollectionKey {
 
-		public RoleCollectionKey(long[] roleIds, long groupId, long userId) {
-			_roleIds = roleIds;
+		public RoleCollectionKey(long groupId, long userId) {
 			_groupId = groupId;
 			_userId = userId;
 		}
@@ -1621,10 +1621,6 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 				return false;
 			}
 
-			if (!Arrays.equals(_roleIds, other._roleIds)) {
-				return false;
-			}
-
 			if (_userId != other._userId) {
 				return false;
 			}
@@ -1637,14 +1633,12 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + (int)(_groupId ^ (_groupId >>> 32));
-			result = prime * result + Arrays.hashCode(_roleIds);
 			result = prime * result + (int)(_userId ^ (_userId >>> 32));
 
 			return result;
 		}
 
 		private final long _groupId;
-		private final long[] _roleIds;
 		private final long _userId;
 
 	}
