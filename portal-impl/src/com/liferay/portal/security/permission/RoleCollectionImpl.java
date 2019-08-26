@@ -16,6 +16,7 @@ package com.liferay.portal.security.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.RoleCollection;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -32,11 +33,15 @@ import java.util.stream.Stream;
 public class RoleCollectionImpl implements RoleCollection {
 
 	public RoleCollectionImpl(
-		Collection<Role> roles, RoleLocalService roleLocalService) {
+		Collection<Role> roles, long groupId,
+		PermissionChecker permissionChecker,
+		RoleLocalService roleLocalService) {
 
 		_roles = new ArrayList<>(roles);
-		_initialRoles = new ArrayList<>(roles);
+		_groupId = groupId;
+		_permissionChecker = permissionChecker;
 		_roleLocalService = roleLocalService;
+		_initialRoles = new ArrayList<>(roles);
 	}
 
 	@Override
@@ -56,8 +61,23 @@ public class RoleCollectionImpl implements RoleCollection {
 	}
 
 	@Override
+	public long getCompanyId() {
+		return _permissionChecker.getCompanyId();
+	}
+
+	@Override
+	public long getGroupId() {
+		return _groupId;
+	}
+
+	@Override
 	public List<Role> getInitialRoles() {
 		return ListUtil.toList(_initialRoles, role -> (Role)role.clone());
+	}
+
+	@Override
+	public long getUserId() {
+		return _permissionChecker.getUserId();
 	}
 
 	@Override
@@ -72,6 +92,11 @@ public class RoleCollectionImpl implements RoleCollection {
 	}
 
 	@Override
+	public boolean isSignedIn() {
+		return _permissionChecker.isSignedIn();
+	}
+
+	@Override
 	public boolean removeIf(Predicate<Role> predicate) {
 		return _roles.removeIf(role -> predicate.test((Role)role.clone()));
 	}
@@ -80,7 +105,9 @@ public class RoleCollectionImpl implements RoleCollection {
 		return _roles;
 	}
 
+	private final long _groupId;
 	private final List<Role> _initialRoles;
+	private final PermissionChecker _permissionChecker;
 	private final RoleLocalService _roleLocalService;
 	private final List<Role> _roles;
 

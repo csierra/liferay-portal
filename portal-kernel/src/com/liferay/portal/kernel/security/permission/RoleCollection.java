@@ -21,13 +21,15 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * RoleCollection is used as the first argument to {@link
- * RoleContributor#contribute(RoleCollection, long, long)}. It holds the managed
- * collection of roles starting with the <em>initial</em> set calculated from
- * persisted role assignment and role inheritance.
+ * RoleCollection is used as the argument to {@link
+ * RoleContributor#contribute(RoleCollection)}. It holds the managed collection
+ * of roles starting with the <em>initial</em> set calculated from persisted
+ * role assignment and role inheritance.
  *
  * @author Carlos Sierra Andrés
  * @author Raymond Augé
+ *
+ * @review
  */
 public interface RoleCollection {
 
@@ -50,6 +52,20 @@ public interface RoleCollection {
 	public boolean addRoleId(long roleId) throws PortalException;
 
 	/**
+	 * Get the companyId of the Company being checked.
+	 *
+	 * @return the companyId of the Company being checked
+	 */
+	public long getCompanyId();
+
+	/**
+	 * Get the groupId of the Group currently being permission checked.
+	 *
+	 * @return the groupId of the Group currently being permission checked
+	 */
+	public long getGroupId();
+
+	/**
 	 * Get the initial set of roles calculated from persisted assignment and
 	 * inheritance.
 	 *
@@ -57,6 +73,13 @@ public interface RoleCollection {
 	 *         and inheritance
 	 */
 	public List<Role> getInitialRoles();
+
+	/**
+	 * Get the userId of the User currently being permission checked.
+	 *
+	 * @return the userId of the User currently being permission checked
+	 */
+	public long getUserId();
 
 	/**
 	 * Check if a Role is already in the collection by roleId.
@@ -74,5 +97,13 @@ public interface RoleCollection {
 	 * @return true if the removal was successful
 	 */
 	public boolean removeIf(Predicate<Role> predicate);
+
+	/**
+	 * Returns <code>true</code> if the user is signed in.
+	 *
+	 * @return <code>true</code> if the user is signed in; <code>false</code>
+	 *         otherwise
+	 */
+	public boolean isSignedIn();
 
 }

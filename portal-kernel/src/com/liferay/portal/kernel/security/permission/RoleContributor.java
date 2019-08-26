@@ -21,6 +21,8 @@ package com.liferay.portal.kernel.security.permission;
  * possible or risk potentially dramatic performance degradation.
  *
  * @author Raymond Augé
+ *
+ * @review
  */
 public interface RoleContributor {
 
@@ -28,10 +30,7 @@ public interface RoleContributor {
 	 * Contribute to the collection of user roles.
 	 *
 	 * @param roleCollection the managed collection of roles
-	 * @param userId the current userId
-	 * @param groupId the current groupId
 	 */
-	public void contribute(
-		RoleCollection roleCollection, long userId, long groupId);
+	public void contribute(RoleCollection roleCollection);
 
 }
