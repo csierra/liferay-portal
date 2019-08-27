@@ -1,0 +1,4 @@
+Bundle-Name: Liferay Portal Security Crypto Hasher SPI
+Bundle-SymbolicName: com.liferay.portal.security.crypto.hasher.spi
+Bundle-Version: 1.0.0
+Export-Package: com.liferay.portal.security.crypto.hasher.spi
