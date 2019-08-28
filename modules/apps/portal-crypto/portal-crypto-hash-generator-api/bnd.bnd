@@ -1,0 +1,6 @@
+Bundle-Name: Liferay Portal Crypto Hash Generator API
+Bundle-SymbolicName: com.liferay.portal.crypto.hash.generator.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	com.liferay.portal.crypto.hash.generator,\
+	com.liferay.portal.crypto.hash.generator.factory
