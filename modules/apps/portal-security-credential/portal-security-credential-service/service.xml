@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.2.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_2_0.dtd">
+
+<service-builder auto-import-default-references="false" auto-namespace-tables="false" dependency-injector="ds" package-path="com.liferay.portal.security.credential">
+	<author>arthurchan35</author>
+	<namespace>Credential</namespace>
+	<entity local-service="true" name="AlgorithmEntry" remote-service="true" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="entryId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="type" type="String" />
+		<column name="meta" type="String" />
+	</entity>
+	<entity local-service="true" name="CredentialEntry" remote-service="true" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="entryId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="secret" type="String" />
+		<column name="reset" type="boolean" />
+
+		<!-- Finder methods -->
+
+		<finder name="UserId" return-type="CredentialEntry" unique="true">
+			<finder-column name="userId" />
+		</finder>
+	</entity>
+	<entity local-service="true" name="CredentialMeta" remote-service="true" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="metaId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="credentialEntryId" type="long" />
+		<column name="algorithmEntryId" type="long" />
+		<column name="orderInEntry" type="int" />
+		<column name="salt" type="String" />
+
+		<!-- Order -->
+
+		<order by="asc">
+			<order-column name="orderInEntry" />
+		</order>
+
+		<!-- Finder methods -->
+
+		<finder name="CredentialEntryId" return-type="Collection">
+			<finder-column name="credentialEntryId" />
+		</finder>
+		<finder name="AlgorithmEntryId" return-type="Collection">
+			<finder-column name="algorithmEntryId" />
+		</finder>
+	</entity>
+</service-builder>

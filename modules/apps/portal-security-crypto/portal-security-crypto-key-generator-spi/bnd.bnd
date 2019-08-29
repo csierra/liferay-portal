@@ -1,0 +1,4 @@
+Bundle-Name: Liferay Portal Security Crypto Key Generator SPI
+Bundle-SymbolicName: com.liferay.portal.security.crypto.key.generator.spi
+Bundle-Version: 1.0.0
+Export-Package: com.liferay.portal.security.crypto.key.generator.spi

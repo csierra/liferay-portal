@@ -1,0 +1,3 @@
+Bundle-Name: Liferay Portal Security Crypto Algorithm PBKDF2
+Bundle-SymbolicName: com.liferay.portal.security.crypto.algorithm.pbkdf2
+Bundle-Version: 1.0.0
