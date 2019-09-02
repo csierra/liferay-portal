@@ -1,0 +1,3 @@
+Bundle-Name: Liferay Portal Security Crypto Hashing Algorithm UFC Crypt
+Bundle-SymbolicName: com.liferay.portal.security.crypto.hashing.algorithm.ufc.crypt
+Bundle-Version: 1.0.0
