@@ -19,11 +19,14 @@ import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
+import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.oauth2.provider.shortcut.internal.constants.OAuth2ProviderShortcutConstants;
 import com.liferay.oauth2.provider.shortcut.internal.spi.scope.finder.OAuth2ProviderShortcutScopeFinder;
 import com.liferay.oauth2.provider.util.OAuth2SecureRandomGenerator;
@@ -99,6 +102,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 		OAuth2Application oAuth2Application = _addOAuth2Application(company);
 
 		_addResourcePermissions(oAuth2Application);
+		_createOAuth2ScopeGrants(oAuth2Application);
 	}
 
 	@Activate
@@ -249,6 +253,46 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 		}
 	}
 
+	private void _createOAuth2ScopeGrants(OAuth2Application oAuth2Application)
+		throws PortalException {
+
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+			_oAuth2ApplicationScopeAliasesLocalService.
+				addOAuth2ApplicationScopeAliases(
+					oAuth2Application.getCompanyId(),
+					oAuth2Application.getUserId(),
+					oAuth2Application.getUserName(),
+					oAuth2Application.getOAuth2ApplicationId(),
+					Collections.emptyList());
+
+		_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
+			oAuth2Application.getCompanyId(),
+			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId(),
+			"Liferay.Segments.Asah.REST", "com.liferay.segments.asah.rest.impl",
+			"GET",
+			Collections.singletonList("Liferay.Segments.Asah.REST.everything"));
+
+		_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
+			oAuth2Application.getCompanyId(),
+			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId(),
+			"Liferay.Segments.Asah.REST", "com.liferay.segments.asah.rest.impl",
+			"DELETE",
+			Collections.singletonList("Liferay.Segments.Asah.REST.everything"));
+
+		_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
+			oAuth2Application.getCompanyId(),
+			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId(),
+			"Liferay.Segments.Asah.REST", "com.liferay.segments.asah.rest.impl",
+			"POST",
+			Collections.singletonList("Liferay.Segments.Asah.REST.everything"));
+
+		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
+			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
+
+		_oAuth2ApplicationLocalService.updateOAuth2Application(
+			oAuth2Application);
+	}
+
 	private static final String _APPLICATION_NAME = "Analytics Cloud";
 
 	private static final String[][] _SAP_ENTRY_OBJECT_ARRAYS = {
@@ -301,6 +345,13 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
+
+	@Reference
+	private OAuth2ApplicationScopeAliasesLocalService
+		_oAuth2ApplicationScopeAliasesLocalService;
+
+	@Reference
+	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
 
 	@Reference
 	private Portal _portal;
