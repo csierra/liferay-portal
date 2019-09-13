@@ -86,6 +86,9 @@ public abstract class BaseAuthVerifierPublisher {
 		else if (key.equals("urlsIncludes")) {
 			key = "urls.includes";
 		}
+		else if (key.equals("servletContextHelperSelectFilter")) {
+			key = "servlet.context.helper.select.filter";
+		}
 
 		return authVerifierPropertyName + key;
 	}
