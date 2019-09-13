@@ -102,7 +102,6 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 		OAuth2Application oAuth2Application = _addOAuth2Application(company);
 
 		_addResourcePermissions(oAuth2Application);
-		_createOAuth2ScopeGrants(oAuth2Application);
 	}
 
 	@Activate
@@ -186,6 +185,8 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 		_oAuth2ApplicationLocalService.updateIcon(
 			oAuth2Application.getOAuth2ApplicationId(), inputStream);
+
+		_createOAuth2ScopeGrants(oAuth2Application);
 
 		return oAuth2Application;
 	}
