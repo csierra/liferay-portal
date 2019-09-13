@@ -266,26 +266,16 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 					oAuth2Application.getOAuth2ApplicationId(),
 					Collections.emptyList());
 
-		_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
-			oAuth2Application.getCompanyId(),
-			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId(),
-			"Liferay.Segments.Asah.REST", "com.liferay.segments.asah.rest.impl",
-			"GET",
-			Collections.singletonList("Liferay.Segments.Asah.REST.everything"));
-
-		_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
-			oAuth2Application.getCompanyId(),
-			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId(),
-			"Liferay.Segments.Asah.REST", "com.liferay.segments.asah.rest.impl",
-			"DELETE",
-			Collections.singletonList("Liferay.Segments.Asah.REST.everything"));
-
-		_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
-			oAuth2Application.getCompanyId(),
-			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId(),
-			"Liferay.Segments.Asah.REST", "com.liferay.segments.asah.rest.impl",
-			"POST",
-			Collections.singletonList("Liferay.Segments.Asah.REST.everything"));
+		for (String scope : _SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS) {
+			_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
+				oAuth2Application.getCompanyId(),
+				oAuth2ApplicationScopeAliases.
+					getOAuth2ApplicationScopeAliasesId(),
+				"Liferay.Segments.Asah.REST",
+				"com.liferay.segments.asah.rest.impl", scope,
+				Collections.singletonList(
+					"Liferay.Segments.Asah.REST.everything"));
+		}
 
 		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
 			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
@@ -337,6 +327,10 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 			"OAUTH2_analytics.write",
 			CompanyService.class.getName() + "#updatePreferences"
 		}
+	};
+
+	private static final String[] _SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS = {
+		"DELETE", "GET", "POST"
 	};
 
 	@Reference(
