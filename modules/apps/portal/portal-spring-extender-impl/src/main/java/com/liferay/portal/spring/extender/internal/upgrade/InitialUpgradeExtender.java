@@ -14,6 +14,8 @@
 
 package com.liferay.portal.spring.extender.internal.upgrade;
 
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -23,6 +25,7 @@ import com.liferay.portal.kernel.dao.db.DBManager;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.upgrade.InitialDataGeneration;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -45,6 +48,8 @@ import javax.sql.DataSource;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.Constants;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
@@ -218,15 +223,29 @@ public class InitialUpgradeExtender
 							e);
 					}
 				}
+
+				InitialDataGeneration initialDataGeneration =
+					_serviceTrackerMap.getService(_bundle.getSymbolicName());
+
+				if (initialDataGeneration != null) {
+					initialDataGeneration.execute();
+				}
 			}
 			catch (SQLException sqle) {
 				throw new UpgradeException(sqle);
+			}
+			finally {
+				_serviceTrackerMap.close();
 			}
 		}
 
 		private InitialUpgradeStep(Bundle bundle, DataSource dataSource) {
 			_bundle = bundle;
 			_dataSource = dataSource;
+
+			_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+				_bundle.getBundleContext(), InitialDataGeneration.class,
+				Constants.BUNDLE_SYMBOLICNAME);
 		}
 
 		private String _getSQLTemplateString(String templateName)
@@ -250,6 +269,9 @@ public class InitialUpgradeExtender
 					"Unable to read SQL template " + templateName, ioe);
 			}
 		}
+
+		private final ServiceTrackerMap<String, InitialDataGeneration>
+			_serviceTrackerMap;
 
 		private final Bundle _bundle;
 		private final DataSource _dataSource;
