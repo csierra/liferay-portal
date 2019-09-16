@@ -19,7 +19,6 @@ import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
@@ -257,28 +256,15 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 	private void _createOAuth2ScopeGrants(OAuth2Application oAuth2Application)
 		throws PortalException {
 
-		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
-			_oAuth2ApplicationScopeAliasesLocalService.
-				addOAuth2ApplicationScopeAliases(
-					oAuth2Application.getCompanyId(),
-					oAuth2Application.getUserId(),
-					oAuth2Application.getUserName(),
-					oAuth2Application.getOAuth2ApplicationId(),
-					Collections.emptyList());
-
 		for (String scope : _SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS) {
 			_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
 				oAuth2Application.getCompanyId(),
-				oAuth2ApplicationScopeAliases.
-					getOAuth2ApplicationScopeAliasesId(),
+				oAuth2Application.getOAuth2ApplicationScopeAliasesId(),
 				"Liferay.Segments.Asah.REST",
 				"com.liferay.segments.asah.rest.impl", scope,
 				Collections.singletonList(
 					"Liferay.Segments.Asah.REST.everything"));
 		}
-
-		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
-			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
 
 		_oAuth2ApplicationLocalService.updateOAuth2Application(
 			oAuth2Application);
