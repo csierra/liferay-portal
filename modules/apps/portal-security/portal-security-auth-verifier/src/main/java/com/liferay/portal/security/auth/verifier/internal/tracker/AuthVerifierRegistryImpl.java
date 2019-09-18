@@ -102,7 +102,7 @@ public class AuthVerifierRegistryImpl implements AuthVerifierRegistry {
 		_bundleContext = bundleContext;
 
 		_serviceTracker = ServiceTrackerFactory.open(
-			bundleContext, "(objectClass=" + AuthVerifier.class.getName() + ")",
+			bundleContext, AuthVerifier.class,
 			new AuthVerifierTrackerCustomizer());
 	}
 
