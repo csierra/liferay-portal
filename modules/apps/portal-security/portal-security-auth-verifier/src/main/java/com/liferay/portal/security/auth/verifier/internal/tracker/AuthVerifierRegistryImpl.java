@@ -300,8 +300,7 @@ public class AuthVerifierRegistryImpl implements AuthVerifierRegistry {
 		protected void mount(String contextPath) {
 			List<AuthVerifierConfiguration> authVerifierConfigurations =
 				_authVerifierConfigurations.computeIfAbsent(
-					contextPath,
-					cp -> new ArrayList<AuthVerifierConfiguration>());
+					contextPath, cp -> new ArrayList<>());
 
 			authVerifierConfigurations.add(_authVerifierConfiguration);
 		}
