@@ -18,7 +18,6 @@ import com.liferay.petra.reflect.AnnotationLocator;
 import com.liferay.portal.kernel.security.access.control.AccessControlUtil;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
-import com.liferay.portal.remote.jaxrs.security.internal.entity.ForbiddenEntity;
 import com.liferay.portal.security.access.control.AccessControlAdvisor;
 import com.liferay.portal.security.access.control.AccessControlAdvisorImpl;
 
@@ -27,7 +26,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -37,33 +35,28 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * @author Carlos Sierra Andrés
  */
 @Component(
 	property = {
-		"osgi.jaxrs.application.select=(!(liferay.access.control.disable=true))",
-		"osgi.jaxrs.extension=true", "osgi.jaxrs.name=Liferay.Access.Control"
+		JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT + "=(!(liferay.access.control=false))",
+		JaxrsWhiteboardConstants.JAX_RS_EXTENSION + "=true",
+		JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT + "=(osgi.jaxrs.name=Liferay.Security.Exception.Mapper)",
+		JaxrsWhiteboardConstants.JAX_RS_NAME + "=Liferay.Access.Control"
 	},
 	scope = ServiceScope.PROTOTYPE,
-	service = {
-		ContainerRequestFilter.class, ContainerResponseFilter.class,
-		ExceptionMapper.class
-	}
+	service = {ContainerRequestFilter.class, ContainerResponseFilter.class}
 )
 public class AccessControlledContainerRequestResponseFilterExceptionMapper
-	implements ContainerRequestFilter, ContainerResponseFilter,
-			   ExceptionMapper<SecurityException> {
+	implements ContainerRequestFilter, ContainerResponseFilter {
 
 	@Override
 	public void filter(ContainerRequestContext containerRequestContext)
@@ -90,37 +83,6 @@ public class AccessControlledContainerRequestResponseFilterExceptionMapper
 		throws IOException {
 
 		decrementServiceDepth();
-	}
-
-	@Override
-	public Response toResponse(SecurityException securityException) {
-		MediaType mediaType = null;
-
-		List<MediaType> mediaTypes = _httpHeaders.getAcceptableMediaTypes();
-
-		for (MediaType currentMediaType : mediaTypes) {
-			MessageBodyWriter<ForbiddenEntity> messageBodyWriter =
-				_providers.getMessageBodyWriter(
-					ForbiddenEntity.class, null, null, currentMediaType);
-
-			if (messageBodyWriter != null) {
-				mediaType = currentMediaType;
-
-				break;
-			}
-		}
-
-		if (mediaType == null) {
-			mediaType = MediaType.APPLICATION_XML_TYPE;
-		}
-
-		return Response.status(
-			Response.Status.FORBIDDEN
-		).entity(
-			new ForbiddenEntity(securityException)
-		).type(
-			mediaType
-		).build();
 	}
 
 	protected void decrementServiceDepth() {
