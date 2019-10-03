@@ -86,8 +86,10 @@ public class TokenAutoLogin extends BaseAutoLogin {
 		long companyId = _portal.getCompanyId(httpServletRequest);
 
 		TokenConfiguration tokenCompanyServiceSettings =
-			_configurationProvider.getCompanyConfiguration(
-				TokenConfiguration.class, companyId);
+			_configurationProvider.getConfiguration(
+				TokenConfiguration.class,
+				new CompanyServiceSettingsLocator(
+					companyId, TokenConstants.SERVICE_NAME));
 
 		if (!tokenCompanyServiceSettings.enabled()) {
 			return null;
