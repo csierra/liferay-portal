@@ -105,7 +105,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.auth.ScreenNameGenerator;
 import com.liferay.portal.kernel.security.auth.ScreenNameValidator;
 import com.liferay.portal.kernel.security.ldap.LDAPSettingsUtil;
-import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
+import com.liferay.portal.kernel.security.pwd.PasswordHelperUtil;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -1024,11 +1024,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			PasswordModificationThreadLocal.setPasswordModified(true);
 			PasswordModificationThreadLocal.setPasswordUnencrypted(password1);
 
-			user.setPassword(PasswordEncryptorUtil.encrypt(password1));
+			PasswordHelperUtil.addPassword(user.getUserId(), password1);
+
 			user.setPasswordUnencrypted(password1);
 		}
-
-		user.setPasswordEncrypted(true);
 
 		PasswordPolicy passwordPolicy = defaultUser.getPasswordPolicy();
 
@@ -1417,16 +1416,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			return user.getUserId();
 		}
 
-		String userPassword = user.getPassword();
-
-		if (!user.isPasswordEncrypted()) {
-			userPassword = PasswordEncryptorUtil.encrypt(userPassword);
-		}
-
-		String encPassword = PasswordEncryptorUtil.encrypt(
-			password, userPassword);
-
-		if (userPassword.equals(password) || userPassword.equals(encPassword)) {
+		if (PasswordHelperUtil.compare(user.getUserId(), password, false)) {
 			resetFailedLoginAttempts(user);
 
 			return user.getUserId();
@@ -1559,21 +1549,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				return false;
 			}
 
-			String userPassword = user.getPassword();
-
-			if (user.isPasswordEncrypted()) {
-				if (userPassword.equals(encPassword)) {
-					return true;
-				}
-			}
-			else {
-				userPassword = PasswordEncryptorUtil.encrypt(
-					userPassword, encPassword);
-
-				if (userPassword.equals(encPassword)) {
-					return true;
-				}
-			}
+			return PasswordHelperUtil.compare(userId, encPassword, true);
 		}
 		catch (Exception e) {
 			_log.error("Unable to authenticate for JAAS", e);
@@ -1729,15 +1705,11 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			PasswordModificationThreadLocal.setPasswordModified(true);
 			PasswordModificationThreadLocal.setPasswordUnencrypted(password);
 
-			user.setPassword(PasswordEncryptorUtil.encrypt(password));
+			PasswordHelperUtil.addPassword(user.getUserId(), password);
+
 			user.setPasswordUnencrypted(password);
-			user.setPasswordEncrypted(true);
-			user.setPasswordModified(true);
-			user.setPasswordModifiedDate(new Date());
 
 			userPersistence.update(user);
-
-			user.setPasswordModified(false);
 		}
 
 		if (user.hasCompanyMx()) {
@@ -1797,12 +1769,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			throw new SystemException(ee);
 		}
 
-		String userPassword = user.getPassword();
-
-		String encPassword = PasswordEncryptorUtil.encrypt(
-			password, userPassword);
-
-		if (userPassword.equals(encPassword)) {
+		if (PasswordHelperUtil.compare(userId, password, false)) {
 			if (isPasswordExpired(user)) {
 				user.setPasswordReset(true);
 
@@ -1900,9 +1867,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		passwordPolicyRelLocalService.deletePasswordPolicyRel(
 			User.class.getName(), user.getUserId());
 
-		// Old passwords
+		// Password information
 
-		passwordTrackerLocalService.deletePasswordTrackers(user.getUserId());
+		PasswordHelperUtil.deletePassword(user.getUserId());
 
 		// External user ids
 
@@ -4438,11 +4405,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				locale, "welcome-x", fullName, false);
 
 			if (Validator.isNotNull(password1)) {
-				user.setPassword(PasswordEncryptorUtil.encrypt(password1));
+				PasswordHelperUtil.addPassword(user.getUserId(), password1);
+
 				user.setPasswordUnencrypted(password1);
 			}
-
-			user.setPasswordEncrypted(true);
 
 			PasswordPolicy passwordPolicy = defaultUser.getPasswordPolicy();
 
@@ -4769,39 +4735,18 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			boolean passwordReset, boolean silentUpdate)
 		throws PortalException {
 
-		// Password hashing takes a long time. Therefore, encrypt the password
-		// before we get the user to avoid
-		// an org.hibernate.StaleObjectStateException.
-
-		String newEncPwd = PasswordEncryptorUtil.encrypt(password1);
-
 		User user = userPersistence.findByPrimaryKey(userId);
 
-		if (!silentUpdate) {
-			validatePassword(user.getCompanyId(), userId, password1, password2);
-
-			trackPassword(user);
-		}
+		PasswordHelperUtil.updatePassword(userId, password1, silentUpdate);
 
 		if (user.hasCompanyMx()) {
 			mailService.updatePassword(user.getCompanyId(), userId, password1);
 		}
 
-		user.setPassword(newEncPwd);
 		user.setPasswordUnencrypted(password1);
-		user.setPasswordEncrypted(true);
 		user.setPasswordReset(passwordReset);
-
-		if (!silentUpdate || (user.getPasswordModifiedDate() == null)) {
-			user.setPasswordModifiedDate(new Date());
-		}
-
 		user.setDigest(user.getDigest(password1));
 		user.setGraceLoginCount(0);
-
-		if (!silentUpdate) {
-			user.setPasswordModified(true);
-		}
 
 		PasswordModificationThreadLocal.setPasswordModified(
 			user.getPasswordModified());
@@ -5584,13 +5529,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		user = _checkPasswordPolicy(user);
 
-		if (!user.isPasswordEncrypted()) {
-			user.setPassword(PasswordEncryptorUtil.encrypt(user.getPassword()));
-			user.setPasswordEncrypted(true);
-
-			user = userPersistence.update(user);
-		}
-
 		// Authenticate against the User_ table
 
 		boolean skipLiferayCheck = false;
@@ -5603,8 +5541,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		else if ((authResult == Authenticator.SUCCESS) &&
 				 PropsValues.AUTH_PIPELINE_ENABLE_LIFERAY_CHECK) {
 
-			boolean authenticated = PwdAuthenticator.authenticate(
-				login, password, user.getPassword());
+			boolean authenticated = PasswordHelperUtil.compare(
+				user.getUserId(), password, false);
+
+			if (!authenticated) {
+				authenticated = PwdAuthenticator.authenticate(login, password);
+			}
 
 			if (authenticated) {
 				authResult = Authenticator.SUCCESS;
@@ -6331,16 +6273,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		user.setDigest(StringPool.BLANK);
 		user.setEmailAddress(emailAddress);
-	}
-
-	protected void trackPassword(User user) throws PortalException {
-		String oldEncPwd = user.getPassword();
-
-		if (!user.isPasswordEncrypted()) {
-			oldEncPwd = PasswordEncryptorUtil.encrypt(user.getPassword());
-		}
-
-		passwordTrackerLocalService.trackPassword(user.getUserId(), oldEncPwd);
 	}
 
 	protected void unsetUserGroups(long userId, long[] groupIds)
