@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.exception.PwdEncryptorException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -36,19 +35,11 @@ import java.security.NoSuchAlgorithmException;
  */
 public class PwdAuthenticator {
 
-	public static boolean authenticate(
-			String login, String clearTextPassword,
-			String currentEncryptedPassword)
+	public static boolean authenticate(String login, String password)
 		throws PwdEncryptorException {
 
-		String encryptedPassword = PasswordEncryptorUtil.encrypt(
-			clearTextPassword, currentEncryptedPassword);
-
-		if (currentEncryptedPassword.equals(encryptedPassword)) {
-			return true;
-		}
-		else if (GetterUtil.getBoolean(
-					PropsUtil.get(PropsKeys.AUTH_MAC_ALLOW))) {
+		if (GetterUtil.getBoolean(
+				PropsUtil.get(PropsKeys.AUTH_MAC_ALLOW))) {
 
 			try {
 				MessageDigest digester = MessageDigest.getInstance(
@@ -68,10 +59,10 @@ public class PwdAuthenticator {
 					return false;
 				}
 
-				encryptedPassword = Base64.encode(
+				String encryptedPassword = Base64.encode(
 					digester.digest(shardKey.getBytes(StringPool.UTF8)));
 
-				if (clearTextPassword.equals(encryptedPassword)) {
+				if (password.equals(encryptedPassword)) {
 					return true;
 				}
 
