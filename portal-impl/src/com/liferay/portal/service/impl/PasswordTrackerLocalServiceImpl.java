@@ -15,110 +15,59 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.PasswordPolicy;
-import com.liferay.portal.kernel.model.PasswordTracker;
-import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
+import com.liferay.portal.kernel.security.pwd.PasswordHelperUtil;
 import com.liferay.portal.service.base.PasswordTrackerLocalServiceBaseImpl;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Scott Lee
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ *             PasswordHelperUtil}
  */
+@Deprecated
 public class PasswordTrackerLocalServiceImpl
 	extends PasswordTrackerLocalServiceBaseImpl {
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public void deletePasswordTrackers(long userId) {
-		passwordTrackerPersistence.removeByUserId(userId);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             PasswordHelperUtil#compare(long, String, boolean)}
+	 */
+	@Deprecated
 	@Override
 	public boolean isSameAsCurrentPassword(long userId, String newClearTextPwd)
 		throws PortalException {
 
-		User user = userPersistence.findByPrimaryKey(userId);
-
-		String currentPwd = user.getPassword();
-
-		if (user.isPasswordEncrypted()) {
-			String newEncPwd = PasswordEncryptorUtil.encrypt(
-				newClearTextPwd, user.getPassword());
-
-			if (currentPwd.equals(newEncPwd)) {
-				return true;
-			}
-
-			return false;
-		}
-
-		if (currentPwd.equals(newClearTextPwd)) {
-			return true;
-		}
-
-		return false;
+		return PasswordHelperUtil.compare(userId, newClearTextPwd, false);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             PasswordHelperUtil#compareHistory(long, String, boolean)}
+	 */
+	@Deprecated
 	@Override
 	public boolean isValidPassword(long userId, String newClearTextPwd)
 		throws PortalException {
 
-		PasswordPolicy passwordPolicy =
-			passwordPolicyLocalService.getPasswordPolicyByUserId(userId);
-
-		if ((passwordPolicy == null) || !passwordPolicy.isHistory()) {
-			return true;
-		}
-
-		// Check password history
-
-		int historyCount = 1;
-
-		List<PasswordTracker> passwordTrackers =
-			passwordTrackerPersistence.findByUserId(userId);
-
-		for (PasswordTracker passwordTracker : passwordTrackers) {
-			if (historyCount >= passwordPolicy.getHistoryCount()) {
-				break;
-			}
-
-			String oldEncPwd = passwordTracker.getPassword();
-
-			String newEncPwd = PasswordEncryptorUtil.encrypt(
-				newClearTextPwd, oldEncPwd);
-
-			if (oldEncPwd.equals(newEncPwd)) {
-				return false;
-			}
-
-			historyCount++;
-		}
-
-		return true;
+		return !PasswordHelperUtil.compareHistory(
+			userId, newClearTextPwd, false);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public void trackPassword(long userId, String encPassword)
 		throws PortalException {
-
-		PasswordPolicy passwordPolicy =
-			passwordPolicyLocalService.getPasswordPolicyByUserId(userId);
-
-		if ((passwordPolicy != null) && passwordPolicy.isHistory()) {
-			long passwordTrackerId = counterLocalService.increment();
-
-			PasswordTracker passwordTracker = passwordTrackerPersistence.create(
-				passwordTrackerId);
-
-			passwordTracker.setUserId(userId);
-			passwordTracker.setCreateDate(new Date());
-			passwordTracker.setPassword(encPassword);
-
-			passwordTrackerPersistence.update(passwordTracker);
-		}
 	}
 
 }
