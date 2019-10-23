@@ -16,10 +16,9 @@ package com.liferay.portal.security.auto.login.request.parameter;
 
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auto.login.AutoLogin;
 import com.liferay.portal.kernel.security.auto.login.BaseAutoLogin;
-import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
+import com.liferay.portal.kernel.security.pwd.PasswordHelperUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -82,23 +81,10 @@ public class RequestParameterAutoLoginSupport extends BaseAutoLogin {
 			return null;
 		}
 
-		if (userId > 0) {
-			User user = _userLocalService.getUserById(userId);
+		if (!PasswordHelperUtil.compare(userId, password, false) &&
+			(userId > 0)) {
 
-			String userPassword = user.getPassword();
-
-			if (!user.isPasswordEncrypted()) {
-				userPassword = PasswordEncryptorUtil.encrypt(userPassword);
-			}
-
-			String encPassword = PasswordEncryptorUtil.encrypt(
-				password, userPassword);
-
-			if (!userPassword.equals(password) &&
-				!userPassword.equals(encPassword)) {
-
-				return null;
-			}
+			return null;
 		}
 
 		return new String[] {
