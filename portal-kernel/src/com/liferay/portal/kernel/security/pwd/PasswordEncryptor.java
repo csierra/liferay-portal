@@ -18,7 +18,10 @@ import com.liferay.portal.kernel.exception.PwdEncryptorException;
 
 /**
  * @author Tomas Polesovsky
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ *             com.liferay.portal.security.crypto.generator.spi.HashGenerator}
  */
+@Deprecated
 public interface PasswordEncryptor {
 
 	public String encrypt(String plainTextPassword, String encryptedPassword)

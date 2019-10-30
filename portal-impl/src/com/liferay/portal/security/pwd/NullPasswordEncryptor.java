@@ -20,7 +20,10 @@ import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
 /**
  * @author Michael C. Han
  * @author Tomas Polesovsky
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ *             com.liferay.portal.security.crypto.algorithm.none.NoneHashGenerator}
  */
+@Deprecated
 public class NullPasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 

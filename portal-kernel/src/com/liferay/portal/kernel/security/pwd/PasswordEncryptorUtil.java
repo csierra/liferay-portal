@@ -23,7 +23,10 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
  * @author Scott Lee
  * @author Tomas Polesovsky
  * @author Michael C. Han
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ *             com.liferay.portal.security.crypto.generator.registry.GeneratorRegistry}
  */
+@Deprecated
 public class PasswordEncryptorUtil {
 
 	public static final String TYPE_BCRYPT = "BCRYPT";

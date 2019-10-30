@@ -38,9 +38,7 @@ public class PwdAuthenticator {
 	public static boolean authenticate(String login, String password)
 		throws PwdEncryptorException {
 
-		if (GetterUtil.getBoolean(
-				PropsUtil.get(PropsKeys.AUTH_MAC_ALLOW))) {
-
+		if (GetterUtil.getBoolean(PropsUtil.get(PropsKeys.AUTH_MAC_ALLOW))) {
 			try {
 				MessageDigest digester = MessageDigest.getInstance(
 					PropsUtil.get(PropsKeys.AUTH_MAC_ALGORITHM));

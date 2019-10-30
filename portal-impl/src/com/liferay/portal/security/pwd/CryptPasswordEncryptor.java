@@ -31,7 +31,10 @@ import org.vps.crypt.Crypt;
 /**
  * @author Michael C. Han
  * @author Tomas Polesovsky
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ *             com.liferay.portal.security.crypto.algorithm.ufc.crypt.CryptHashGenerator}
  */
+@Deprecated
 public class CryptPasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 

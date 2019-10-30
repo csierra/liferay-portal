@@ -37,7 +37,10 @@ import javax.crypto.spec.PBEKeySpec;
 /**
  * @author Michael C. Han
  * @author Tomas Polesovsky
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ *             com.liferay.portal.security.crypto.algorithm.pbkdf2.PBKDF2HashGenerator}
  */
+@Deprecated
 public class PBKDF2PasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 

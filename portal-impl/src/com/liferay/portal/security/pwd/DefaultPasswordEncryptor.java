@@ -20,7 +20,9 @@ import com.liferay.portal.kernel.util.DigesterUtil;
 /**
  * @author Michael C. Han
  * @author Tomas Polesovsky
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  */
+@Deprecated
 public class DefaultPasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 

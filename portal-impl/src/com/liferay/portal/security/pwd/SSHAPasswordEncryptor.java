@@ -32,7 +32,10 @@ import java.security.NoSuchAlgorithmException;
 /**
  * @author Michael C. Han
  * @author Tomas Polesovsky
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ *             com.liferay.portal.security.crypto.algorithm.message.digest.MessageDigestHashGenerator}
  */
+@Deprecated
 public class SSHAPasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 

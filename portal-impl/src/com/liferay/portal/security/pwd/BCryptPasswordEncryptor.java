@@ -27,7 +27,10 @@ import jodd.util.BCrypt;
 /**
  * @author Michael C. Han
  * @author Tomas Polesovsky
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ *             com.liferay.portal.security.crypto.algorithm.bcrypt.BCryptHashGenerator}
  */
+@Deprecated
 public class BCryptPasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 

@@ -23,7 +23,10 @@ import com.liferay.portal.util.PropsUtil;
 
 /**
  * @author Michael C. Han
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ *             com.liferay.portal.security.crypto.generator.spi.AbstractHashGenerator}
  */
+@Deprecated
 public abstract class BasePasswordEncryptor implements PasswordEncryptor {
 
 	@Override
