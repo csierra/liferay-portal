@@ -64,7 +64,7 @@ public interface OAuth2ApplicationScopeAliasesLocalService
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
 			long companyId, long userId, String userName,
 			long oAuth2ApplicationId,
-			Function<OAuth2Scope.Builder, OAuth2Scope> builderFunction)
+			Function<OAuth2Scope, OAuth2Scope> builderFunction)
 		throws PortalException;
 
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
