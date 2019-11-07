@@ -21,39 +21,27 @@ import java.util.function.Function;
 /**
  * @author Stian Sigvartsen
  */
-public final class OAuth2Scope {
+public interface OAuth2Scope {
 
-	public interface Builder {
+	public OAuth2Scope forApplication(
+		String applicationName,
+		Function<ScopeAssigner, ScopeAssigner> scopeAssignerFunction);
 
-		public default OAuth2Scope build() {
-			return new OAuth2Scope();
+	public interface ScopeAssigner {
+
+		public default ScopeAssigner assignScope(String scope) {
+			return assignScope(scope, Collections.singletonList(scope));
 		}
 
-		public Builder forApplication(
-			String applicationName,
-			Function<ScopeAssigner, ScopeAssigner> scopeAssignerFunction);
+		public ScopeAssigner assignScope(
+			String scope, List<String> scopeAliases);
 
-		public interface ScopeAssigner {
+		public default ScopeAssigner assignScope(
+			String scope, String scopeAlias) {
 
-			public default ScopeAssigner assignScope(String scope) {
-				return assignScope(scope, Collections.singletonList(scope));
-			}
-
-			public ScopeAssigner assignScope(
-				String scope, List<String> scopeAliases);
-
-			public default ScopeAssigner assignScope(
-				String scope, String scopeAlias) {
-
-				return assignScope(
-					scope, Collections.singletonList(scopeAlias));
-			}
-
+			return assignScope(scope, Collections.singletonList(scopeAlias));
 		}
 
-	}
-
-	private OAuth2Scope() {
 	}
 
 }
