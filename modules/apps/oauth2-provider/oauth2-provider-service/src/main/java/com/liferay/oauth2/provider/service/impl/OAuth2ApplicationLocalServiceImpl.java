@@ -104,7 +104,7 @@ public class OAuth2ApplicationLocalServiceImpl
 			String description, List<String> featuresList, String homePageURL,
 			long iconFileEntryId, String name, String privacyPolicyURL,
 			List<String> redirectURIsList,
-			Function<OAuth2Scope, OAuth2Scope> builderFunction,
+			Function<OAuth2Scope.Builder, OAuth2Scope> builderFunction,
 			ServiceContext serviceContext)
 		throws PortalException {
 

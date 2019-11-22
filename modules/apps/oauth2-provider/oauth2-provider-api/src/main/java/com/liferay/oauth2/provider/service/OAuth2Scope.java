@@ -23,23 +23,28 @@ import java.util.function.Function;
  */
 public interface OAuth2Scope {
 
-	public OAuth2Scope forApplication(
-		String applicationName,
-		Function<ScopeAssigner, ScopeAssigner> scopeAssignerFunction);
+	public interface Builder {
 
-	public interface ScopeAssigner {
+		public <T extends OAuth2Scope & Builder> T forApplication(
+			String applicationName,
+			Function<ScopeAssigner, ScopeAssigner> scopeAssignerFunction);
 
-		public default ScopeAssigner assignScope(String scope) {
-			return assignScope(scope, Collections.singletonList(scope));
-		}
+		public interface ScopeAssigner {
 
-		public ScopeAssigner assignScope(
-			String scope, List<String> scopeAliases);
+			public default ScopeAssigner assignScope(String scope) {
+				return assignScope(scope, Collections.singletonList(scope));
+			}
 
-		public default ScopeAssigner assignScope(
-			String scope, String scopeAlias) {
+			public ScopeAssigner assignScope(
+				String scope, List<String> scopeAliases);
 
-			return assignScope(scope, Collections.singletonList(scopeAlias));
+			public default ScopeAssigner assignScope(
+				String scope, String scopeAlias) {
+
+				return assignScope(
+					scope, Collections.singletonList(scopeAlias));
+			}
+
 		}
 
 	}

@@ -74,7 +74,7 @@ public class FragmentRendererPortalInstanceLifecycleListener
 			user.getUserId(), _clientId, ClientProfile.NATIVE_APPLICATION.id(),
 			StringPool.BLANK, null, null, null, 0, _applicationName, null,
 			Collections.emptyList(),
-			oAuth2Scope -> oAuth2Scope.forApplication(
+			builder -> builder.forApplication(
 				"liferay-json-web-services",
 				scopeAssigner -> scopeAssigner.assignScope(
 					"everything.read",

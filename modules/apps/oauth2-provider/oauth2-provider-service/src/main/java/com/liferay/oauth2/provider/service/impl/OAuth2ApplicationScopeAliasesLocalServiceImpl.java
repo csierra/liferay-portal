@@ -58,14 +58,15 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
 			long companyId, long userId, String userName,
 			long oAuth2ApplicationId,
-			Function<OAuth2Scope, OAuth2Scope> builderFunction)
+			Function<OAuth2Scope.Builder, OAuth2Scope> builderFunction)
 		throws PortalException {
 
 		Map<LiferayOAuth2Scope, List<String>> liferayOAuth2ScopesScopeAliases =
 			new HashMap<>();
 
 		builderFunction.apply(
-			new OAuth2ScopeImpl(companyId, liferayOAuth2ScopesScopeAliases));
+			new OAuth2ScopeBuilderImpl(
+				companyId, liferayOAuth2ScopesScopeAliases));
 
 		return _addOAuth2ApplicationScopeAliases(
 			companyId, userId, userName, oAuth2ApplicationId,
@@ -346,9 +347,10 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 	@Reference
 	private ScopeLocator _scopeLocator;
 
-	private class OAuth2ScopeImpl implements OAuth2Scope {
+	private class OAuth2ScopeBuilderImpl
+		implements OAuth2Scope.Builder, OAuth2Scope {
 
-		public OAuth2ScopeImpl(
+		public OAuth2ScopeBuilderImpl(
 			long companyId,
 			Map<LiferayOAuth2Scope, List<String>>
 				liferayOAuth2ScopesScopeAliases) {
@@ -357,7 +359,7 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			_liferayOAuth2ScopesScopeAliases = liferayOAuth2ScopesScopeAliases;
 		}
 
-		public OAuth2Scope.ScopeAssigner assignScope(
+		public ScopeAssigner assignScope(
 			String scope, List<String> scopeAliases) {
 
 			_liferayOAuth2ScopesScopeAliases.put(
@@ -369,16 +371,15 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		}
 
 		@Override
-		public OAuth2Scope forApplication(
+		public <T extends OAuth2Scope & OAuth2Scope.Builder> T forApplication(
 			String applicationName,
-			Function<OAuth2Scope.ScopeAssigner, OAuth2Scope.ScopeAssigner>
-				scopeAssignerFunction) {
+			Function<ScopeAssigner, ScopeAssigner> scopeAssignerFunction) {
 
 			_applicationName = applicationName;
 
 			scopeAssignerFunction.apply(this::assignScope);
 
-			return this;
+			return (T)this;
 		}
 
 		private String _applicationName;
