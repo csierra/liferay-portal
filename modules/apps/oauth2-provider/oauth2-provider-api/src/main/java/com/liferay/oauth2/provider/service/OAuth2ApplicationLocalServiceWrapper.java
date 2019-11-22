@@ -49,7 +49,7 @@ public class OAuth2ApplicationLocalServiceWrapper
 				java.util.List<String> featuresList, String homePageURL,
 				long iconFileEntryId, String name, String privacyPolicyURL,
 				java.util.List<String> redirectURIsList,
-				java.util.function.Function<OAuth2Scope, OAuth2Scope>
+				java.util.function.Function<OAuth2Scope.Builder, OAuth2Scope>
 					builderFunction,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
