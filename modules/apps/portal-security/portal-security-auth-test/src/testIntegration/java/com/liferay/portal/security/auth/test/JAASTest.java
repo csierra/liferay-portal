@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.jaas.PortalPrincipal;
 import com.liferay.portal.kernel.security.jaas.PortalRole;
+import com.liferay.portal.kernel.security.pwd.PasswordHelperUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
@@ -283,7 +284,9 @@ public class JAASTest {
 		ReflectionTestUtil.setFieldValue(
 			PropsValues.class, "PORTAL_JAAS_AUTH_TYPE", authType);
 
-		LoginContext loginContext = _getLoginContext(name, _user.getPassword());
+		String password = PasswordHelperUtil.getPassword(_user.getUserId());
+
+		LoginContext loginContext = _getLoginContext(name, password);
 
 		loginContext.login();
 
@@ -294,7 +297,9 @@ public class JAASTest {
 		ReflectionTestUtil.setFieldValue(
 			PropsValues.class, "PORTAL_JAAS_AUTH_TYPE", authType);
 
-		LoginContext loginContext = _getLoginContext(name, _user.getPassword());
+		String password = PasswordHelperUtil.getPassword(_user.getUserId());
+
+		LoginContext loginContext = _getLoginContext(name, password);
 
 		try {
 			loginContext.login();
