@@ -25,21 +25,28 @@ public interface OAuth2Scope {
 
 	public interface Builder {
 
-		public <T extends OAuth2Scope & Builder> T forApplication(
-			String applicationName,
-			Function<ScopeAssigner, ScopeAssigner> scopeAssignerFunction);
+		public
+			<T extends OAuth2Scope & Builder,
+			 S extends ApplicationScope & ScopeAssigner> T forApplication(
+				 String applicationName,
+				 Function<ScopeAssigner, S> scopeAssignerFunction);
+
+		public interface ApplicationScope {
+		}
 
 		public interface ScopeAssigner {
 
-			public default ScopeAssigner assignScope(String scope) {
+			public default <T extends ApplicationScope & ScopeAssigner> T
+				assignScope(String scope) {
+
 				return assignScope(scope, Collections.singletonList(scope));
 			}
 
-			public ScopeAssigner assignScope(
+			public <T extends ApplicationScope & ScopeAssigner> T assignScope(
 				String scope, List<String> scopeAliases);
 
-			public default ScopeAssigner assignScope(
-				String scope, String scopeAlias) {
+			public default <T extends ApplicationScope & ScopeAssigner> T
+				assignScope(String scope, String scopeAlias) {
 
 				return assignScope(
 					scope, Collections.singletonList(scopeAlias));

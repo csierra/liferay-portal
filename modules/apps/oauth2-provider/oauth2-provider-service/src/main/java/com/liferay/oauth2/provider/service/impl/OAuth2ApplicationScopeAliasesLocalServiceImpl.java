@@ -359,21 +359,29 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			_liferayOAuth2ScopesScopeAliases = liferayOAuth2ScopesScopeAliases;
 		}
 
-		public ScopeAssigner assignScope(
-			String scope, List<String> scopeAliases) {
+		public
+			<T
+				 extends OAuth2Scope.Builder.ApplicationScope &
+			OAuth2Scope.Builder.ScopeAssigner> T assignScope(
+				String scope, List<String> scopeAliases) {
 
 			_liferayOAuth2ScopesScopeAliases.put(
 				_scopeLocator.getLiferayOAuth2Scope(
 					_companyId, _applicationName, scope),
 				scopeAliases);
 
-			return this::assignScope;
+			return (T)this;
 		}
 
 		@Override
-		public <T extends OAuth2Scope & OAuth2Scope.Builder> T forApplication(
-			String applicationName,
-			Function<ScopeAssigner, ScopeAssigner> scopeAssignerFunction) {
+		public
+			<T extends OAuth2Scope & OAuth2Scope.Builder,
+			 S
+				  extends OAuth2Scope.Builder.ApplicationScope &
+			 OAuth2Scope.Builder.ScopeAssigner> T forApplication(
+				 String applicationName,
+				 Function<OAuth2Scope.Builder.ScopeAssigner, S>
+					 scopeAssignerFunction) {
 
 			_applicationName = applicationName;
 
