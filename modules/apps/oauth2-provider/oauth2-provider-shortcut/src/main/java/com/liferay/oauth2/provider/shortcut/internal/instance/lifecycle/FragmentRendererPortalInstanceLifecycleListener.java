@@ -17,7 +17,7 @@ package com.liferay.oauth2.provider.shortcut.internal.instance.lifecycle;
 import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
-import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
+import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
@@ -63,7 +63,7 @@ public class FragmentRendererPortalInstanceLifecycleListener
 
 		User user = _userLocalService.getDefaultUser(company.getCompanyId());
 
-		oAuth2Application = _oAuth2ApplicationLocalService.addOAuth2Application(
+		_oAuth2ApplicationLocalService.addOAuth2Application(
 			company.getCompanyId(), user.getUserId(), user.getScreenName(),
 			new ArrayList<GrantType>() {
 				{
@@ -73,38 +73,20 @@ public class FragmentRendererPortalInstanceLifecycleListener
 			},
 			user.getUserId(), _clientId, ClientProfile.NATIVE_APPLICATION.id(),
 			StringPool.BLANK, null, null, null, 0, _applicationName, null,
-			Collections.emptyList(), Collections.emptyList(),
+			Collections.emptyList(),
+			oAuth2Scope -> oAuth2Scope.forApplication(
+				"liferay-json-web-services",
+				scopeAssigner -> scopeAssigner.assignScope(
+					"everything.read",
+					"liferay-json-web-services.fragments.everything.read")),
 			new ServiceContext());
-
-		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
-			_oAuth2ApplicationScopeAliasesLocalService.
-				addOAuth2ApplicationScopeAliases(
-					oAuth2Application.getCompanyId(),
-					oAuth2Application.getUserId(),
-					oAuth2Application.getUserName(),
-					oAuth2Application.getOAuth2ApplicationId(),
-					Collections.emptyList());
-
-		_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
-			oAuth2Application.getCompanyId(),
-			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId(),
-			"liferay-json-web-services", "com.liferay.oauth2.provider.jsonws",
-			"everything.read",
-			Collections.singletonList(
-				"liferay-json-web-services.everything.read"));
-
-		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
-			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
-
-		_oAuth2ApplicationLocalService.updateOAuth2Application(
-			oAuth2Application);
 	}
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
+		_clientId = GetterUtil.getString(properties.get("clientId"));
 		_applicationName = GetterUtil.getString(
 			properties.get("applicationName"));
-		_clientId = GetterUtil.getString(properties.get("clientId"));
 	}
 
 	private String _applicationName = "Fragment Renderer";
@@ -119,6 +101,9 @@ public class FragmentRendererPortalInstanceLifecycleListener
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
+
+	@Reference
+	private ScopeLocator _scopeLocator;
 
 	@Reference
 	private UserLocalService _userLocalService;
