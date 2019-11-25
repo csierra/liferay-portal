@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portlet.admin.util.AdminUtil;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 import com.liferay.users.admin.kernel.util.UsersAdmin;
 
@@ -87,6 +88,9 @@ public class UpdateUserRolesMVCActionCommand extends BaseMVCActionCommand {
 
 			Contact contact = user.getContact();
 
+			String oldPassword = AdminUtil.getUpdateUserPassword(
+				actionRequest, user.getUserId());
+
 			Calendar birthdayCal = CalendarFactoryUtil.getCalendar();
 
 			birthdayCal.setTime(user.getBirthday());
@@ -118,7 +122,7 @@ public class UpdateUserRolesMVCActionCommand extends BaseMVCActionCommand {
 				User.class.getName(), actionRequest);
 
 			user = _userService.updateUser(
-				user.getUserId(), user.getPassword(), null, null,
+				user.getUserId(), oldPassword, null, null,
 				user.isPasswordReset(), null, null, user.getScreenName(),
 				user.getEmailAddress(), user.getFacebookId(), user.getOpenId(),
 				user.getLanguageId(), user.getTimeZoneId(), user.getGreeting(),

@@ -161,7 +161,7 @@ public class MembershipPolicyTestUtil {
 		throws Exception {
 
 		long userId = user.getUserId();
-		String oldPassword = user.getPassword();
+		String oldPassword = StringPool.BLANK;
 
 		String newPassword1 = RandomTestUtil.randomString();
 

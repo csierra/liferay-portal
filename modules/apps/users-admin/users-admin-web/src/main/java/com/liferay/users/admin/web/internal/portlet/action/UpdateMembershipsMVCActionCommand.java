@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portlet.admin.util.AdminUtil;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 import com.liferay.users.admin.kernel.util.UsersAdmin;
 
@@ -63,6 +64,9 @@ public class UpdateMembershipsMVCActionCommand extends BaseMVCActionCommand {
 
 			Contact contact = user.getContact();
 
+			String oldPassword = AdminUtil.getUpdateUserPassword(
+				actionRequest, user.getUserId());
+
 			Calendar birthdayCal = CalendarFactoryUtil.getCalendar();
 
 			birthdayCal.setTime(user.getBirthday());
@@ -74,7 +78,7 @@ public class UpdateMembershipsMVCActionCommand extends BaseMVCActionCommand {
 				User.class.getName(), actionRequest);
 
 			_userService.updateUser(
-				user.getUserId(), user.getPassword(), null, null,
+				user.getUserId(), oldPassword, null, null,
 				user.isPasswordReset(), null, null, user.getScreenName(),
 				user.getEmailAddress(), user.getFacebookId(), user.getOpenId(),
 				user.getLanguageId(), user.getTimeZoneId(), user.getGreeting(),

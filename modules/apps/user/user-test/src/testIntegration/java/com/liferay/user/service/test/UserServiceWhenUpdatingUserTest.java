@@ -109,7 +109,7 @@ public class UserServiceWhenUpdatingUserTest {
 		ServiceContext serviceContext = new ServiceContext();
 
 		return _userService.updateUser(
-			user.getUserId(), user.getPassword(), StringPool.BLANK,
+			user.getUserId(), StringPool.BLANK, StringPool.BLANK,
 			StringPool.BLANK, user.isPasswordReset(),
 			user.getReminderQueryQuestion(), user.getReminderQueryAnswer(),
 			user.getScreenName(), user.getEmailAddress(), user.getFacebookId(),

@@ -15,6 +15,7 @@
 package com.liferay.user.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
@@ -104,7 +105,7 @@ public class UserServiceWhenUpdatingUserWithSiteRoleTest {
 		int birthdayYear = birthdayCal.get(Calendar.YEAR);
 
 		return _userService.updateUser(
-			user.getUserId(), user.getPassword(), null, null,
+			user.getUserId(), StringPool.BLANK, null, null,
 			user.isPasswordReset(), null, null, user.getScreenName(),
 			user.getEmailAddress(), user.getFacebookId(), user.getOpenId(),
 			user.getLanguageId(), user.getTimeZoneId(), user.getGreeting(),

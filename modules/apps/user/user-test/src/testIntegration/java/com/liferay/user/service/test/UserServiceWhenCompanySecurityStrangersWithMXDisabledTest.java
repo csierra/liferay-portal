@@ -15,6 +15,7 @@
 package com.liferay.user.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.UserEmailAddressException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -97,8 +98,8 @@ public class UserServiceWhenCompanySecurityStrangersWithMXDisabledTest {
 				"UserServiceTest." + RandomTestUtil.nextLong() + "@liferay.com";
 
 			_userService.updateEmailAddress(
-				_user.getUserId(), _user.getPassword(), emailAddress,
-				emailAddress, new ServiceContext());
+				_user.getUserId(), StringPool.BLANK, emailAddress, emailAddress,
+				new ServiceContext());
 		}
 		finally {
 			PrincipalThreadLocal.setName(name);
