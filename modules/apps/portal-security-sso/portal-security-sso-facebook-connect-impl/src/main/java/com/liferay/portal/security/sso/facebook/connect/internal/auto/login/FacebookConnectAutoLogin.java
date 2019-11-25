@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.facebook.FacebookConnect;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auto.login.AutoLogin;
 import com.liferay.portal.kernel.security.auto.login.BaseAutoLogin;
+import com.liferay.portal.kernel.security.pwd.PasswordHelperUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -70,7 +71,7 @@ public class FacebookConnectAutoLogin extends BaseAutoLogin {
 		String[] credentials = new String[3];
 
 		credentials[0] = String.valueOf(user.getUserId());
-		credentials[1] = user.getPassword();
+		credentials[1] = PasswordHelperUtil.getPassword(user.getUserId());
 		credentials[2] = Boolean.FALSE.toString();
 
 		return credentials;

@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.access.control.AccessControlUtil;
 import com.liferay.portal.kernel.security.auto.login.AutoLogin;
 import com.liferay.portal.kernel.security.auto.login.BaseAutoLogin;
+import com.liferay.portal.kernel.security.pwd.PasswordHelperUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
@@ -104,7 +105,7 @@ public class RequestHeaderAutoLogin extends BaseAutoLogin {
 		String[] credentials = new String[3];
 
 		credentials[0] = String.valueOf(user.getUserId());
-		credentials[1] = user.getPassword();
+		credentials[1] = PasswordHelperUtil.getPassword(user.getUserId());
 		credentials[2] = Boolean.TRUE.toString();
 
 		return credentials;

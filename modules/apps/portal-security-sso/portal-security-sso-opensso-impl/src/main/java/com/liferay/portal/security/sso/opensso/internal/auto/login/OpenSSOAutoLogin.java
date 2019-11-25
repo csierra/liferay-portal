@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.ScreenNameGenerator;
 import com.liferay.portal.kernel.security.auto.login.AutoLogin;
 import com.liferay.portal.kernel.security.auto.login.BaseAutoLogin;
+import com.liferay.portal.kernel.security.pwd.PasswordHelperUtil;
 import com.liferay.portal.kernel.security.sso.OpenSSO;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -305,7 +306,7 @@ public class OpenSSOAutoLogin extends BaseAutoLogin {
 		String[] credentials = new String[3];
 
 		credentials[0] = String.valueOf(user.getUserId());
-		credentials[1] = user.getPassword();
+		credentials[1] = PasswordHelperUtil.getPassword(user.getUserId());
 		credentials[2] = Boolean.TRUE.toString();
 
 		return credentials;
