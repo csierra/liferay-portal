@@ -282,14 +282,13 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
 
-		Set<String> scopeAliases = stream.flatMap(
+		return stream.flatMap(
 			oa2sg -> oa2sg.getScopeAliasesList(
 			).stream()
+		).distinct(
 		).collect(
-			Collectors.toSet()
+			Collectors.toList()
 		);
-
-		return new ArrayList<>(scopeAliases);
 	}
 
 	private boolean _hasUpToDateScopeGrants(
