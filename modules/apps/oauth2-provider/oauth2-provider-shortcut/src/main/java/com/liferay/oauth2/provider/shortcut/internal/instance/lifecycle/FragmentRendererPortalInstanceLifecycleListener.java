@@ -76,8 +76,9 @@ public class FragmentRendererPortalInstanceLifecycleListener
 			builder -> builder.forApplication(
 				"liferay-json-web-services",
 				scopeAssigner -> scopeAssigner.assignScope(
-					"everything.read",
-					"liferay-json-web-services.everything.read")),
+					Collections.singletonList("everything.read"),
+					__ -> Collections.singletonList(
+						"liferay-json-web-services.everything.read"))),
 			new ServiceContext());
 	}
 
