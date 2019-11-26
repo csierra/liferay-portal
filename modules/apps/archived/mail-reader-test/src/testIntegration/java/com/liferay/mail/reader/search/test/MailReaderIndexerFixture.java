@@ -48,9 +48,8 @@ public class MailReaderIndexerFixture {
 		Account account = AccountLocalServiceUtil.addAccount(
 			_user.getUserId(), "teste@liferay.com",
 			RandomTestUtil.randomString(), protocol, incomingHostName, 993,
-			true, outgoingHostName, 465, true, _user.getLogin(),
-			_user.getPassword(), false, RandomTestUtil.randomString(), false,
-			"", 0, 0, 0, 0, false);
+			true, outgoingHostName, 465, true, _user.getLogin(), null, false,
+			RandomTestUtil.randomString(), false, "", 0, 0, 0, 0, false);
 
 		_accounts.add(account);
 
