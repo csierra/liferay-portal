@@ -347,7 +347,8 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 	@Reference
 	private ScopeLocator _scopeLocator;
 
-	private class OAuth2ScopeBuilderImpl implements OAuth2Scope.Built {
+	private class OAuth2ScopeBuilderImpl
+		implements OAuth2Scope.Built, OAuth2Scope.Builder.ApplicationScope {
 
 		public OAuth2ScopeBuilderImpl(
 			long companyId,
@@ -368,7 +369,7 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 					scopeAliases);
 			}
 
-			return this::assignScope;
+			return this;
 		}
 
 		@Override
@@ -379,7 +380,7 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 			_applicationName = applicationName;
 
-			applicationScopeAssignerFunction.apply(this::assignScope);
+			applicationScopeAssignerFunction.apply(this);
 
 			return this;
 		}
