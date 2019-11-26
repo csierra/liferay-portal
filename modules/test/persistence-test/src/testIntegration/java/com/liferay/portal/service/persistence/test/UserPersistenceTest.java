@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.pwd.PasswordHelperUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.service.persistence.UserUtil;
@@ -231,7 +232,9 @@ public class UserPersistenceTest {
 			existingUser.isDefaultUser(), newUser.isDefaultUser());
 		Assert.assertEquals(
 			existingUser.getContactId(), newUser.getContactId());
-		Assert.assertEquals(existingUser.getPassword(), newUser.getPassword());
+		Assert.assertEquals(
+			PasswordHelperUtil.getPassword(existingUser.getUserId()),
+			PasswordHelperUtil.getPassword(newUser.getUserId()));
 		Assert.assertEquals(
 			existingUser.isPasswordEncrypted(), newUser.isPasswordEncrypted());
 		Assert.assertEquals(
