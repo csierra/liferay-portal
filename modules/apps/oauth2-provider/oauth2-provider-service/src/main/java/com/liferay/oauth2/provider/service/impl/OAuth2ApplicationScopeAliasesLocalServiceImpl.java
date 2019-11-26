@@ -19,6 +19,7 @@ import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
+import com.liferay.oauth2.provider.service.OAuth2Scope;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationScopeAliasesLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,6 +54,24 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 	extends OAuth2ApplicationScopeAliasesLocalServiceBaseImpl {
+
+	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
+			long companyId, long userId, String userName,
+			long oAuth2ApplicationId,
+			Function<OAuth2Scope.Builder, OAuth2Scope.Built> builderFunction)
+		throws PortalException {
+
+		Map<LiferayOAuth2Scope, List<String>> liferayOAuth2ScopesScopeAliases =
+			new HashMap<>();
+
+		builderFunction.apply(
+			new OAuth2ScopeBuilderImpl(
+				companyId, liferayOAuth2ScopesScopeAliases));
+
+		return _addOAuth2ApplicationScopeAliases(
+			companyId, userId, userName, oAuth2ApplicationId,
+			liferayOAuth2ScopesScopeAliases);
+	}
 
 	@Override
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
@@ -326,5 +346,47 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 	@Reference
 	private ScopeLocator _scopeLocator;
+
+	private class OAuth2ScopeBuilderImpl implements OAuth2Scope.Built {
+
+		public OAuth2ScopeBuilderImpl(
+			long companyId,
+			Map<LiferayOAuth2Scope, List<String>>
+				liferayOAuth2ScopesScopeAliases) {
+
+			_companyId = companyId;
+			_liferayOAuth2ScopesScopeAliases = liferayOAuth2ScopesScopeAliases;
+		}
+
+		public ApplicationScope assignScope(
+			String scope, List<String> scopeAliases) {
+
+			_liferayOAuth2ScopesScopeAliases.put(
+				_scopeLocator.getLiferayOAuth2Scope(
+					_companyId, _applicationName, scope),
+				scopeAliases);
+
+			return this::assignScope;
+		}
+
+		@Override
+		public OAuth2Scope.Built forApplication(
+			String applicationName,
+			Function<ApplicationScopeAssigner, ApplicationScope>
+				applicationScopeAssignerFunction) {
+
+			_applicationName = applicationName;
+
+			applicationScopeAssignerFunction.apply(this::assignScope);
+
+			return this;
+		}
+
+		private String _applicationName;
+		private final long _companyId;
+		private final Map<LiferayOAuth2Scope, List<String>>
+			_liferayOAuth2ScopesScopeAliases;
+
+	}
 
 }
