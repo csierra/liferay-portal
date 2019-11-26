@@ -179,7 +179,9 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 				builder -> builder.forApplication(
 					OAuth2ProviderShortcutConstants.APPLICATION_NAME,
 					applicationScopeAssigner ->
-						applicationScopeAssigner.assignScope(_scopesList)
+						applicationScopeAssigner.assignScope(
+							_scopesList,
+							scope -> Collections.singletonList(scope))
 				).forApplication(
 					"Liferay.Segments.Asah.REST",
 					applicationScopeAssigner ->
