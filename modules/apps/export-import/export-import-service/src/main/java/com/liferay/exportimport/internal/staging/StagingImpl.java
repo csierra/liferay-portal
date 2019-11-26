@@ -1708,7 +1708,7 @@ public class StagingImpl implements Staging {
 		HttpPrincipal httpPrincipal = new HttpPrincipal(
 			_stagingURLHelper.buildRemoteURL(
 				stagingGroup.getTypeSettingsProperties()),
-			user.getLogin(), user.getPassword(), user.isPasswordEncrypted());
+			user.getLogin(), null, true);
 
 		Layout layout = _layoutLocalService.fetchLayout(plid);
 
@@ -1739,7 +1739,7 @@ public class StagingImpl implements Staging {
 
 		HttpPrincipal httpPrincipal = new HttpPrincipal(
 			_stagingURLHelper.buildRemoteURL(typeSettingsProperties),
-			user.getLogin(), user.getPassword(), user.isPasswordEncrypted());
+			user.getLogin(), null, true);
 
 		long remoteGroupId = GetterUtil.getLong(
 			typeSettingsProperties.getProperty("remoteGroupId"));
@@ -2007,8 +2007,7 @@ public class StagingImpl implements Staging {
 			HttpPrincipal httpPrincipal = new HttpPrincipal(
 				_stagingURLHelper.buildRemoteURL(
 					stagingGroup.getTypeSettingsProperties()),
-				user.getLogin(), user.getPassword(),
-				user.isPasswordEncrypted());
+				user.getLogin(), null, true);
 
 			return LayoutServiceHttp.hasPortletId(
 				httpPrincipal, plid, portletId);
@@ -2327,8 +2326,7 @@ public class StagingImpl implements Staging {
 			User user = permissionChecker.getUser();
 
 			HttpPrincipal httpPrincipal = new HttpPrincipal(
-				remoteURL, user.getLogin(), user.getPassword(),
-				user.isPasswordEncrypted());
+				remoteURL, user.getLogin(), null, true);
 
 			taskContextMap.put("httpPrincipal", httpPrincipal);
 		}
@@ -3136,8 +3134,7 @@ public class StagingImpl implements Staging {
 			remoteAddress, remotePort, remotePathContext, secureConnection);
 
 		HttpPrincipal httpPrincipal = new HttpPrincipal(
-			remoteURL, user.getLogin(), user.getPassword(),
-			user.isPasswordEncrypted());
+			remoteURL, user.getLogin(), null, true);
 
 		try {
 			currentThread.setContextClassLoader(
@@ -3277,8 +3274,7 @@ public class StagingImpl implements Staging {
 					_stagingURLHelper.buildRemoteURL(
 						remoteAddress, remotePort, remotePathContext,
 						secureConnection),
-					user.getLogin(), user.getPassword(),
-					user.isPasswordEncrypted())
+					user.getLogin(), null, true)
 			).put(
 				"privateLayout", remotePrivateLayout
 			).build();
@@ -3565,8 +3561,7 @@ public class StagingImpl implements Staging {
 				HttpPrincipal httpPrincipal = new HttpPrincipal(
 					_stagingURLHelper.buildRemoteURL(
 						stagingGroup.getTypeSettingsProperties()),
-					user.getLogin(), user.getPassword(),
-					user.isPasswordEncrypted());
+					user.getLogin(), null, true);
 
 				targetLayoutPlid = LayoutServiceHttp.getControlPanelLayoutPlid(
 					httpPrincipal);

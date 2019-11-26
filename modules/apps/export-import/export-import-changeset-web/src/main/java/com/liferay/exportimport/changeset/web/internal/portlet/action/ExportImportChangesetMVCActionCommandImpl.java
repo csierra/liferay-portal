@@ -281,8 +281,7 @@ public class ExportImportChangesetMVCActionCommandImpl
 				HttpPrincipal httpPrincipal = new HttpPrincipal(
 					_stagingURLHelper.buildRemoteURL(
 						stagingGroup.getTypeSettingsProperties()),
-					user.getLogin(), user.getPassword(),
-					user.isPasswordEncrypted());
+					user.getLogin(), null, true);
 
 				Thread currentThread = Thread.currentThread();
 

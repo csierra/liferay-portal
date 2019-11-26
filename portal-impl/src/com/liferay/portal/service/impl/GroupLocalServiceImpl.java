@@ -5071,8 +5071,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			remoteAddress, remotePort, remotePathContext, secureConnection);
 
 		HttpPrincipal httpPrincipal = new HttpPrincipal(
-			remoteURL, user.getLogin(), user.getPassword(),
-			user.isPasswordEncrypted());
+			remoteURL, user.getLogin(), null, true);
 
 		try {
 			currentThread.setContextClassLoader(
