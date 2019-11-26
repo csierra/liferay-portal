@@ -106,10 +106,10 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_scopeAliasesList = new ArrayList<>(_SAP_ENTRY_OBJECT_ARRAYS.length);
+		_scopesList = new ArrayList<>(_SAP_ENTRY_OBJECT_ARRAYS.length);
 
 		for (String[] sapEntryObjectArray : _SAP_ENTRY_OBJECT_ARRAYS) {
-			_scopeAliasesList.add(
+			_scopesList.add(
 				StringUtil.replaceFirst(
 					sapEntryObjectArray[0], "OAUTH2_", StringPool.BLANK));
 		}
@@ -177,7 +177,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 				"https://analytics.liferay.com", 0, _APPLICATION_NAME, null,
 				Collections.singletonList(
 					"https://analytics.liferay.com/oauth/receive"),
-				_scopeAliasesList, new ServiceContext());
+				_scopesList, new ServiceContext());
 
 		Class<?> clazz = getClass();
 
@@ -348,7 +348,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 	@Reference
 	private SAPEntryLocalService _sapEntryLocalService;
 
-	private List<String> _scopeAliasesList;
+	private List<String> _scopesList;
 	private ServiceRegistration<?> _serviceRegistration;
 
 	@Reference
