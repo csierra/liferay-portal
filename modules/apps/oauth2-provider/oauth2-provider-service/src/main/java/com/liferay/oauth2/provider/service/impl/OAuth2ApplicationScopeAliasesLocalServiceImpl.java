@@ -360,7 +360,7 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 		public ApplicationScope assignScope(
 			List<String> scopes,
-			Function<String, List<String>> scopeAliasesFunction) {
+			Function<String, List<String>> scopeMapperFunction) {
 
 			for (String scope : scopes) {
 				_liferayOAuth2ScopesScopeAliases.put(

@@ -44,7 +44,7 @@ public interface OAuth2Scope {
 
 			public ApplicationScope assignScope(
 				List<String> scope,
-				Function<String, List<String>> scopeAliasesFunction);
+				Function<String, List<String>> scopeMapperFunction);
 
 			public default ApplicationScope assignScope(String... scopes) {
 				List<String> scopeList = Arrays.asList(scopes);
