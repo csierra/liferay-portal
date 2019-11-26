@@ -363,10 +363,18 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			Function<String, List<String>> scopeMapperFunction) {
 
 			for (String scope : scopes) {
-				_liferayOAuth2ScopesScopeAliases.put(
+				_liferayOAuth2ScopesScopeAliases.merge(
 					_scopeLocator.getLiferayOAuth2Scope(
 						_companyId, _applicationName, scope),
-					scopeAliasesFunction.apply(scope));
+					scopeMapperFunction.apply(scope),
+					(list1, list2) -> Stream.of(
+						list1, list2
+					).flatMap(
+						Collection::stream
+					).distinct(
+					).collect(
+						Collectors.toList()
+					));
 			}
 
 			return this;
