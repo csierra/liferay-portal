@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.AuthenticatedUserUUIDStoreUtil;
 import com.liferay.portal.kernel.security.auth.Authenticator;
 import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManager;
+import com.liferay.portal.kernel.security.pwd.PasswordHelperUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
@@ -161,7 +162,7 @@ public class AuthenticatedSessionManagerImpl
 			session.setAttribute("j_password", password);
 		}
 		else {
-			session.setAttribute("j_password", user.getPassword());
+			session.setAttribute("j_password", PasswordHelperUtil.getPassword(user.getUserId()));
 		}
 
 		session.setAttribute("j_remoteuser", userIdString);
