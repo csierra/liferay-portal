@@ -186,7 +186,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 						applicationScopeAssigner.assignScope(
 							Arrays.asList(
 								_SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS),
-							Collections.singletonList(
+							__ -> Collections.singletonList(
 								"Liferay.Segments.Asah.REST.everything"))
 				),
 				new ServiceContext());
