@@ -359,12 +359,14 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		}
 
 		public ApplicationScope assignScope(
-			String scope, List<String> scopeAliases) {
+			List<String> scopes, List<String> scopeAliases) {
 
-			_liferayOAuth2ScopesScopeAliases.put(
-				_scopeLocator.getLiferayOAuth2Scope(
-					_companyId, _applicationName, scope),
-				scopeAliases);
+			for (String scope : scopes) {
+				_liferayOAuth2ScopesScopeAliases.put(
+					_scopeLocator.getLiferayOAuth2Scope(
+						_companyId, _applicationName, scope),
+					scopeAliases);
+			}
 
 			return this::assignScope;
 		}
