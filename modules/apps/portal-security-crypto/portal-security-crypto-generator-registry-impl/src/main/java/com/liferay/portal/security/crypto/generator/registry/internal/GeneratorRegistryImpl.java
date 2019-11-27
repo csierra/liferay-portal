@@ -43,7 +43,7 @@ public class GeneratorRegistryImpl implements GeneratorRegistry {
 
 		if (hashGeneratorFactory == null) {
 			throw new IllegalStateException(
-				"There is no generator for algorithm: "+ algorithmName);
+				"There is no generator for algorithm: " + algorithmName);
 		}
 
 		return hashGeneratorFactory.create(algorithmName, generatorMeta);
@@ -59,7 +59,7 @@ public class GeneratorRegistryImpl implements GeneratorRegistry {
 
 		if (hashGeneratorFactory == null) {
 			throw new IllegalStateException(
-				"There is no generator for algorithm: "+ algorithmName);
+				"There is no generator for algorithm: " + algorithmName);
 		}
 
 		return hashGeneratorFactory.create(algorithmName, generatorMeta);

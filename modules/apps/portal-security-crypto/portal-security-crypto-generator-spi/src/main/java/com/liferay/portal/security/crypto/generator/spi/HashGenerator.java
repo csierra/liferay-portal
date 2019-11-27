@@ -22,6 +22,12 @@ import aQute.bnd.annotation.ProviderType;
 @ProviderType
 public interface HashGenerator extends Generator {
 
+	public String generateSalt() throws Exception;
+
+	public byte[] hash(byte[] toBeHashed) throws Exception;
+
+	public byte[] hash(String toBeHashed) throws Exception;
+
 	public HashGenerator withPepper(byte[] pepper) throws Exception;
 
 	public HashGenerator withPepper(String pepper) throws Exception;
@@ -29,11 +35,5 @@ public interface HashGenerator extends Generator {
 	public HashGenerator withSalt(byte[] salt) throws Exception;
 
 	public HashGenerator withSalt(String salt) throws Exception;
-
-	public String generateSalt() throws Exception;
-
-	public byte[] hash(byte[] toBeHashed) throws Exception;
-
-	public byte[] hash(String toBeHashed) throws Exception;
 
 }

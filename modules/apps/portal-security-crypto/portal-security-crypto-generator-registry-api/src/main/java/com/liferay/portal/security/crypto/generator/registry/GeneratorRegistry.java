@@ -15,6 +15,7 @@
 package com.liferay.portal.security.crypto.generator.registry;
 
 import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.security.crypto.generator.spi.HashGenerator;
 
 import org.json.JSONObject;
