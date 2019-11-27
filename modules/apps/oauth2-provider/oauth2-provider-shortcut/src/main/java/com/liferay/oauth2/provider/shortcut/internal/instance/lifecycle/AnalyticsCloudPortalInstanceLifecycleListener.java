@@ -24,6 +24,7 @@ import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.oauth2.provider.service.OAuth2Scope;
 import com.liferay.oauth2.provider.shortcut.internal.constants.OAuth2ProviderShortcutConstants;
 import com.liferay.oauth2.provider.shortcut.internal.spi.scope.finder.OAuth2ProviderShortcutScopeFinder;
 import com.liferay.oauth2.provider.util.OAuth2SecureRandomGenerator;
@@ -176,22 +177,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 				"https://analytics.liferay.com", 0, _APPLICATION_NAME, null,
 				Collections.singletonList(
 					"https://analytics.liferay.com/oauth/receive"),
-				builder -> {
-					builder.forApplication(
-						OAuth2ProviderShortcutConstants.APPLICATION_NAME,
-						applicationScopeAssigner -> _scopesList.forEach(
-							applicationScopeAssigner::assignScope));
-
-					builder.forApplication(
-						"Liferay.Segments.Asah.REST",
-						applicationScopeAssigner -> Arrays.stream(
-							_SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS
-						).forEach(
-							scope -> applicationScopeAssigner.assignScope(
-								scope, "Liferay.Segments.Asah.REST.everything")
-						));
-				},
-				new ServiceContext());
+				this::_buildScopes, new ServiceContext());
 
 		Class<?> clazz = getClass();
 
@@ -263,6 +249,30 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 				userId, sapEntryObjectArray[1], false, true, sapEntryName,
 				titleMap, new ServiceContext());
 		}
+	}
+
+	private void _buildAnalyticsCloudScopes(OAuth2Scope.Builder builder) {
+		builder.forApplication(
+			OAuth2ProviderShortcutConstants.APPLICATION_NAME,
+			applicationScopeAssigner -> _scopesList.forEach(
+				applicationScopeAssigner::assignScope));
+	}
+
+	private void _buildScopes(OAuth2Scope.Builder builder) {
+		_buildAnalyticsCloudScopes(builder);
+
+		_buildSegmentsAsahScopes(builder);
+	}
+
+	private void _buildSegmentsAsahScopes(OAuth2Scope.Builder builder) {
+		builder.forApplication(
+			"Liferay.Segments.Asah.REST",
+			applicationScopeAssigner -> Arrays.stream(
+				_SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS
+			).forEach(
+				scope -> applicationScopeAssigner.assignScope(
+					scope, "Liferay.Segments.Asah.REST.everything")
+			));
 	}
 
 	private static final String _APPLICATION_NAME = "Analytics Cloud";
