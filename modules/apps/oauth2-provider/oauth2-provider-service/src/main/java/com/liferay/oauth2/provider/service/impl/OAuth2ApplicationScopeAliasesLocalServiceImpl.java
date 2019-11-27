@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,13 +58,13 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
 			long companyId, long userId, String userName,
 			long oAuth2ApplicationId,
-			Function<OAuth2Scope.Builder, OAuth2Scope.Built> builderFunction)
+			Consumer<OAuth2Scope.Builder> builderConsumer)
 		throws PortalException {
 
 		Map<LiferayOAuth2Scope, List<String>> liferayOAuth2ScopesScopeAliases =
 			new HashMap<>();
 
-		builderFunction.apply(
+		builderConsumer.accept(
 			new OAuth2ScopeBuilderImpl(
 				companyId, liferayOAuth2ScopesScopeAliases));
 
@@ -347,7 +347,8 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 	private ScopeLocator _scopeLocator;
 
 	private class OAuth2ScopeBuilderImpl
-		implements OAuth2Scope.Built, OAuth2Scope.Builder.ApplicationScope {
+		implements OAuth2Scope.Builder,
+				   OAuth2Scope.Builder.ApplicationScopeAssigner {
 
 		public OAuth2ScopeBuilderImpl(
 			long companyId,
@@ -358,28 +359,22 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			_liferayOAuth2ScopesScopeAliases = liferayOAuth2ScopesScopeAliases;
 		}
 
-		public ApplicationScope assignScope(
-			String scope, List<String> scopeAliases) {
-
+		public void assignScope(String scope, List<String> scopeAliases) {
 			_liferayOAuth2ScopesScopeAliases.put(
 				_scopeLocator.getLiferayOAuth2Scope(
 					_companyId, _applicationName, scope),
 				scopeAliases);
-
-			return this;
 		}
 
 		@Override
-		public OAuth2Scope.Built forApplication(
+		public void forApplication(
 			String applicationName,
-			Function<ApplicationScopeAssigner, ApplicationScope>
-				applicationScopeAssignerFunction) {
+			Consumer<ApplicationScopeAssigner>
+				applicationScopeAssignerConsumer) {
 
 			_applicationName = applicationName;
 
-			applicationScopeAssignerFunction.apply(this);
-
-			return this;
+			applicationScopeAssignerConsumer.accept(this);
 		}
 
 		private String _applicationName;

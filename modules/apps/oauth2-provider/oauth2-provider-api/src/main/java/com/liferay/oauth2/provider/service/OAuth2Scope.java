@@ -16,7 +16,7 @@ package com.liferay.oauth2.provider.service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 /**
  * @author Stian Sigvartsen
@@ -26,35 +26,25 @@ public interface OAuth2Scope {
 
 	public interface Builder {
 
-		public OAuth2Scope.Built forApplication(
+		public void forApplication(
 			String applicationName,
-			Function<ApplicationScopeAssigner, ApplicationScope>
-				applicationScopeAssignerFunction);
-
-		public interface ApplicationScope extends ApplicationScopeAssigner {
-		}
+			Consumer<ApplicationScopeAssigner>
+				applicationScopeAssignerConsumer);
 
 		public interface ApplicationScopeAssigner {
 
-			public default ApplicationScope assignScope(String scope) {
-				return assignScope(scope, Collections.singletonList(scope));
+			public default void assignScope(String scope) {
+				assignScope(scope, Collections.singletonList(scope));
 			}
 
-			public ApplicationScope assignScope(
-				String scope, List<String> scopeAliases);
+			public void assignScope(String scope, List<String> scopeAliases);
 
-			public default ApplicationScope assignScope(
-				String scope, String scopeAlias) {
-
-				return assignScope(
-					scope, Collections.singletonList(scopeAlias));
+			public default void assignScope(String scope, String scopeAlias) {
+				assignScope(scope, Collections.singletonList(scopeAlias));
 			}
 
 		}
 
-	}
-
-	public interface Built extends Builder {
 	}
 
 }
