@@ -40,17 +40,16 @@ public interface OAuth2Scope {
 			public default ApplicationScope assignScope(
 				List<String> scopeList) {
 
-				return assignScope(scopeList, __ -> scopeList);
+				return assignScope(scopeList, scopeList);
 			}
 
 			public ApplicationScope assignScope(
-				List<String> scope,
-				Function<String, List<String>> scopeAliasesFunction);
+				List<String> scope, List<String> scopeAliases);
 
 			public default ApplicationScope assignScope(String... scopes) {
 				List<String> scopeList = Arrays.asList(scopes);
 
-				return assignScope(scopeList, __ -> scopeList);
+				return assignScope(scopeList, scopeList);
 			}
 
 			public default ApplicationScope assignScope(
@@ -58,7 +57,7 @@ public interface OAuth2Scope {
 
 				return assignScope(
 					Collections.singletonList(scope),
-					__ -> Arrays.asList(scopeAlias));
+					Arrays.asList(scopeAlias));
 			}
 
 		}
