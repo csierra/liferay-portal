@@ -19,13 +19,13 @@ package com.liferay.portal.security.crypto.generator.spi;
  */
 public interface HashGenerator extends Generator {
 
-	public HashGenerator addPepper(byte[] pepper) throws Exception;
+	public HashGenerator withPepper(byte[] pepper) throws Exception;
 
-	public HashGenerator addPepper(String pepper) throws Exception;
+	public HashGenerator withPepper(String pepper) throws Exception;
 
-	public HashGenerator addSalt(byte[] salt) throws Exception;
+	public HashGenerator withSalt(byte[] salt) throws Exception;
 
-	public HashGenerator addSalt(String salt) throws Exception;
+	public HashGenerator withSalt(String salt) throws Exception;
 
 	public String generateSalt() throws Exception;
 
