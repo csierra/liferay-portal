@@ -49,8 +49,8 @@ public class OAuth2ApplicationLocalServiceWrapper
 				java.util.List<String> featuresList, String homePageURL,
 				long iconFileEntryId, String name, String privacyPolicyURL,
 				java.util.List<String> redirectURIsList,
-				java.util.function.Function
-					<OAuth2Scope.Builder, OAuth2Scope.Built> builderFunction,
+				java.util.function.Consumer<OAuth2Scope.Builder>
+					builderConsumer,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -58,7 +58,7 @@ public class OAuth2ApplicationLocalServiceWrapper
 			companyId, userId, userName, allowedGrantTypesList,
 			clientCredentialUserId, clientId, clientProfile, clientSecret,
 			description, featuresList, homePageURL, iconFileEntryId, name,
-			privacyPolicyURL, redirectURIsList, builderFunction,
+			privacyPolicyURL, redirectURIsList, builderConsumer,
 			serviceContext);
 	}
 

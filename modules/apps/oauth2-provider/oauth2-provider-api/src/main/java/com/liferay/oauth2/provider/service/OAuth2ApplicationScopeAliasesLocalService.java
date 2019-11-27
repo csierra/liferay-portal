@@ -34,7 +34,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -64,7 +64,7 @@ public interface OAuth2ApplicationScopeAliasesLocalService
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
 			long companyId, long userId, String userName,
 			long oAuth2ApplicationId,
-			Function<OAuth2Scope.Builder, OAuth2Scope.Built> builderFunction)
+			Consumer<OAuth2Scope.Builder> builderConsumer)
 		throws PortalException;
 
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(

@@ -38,7 +38,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -72,7 +72,7 @@ public interface OAuth2ApplicationLocalService
 			String description, List<String> featuresList, String homePageURL,
 			long iconFileEntryId, String name, String privacyPolicyURL,
 			List<String> redirectURIsList,
-			Function<OAuth2Scope.Builder, OAuth2Scope.Built> builderFunction,
+			Consumer<OAuth2Scope.Builder> builderConsumer,
 			ServiceContext serviceContext)
 		throws PortalException;
 
