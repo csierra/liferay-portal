@@ -28,28 +28,28 @@ public interface HashGeneratorFactory {
 	/**
 	 * Construct a {@link com.liferay.portal.security.crypto.generator.spi.HasherGenerator} from given algorithm.
 	 *
-	 * @param generatorName The name of algorithm this generator is associated with
+	 * @param algorithmName The name of algorithm this generator is associated with
 	 * @param generatorMeta A JSON Object of meta info required by some algorithms
 	 * @return An instance of HashGenerator
 	 */
 	public HashGenerator create(
-			String generatorName, JSONObject generatorMeta)
+			String algorithmName, JSONObject generatorMeta)
 		throws Exception;
 
 	/**
 	 * Construct a {@link com.liferay.portal.security.crypto.generator.spi.HasherGenerator} from given algorithm.
 	 *
-	 * @param generatorName The name of algorithm this generator is associated with
+	 * @param algorithmName The name of algorithm this generator is associated with
 	 * @param generatorMeta A JSON Object formatted String of meta info required by some algorithms
 	 * @return An instance of HashGenerator
 	 */
 	public default HashGenerator create(
-			String generatorName, String generatorMeta)
+			String algorithmName, String generatorMeta)
 		throws Exception {
 
 		JSONObject generatorMetaJSONObject = new JSONObject(generatorMeta);
 
-		return create(generatorName, generatorMetaJSONObject);
+		return create(algorithmName, generatorMetaJSONObject);
 	}
 
 }
