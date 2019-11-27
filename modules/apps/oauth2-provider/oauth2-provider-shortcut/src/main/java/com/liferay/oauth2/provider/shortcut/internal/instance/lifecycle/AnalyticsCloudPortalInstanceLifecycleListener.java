@@ -24,7 +24,6 @@ import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
-import com.liferay.oauth2.provider.service.OAuth2Scope;
 import com.liferay.oauth2.provider.shortcut.internal.constants.OAuth2ProviderShortcutConstants;
 import com.liferay.oauth2.provider.shortcut.internal.spi.scope.finder.OAuth2ProviderShortcutScopeFinder;
 import com.liferay.oauth2.provider.util.OAuth2SecureRandomGenerator;
@@ -68,6 +67,7 @@ import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalSe
 import java.io.InputStream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
@@ -176,37 +176,21 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 				"https://analytics.liferay.com", 0, _APPLICATION_NAME, null,
 				Collections.singletonList(
 					"https://analytics.liferay.com/oauth/receive"),
-				builder -> builder.forApplication(
-					OAuth2ProviderShortcutConstants.APPLICATION_NAME,
-					applicationScopeAssigner -> {
-						OAuth2Scope.Builder.ApplicationScope applicationScope =
-							null;
+				builder -> {
+					builder.forApplication(
+						OAuth2ProviderShortcutConstants.APPLICATION_NAME,
+						applicationScopeAssigner -> _scopesList.forEach(
+							applicationScopeAssigner::assignScope));
 
-						for (String scope : _scopesList) {
-							applicationScope =
-								applicationScopeAssigner.assignScope(scope);
-						}
-
-						return applicationScope;
-					}
-				).forApplication(
-					"Liferay.Segments.Asah.REST",
-					applicationScopeAssigner -> {
-						OAuth2Scope.Builder.ApplicationScope applicationScope =
-							null;
-
-						for (String scope :
-								_SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS) {
-
-							applicationScope =
-								applicationScopeAssigner.assignScope(
-									scope,
-									"Liferay.Segments.Asah.REST.everything");
-						}
-
-						return applicationScope;
-					}
-				),
+					builder.forApplication(
+						"Liferay.Segments.Asah.REST",
+						applicationScopeAssigner -> Arrays.stream(
+							_SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS
+						).forEach(
+							scope -> applicationScopeAssigner.assignScope(
+								scope, "Liferay.Segments.Asah.REST.everything")
+						));
+				},
 				new ServiceContext());
 
 		Class<?> clazz = getClass();
