@@ -363,7 +363,8 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		}
 
 		public ApplicationScope assignScope(Collection<String> scope) {
-			_flush();
+			_flushScopes();
+
 			_scopes.addAll(scope);
 
 			return this;
@@ -379,7 +380,7 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 			applicationScopeAssignerConsumer.accept(this);
 
-			_flush();
+			_flushScopes();
 		}
 
 		@Override
@@ -387,7 +388,7 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			_scopeAliases = scopeAliases;
 		}
 
-		private void _flush() {
+		private void _flushScopes() {
 			_scopes.forEach(
 				scope -> _liferayOAuth2ScopesScopeAliases.merge(
 					_scopeLocator.getLiferayOAuth2Scope(
