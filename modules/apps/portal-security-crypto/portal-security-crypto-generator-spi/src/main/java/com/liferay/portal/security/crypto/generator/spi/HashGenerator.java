@@ -14,9 +14,12 @@
 
 package com.liferay.portal.security.crypto.generator.spi;
 
+import aQute.bnd.annotation.ProviderType;
+
 /**
  * @author Arthur Chan
  */
+@ProviderType
 public interface HashGenerator extends Generator {
 
 	public HashGenerator withPepper(byte[] pepper) throws Exception;

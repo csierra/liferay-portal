@@ -14,6 +14,7 @@
 
 package com.liferay.portal.security.crypto.generator.spi.factory;
 
+import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.security.crypto.generator.spi.HashGenerator;
 
 import org.json.JSONObject;
@@ -21,6 +22,7 @@ import org.json.JSONObject;
 /**
  * @author Arthur Chan
  */
+@ProviderType
 public interface HashGeneratorFactory {
 
 	/**
