@@ -35,13 +35,13 @@ public class GeneratorRegistryImpl implements GeneratorRegistry {
 
 	@Override
 	public HashGenerator getHashGenerator(
-			String generatorName, JSONObject generatorMeta)
+			String algorithmName, JSONObject generatorMeta)
 		throws Exception {
 
 		HashGeneratorFactory hashGeneratorFactory =
-			_hashGeneratorFactories.getService(generatorName);
+			_hashGeneratorFactories.getService(algorithmName);
 
-		return hashGeneratorFactory.create(generatorName, generatorMeta);
+		return hashGeneratorFactory.create(algorithmName, generatorMeta);
 	}
 
 	@Override
