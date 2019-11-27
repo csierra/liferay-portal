@@ -362,9 +362,9 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			_scopeAliases = new ArrayList<>();
 		}
 
-		public ApplicationScope assignScope(Collection<String> scope) {
+		public ApplicationScope assignScope(Collection<String> scopes) {
 			_flush();
-			_scopes.addAll(scope);
+			_scopes.addAll(scopes);
 
 			return this;
 		}

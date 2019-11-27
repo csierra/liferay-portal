@@ -33,7 +33,7 @@ public interface OAuth2Scope {
 
 		public interface ApplicationScope {
 
-			public void mapToScopeAlias(Collection<String> scopeAlias);
+			public void mapToScopeAlias(Collection<String> scopeAliases);
 
 			public default void mapToScopeAlias(String... scopeAlias) {
 				mapToScopeAlias(Arrays.asList(scopeAlias));
@@ -43,7 +43,7 @@ public interface OAuth2Scope {
 
 		public interface ApplicationScopeAssigner {
 
-			public ApplicationScope assignScope(Collection<String> scope);
+			public ApplicationScope assignScope(Collection<String> scopes);
 
 			public default ApplicationScope assignScope(String... scope) {
 				return assignScope(Arrays.asList(scope));
