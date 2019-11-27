@@ -79,7 +79,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -104,7 +104,7 @@ public class OAuth2ApplicationLocalServiceImpl
 			String description, List<String> featuresList, String homePageURL,
 			long iconFileEntryId, String name, String privacyPolicyURL,
 			List<String> redirectURIsList,
-			Function<OAuth2Scope.Builder, OAuth2Scope.Built> builderFunction,
+			Consumer<OAuth2Scope.Builder> builderConsumer,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -159,12 +159,12 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
 
-		if (builderFunction != null) {
+		if (builderConsumer != null) {
 			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
 				_oAuth2ApplicationScopeAliasesLocalService.
 					addOAuth2ApplicationScopeAliases(
 						companyId, userId, userName, oAuth2ApplicationId,
-						builderFunction);
+						builderConsumer);
 
 			oAuth2Application.setOAuth2ApplicationScopeAliasesId(
 				oAuth2ApplicationScopeAliases.
