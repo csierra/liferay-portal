@@ -41,6 +41,11 @@ public class GeneratorRegistryImpl implements GeneratorRegistry {
 		HashGeneratorFactory hashGeneratorFactory =
 			_hashGeneratorFactories.getService(algorithmName);
 
+		if (hashGeneratorFactory == null) {
+			throw new IllegalStateException(
+				"There is no generator for algorithm: "+ algorithmName);
+		}
+
 		return hashGeneratorFactory.create(algorithmName, generatorMeta);
 	}
 
@@ -51,6 +56,11 @@ public class GeneratorRegistryImpl implements GeneratorRegistry {
 
 		HashGeneratorFactory hashGeneratorFactory =
 			_hashGeneratorFactories.getService(algorithmName);
+
+		if (hashGeneratorFactory == null) {
+			throw new IllegalStateException(
+				"There is no generator for algorithm: "+ algorithmName);
+		}
 
 		return hashGeneratorFactory.create(algorithmName, generatorMeta);
 	}
