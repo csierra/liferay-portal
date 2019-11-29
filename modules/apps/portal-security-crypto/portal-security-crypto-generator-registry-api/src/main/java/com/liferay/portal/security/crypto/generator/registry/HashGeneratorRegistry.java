@@ -14,6 +14,8 @@
 
 package com.liferay.portal.security.crypto.generator.registry;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.security.crypto.generator.spi.HashGenerator;
 
 import java.util.Set;
@@ -23,6 +25,7 @@ import org.json.JSONObject;
 /**
  * @author Arthur Chan
  */
+@ProviderType
 public interface HashGeneratorRegistry {
 
 	public HashGenerator getHashGenerator(
