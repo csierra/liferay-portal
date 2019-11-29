@@ -14,11 +14,20 @@
 
 package com.liferay.portal.security.crypto.generator.spi;
 
+import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.security.SecureRandomUtil;
+
 /**
  * @author Carlos Sierra Andrés
  */
 public interface VariableLengthSaltGenerator extends SaltGenerator {
 
-	public byte[] generateSalt(long size);
+	public default byte[] generateSalt(int size) {
+		byte[] saltBytes = new byte[size];
+
+		BigEndianCodec.putLong(saltBytes, 0, SecureRandomUtil.nextLong());
+
+		return saltBytes;
+	}
 
 }
