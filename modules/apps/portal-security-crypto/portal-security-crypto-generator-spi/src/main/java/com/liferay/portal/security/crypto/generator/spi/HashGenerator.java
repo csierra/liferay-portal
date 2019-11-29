@@ -23,7 +23,7 @@ public interface HashGenerator extends Generator {
 
 	public default HashGenerator withPepper(String pepper) throws Exception {
 		if (pepper == null) {
-			throw new Exception("Do not with null for pepper");
+			throw new IllegalArgumentException("pepper can not be null");
 		}
 
 		return withPepper(pepper.getBytes());
@@ -33,7 +33,7 @@ public interface HashGenerator extends Generator {
 
 	public default HashGenerator withSalt(String salt) throws Exception {
 		if (salt == null) {
-			throw new Exception("Do not with null for salt");
+			throw new IllegalArgumentException("salt can not be null");
 		}
 
 		return withSalt(salt.getBytes());
@@ -45,7 +45,7 @@ public interface HashGenerator extends Generator {
 
 	public default byte[] hash(String toBeHashed) throws Exception {
 		if (toBeHashed == null) {
-			throw new Exception("Unable to hash null");
+			throw new IllegalArgumentException("toBeHashed can not be null");
 		}
 
 		return hash(toBeHashed.getBytes());
