@@ -22,7 +22,7 @@ import aQute.bnd.annotation.ProviderType;
 @ProviderType
 public interface HashGenerator extends Generator {
 
-	public String generateSalt() throws Exception;
+	public SaltGenerator getSaltGenerator() throws Exception;
 
 	public byte[] hash(byte[] toBeHashed) throws Exception;
 

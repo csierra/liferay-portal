@@ -14,28 +14,20 @@
 
 package com.liferay.portal.security.crypto.generator.spi;
 
+import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.security.SecureRandomUtil;
+
 /**
- * @author Arthur Chan
+ * @author Carlos Sierra Andrés
  */
-public abstract class AbstractHashGenerator implements HashGenerator {
+public interface VariableLengthSaltGenerator extends SaltGenerator {
 
-	public HashGenerator withPepper(byte[] pepper) throws Exception {
-		if (pepper == null) {
-			throw new IllegalArgumentException("pepper can not be null");
-		}
+	public default byte[] generateSalt(int size) {
+		byte[] saltBytes = new byte[size];
 
-		return withPepper(new String(pepper));
+		BigEndianCodec.putLong(saltBytes, 0, SecureRandomUtil.nextLong());
+
+		return saltBytes;
 	}
-
-	public HashGenerator withSalt(byte[] salt) throws Exception {
-		if (salt == null) {
-			throw new IllegalArgumentException("salt can not be null");
-		}
-
-		return withSalt(new String(salt));
-	}
-
-	protected byte[] pepper = new byte[0];
-	protected byte[] salt = new byte[0];
 
 }
