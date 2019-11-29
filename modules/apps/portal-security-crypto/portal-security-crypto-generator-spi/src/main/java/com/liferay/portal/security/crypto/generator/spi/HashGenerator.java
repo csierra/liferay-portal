@@ -26,32 +26,8 @@ public interface HashGenerator extends Generator {
 
 	public byte[] hash(byte[] toBeHashed) throws Exception;
 
-	public default byte[] hash(String toBeHashed) throws Exception {
-		if (toBeHashed == null) {
-			throw new IllegalArgumentException("toBeHashed can not be null");
-		}
-
-		return hash(toBeHashed.getBytes());
-	}
-
 	public HashGenerator withPepper(byte[] pepper) throws Exception;
 
-	public default HashGenerator withPepper(String pepper) throws Exception {
-		if (pepper == null) {
-			throw new IllegalArgumentException("pepper can not be null");
-		}
-
-		return withPepper(pepper.getBytes());
-	}
-
 	public HashGenerator withSalt(byte[] salt) throws Exception;
-
-	public default HashGenerator withSalt(String salt) throws Exception {
-		if (salt == null) {
-			throw new IllegalArgumentException("salt can not be null");
-		}
-
-		return withSalt(salt.getBytes());
-	}
 
 }
