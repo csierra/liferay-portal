@@ -23,20 +23,20 @@ import com.liferay.portal.kernel.util.Base64;
  */
 public abstract class AbstractHashGenerator implements HashGenerator {
 
-	public HashGenerator addPepper(byte[] pepper) throws Exception {
+	public HashGenerator withPepper(byte[] pepper) throws Exception {
 		if (pepper == null) {
-			throw new Exception("Do not add null for pepper");
+			throw new Exception("Do not with null for pepper");
 		}
 
-		return addPepper(new String(pepper));
+		return withPepper(new String(pepper));
 	}
 
-	public HashGenerator addSalt(byte[] salt) throws Exception {
+	public HashGenerator withSalt(byte[] salt) throws Exception {
 		if (salt == null) {
-			throw new Exception("Do not add null for salt");
+			throw new Exception("Do not with null for salt");
 		}
 
-		return addSalt(new String(salt));
+		return withSalt(new String(salt));
 	}
 
 	public String generateSalt() throws Exception {
