@@ -23,6 +23,14 @@ import com.liferay.portal.kernel.util.Base64;
  */
 public abstract class AbstractHashGenerator implements HashGenerator {
 
+	public String generateSalt() throws Exception {
+		byte[] saltBytes = new byte[Long.BYTES];
+
+		BigEndianCodec.putLong(saltBytes, 0, SecureRandomUtil.nextLong());
+
+		return Base64.encode(saltBytes);
+	}
+
 	public HashGenerator withPepper(byte[] pepper) throws Exception {
 		if (pepper == null) {
 			throw new IllegalArgumentException("pepper can not be null");
@@ -37,14 +45,6 @@ public abstract class AbstractHashGenerator implements HashGenerator {
 		}
 
 		return withSalt(new String(salt));
-	}
-
-	public String generateSalt() throws Exception {
-		byte[] saltBytes = new byte[Long.BYTES];
-
-		BigEndianCodec.putLong(saltBytes, 0, SecureRandomUtil.nextLong());
-
-		return Base64.encode(saltBytes);
 	}
 
 	protected byte[] pepper = new byte[0];

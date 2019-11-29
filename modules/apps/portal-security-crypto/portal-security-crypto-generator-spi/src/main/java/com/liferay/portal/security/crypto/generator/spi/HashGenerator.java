@@ -14,10 +14,25 @@
 
 package com.liferay.portal.security.crypto.generator.spi;
 
+import aQute.bnd.annotation.ProviderType;
+
 /**
  * @author Arthur Chan
  */
+@ProviderType
 public interface HashGenerator extends Generator {
+
+	public String generateSalt() throws Exception;
+
+	public byte[] hash(byte[] toBeHashed) throws Exception;
+
+	public default byte[] hash(String toBeHashed) throws Exception {
+		if (toBeHashed == null) {
+			throw new IllegalArgumentException("toBeHashed can not be null");
+		}
+
+		return hash(toBeHashed.getBytes());
+	}
 
 	public HashGenerator withPepper(byte[] pepper) throws Exception;
 
@@ -37,18 +52,6 @@ public interface HashGenerator extends Generator {
 		}
 
 		return withSalt(salt.getBytes());
-	}
-
-	public String generateSalt() throws Exception;
-
-	public byte[] hash(byte[] toBeHashed) throws Exception;
-
-	public default byte[] hash(String toBeHashed) throws Exception {
-		if (toBeHashed == null) {
-			throw new IllegalArgumentException("toBeHashed can not be null");
-		}
-
-		return hash(toBeHashed.getBytes());
 	}
 
 }
