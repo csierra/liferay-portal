@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.util.Base64;
  */
 public abstract class AbstractHashGenerator implements HashGenerator {
 
-	public String generateSalt() throws Exception {
+	public String getSaltGenerator() throws Exception {
 		byte[] saltBytes = new byte[Long.BYTES];
 
 		BigEndianCodec.putLong(saltBytes, 0, SecureRandomUtil.nextLong());
