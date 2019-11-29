@@ -19,24 +19,24 @@ package com.liferay.portal.security.crypto.generator.spi;
  */
 public interface HashGenerator extends Generator {
 
-	public HashGenerator addPepper(byte[] pepper) throws Exception;
+	public HashGenerator withPepper(byte[] pepper) throws Exception;
 
-	public default HashGenerator addPepper(String pepper) throws Exception {
+	public default HashGenerator withPepper(String pepper) throws Exception {
 		if (pepper == null) {
-			throw new Exception("Do not add null for pepper");
+			throw new Exception("Do not with null for pepper");
 		}
 
-		return addPepper(pepper.getBytes());
+		return withPepper(pepper.getBytes());
 	}
 
-	public HashGenerator addSalt(byte[] salt) throws Exception;
+	public HashGenerator withSalt(byte[] salt) throws Exception;
 
-	public default HashGenerator addSalt(String salt) throws Exception {
+	public default HashGenerator withSalt(String salt) throws Exception {
 		if (salt == null) {
-			throw new Exception("Do not add null for salt");
+			throw new Exception("Do not with null for salt");
 		}
 
-		return addSalt(salt.getBytes());
+		return withSalt(salt.getBytes());
 	}
 
 	public String generateSalt() throws Exception;
