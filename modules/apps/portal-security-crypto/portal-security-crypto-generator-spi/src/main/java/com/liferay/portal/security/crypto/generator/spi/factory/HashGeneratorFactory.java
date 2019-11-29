@@ -30,7 +30,7 @@ public interface HashGeneratorFactory {
 	 * @param generatorMeta A JSON Object of meta info required by some algorithms
 	 * @return An instance of HashGenerator
 	 */
-	public HashGenerator getGenerator(
+	public HashGenerator create(
 			String generatorName, JSONObject generatorMeta)
 		throws Exception;
 
@@ -41,13 +41,13 @@ public interface HashGeneratorFactory {
 	 * @param generatorMetaJSON A JSON Object formatted String of meta info required by some algorithms
 	 * @return An instance of HashGenerator
 	 */
-	public default HashGenerator getGenerator(
+	public default HashGenerator create(
 			String generatorName, String generatorMetaJSON)
 		throws Exception {
 
 		JSONObject generatorMetaJSONObject = new JSONObject(generatorMetaJSON);
 
-		return getGenerator(generatorName, generatorMetaJSONObject);
+		return create(generatorName, generatorMetaJSONObject);
 	}
 
 }

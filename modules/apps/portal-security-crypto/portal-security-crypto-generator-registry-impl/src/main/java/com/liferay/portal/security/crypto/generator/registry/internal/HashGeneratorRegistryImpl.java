@@ -43,7 +43,7 @@ public class HashGeneratorRegistryImpl implements HashGeneratorRegistry {
 		HashGeneratorFactory hashGeneratorFactory =
 			_hashGeneratorFactories.getService(generatorName);
 
-		return hashGeneratorFactory.getGenerator(generatorName, generatorMeta);
+		return hashGeneratorFactory.create(generatorName, generatorMeta);
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class HashGeneratorRegistryImpl implements HashGeneratorRegistry {
 		HashGeneratorFactory hashGeneratorFactory =
 			_hashGeneratorFactories.getService(generatorName);
 
-		return hashGeneratorFactory.getGenerator(
+		return hashGeneratorFactory.create(
 			generatorName, generatorMetaJSON);
 	}
 
