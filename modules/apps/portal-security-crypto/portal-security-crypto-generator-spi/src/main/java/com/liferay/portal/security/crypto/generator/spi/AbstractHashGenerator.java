@@ -24,7 +24,9 @@ public abstract class AbstractHashGenerator implements HashGenerator {
 			throw new IllegalArgumentException("pepper can not be null");
 		}
 
-		return withPepper(new String(pepper));
+		this.pepper = pepper;
+
+		return this;
 	}
 
 	public HashGenerator withSalt(byte[] salt) throws Exception {
@@ -32,7 +34,9 @@ public abstract class AbstractHashGenerator implements HashGenerator {
 			throw new IllegalArgumentException("salt can not be null");
 		}
 
-		return withSalt(new String(salt));
+		this.salt = salt;
+
+		return this;
 	}
 
 	protected byte[] pepper = new byte[0];
