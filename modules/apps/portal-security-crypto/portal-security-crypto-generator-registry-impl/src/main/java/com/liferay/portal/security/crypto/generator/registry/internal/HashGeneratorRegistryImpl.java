@@ -54,8 +54,7 @@ public class HashGeneratorRegistryImpl implements HashGeneratorRegistry {
 		HashGeneratorFactory hashGeneratorFactory =
 			_hashGeneratorFactories.getService(generatorName);
 
-		return hashGeneratorFactory.create(
-			generatorName, generatorMetaJSON);
+		return hashGeneratorFactory.create(generatorName, generatorMetaJSON);
 	}
 
 	@Override

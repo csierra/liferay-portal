@@ -33,8 +33,7 @@ public interface HashGeneratorFactory {
 	 * @param generatorMeta A JSON Object of meta info required by some algorithms
 	 * @return An instance of HashGenerator
 	 */
-	public HashGenerator create(
-			String generatorName, JSONObject generatorMeta)
+	public HashGenerator create(String generatorName, JSONObject generatorMeta)
 		throws Exception;
 
 	/**
