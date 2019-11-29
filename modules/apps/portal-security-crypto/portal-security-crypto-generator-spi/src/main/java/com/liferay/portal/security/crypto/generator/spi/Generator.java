@@ -14,9 +14,12 @@
 
 package com.liferay.portal.security.crypto.generator.spi;
 
+import aQute.bnd.annotation.ProviderType;
+
 /**
  * @author Arthur Chan
  */
+@ProviderType
 public interface Generator {
 
 	public String[] getGeneratorNames();
