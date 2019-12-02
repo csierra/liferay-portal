@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.security.crypto.generator.spi;
+package com.liferay.portal.security.crypto.generator.spi.hashing;
 
 /**
  * @author Arthur Chan

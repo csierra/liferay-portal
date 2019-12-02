@@ -12,22 +12,25 @@
  * details.
  */
 
-package com.liferay.portal.security.crypto.generator.spi;
+package com.liferay.portal.security.crypto.generator.spi.hashing;
 
-import com.liferay.portal.kernel.io.BigEndianCodec;
-import com.liferay.portal.kernel.security.SecureRandomUtil;
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.security.crypto.generator.spi.Generator;
+import com.liferay.portal.security.crypto.generator.spi.hashing.salt.SaltGenerator;
 
 /**
- * @author Carlos Sierra Andrés
+ * @author Arthur Chan
  */
-public interface VariableLengthSaltGenerator extends SaltGenerator {
+@ProviderType
+public interface HashGenerator extends Generator {
 
-	public default byte[] generateSalt(int size) {
-		byte[] saltBytes = new byte[size];
+	public SaltGenerator getSaltGenerator() throws Exception;
 
-		BigEndianCodec.putLong(saltBytes, 0, SecureRandomUtil.nextLong());
+	public byte[] hash(byte[] toBeHashed) throws Exception;
 
-		return saltBytes;
-	}
+	public HashGenerator withPepper(byte[] pepper) throws Exception;
+
+	public HashGenerator withSalt(byte[] salt) throws Exception;
 
 }

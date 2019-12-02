@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.portal.security.crypto.generator.spi.factory;
+package com.liferay.portal.security.crypto.generator.spi.hashing.factory;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.security.crypto.generator.spi.HashGenerator;
+import com.liferay.portal.security.crypto.generator.spi.hashing.HashGenerator;
 
 import org.json.JSONObject;
 
@@ -27,7 +27,7 @@ import org.json.JSONObject;
 public interface HashGeneratorFactory {
 
 	/**
-	 * Construct a {@link com.liferay.portal.security.crypto.generator.spi.HasherGenerator} from given algorithm.
+	 * Construct a {@link com.liferay.portal.security.crypto.generator.spi.hashing.HasherGenerator} from given algorithm.
 	 *
 	 * @param generatorName The name of algorithm this generator is associated with
 	 * @param generatorMeta A JSON Object of meta info required by some algorithms
@@ -37,7 +37,7 @@ public interface HashGeneratorFactory {
 		throws Exception;
 
 	/**
-	 * Construct a {@link com.liferay.portal.security.crypto.generator.spi.HasherGenerator} from given algorithm.
+	 * Construct a {@link com.liferay.portal.security.crypto.generator.spi.hashing.HasherGenerator} from given algorithm.
 	 *
 	 * @param generatorName The name of algorithm this generator is associated with
 	 * @param generatorMetaJSON A JSON Object formatted String of meta info required by some algorithms
