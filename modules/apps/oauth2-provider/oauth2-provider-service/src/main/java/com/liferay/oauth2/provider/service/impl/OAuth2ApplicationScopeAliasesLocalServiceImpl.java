@@ -222,6 +222,10 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setScopeLocator(ScopeLocator scopeLocator) {
+		_scopeLocator = scopeLocator;
+	}
 	private OAuth2ApplicationScopeAliases _addOAuth2ApplicationScopeAliases(
 			long companyId, long userId, String userName,
 			long oAuth2ApplicationId,
@@ -343,10 +347,9 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
 
-	@Reference
 	private ScopeLocator _scopeLocator;
 
-	private class OAuth2ScopeBuilderImpl
+	protected class OAuth2ScopeBuilderImpl
 		implements OAuth2Scope.Builder,
 				   OAuth2Scope.Builder.ApplicationScopeAssigner,
 				   OAuth2Scope.Builder.ApplicationScope {
