@@ -253,8 +253,8 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 	private void _buildAnalyticsCloudScopes(OAuth2Scope.Builder builder) {
 		builder.forApplication(
 			OAuth2ProviderShortcutConstants.APPLICATION_NAME,
-			applicationScopeAssigner -> applicationScopeAssigner.assignScope(
-				_scopesList));
+			applicationScopeAssigner -> _scopesList.forEach(
+				applicationScopeAssigner::assignScope));
 	}
 
 	private void _buildScopes(OAuth2Scope.Builder builder) {
