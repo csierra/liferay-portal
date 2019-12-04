@@ -46,7 +46,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * @author Stian Sigvartsen
  */
 @RunWith(PowerMockRunner.class)
-public class OAuth2ScopeBuilderTest extends PowerMockito {
+public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 
 	@Test
 	public void testApplicationIsolation() {
