@@ -17,15 +17,11 @@ package com.liferay.oauth2.provider.service.impl;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.not;
 
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-
-import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.service.OAuth2Scope;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,13 +37,8 @@ import java.util.stream.Stream;
 import org.apache.commons.compress.utils.Sets;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.mockito.Mockito;
-
-import org.osgi.framework.Bundle;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -57,29 +48,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
  */
 @RunWith(PowerMockRunner.class)
 public class OAuth2ScopeBuilderTest extends PowerMockito {
-
-	@Before
-	public void setUp() {
-		_oAuth2ApplicationScopeAliasesLocalServiceImpl =
-			new OAuth2ApplicationScopeAliasesLocalServiceImpl();
-
-		ScopeLocator scopeLocator = Mockito.mock(ScopeLocator.class);
-
-		when(
-			scopeLocator.getLiferayOAuth2Scope(
-				anyLong(), anyString(), anyString())
-		).thenAnswer(
-			invocation -> {
-				Object[] arguments = invocation.getArguments();
-
-				return new TestLiferayOAuth2Scope(
-					(String)arguments[1], (String)arguments[2]);
-			}
-		);
-
-		_oAuth2ApplicationScopeAliasesLocalServiceImpl.setScopeLocator(
-			scopeLocator);
-	}
 
 	@Test
 	public void testApplicationIsolation() {
@@ -94,8 +62,8 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 			(applicationName, scope) ->
 				applicationName + StringPool.PERIOD + scope;
 
-		Map<LiferayOAuth2Scope, Set<String>> liferayOAuth2ScopesScopeAliases =
-			_exerciseBuilder(
+		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
+			simpeEntryScopeAliases = _exerciseBuilder(
 				builder -> {
 					builder.forApplication(
 						applicationName1,
@@ -118,15 +86,14 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 							));
 				});
 
-		liferayOAuth2ScopesScopeAliases.forEach(
+		simpeEntryScopeAliases.forEach(
 			(key, value) -> {
 				Assert.assertThat(value, not(hasItems(scopes)));
 				Assert.assertEquals(1, value.size());
 				Assert.assertThat(
 					value,
 					hasItems(
-						scopeAliasFunction.apply(
-							key.getApplicationName(), scopeAlias)));
+						scopeAliasFunction.apply(key.getKey(), scopeAlias)));
 			});
 	}
 
@@ -141,8 +108,8 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 				"Test.Application2", Sets.newHashSet("application2.everything")
 			).build();
 
-		Map<LiferayOAuth2Scope, Set<String>> liferayOAuth2ScopesScopeAliases =
-			_exerciseBuilder(
+		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
+			simpeEntryScopeAliases = _exerciseBuilder(
 				builder -> applicationScopeAlias.forEach(
 					(applicationName, scopeAliases) -> builder.forApplication(
 						applicationName,
@@ -153,11 +120,11 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 								scopeAliases
 							))));
 
-		liferayOAuth2ScopesScopeAliases.forEach(
+		simpeEntryScopeAliases.forEach(
 			(key, value) -> {
 				Assert.assertThat(value, not(hasItems(scopes)));
 				Assert.assertEquals(
-					value, applicationScopeAlias.get(key.getApplicationName()));
+					value, applicationScopeAlias.get(key.getKey()));
 			});
 	}
 
@@ -169,8 +136,8 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 
 		String scopeAlias = "everything";
 
-		Map<LiferayOAuth2Scope, Set<String>> liferayOAuth2ScopesScopeAliases =
-			_exerciseBuilder(
+		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
+			simpeEntryScopeAliases = _exerciseBuilder(
 				builder -> builder.forApplication(
 					applicationName,
 					applicationScopeAssigner ->
@@ -180,7 +147,7 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 							scopeAlias
 						)));
 
-		liferayOAuth2ScopesScopeAliases.forEach(
+		simpeEntryScopeAliases.forEach(
 			(key, value) -> {
 				Assert.assertThat(value, not(hasItems(scopes)));
 				Assert.assertEquals(1, value.size());
@@ -197,8 +164,8 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 
 		Collection<String> scopeAlias = Collections.singleton("everything");
 
-		Map<LiferayOAuth2Scope, Set<String>> liferayOAuth2ScopesScopeAliases =
-			_exerciseBuilder(
+		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
+			simpeEntryScopeAliases = _exerciseBuilder(
 				builder -> builder.forApplication(
 					applicationName,
 					applicationScopeAssigner -> {
@@ -216,14 +183,14 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 					}));
 
 		Assert.assertEquals(
-			liferayOAuth2ScopesScopeAliases.toString(), 2,
-			liferayOAuth2ScopesScopeAliases.size());
+			simpeEntryScopeAliases.toString(), 2,
+			simpeEntryScopeAliases.size());
 
-		liferayOAuth2ScopesScopeAliases.forEach(
+		simpeEntryScopeAliases.forEach(
 			(key, value) -> {
 				Assert.assertEquals(scopeAlias, value);
 
-				scopes.remove(key.getScope());
+				scopes.remove(key.getValue());
 			});
 
 		Assert.assertEquals(scopes.toString(), 0, scopes.size());
@@ -239,8 +206,8 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 
 		// Test assigning scopes using Collection
 
-		Map<LiferayOAuth2Scope, Set<String>> liferayOAuth2ScopesScopeAliases1 =
-			_exerciseBuilder(
+		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
+			simpeEntryScopeAliases1 = _exerciseBuilder(
 				builder -> builder.forApplication(
 					applicationName,
 					applicationScopeAssigner ->
@@ -248,13 +215,13 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 
 		// Test that the resulting scope aliases all map to all scopes
 
-		liferayOAuth2ScopesScopeAliases1.forEach(
+		simpeEntryScopeAliases1.forEach(
 			(key, value) -> Assert.assertEquals(value, scopes));
 
 		// Repeat using VarArgs
 
-		Map<LiferayOAuth2Scope, Set<String>> liferayOAuth2ScopesScopeAliases2 =
-			_exerciseBuilder(
+		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
+			simpeEntryScopeAliases2 = _exerciseBuilder(
 				builder -> builder.forApplication(
 					applicationName,
 					applicationScopeAssigner ->
@@ -263,26 +230,25 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 		// Assert the result is identical
 
 		Assert.assertEquals(
-			liferayOAuth2ScopesScopeAliases2.toString(),
-			liferayOAuth2ScopesScopeAliases1.size(),
-			liferayOAuth2ScopesScopeAliases2.size());
+			simpeEntryScopeAliases2.toString(), simpeEntryScopeAliases1.size(),
+			simpeEntryScopeAliases2.size());
 
-		Set<Map.Entry<LiferayOAuth2Scope, Set<String>>> entrySet =
-			liferayOAuth2ScopesScopeAliases1.entrySet();
+		Set<Map.Entry<AbstractMap.SimpleEntry<String, String>, Set<String>>>
+			entrySet = simpeEntryScopeAliases1.entrySet();
 
-		Stream<Map.Entry<LiferayOAuth2Scope, Set<String>>> stream =
-			entrySet.stream();
+		Stream<Map.Entry<AbstractMap.SimpleEntry<String, String>, Set<String>>>
+			stream = entrySet.stream();
 
 		Assert.assertTrue(
 			stream.allMatch(
 				entry -> Objects.equals(
 					entry.getValue(),
-					liferayOAuth2ScopesScopeAliases2.get(entry.getKey()))));
+					simpeEntryScopeAliases2.get(entry.getKey()))));
 
 		// Test separate calls result in each scope mapping to a different scope
 		// alias
 
-		liferayOAuth2ScopesScopeAliases1 = _exerciseBuilder(
+		simpeEntryScopeAliases1 = _exerciseBuilder(
 			builder -> builder.forApplication(
 				applicationName,
 				applicationScopeAssigner -> {
@@ -290,87 +256,31 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 					applicationScopeAssigner.assignScope(scopesArray[1]);
 				}));
 
-		liferayOAuth2ScopesScopeAliases1.forEach(
+		simpeEntryScopeAliases1.forEach(
 			(key, value) -> Assert.assertEquals(
-				Collections.singleton(key.getScope()), value));
+				Collections.singleton(key.getValue()), value));
 	}
 
-	public class TestLiferayOAuth2Scope implements LiferayOAuth2Scope {
+	private Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
+		_exerciseBuilder(Consumer<OAuth2Scope.Builder> builderConsumer) {
 
-		public TestLiferayOAuth2Scope(String applicationName, String scope) {
-			_applicationName = applicationName;
-			_scope = scope;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-
-			LiferayOAuth2Scope liferayOAuth2Scope = (LiferayOAuth2Scope)obj;
-
-			if (Objects.equals(
-					getApplicationName(),
-					liferayOAuth2Scope.getApplicationName()) &&
-				Objects.equals(getScope(), liferayOAuth2Scope.getScope())) {
-
-				return true;
-			}
-
-			return false;
-		}
-
-		@Override
-		public String getApplicationName() {
-			return _applicationName;
-		}
-
-		@Override
-		public Bundle getBundle() {
-			return null;
-		}
-
-		@Override
-		public String getScope() {
-			return _scope;
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(_applicationName, _scope);
-		}
-
-		private final String _applicationName;
-		private final String _scope;
-
-	}
-
-	private Map<LiferayOAuth2Scope, Set<String>> _exerciseBuilder(
-		Consumer<OAuth2Scope.Builder> builderConsumer) {
-
-		Map<LiferayOAuth2Scope, List<String>> liferayOAuth2ScopesScopeAliases =
-			new HashMap<>();
+		Map<AbstractMap.SimpleEntry<String, String>, List<String>>
+			simpleEntryScopeAliases = new HashMap<>();
 
 		OAuth2Scope.Builder builder =
-			_oAuth2ApplicationScopeAliasesLocalServiceImpl.
-				new OAuth2ScopeBuilderImpl(
-					_companyId, liferayOAuth2ScopesScopeAliases);
+			new OAuth2ApplicationScopeAliasesLocalServiceImpl.
+				OAuth2ScopeBuilderImpl(simpleEntryScopeAliases);
 
 		builderConsumer.accept(builder);
 
-		Map<LiferayOAuth2Scope, Set<String>>
-			liferayOAuth2ScopesScopeAliasesSet = new HashMap<>();
+		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
+			simpleEntryScopeAliasesSet = new HashMap<>();
 
-		liferayOAuth2ScopesScopeAliases.forEach(
-			(key, value) -> liferayOAuth2ScopesScopeAliasesSet.put(
+		simpleEntryScopeAliases.forEach(
+			(key, value) -> simpleEntryScopeAliasesSet.put(
 				key, new HashSet<>(value)));
 
-		return liferayOAuth2ScopesScopeAliasesSet;
+		return simpleEntryScopeAliasesSet;
 	}
-
-	private long _companyId;
-	private OAuth2ApplicationScopeAliasesLocalServiceImpl
-		_oAuth2ApplicationScopeAliasesLocalServiceImpl;
 
 }
