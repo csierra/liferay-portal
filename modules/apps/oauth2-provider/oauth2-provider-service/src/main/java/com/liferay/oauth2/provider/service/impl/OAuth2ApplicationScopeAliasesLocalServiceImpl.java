@@ -270,14 +270,14 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 		private void _flushScopes() {
 			for (String scope : _scopes) {
-				List<String> computeIfAbsent =
+				List<String> scopeAliasList =
 					_simpleEntryScopeAliases.computeIfAbsent(
 						new AbstractMap.SimpleEntry<>(_applicationName, scope),
 						s -> new ArrayList<>());
 
 				for (String scopeAlias : _scopeAliases) {
-					if (!computeIfAbsent.contains(scopeAlias)) {
-						computeIfAbsent.add(scopeAlias);
+					if (!scopeAliasList.contains(scopeAlias)) {
+						scopeAliasList.add(scopeAlias);
 					}
 				}
 			}
