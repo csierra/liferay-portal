@@ -270,19 +270,19 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		}
 
 		private void _flushScopes() {
-			_scopes.forEach(
-				scope -> _liferayOAuth2ScopesScopeAliases.merge(
-					_scopeLocator.getLiferayOAuth2Scope(
-						_companyId, _applicationName, scope),
-					new ArrayList<>(_scopeAliases),
-					(list1, list2) -> Stream.of(
-						list1, list2
-					).flatMap(
-						Collection::stream
-					).distinct(
-					).collect(
-						Collectors.toList()
-					)));
+			for (String scope : _scopes) {
+				List<String> computeIfAbsent =
+					_liferayOAuth2ScopesScopeAliases.computeIfAbsent(
+						_scopeLocator.getLiferayOAuth2Scope(
+							_companyId, _applicationName, scope),
+						s -> new ArrayList<>());
+
+				for (String scopeAlias : _scopeAliases) {
+					if (!computeIfAbsent.contains(scopeAlias)) {
+						computeIfAbsent.add(scopeAlias);
+					}
+				}
+			}
 
 			_scopes.clear();
 
