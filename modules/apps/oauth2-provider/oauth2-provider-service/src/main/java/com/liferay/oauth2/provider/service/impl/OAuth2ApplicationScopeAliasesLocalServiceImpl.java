@@ -356,15 +356,16 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			Map<AbstractMap.SimpleEntry<String, String>, List<String>>
 				simpleEntryScopeAliases) {
 
-		Map<LiferayOAuth2Scope, List<String>> ret = new HashMap<>();
+		Map<LiferayOAuth2Scope, List<String>> liferayOAuth2ScopeListMap =
+			new HashMap<>();
 
 		simpleEntryScopeAliases.forEach(
-			(simpleEntry, scopeAliases) -> ret.put(
+			(simpleEntry, scopeAliases) -> liferayOAuth2ScopeListMap.put(
 				_scopeLocator.getLiferayOAuth2Scope(
 					companyId, simpleEntry.getKey(), simpleEntry.getValue()),
 				scopeAliases));
 
-		return ret;
+		return liferayOAuth2ScopeListMap;
 	}
 
 	private List<String> _getScopeAliasesList(
