@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -58,10 +57,6 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 
 		String scopeAlias = "everything";
 
-		BiFunction<String, String, String> scopeAliasFunction =
-			(applicationName, scope) ->
-				applicationName + StringPool.PERIOD + scope;
-
 		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
 			simpeEntryScopeAliases = _exerciseBuilder(
 				builder -> {
@@ -71,7 +66,7 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 							applicationScopeAssigner.assignScope(
 								scopes
 							).mapToScopeAlias(
-								scopeAliasFunction.apply(
+								_getApplicationScopeAlias(
 									applicationName1, scopeAlias)
 							));
 
@@ -81,7 +76,7 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 							applicationScopeAssigner.assignScope(
 								scopes
 							).mapToScopeAlias(
-								scopeAliasFunction.apply(
+								_getApplicationScopeAlias(
 									applicationName2, scopeAlias)
 							));
 				});
@@ -93,7 +88,7 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 				Assert.assertThat(
 					value,
 					hasItems(
-						scopeAliasFunction.apply(key.getKey(), scopeAlias)));
+						_getApplicationScopeAlias(key.getKey(), scopeAlias)));
 			});
 	}
 
@@ -259,6 +254,12 @@ public class OAuth2ScopeBuilderTest extends PowerMockito {
 		simpeEntryScopeAliases1.forEach(
 			(key, value) -> Assert.assertEquals(
 				Collections.singleton(key.getValue()), value));
+	}
+
+	private static String _getApplicationScopeAlias(
+		String applicationName, String scope) {
+
+		return applicationName + StringPool.PERIOD + scope;
 	}
 
 	private Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
