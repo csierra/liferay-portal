@@ -253,6 +253,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 	private void _buildAnalyticsCloudScopes(OAuth2Scope.Builder builder) {
 		builder.forApplication(
 			OAuth2ProviderShortcutConstants.APPLICATION_NAME,
+			"com.liferay.oauth2.provider.shortcut",
 			applicationScopeAssigner -> _scopesList.forEach(
 				applicationScopeAssigner::assignScope));
 	}
@@ -265,7 +266,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 	private void _buildSegmentsAsahScopes(OAuth2Scope.Builder builder) {
 		builder.forApplication(
-			"Liferay.Segments.Asah.REST",
+			"Liferay.Segments.Asah.REST", "com.liferay.segments.asah.rest.impl",
 			applicationScopeAssigner -> applicationScopeAssigner.assignScope(
 				_SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS
 			).mapToScopeAlias(

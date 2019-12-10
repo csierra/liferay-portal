@@ -75,6 +75,7 @@ public class FragmentRendererPortalInstanceLifecycleListener
 			Collections.emptyList(),
 			builder -> builder.forApplication(
 				"liferay-json-web-services",
+				"com.liferay.oauth2.provider.jsonws",
 				scopeAssigner -> scopeAssigner.assignScope(
 					"everything.read"
 				).mapToScopeAlias(

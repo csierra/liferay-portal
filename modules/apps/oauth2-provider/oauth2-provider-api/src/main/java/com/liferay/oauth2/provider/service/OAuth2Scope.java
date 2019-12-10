@@ -27,7 +27,7 @@ public interface OAuth2Scope {
 	public interface Builder {
 
 		public void forApplication(
-			String applicationName,
+			String applicationName, String bundleSymbolicName,
 			Consumer<ApplicationScopeAssigner>
 				applicationScopeAssignerConsumer);
 
