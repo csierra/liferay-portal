@@ -17,11 +17,11 @@ package com.liferay.multi.factor.authentication.checker.email.otp.web.internal.p
 import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.checker.EmailOTPMFAChecker;
 import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants.MFAPortletKeys;
 import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants.MFAPortletURLFactory;
+import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants.WebKeys;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
@@ -59,8 +59,9 @@ public class MFAVerifyMVCRenderCommand implements MVCRenderCommand {
 			return "/error.jsp";
 		}
 
-		renderRequest.setAttribute("emailMFAChecker", _emailOTPMFAChecker);
-		renderRequest.setAttribute("mfaUserId", mfaUserId);
+		renderRequest.setAttribute(
+			WebKeys.EMAIL_MFA_CHECKER, _emailOTPMFAChecker);
+		renderRequest.setAttribute(WebKeys.MFA_USER_ID, mfaUserId);
 
 		return "/mfa_verify/verify.jsp";
 	}
@@ -69,7 +70,7 @@ public class MFAVerifyMVCRenderCommand implements MVCRenderCommand {
 		PortletRequest portletRequest) {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+			com.liferay.portal.kernel.util.WebKeys.THEME_DISPLAY);
 
 		if (themeDisplay.isSignedIn()) {
 			return themeDisplay.getUserId();
