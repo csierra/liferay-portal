@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.not;
 
 import com.liferay.oauth2.provider.service.OAuth2Scope;
+import com.liferay.oauth2.provider.service.impl.OAuth2ApplicationScopeAliasesLocalServiceImpl.ScopeNamespace;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
@@ -57,11 +58,11 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 
 		String scopeAlias = "everything";
 
-		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
-			simpeEntryScopeAliases = _exerciseBuilder(
+		Map<Map.Entry<String, String>, Set<String>> simpeEntryScopeAliases =
+			_exerciseBuilder(
 				builder -> {
 					builder.forApplication(
-						applicationName1,
+						applicationName1, _TEST_BUNDLE_SYMBOLIC_NAME,
 						applicationScopeAssigner ->
 							applicationScopeAssigner.assignScope(
 								scopes
@@ -71,7 +72,7 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 							));
 
 					builder.forApplication(
-						applicationName2,
+						applicationName2, _TEST_BUNDLE_SYMBOLIC_NAME,
 						applicationScopeAssigner ->
 							applicationScopeAssigner.assignScope(
 								scopes
@@ -103,11 +104,11 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 				"Test.Application2", Sets.newHashSet("application2.everything")
 			).build();
 
-		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
-			simpeEntryScopeAliases = _exerciseBuilder(
+		Map<Map.Entry<String, String>, Set<String>> simpeEntryScopeAliases =
+			_exerciseBuilder(
 				builder -> applicationScopeAlias.forEach(
 					(applicationName, scopeAliases) -> builder.forApplication(
-						applicationName,
+						applicationName, _TEST_BUNDLE_SYMBOLIC_NAME,
 						applicationScopeAssigner ->
 							applicationScopeAssigner.assignScope(
 								scopes
@@ -131,10 +132,10 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 
 		String scopeAlias = "everything";
 
-		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
-			simpeEntryScopeAliases = _exerciseBuilder(
+		Map<Map.Entry<String, String>, Set<String>> simpeEntryScopeAliases =
+			_exerciseBuilder(
 				builder -> builder.forApplication(
-					applicationName,
+					applicationName, _TEST_BUNDLE_SYMBOLIC_NAME,
 					applicationScopeAssigner ->
 						applicationScopeAssigner.assignScope(
 							scopes
@@ -159,10 +160,10 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 
 		Collection<String> scopeAlias = Collections.singleton("everything");
 
-		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
-			simpeEntryScopeAliases = _exerciseBuilder(
+		Map<Map.Entry<String, String>, Set<String>> simpeEntryScopeAliases =
+			_exerciseBuilder(
 				builder -> builder.forApplication(
-					applicationName,
+					applicationName, _TEST_BUNDLE_SYMBOLIC_NAME,
 					applicationScopeAssigner -> {
 						applicationScopeAssigner.assignScope(
 							"everything.read"
@@ -201,10 +202,10 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 
 		// Test assigning scopes using Collection
 
-		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
-			simpeEntryScopeAliases1 = _exerciseBuilder(
+		Map<Map.Entry<String, String>, Set<String>> simpeEntryScopeAliases1 =
+			_exerciseBuilder(
 				builder -> builder.forApplication(
-					applicationName,
+					applicationName, _TEST_BUNDLE_SYMBOLIC_NAME,
 					applicationScopeAssigner ->
 						applicationScopeAssigner.assignScope(scopes)));
 
@@ -215,10 +216,10 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 
 		// Repeat using VarArgs
 
-		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
-			simpeEntryScopeAliases2 = _exerciseBuilder(
+		Map<Map.Entry<String, String>, Set<String>> simpeEntryScopeAliases2 =
+			_exerciseBuilder(
 				builder -> builder.forApplication(
-					applicationName,
+					applicationName, _TEST_BUNDLE_SYMBOLIC_NAME,
 					applicationScopeAssigner ->
 						applicationScopeAssigner.assignScope(scopesArray)));
 
@@ -228,11 +229,11 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 			simpeEntryScopeAliases2.toString(), simpeEntryScopeAliases1.size(),
 			simpeEntryScopeAliases2.size());
 
-		Set<Map.Entry<AbstractMap.SimpleEntry<String, String>, Set<String>>>
-			entrySet = simpeEntryScopeAliases1.entrySet();
+		Set<Map.Entry<Map.Entry<String, String>, Set<String>>> entrySet =
+			simpeEntryScopeAliases1.entrySet();
 
-		Stream<Map.Entry<AbstractMap.SimpleEntry<String, String>, Set<String>>>
-			stream = entrySet.stream();
+		Stream<Map.Entry<Map.Entry<String, String>, Set<String>>> stream =
+			entrySet.stream();
 
 		Assert.assertTrue(
 			stream.allMatch(
@@ -245,7 +246,7 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 
 		simpeEntryScopeAliases1 = _exerciseBuilder(
 			builder -> builder.forApplication(
-				applicationName,
+				applicationName, _TEST_BUNDLE_SYMBOLIC_NAME,
 				applicationScopeAssigner -> {
 					applicationScopeAssigner.assignScope(scopesArray[0]);
 					applicationScopeAssigner.assignScope(scopesArray[1]);
@@ -262,10 +263,10 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 		return applicationName + StringPool.PERIOD + scope;
 	}
 
-	private Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
-		_exerciseBuilder(Consumer<OAuth2Scope.Builder> builderConsumer) {
+	private Map<Map.Entry<String, String>, Set<String>> _exerciseBuilder(
+		Consumer<OAuth2Scope.Builder> builderConsumer) {
 
-		Map<AbstractMap.SimpleEntry<String, String>, List<String>>
+		Map<Map.Entry<ScopeNamespace, String>, List<String>>
 			simpleEntryScopeAliases = new HashMap<>();
 
 		OAuth2Scope.Builder builder =
@@ -274,14 +275,23 @@ public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 
 		builderConsumer.accept(builder);
 
-		Map<AbstractMap.SimpleEntry<String, String>, Set<String>>
-			simpleEntryScopeAliasesSet = new HashMap<>();
+		Map<Map.Entry<String, String>, Set<String>> simpleEntryScopeAliasesSet =
+			new HashMap<>();
 
 		simpleEntryScopeAliases.forEach(
-			(key, value) -> simpleEntryScopeAliasesSet.put(
-				key, new HashSet<>(value)));
+			(key, value) -> {
+				ScopeNamespace scopeNamespace = key.getKey();
+
+				simpleEntryScopeAliasesSet.put(
+					new AbstractMap.SimpleEntry<String, String>(
+						scopeNamespace.applicationName, key.getValue()),
+					new HashSet<>(value));
+			});
 
 		return simpleEntryScopeAliasesSet;
 	}
+
+	private static final String _TEST_BUNDLE_SYMBOLIC_NAME =
+		"test.bundle.symbolic.name";
 
 }

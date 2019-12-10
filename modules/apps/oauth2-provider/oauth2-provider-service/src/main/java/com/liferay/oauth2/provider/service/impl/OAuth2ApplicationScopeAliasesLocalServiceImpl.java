@@ -95,8 +95,8 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 			_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
 				companyId, oAuth2ApplicationScopeAliasesId,
-				scopeNamespace._applicationName,
-				scopeNamespace._bundleSymbolicName, key.getValue(),
+				scopeNamespace.applicationName,
+				scopeNamespace.bundleSymbolicName, key.getValue(),
 				entry.getValue());
 		}
 
@@ -304,8 +304,8 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		public ScopeNamespace(
 			String applicationName, String bundleSymbolicName) {
 
-			_applicationName = applicationName;
-			_bundleSymbolicName = bundleSymbolicName;
+			this.applicationName = applicationName;
+			this.bundleSymbolicName = bundleSymbolicName;
 		}
 
 		@Override
@@ -313,9 +313,9 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			ScopeNamespace scopeNamespace = (ScopeNamespace)obj;
 
 			if (Objects.equals(
-					_applicationName, scopeNamespace._applicationName) &&
+					applicationName, scopeNamespace.applicationName) &&
 				Objects.equals(
-					_bundleSymbolicName, scopeNamespace._bundleSymbolicName)) {
+					bundleSymbolicName, scopeNamespace.bundleSymbolicName)) {
 
 				return true;
 			}
@@ -325,11 +325,11 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(_applicationName, _bundleSymbolicName);
+			return Objects.hash(applicationName, bundleSymbolicName);
 		}
 
-		private final String _applicationName;
-		private final String _bundleSymbolicName;
+		protected final String applicationName;
+		protected final String bundleSymbolicName;
 
 	}
 
