@@ -54,8 +54,7 @@ public class FragmentRendererPortalInstanceLifecycleListener
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
 		OAuth2Application oAuth2Application =
-			_oAuth2ApplicationLocalService.fetchOAuth2Application(
-				company.getCompanyId(), _clientId);
+			_oAuth2ApplicationLocalService.fetchOAuth2Application(_clientId);
 
 		if (oAuth2Application != null) {
 			return;
@@ -64,7 +63,7 @@ public class FragmentRendererPortalInstanceLifecycleListener
 		User user = _userLocalService.getDefaultUser(company.getCompanyId());
 
 		oAuth2Application = _oAuth2ApplicationLocalService.addOAuth2Application(
-			company.getCompanyId(), user.getUserId(), user.getScreenName(),
+			user.getUserId(), user.getScreenName(),
 			new ArrayList<GrantType>() {
 				{
 					add(GrantType.REFRESH_TOKEN);
@@ -79,14 +78,12 @@ public class FragmentRendererPortalInstanceLifecycleListener
 		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
 			_oAuth2ApplicationScopeAliasesLocalService.
 				addOAuth2ApplicationScopeAliases(
-					oAuth2Application.getCompanyId(),
 					oAuth2Application.getUserId(),
 					oAuth2Application.getUserName(),
 					oAuth2Application.getOAuth2ApplicationId(),
 					Collections.emptyList());
 
 		_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
-			oAuth2Application.getCompanyId(),
 			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId(),
 			"liferay-json-web-services", "com.liferay.oauth2.provider.jsonws",
 			"everything.read",

@@ -163,7 +163,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 		OAuth2Application oAuth2Application =
 			_oAuth2ApplicationLocalService.addOAuth2Application(
-				company.getCompanyId(), user.getUserId(), user.getScreenName(),
+				user.getUserId(), user.getScreenName(),
 				new ArrayList<GrantType>() {
 					{
 						add(GrantType.AUTHORIZATION_CODE);
@@ -260,7 +260,6 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 		for (String scope : _SEGMENTS_ASAH_DEFAULT_OAUTH2_SCOPE_GRANTS) {
 			_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
-				oAuth2Application.getCompanyId(),
 				oAuth2Application.getOAuth2ApplicationScopeAliasesId(),
 				"Liferay.Segments.Asah.REST",
 				"com.liferay.segments.asah.rest.impl", scope,

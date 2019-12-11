@@ -57,8 +57,8 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 
 	@Override
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
-			long userId, String userName,
-			long oAuth2ApplicationId, List<String> scopeAliasesList)
+			long userId, String userName, long oAuth2ApplicationId,
+			List<String> scopeAliasesList)
 		throws PortalException {
 
 		for (String scopeAlias : scopeAliasesList) {
@@ -216,7 +216,7 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 			Bundle bundle = liferayOAuth2Scope.getBundle();
 
 			_oAuth2ScopeGrantLocalService.createOAuth2ScopeGrant(
-				CompanyThreadLocal.getCompanyId(), oAuth2ApplicationScopeAliasesId,
+				oAuth2ApplicationScopeAliasesId,
 				liferayOAuth2Scope.getApplicationName(),
 				bundle.getSymbolicName(), liferayOAuth2Scope.getScope(),
 				entry.getValue());
@@ -249,8 +249,7 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 				oAuth2ApplicationScopeAliases);
 
 		createScopeGrants(
-			oAuth2ApplicationScopeAliasesId,
-			liferayOAuth2ScopesScopeAliases);
+			oAuth2ApplicationScopeAliasesId, liferayOAuth2ScopesScopeAliases);
 
 		return oAuth2ApplicationScopeAliases;
 	}
