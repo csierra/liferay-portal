@@ -51,13 +51,7 @@ public class SSOImpl implements SSO {
 
 	@Override
 	public String getSignInURL(long companyId, String defaultSigninURL) {
-		CASConfiguration casConfiguration = _getCASConfiguration(companyId);
-
-		if (!casConfiguration.enabled()) {
-			return null;
-		}
-
-		return casConfiguration.loginURL();
+		return defaultSigninURL;
 	}
 
 	@Override
