@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 
-import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -49,8 +48,7 @@ public class VerifyMFARenderCommand implements MVCRenderCommand {
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws PortletException {
+		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		long mfaUserId = _getMultiFactorAuthenticationUserId(renderRequest);
 
