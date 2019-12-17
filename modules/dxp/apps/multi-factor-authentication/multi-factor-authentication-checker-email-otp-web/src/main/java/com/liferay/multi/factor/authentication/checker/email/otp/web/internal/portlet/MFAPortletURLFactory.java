@@ -12,12 +12,13 @@
  *
  */
 
-package com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants;
+package com.liferay.multi.factor.authentication.checker.email.otp.web.internal.portlet;
 
+import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants.MFAPortletKeys;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
-import com.liferay.portal.kernel.portlet.PortletURLFactory;
+import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.PortletRequest;
@@ -25,21 +26,20 @@ import javax.portlet.PortletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Tomas Polesovsky
+ * @author Marta Medio
  */
-@Component(service = MFAPortletURLFactory.class)
-public class MFAPortletURLFactoryImpl implements MFAPortletURLFactory {
+public class MFAPortletURLFactory {
 
-	@Override
-	public LiferayPortletURL createVerifyURL(
+	public static final String MFA_USER_ID =
+		MFAPortletURLFactory.class.getName() + "#MFA_USER_ID";
+
+	public static LiferayPortletURL createVerifyURL(
 		HttpServletRequest httpServletRequest, String redirectURL,
 		long userId) {
 
-		httpServletRequest = _portal.getOriginalServletRequest(
+		httpServletRequest = PortalUtil.getOriginalServletRequest(
 			httpServletRequest);
 
 		HttpSession httpSession = httpServletRequest.getSession();
@@ -55,7 +55,7 @@ public class MFAPortletURLFactoryImpl implements MFAPortletURLFactory {
 			plid = themeDisplay.getPlid();
 		}
 
-		LiferayPortletURL liferayPortletURL = _portletURLFactory.create(
+		LiferayPortletURL liferayPortletURL = PortletURLFactoryUtil.create(
 			httpServletRequest, MFAPortletKeys.MFA_VERIFY_PORTLET, plid,
 			PortletRequest.RENDER_PHASE);
 
@@ -67,11 +67,5 @@ public class MFAPortletURLFactoryImpl implements MFAPortletURLFactory {
 
 		return liferayPortletURL;
 	}
-
-	@Reference
-	private Portal _portal;
-
-	@Reference
-	private PortletURLFactory _portletURLFactory;
 
 }
