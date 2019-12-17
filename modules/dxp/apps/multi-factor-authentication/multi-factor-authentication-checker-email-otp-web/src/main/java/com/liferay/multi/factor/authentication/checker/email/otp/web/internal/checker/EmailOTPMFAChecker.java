@@ -83,7 +83,7 @@ public class EmailOTPMFAChecker {
 				_getEmailOTPConfiguration(userId);
 
 			httpServletRequest.setAttribute(
-				"emailOTPConfiguration", emailOTPConfiguration);
+				WebKeys.EMAIL_OTP_CONFIGURATION, emailOTPConfiguration);
 
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 
