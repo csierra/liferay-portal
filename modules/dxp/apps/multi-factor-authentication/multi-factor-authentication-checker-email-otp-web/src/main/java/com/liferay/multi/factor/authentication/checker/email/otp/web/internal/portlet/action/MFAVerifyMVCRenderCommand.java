@@ -80,9 +80,9 @@ public class MFAVerifyMVCRenderCommand implements MVCRenderCommand {
 			_portal.getOriginalServletRequest(
 				_portal.getHttpServletRequest(portletRequest));
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession httpSession = httpServletRequest.getSession();
 
-		Object mfaUserId = session.getAttribute(
+		Object mfaUserId = httpSession.getAttribute(
 			MFAPortletURLFactory.MFA_USER_ID);
 
 		if (mfaUserId == null) {
