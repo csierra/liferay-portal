@@ -21,6 +21,7 @@ import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.po
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import javax.portlet.PortletException;
@@ -82,14 +83,8 @@ public class VerifyMFARenderCommand implements MVCRenderCommand {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
-		Object mfaUserId = httpSession.getAttribute(
-			MFAPortletURLFactory.MFA_USER_ID);
-
-		if (mfaUserId == null) {
-			return 0;
-		}
-
-		return (Long)mfaUserId;
+		return GetterUtil.getLong(
+			httpSession.getAttribute(MFAPortletURLFactory.MFA_USER_ID));
 	}
 
 	@Reference
