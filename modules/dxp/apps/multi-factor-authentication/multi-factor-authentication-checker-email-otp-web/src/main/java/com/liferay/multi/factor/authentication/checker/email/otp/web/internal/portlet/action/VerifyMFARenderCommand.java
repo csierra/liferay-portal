@@ -16,8 +16,8 @@ package com.liferay.multi.factor.authentication.checker.email.otp.web.internal.p
 
 import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.checker.EmailOTPMFAChecker;
 import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants.MFAPortletKeys;
-import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants.MFAPortletURLFactory;
 import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants.WebKeys;
+import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.portlet.MFAPortletURL;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -82,8 +82,7 @@ public class VerifyMFARenderCommand implements MVCRenderCommand {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
-		Object mfaUserId = httpSession.getAttribute(
-			MFAPortletURLFactory.MFA_USER_ID);
+		Object mfaUserId = httpSession.getAttribute(MFAPortletURL.MFA_USER_ID);
 
 		if (mfaUserId == null) {
 			return 0;
