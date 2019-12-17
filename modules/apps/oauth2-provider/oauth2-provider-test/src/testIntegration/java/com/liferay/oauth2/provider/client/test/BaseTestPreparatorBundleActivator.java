@@ -420,6 +420,18 @@ public abstract class BaseTestPreparatorBundleActivator
 				OAuth2ProviderConfiguration.class.getName(), properties));
 	}
 
+	protected void updateTokenProviderConfiguration(
+			Dictionary<String, Object> properties)
+		throws Exception {
+
+		autoCloseables.add(
+			new ConfigurationTemporarySwapper(
+				"com.liferay.oauth2.provider.rest.internal.spi.bearer.token." +
+					"provider.configuration." +
+						"DefaultBearerTokenProviderConfiguration",
+				properties));
+	}
+
 	protected ArrayList<AutoCloseable> autoCloseables;
 	protected BundleContext bundleContext;
 
