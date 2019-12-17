@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.test.log.CaptureAppender;
 import com.liferay.portal.test.log.Log4JLoggerTestUtil;
@@ -109,6 +110,36 @@ public class RefreshTokenTest extends BaseClientTestCase {
 		}
 	}
 
+	@Test
+	public void testExpiration() throws Exception {
+		JSONObject jsonObject = getToken(
+			"oauthTestApplication", null,
+			getResourceOwnerPasswordBiFunction("test@liferay.com", "test"),
+			this::parseJSONObject);
+
+		Thread.sleep(1500);
+
+		WebTarget tokenWebTarget = getTokenWebTarget();
+
+		Invocation.Builder tokenBuilder = tokenWebTarget.request();
+
+		MultivaluedMap<String, String> formData = new MultivaluedHashMap<>();
+
+		formData.add("client_id", "oauthTestApplication");
+		formData.add("client_secret", "oauthTestApplicationSecret");
+		formData.add("grant_type", "refresh_token");
+		formData.add("refresh_token", jsonObject.getString("refresh_token"));
+
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"portal_web.docroot.errors.code_jsp", Level.WARN)) {
+
+			Response response = tokenBuilder.post(Entity.form(formData));
+
+			Assert.assertEquals(400, response.getStatus());
+		}
+	}
+
 	public static class TokenExpeditionTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
 
@@ -131,6 +162,9 @@ public class RefreshTokenTest extends BaseClientTestCase {
 				Arrays.asList(
 					GrantType.RESOURCE_OWNER_PASSWORD, GrantType.REFRESH_TOKEN),
 				Collections.singletonList("everything"));
+
+			updateTokenProviderConfiguration(
+				MapUtil.singletonDictionary("refresh.token.expires.in", 1));
 		}
 
 	}
