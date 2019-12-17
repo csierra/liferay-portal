@@ -42,9 +42,9 @@ public class MFAPortletURLFactoryImpl implements MFAPortletURLFactory {
 		httpServletRequest = _portal.getOriginalServletRequest(
 			httpServletRequest);
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession httpSession = httpServletRequest.getSession();
 
-		session.setAttribute(MFA_USER_ID, userId);
+		httpSession.setAttribute(MFA_USER_ID, userId);
 
 		long plid = 0;
 		ThemeDisplay themeDisplay =
