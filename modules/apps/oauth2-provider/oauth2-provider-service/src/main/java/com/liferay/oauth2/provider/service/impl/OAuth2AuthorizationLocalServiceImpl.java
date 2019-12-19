@@ -41,7 +41,7 @@ public class OAuth2AuthorizationLocalServiceImpl
 
 	/**
 	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 *             #addOAuth2Authorization(long, long, String, long,long,
+	 *             #addOAuth2Authorization(long, String, long,long,
 	 *             String, Date, Date, String, String, String, Date, Date)}
 	 */
 	@Deprecated
@@ -54,7 +54,7 @@ public class OAuth2AuthorizationLocalServiceImpl
 		Date refreshTokenCreateDate, Date refreshTokenExpirationDate) {
 
 		return addOAuth2Authorization(
-			companyId, userId, userName, oAuth2ApplicationId,
+			userId, userName, oAuth2ApplicationId,
 			oAuth2ApplicationScopeAliasesId, accessTokenContent,
 			accessTokenCreateDate, accessTokenExpirationDate, null,
 			remoteIPInfo, refreshTokenContent, refreshTokenCreateDate,
