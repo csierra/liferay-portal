@@ -67,7 +67,7 @@ public interface OAuth2AuthorizationLocalService
 
 	/**
 	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addOAuth2Authorization(long, long, String, long,long,
+	 #addOAuth2Authorization(long, String, long,long,
 	 String, Date, Date, String, String, String, Date, Date)}
 	 */
 	@Deprecated
@@ -79,7 +79,7 @@ public interface OAuth2AuthorizationLocalService
 		Date refreshTokenCreateDate, Date refreshTokenExpirationDate);
 
 	public OAuth2Authorization addOAuth2Authorization(
-		long companyId, long userId, String userName, long oAuth2ApplicationId,
+		long userId, String userName, long oAuth2ApplicationId,
 		long oAuth2ApplicationScopeAliasesId, String accessTokenContent,
 		Date accessTokenCreateDate, Date accessTokenExpirationDate,
 		String remoteHostInfo, String remoteIPInfo, String refreshTokenContent,

@@ -40,7 +40,7 @@ public class OAuth2AuthorizationLocalServiceUtil {
 
 	/**
 	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addOAuth2Authorization(long, long, String, long,long,
+	 #addOAuth2Authorization(long, String, long,long,
 	 String, Date, Date, String, String, String, Date, Date)}
 	 */
 	@Deprecated
@@ -63,16 +63,16 @@ public class OAuth2AuthorizationLocalServiceUtil {
 
 	public static com.liferay.oauth2.provider.model.OAuth2Authorization
 		addOAuth2Authorization(
-			long companyId, long userId, String userName,
-			long oAuth2ApplicationId, long oAuth2ApplicationScopeAliasesId,
-			String accessTokenContent, java.util.Date accessTokenCreateDate,
+			long userId, String userName, long oAuth2ApplicationId,
+			long oAuth2ApplicationScopeAliasesId, String accessTokenContent,
+			java.util.Date accessTokenCreateDate,
 			java.util.Date accessTokenExpirationDate, String remoteHostInfo,
 			String remoteIPInfo, String refreshTokenContent,
 			java.util.Date refreshTokenCreateDate,
 			java.util.Date refreshTokenExpirationDate) {
 
 		return getService().addOAuth2Authorization(
-			companyId, userId, userName, oAuth2ApplicationId,
+			userId, userName, oAuth2ApplicationId,
 			oAuth2ApplicationScopeAliasesId, accessTokenContent,
 			accessTokenCreateDate, accessTokenExpirationDate, remoteHostInfo,
 			remoteIPInfo, refreshTokenContent, refreshTokenCreateDate,
