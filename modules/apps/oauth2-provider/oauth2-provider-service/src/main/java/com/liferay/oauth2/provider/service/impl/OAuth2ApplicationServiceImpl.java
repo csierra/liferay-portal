@@ -70,11 +70,11 @@ public class OAuth2ApplicationServiceImpl
 		}
 
 		return oAuth2ApplicationLocalService.addOAuth2Application(
-			user.getCompanyId(), user.getUserId(), user.getFullName(),
-			allowedGrantTypesList, clientCredentialUserId, clientId,
-			clientProfile, clientSecret, description, featuresList, homePageURL,
-			iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
-			scopeAliasesList, serviceContext);
+			user.getUserId(), user.getFullName(), allowedGrantTypesList,
+			clientCredentialUserId, clientId, clientProfile, clientSecret,
+			description, featuresList, homePageURL, iconFileEntryId, name,
+			privacyPolicyURL, redirectURIsList, scopeAliasesList,
+			serviceContext);
 	}
 
 	/**
@@ -123,8 +123,7 @@ public class OAuth2ApplicationServiceImpl
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
-			oAuth2ApplicationLocalService.fetchOAuth2Application(
-				CompanyThreadLocal.getCompanyId(), clientId);
+			oAuth2ApplicationLocalService.fetchOAuth2Application(clientId);
 
 		if (oAuth2Application != null) {
 			_oAuth2ApplicationModelResourcePermission.check(
@@ -153,8 +152,7 @@ public class OAuth2ApplicationServiceImpl
 		throws PortalException {
 
 		OAuth2Application oAuth2Application =
-			oAuth2ApplicationLocalService.getOAuth2Application(
-				CompanyThreadLocal.getCompanyId(), clientId);
+			oAuth2ApplicationLocalService.getOAuth2Application(clientId);
 
 		_oAuth2ApplicationModelResourcePermission.check(
 			getPermissionChecker(), oAuth2Application, ActionKeys.VIEW);
@@ -163,7 +161,8 @@ public class OAuth2ApplicationServiceImpl
 	}
 
 	@Override
-	public List<OAuth2Application> getOAuth2Applications(int start, int end,
+	public List<OAuth2Application> getOAuth2Applications(
+		int start, int end,
 		OrderByComparator<OAuth2Application> orderByComparator) {
 
 		return oAuth2ApplicationPersistence.filterFindByC(

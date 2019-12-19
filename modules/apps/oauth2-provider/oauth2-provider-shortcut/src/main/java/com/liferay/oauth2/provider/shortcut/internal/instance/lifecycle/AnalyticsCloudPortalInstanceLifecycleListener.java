@@ -162,7 +162,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 		OAuth2Application oAuth2Application =
 			_oAuth2ApplicationLocalService.addOAuth2Application(
-				company.getCompanyId(), user.getUserId(), user.getScreenName(),
+				user.getUserId(), user.getScreenName(),
 				new ArrayList<GrantType>() {
 					{
 						add(GrantType.AUTHORIZATION_CODE);
@@ -176,7 +176,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 				"https://analytics.liferay.com", 0, _APPLICATION_NAME, null,
 				Collections.singletonList(
 					"https://analytics.liferay.com/oauth/receive"),
-				this::_buildScopes, new ServiceContext());
+				this::_buildScopes);
 
 		Class<?> clazz = getClass();
 
