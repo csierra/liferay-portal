@@ -66,26 +66,6 @@ public interface OAuth2ApplicationLocalService
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationLocalServiceUtil} to access the o auth2 application local service. Add custom service methods to <code>com.liferay.oauth2.provider.service.impl.OAuth2ApplicationLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public OAuth2Application addOAuth2Application(
-			long companyId, long userId, String userName,
-			List<GrantType> allowedGrantTypesList, long clientCredentialUserId,
-			String clientId, int clientProfile, String clientSecret,
-			String description, List<String> featuresList, String homePageURL,
-			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList,
-			Consumer<OAuth2ScopeBuilder> builderConsumer,
-			ServiceContext serviceContext)
-		throws PortalException;
-
-	public OAuth2Application addOAuth2Application(
-			long companyId, long userId, String userName,
-			List<GrantType> allowedGrantTypesList, long clientCredentialUserId,
-			String clientId, int clientProfile, String clientSecret,
-			String description, List<String> featuresList, String homePageURL,
-			long iconFileEntryId, String name, String privacyPolicyURL,
-			List<String> redirectURIsList, List<String> scopeAliasesList,
-			ServiceContext serviceContext)
-		throws PortalException;
 
 	/**
 	 * @deprecated As of Mueller (7.2.x)
@@ -97,6 +77,24 @@ public interface OAuth2ApplicationLocalService
 			int clientProfile, String clientSecret, String description,
 			List<String> featuresList, String homePageURL, long iconFileEntryId,
 			String name, String privacyPolicyURL, List<String> redirectURIsList,
+			List<String> scopeAliasesList, ServiceContext serviceContext)
+		throws PortalException;
+
+	public OAuth2Application addOAuth2Application(
+			long userId, String userName, List<GrantType> allowedGrantTypesList,
+			long clientCredentialUserId, String clientId, int clientProfile,
+			String clientSecret, String description, List<String> featuresList,
+			String homePageURL, long iconFileEntryId, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
+			Consumer<OAuth2ScopeBuilder> builderConsumer)
+		throws PortalException;
+
+	public OAuth2Application addOAuth2Application(
+			long userId, String userName, List<GrantType> allowedGrantTypesList,
+			long clientCredentialUserId, String clientId, int clientProfile,
+			String clientSecret, String description, List<String> featuresList,
+			String homePageURL, long iconFileEntryId, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
 			List<String> scopeAliasesList, ServiceContext serviceContext)
 		throws PortalException;
 
@@ -139,8 +137,6 @@ public interface OAuth2ApplicationLocalService
 	@Indexable(type = IndexableType.DELETE)
 	public OAuth2Application deleteOAuth2Application(
 		OAuth2Application oAuth2Application);
-
-	public void deleteOAuth2Applications(long companyId) throws PortalException;
 
 	/**
 	 * @throws PortalException
@@ -219,8 +215,7 @@ public interface OAuth2ApplicationLocalService
 	public OAuth2Application fetchOAuth2Application(long oAuth2ApplicationId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public OAuth2Application fetchOAuth2Application(
-		long companyId, String clientId);
+	public OAuth2Application fetchOAuth2Application(String clientId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -240,9 +235,11 @@ public interface OAuth2ApplicationLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public OAuth2Application getOAuth2Application(
-			long companyId, String clientId)
+	public OAuth2Application getOAuth2Application(String clientId)
 		throws NoSuchOAuth2ApplicationException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<OAuth2Application> getOAuth2Applications();
 
 	/**
 	 * Returns a range of all the o auth2 applications.
@@ -257,9 +254,6 @@ public interface OAuth2ApplicationLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuth2Application> getOAuth2Applications(int start, int end);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<OAuth2Application> getOAuth2Applications(long companyId);
 
 	/**
 	 * Returns the number of o auth2 applications.
