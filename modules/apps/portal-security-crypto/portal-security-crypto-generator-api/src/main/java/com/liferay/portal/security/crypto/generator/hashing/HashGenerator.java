@@ -12,7 +12,9 @@
  * details.
  */
 
-package com.liferay.portal.security.crypto.generator.spi;
+package com.liferay.portal.security.crypto.generator.hashing;
+
+import com.liferay.portal.security.crypto.generator.hashing.salt.SaltGenerator;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -20,8 +22,16 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Arthur Chan
  */
 @ProviderType
-public interface Generator {
+public interface HashGenerator {
 
 	public String[] getGeneratorNames();
+
+	public SaltGenerator getSaltGenerator() throws Exception;
+
+	public byte[] hash(byte[] toBeHashed) throws Exception;
+
+	public HashGenerator withPepper(byte[] pepper) throws Exception;
+
+	public HashGenerator withSalt(byte[] salt) throws Exception;
 
 }
