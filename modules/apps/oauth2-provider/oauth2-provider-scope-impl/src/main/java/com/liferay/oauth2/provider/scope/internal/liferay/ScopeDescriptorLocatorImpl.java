@@ -35,29 +35,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = ScopeDescriptorLocator.class)
 public class ScopeDescriptorLocatorImpl implements ScopeDescriptorLocator {
 
-	/**
-	 * @deprecated As of Mueller (7.2.x)
-	 */
-	@Deprecated
-	@Override
-	public ScopeDescriptor getScopeDescriptor(
-		long companyId, String applicationName) {
-
-		return _scopedServiceTrackerMap.getService(companyId, applicationName);
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x)
-	 */
-	@Deprecated
-	@Override
-	public ScopeDescriptor getScopeDescriptor(String applicationName) {
-		ScopeDescriptor scopeDescriptor = _scopedServiceTrackerMap.getService(
-			0, applicationName);
-
-		return scopeDescriptor::describeScope;
-	}
-
 	@Override
 	public BiFunction<String, Locale, String> getScopeDescriptorBiFunction(
 		long companyId, String applicationName) {

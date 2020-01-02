@@ -37,24 +37,6 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 public class ApplicationDescriptorLocatorImpl
 	implements ApplicationDescriptorLocator {
 
-	/**
-	 * @deprecated As of Mueller (7.2.x)
-	 */
-	@Deprecated
-	@Override
-	public ApplicationDescriptor getApplicationDescriptor(
-		String applicationName) {
-
-		ApplicationDescriptor applicationDescriptor =
-			_serviceTrackerMap.getService(applicationName);
-
-		if (applicationDescriptor == null) {
-			return _defaultApplicationDescriptor;
-		}
-
-		return applicationDescriptor;
-	}
-
 	@Override
 	public Function<Locale, String> getApplicationDescriptorFunction(
 		String applicationName) {

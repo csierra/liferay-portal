@@ -14,8 +14,6 @@
 
 package com.liferay.oauth2.provider.scope.liferay;
 
-import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
-
 import java.util.Locale;
 import java.util.function.Function;
 
@@ -23,14 +21,6 @@ import java.util.function.Function;
  * @author Tomas Polesovsky
  */
 public interface ApplicationDescriptorLocator {
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 * #getApplicationDescriptorFunction(String)}
-	 */
-	@Deprecated
-	public ApplicationDescriptor getApplicationDescriptor(
-		String applicationName);
 
 	public Function<Locale, String> getApplicationDescriptorFunction(
 		String applicationName);
