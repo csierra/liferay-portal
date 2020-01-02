@@ -26,12 +26,12 @@ public interface HashGenerator {
 
 	public String[] getGeneratorNames();
 
-	public SaltGenerator getSaltGenerator() throws Exception;
+	public SaltGenerator getSaltGenerator();
 
 	public byte[] hash(byte[] toBeHashed) throws Exception;
 
-	public HashGenerator withPepper(byte[] pepper) throws Exception;
+	public HashGenerator withPepper(byte[] pepper);
 
-	public HashGenerator withSalt(byte[] salt) throws Exception;
+	public HashGenerator withSalt(byte[] salt);
 
 }
