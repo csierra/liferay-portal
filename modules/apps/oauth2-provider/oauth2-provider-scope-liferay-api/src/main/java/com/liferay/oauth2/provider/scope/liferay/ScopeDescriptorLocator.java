@@ -16,6 +16,9 @@ package com.liferay.oauth2.provider.scope.liferay;
 
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 
+import java.util.Locale;
+import java.util.function.BiFunction;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -24,6 +27,11 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface ScopeDescriptorLocator {
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 * #getScopeDescriptorBiFunction(long, String)}
+	 */
+	@Deprecated
 	public ScopeDescriptor getScopeDescriptor(
 		long companyId, String applicationName);
 
@@ -32,5 +40,8 @@ public interface ScopeDescriptorLocator {
 	 */
 	@Deprecated
 	public ScopeDescriptor getScopeDescriptor(String applicationName);
+
+	public BiFunction<String, Locale, String> getScopeDescriptorBiFunction(
+		long companyId, String applicationName);
 
 }

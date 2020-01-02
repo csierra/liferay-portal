@@ -20,6 +20,9 @@ import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationD
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 
+import java.util.Locale;
+import java.util.function.Function;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -34,6 +37,10 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 public class ApplicationDescriptorLocatorImpl
 	implements ApplicationDescriptorLocator {
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	@Override
 	public ApplicationDescriptor getApplicationDescriptor(
 		String applicationName) {
@@ -46,6 +53,20 @@ public class ApplicationDescriptorLocatorImpl
 		}
 
 		return applicationDescriptor;
+	}
+
+	@Override
+	public Function<Locale, String> getApplicationDescriptorFunction(
+		String applicationName) {
+
+		ApplicationDescriptor applicationDescriptor =
+			_serviceTrackerMap.getService(applicationName);
+
+		if (applicationDescriptor == null) {
+			return _defaultApplicationDescriptor::describeApplication;
+		}
+
+		return applicationDescriptor::describeApplication;
 	}
 
 	@Activate

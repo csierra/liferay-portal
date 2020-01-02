@@ -17,8 +17,6 @@ package com.liferay.oauth2.provider.web.internal;
 import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
-import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
-import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 import com.liferay.petra.string.StringUtil;
 
 import java.util.Collection;
@@ -27,6 +25,8 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -132,15 +132,15 @@ public class AssignableScopes {
 	}
 
 	public String getApplicationDescription(String applicationName) {
-		ApplicationDescriptor applicationDescriptor =
-			_applicationDescriptorLocator.getApplicationDescriptor(
+		Function<Locale, String> applicationDescriptorFunction =
+			_applicationDescriptorLocator.getApplicationDescriptorFunction(
 				applicationName);
 
-		if (applicationDescriptor == null) {
+		if (applicationDescriptorFunction == null) {
 			return applicationName;
 		}
 
-		return applicationDescriptor.describeApplication(_locale);
+		return applicationDescriptorFunction.apply(_locale);
 	}
 
 	public Set<String> getApplicationNames() {
@@ -176,15 +176,15 @@ public class AssignableScopes {
 	public String getScopeDescription(
 		long companyId, LiferayOAuth2Scope liferayOAuth2Scope) {
 
-		ScopeDescriptor scopeDescriptor =
-			_scopeDescriptorLocator.getScopeDescriptor(
+		BiFunction<String, Locale, String> scopeDescriptorBiFunction =
+			_scopeDescriptorLocator.getScopeDescriptorBiFunction(
 				companyId, liferayOAuth2Scope.getApplicationName());
 
-		if (scopeDescriptor == null) {
+		if (scopeDescriptorBiFunction == null) {
 			return liferayOAuth2Scope.getScope();
 		}
 
-		return scopeDescriptor.describeScope(
+		return scopeDescriptorBiFunction.apply(
 			liferayOAuth2Scope.getScope(), _locale);
 	}
 

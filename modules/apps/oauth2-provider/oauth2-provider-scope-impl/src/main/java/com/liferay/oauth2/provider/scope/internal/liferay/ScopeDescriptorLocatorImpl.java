@@ -20,6 +20,9 @@ import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMapFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.descriptor.ScopeDescriptor;
 
+import java.util.Locale;
+import java.util.function.BiFunction;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -32,6 +35,10 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = ScopeDescriptorLocator.class)
 public class ScopeDescriptorLocatorImpl implements ScopeDescriptorLocator {
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	@Override
 	public ScopeDescriptor getScopeDescriptor(
 		long companyId, String applicationName) {
@@ -45,7 +52,20 @@ public class ScopeDescriptorLocatorImpl implements ScopeDescriptorLocator {
 	@Deprecated
 	@Override
 	public ScopeDescriptor getScopeDescriptor(String applicationName) {
-		return _scopedServiceTrackerMap.getService(0, applicationName);
+		ScopeDescriptor scopeDescriptor = _scopedServiceTrackerMap.getService(
+			0, applicationName);
+
+		return scopeDescriptor::describeScope;
+	}
+
+	@Override
+	public BiFunction<String, Locale, String> getScopeDescriptorBiFunction(
+		long companyId, String applicationName) {
+
+		ScopeDescriptor scopeDescriptor = _scopedServiceTrackerMap.getService(
+			companyId, applicationName);
+
+		return scopeDescriptor::describeScope;
 	}
 
 	@Activate

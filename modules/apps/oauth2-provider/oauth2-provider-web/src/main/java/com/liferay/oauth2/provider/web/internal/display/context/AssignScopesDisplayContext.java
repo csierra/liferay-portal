@@ -22,7 +22,6 @@ import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
-import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
@@ -166,15 +165,15 @@ public class AssignScopesDisplayContext
 	}
 
 	public String getApplicationDescription(String applicationName) {
-		ApplicationDescriptor applicationDescriptor =
-			_applicationDescriptorLocator.getApplicationDescriptor(
+		Function<Locale, String> applicationDescriptorFunction =
+			_applicationDescriptorLocator.getApplicationDescriptorFunction(
 				applicationName);
 
-		if (applicationDescriptor == null) {
+		if (applicationDescriptorFunction == null) {
 			return applicationName;
 		}
 
-		return applicationDescriptor.describeApplication(_locale);
+		return applicationDescriptorFunction.apply(_locale);
 	}
 
 	public Set<String> getApplicationNames() {
