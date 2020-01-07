@@ -163,15 +163,13 @@ public class EmailOTPMFAChecker {
 				}
 			}
 
-			String userInput = ParamUtil.getString(httpServletRequest, "otp");
+			String otp = ParamUtil.getString(httpServletRequest, "otp");
 
-			boolean verified = _verify(httpSession, userInput);
+			boolean verified = _verify(httpSession, otp);
 
-			String userIP = originalHttpServletRequest.getRemoteAddr();
+			String remoteAddr = originalHttpServletRequest.getRemoteAddr();
 
 			if (verified) {
-				long validatedAt = System.currentTimeMillis();
-
 				Map<String, Object> validatedMap = _getValidatedMap(
 					httpSession);
 
@@ -182,15 +180,17 @@ public class EmailOTPMFAChecker {
 				}
 
 				validatedMap.put(WebKeys.USER_ID, userId);
-				validatedMap.put(WebKeys.VALIDATED_AT, validatedAt);
+				validatedMap.put(
+					WebKeys.VALIDATED_AT, System.currentTimeMillis());
 
 				_mfaEmailOTPEntryLocalService.updateAttempts(
-					userId, userIP, true);
+					userId, remoteAddr, true);
 
 				return true;
 			}
 
-			_mfaEmailOTPEntryLocalService.updateAttempts(userId, userIP, false);
+			_mfaEmailOTPEntryLocalService.updateAttempts(
+				userId, remoteAddr, false);
 
 			return false;
 		}
@@ -308,10 +308,10 @@ public class EmailOTPMFAChecker {
 		EmailOTPConfiguration emailOTPConfiguration,
 		MFAEmailOTPEntry mfaEmailOTPEntry) {
 
+		Date lastFailDate = mfaEmailOTPEntry.getLastFailDate();
 		long retryTimeout = emailOTPConfiguration.retryTimeout();
-		Date lastFailedDate = mfaEmailOTPEntry.getLastFailDate();
 
-		if ((lastFailedDate.getTime() + retryTimeout) >
+		if ((lastFailDate.getTime() + retryTimeout) >
 				System.currentTimeMillis()) {
 
 			return false;
@@ -334,10 +334,10 @@ public class EmailOTPMFAChecker {
 		return false;
 	}
 
-	private boolean _verify(HttpSession httpSession, String userInput) {
-		String expected = (String)httpSession.getAttribute(WebKeys.OTP);
+	private boolean _verify(HttpSession httpSession, String otp) {
+		String expectedOtp = (String)httpSession.getAttribute(WebKeys.OTP);
 
-		if ((expected == null) || !expected.equals(userInput)) {
+		if ((expectedOtp == null) || !expectedOtp.equals(otp)) {
 			return false;
 		}
 
