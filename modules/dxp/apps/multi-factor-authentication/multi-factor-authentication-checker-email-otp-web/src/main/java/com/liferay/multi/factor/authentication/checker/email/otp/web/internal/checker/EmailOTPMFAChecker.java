@@ -17,7 +17,7 @@ package com.liferay.multi.factor.authentication.checker.email.otp.web.internal.c
 import com.liferay.multi.factor.authentication.checker.email.otp.model.MFAEmailOTPEntry;
 import com.liferay.multi.factor.authentication.checker.email.otp.service.MFAEmailOTPEntryLocalService;
 import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.configuration.EmailOTPConfiguration;
-import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants.WebKeys;
+import com.liferay.multi.factor.authentication.checker.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -74,7 +74,7 @@ public class EmailOTPMFAChecker {
 		}
 
 		httpServletRequest.setAttribute(
-			WebKeys.SEND_TO_EMAIL, user.getEmailAddress());
+			MFAEmailOTPWebKeys.SEND_TO_EMAIL_ADDRESS, user.getEmailAddress());
 
 		RequestDispatcher requestDispatcher =
 			_servletContext.getRequestDispatcher("/verify_otp.jsp");
@@ -84,7 +84,8 @@ public class EmailOTPMFAChecker {
 				_getEmailOTPConfiguration(userId);
 
 			httpServletRequest.setAttribute(
-				WebKeys.EMAIL_OTP_CONFIGURATION, emailOTPConfiguration);
+				MFAEmailOTPWebKeys.EMAIL_OTP_CONFIGURATION,
+				emailOTPConfiguration);
 
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 
@@ -93,8 +94,8 @@ public class EmailOTPMFAChecker {
 
 			HttpSession httpSession = originalHttpServletRequest.getSession();
 
-			httpSession.setAttribute(WebKeys.OTP_PHASE, "verify");
-			httpSession.setAttribute(WebKeys.USER_ID, userId);
+			httpSession.setAttribute(MFAEmailOTPWebKeys.OTP_PHASE, "verify");
+			httpSession.setAttribute(MFAEmailOTPWebKeys.USER_ID, userId);
 		}
 		catch (ServletException se) {
 			throw new IOException(
@@ -179,9 +180,10 @@ public class EmailOTPMFAChecker {
 					httpSession.setAttribute(_VALIDATED, validatedMap);
 				}
 
-				validatedMap.put(WebKeys.USER_ID, userId);
+				validatedMap.put(MFAEmailOTPWebKeys.USER_ID, userId);
 				validatedMap.put(
-					WebKeys.VALIDATED_AT, System.currentTimeMillis());
+					MFAEmailOTPWebKeys.VALIDATED_AT,
+					System.currentTimeMillis());
 
 				_mfaEmailOTPEntryLocalService.updateAttempts(
 					userId, remoteAddr, true);
@@ -254,7 +256,9 @@ public class EmailOTPMFAChecker {
 		Map<String, Object> validatedMap = _getValidatedMap(httpSession);
 
 		if (validatedMap != null) {
-			if (userId != MapUtil.getLong(validatedMap, WebKeys.USER_ID)) {
+			if (userId != MapUtil.getLong(
+					validatedMap, MFAEmailOTPWebKeys.USER_ID)) {
+
 				return false;
 			}
 
@@ -269,7 +273,7 @@ public class EmailOTPMFAChecker {
 			}
 
 			long validatedAt = MapUtil.getLong(
-				validatedMap, WebKeys.VALIDATED_AT);
+				validatedMap, MFAEmailOTPWebKeys.VALIDATED_AT);
 
 			if ((validatedAt + validationExpirationTime * 1000) >
 					System.currentTimeMillis()) {
@@ -335,16 +339,17 @@ public class EmailOTPMFAChecker {
 	}
 
 	private boolean _verify(HttpSession httpSession, String otp) {
-		String expectedOtp = (String)httpSession.getAttribute(WebKeys.OTP);
+		String expectedOtp = (String)httpSession.getAttribute(
+			MFAEmailOTPWebKeys.OTP);
 
 		if ((expectedOtp == null) || !expectedOtp.equals(otp)) {
 			return false;
 		}
 
-		httpSession.removeAttribute(WebKeys.OTP);
-		httpSession.removeAttribute(WebKeys.OTP_PHASE);
-		httpSession.removeAttribute(WebKeys.OTP_SET_AT);
-		httpSession.removeAttribute(WebKeys.USER_ID);
+		httpSession.removeAttribute(MFAEmailOTPWebKeys.OTP);
+		httpSession.removeAttribute(MFAEmailOTPWebKeys.OTP_PHASE);
+		httpSession.removeAttribute(MFAEmailOTPWebKeys.OTP_SET_AT);
+		httpSession.removeAttribute(MFAEmailOTPWebKeys.USER_ID);
 
 		return true;
 	}

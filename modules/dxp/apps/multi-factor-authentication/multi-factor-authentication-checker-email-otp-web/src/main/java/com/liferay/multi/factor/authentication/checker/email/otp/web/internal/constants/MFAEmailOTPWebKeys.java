@@ -17,21 +17,21 @@ package com.liferay.multi.factor.authentication.checker.email.otp.web.internal.c
 /**
  * @author Carlos Sierra Andrés
  */
-public class WebKeys {
+public class MFAEmailOTPWebKeys {
 
 	public static final String EMAIL_OTP_CONFIGURATION =
-		"emailOTPConfiguration";
+		"EMAIL_OTP_CONFIGURATION";
 
-	public static final String OTP = "otp";
+	public static final String OTP = "OTP";
 
-	public static final String OTP_PHASE = "otpPhase";
+	public static final String OTP_PHASE = "OTP_PHASE";
 
-	public static final String OTP_SET_AT = "otpSetAt";
+	public static final String OTP_SET_AT = "OTP_SET_AT";
 
-	public static final String SEND_TO_EMAIL = "sendToEmail";
+	public static final String SEND_TO_EMAIL_ADDRESS = "SEND_TO_EMAIL_ADDRESS";
 
-	public static final String USER_ID = "userId";
+	public static final String USER_ID = "USER_ID";
 
-	public static final String VALIDATED_AT = "validatedAt";
+	public static final String VALIDATED_AT = "VALIDATED_AT";
 
 }
