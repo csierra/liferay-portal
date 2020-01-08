@@ -34,4 +34,6 @@ public class MFAEmailOTPWebKeys {
 
 	public static final String VALIDATED_AT = "VALIDATED_AT";
 
+	public static final String VALIDATED_USER_ID = "VALIDATED_USER_ID";
+
 }

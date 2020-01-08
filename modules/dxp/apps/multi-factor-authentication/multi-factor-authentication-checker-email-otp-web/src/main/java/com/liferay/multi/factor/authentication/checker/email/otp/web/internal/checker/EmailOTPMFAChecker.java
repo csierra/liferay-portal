@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.util.PropsValues;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -171,19 +169,11 @@ public class EmailOTPMFAChecker {
 			String remoteAddr = originalHttpServletRequest.getRemoteAddr();
 
 			if (verified) {
-				Map<String, Object> validatedMap = _getValidatedMap(
-					httpSession);
-
-				if (validatedMap == null) {
-					validatedMap = new HashMap<>(2);
-
-					httpSession.setAttribute(_VALIDATED, validatedMap);
-				}
-
-				validatedMap.put(MFAEmailOTPWebKeys.USER_ID, userId);
-				validatedMap.put(
+				httpSession.setAttribute(
 					MFAEmailOTPWebKeys.VALIDATED_AT,
 					System.currentTimeMillis());
+				httpSession.setAttribute(
+					MFAEmailOTPWebKeys.VALIDATED_USER_ID, userId);
 
 				_mfaEmailOTPEntryLocalService.updateAttempts(
 					userId, remoteAddr, true);
@@ -211,7 +201,10 @@ public class EmailOTPMFAChecker {
 					Arrays.asList(
 						PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES));
 
-			sessionPhishingProtectedAttributesList.add(_VALIDATED);
+			sessionPhishingProtectedAttributesList.add(
+				MFAEmailOTPWebKeys.VALIDATED_USER_ID);
+			sessionPhishingProtectedAttributesList.add(
+				MFAEmailOTPWebKeys.VALIDATED_AT);
 
 			PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES =
 				sessionPhishingProtectedAttributesList.toArray(new String[0]);
@@ -226,7 +219,10 @@ public class EmailOTPMFAChecker {
 					Arrays.asList(
 						PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES));
 
-			sessionPhishingProtectedAttributesList.remove(_VALIDATED);
+			sessionPhishingProtectedAttributesList.remove(
+				MFAEmailOTPWebKeys.VALIDATED_USER_ID);
+			sessionPhishingProtectedAttributesList.remove(
+				MFAEmailOTPWebKeys.VALIDATED_AT);
 
 			PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES =
 				sessionPhishingProtectedAttributesList.toArray(new String[0]);
@@ -253,33 +249,30 @@ public class EmailOTPMFAChecker {
 			return false;
 		}
 
-		Map<String, Object> validatedMap = _getValidatedMap(httpSession);
+		long validatedUserId = (long)httpSession.getAttribute(
+			MFAEmailOTPWebKeys.VALIDATED_USER_ID);
 
-		if (validatedMap != null) {
-			if (userId != MapUtil.getLong(
-					validatedMap, MFAEmailOTPWebKeys.USER_ID)) {
+		if (userId != validatedUserId) {
+			return false;
+		}
 
-				return false;
-			}
+		EmailOTPConfiguration emailOTPConfiguration = _getEmailOTPConfiguration(
+			userId);
 
-			EmailOTPConfiguration emailOTPConfiguration =
-				_getEmailOTPConfiguration(userId);
+		long validationExpirationTime =
+			emailOTPConfiguration.validationExpirationTime();
 
-			long validationExpirationTime =
-				emailOTPConfiguration.validationExpirationTime();
+		if (validationExpirationTime < 0) {
+			return true;
+		}
 
-			if (validationExpirationTime < 0) {
-				return true;
-			}
+		long validatedAt = (long)httpSession.getAttribute(
+			MFAEmailOTPWebKeys.VALIDATED_AT);
 
-			long validatedAt = MapUtil.getLong(
-				validatedMap, MFAEmailOTPWebKeys.VALIDATED_AT);
+		if ((validatedAt + validationExpirationTime * 1000) >
+				System.currentTimeMillis()) {
 
-			if ((validatedAt + validationExpirationTime * 1000) >
-					System.currentTimeMillis()) {
-
-				return true;
-			}
+			return true;
 		}
 
 		return false;
@@ -301,11 +294,6 @@ public class EmailOTPMFAChecker {
 		catch (ConfigurationException ce) {
 			throw new IllegalStateException(ce);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> _getValidatedMap(HttpSession httpSession) {
-		return (Map<String, Object>)httpSession.getAttribute(_VALIDATED);
 	}
 
 	private boolean _isRetryTimedOut(
@@ -353,9 +341,6 @@ public class EmailOTPMFAChecker {
 
 		return true;
 	}
-
-	private static final String _VALIDATED =
-		EmailOTPMFAChecker.class.getName() + "#VALIDATED";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EmailOTPMFAChecker.class);
