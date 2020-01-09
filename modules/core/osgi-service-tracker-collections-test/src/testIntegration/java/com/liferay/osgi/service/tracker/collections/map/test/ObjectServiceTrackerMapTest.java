@@ -369,7 +369,7 @@ public class ObjectServiceTrackerMapTest {
 			ServiceTrackerMapBuilder.SelectorFactory.newSelector(
 				_bundleContext, TrackedOne.class
 			).newSelector(
-				"(&(other=*)(target=*))"
+				"(&(other=*)(target=*)(!(forbidden=*)))"
 			);
 
 		ServiceTrackerMapBuilder.Mapper<String, TrackedOne, TrackedOne, ?>
@@ -395,6 +395,19 @@ public class ObjectServiceTrackerMapTest {
 
 		Assert.assertNotNull(
 			_serviceTrackerMap.getService("aProperty - aTarget"));
+
+		properties = new Hashtable<>();
+
+		properties.put("forbidden", "true");
+		properties.put("other", "aProperty2");
+		properties.put("target", "aTarget2");
+
+		_serviceRegistrations.add(
+			_bundleContext.registerService(
+				TrackedOne.class, new TrackedOne(), properties));
+
+		Assert.assertNull(
+			_serviceTrackerMap.getService("aProperty2 - aTarget2"));
 	}
 
 	@Test
