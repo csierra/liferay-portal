@@ -15,7 +15,7 @@
 package com.liferay.multi.factor.authentication.email.otp.web.internal.action;
 
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.EmailOTPConfiguration;
+import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Component;
 	},
 	service = MVCActionCommand.class
 )
-public class SaveEmailOTPConfigurationMVCActionCommand
+public class SaveMFAEmailOTPConfigurationMVCActionCommand
 	extends BaseMVCActionCommand {
 
 	@Override
@@ -95,7 +95,7 @@ public class SaveEmailOTPConfigurationMVCActionCommand
 				"emailTemplateSubject", subjectProperties.toString());
 
 			ConfigurationProviderUtil.saveCompanyConfiguration(
-				EmailOTPConfiguration.class, companyId, properties);
+				MFAEmailOTPConfiguration.class, companyId, properties);
 		}
 		catch (ConfigurationException ce) {
 			if (_log.isWarnEnabled()) {
@@ -105,6 +105,6 @@ public class SaveEmailOTPConfigurationMVCActionCommand
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		SaveEmailOTPConfigurationMVCActionCommand.class);
+		SaveMFAEmailOTPConfigurationMVCActionCommand.class);
 
 }
