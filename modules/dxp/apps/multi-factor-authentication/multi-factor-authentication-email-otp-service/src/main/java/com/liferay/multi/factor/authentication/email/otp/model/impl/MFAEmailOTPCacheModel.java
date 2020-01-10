@@ -12,9 +12,9 @@
  *
  */
 
-package com.liferay.multi.factor.authentication.checker.email.otp.model.impl;
+package com.liferay.multi.factor.authentication.email.otp.model.impl;
 
-import com.liferay.multi.factor.authentication.checker.email.otp.model.MFAEmailOTPEntry;
+import com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTP;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.CacheModel;
@@ -28,13 +28,13 @@ import java.io.ObjectOutput;
 import java.util.Date;
 
 /**
- * The cache model class for representing MFAEmailOTPEntry in entity cache.
+ * The cache model class for representing MFAEmailOTP in entity cache.
  *
  * @author Arthur Chan
  * @generated
  */
-public class MFAEmailOTPEntryCacheModel
-	implements CacheModel<MFAEmailOTPEntry>, Externalizable, MVCCModel {
+public class MFAEmailOTPCacheModel
+	implements CacheModel<MFAEmailOTP>, Externalizable, MVCCModel {
 
 	@Override
 	public boolean equals(Object obj) {
@@ -42,16 +42,15 @@ public class MFAEmailOTPEntryCacheModel
 			return true;
 		}
 
-		if (!(obj instanceof MFAEmailOTPEntryCacheModel)) {
+		if (!(obj instanceof MFAEmailOTPCacheModel)) {
 			return false;
 		}
 
-		MFAEmailOTPEntryCacheModel mfaEmailOTPEntryCacheModel =
-			(MFAEmailOTPEntryCacheModel)obj;
+		MFAEmailOTPCacheModel mfaEmailOTPCacheModel =
+			(MFAEmailOTPCacheModel)obj;
 
-		if ((mfaEmailOTPEntryId ==
-				mfaEmailOTPEntryCacheModel.mfaEmailOTPEntryId) &&
-			(mvccVersion == mfaEmailOTPEntryCacheModel.mvccVersion)) {
+		if ((emailOTPId == mfaEmailOTPCacheModel.emailOTPId) &&
+			(mvccVersion == mfaEmailOTPCacheModel.mvccVersion)) {
 
 			return true;
 		}
@@ -61,7 +60,7 @@ public class MFAEmailOTPEntryCacheModel
 
 	@Override
 	public int hashCode() {
-		int hashCode = HashUtil.hash(0, mfaEmailOTPEntryId);
+		int hashCode = HashUtil.hash(0, emailOTPId);
 
 		return HashUtil.hash(hashCode, mvccVersion);
 	}
@@ -82,8 +81,8 @@ public class MFAEmailOTPEntryCacheModel
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", mfaEmailOTPEntryId=");
-		sb.append(mfaEmailOTPEntryId);
+		sb.append(", emailOTPId=");
+		sb.append(emailOTPId);
 		sb.append(", companyId=");
 		sb.append(companyId);
 		sb.append(", userId=");
@@ -110,75 +109,75 @@ public class MFAEmailOTPEntryCacheModel
 	}
 
 	@Override
-	public MFAEmailOTPEntry toEntityModel() {
-		MFAEmailOTPEntryImpl mfaEmailOTPEntryImpl = new MFAEmailOTPEntryImpl();
+	public MFAEmailOTP toEntityModel() {
+		MFAEmailOTPImpl mfaEmailOTPImpl = new MFAEmailOTPImpl();
 
-		mfaEmailOTPEntryImpl.setMvccVersion(mvccVersion);
-		mfaEmailOTPEntryImpl.setMfaEmailOTPEntryId(mfaEmailOTPEntryId);
-		mfaEmailOTPEntryImpl.setCompanyId(companyId);
-		mfaEmailOTPEntryImpl.setUserId(userId);
+		mfaEmailOTPImpl.setMvccVersion(mvccVersion);
+		mfaEmailOTPImpl.setEmailOTPId(emailOTPId);
+		mfaEmailOTPImpl.setCompanyId(companyId);
+		mfaEmailOTPImpl.setUserId(userId);
 
 		if (userName == null) {
-			mfaEmailOTPEntryImpl.setUserName("");
+			mfaEmailOTPImpl.setUserName("");
 		}
 		else {
-			mfaEmailOTPEntryImpl.setUserName(userName);
+			mfaEmailOTPImpl.setUserName(userName);
 		}
 
 		if (createDate == Long.MIN_VALUE) {
-			mfaEmailOTPEntryImpl.setCreateDate(null);
+			mfaEmailOTPImpl.setCreateDate(null);
 		}
 		else {
-			mfaEmailOTPEntryImpl.setCreateDate(new Date(createDate));
+			mfaEmailOTPImpl.setCreateDate(new Date(createDate));
 		}
 
 		if (modifiedDate == Long.MIN_VALUE) {
-			mfaEmailOTPEntryImpl.setModifiedDate(null);
+			mfaEmailOTPImpl.setModifiedDate(null);
 		}
 		else {
-			mfaEmailOTPEntryImpl.setModifiedDate(new Date(modifiedDate));
+			mfaEmailOTPImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		mfaEmailOTPEntryImpl.setFailedAttempts(failedAttempts);
+		mfaEmailOTPImpl.setFailedAttempts(failedAttempts);
 
 		if (lastFailDate == Long.MIN_VALUE) {
-			mfaEmailOTPEntryImpl.setLastFailDate(null);
+			mfaEmailOTPImpl.setLastFailDate(null);
 		}
 		else {
-			mfaEmailOTPEntryImpl.setLastFailDate(new Date(lastFailDate));
+			mfaEmailOTPImpl.setLastFailDate(new Date(lastFailDate));
 		}
 
 		if (lastFailIP == null) {
-			mfaEmailOTPEntryImpl.setLastFailIP("");
+			mfaEmailOTPImpl.setLastFailIP("");
 		}
 		else {
-			mfaEmailOTPEntryImpl.setLastFailIP(lastFailIP);
+			mfaEmailOTPImpl.setLastFailIP(lastFailIP);
 		}
 
 		if (lastSuccessDate == Long.MIN_VALUE) {
-			mfaEmailOTPEntryImpl.setLastSuccessDate(null);
+			mfaEmailOTPImpl.setLastSuccessDate(null);
 		}
 		else {
-			mfaEmailOTPEntryImpl.setLastSuccessDate(new Date(lastSuccessDate));
+			mfaEmailOTPImpl.setLastSuccessDate(new Date(lastSuccessDate));
 		}
 
 		if (lastSuccessIP == null) {
-			mfaEmailOTPEntryImpl.setLastSuccessIP("");
+			mfaEmailOTPImpl.setLastSuccessIP("");
 		}
 		else {
-			mfaEmailOTPEntryImpl.setLastSuccessIP(lastSuccessIP);
+			mfaEmailOTPImpl.setLastSuccessIP(lastSuccessIP);
 		}
 
-		mfaEmailOTPEntryImpl.resetOriginalValues();
+		mfaEmailOTPImpl.resetOriginalValues();
 
-		return mfaEmailOTPEntryImpl;
+		return mfaEmailOTPImpl;
 	}
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
 
-		mfaEmailOTPEntryId = objectInput.readLong();
+		emailOTPId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
 
@@ -198,7 +197,7 @@ public class MFAEmailOTPEntryCacheModel
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
-		objectOutput.writeLong(mfaEmailOTPEntryId);
+		objectOutput.writeLong(emailOTPId);
 
 		objectOutput.writeLong(companyId);
 
@@ -235,7 +234,7 @@ public class MFAEmailOTPEntryCacheModel
 	}
 
 	public long mvccVersion;
-	public long mfaEmailOTPEntryId;
+	public long emailOTPId;
 	public long companyId;
 	public long userId;
 	public String userName;

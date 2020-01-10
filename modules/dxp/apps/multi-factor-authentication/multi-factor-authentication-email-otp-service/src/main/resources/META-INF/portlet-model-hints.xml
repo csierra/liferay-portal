@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
 <model-hints>
-	<model name="com.liferay.multi.factor.authentication.checker.email.otp.model.MFAEmailOTPEntry">
+	<model name="com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTP">
 		<field name="mvccVersion" type="long" />
-		<field name="mfaEmailOTPEntryId" type="long" />
+		<field name="emailOTPId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="userId" type="long" />
 		<field name="userName" type="String" />

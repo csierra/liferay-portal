@@ -12,14 +12,28 @@
  *
  */
 
-package com.liferay.multi.factor.authentication.checker.email.otp.model.impl;
+package com.liferay.multi.factor.authentication.email.otp.exception;
+
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
  * @author Arthur Chan
  */
-public class MFAEmailOTPEntryImpl extends MFAEmailOTPEntryBaseImpl {
+public class DuplicateEmailOTPException extends PortalException {
 
-	public MFAEmailOTPEntryImpl() {
+	public DuplicateEmailOTPException() {
+	}
+
+	public DuplicateEmailOTPException(String msg) {
+		super(msg);
+	}
+
+	public DuplicateEmailOTPException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
+
+	public DuplicateEmailOTPException(Throwable cause) {
+		super(cause);
 	}
 
 }

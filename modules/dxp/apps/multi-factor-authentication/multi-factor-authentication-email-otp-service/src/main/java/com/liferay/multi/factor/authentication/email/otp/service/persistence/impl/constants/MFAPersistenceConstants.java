@@ -12,7 +12,7 @@
  *
  */
 
-package com.liferay.multi.factor.authentication.checker.email.otp.service.persistence.impl.constants;
+package com.liferay.multi.factor.authentication.email.otp.service.persistence.impl.constants;
 
 import com.liferay.petra.string.StringBundler;
 
@@ -24,10 +24,10 @@ import org.osgi.framework.FrameworkUtil;
  * @author Arthur Chan
  * @generated
  */
-public class MFAEmailOTPPersistenceConstants {
+public class MFAPersistenceConstants {
 
 	public static final String BUNDLE_SYMBOLIC_NAME =
-		"com.liferay.multi.factor.authentication.checker.email.otp.service";
+		"com.liferay.multi.factor.authentication.email.otp.service";
 
 	public static final String ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER =
 		"(origin.bundle.symbolic.name=" + BUNDLE_SYMBOLIC_NAME + ")";
@@ -36,8 +36,7 @@ public class MFAEmailOTPPersistenceConstants {
 		"(&" + ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER + "(name=service))";
 
 	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			MFAEmailOTPPersistenceConstants.class);
+		Bundle bundle = FrameworkUtil.getBundle(MFAPersistenceConstants.class);
 
 		if (!BUNDLE_SYMBOLIC_NAME.equals(bundle.getSymbolicName())) {
 			throw new IllegalStateException(
