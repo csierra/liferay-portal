@@ -1,1 +1,1 @@
-create unique index IX_E9D0CF1B on MFAEmailOTPEntry (userId);
+create unique index IX_9528CD17 on MFAEmailOTP (userId);

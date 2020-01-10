@@ -1,6 +1,6 @@
-create table MFAEmailOTPEntry (
+create table MFAEmailOTP (
 	mvccVersion LONG default 0 not null,
-	mfaEmailOTPEntryId LONG not null primary key,
+	emailOTPId LONG not null primary key,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
