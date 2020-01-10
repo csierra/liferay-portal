@@ -3,12 +3,12 @@
 
 <service-builder auto-import-default-references="false" auto-namespace-tables="false" mvcc-enabled="true" package-path="com.liferay.multi.factor.authentication.email.otp">
 	<author>Arthur Chan</author>
-	<namespace>MFAEmailOTP</namespace>
-	<entity local-service="true" name="MFAEmailOTPEntry" remote-service="false">
+	<namespace>MFA</namespace>
+	<entity local-service="true" name="MFAEmailOTP" remote-service="false">
 
 		<!-- PK fields -->
 
-		<column name="mfaEmailOTPEntryId" primary="true" type="long" />
+		<column name="emailOTPId" primary="true" type="long" />
 
 		<!-- Audit fields -->
 
@@ -37,6 +37,6 @@
 		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>
 	<exceptions>
-		<exception>DuplicateMFAEmailOTPEntry</exception>
+		<exception>DuplicateEmailOTP</exception>
 	</exceptions>
 </service-builder>
