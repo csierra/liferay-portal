@@ -14,8 +14,8 @@
 
 package com.liferay.multi.factor.authentication.email.otp.web.internal.portal.settings.configuration.admin.display;
 
-import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.EmailOTPConfiguration;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.settings.EmailOTPConfigurationLocalizedValuesMap;
+import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
+import com.liferay.multi.factor.authentication.email.otp.web.internal.settings.MFAEmailOTPConfigurationLocalizedValuesMap;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marta Medio
  */
 @Component(service = PortalSettingsConfigurationScreenContributor.class)
-public class EmailOTPPortalSettingsConfigurationScreenContributor
+public class MFAEmailOTPPortalSettingsConfigurationScreenContributor
 	implements PortalSettingsConfigurationScreenContributor {
 
 	@Override
@@ -61,7 +61,8 @@ public class EmailOTPPortalSettingsConfigurationScreenContributor
 	@Override
 	public String getName(Locale locale) {
 		return LanguageUtil.get(
-			ResourceBundleUtil.getBundle(locale, EmailOTPConfiguration.class),
+			ResourceBundleUtil.getBundle(
+				locale, MFAEmailOTPConfiguration.class),
 			"email-otp-configuration-name");
 	}
 
@@ -84,12 +85,13 @@ public class EmailOTPPortalSettingsConfigurationScreenContributor
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		EmailOTPConfiguration emailOTPConfiguration = null;
+		MFAEmailOTPConfiguration emailOTPConfiguration = null;
 
 		try {
 			emailOTPConfiguration =
 				ConfigurationProviderUtil.getCompanyConfiguration(
-					EmailOTPConfiguration.class, themeDisplay.getCompanyId());
+					MFAEmailOTPConfiguration.class,
+					themeDisplay.getCompanyId());
 		}
 		catch (ConfigurationException ce) {
 			if (_log.isWarnEnabled()) {
@@ -103,28 +105,28 @@ public class EmailOTPPortalSettingsConfigurationScreenContributor
 		httpServletRequest.setAttribute(
 			"bodyLocalizedValuesMap",
 			_getEmailOTPTemplate(
-				EmailOTPConfiguration.DEFAULT_EMAIL_OTP_BODY,
+				MFAEmailOTPConfiguration.DEFAULT_EMAIL_OTP_BODY,
 				emailOTPConfiguration.emailTemplateBody()));
 		httpServletRequest.setAttribute(
 			"subjectLocalizedValuesMap",
 			_getEmailOTPTemplate(
-				EmailOTPConfiguration.DEFAULT_EMAIL_OTP_SUBJECT,
+				MFAEmailOTPConfiguration.DEFAULT_EMAIL_OTP_SUBJECT,
 				emailOTPConfiguration.emailTemplateSubject()));
 	}
 
-	private EmailOTPConfigurationLocalizedValuesMap _getEmailOTPTemplate(
+	private MFAEmailOTPConfigurationLocalizedValuesMap _getEmailOTPTemplate(
 		String defaultTemplate, String properties) {
 
 		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
 
 		unicodeProperties.fastLoad(properties);
 
-		return new EmailOTPConfigurationLocalizedValuesMap(
+		return new MFAEmailOTPConfigurationLocalizedValuesMap(
 			StringUtil.read(getClass(), defaultTemplate), unicodeProperties);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		EmailOTPPortalSettingsConfigurationScreenContributor.class);
+		MFAEmailOTPPortalSettingsConfigurationScreenContributor.class);
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.multi.factor.authentication.checker.email.otp.web)",

@@ -16,8 +16,8 @@ package com.liferay.multi.factor.authentication.email.otp.web.internal.checker;
 
 import com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTP;
 import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPLocalService;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.EmailOTPConfiguration;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAWebKeys;
+import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
+import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -51,8 +51,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Arthur Chan
  */
-@Component(service = EmailOTPMFAChecker.class)
-public class EmailOTPMFAChecker {
+@Component(service = MFAEmailOTPChecker.class)
+public class MFAEmailOTPChecker {
 
 	public void includeBrowserVerification(
 			HttpServletRequest httpServletRequest,
@@ -72,17 +72,19 @@ public class EmailOTPMFAChecker {
 		}
 
 		httpServletRequest.setAttribute(
-			MFAWebKeys.MFA_SEND_TO_EMAIL_ADDRESS, user.getEmailAddress());
+			MFAEmailOTPWebKeys.MFA_SEND_TO_EMAIL_ADDRESS,
+			user.getEmailAddress());
 
 		RequestDispatcher requestDispatcher =
 			_servletContext.getRequestDispatcher("/verify_otp.jsp");
 
 		try {
-			EmailOTPConfiguration emailOTPConfiguration =
+			MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
 				_getEmailOTPConfiguration(userId);
 
 			httpServletRequest.setAttribute(
-				MFAWebKeys.MFA_EMAIL_OTP_CONFIGURATION, emailOTPConfiguration);
+				MFAEmailOTPWebKeys.MFA_EMAIL_OTP_CONFIGURATION,
+				mfaEmailOTPConfiguration);
 
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 
@@ -91,8 +93,9 @@ public class EmailOTPMFAChecker {
 
 			HttpSession httpSession = originalHttpServletRequest.getSession();
 
-			httpSession.setAttribute(MFAWebKeys.MFA_OTP_PHASE, "verify");
-			httpSession.setAttribute(MFAWebKeys.MFA_USER_ID, userId);
+			httpSession.setAttribute(
+				MFAEmailOTPWebKeys.MFA_OTP_PHASE, "verify");
+			httpSession.setAttribute(MFAEmailOTPWebKeys.MFA_USER_ID, userId);
 		}
 		catch (ServletException se) {
 			throw new IOException(
@@ -145,14 +148,16 @@ public class EmailOTPMFAChecker {
 					userId);
 			}
 
-			EmailOTPConfiguration emailOTPConfiguration =
+			MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
 				_getEmailOTPConfiguration(userId);
 
-			if (isThrottlingEnabled(emailOTPConfiguration) &&
+			if (isThrottlingEnabled(mfaEmailOTPConfiguration) &&
 				_reachedFailedAttemptsAllowed(
-					emailOTPConfiguration, mfaEmailOTPEntry)) {
+					mfaEmailOTPConfiguration, mfaEmailOTPEntry)) {
 
-				if (_isRetryTimedOut(emailOTPConfiguration, mfaEmailOTPEntry)) {
+				if (_isRetryTimedOut(
+						mfaEmailOTPConfiguration, mfaEmailOTPEntry)) {
+
 					_mfaEmailOTPEntryLocalService.resetFailedAttempts(userId);
 				}
 				else {
@@ -168,9 +173,10 @@ public class EmailOTPMFAChecker {
 
 			if (verified) {
 				httpSession.setAttribute(
-					MFAWebKeys.MFA_VALIDATED_AT, System.currentTimeMillis());
+					MFAEmailOTPWebKeys.MFA_VALIDATED_AT,
+					System.currentTimeMillis());
 				httpSession.setAttribute(
-					MFAWebKeys.MFA_VALIDATED_USER_ID, userId);
+					MFAEmailOTPWebKeys.MFA_VALIDATED_USER_ID, userId);
 
 				_mfaEmailOTPEntryLocalService.updateAttempts(
 					userId, remoteAddr, true);
@@ -199,9 +205,9 @@ public class EmailOTPMFAChecker {
 						PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES));
 
 			sessionPhishingProtectedAttributesList.add(
-				MFAWebKeys.MFA_VALIDATED_AT);
+				MFAEmailOTPWebKeys.MFA_VALIDATED_AT);
 			sessionPhishingProtectedAttributesList.add(
-				MFAWebKeys.MFA_VALIDATED_USER_ID);
+				MFAEmailOTPWebKeys.MFA_VALIDATED_USER_ID);
 
 			PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES =
 				sessionPhishingProtectedAttributesList.toArray(new String[0]);
@@ -217,9 +223,9 @@ public class EmailOTPMFAChecker {
 						PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES));
 
 			sessionPhishingProtectedAttributesList.remove(
-				MFAWebKeys.MFA_VALIDATED_AT);
+				MFAEmailOTPWebKeys.MFA_VALIDATED_AT);
 			sessionPhishingProtectedAttributesList.remove(
-				MFAWebKeys.MFA_VALIDATED_USER_ID);
+				MFAEmailOTPWebKeys.MFA_VALIDATED_USER_ID);
 
 			PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES =
 				sessionPhishingProtectedAttributesList.toArray(new String[0]);
@@ -227,7 +233,7 @@ public class EmailOTPMFAChecker {
 	}
 
 	protected boolean isThrottlingEnabled(
-		EmailOTPConfiguration emailOTPConfiguration) {
+		MFAEmailOTPConfiguration emailOTPConfiguration) {
 
 		long retryTimeout = emailOTPConfiguration.retryTimeout();
 
@@ -247,14 +253,14 @@ public class EmailOTPMFAChecker {
 		}
 
 		long validatedUserId = (long)httpSession.getAttribute(
-			MFAWebKeys.MFA_VALIDATED_USER_ID);
+			MFAEmailOTPWebKeys.MFA_VALIDATED_USER_ID);
 
 		if (userId != validatedUserId) {
 			return false;
 		}
 
-		EmailOTPConfiguration emailOTPConfiguration = _getEmailOTPConfiguration(
-			userId);
+		MFAEmailOTPConfiguration emailOTPConfiguration =
+			_getEmailOTPConfiguration(userId);
 
 		long validationExpirationTime =
 			emailOTPConfiguration.validationExpirationTime();
@@ -264,7 +270,7 @@ public class EmailOTPMFAChecker {
 		}
 
 		long validatedAt = (long)httpSession.getAttribute(
-			MFAWebKeys.MFA_VALIDATED_AT);
+			MFAEmailOTPWebKeys.MFA_VALIDATED_AT);
 
 		if ((validatedAt + validationExpirationTime * 1000) >
 				System.currentTimeMillis()) {
@@ -275,7 +281,7 @@ public class EmailOTPMFAChecker {
 		return false;
 	}
 
-	private EmailOTPConfiguration _getEmailOTPConfiguration(long userId) {
+	private MFAEmailOTPConfiguration _getEmailOTPConfiguration(long userId) {
 		User user = _userLocalService.fetchUser(userId);
 
 		if (user == null) {
@@ -286,7 +292,7 @@ public class EmailOTPMFAChecker {
 
 		try {
 			return ConfigurationProviderUtil.getCompanyConfiguration(
-				EmailOTPConfiguration.class, user.getCompanyId());
+				MFAEmailOTPConfiguration.class, user.getCompanyId());
 		}
 		catch (ConfigurationException ce) {
 			throw new IllegalStateException(ce);
@@ -294,7 +300,7 @@ public class EmailOTPMFAChecker {
 	}
 
 	private boolean _isRetryTimedOut(
-		EmailOTPConfiguration emailOTPConfiguration,
+		MFAEmailOTPConfiguration emailOTPConfiguration,
 		MFAEmailOTP mfaEmailOTPEntry) {
 
 		Date lastFailDate = mfaEmailOTPEntry.getLastFailDate();
@@ -310,7 +316,7 @@ public class EmailOTPMFAChecker {
 	}
 
 	private boolean _reachedFailedAttemptsAllowed(
-		EmailOTPConfiguration emailOTPConfiguration,
+		MFAEmailOTPConfiguration emailOTPConfiguration,
 		MFAEmailOTP mfaEmailOTPEntry) {
 
 		int failedAttemptsAllowed =
@@ -325,22 +331,22 @@ public class EmailOTPMFAChecker {
 
 	private boolean _verify(HttpSession httpSession, String otp) {
 		String expectedOtp = (String)httpSession.getAttribute(
-			MFAWebKeys.MFA_OTP);
+			MFAEmailOTPWebKeys.MFA_OTP);
 
 		if ((expectedOtp == null) || !expectedOtp.equals(otp)) {
 			return false;
 		}
 
-		httpSession.removeAttribute(MFAWebKeys.MFA_OTP);
-		httpSession.removeAttribute(MFAWebKeys.MFA_OTP_PHASE);
-		httpSession.removeAttribute(MFAWebKeys.MFA_OTP_SET_AT);
-		httpSession.removeAttribute(MFAWebKeys.MFA_USER_ID);
+		httpSession.removeAttribute(MFAEmailOTPWebKeys.MFA_OTP);
+		httpSession.removeAttribute(MFAEmailOTPWebKeys.MFA_OTP_PHASE);
+		httpSession.removeAttribute(MFAEmailOTPWebKeys.MFA_OTP_SET_AT);
+		httpSession.removeAttribute(MFAEmailOTPWebKeys.MFA_USER_ID);
 
 		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		EmailOTPMFAChecker.class);
+		MFAEmailOTPChecker.class);
 
 	@Reference
 	private MFAEmailOTPLocalService _mfaEmailOTPEntryLocalService;

@@ -17,7 +17,7 @@ package com.liferay.multi.factor.authentication.email.otp.web.internal.constants
 /**
  * @author Carlos Sierra Andrés
  */
-public class MFAWebKeys {
+public class MFAEmailOTPWebKeys {
 
 	public static final String MFA_EMAIL_OTP_CONFIGURATION =
 		"MFA_EMAIL_OTP_CONFIGURATION";

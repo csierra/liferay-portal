@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-EmailOTPConfiguration emailOTPConfiguration = ConfigurationProviderUtil.getCompanyConfiguration(EmailOTPConfiguration.class, themeDisplay.getCompanyId());
+MFAEmailOTPConfiguration emailOTPConfiguration = ConfigurationProviderUtil.getCompanyConfiguration(MFAEmailOTPConfiguration.class, themeDisplay.getCompanyId());
 %>
 
 <aui:fieldset>
