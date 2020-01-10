@@ -14,8 +14,8 @@
 
 package com.liferay.multi.factor.authentication.email.otp.web.internal.checker;
 
-import com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTPEntry;
-import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPEntryLocalService;
+import com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTP;
+import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPLocalService;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.EmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAWebKeys;
 import com.liferay.portal.kernel.log.Log;
@@ -137,13 +137,12 @@ public class EmailOTPMFAChecker {
 		HttpSession httpSession = originalHttpServletRequest.getSession();
 
 		try {
-			MFAEmailOTPEntry mfaEmailOTPEntry =
-				_mfaEmailOTPEntryLocalService.fetchMFAEmailOTPEntryByUserId(
-					userId);
+			MFAEmailOTP mfaEmailOTPEntry =
+				_mfaEmailOTPEntryLocalService.fetchEmailOTPByUserId(userId);
 
 			if (mfaEmailOTPEntry == null) {
-				mfaEmailOTPEntry =
-					_mfaEmailOTPEntryLocalService.addMFAEmailOTPEntry(userId);
+				mfaEmailOTPEntry = _mfaEmailOTPEntryLocalService.addEmailOTP(
+					userId);
 			}
 
 			EmailOTPConfiguration emailOTPConfiguration =
@@ -296,7 +295,7 @@ public class EmailOTPMFAChecker {
 
 	private boolean _isRetryTimedOut(
 		EmailOTPConfiguration emailOTPConfiguration,
-		MFAEmailOTPEntry mfaEmailOTPEntry) {
+		MFAEmailOTP mfaEmailOTPEntry) {
 
 		Date lastFailDate = mfaEmailOTPEntry.getLastFailDate();
 		long retryTimeout = emailOTPConfiguration.retryTimeout();
@@ -312,7 +311,7 @@ public class EmailOTPMFAChecker {
 
 	private boolean _reachedFailedAttemptsAllowed(
 		EmailOTPConfiguration emailOTPConfiguration,
-		MFAEmailOTPEntry mfaEmailOTPEntry) {
+		MFAEmailOTP mfaEmailOTPEntry) {
 
 		int failedAttemptsAllowed =
 			emailOTPConfiguration.failedAttemptsAllowed();
@@ -344,7 +343,7 @@ public class EmailOTPMFAChecker {
 		EmailOTPMFAChecker.class);
 
 	@Reference
-	private MFAEmailOTPEntryLocalService _mfaEmailOTPEntryLocalService;
+	private MFAEmailOTPLocalService _mfaEmailOTPEntryLocalService;
 
 	@Reference
 	private Portal _portal;
