@@ -41,6 +41,8 @@ renderResponse.setTitle(headerTitle);
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
+
+final boolean showSimpleScopesView = ParamUtil.getBoolean(request, OAuth2ProviderWebKeys.OAUTH2_ADMIN_PORTLET_SIMPLE_DISPLAY_CONTEXT);
 %>
 
 <c:if test="<%= oAuth2Application != null %>">
@@ -108,7 +110,10 @@ portletDisplay.setURLBack(redirect);
 	<c:when test='<%= currentAppTab.equals("credentials") && ((oAuth2Application == null) || oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application)) %>'>
 		<liferay-util:include page="/admin/edit_application_credentials.jsp" servletContext="<%= application %>" />
 	</c:when>
-	<c:when test='<%= (oAuth2Application != null) && currentAppTab.equals("assign_scopes") && oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>'>
+	<c:when test='<%= (oAuth2Application != null) && currentAppTab.equals("assign_scopes") && oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) && showSimpleScopesView %>'>
+		<liferay-util:include page="/admin/assign_simple_scopes.jsp" servletContext="<%= application %>" />
+	</c:when>
+	<c:when test='<%= (oAuth2Application != null) && currentAppTab.equals("assign_scopes") && oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) && !showSimpleScopesView %>'>
 		<liferay-util:include page="/admin/assign_scopes.jsp" servletContext="<%= application %>" />
 	</c:when>
 	<c:when test='<%= (oAuth2Application != null) && currentAppTab.equals("application_authorizations") && oAuth2AdminPortletDisplayContext.hasViewGrantedAuthorizationsPermission() %>'>
