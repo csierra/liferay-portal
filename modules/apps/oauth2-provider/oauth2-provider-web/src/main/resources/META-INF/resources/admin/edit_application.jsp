@@ -42,7 +42,11 @@ renderResponse.setTitle(headerTitle);
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-final boolean showSimpleScopesView = ParamUtil.getBoolean(request, OAuth2ProviderWebKeys.OAUTH2_ADMIN_PORTLET_SIMPLE_DISPLAY_CONTEXT);
+boolean showSimpleScopesView = false;
+
+if (request.getAttribute(OAuth2ProviderWebKeys.OAUTH2_ADMIN_PORTLET_SIMPLE_DISPLAY_CONTEXT) != null) {
+	showSimpleScopesView = true;
+}
 %>
 
 <c:if test="<%= oAuth2Application != null %>">
