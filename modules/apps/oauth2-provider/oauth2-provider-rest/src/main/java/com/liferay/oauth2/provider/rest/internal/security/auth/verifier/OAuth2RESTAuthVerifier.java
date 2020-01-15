@@ -56,7 +56,10 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	immediate = true,
-	property = "auth.verifier.OAuth2RESTAuthVerifier.urls.includes=#N/A#",
+	property = {
+		"auth.verifier.OAuth2RESTAuthVerifier.urls.includes=*",
+		"auth.verifier.OAuth2RESTAuthVerifier.servlet.context.helper.select.filter=(osgi.http.whiteboard.context.name=*)"
+	},
 	service = AuthVerifier.class
 )
 public class OAuth2RESTAuthVerifier implements AuthVerifier {
