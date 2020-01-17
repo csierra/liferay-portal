@@ -21,6 +21,8 @@ public class MFAEmailOTPWebKeys {
 
 	public static final String MFA_EMAIL_OTP = "MFA_EMAIL_OTP";
 
+	public static final String MFA_EMAIL_OTP_CHECKER = "MFA_EMAIL_OTP_CHECKER";
+
 	public static final String MFA_EMAIL_OTP_CONFIGURATION =
 		"MFA_EMAIL_OTP_CONFIGURATION";
 
