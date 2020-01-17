@@ -36,3 +36,7 @@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
+
+<%
+MFAEmailOTPConfiguration mfaEmailOTPConfiguration = ConfigurationProviderUtil.getCompanyConfiguration(MFAEmailOTPConfiguration.class, themeDisplay.getCompanyId());
+%>
