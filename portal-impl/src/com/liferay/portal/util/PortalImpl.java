@@ -237,6 +237,8 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 import java.sql.Connection;
@@ -928,21 +930,42 @@ public class PortalImpl implements Portal {
 	@Override
 	public String escapeRedirect(String url) {
 		if (Validator.isNull(url)) {
-			return url;
+			return null;
 		}
 
 		url = url.trim();
 
-		if ((url.charAt(0) == CharPool.SLASH) &&
-			((url.length() == 1) ||
-			 ((url.length() > 1) && (url.charAt(1) != CharPool.SLASH)))) {
+		URI uri;
+
+		try {
+			uri = new URI(url);
+		}
+		catch (URISyntaxException e) {
+			return null;
+		}
+
+		String domain = uri.getHost();
+		String protocol = uri.getScheme();
+
+		if (Validator.isBlank(domain)) {
+			if (Validator.isBlank(uri.getPath())) {
+				return null;
+			}
+
+			// Specs allows URL of protocol followed by path, but we do not.
+
+			if (!Validator.isBlank(protocol)) {
+				return null;
+			}
+
+			// The URL is a relative path
 
 			return url;
 		}
 
-		String domain = HttpUtil.getDomain(url);
+		// Specs regards URL staring with double slashes valid, but we do not.
 
-		if (domain.isEmpty()) {
+		if (Validator.isBlank(protocol)) {
 			return null;
 		}
 
