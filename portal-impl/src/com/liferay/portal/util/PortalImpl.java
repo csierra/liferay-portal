@@ -928,21 +928,36 @@ public class PortalImpl implements Portal {
 	@Override
 	public String escapeRedirect(String url) {
 		if (Validator.isNull(url)) {
-			return url;
+			return null;
 		}
 
 		url = url.trim();
 
-		if ((url.charAt(0) == CharPool.SLASH) &&
-			((url.length() == 1) ||
-			 ((url.length() > 1) && (url.charAt(1) != CharPool.SLASH)))) {
+		String protocol = HttpUtil.getProtocol(url);
+
+		String domain = HttpUtil.getDomain(url);
+
+		String path = HttpUtil.getPath(url);
+
+		if (domain.isEmpty()) {
+			if (path.isEmpty()) {
+				return null;
+			}
+
+			// Specs allows URL of protocol followed by path, but we do not.
+
+			if (!protocol.isEmpty()) {
+				return null;
+			}
+
+			// The URL is a relative path
 
 			return url;
 		}
 
-		String domain = HttpUtil.getDomain(url);
+		// Specs regards URL staring with double slashes valid, but we do not.
 
-		if (domain.isEmpty()) {
+		if (protocol.isEmpty()) {
 			return null;
 		}
 
