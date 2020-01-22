@@ -77,7 +77,8 @@ public class MFAEmailOTPChecker {
 			user.getEmailAddress());
 
 		RequestDispatcher requestDispatcher =
-			_servletContext.getRequestDispatcher("/verify_mfa_email_otp.jsp");
+			_servletContext.getRequestDispatcher(
+				"/mfa_email_otp_checker/verify_browser.jsp");
 
 		requestDispatcher.include(httpServletRequest, httpServletResponse);
 
