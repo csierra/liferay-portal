@@ -26,10 +26,6 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Arthur Chan
  */
-@Component(
-	immediate = true, property = "crypto.hashing.algorithm=BCrypt",
-	service = HashGenerator.class
-)
 public class BCryptHashGenerator extends AbstractHashGenerator {
 
 	public BCryptHashGenerator() {
