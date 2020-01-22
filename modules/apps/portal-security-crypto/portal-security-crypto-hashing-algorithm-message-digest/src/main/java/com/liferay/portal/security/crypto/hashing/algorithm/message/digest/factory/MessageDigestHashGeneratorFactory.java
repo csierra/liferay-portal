@@ -28,13 +28,10 @@ import org.osgi.service.component.annotations.Component;
 @Component(
 	immediate = true,
 	property = {
-		"crypto.hash.generator.factory=MD2",
-		"crypto.hash.generator.factory=MD5",
-		"crypto.hash.generator.factory=SHA-1",
-		"crypto.hash.generator.factory=SHA-224",
-		"crypto.hash.generator.factory=SHA-256",
-		"crypto.hash.generator.factory=SHA-384",
-		"crypto.hash.generator.factory=SHA-512"
+		"crypto.hashing.algorithm=MD2", "crypto.hashing.algorithm=MD5",
+		"crypto.hashing.algorithm=SHA-1", "crypto.hashing.algorithm=SHA-224",
+		"crypto.hashing.algorithm=SHA-256", "crypto.hashing.algorithm=SHA-384",
+		"crypto.hashing.algorithm=SHA-512"
 	},
 	service = HashGeneratorFactory.class
 )

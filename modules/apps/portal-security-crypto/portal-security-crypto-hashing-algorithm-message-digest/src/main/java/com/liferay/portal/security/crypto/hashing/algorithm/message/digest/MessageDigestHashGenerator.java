@@ -26,16 +26,6 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Arthur Chan
  */
-@Component(
-	immediate = true,
-	property = {
-		"crypto.hashing.algorithm=MD2", "crypto.hashing.algorithm=MD5",
-		"crypto.hashing.algorithm=SHA-1", "crypto.hashing.algorithm=SHA-224",
-		"crypto.hashing.algorithm=SHA-256", "crypto.hashing.algorithm=SHA-384",
-		"crypto.hashing.algorithm=SHA-512"
-	},
-	service = HashGenerator.class
-)
 public class MessageDigestHashGenerator extends AbstractHashGenerator {
 
 	public MessageDigestHashGenerator(String generatorName) {

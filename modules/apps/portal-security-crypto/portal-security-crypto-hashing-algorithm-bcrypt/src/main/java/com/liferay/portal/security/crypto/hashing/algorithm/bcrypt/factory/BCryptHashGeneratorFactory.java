@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Arthur Chan
  */
 @Component(
-	immediate = true, property = "crypto.hash.generator.factory=BCrypt",
+	immediate = true, property = "crypto.hashing.algorithm=BCrypt",
 	service = HashGeneratorFactory.class
 )
 public class BCryptHashGeneratorFactory implements HashGeneratorFactory {
