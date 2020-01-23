@@ -755,10 +755,6 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			httpServletRequest);
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
 		try {
 			User user = _userResolver.resolveUser(
 				new UserResolverSAMLContextImpl(messageContext),
@@ -798,8 +794,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 				SamlWebKeys.SAML_SUBJECT_SCREEN_NAME, nameID.getValue());
 
 			httpServletResponse.sendRedirect(
-				getAuthRedirectURL(
-					messageContext, httpServletRequest, themeDisplay));
+				getAuthRedirectURL(messageContext, httpServletRequest));
 
 			return;
 		}
@@ -844,8 +839,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 			samlSpSession.getSamlSpSessionKey(), -1);
 
 		httpServletResponse.sendRedirect(
-			getAuthRedirectURL(
-				messageContext, httpServletRequest, themeDisplay));
+			getAuthRedirectURL(messageContext, httpServletRequest));
 	}
 
 	protected void doSendAuthnRequest(
@@ -966,10 +960,14 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
 	protected String getAuthRedirectURL(
 			MessageContext<?> messageContext,
-			HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay)
+			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
 		StringBundler sb = new StringBundler(3);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		sb.append(themeDisplay.getPathMain());
 
