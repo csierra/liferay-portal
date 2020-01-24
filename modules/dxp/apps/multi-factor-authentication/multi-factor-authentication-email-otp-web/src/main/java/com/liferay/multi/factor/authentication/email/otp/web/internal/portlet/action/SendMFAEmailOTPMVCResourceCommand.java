@@ -95,7 +95,7 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 
 			if (userId == null) {
 				if (_log.isWarnEnabled()) {
-					_log.warn("User id is not in the session");
+					_log.warn("User ID is not in the session");
 				}
 
 				return false;
