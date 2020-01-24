@@ -88,132 +88,138 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 			throw new PortletException(principalException);
 		}
 
-		HttpSession httpSession = httpServletRequest.getSession();
-
 		try {
-			Long userId = (Long)httpSession.getAttribute(WebKeys.USER_ID);
-
-			if (userId == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn("User ID is not in the session");
-				}
-
-				return false;
-			}
-
-			User user = _userLocalService.getUserById(userId);
-
-			MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
-				ConfigurationProviderUtil.getCompanyConfiguration(
-					MFAEmailOTPConfiguration.class, user.getCompanyId());
-
-			if (mfaEmailOTPConfiguration == null) {
-				return false;
-			}
-
-			long mfaEmailOTPSetAtTime = GetterUtil.getLong(
-				httpSession.getAttribute(
-					MFAEmailOTPWebKeys.MFA_EMAIL_OTP_SET_AT_TIME),
-				Long.MIN_VALUE);
-
-			long time =
-				mfaEmailOTPSetAtTime +
-					mfaEmailOTPConfiguration.resendEmailTimeout() * 1000;
-
-			if (System.currentTimeMillis() <= time) {
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						"Refusing to send email before resend timeout for " +
-							"user " + user.getUserId());
-				}
-
-				return false;
-			}
-
-			String generatedMFAEmailOTP = PwdGenerator.getPassword(
-				mfaEmailOTPConfiguration.otpSize());
-
-			httpSession.setAttribute(
-				MFAEmailOTPWebKeys.MFA_EMAIL_OTP, generatedMFAEmailOTP);
-
-			httpSession.setAttribute(
-				MFAEmailOTPWebKeys.MFA_EMAIL_OTP_SET_AT_TIME,
-				System.currentTimeMillis());
-
-			String defaultEmailOTPSubject = StringUtil.read(
-				MFAEmailOTPConfiguration.class,
-				MFAEmailOTPConfiguration.DEFAULT_EMAIL_OTP_SUBJECT);
-
-			UnicodeProperties subjectUnicodeProperties = new UnicodeProperties(
-				true);
-
-			subjectUnicodeProperties.fastLoad(
-				mfaEmailOTPConfiguration.emailTemplateSubject());
-
-			MFAEmailOTPConfigurationLocalizedValuesMap
-				subjectEmailOTPConfigurationLocalizedValuesMap =
-					new MFAEmailOTPConfigurationLocalizedValuesMap(
-						defaultEmailOTPSubject, subjectUnicodeProperties);
-
-			String emailOTPSubject =
-				subjectEmailOTPConfigurationLocalizedValuesMap.get(
-					user.getLocale());
-
-			String defaultEmailOTPBody = StringUtil.read(
-				MFAEmailOTPConfiguration.class,
-				MFAEmailOTPConfiguration.DEFAULT_EMAIL_OTP_BODY);
-
-			UnicodeProperties bodyUnicodeProperties = new UnicodeProperties(
-				true);
-
-			bodyUnicodeProperties.fastLoad(
-				mfaEmailOTPConfiguration.emailTemplateBody());
-
-			MFAEmailOTPConfigurationLocalizedValuesMap
-				bodyEmailOTPConfigurationLocalizedValuesMap =
-					new MFAEmailOTPConfigurationLocalizedValuesMap(
-						defaultEmailOTPBody, bodyUnicodeProperties);
-
-			String emailOTPBody =
-				bodyEmailOTPConfigurationLocalizedValuesMap.get(
-					user.getLocale());
-
-			MailTemplateContextBuilder mailTemplateContextBuilder =
-				MailTemplateFactoryUtil.createMailTemplateContextBuilder();
-
-			mailTemplateContextBuilder.put(
-				"[$FROM_ADDRESS$]",
-				mfaEmailOTPConfiguration.emailTemplateFrom());
-			mailTemplateContextBuilder.put(
-				"[$FROM_NAME$]",
-				HtmlUtil.escape(
-					mfaEmailOTPConfiguration.emailTemplateFromName()));
-			mailTemplateContextBuilder.put(
-				"[$ONE_TIME_PASSWORD$]", HtmlUtil.escape(generatedMFAEmailOTP));
-			mailTemplateContextBuilder.put(
-				"[$PORTAL_URL$]", _portal.getPortalURL(httpServletRequest));
-			mailTemplateContextBuilder.put(
-				"[$REMOTE_ADDRESS$]", httpServletRequest.getRemoteAddr());
-			mailTemplateContextBuilder.put(
-				"[$REMOTE_HOST$]",
-				HtmlUtil.escape(httpServletRequest.getRemoteHost()));
-			mailTemplateContextBuilder.put(
-				"[$TO_NAME$]", HtmlUtil.escape(user.getFullName()));
-
-			MailTemplateContext mailTemplateContext =
-				mailTemplateContextBuilder.build();
-
-			_sendNotificationEmail(
-				mfaEmailOTPConfiguration.emailTemplateFrom(),
-				mfaEmailOTPConfiguration.emailTemplateFromName(),
-				user.getEmailAddress(), user, emailOTPSubject, emailOTPBody,
-				mailTemplateContext);
-
-			return true;
+			return _serveResource(httpServletRequest);
 		}
 		catch (Exception exception) {
 			throw new PortletException(exception);
 		}
+	}
+
+	private boolean _serveResource(HttpServletRequest httpServletRequest)
+		throws Exception {
+
+		HttpSession httpSession = httpServletRequest.getSession();
+
+		Long userId = (Long)httpSession.getAttribute(WebKeys.USER_ID);
+
+		if (userId == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("User ID is not in the session");
+			}
+
+			return false;
+		}
+
+		User user = _userLocalService.getUserById(userId);
+
+		MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
+			ConfigurationProviderUtil.getCompanyConfiguration(
+				MFAEmailOTPConfiguration.class, user.getCompanyId());
+
+		if (mfaEmailOTPConfiguration == null) {
+			return false;
+		}
+
+		long mfaEmailOTPSetAtTime = GetterUtil.getLong(
+			httpSession.getAttribute(
+				MFAEmailOTPWebKeys.MFA_EMAIL_OTP_SET_AT_TIME),
+			Long.MIN_VALUE);
+
+		long time =
+			mfaEmailOTPSetAtTime +
+				mfaEmailOTPConfiguration.resendEmailTimeout() * 1000;
+
+		if (System.currentTimeMillis() <= time) {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					"Refusing to send email before resend timeout for " +
+						"user " + user.getUserId());
+			}
+
+			return false;
+		}
+
+		String generatedMFAEmailOTP = PwdGenerator.getPassword(
+			mfaEmailOTPConfiguration.otpSize());
+
+		httpSession.setAttribute(
+			MFAEmailOTPWebKeys.MFA_EMAIL_OTP, generatedMFAEmailOTP);
+
+		httpSession.setAttribute(
+			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_SET_AT_TIME,
+			System.currentTimeMillis());
+
+		String defaultEmailOTPSubject = StringUtil.read(
+			MFAEmailOTPConfiguration.class,
+			MFAEmailOTPConfiguration.DEFAULT_EMAIL_OTP_SUBJECT);
+
+		UnicodeProperties subjectUnicodeProperties = new UnicodeProperties(
+			true);
+
+		subjectUnicodeProperties.fastLoad(
+			mfaEmailOTPConfiguration.emailTemplateSubject());
+
+		MFAEmailOTPConfigurationLocalizedValuesMap
+			subjectEmailOTPConfigurationLocalizedValuesMap =
+				new MFAEmailOTPConfigurationLocalizedValuesMap(
+					defaultEmailOTPSubject, subjectUnicodeProperties);
+
+		String emailOTPSubject =
+			subjectEmailOTPConfigurationLocalizedValuesMap.get(
+				user.getLocale());
+
+		String defaultEmailOTPBody = StringUtil.read(
+			MFAEmailOTPConfiguration.class,
+			MFAEmailOTPConfiguration.DEFAULT_EMAIL_OTP_BODY);
+
+		UnicodeProperties bodyUnicodeProperties = new UnicodeProperties(
+			true);
+
+		bodyUnicodeProperties.fastLoad(
+			mfaEmailOTPConfiguration.emailTemplateBody());
+
+		MFAEmailOTPConfigurationLocalizedValuesMap
+			bodyEmailOTPConfigurationLocalizedValuesMap =
+				new MFAEmailOTPConfigurationLocalizedValuesMap(
+					defaultEmailOTPBody, bodyUnicodeProperties);
+
+		String emailOTPBody =
+			bodyEmailOTPConfigurationLocalizedValuesMap.get(
+				user.getLocale());
+
+		MailTemplateContextBuilder mailTemplateContextBuilder =
+			MailTemplateFactoryUtil.createMailTemplateContextBuilder();
+
+		mailTemplateContextBuilder.put(
+			"[$FROM_ADDRESS$]",
+			mfaEmailOTPConfiguration.emailTemplateFrom());
+		mailTemplateContextBuilder.put(
+			"[$FROM_NAME$]",
+			HtmlUtil.escape(
+				mfaEmailOTPConfiguration.emailTemplateFromName()));
+		mailTemplateContextBuilder.put(
+			"[$ONE_TIME_PASSWORD$]", HtmlUtil.escape(generatedMFAEmailOTP));
+		mailTemplateContextBuilder.put(
+			"[$PORTAL_URL$]", _portal.getPortalURL(httpServletRequest));
+		mailTemplateContextBuilder.put(
+			"[$REMOTE_ADDRESS$]", httpServletRequest.getRemoteAddr());
+		mailTemplateContextBuilder.put(
+			"[$REMOTE_HOST$]",
+			HtmlUtil.escape(httpServletRequest.getRemoteHost()));
+		mailTemplateContextBuilder.put(
+			"[$TO_NAME$]", HtmlUtil.escape(user.getFullName()));
+
+		MailTemplateContext mailTemplateContext =
+			mailTemplateContextBuilder.build();
+
+		_sendNotificationEmail(
+			mfaEmailOTPConfiguration.emailTemplateFrom(),
+			mfaEmailOTPConfiguration.emailTemplateFromName(),
+			user.getEmailAddress(), user, emailOTPSubject, emailOTPBody,
+			mailTemplateContext);
+
+		return true;
 	}
 
 	private void _sendNotificationEmail(
