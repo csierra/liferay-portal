@@ -104,7 +104,6 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 
 		MailTemplate subjectMailTemplate =
 			MailTemplateFactoryUtil.createMailTemplate(subject, false);
-
 		MailTemplate bodyMailTemplate =
 			MailTemplateFactoryUtil.createMailTemplate(body, true);
 
@@ -128,8 +127,8 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 		if (_log.isDebugEnabled()) {
 			_log.debug(
 				StringBundler.concat(
-					"one-time password email sent to user id ",
-					toUser.getUserId(), " to address ", toAddress));
+					"One-time password email sent to user ",
+					toUser.getUserId(), " at address ", toAddress));
 		}
 	}
 
