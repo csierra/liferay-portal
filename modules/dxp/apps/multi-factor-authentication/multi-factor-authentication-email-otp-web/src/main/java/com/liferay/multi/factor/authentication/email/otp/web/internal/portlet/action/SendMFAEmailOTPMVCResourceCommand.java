@@ -111,13 +111,13 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 				return false;
 			}
 
-			long mfaEmailOtpSetAtTime = GetterUtil.getLong(
+			long mfaEmailOTPSetAtTime = GetterUtil.getLong(
 				httpSession.getAttribute(
 					MFAEmailOTPWebKeys.MFA_EMAIL_OTP_SET_AT_TIME),
 				Long.MIN_VALUE);
 
 			long time =
-				mfaEmailOtpSetAtTime +
+				mfaEmailOTPSetAtTime +
 					mfaEmailOTPConfiguration.resendEmailTimeout() * 1000;
 
 			if (System.currentTimeMillis() <= time) {
@@ -130,11 +130,11 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 				return false;
 			}
 
-			String generatedMfaEmailOtp = PwdGenerator.getPassword(
+			String generatedMfaEmailOTP = PwdGenerator.getPassword(
 				mfaEmailOTPConfiguration.otpSize());
 
 			httpSession.setAttribute(
-				MFAEmailOTPWebKeys.MFA_EMAIL_OTP, generatedMfaEmailOtp);
+				MFAEmailOTPWebKeys.MFA_EMAIL_OTP, generatedMfaEmailOTP);
 
 			httpSession.setAttribute(
 				MFAEmailOTPWebKeys.MFA_EMAIL_OTP_SET_AT_TIME,
@@ -189,7 +189,7 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 				HtmlUtil.escape(
 					mfaEmailOTPConfiguration.emailTemplateFromName()));
 			mailTemplateContextBuilder.put(
-				"[$ONE_TIME_PASSWORD$]", HtmlUtil.escape(generatedMfaEmailOtp));
+				"[$ONE_TIME_PASSWORD$]", HtmlUtil.escape(generatedMfaEmailOTP));
 			mailTemplateContextBuilder.put(
 				"[$PORTAL_URL$]", _portal.getPortalURL(httpServletRequest));
 			mailTemplateContextBuilder.put(
