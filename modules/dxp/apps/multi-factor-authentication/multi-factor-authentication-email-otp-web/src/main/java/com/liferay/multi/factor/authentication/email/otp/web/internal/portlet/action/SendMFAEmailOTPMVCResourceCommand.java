@@ -96,6 +96,43 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 		}
 	}
 
+	private void _sendNotificationEmail(
+			String fromAddress, String fromName, String toAddress, User toUser,
+			String subject, String body,
+			MailTemplateContext mailTemplateContext)
+		throws IOException, PortalException {
+
+		MailTemplate subjectMailTemplate =
+			MailTemplateFactoryUtil.createMailTemplate(subject, false);
+
+		MailTemplate bodyMailTemplate =
+			MailTemplateFactoryUtil.createMailTemplate(body, true);
+
+		MailMessage mailMessage = new MailMessage(
+			new InternetAddress(fromAddress, fromName),
+			new InternetAddress(toAddress, toUser.getFullName()),
+			subjectMailTemplate.renderAsString(
+				toUser.getLocale(), mailTemplateContext),
+			bodyMailTemplate.renderAsString(
+				toUser.getLocale(), mailTemplateContext),
+			true);
+
+		Company company = _companyLocalService.getCompany(
+			toUser.getCompanyId());
+
+		mailMessage.setMessageId(
+			_portal.getMailId(company.getMx(), "user", toUser.getUserId()));
+
+		_mailService.sendEmail(mailMessage);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"one-time password email sent to user id ",
+					toUser.getUserId(), " to address ", toAddress));
+		}
+	}
+
 	private boolean _serveResource(HttpServletRequest httpServletRequest)
 		throws Exception {
 
@@ -173,8 +210,7 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 			MFAEmailOTPConfiguration.class,
 			MFAEmailOTPConfiguration.DEFAULT_EMAIL_OTP_BODY);
 
-		UnicodeProperties bodyUnicodeProperties = new UnicodeProperties(
-			true);
+		UnicodeProperties bodyUnicodeProperties = new UnicodeProperties(true);
 
 		bodyUnicodeProperties.fastLoad(
 			mfaEmailOTPConfiguration.emailTemplateBody());
@@ -184,20 +220,17 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 				new MFAEmailOTPConfigurationLocalizedValuesMap(
 					defaultEmailOTPBody, bodyUnicodeProperties);
 
-		String emailOTPBody =
-			bodyEmailOTPConfigurationLocalizedValuesMap.get(
-				user.getLocale());
+		String emailOTPBody = bodyEmailOTPConfigurationLocalizedValuesMap.get(
+			user.getLocale());
 
 		MailTemplateContextBuilder mailTemplateContextBuilder =
 			MailTemplateFactoryUtil.createMailTemplateContextBuilder();
 
 		mailTemplateContextBuilder.put(
-			"[$FROM_ADDRESS$]",
-			mfaEmailOTPConfiguration.emailTemplateFrom());
+			"[$FROM_ADDRESS$]", mfaEmailOTPConfiguration.emailTemplateFrom());
 		mailTemplateContextBuilder.put(
 			"[$FROM_NAME$]",
-			HtmlUtil.escape(
-				mfaEmailOTPConfiguration.emailTemplateFromName()));
+			HtmlUtil.escape(mfaEmailOTPConfiguration.emailTemplateFromName()));
 		mailTemplateContextBuilder.put(
 			"[$ONE_TIME_PASSWORD$]", HtmlUtil.escape(generatedMFAEmailOTP));
 		mailTemplateContextBuilder.put(
@@ -220,43 +253,6 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 			mailTemplateContext);
 
 		return true;
-	}
-
-	private void _sendNotificationEmail(
-			String fromAddress, String fromName, String toAddress, User toUser,
-			String subject, String body,
-			MailTemplateContext mailTemplateContext)
-		throws IOException, PortalException {
-
-		MailTemplate subjectMailTemplate =
-			MailTemplateFactoryUtil.createMailTemplate(subject, false);
-
-		MailTemplate bodyMailTemplate =
-			MailTemplateFactoryUtil.createMailTemplate(body, true);
-
-		MailMessage mailMessage = new MailMessage(
-			new InternetAddress(fromAddress, fromName),
-			new InternetAddress(toAddress, toUser.getFullName()),
-			subjectMailTemplate.renderAsString(
-				toUser.getLocale(), mailTemplateContext),
-			bodyMailTemplate.renderAsString(
-				toUser.getLocale(), mailTemplateContext),
-			true);
-
-		Company company = _companyLocalService.getCompany(
-			toUser.getCompanyId());
-
-		mailMessage.setMessageId(
-			_portal.getMailId(company.getMx(), "user", toUser.getUserId()));
-
-		_mailService.sendEmail(mailMessage);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				StringBundler.concat(
-					"one-time password email sent to user id ",
-					toUser.getUserId(), " to address ", toAddress));
-		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
