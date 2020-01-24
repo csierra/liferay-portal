@@ -130,11 +130,11 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 				return false;
 			}
 
-			String generatedMfaEmailOTP = PwdGenerator.getPassword(
+			String generatedMFAEmailOTP = PwdGenerator.getPassword(
 				mfaEmailOTPConfiguration.otpSize());
 
 			httpSession.setAttribute(
-				MFAEmailOTPWebKeys.MFA_EMAIL_OTP, generatedMfaEmailOTP);
+				MFAEmailOTPWebKeys.MFA_EMAIL_OTP, generatedMFAEmailOTP);
 
 			httpSession.setAttribute(
 				MFAEmailOTPWebKeys.MFA_EMAIL_OTP_SET_AT_TIME,
@@ -189,7 +189,7 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 				HtmlUtil.escape(
 					mfaEmailOTPConfiguration.emailTemplateFromName()));
 			mailTemplateContextBuilder.put(
-				"[$ONE_TIME_PASSWORD$]", HtmlUtil.escape(generatedMfaEmailOTP));
+				"[$ONE_TIME_PASSWORD$]", HtmlUtil.escape(generatedMFAEmailOTP));
 			mailTemplateContextBuilder.put(
 				"[$PORTAL_URL$]", _portal.getPortalURL(httpServletRequest));
 			mailTemplateContextBuilder.put(
