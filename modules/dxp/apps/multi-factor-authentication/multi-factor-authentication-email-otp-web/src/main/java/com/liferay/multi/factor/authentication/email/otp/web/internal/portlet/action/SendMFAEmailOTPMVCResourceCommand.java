@@ -23,7 +23,6 @@ import com.liferay.mail.kernel.template.MailTemplateFactoryUtil;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPPortletKeys;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.settings.MFAEmailOTPConfigurationLocalizedValuesMap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -36,12 +35,11 @@ import com.liferay.portal.kernel.security.auth.AuthToken;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PwdGenerator;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -186,50 +184,25 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_SET_AT_TIME,
 			System.currentTimeMillis());
 
-		String defaultEmailOTPSubject = StringUtil.read(
-			MFAEmailOTPConfiguration.class,
-			MFAEmailOTPConfiguration.DEFAULT_EMAIL_OTP_SUBJECT);
+		LocalizedValuesMap subjectLocalizedValuesMap =
+			mfaEmailOTPConfiguration.emailOTPSentSubject();
 
-		UnicodeProperties subjectUnicodeProperties = new UnicodeProperties(
-			true);
-
-		subjectUnicodeProperties.fastLoad(
-			mfaEmailOTPConfiguration.emailTemplateSubject());
-
-		MFAEmailOTPConfigurationLocalizedValuesMap
-			subjectEmailOTPConfigurationLocalizedValuesMap =
-				new MFAEmailOTPConfigurationLocalizedValuesMap(
-					defaultEmailOTPSubject, subjectUnicodeProperties);
-
-		String emailOTPSubject =
-			subjectEmailOTPConfigurationLocalizedValuesMap.get(
-				user.getLocale());
-
-		String defaultEmailOTPBody = StringUtil.read(
-			MFAEmailOTPConfiguration.class,
-			MFAEmailOTPConfiguration.DEFAULT_EMAIL_OTP_BODY);
-
-		UnicodeProperties bodyUnicodeProperties = new UnicodeProperties(true);
-
-		bodyUnicodeProperties.fastLoad(
-			mfaEmailOTPConfiguration.emailTemplateBody());
-
-		MFAEmailOTPConfigurationLocalizedValuesMap
-			bodyEmailOTPConfigurationLocalizedValuesMap =
-				new MFAEmailOTPConfigurationLocalizedValuesMap(
-					defaultEmailOTPBody, bodyUnicodeProperties);
-
-		String emailOTPBody = bodyEmailOTPConfigurationLocalizedValuesMap.get(
+		String emailOTPSubject = subjectLocalizedValuesMap.get(
 			user.getLocale());
+
+		LocalizedValuesMap bodyLocalizedValuesMap =
+			mfaEmailOTPConfiguration.emailOTPSentBody();
+
+		String emailOTPBody = bodyLocalizedValuesMap.get(user.getLocale());
 
 		MailTemplateContextBuilder mailTemplateContextBuilder =
 			MailTemplateFactoryUtil.createMailTemplateContextBuilder();
 
 		mailTemplateContextBuilder.put(
-			"[$FROM_ADDRESS$]", mfaEmailOTPConfiguration.emailTemplateFrom());
+			"[$FROM_ADDRESS$]", mfaEmailOTPConfiguration.emailFromAddress());
 		mailTemplateContextBuilder.put(
 			"[$FROM_NAME$]",
-			HtmlUtil.escape(mfaEmailOTPConfiguration.emailTemplateFromName()));
+			HtmlUtil.escape(mfaEmailOTPConfiguration.emailFromName()));
 		mailTemplateContextBuilder.put(
 			"[$ONE_TIME_PASSWORD$]", HtmlUtil.escape(generatedMFAEmailOTP));
 		mailTemplateContextBuilder.put(
@@ -246,10 +219,9 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 			mailTemplateContextBuilder.build();
 
 		_sendNotificationEmail(
-			mfaEmailOTPConfiguration.emailTemplateFrom(),
-			mfaEmailOTPConfiguration.emailTemplateFromName(),
-			user.getEmailAddress(), user, emailOTPSubject, emailOTPBody,
-			mailTemplateContext);
+			mfaEmailOTPConfiguration.emailFromAddress(),
+			mfaEmailOTPConfiguration.emailFromName(), user.getEmailAddress(),
+			user, emailOTPSubject, emailOTPBody, mailTemplateContext);
 
 		return true;
 	}
