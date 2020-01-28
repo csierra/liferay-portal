@@ -114,18 +114,18 @@ public class UpdatePasswordMyAccountMVCActionCommand
 					AuthenticatedSessionManagerUtil.logout(
 						originalHttpServletRequest, httpServletResponse);
 
-					String redirect = _portal.getCurrentCompleteURL(
-						originalHttpServletRequest);
-
-					if (!StringUtil.equals(
+					if (StringUtil.equals(
 							originalHttpServletRequest.getMethod(),
 							HttpMethods.GET)) {
 
-						redirect = _portal.getPortalURL(
-							originalHttpServletRequest);
+						httpServletResponse.sendRedirect(
+							_portal.getCurrentCompleteURL(
+								originalHttpServletRequest));
 					}
-
-					httpServletResponse.sendRedirect(redirect);
+					else {
+						httpServletResponse.sendRedirect(
+							_portal.getPortalURL(originalHttpServletRequest));
+					}
 
 					throw new UserLockoutException.PasswordPolicyLockout(
 						user, user.getPasswordPolicy());
