@@ -63,8 +63,8 @@ public class LockoutFilter extends BasePortalFilter {
 		try {
 			User user = PortalUtil.getUser(httpServletRequest);
 
-			if (user != null) {
-				return user.isLockout();
+			if ((user != null) && user.isLockout()) {
+				return true;
 			}
 
 			return false;
