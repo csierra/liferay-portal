@@ -92,7 +92,6 @@ public class PasswordModifiedFilter extends BasePortalFilter {
 			}
 
 			if (!httpServletRequest.isRequestedSessionIdValid() ||
-				(session == null) ||
 				(session.getCreationTime() < passwordModifiedDate.getTime())) {
 
 				return true;
