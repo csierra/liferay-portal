@@ -267,7 +267,8 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_DIGEST,
 			DigesterUtil.digest(encryptedStateMapJSON));
 		httpSession.setAttribute(MFAEmailOTPWebKeys.MFA_EMAIL_OTP_KEY, key);
-		httpSession.setAttribute(WebKeys.USER_ID, userId);
+		httpSession.setAttribute(
+			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_USER_ID, userId);
 	}
 
 	private static final Accessor<Object, String> _STRING_ACCESSOR =

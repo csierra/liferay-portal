@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PwdGenerator;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 
@@ -135,7 +134,8 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
-		Long userId = (Long)httpSession.getAttribute(WebKeys.USER_ID);
+		Long userId = (Long)httpSession.getAttribute(
+			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_USER_ID);
 
 		if (userId == null) {
 			if (_log.isWarnEnabled()) {
