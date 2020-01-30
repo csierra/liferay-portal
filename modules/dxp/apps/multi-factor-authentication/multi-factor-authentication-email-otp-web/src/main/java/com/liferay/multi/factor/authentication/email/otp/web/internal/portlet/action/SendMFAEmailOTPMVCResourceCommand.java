@@ -134,10 +134,10 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
-		Long userId = (Long)httpSession.getAttribute(
+		Long mfaEmailOTPUserId = (Long)httpSession.getAttribute(
 			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_USER_ID);
 
-		if (userId == null) {
+		if (mfaEmailOTPUserId == null) {
 			if (_log.isWarnEnabled()) {
 				_log.warn("User ID is not in the session");
 			}
@@ -145,7 +145,7 @@ public class SendMFAEmailOTPMVCResourceCommand implements MVCResourceCommand {
 			return false;
 		}
 
-		User user = _userLocalService.getUserById(userId);
+		User user = _userLocalService.getUserById(mfaEmailOTPUserId);
 
 		MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
 			ConfigurationProviderUtil.getCompanyConfiguration(
