@@ -14,9 +14,9 @@
 
 package com.liferay.multi.factor.authentication.email.otp.web.internal.portlet.action;
 
+import com.liferay.login.web.constants.LoginPortletKeys;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.checker.MFAEmailOTPChecker;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.LoginPortletKeys;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPPortletKeys;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
 import com.liferay.petra.encryptor.Encryptor;
