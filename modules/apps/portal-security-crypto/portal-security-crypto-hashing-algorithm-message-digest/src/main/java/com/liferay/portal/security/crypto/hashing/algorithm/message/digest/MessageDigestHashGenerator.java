@@ -14,14 +14,9 @@
 
 package com.liferay.portal.security.crypto.hashing.algorithm.message.digest;
 
-import com.liferay.portal.security.crypto.generator.hashing.HashGenerator;
-import com.liferay.portal.security.crypto.generator.hashing.salt.SaltGenerator;
-import com.liferay.portal.security.crypto.generator.hashing.salt.VariableSizeSaltGenerator;
 import com.liferay.portal.security.crypto.generator.spi.hashing.AbstractHashGenerator;
 
 import java.security.MessageDigest;
-
-import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Arthur Chan
@@ -30,11 +25,6 @@ public class MessageDigestHashGenerator extends AbstractHashGenerator {
 
 	public MessageDigestHashGenerator(String generatorName) {
 		_chosenGenerator = generatorName;
-	}
-
-	@Override
-	public SaltGenerator getSaltGenerator() {
-		return VariableSizeSaltGenerator.DEFAULT;
 	}
 
 	@Override

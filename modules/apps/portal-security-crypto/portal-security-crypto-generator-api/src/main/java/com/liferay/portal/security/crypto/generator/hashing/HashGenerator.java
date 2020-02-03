@@ -15,6 +15,7 @@
 package com.liferay.portal.security.crypto.generator.hashing;
 
 import com.liferay.portal.security.crypto.generator.hashing.salt.SaltGenerator;
+import com.liferay.portal.security.crypto.generator.hashing.salt.VariableSizeSaltGenerator;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -24,7 +25,13 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashGenerator {
 
-	public SaltGenerator getSaltGenerator();
+	public static final SaltGenerator DEFAULT_SALT_GENERATOR =
+		new VariableSizeSaltGenerator() {
+		};
+
+	public default SaltGenerator getSaltGenerator() {
+		return DEFAULT_SALT_GENERATOR;
+	}
 
 	public byte[] hash(byte[] toBeHashed) throws Exception;
 
