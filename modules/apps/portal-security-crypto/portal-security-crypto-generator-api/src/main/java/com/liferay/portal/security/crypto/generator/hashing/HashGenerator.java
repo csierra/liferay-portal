@@ -24,8 +24,6 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashGenerator {
 
-	public String[] getGeneratorNames();
-
 	public SaltGenerator getSaltGenerator();
 
 	public byte[] hash(byte[] toBeHashed) throws Exception;
