@@ -20,6 +20,8 @@ import org.json.JSONObject;
 
 import org.osgi.annotation.versioning.ProviderType;
 
+import java.util.EnumSet;
+
 /**
  * @author Arthur Chan
  */
@@ -35,5 +37,6 @@ public interface HashGeneratorFactory {
 	 */
 	public HashGenerator create(String generatorName, JSONObject generatorMeta)
 		throws Exception;
+
 
 }

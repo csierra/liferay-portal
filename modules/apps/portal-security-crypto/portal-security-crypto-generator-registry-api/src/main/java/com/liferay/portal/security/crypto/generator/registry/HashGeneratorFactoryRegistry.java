@@ -14,10 +14,10 @@
 
 package com.liferay.portal.security.crypto.generator.registry;
 
-import com.liferay.portal.security.crypto.generator.hashing.HashGenerator;
-
 import java.util.Set;
 
+import com.liferay.portal.security.crypto.generator.registry.HashRequest.HashRequestBuilder;
+import com.liferay.portal.security.crypto.generator.registry.HashRequest.SaltCommand;
 import org.json.JSONObject;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -28,10 +28,58 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashGeneratorFactoryRegistry {
 
-	public HashGenerator createHashGenerator(
+	public HashRequestProcessor getHashRequestProcessor(
 			String generatorName, JSONObject generatorMeta)
 		throws Exception;
 
 	public Set<String> getRegisteredHashGeneratorFactoryNames();
 
+	interface HashRequestProcessor {
+		public HashResponse process(HashRequest hashRequest);
+	}
+
+	public static void main(String[] args) {
+		HashGeneratorFactoryRegistry hashGeneratorFactoryRegistry =
+			new HashGeneratorFactoryRegistry() {
+			@Override
+			public HashRequestProcessor getHashRequestProcessor(
+				String generatorName, JSONObject generatorMeta)
+				throws Exception {
+				return null;
+			}
+
+			@Override
+			public Set<String> getRegisteredHashGeneratorFactoryNames() {
+				return null;
+			}
+		};
+
+		final HashRequestProcessor hashRequestProcessor =
+			hashGeneratorFactoryRegistry.getHashRequestProcessor(
+				"MD5", new JSONObject());
+
+		hashRequestProcessor.process(
+			HashRequestBuilder.pepper(
+				"pepper".getBytes()
+			).saltCommand(
+				SaltCommand.oneOf(
+					SaltCommand.generateVariableSizeSalt(32),
+					SaltCommand.generateDefaultSizeSalt()
+				)
+			).input(
+				"password".getBytes()
+			)
+		);
+
+		hashRequestProcessor.process(
+			HashRequestBuilder.pepper(
+				"pepper".getBytes()
+			).saltCommand(
+				SaltCommand.useSalt("storedSalt".getBytes())
+			).input(
+				"password".getBytes()
+			)
+		);
+
+	}
 }

@@ -39,4 +39,8 @@ public interface HashGenerator {
 
 	public HashGenerator withSalt(byte[] salt);
 
+	public static void main(String[] args) {
+		HashGenerator hg; hg.withSalt().withPepper();
+	}
+
 }
