@@ -6,6 +6,9 @@ import jodd.util.BCrypt;
 
 public class BCryptSaltGenerator implements SaltGenerator {
 
+	public BCryptSaltGenerator() {
+	}
+
 	public BCryptSaltGenerator(int rounds) {
 		_rounds = rounds;
 	}
