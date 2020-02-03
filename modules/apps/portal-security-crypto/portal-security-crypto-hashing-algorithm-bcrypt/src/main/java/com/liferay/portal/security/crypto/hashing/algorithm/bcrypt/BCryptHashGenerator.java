@@ -62,9 +62,4 @@ public class BCryptHashGenerator extends AbstractHashGenerator {
 		return hash.getBytes();
 	}
 
-	@Override
-	public String[] getGeneratorNames() {
-		return new String[] {"BCrypt"};
-	}
-
 }
