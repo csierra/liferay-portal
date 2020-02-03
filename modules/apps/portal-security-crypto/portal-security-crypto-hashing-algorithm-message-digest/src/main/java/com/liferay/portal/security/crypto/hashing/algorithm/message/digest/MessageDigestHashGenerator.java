@@ -33,13 +33,6 @@ public class MessageDigestHashGenerator extends AbstractHashGenerator {
 	}
 
 	@Override
-	public String[] getGeneratorNames() {
-		return new String[] {
-			"MD2", "MD5", "SHA-1", "SHA-224", "SHA-256", "SHA-384", "SHA-512"
-		};
-	}
-
-	@Override
 	public SaltGenerator getSaltGenerator() {
 		return VariableSizeSaltGenerator.DEFAULT;
 	}
