@@ -104,7 +104,11 @@ public class MFAEmailOTPChecker {
 
 		HttpSession httpSession = originalHttpServletRequest.getSession(false);
 
-		return isVerified(httpSession, userId);
+		if (isVerified(httpSession, userId)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean verifyBrowserRequest(
