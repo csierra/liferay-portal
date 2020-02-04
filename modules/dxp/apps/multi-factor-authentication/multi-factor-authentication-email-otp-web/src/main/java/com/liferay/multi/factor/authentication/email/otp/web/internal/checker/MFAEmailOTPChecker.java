@@ -47,6 +47,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 
 /**
  * @author Arthur Chan
@@ -318,7 +319,9 @@ public class MFAEmailOTPChecker {
 	}
 
 	private void _routeAuditMessage(AuditMessage auditMessage) {
-		_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+		if (_mfaEmailOTPCheckerAudit != null) {
+			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+		}
 	}
 
 	private boolean _verify(HttpSession httpSession, String otp) {
@@ -341,7 +344,7 @@ public class MFAEmailOTPChecker {
 	private static final Log _log = LogFactoryUtil.getLog(
 		MFAEmailOTPChecker.class);
 
-	@Reference
+	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
 	private MFAEmailOTPCheckerAudit _mfaEmailOTPCheckerAudit;
 
 	@Reference
