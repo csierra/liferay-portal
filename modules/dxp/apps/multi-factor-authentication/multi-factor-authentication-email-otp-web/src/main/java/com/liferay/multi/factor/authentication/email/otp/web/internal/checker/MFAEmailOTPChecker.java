@@ -124,7 +124,7 @@ public class MFAEmailOTPChecker {
 				_mfaEmailOTPCheckerAudit.buildVerificationFailureMessage(
 					user, getClass().getName(), "Nonexistent User");
 
-			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+			_routeAuditMessage(auditMessage);
 
 			return false;
 		}
@@ -160,7 +160,7 @@ public class MFAEmailOTPChecker {
 						user, getClass().getName(),
 						"Reached Maximum allowed attempts");
 
-				_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+				_routeAuditMessage(auditMessage);
 
 				return false;
 			}
@@ -187,7 +187,7 @@ public class MFAEmailOTPChecker {
 				_mfaEmailOTPCheckerAudit.buildVerificationSuccessMessage(
 					user, getClass().getName());
 
-			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+			_routeAuditMessage(auditMessage);
 
 			return true;
 		}
@@ -197,7 +197,7 @@ public class MFAEmailOTPChecker {
 				user, getClass().getName(),
 				"Incorrect Email One-time Password");
 
-		_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+		_routeAuditMessage(auditMessage);
 
 		_mfaEmailOTPEntryLocalService.updateAttempts(
 			userId, originalHttpServletRequest.getRemoteAddr(), false);
@@ -255,7 +255,7 @@ public class MFAEmailOTPChecker {
 				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
 					user, getClass().getName(), "Nonexistent User");
 
-			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+			_routeAuditMessage(auditMessage);
 
 			return false;
 		}
@@ -265,7 +265,7 @@ public class MFAEmailOTPChecker {
 				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
 					user, getClass().getName(), "Empty Session");
 
-			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+			_routeAuditMessage(auditMessage);
 
 			return false;
 		}
@@ -279,7 +279,7 @@ public class MFAEmailOTPChecker {
 				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
 					user, getClass().getName(), "Not The Same User");
 
-			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+			_routeAuditMessage(auditMessage);
 
 			return false;
 		}
@@ -303,7 +303,7 @@ public class MFAEmailOTPChecker {
 				_mfaEmailOTPCheckerAudit.buildIsVerifiedMessage(
 					user, getClass().getName());
 
-			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+			_routeAuditMessage(auditMessage);
 
 			return true;
 		}
@@ -312,7 +312,7 @@ public class MFAEmailOTPChecker {
 			_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
 				user, getClass().getName(), "Verification Has Expired");
 
-		_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
+		_routeAuditMessage(auditMessage);
 
 		return false;
 	}
@@ -333,6 +333,10 @@ public class MFAEmailOTPChecker {
 		catch (ConfigurationException configurationException) {
 			throw new IllegalStateException(configurationException);
 		}
+	}
+
+	private void _routeAuditMessage(AuditMessage auditMessage) {
+		_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 	}
 
 	private boolean _verify(HttpSession httpSession, String otp) {
