@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.audit.AuditException;
 import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.audit.AuditRouter;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -37,67 +38,33 @@ public class MFAEmailOTPCheckerAudit {
 	public AuditMessage buildIsNotVerifiedMessage(
 		User user, String checkerClassName, String reason) {
 
-		if (user == null) {
-			return new AuditMessage(
-				MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_NOT_VERIFIED,
-				CompanyThreadLocal.getCompanyId(), 0, StringPool.BLANK,
-				checkerClassName, "0", null, JSONUtil.put("reason", reason));
-		}
-
-		return new AuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_NOT_VERIFIED,
-			user.getCompanyId(), user.getUserId(), user.getFullName(),
-			checkerClassName, String.valueOf(user.getPrimaryKey()), null,
-			JSONUtil.put("reason", reason));
+		return _getAuditMessage(
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_NOT_VERIFIED, user,
+			checkerClassName, JSONUtil.put("reason", reason));
 	}
 
 	public AuditMessage buildIsVerifiedMessage(
 		User user, String checkerClassName) {
 
-		if (user == null) {
-			return new AuditMessage(
-				MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_VERIFIED,
-				CompanyThreadLocal.getCompanyId(), 0, StringPool.BLANK,
-				checkerClassName, "0", null, null);
-		}
-
-		return new AuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_VERIFIED,
-			user.getCompanyId(), user.getUserId(), user.getFullName(),
-			checkerClassName, String.valueOf(user.getPrimaryKey()), null, null);
+		return _getAuditMessage(
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_VERIFIED, user,
+			checkerClassName, null);
 	}
 
 	public AuditMessage buildVerificationFailureMessage(
 		User user, String checkerClassName, String reason) {
 
-		if (user == null) {
-			return new AuditMessage(
-				MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_FAILURE,
-				CompanyThreadLocal.getCompanyId(), 0, StringPool.BLANK,
-				checkerClassName, "0", null, JSONUtil.put("reason", reason));
-		}
-
-		return new AuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_FAILURE,
-			user.getCompanyId(), user.getUserId(), user.getFullName(),
-			checkerClassName, String.valueOf(user.getPrimaryKey()), null,
-			JSONUtil.put("reason", reason));
+		return _getAuditMessage(
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_FAILURE, user,
+			checkerClassName, JSONUtil.put("reason", reason));
 	}
 
 	public AuditMessage buildVerificationSuccessMessage(
 		User user, String checkerClassName) {
 
-		if (user == null) {
-			return new AuditMessage(
-				MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_SUCCESS,
-				CompanyThreadLocal.getCompanyId(), 0, StringPool.BLANK,
-				checkerClassName, "0", null, null);
-		}
-
-		return new AuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_SUCCESS,
-			user.getCompanyId(), user.getUserId(), user.getFullName(),
-			checkerClassName, String.valueOf(user.getPrimaryKey()), null, null);
+		return _getAuditMessage(
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_SUCCESS, user,
+			checkerClassName, null);
 	}
 
 	public void routeAuditMessage(AuditMessage auditMessage) {
@@ -114,6 +81,22 @@ public class MFAEmailOTPCheckerAudit {
 				_log.debug(exception, exception);
 			}
 		}
+	}
+
+	private AuditMessage _getAuditMessage(
+		String eventType, User user, String checkerClassName,
+		JSONObject reason) {
+
+		if (user == null) {
+			return new AuditMessage(
+				eventType, CompanyThreadLocal.getCompanyId(), 0,
+				StringPool.BLANK, checkerClassName, "0", null, reason);
+		}
+
+		return new AuditMessage(
+			eventType, user.getCompanyId(), user.getUserId(),
+			user.getFullName(), checkerClassName,
+			String.valueOf(user.getPrimaryKey()), null, reason);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
