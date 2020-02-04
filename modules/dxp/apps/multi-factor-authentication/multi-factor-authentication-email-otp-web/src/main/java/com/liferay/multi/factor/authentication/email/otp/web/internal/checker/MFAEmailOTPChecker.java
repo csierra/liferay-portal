@@ -16,7 +16,7 @@ package com.liferay.multi.factor.authentication.email.otp.web.internal.checker;
 
 import com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTPEntry;
 import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPEntryLocalService;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.checker.audit.util.MFAEmailOTPCheckerAuditUtil;
+import com.liferay.multi.factor.authentication.email.otp.web.internal.checker.audit.util.MFAEmailOTPCheckerAudit;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
 import com.liferay.portal.kernel.audit.AuditMessage;
@@ -121,10 +121,10 @@ public class MFAEmailOTPChecker {
 			}
 
 			AuditMessage auditMessage =
-				MFAEmailOTPCheckerAuditUtil.buildVerificationFailureMessage(
+				_mfaEmailOTPCheckerAudit.buildVerificationFailureMessage(
 					user, getClass().getName(), "Nonexistent User");
 
-			MFAEmailOTPCheckerAuditUtil.routeAuditMessage(auditMessage);
+			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 
 			return false;
 		}
@@ -156,11 +156,11 @@ public class MFAEmailOTPChecker {
 			}
 			else {
 				AuditMessage auditMessage =
-					MFAEmailOTPCheckerAuditUtil.buildVerificationFailureMessage(
+					_mfaEmailOTPCheckerAudit.buildVerificationFailureMessage(
 						user, getClass().getName(),
 						"Reached Maximum allowed attempts");
 
-				MFAEmailOTPCheckerAuditUtil.routeAuditMessage(auditMessage);
+				_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 
 				return false;
 			}
@@ -184,20 +184,20 @@ public class MFAEmailOTPChecker {
 				userId, originalHttpServletRequest.getRemoteAddr(), true);
 
 			AuditMessage auditMessage =
-				MFAEmailOTPCheckerAuditUtil.buildVerificationSuccessMessage(
+				_mfaEmailOTPCheckerAudit.buildVerificationSuccessMessage(
 					user, getClass().getName());
 
-			MFAEmailOTPCheckerAuditUtil.routeAuditMessage(auditMessage);
+			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 
 			return true;
 		}
 
 		AuditMessage auditMessage =
-			MFAEmailOTPCheckerAuditUtil.buildVerificationFailureMessage(
+			_mfaEmailOTPCheckerAudit.buildVerificationFailureMessage(
 				user, getClass().getName(),
 				"Incorrect Email One-time Password");
 
-		MFAEmailOTPCheckerAuditUtil.routeAuditMessage(auditMessage);
+		_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 
 		_mfaEmailOTPEntryLocalService.updateAttempts(
 			userId, originalHttpServletRequest.getRemoteAddr(), false);
@@ -252,20 +252,20 @@ public class MFAEmailOTPChecker {
 			}
 
 			AuditMessage auditMessage =
-				MFAEmailOTPCheckerAuditUtil.buildIsNotVerifiedMessage(
+				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
 					user, getClass().getName(), "Nonexistent User");
 
-			MFAEmailOTPCheckerAuditUtil.routeAuditMessage(auditMessage);
+			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 
 			return false;
 		}
 
 		if (httpSession == null) {
 			AuditMessage auditMessage =
-				MFAEmailOTPCheckerAuditUtil.buildIsNotVerifiedMessage(
+				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
 					user, getClass().getName(), "Empty Session");
 
-			MFAEmailOTPCheckerAuditUtil.routeAuditMessage(auditMessage);
+			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 
 			return false;
 		}
@@ -276,10 +276,10 @@ public class MFAEmailOTPChecker {
 				userId)) {
 
 			AuditMessage auditMessage =
-				MFAEmailOTPCheckerAuditUtil.buildIsNotVerifiedMessage(
+				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
 					user, getClass().getName(), "Not The Same User");
 
-			MFAEmailOTPCheckerAuditUtil.routeAuditMessage(auditMessage);
+			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 
 			return false;
 		}
@@ -300,19 +300,19 @@ public class MFAEmailOTPChecker {
 
 		if (time > System.currentTimeMillis()) {
 			AuditMessage auditMessage =
-				MFAEmailOTPCheckerAuditUtil.buildIsVerifiedMessage(
+				_mfaEmailOTPCheckerAudit.buildIsVerifiedMessage(
 					user, getClass().getName());
 
-			MFAEmailOTPCheckerAuditUtil.routeAuditMessage(auditMessage);
+			_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 
 			return true;
 		}
 
 		AuditMessage auditMessage =
-			MFAEmailOTPCheckerAuditUtil.buildIsNotVerifiedMessage(
+			_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
 				user, getClass().getName(), "Verification Has Expired");
 
-		MFAEmailOTPCheckerAuditUtil.routeAuditMessage(auditMessage);
+		_mfaEmailOTPCheckerAudit.routeAuditMessage(auditMessage);
 
 		return false;
 	}
@@ -354,6 +354,9 @@ public class MFAEmailOTPChecker {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		MFAEmailOTPChecker.class);
+
+	@Reference
+	private MFAEmailOTPCheckerAudit _mfaEmailOTPCheckerAudit;
 
 	@Reference
 	private MFAEmailOTPEntryLocalService _mfaEmailOTPEntryLocalService;

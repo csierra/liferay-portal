@@ -17,19 +17,23 @@ package com.liferay.multi.factor.authentication.email.otp.web.internal.checker.a
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPEventTypes;
 import com.liferay.portal.kernel.audit.AuditException;
 import com.liferay.portal.kernel.audit.AuditMessage;
-import com.liferay.portal.kernel.audit.AuditRouterUtil;
+import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Arthur Chan
  */
-public class MFAEmailOTPCheckerAuditUtil {
+@Component(service = MFAEmailOTPCheckerAudit.class)
+public class MFAEmailOTPCheckerAudit {
 
-	public static AuditMessage buildIsNotVerifiedMessage(
+	public AuditMessage buildIsNotVerifiedMessage(
 		User user, String checkerClassName, String reason) {
 
 		JSONObject additionalInfo = JSONUtil.put("reason", reason);
@@ -41,7 +45,7 @@ public class MFAEmailOTPCheckerAuditUtil {
 			additionalInfo);
 	}
 
-	public static AuditMessage buildIsVerifiedMessage(
+	public AuditMessage buildIsVerifiedMessage(
 		User user, String checkerClassName) {
 
 		return new AuditMessage(
@@ -50,7 +54,7 @@ public class MFAEmailOTPCheckerAuditUtil {
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null, null);
 	}
 
-	public static AuditMessage buildVerificationFailureMessage(
+	public AuditMessage buildVerificationFailureMessage(
 		User user, String checkerClassName, String reason) {
 
 		JSONObject additionalInfo = JSONUtil.put("reason", reason);
@@ -62,7 +66,7 @@ public class MFAEmailOTPCheckerAuditUtil {
 			additionalInfo);
 	}
 
-	public static AuditMessage buildVerificationSuccessMessage(
+	public AuditMessage buildVerificationSuccessMessage(
 		User user, String checkerClassName) {
 
 		return new AuditMessage(
@@ -71,9 +75,9 @@ public class MFAEmailOTPCheckerAuditUtil {
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null, null);
 	}
 
-	public static void routeAuditMessage(AuditMessage auditMessage) {
+	public void routeAuditMessage(AuditMessage auditMessage) {
 		try {
-			AuditRouterUtil.route(auditMessage);
+			_auditRouter.route(auditMessage);
 		}
 		catch (AuditException auditException) {
 			if (_log.isWarnEnabled()) {
@@ -88,6 +92,9 @@ public class MFAEmailOTPCheckerAuditUtil {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		MFAEmailOTPCheckerAuditUtil.class);
+		MFAEmailOTPCheckerAudit.class);
+
+	@Reference
+	private AuditRouter _auditRouter;
 
 }
