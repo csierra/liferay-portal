@@ -18,7 +18,6 @@ import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.
 import com.liferay.portal.kernel.audit.AuditException;
 import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.audit.AuditRouter;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -36,13 +35,11 @@ public class MFAEmailOTPCheckerAudit {
 	public AuditMessage buildIsNotVerifiedMessage(
 		User user, String checkerClassName, String reason) {
 
-		JSONObject additionalInfo = JSONUtil.put("reason", reason);
-
 		return new AuditMessage(
 			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_NOT_VERIFIED,
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null,
-			additionalInfo);
+			JSONUtil.put("reason", reason));
 	}
 
 	public AuditMessage buildIsVerifiedMessage(
@@ -57,13 +54,11 @@ public class MFAEmailOTPCheckerAudit {
 	public AuditMessage buildVerificationFailureMessage(
 		User user, String checkerClassName, String reason) {
 
-		JSONObject additionalInfo = JSONUtil.put("reason", reason);
-
 		return new AuditMessage(
 			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_FAILURE,
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null,
-			additionalInfo);
+			JSONUtil.put("reason", reason));
 	}
 
 	public AuditMessage buildVerificationSuccessMessage(
