@@ -127,7 +127,7 @@ public class MFAEmailOTPChecker {
 
 			_routeAuditMessage(
 				_mfaEmailOTPCheckerAudit.buildVerificationFailureMessage(
-					user, getClass().getName(), "Nonexistent User"));
+					user, getClass().getName(), "Nonexistent User " + userId));
 
 			return false;
 		}
@@ -250,7 +250,7 @@ public class MFAEmailOTPChecker {
 
 			_routeAuditMessage(
 				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
-					user, getClass().getName(), "Nonexistent User"));
+					user, getClass().getName(), "Nonexistent User " + userId));
 
 			return false;
 		}
