@@ -51,6 +51,15 @@ public class MFAEmailOTPCheckerAudit {
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null, null);
 	}
 
+	public AuditMessage buildNonexistentUserAuditMessage(
+		long companyId, long userId, String checkerClassName) {
+
+		return new AuditMessage(
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_FAILURE, companyId,
+			userId, "Nonexistent", checkerClassName, String.valueOf(userId),
+			null, JSONUtil.put("reason", "Nonexistent User"));
+	}
+
 	public AuditMessage buildVerificationFailureMessage(
 		User user, String checkerClassName, String reason) {
 

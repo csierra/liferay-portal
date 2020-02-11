@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -126,8 +127,9 @@ public class MFAEmailOTPChecker {
 			}
 
 			_routeAuditMessage(
-				_mfaEmailOTPCheckerAudit.buildVerificationFailureMessage(
-					user, getClass().getName(), "Nonexistent User"));
+				_mfaEmailOTPCheckerAudit.buildNonexistentUserAuditMessage(
+					CompanyThreadLocal.getCompanyId(), userId,
+					getClass().getName()));
 
 			return false;
 		}
@@ -249,8 +251,9 @@ public class MFAEmailOTPChecker {
 			}
 
 			_routeAuditMessage(
-				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
-					user, getClass().getName(), "Nonexistent User"));
+				_mfaEmailOTPCheckerAudit.buildNonexistentUserAuditMessage(
+					CompanyThreadLocal.getCompanyId(), userId,
+					getClass().getName()));
 
 			return false;
 		}
