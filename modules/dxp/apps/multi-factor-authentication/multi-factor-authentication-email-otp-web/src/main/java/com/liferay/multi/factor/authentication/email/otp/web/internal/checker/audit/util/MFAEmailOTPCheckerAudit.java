@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -36,34 +37,34 @@ import org.osgi.service.component.annotations.Reference;
 public class MFAEmailOTPCheckerAudit {
 
 	public AuditMessage buildIsNotVerifiedMessage(
-		User user, String checkerClassName, String reason) {
+		long userId, String checkerClassName, String reason) {
 
 		return _getAuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_NOT_VERIFIED, user,
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_NOT_VERIFIED, userId,
 			checkerClassName, JSONUtil.put("reason", reason));
 	}
 
 	public AuditMessage buildIsVerifiedMessage(
-		User user, String checkerClassName) {
+		long userId, String checkerClassName) {
 
 		return _getAuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_VERIFIED, user,
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_VERIFIED, userId,
 			checkerClassName, null);
 	}
 
 	public AuditMessage buildVerificationFailureMessage(
-		User user, String checkerClassName, String reason) {
+		long userId, String checkerClassName, String reason) {
 
 		return _getAuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_FAILURE, user,
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_FAILURE, userId,
 			checkerClassName, JSONUtil.put("reason", reason));
 	}
 
 	public AuditMessage buildVerificationSuccessMessage(
-		User user, String checkerClassName) {
+		long userId, String checkerClassName) {
 
 		return _getAuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_SUCCESS, user,
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_SUCCESS, userId,
 			checkerClassName, null);
 	}
 
@@ -84,13 +85,16 @@ public class MFAEmailOTPCheckerAudit {
 	}
 
 	private AuditMessage _getAuditMessage(
-		String eventType, User user, String checkerClassName,
+		String eventType, long userId, String checkerClassName,
 		JSONObject reason) {
+
+		User user = _userLocalService.fetchUser(userId);
 
 		if (user == null) {
 			return new AuditMessage(
-				eventType, CompanyThreadLocal.getCompanyId(), 0,
-				StringPool.BLANK, checkerClassName, "0", null, reason);
+				eventType, CompanyThreadLocal.getCompanyId(), userId,
+				StringPool.BLANK, checkerClassName, String.valueOf(userId),
+				null, JSONUtil.put("reason", "No Such User " + userId));
 		}
 
 		return new AuditMessage(
@@ -104,5 +108,8 @@ public class MFAEmailOTPCheckerAudit {
 
 	@Reference
 	private AuditRouter _auditRouter;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
