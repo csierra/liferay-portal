@@ -19,16 +19,16 @@ package com.liferay.multi.factor.authentication.email.otp.web.internal.constants
  */
 public interface MFAEmailOTPEventTypes {
 
-	public static final String MFA_EMAIL_OTP_IS_NOT_VERIFIED =
-		"MFA_EMAIL_OTP_IS_NOT_VERIFIED";
-
-	public static final String MFA_EMAIL_OTP_IS_VERIFIED =
-		"MFA_EMAIL_OTP_IS_VERIFIED";
+	public static final String MFA_EMAIL_OTP_NOT_VERIFIED =
+		"MFA_EMAIL_OTP_NOT_VERIFIED";
 
 	public static final String MFA_EMAIL_OTP_VERIFICATION_FAILURE =
 		"MFA_EMAIL_OTP_VERIFICATION_FAILURE";
 
 	public static final String MFA_EMAIL_OTP_VERIFICATION_SUCCESS =
 		"MFA_EMAIL_OTP_VERIFICATION_SUCCESS";
+
+	public static final String MFA_EMAIL_OTP_VERIFIED =
+		"MFA_EMAIL_OTP_VERIFIED";
 
 }

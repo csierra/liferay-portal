@@ -32,21 +32,21 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = MFAEmailOTPCheckerAudit.class)
 public class MFAEmailOTPCheckerAudit {
 
-	public AuditMessage buildIsNotVerifiedMessage(
+	public AuditMessage buildNotVerifiedMessage(
 		User user, String checkerClassName, String reason) {
 
 		return new AuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_NOT_VERIFIED,
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_NOT_VERIFIED,
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null,
 			JSONUtil.put("reason", reason));
 	}
 
-	public AuditMessage buildIsVerifiedMessage(
+	public AuditMessage buildVerifiedMessage(
 		User user, String checkerClassName) {
 
 		return new AuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_VERIFIED,
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFIED,
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null, null);
 	}
