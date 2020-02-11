@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = MFAEmailOTPCheckerAudit.class)
 public class MFAEmailOTPCheckerAudit {
 
-	public AuditMessage buildNotVerifiedMessage(
+	public AuditMessage buildNotVerifiedAuditMessage(
 		User user, String checkerClassName, String reason) {
 
 		return new AuditMessage(
@@ -42,7 +42,7 @@ public class MFAEmailOTPCheckerAudit {
 			JSONUtil.put("reason", reason));
 	}
 
-	public AuditMessage buildVerifiedMessage(
+	public AuditMessage buildVerifiedAuditMessage(
 		User user, String checkerClassName) {
 
 		return new AuditMessage(
@@ -60,7 +60,7 @@ public class MFAEmailOTPCheckerAudit {
 			null, JSONUtil.put("reason", "Nonexistent User"));
 	}
 
-	public AuditMessage buildVerificationFailureMessage(
+	public AuditMessage buildVerificationFailureAuditMessage(
 		User user, String checkerClassName, String reason) {
 
 		return new AuditMessage(
@@ -70,7 +70,7 @@ public class MFAEmailOTPCheckerAudit {
 			JSONUtil.put("reason", reason));
 	}
 
-	public AuditMessage buildVerificationSuccessMessage(
+	public AuditMessage buildVerificationSuccessAuditMessage(
 		User user, String checkerClassName) {
 
 		return new AuditMessage(
