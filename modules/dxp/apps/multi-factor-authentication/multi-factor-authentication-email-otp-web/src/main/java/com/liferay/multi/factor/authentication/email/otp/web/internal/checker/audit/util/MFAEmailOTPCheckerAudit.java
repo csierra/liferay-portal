@@ -36,20 +36,12 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = MFAEmailOTPCheckerAudit.class)
 public class MFAEmailOTPCheckerAudit {
 
-	public AuditMessage buildIsNotVerifiedMessage(
+	public AuditMessage buildNotVerifiedMessage(
 		long userId, String checkerClassName, String reason) {
 
 		return _getAuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_NOT_VERIFIED, userId,
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_NOT_VERIFIED, userId,
 			checkerClassName, JSONUtil.put("reason", reason));
-	}
-
-	public AuditMessage buildIsVerifiedMessage(
-		long userId, String checkerClassName) {
-
-		return _getAuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_IS_VERIFIED, userId,
-			checkerClassName, null);
 	}
 
 	public AuditMessage buildVerificationFailureMessage(
@@ -65,6 +57,14 @@ public class MFAEmailOTPCheckerAudit {
 
 		return _getAuditMessage(
 			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_SUCCESS, userId,
+			checkerClassName, null);
+	}
+
+	public AuditMessage buildVerifiedMessage(
+		long userId, String checkerClassName) {
+
+		return _getAuditMessage(
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFIED, userId,
 			checkerClassName, null);
 	}
 
