@@ -32,6 +32,15 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = MFAEmailOTPAuditMessageBuilder.class)
 public class MFAEmailOTPAuditMessageBuilder {
 
+	public AuditMessage buildNonexistentUserAuditMessage(
+		long companyId, long userId, String checkerClassName) {
+
+		return new AuditMessage(
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_FAILURE, companyId,
+			userId, "Nonexistent", checkerClassName, String.valueOf(userId),
+			null, JSONUtil.put("reason", "Nonexistent User"));
+	}
+
 	public AuditMessage buildNotVerifiedAuditMessage(
 		User user, String checkerClassName, String reason) {
 
@@ -40,24 +49,6 @@ public class MFAEmailOTPAuditMessageBuilder {
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null,
 			JSONUtil.put("reason", reason));
-	}
-
-	public AuditMessage buildVerifiedAuditMessage(
-		User user, String checkerClassName) {
-
-		return new AuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFIED,
-			user.getCompanyId(), user.getUserId(), user.getFullName(),
-			checkerClassName, String.valueOf(user.getPrimaryKey()), null, null);
-	}
-
-	public AuditMessage buildNonexistentUserAuditMessage(
-		long companyId, long userId, String checkerClassName) {
-
-		return new AuditMessage(
-			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_FAILURE, companyId,
-			userId, "Nonexistent", checkerClassName, String.valueOf(userId),
-			null, JSONUtil.put("reason", "Nonexistent User"));
 	}
 
 	public AuditMessage buildVerificationFailureAuditMessage(
@@ -77,6 +68,15 @@ public class MFAEmailOTPAuditMessageBuilder {
 			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFICATION_SUCCESS,
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null, null);
+	}
+
+	public AuditMessage buildVerifiedAuditMessage(
+		User user, String checkerClassName) {
+
+		return new AuditMessage(
+			MFAEmailOTPEventTypes.MFA_EMAIL_OTP_VERIFIED, user.getCompanyId(),
+			user.getUserId(), user.getFullName(), checkerClassName,
+			String.valueOf(user.getPrimaryKey()), null, null);
 	}
 
 	public void routeAuditMessage(AuditMessage auditMessage) {

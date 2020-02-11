@@ -16,9 +16,9 @@ package com.liferay.multi.factor.authentication.email.otp.web.internal.checker;
 
 import com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTPEntry;
 import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPEntryLocalService;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.util.MFAEmailOTPAuditMessageBuilder;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
+import com.liferay.multi.factor.authentication.email.otp.web.internal.util.MFAEmailOTPAuditMessageBuilder;
 import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -127,9 +127,10 @@ public class MFAEmailOTPChecker {
 			}
 
 			_routeAuditMessage(
-				_mfaEmailOTPAuditMessageBuilder.buildNonexistentUserAuditMessage(
-					CompanyThreadLocal.getCompanyId(), userId,
-					getClass().getName()));
+				_mfaEmailOTPAuditMessageBuilder.
+					buildNonexistentUserAuditMessage(
+						CompanyThreadLocal.getCompanyId(), userId,
+						getClass().getName()));
 
 			return false;
 		}
@@ -188,16 +189,18 @@ public class MFAEmailOTPChecker {
 				userId, originalHttpServletRequest.getRemoteAddr(), true);
 
 			_routeAuditMessage(
-				_mfaEmailOTPAuditMessageBuilder.buildVerificationSuccessAuditMessage(
-					user, getClass().getName()));
+				_mfaEmailOTPAuditMessageBuilder.
+					buildVerificationSuccessAuditMessage(
+						user, getClass().getName()));
 
 			return true;
 		}
 
 		_routeAuditMessage(
-			_mfaEmailOTPAuditMessageBuilder.buildVerificationFailureAuditMessage(
-				user, getClass().getName(),
-				"Incorrect Email One-time Password"));
+			_mfaEmailOTPAuditMessageBuilder.
+				buildVerificationFailureAuditMessage(
+					user, getClass().getName(),
+					"Incorrect Email One-time Password"));
 
 		_mfaEmailOTPEntryLocalService.updateAttempts(
 			userId, originalHttpServletRequest.getRemoteAddr(), false);
@@ -252,9 +255,10 @@ public class MFAEmailOTPChecker {
 			}
 
 			_routeAuditMessage(
-				_mfaEmailOTPAuditMessageBuilder.buildNonexistentUserAuditMessage(
-					CompanyThreadLocal.getCompanyId(), userId,
-					getClass().getName()));
+				_mfaEmailOTPAuditMessageBuilder.
+					buildNonexistentUserAuditMessage(
+						CompanyThreadLocal.getCompanyId(), userId,
+						getClass().getName()));
 
 			return false;
 		}
@@ -360,8 +364,7 @@ public class MFAEmailOTPChecker {
 		MFAEmailOTPChecker.class);
 
 	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
-	private MFAEmailOTPAuditMessageBuilder
-		_mfaEmailOTPAuditMessageBuilder;
+	private MFAEmailOTPAuditMessageBuilder _mfaEmailOTPAuditMessageBuilder;
 
 	@Reference
 	private MFAEmailOTPEntryLocalService _mfaEmailOTPEntryLocalService;
