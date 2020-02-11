@@ -263,11 +263,18 @@ public class MFAEmailOTPChecker {
 			return false;
 		}
 
-		if (!Objects.equals(
-				httpSession.getAttribute(
-					MFAEmailOTPWebKeys.MFA_EMAIL_OTP_VALIDATED_USER_ID),
-				userId)) {
+		Object validatedUserId = httpSession.getAttribute(
+			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_VALIDATED_USER_ID);
 
+		if (validatedUserId == null) {
+			_routeAuditMessage(
+				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
+					userId, getClass().getName(), "Not Verified Yet"));
+
+			return false;
+		}
+
+		if (!Objects.equals(validatedUserId, userId)) {
 			_routeAuditMessage(
 				_mfaEmailOTPCheckerAudit.buildIsNotVerifiedMessage(
 					userId, getClass().getName(), "Not The Same User"));
