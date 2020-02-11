@@ -266,10 +266,10 @@ public class MFAEmailOTPChecker {
 			return false;
 		}
 
-		Object validatedUserId = httpSession.getAttribute(
+		Object mfaEmailOTPValidatedUserID = httpSession.getAttribute(
 			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_VALIDATED_USER_ID);
 
-		if (validatedUserId == null) {
+		if (mfaEmailOTPValidatedUserID == null) {
 			_routeAuditMessage(
 				_mfaEmailOTPCheckerAudit.buildNotVerifiedMessage(
 					user, getClass().getName(), "Not Verified Yet"));
@@ -277,7 +277,7 @@ public class MFAEmailOTPChecker {
 			return false;
 		}
 
-		if (!Objects.equals(validatedUserId, userId)) {
+		if (!Objects.equals(mfaEmailOTPValidatedUserID, userId)) {
 			_routeAuditMessage(
 				_mfaEmailOTPCheckerAudit.buildNotVerifiedMessage(
 					user, getClass().getName(), "Not The Same User"));
