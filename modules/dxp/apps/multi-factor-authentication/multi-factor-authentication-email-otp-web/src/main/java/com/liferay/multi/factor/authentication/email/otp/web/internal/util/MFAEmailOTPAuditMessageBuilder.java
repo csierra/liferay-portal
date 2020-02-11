@@ -12,7 +12,7 @@
  *
  */
 
-package com.liferay.multi.factor.authentication.email.otp.web.internal.checker.audit.util;
+package com.liferay.multi.factor.authentication.email.otp.web.internal.util;
 
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPEventTypes;
 import com.liferay.portal.kernel.audit.AuditException;
@@ -29,8 +29,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Arthur Chan
  */
-@Component(service = MFAEmailOTPCheckerAudit.class)
-public class MFAEmailOTPCheckerAudit {
+@Component(service = MFAEmailOTPAuditMessageBuilder.class)
+public class MFAEmailOTPAuditMessageBuilder {
 
 	public AuditMessage buildNotVerifiedAuditMessage(
 		User user, String checkerClassName, String reason) {
@@ -96,7 +96,7 @@ public class MFAEmailOTPCheckerAudit {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		MFAEmailOTPCheckerAudit.class);
+		MFAEmailOTPAuditMessageBuilder.class);
 
 	@Reference
 	private AuditRouter _auditRouter;
