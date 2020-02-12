@@ -128,7 +128,7 @@ public class MFAEmailOTPChecker {
 
 			_routeAuditMessage(
 				_mfaEmailOTPAuditMessageBuilder.
-					buildNonexistentUserAuditMessage(
+					buildNonexistentUserVerificationFailureAuditMessage(
 						CompanyThreadLocal.getCompanyId(), userId,
 						getClass().getName()));
 
@@ -256,7 +256,7 @@ public class MFAEmailOTPChecker {
 
 			_routeAuditMessage(
 				_mfaEmailOTPAuditMessageBuilder.
-					buildNonexistentUserAuditMessage(
+					buildNonexistentUserVerificationFailureAuditMessage(
 						CompanyThreadLocal.getCompanyId(), userId,
 						getClass().getName()));
 

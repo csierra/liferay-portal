@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = MFAEmailOTPAuditMessageBuilder.class)
 public class MFAEmailOTPAuditMessageBuilder {
 
-	public AuditMessage buildNonexistentUserAuditMessage(
+	public AuditMessage buildNonexistentUserVerificationFailureAuditMessage(
 		long companyId, long userId, String checkerClassName) {
 
 		return new AuditMessage(
