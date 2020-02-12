@@ -931,9 +931,8 @@ public class PortalImpl implements Portal {
 			return url;
 		}
 
-		String protocol = HttpUtil.getProtocol(url);
-
 		String domain = HttpUtil.getDomain(url);
+		String protocol = HttpUtil.getProtocol(url);
 
 		if (Validator.isBlank(domain)) {
 			if (Validator.isBlank(HttpUtil.getPath(url))) {
