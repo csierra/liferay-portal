@@ -1054,11 +1054,11 @@ public class HttpImpl implements Http {
 
 	@Override
 	public String removeProtocol(String url) {
-		url = url.trim();
-
 		String protocol = getProtocol(url);
 
 		if (Validator.isNotNull(protocol)) {
+			url = url.trim();
+
 			String delimiter = url.substring(
 				protocol.length(),
 				protocol.length() + PROTOCOL_DELIMITER.length());
