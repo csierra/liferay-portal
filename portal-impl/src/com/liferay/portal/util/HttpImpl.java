@@ -471,8 +471,6 @@ public class HttpImpl implements Http {
 			return url;
 		}
 
-		url = url.trim();
-
 		try {
 			URI uri = _getURI(url);
 
@@ -554,8 +552,6 @@ public class HttpImpl implements Http {
 			return url;
 		}
 
-		url = url.trim();
-
 		try {
 			URI uri = _getURI(url);
 
@@ -602,8 +598,6 @@ public class HttpImpl implements Http {
 			return url;
 		}
 
-		url = url.trim();
-
 		try {
 			URI uri = _getURI(url);
 
@@ -625,8 +619,6 @@ public class HttpImpl implements Http {
 		if (Validator.isNull(url)) {
 			return url;
 		}
-
-		url = url.trim();
 
 		try {
 			URI uri = _getURI(url);
@@ -1903,6 +1895,7 @@ public class HttpImpl implements Http {
 
 	private URI _getURI(String url) throws URISyntaxException {
 		Map<String, URI> uriMap = _uriMap.get();
+		url = url.trim();
 
 		URI uri = uriMap.get(url);
 

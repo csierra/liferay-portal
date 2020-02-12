@@ -931,8 +931,6 @@ public class PortalImpl implements Portal {
 			return url;
 		}
 
-		url = url.trim();
-
 		String protocol = HttpUtil.getProtocol(url);
 
 		String domain = HttpUtil.getDomain(url);
