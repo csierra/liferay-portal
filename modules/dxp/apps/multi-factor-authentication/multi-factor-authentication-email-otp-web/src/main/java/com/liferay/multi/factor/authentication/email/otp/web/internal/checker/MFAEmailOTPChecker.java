@@ -19,8 +19,6 @@ import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPEntr
 import com.liferay.multi.factor.authentication.email.otp.web.internal.audit.MFAEmailOTPAuditMessageBuilder;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.system.configuration.MFAEmailOTPSystemConfiguration;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -29,7 +27,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.util.PropsValues;
@@ -48,10 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -59,11 +54,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 /**
  * @author Arthur Chan
  */
-@Component(
-	configurationPid = "com.liferay.multi.factor.authentication.email.otp.web.internal.system.configuration.MFAEmailOTPSystemConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
-	service = {}
-)
+@Component(enabled = false, service = MFAEmailOTPChecker.class)
 public class MFAEmailOTPChecker {
 
 	public void includeBrowserVerification(
@@ -222,14 +213,6 @@ public class MFAEmailOTPChecker {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		MFAEmailOTPSystemConfiguration mfaEmailOTPSystemConfiguration =
-			ConfigurableUtil.createConfigurable(
-				MFAEmailOTPSystemConfiguration.class, properties);
-
-		if (mfaEmailOTPSystemConfiguration.disableGlobally()) {
-			return;
-		}
-
 		if (!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION) {
 			return;
 		}
@@ -244,22 +227,10 @@ public class MFAEmailOTPChecker {
 
 		PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES =
 			sessionPhishingProtectedAttributes.toArray(new String[0]);
-
-		_serviceRegistration = bundleContext.registerService(
-			MFAEmailOTPChecker.class, this,
-			new HashMapDictionary<>(properties));
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		if (_serviceRegistration == null) {
-			return;
-		}
-
-		_serviceRegistration.unregister();
-
-		_serviceRegistration = null;
-
 		if (!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION) {
 			return;
 		}
@@ -409,8 +380,6 @@ public class MFAEmailOTPChecker {
 
 	@Reference
 	private Portal _portal;
-
-	private ServiceRegistration<MFAEmailOTPChecker> _serviceRegistration;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.multi.factor.authentication.email.otp.web)"
