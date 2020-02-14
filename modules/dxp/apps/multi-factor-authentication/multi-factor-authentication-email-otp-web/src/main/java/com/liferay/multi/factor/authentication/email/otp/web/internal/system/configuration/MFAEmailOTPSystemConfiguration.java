@@ -32,7 +32,10 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 )
 public interface MFAEmailOTPSystemConfiguration {
 
-	@Meta.AD(deflt = "false", name = "enabled", required = false)
-	public boolean enabled();
+	@Meta.AD(
+		deflt = "false", description = "disable-globally-description",
+		name = "disable-globally", required = false
+	)
+	public boolean disableGlobally();
 
 }

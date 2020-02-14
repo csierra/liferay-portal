@@ -85,7 +85,7 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			ConfigurationProviderUtil.getSystemConfiguration(
 				MFAEmailOTPSystemConfiguration.class);
 
-		if (!mfaEmailOTPSystemConfiguration.enabled()) {
+		if (mfaEmailOTPSystemConfiguration.disableGlobally()) {
 			_loginMVCActionCommand.processAction(actionRequest, actionResponse);
 
 			return;
