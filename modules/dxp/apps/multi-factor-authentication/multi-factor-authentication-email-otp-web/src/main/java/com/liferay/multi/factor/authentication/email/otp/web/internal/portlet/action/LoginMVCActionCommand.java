@@ -19,6 +19,7 @@ import com.liferay.multi.factor.authentication.email.otp.web.internal.checker.MF
 import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPPortletKeys;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
+import com.liferay.multi.factor.authentication.email.otp.web.internal.system.configuration.MFAEmailOTPSystemConfiguration;
 import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
@@ -79,6 +80,16 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
+
+		MFAEmailOTPSystemConfiguration mfaEmailOTPSystemConfiguration =
+			ConfigurationProviderUtil.getSystemConfiguration(
+				MFAEmailOTPSystemConfiguration.class);
+
+		if (!mfaEmailOTPSystemConfiguration.enabled()) {
+			_loginMVCActionCommand.processAction(actionRequest, actionResponse);
+
+			return;
+		}
 
 		MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
 			ConfigurationProviderUtil.getCompanyConfiguration(
