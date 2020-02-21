@@ -14,7 +14,7 @@
 
 package com.liferay.depot.internal.security.permissions;
 
-import com.liferay.depot.internal.constants.DepotRolesConstants;
+import com.liferay.depot.constants.DepotRolesConstants;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -34,6 +34,7 @@ import com.liferay.portal.security.permission.PermissionCacheUtil;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author Cristina González
@@ -42,10 +43,12 @@ public class DepotPermissionChecker implements PermissionChecker {
 
 	public DepotPermissionChecker(
 		PermissionChecker permissionChecker,
+		Supplier<PermissionChecker> decoratedPermissionChecker,
 		GroupLocalService groupLocalService, RoleLocalService roleLocalService,
 		UserGroupRoleLocalService userGroupRoleLocalService) {
 
 		_permissionChecker = permissionChecker;
+		_decoratedPermissionChecker = decoratedPermissionChecker;
 		_groupLocalService = groupLocalService;
 		_roleLocalService = roleLocalService;
 		_userGroupRoleLocalService = userGroupRoleLocalService;
@@ -54,8 +57,8 @@ public class DepotPermissionChecker implements PermissionChecker {
 	@Override
 	public PermissionChecker clone() {
 		return new DepotPermissionChecker(
-			_permissionChecker.clone(), _groupLocalService, _roleLocalService,
-			_userGroupRoleLocalService);
+			_permissionChecker.clone(), _decoratedPermissionChecker,
+			_groupLocalService, _roleLocalService, _userGroupRoleLocalService);
 	}
 
 	@Override
@@ -352,6 +355,7 @@ public class DepotPermissionChecker implements PermissionChecker {
 	private static final Log _log = LogFactoryUtil.getLog(
 		DepotPermissionChecker.class);
 
+	private final Supplier<PermissionChecker> _decoratedPermissionChecker;
 	private final GroupLocalService _groupLocalService;
 	private final PermissionChecker _permissionChecker;
 	private final RoleLocalService _roleLocalService;

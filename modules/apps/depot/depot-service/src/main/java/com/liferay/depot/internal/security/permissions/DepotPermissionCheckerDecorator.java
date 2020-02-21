@@ -14,9 +14,8 @@
 
 package com.liferay.depot.internal.security.permissions;
 
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerDecorator;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
@@ -25,28 +24,38 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Cristina Gonzálaez
+ * @author Cristina González
+ * @author Carlos Sierra
+ * @author Marta Medio
  */
 @Component(
-	property = "service.ranking:Integer=100",
-	service = PermissionCheckerFactory.class
+	property = "service.ranking:Integer=30",
+	service = PermissionCheckerDecorator.class
 )
-public class PermissionCheckerFactoryImpl implements PermissionCheckerFactory {
+public class DepotPermissionCheckerDecorator
+	implements PermissionCheckerDecorator {
 
 	@Override
-	public PermissionChecker create(User user) {
+	public PermissionChecker decorate(PermissionChecker permissionChecker) {
 		return new DepotPermissionChecker(
-			_permissionCheckerFactory.create(user), _groupLocalService,
-			_roleLocalService, _userGroupRoleLocalService);
+			permissionChecker, this::getDecoratedPermissionChecker,
+			_groupLocalService, _roleLocalService, _userGroupRoleLocalService);
 	}
+
+	public PermissionChecker getDecoratedPermissionChecker() {
+		return _decoratedPermissionChecker;
+	}
+
+	public void setDecoratedPermissionChecker(
+		PermissionChecker decoratedPermissionChecker) {
+
+		_decoratedPermissionChecker = decoratedPermissionChecker;
+	}
+
+	private PermissionChecker _decoratedPermissionChecker;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference(
-		target = "(&(original.bean=true)(bean.id=com.liferay.portal.kernel.security.permission.PermissionCheckerFactory))"
-	)
-	private PermissionCheckerFactory _permissionCheckerFactory;
 
 	@Reference
 	private RoleLocalService _roleLocalService;

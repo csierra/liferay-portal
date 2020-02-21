@@ -26,19 +26,25 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author Tomas Polesovsky
  */
 public class StagingPermissionChecker implements PermissionChecker {
 
-	public StagingPermissionChecker(PermissionChecker permissionChecker) {
+	public StagingPermissionChecker(
+		PermissionChecker permissionChecker,
+		Supplier<PermissionChecker> decoratedPermissionChecker) {
+
 		_permissionChecker = permissionChecker;
+		_decoratedPermissionChecker = decoratedPermissionChecker;
 	}
 
 	@Override
 	public PermissionChecker clone() {
-		return new StagingPermissionChecker(_permissionChecker.clone());
+		return new StagingPermissionChecker(
+			_permissionChecker.clone(), _decoratedPermissionChecker);
 	}
 
 	@Override
@@ -231,6 +237,7 @@ public class StagingPermissionChecker implements PermissionChecker {
 		return false;
 	}
 
+	private final Supplier<PermissionChecker> _decoratedPermissionChecker;
 	private final PermissionChecker _permissionChecker;
 
 }
