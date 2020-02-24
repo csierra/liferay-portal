@@ -12,26 +12,17 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.generator.registry;
-
-import com.liferay.portal.crypto.hash.request.processor.HashRequestProcessor;
-
-import java.util.Set;
-
-import org.json.JSONObject;
-
-import org.osgi.annotation.versioning.ProviderType;
+package com.liferay.portal.crypto.hash.salt.command;
 
 /**
- * @author Arthur Chan
+ * @author Carlos Sierra Andrés
  */
-@ProviderType
-public interface HashGeneratorFactoryRegistry {
+public class GenerateVariableSizeSaltCommand implements SaltCommand {
 
-	public HashRequestProcessor getHashRequestProcessor(
-			String processorName, JSONObject processorMeta)
-		throws Exception;
+	public GenerateVariableSizeSaltCommand(int size) {
+		_size = size;
+	}
 
-	public Set<String> getRegisteredHashRequestProcessorNames();
+	private final int _size;
 
 }

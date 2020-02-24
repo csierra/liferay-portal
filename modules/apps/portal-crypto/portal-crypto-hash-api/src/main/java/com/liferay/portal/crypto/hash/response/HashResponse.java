@@ -12,26 +12,17 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.generator.registry;
+package com.liferay.portal.crypto.hash.response;
 
-import com.liferay.portal.crypto.hash.request.processor.HashRequestProcessor;
-
-import java.util.Set;
-
-import org.json.JSONObject;
-
-import org.osgi.annotation.versioning.ProviderType;
+import java.util.Optional;
 
 /**
- * @author Arthur Chan
+ * @author Carlos Sierra Andrés
  */
-@ProviderType
-public interface HashGeneratorFactoryRegistry {
+public class HashResponse {
 
-	public HashRequestProcessor getHashRequestProcessor(
-			String processorName, JSONObject processorMeta)
-		throws Exception;
-
-	public Set<String> getRegisteredHashRequestProcessorNames();
+	public String algorithmMeta;
+	public byte[] hash;
+	public Optional<byte[]> salt;
 
 }

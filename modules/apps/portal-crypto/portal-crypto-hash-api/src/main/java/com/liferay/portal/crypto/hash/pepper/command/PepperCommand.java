@@ -12,26 +12,19 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.generator.registry;
-
-import com.liferay.portal.crypto.hash.request.processor.HashRequestProcessor;
-
-import java.util.Set;
-
-import org.json.JSONObject;
-
-import org.osgi.annotation.versioning.ProviderType;
+package com.liferay.portal.crypto.hash.pepper.command;
 
 /**
- * @author Arthur Chan
+ * @author Carlos Sierra Andrés
  */
-@ProviderType
-public interface HashGeneratorFactoryRegistry {
+public interface PepperCommand {
 
-	public HashRequestProcessor getHashRequestProcessor(
-			String processorName, JSONObject processorMeta)
-		throws Exception;
+	public default PepperCommand generatePepper(int size) {
+		return new GeneratePepperCommand(size);
+	}
 
-	public Set<String> getRegisteredHashRequestProcessorNames();
+	public default PepperCommand usePepper(byte[] pepper) {
+		return new UsePepperCommand(pepper);
+	}
 
 }
