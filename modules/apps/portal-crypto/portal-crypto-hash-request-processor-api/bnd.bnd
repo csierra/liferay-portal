@@ -1,0 +1,6 @@
+Bundle-Name: Liferay Portal Crypto Hash Request Processor API
+Bundle-SymbolicName: com.liferay.portal.crypto.hash.request.processor.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	com.liferay.portal.crypto.hash.request.processor,\
+	com.liferay.portal.crypto.hash.request.processor.factory

@@ -18,11 +18,47 @@ import java.util.Optional;
 
 /**
  * @author Carlos Sierra Andrés
+ * @author Arthur Chan
  */
 public class HashResponse {
 
-	public String algorithmMeta;
-	public byte[] hash;
-	public Optional<byte[]> salt;
+	public byte[] getHash() {
+		return _hash;
+	}
+
+	public byte[] getSalt() {
+		if (_salt.isPresent()) {
+			return _salt.get();
+		}
+
+		return null;
+	}
+
+	public static class Builder {
+
+		public Builder(byte[] hash) {
+			_hash = hash;
+		}
+
+		public HashResponse build() {
+			return new HashResponse(this);
+		}
+
+		public void setSalt(byte[] salt) {
+			_salt = Optional.ofNullable(salt);
+		}
+
+		private byte[] _hash;
+		private Optional<byte[]> _salt;
+
+	}
+
+	private HashResponse(Builder builder) {
+		_hash = builder._hash;
+		_salt = builder._salt;
+	}
+
+	private byte[] _hash;
+	private Optional<byte[]> _salt;
 
 }

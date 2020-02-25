@@ -15,11 +15,33 @@
 package com.liferay.portal.crypto.hash.generator.spi;
 
 import com.liferay.portal.crypto.hash.generator.HashGenerator;
+import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.security.SecureRandomUtil;
 
 /**
  * @author Arthur Chan
  */
 public abstract class AbstractHashGenerator implements HashGenerator {
+
+	@Override
+	public byte[] generateSalt() {
+		byte[] salt = new byte[Long.BYTES];
+
+		BigEndianCodec.putLong(salt, 0, SecureRandomUtil.nextLong());
+
+		return salt;
+	}
+
+	@Override
+	public byte[] generateSalt(int size) {
+		byte[] salt = new byte[size];
+
+		for (int i = 0; i < size; ++i) {
+			salt[0] = SecureRandomUtil.nextByte();
+		}
+
+		return salt;
+	}
 
 	@Override
 	public HashGenerator withPepper(byte[] pepper) {
