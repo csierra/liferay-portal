@@ -16,6 +16,7 @@ package com.liferay.portal.security.permission;
 
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.UserBag;
 
 /**
@@ -88,6 +89,11 @@ public class SimplePermissionChecker extends BasePermissionChecker {
 		return signedIn;
 	}
 
+	@Override
+	public void setPermissionChecker(PermissionChecker permissionChecker) {
+		_decoratedPermissionChecker = permissionChecker;
+	}
+
 	protected boolean hasPermission(String actionId) {
 		if (signedIn) {
 			return true;
@@ -99,5 +105,7 @@ public class SimplePermissionChecker extends BasePermissionChecker {
 
 		return false;
 	}
+
+	private PermissionChecker _decoratedPermissionChecker = this;
 
 }
