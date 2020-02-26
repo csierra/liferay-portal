@@ -69,7 +69,7 @@ public class MFAEmailOTPVerifyMVCActionCommand extends BaseMVCActionCommand {
 					_portal.getHttpServletResponse(actionResponse),
 					mfaEmailOTPUserId)) {
 
-				SessionErrors.add(actionRequest, "verificationFailed");
+				SessionErrors.add(actionRequest, "mfaEmailOTPFailed");
 
 				return;
 			}
