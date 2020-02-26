@@ -21,19 +21,30 @@ package com.liferay.portal.security.crypto.generator.registry;
 public class HashRequest {
 
 	public interface HashRequestBuilder {
-		public static SaltHashRequestBuilder saltCommand(
-			SaltCommand saltCommand){
 
-			return null;
+		public static PepperHashRequestBuider newBuilder() {
+			return new HashRequestBuilderImpl(null, null);
 		}
 
-		public static PepperHashRequestBuilder pepper(byte[] pepper) { return null;}
-
-		public static HashRequest input(byte[] input) { return null;}
 	}
 
-	public interface SaltHashRequestBuilder {
+
+	public interface PepperHashRequestBuider extends SaltHashRequestBuilder {
+
+		public SaltHashRequestBuilder pepper(PepperCommand pepperCommand);
+	}
+
+	public interface InputBuilder {
 		public HashRequest input(byte[] input);
+	}
+
+	public interface SaltHashRequestBuilder extends InputBuilder {
+		public InputBuilder saltCommand(SaltCommand saltCommand);
+	}
+	public interface PepperCommand {
+		public static PepperCommand usePepper(String pepper) {
+
+		}
 	}
 
 	public interface SaltCommand {
@@ -85,32 +96,53 @@ public class HashRequest {
 		}
 	}
 
-	public static interface PepperCommand {
-		public static PepperCommand usePepper(byte[] pepper) {
-			return new UsePepperCommand(pepper);
+	public static class HashRequestBuilderImpl implements PepperHashRequestBuider {
+
+		PepperCommand _pepperCommand;
+		SaltCommand _saltCommand;
+		byte[] _input;
+
+		public HashRequestBuilderImpl(
+			PepperCommand pepperCommand,
+			SaltCommand saltCommand) {
+
+			_pepperCommand = pepperCommand;
+			_saltCommand = saltCommand;
 		}
 
-		public static PepperCommand generatePepper(int size) {
-			return new GeneratePepperCommand(size);
+		@Override
+		public SaltHashRequestBuilder pepper(
+			PepperCommand pepperCommand) {
+
+			return new HashRequestBuilderImpl(pepperCommand, null);
+		}
+
+		@Override
+		public HashRequest input(byte[] input) {
+			return new HashRequestImpl(_pepperCommand, _saltCommand, input);
+		}
+
+		@Override
+		public InputBuilder saltCommand(
+			SaltCommand saltCommand) {
+
+			return new HashRequestBuilderImpl(_pepperCommand, saltCommand);
 		}
 	}
 
-	public static class UsePepperCommand implements PepperCommand {
-		public UsePepperCommand(byte[] pepper) {
+	public static class HashRequestImpl extends HashRequest {
+		private final PepperCommand _pepperCommand;
+		private final SaltCommand _saltCommand;
+		private final byte[] _input;
+
+		public HashRequestImpl(
+			PepperCommand pepperCommand,
+			SaltCommand saltCommand, byte[] input) {
+
+			_pepperCommand = pepperCommand;
+			_saltCommand = saltCommand;
+			_input = input;
 		}
 	}
 
-	public static class GeneratePepperCommand implements PepperCommand {
-		private int _size;
-
-		public GeneratePepperCommand(int size) {
-			_size = size;
-		}
-	}
-
-	public static interface PepperHashRequestBuilder {
-		public HashRequest input(byte[] input);
-
-		public SaltHashRequestBuilder saltCommand(SaltCommand saltCommand);
-	}
 }

@@ -18,8 +18,13 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.security.crypto.generator.hashing.HashGenerator;
 import com.liferay.portal.security.crypto.generator.registry.HashGeneratorFactoryRegistry;
+import com.liferay.portal.security.crypto.generator.registry.HashRequest;
 import com.liferay.portal.security.crypto.generator.spi.hashing.factory.HashGeneratorFactory;
 
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONObject;
@@ -58,10 +63,25 @@ public class HashGeneratorFactoryRegistryImpl
 	}
 
 	@Activate
-	protected void activate(BundleContext bundleContext) {
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
 		_hashGeneratorFactories = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, HashGeneratorFactory.class,
 			"crypto.hash.generator.name");
+
+		final HashRequest.PepperHashRequestBuilder pepperedBuilder =
+			HashRequest.HashRequestBuilder.pepper(
+				properties.get("pepper").toString().getBytes());
+
+		bundleContext.registerService(
+			new String[]{
+				HashRequest.InputBuilder.class.getName(),
+				HashRequest.PepperHashRequestBuilder.class.getName()
+			}, pepperedBuilder,
+			new Hashtable<>()
+		);
+
 	}
 
 	@Deactivate

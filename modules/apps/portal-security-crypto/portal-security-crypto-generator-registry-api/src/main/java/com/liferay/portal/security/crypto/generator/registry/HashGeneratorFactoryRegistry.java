@@ -17,6 +17,7 @@ package com.liferay.portal.security.crypto.generator.registry;
 import java.util.Set;
 
 import com.liferay.portal.security.crypto.generator.registry.HashRequest.HashRequestBuilder;
+import com.liferay.portal.security.crypto.generator.registry.HashRequest.PepperCommand;
 import com.liferay.portal.security.crypto.generator.registry.HashRequest.SaltCommand;
 import org.json.JSONObject;
 
@@ -59,8 +60,8 @@ public interface HashGeneratorFactoryRegistry {
 				"MD5", new JSONObject());
 
 		hashRequestProcessor.process(
-			HashRequestBuilder.pepper(
-				"pepper".getBytes()
+			HashRequestBuilder.newBuilder().pepper(
+				PepperCommand.usePepper("pepper")
 			).saltCommand(
 				SaltCommand.oneOf(
 					SaltCommand.generateVariableSizeSalt(32),
@@ -72,8 +73,8 @@ public interface HashGeneratorFactoryRegistry {
 		);
 
 		hashRequestProcessor.process(
-			HashRequestBuilder.pepper(
-				"pepper".getBytes()
+			HashRequestBuilder.newBuilder().pepper(
+				PepperCommand.usePepper("pepper")
 			).saltCommand(
 				SaltCommand.useSalt("storedSalt".getBytes())
 			).input(
@@ -81,5 +82,37 @@ public interface HashGeneratorFactoryRegistry {
 			)
 		);
 
+
+		doSomethingWithInput(
+			HashRequestBuilder.newBuilder().pepper(
+			PepperCommand.usePepper("pepper")
+			).saltCommand(
+				SaltCommand.useSalt("storedSalt".getBytes())
+			)
+		);
+
+		doSomethingWithSalt(
+			HashRequestBuilder.newBuilder()
+		);
+
+		doSomethingWithSalt(
+			HashRequestBuilder.newBuilder().pepper(
+				PepperCommand.usePepper("pepper")));
+
 	}
+
+	public static void doSomethingWithSalt(
+		HashRequest.SaltHashRequestBuilder saltHashRequestBuilder) {
+
+		doSomethingWithInput(
+			saltHashRequestBuilder.saltCommand(
+				SaltCommand.generateDefaultSizeSalt()));
+	}
+
+	public static void doSomethingWithInput(
+		HashRequest.InputBuilder inputBuilder) {
+
+		inputBuilder.input("input".getBytes());
+	}
+
 }
