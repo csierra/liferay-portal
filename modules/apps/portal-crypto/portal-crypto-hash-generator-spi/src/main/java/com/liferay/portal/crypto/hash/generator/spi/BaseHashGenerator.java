@@ -14,22 +14,10 @@
 
 package com.liferay.portal.crypto.hash.generator.spi;
 
-import com.liferay.portal.kernel.io.BigEndianCodec;
-import com.liferay.portal.kernel.security.SecureRandomUtil;
-
 /**
  * @author Arthur Chan
  */
 public abstract class BaseHashGenerator implements HashGenerator {
-
-	@Override
-	public byte[] generateSalt() {
-		byte[] salt = new byte[Long.BYTES];
-
-		BigEndianCodec.putLong(salt, 0, SecureRandomUtil.nextLong());
-
-		return salt;
-	}
 
 	@Override
 	public void setPepper(byte[] pepper) {

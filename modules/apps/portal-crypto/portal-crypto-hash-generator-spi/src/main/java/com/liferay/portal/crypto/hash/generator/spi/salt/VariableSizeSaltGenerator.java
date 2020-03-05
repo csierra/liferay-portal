@@ -12,19 +12,19 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.generator.spi;
+package com.liferay.portal.crypto.hash.generator.spi.salt;
 
-import com.liferay.portal.crypto.hash.generator.spi.salt.GenerateVariableSizeSalt;
 import com.liferay.portal.kernel.security.SecureRandomUtil;
+
+import org.osgi.annotation.versioning.ConsumerType;
 
 /**
  * @author Arthur Chan
  */
-public abstract class VariableSizeSaltHashGenerator
-	extends BaseHashGenerator implements GenerateVariableSizeSalt {
+@ConsumerType
+public interface VariableSizeSaltGenerator extends SaltGenerator {
 
-	@Override
-	public byte[] generateSalt(int size) {
+	public default byte[] generateSalt(int size) {
 		byte[] salt = new byte[size];
 
 		for (int i = 0; i < size; ++i) {
