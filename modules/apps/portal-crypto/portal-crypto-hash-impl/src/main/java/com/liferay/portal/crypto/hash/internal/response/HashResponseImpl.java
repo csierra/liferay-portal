@@ -23,10 +23,12 @@ import java.util.Optional;
  */
 public class HashResponseImpl implements HashResponse {
 
-	public HashResponseImpl(byte[] hash, byte[] pepper, byte[] salt) {
+	public HashResponseImpl(
+		byte[] hash, Optional<byte[]> pepper, Optional<byte[]> salt) {
+
 		_hash = hash;
-		_pepper = Optional.ofNullable(pepper);
-		_salt = Optional.ofNullable(salt);
+		_pepper = pepper;
+		_salt = salt;
 	}
 
 	public byte[] getHash() {

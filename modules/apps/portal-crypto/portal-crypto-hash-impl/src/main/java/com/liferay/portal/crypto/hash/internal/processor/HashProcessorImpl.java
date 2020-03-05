@@ -28,6 +28,8 @@ import com.liferay.portal.crypto.hash.request.command.salt.SaltCommandVisitor;
 import com.liferay.portal.crypto.hash.request.command.salt.UseSaltCommand;
 import com.liferay.portal.crypto.hash.response.HashResponse;
 
+import java.util.Optional;
+
 /**
  * @author Arthur Chan
  * @author Carlos Sierra Andrés
@@ -40,30 +42,25 @@ public class HashProcessorImpl implements HashProcessor {
 
 	@Override
 	public HashResponse process(HashRequest hashRequest) throws Exception {
-		SaltCommand saltCommand = hashRequest.getSaltCommand();
+		Optional<SaltCommand> optionalSaltCommand =
+			hashRequest.getSaltCommand();
 
-		byte[] salt = null;
+		Optional<byte[]> optionalSalt = optionalSaltCommand.map(
+			saltCommand -> saltCommand.accept(new GetSaltCommandVisitor()));
 
-		if (saltCommand != null) {
-			SaltCommandVisitor<byte[]> saltCommandVisitor =
-				new GetSaltCommandVisitor();
+		optionalSalt.ifPresent(_hashGenerator::setSalt);
 
-			salt = saltCommand.accept(saltCommandVisitor);
+		Optional<PepperCommand> optionalPepperCommand =
+			hashRequest.getPepperCommand();
 
-			_hashGenerator.setSalt(salt);
-		}
+		Optional<byte[]> optionalPepper = optionalPepperCommand.map(
+			PepperCommand::getPepper);
 
-		PepperCommand pepperCommand = hashRequest.getPepperCommand();
+		optionalPepper.ifPresent(_hashGenerator::setPepper);
 
-		byte[] pepper = pepperCommand.getPepper();
-
-		if (pepperCommand != null) {
-			_hashGenerator.setPepper(pepper);
-		}
-
-		byte[] hash = _hashGenerator.hash(hashRequest.getInput());
-
-		return new HashResponseImpl(hash, pepper, salt);
+		return new HashResponseImpl(
+			_hashGenerator.hash(hashRequest.getInput()), optionalSalt,
+			optionalPepper);
 	}
 
 	private final HashGenerator _hashGenerator;
