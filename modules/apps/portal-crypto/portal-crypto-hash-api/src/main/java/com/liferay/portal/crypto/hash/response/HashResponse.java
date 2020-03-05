@@ -14,11 +14,14 @@
 
 package com.liferay.portal.crypto.hash.response;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 import java.util.Optional;
 
 /**
  * @author Carlos Sierra Andrés
  */
+@ProviderType
 public interface HashResponse {
 
 	public byte[] getHash();
