@@ -14,14 +14,20 @@
 
 package com.liferay.portal.crypto.hash.generator.spi.salt;
 
-import org.osgi.annotation.versioning.ConsumerType;
+import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.security.SecureRandomUtil;
 
 /**
- * @author Arthur Chan
+ * @author Carlos Sierra Andrés
  */
-@ConsumerType
-public interface GenerateVariableSizeSalt {
+public interface SaltGenerator {
 
-	public byte[] generateSalt(int size);
+	public default byte[] generateSalt() {
+		byte[] salt = new byte[Long.BYTES];
+
+		BigEndianCodec.putLong(salt, 0, SecureRandomUtil.nextLong());
+
+		return salt;
+	}
 
 }

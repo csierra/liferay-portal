@@ -14,15 +14,15 @@
 
 package com.liferay.portal.crypto.hash.generator.spi;
 
+import com.liferay.portal.crypto.hash.generator.spi.salt.SaltGenerator;
+
 import org.osgi.annotation.versioning.ConsumerType;
 
 /**
  * @author Arthur Chan
  */
 @ConsumerType
-public interface HashGenerator {
-
-	public byte[] generateSalt();
+public interface HashGenerator extends SaltGenerator {
 
 	public byte[] hash(byte[] toBeHashed) throws Exception;
 
