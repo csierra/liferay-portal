@@ -14,9 +14,9 @@
 
 package com.liferay.portal.crypto.hash.response;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 import java.util.Optional;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Carlos Sierra Andrés

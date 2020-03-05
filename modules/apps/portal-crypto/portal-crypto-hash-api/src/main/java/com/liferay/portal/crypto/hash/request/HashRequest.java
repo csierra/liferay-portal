@@ -20,6 +20,8 @@ import com.liferay.portal.crypto.hash.request.builder.SaltBuilder;
 import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
 
+import java.util.Optional;
+
 /**
  * @author Carlos Sierra Andrés
  * @author Arthur Chan
@@ -30,11 +32,11 @@ public class HashRequest {
 		return _input;
 	}
 
-	public PepperCommand getPepperCommand() {
+	public Optional<PepperCommand> getPepperCommand() {
 		return _pepperCommand;
 	}
 
-	public SaltCommand getSaltCommand() {
+	public Optional<SaltCommand> getSaltCommand() {
 		return _saltCommand;
 	}
 
@@ -59,9 +61,7 @@ public class HashRequest {
 			return new Builder(_pepperCommand, saltCommand);
 		}
 
-		private Builder(
-			PepperCommand pepperCommand, SaltCommand saltCommand) {
-
+		private Builder(PepperCommand pepperCommand, SaltCommand saltCommand) {
 			_pepperCommand = pepperCommand;
 			_saltCommand = saltCommand;
 		}
@@ -74,13 +74,13 @@ public class HashRequest {
 	private HashRequest(
 		PepperCommand pepperCommand, SaltCommand saltCommand, byte[] input) {
 
-		_pepperCommand = pepperCommand;
-		_saltCommand = saltCommand;
+		_pepperCommand = Optional.ofNullable(pepperCommand);
+		_saltCommand = Optional.ofNullable(saltCommand);
 		_input = input;
 	}
 
 	private final byte[] _input;
-	private PepperCommand _pepperCommand;
-	private SaltCommand _saltCommand;
+	private Optional<PepperCommand> _pepperCommand;
+	private Optional<SaltCommand> _saltCommand;
 
 }
