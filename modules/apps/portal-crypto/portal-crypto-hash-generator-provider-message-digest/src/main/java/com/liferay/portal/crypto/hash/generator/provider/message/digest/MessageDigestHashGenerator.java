@@ -24,17 +24,17 @@ import java.security.MessageDigest;
 public class MessageDigestHashGenerator extends VariableSizeSaltHashGenerator {
 
 	public MessageDigestHashGenerator() {
-		_chosenGenerator = "SHA-512";
+		_generatorName = "SHA-512";
 	}
 
 	public MessageDigestHashGenerator(String generatorName) {
-		_chosenGenerator = generatorName;
+		_generatorName = generatorName;
 	}
 
 	@Override
 	public byte[] hash(byte[] input) throws Exception {
 		MessageDigest messageDigest = MessageDigest.getInstance(
-			_chosenGenerator);
+			_generatorName);
 
 		byte[] combined = new byte[input.length + pepper.length + salt.length];
 
@@ -46,6 +46,6 @@ public class MessageDigestHashGenerator extends VariableSizeSaltHashGenerator {
 		return messageDigest.digest(combined);
 	}
 
-	private final String _chosenGenerator;
+	private final String _generatorName;
 
 }
