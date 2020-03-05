@@ -24,11 +24,11 @@ import java.util.Optional;
 public class HashResponseImpl implements HashResponse {
 
 	public HashResponseImpl(
-		byte[] hash, Optional<byte[]> pepper, Optional<byte[]> salt) {
+		Optional<byte[]> pepper, Optional<byte[]> salt, byte[] hash) {
 
-		_hash = hash;
 		_pepper = pepper;
 		_salt = salt;
+		_hash = hash;
 	}
 
 	public byte[] getHash() {

@@ -42,14 +42,6 @@ public class HashProcessorImpl implements HashProcessor {
 
 	@Override
 	public HashResponse process(HashRequest hashRequest) throws Exception {
-		Optional<SaltCommand> optionalSaltCommand =
-			hashRequest.getSaltCommand();
-
-		Optional<byte[]> optionalSalt = optionalSaltCommand.map(
-			saltCommand -> saltCommand.accept(new GetSaltCommandVisitor()));
-
-		optionalSalt.ifPresent(_hashGenerator::setSalt);
-
 		Optional<PepperCommand> optionalPepperCommand =
 			hashRequest.getPepperCommand();
 
@@ -58,9 +50,17 @@ public class HashProcessorImpl implements HashProcessor {
 
 		optionalPepper.ifPresent(_hashGenerator::setPepper);
 
+		Optional<SaltCommand> optionalSaltCommand =
+			hashRequest.getSaltCommand();
+
+		Optional<byte[]> optionalSalt = optionalSaltCommand.map(
+			saltCommand -> saltCommand.accept(new GetSaltCommandVisitor()));
+
+		optionalSalt.ifPresent(_hashGenerator::setSalt);
+
 		return new HashResponseImpl(
-			_hashGenerator.hash(hashRequest.getInput()), optionalSalt,
-			optionalPepper);
+			optionalSalt, optionalPepper,
+			_hashGenerator.hash(hashRequest.getInput()));
 	}
 
 	private final HashGenerator _hashGenerator;
