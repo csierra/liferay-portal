@@ -36,14 +36,14 @@ public class MessageDigestHashGenerator extends VariableSizeSaltHashGenerator {
 		MessageDigest messageDigest = MessageDigest.getInstance(
 			_generatorName);
 
-		byte[] combined = new byte[input.length + pepper.length + salt.length];
+		byte[] bytes = new byte[input.length + pepper.length + salt.length];
 
-		System.arraycopy(input, 0, combined, 0, input.length);
-		System.arraycopy(pepper, 0, combined, input.length, pepper.length);
+		System.arraycopy(input, 0, bytes, 0, input.length);
+		System.arraycopy(pepper, 0, bytes, input.length, pepper.length);
 		System.arraycopy(
-			salt, 0, combined, input.length + pepper.length, salt.length);
+			salt, 0, bytes, input.length + pepper.length, salt.length);
 
-		return messageDigest.digest(combined);
+		return messageDigest.digest(bytes);
 	}
 
 	private final String _generatorName;
