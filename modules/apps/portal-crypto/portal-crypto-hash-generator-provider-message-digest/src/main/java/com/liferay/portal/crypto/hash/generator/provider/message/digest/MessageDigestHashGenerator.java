@@ -17,25 +17,25 @@ package com.liferay.portal.crypto.hash.generator.provider.message.digest;
 import com.liferay.portal.crypto.hash.generator.spi.VariableSizeSaltHashGenerator;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author Arthur Chan
  */
 public class MessageDigestHashGenerator extends VariableSizeSaltHashGenerator {
 
-	public MessageDigestHashGenerator() {
-		_generatorName = "SHA-512";
+	public MessageDigestHashGenerator() throws NoSuchAlgorithmException {
+		this("SHA-512");
 	}
 
-	public MessageDigestHashGenerator(String generatorName) {
-		_generatorName = generatorName;
+	public MessageDigestHashGenerator(String generatorName)
+		throws NoSuchAlgorithmException {
+
+		_messageDigest = MessageDigest.getInstance(generatorName);
 	}
 
 	@Override
-	public byte[] hash(byte[] input) throws Exception {
-		MessageDigest messageDigest = MessageDigest.getInstance(
-			_generatorName);
-
+	public byte[] hash(byte[] input) {
 		byte[] bytes = new byte[input.length + pepper.length + salt.length];
 
 		System.arraycopy(input, 0, bytes, 0, input.length);
@@ -43,9 +43,9 @@ public class MessageDigestHashGenerator extends VariableSizeSaltHashGenerator {
 		System.arraycopy(
 			salt, 0, bytes, input.length + pepper.length, salt.length);
 
-		return messageDigest.digest(bytes);
+		return _messageDigest.digest(bytes);
 	}
 
-	private final String _generatorName;
+	private final MessageDigest _messageDigest;
 
 }
