@@ -12,32 +12,22 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.generator.spi;
+package com.liferay.portal.crypto.hash.generator.spi.salt;
+
+import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.security.SecureRandomUtil;
 
 /**
- * @author Arthur Chan
+ * @author Carlos Sierra Andrés
  */
-public abstract class BaseHashGenerator implements HashGenerator {
+public interface SaltGenerator {
 
-	@Override
-	public void setPepper(byte[] pepper) {
-		if (pepper == null) {
-			throw new IllegalArgumentException("pepper can not be null");
-		}
+	public default byte[] generateSalt() {
+		byte[] salt = new byte[Long.BYTES];
 
-		this.pepper = pepper;
+		BigEndianCodec.putLong(salt, 0, SecureRandomUtil.nextLong());
+
+		return salt;
 	}
-
-	@Override
-	public void setSalt(byte[] salt) {
-		if (salt == null) {
-			throw new IllegalArgumentException("salt can not be null");
-		}
-
-		this.salt = salt;
-	}
-
-	protected byte[] pepper = new byte[0];
-	protected byte[] salt = new byte[0];
 
 }
