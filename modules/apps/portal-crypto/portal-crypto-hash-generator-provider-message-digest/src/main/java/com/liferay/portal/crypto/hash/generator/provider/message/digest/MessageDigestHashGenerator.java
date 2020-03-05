@@ -14,17 +14,13 @@
 
 package com.liferay.portal.crypto.hash.generator.provider.message.digest;
 
-import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
 import com.liferay.portal.crypto.hash.generator.spi.VariableSizeSaltHashGenerator;
 
 import java.security.MessageDigest;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * @author Arthur Chan
  */
-@Component(immediate = true, service = HashGenerator.class)
 public class MessageDigestHashGenerator extends VariableSizeSaltHashGenerator {
 
 	public MessageDigestHashGenerator() {
