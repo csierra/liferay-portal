@@ -14,14 +14,24 @@
 
 package com.liferay.portal.crypto.hash.generator.spi.salt;
 
+import com.liferay.portal.kernel.security.SecureRandomUtil;
+
 import org.osgi.annotation.versioning.ConsumerType;
 
 /**
  * @author Arthur Chan
  */
 @ConsumerType
-public interface GenerateVariableSizeSalt {
+public interface VariableSizeSaltGenerator extends SaltGenerator {
 
-	public byte[] generateSalt(int size);
+	public default byte[] generateSalt(int size) {
+		byte[] salt = new byte[size];
+
+		for (int i = 0; i < size; ++i) {
+			salt[0] = SecureRandomUtil.nextByte();
+		}
+
+		return salt;
+	}
 
 }

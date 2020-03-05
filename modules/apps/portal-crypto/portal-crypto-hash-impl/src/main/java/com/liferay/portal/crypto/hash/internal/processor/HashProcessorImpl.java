@@ -15,7 +15,7 @@
 package com.liferay.portal.crypto.hash.internal.processor;
 
 import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
-import com.liferay.portal.crypto.hash.generator.spi.salt.GenerateVariableSizeSalt;
+import com.liferay.portal.crypto.hash.generator.spi.salt.VariableSizeSaltGenerator;
 import com.liferay.portal.crypto.hash.internal.response.HashResponseImpl;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.request.HashRequest;
@@ -96,9 +96,9 @@ public class HashProcessorImpl implements HashProcessor {
 		public byte[] visit(
 			GenerateVariableSizeSaltCommand generateVariableSizeSaltCommand) {
 
-			if (_hashGenerator instanceof GenerateVariableSizeSalt) {
-				GenerateVariableSizeSalt generateVariableSizeSalt =
-					(GenerateVariableSizeSalt)_hashGenerator;
+			if (_hashGenerator instanceof VariableSizeSaltGenerator) {
+				VariableSizeSaltGenerator generateVariableSizeSalt =
+					(VariableSizeSaltGenerator)_hashGenerator;
 
 				return generateVariableSizeSalt.generateSalt(
 					generateVariableSizeSaltCommand.getSaltSize());

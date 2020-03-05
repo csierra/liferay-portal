@@ -14,7 +14,8 @@
 
 package com.liferay.portal.crypto.hash.generator.provider.message.digest;
 
-import com.liferay.portal.crypto.hash.generator.spi.VariableSizeSaltHashGenerator;
+import com.liferay.portal.crypto.hash.generator.spi.BaseHashGenerator;
+import com.liferay.portal.crypto.hash.generator.spi.salt.VariableSizeSaltGenerator;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,7 +23,8 @@ import java.security.NoSuchAlgorithmException;
 /**
  * @author Arthur Chan
  */
-public class MessageDigestHashGenerator extends VariableSizeSaltHashGenerator {
+public class MessageDigestHashGenerator
+	extends BaseHashGenerator implements VariableSizeSaltGenerator {
 
 	public MessageDigestHashGenerator() throws NoSuchAlgorithmException {
 		this("SHA-512");
