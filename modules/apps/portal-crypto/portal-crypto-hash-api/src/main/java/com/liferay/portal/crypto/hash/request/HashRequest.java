@@ -42,7 +42,7 @@ public class HashRequest {
 
 		@Override
 		public HashRequest input(byte[] input) {
-			return new HashRequest(input, _saltCommand, _pepperCommand);
+			return new HashRequest(_pepperCommand, _saltCommand, input);
 		}
 
 		public PepperBuilder newBuilder() {
@@ -51,17 +51,19 @@ public class HashRequest {
 
 		@Override
 		public SaltBuilder pepperCommand(PepperCommand pepperCommand) {
-			return new Builder(null, pepperCommand);
+			return new Builder(pepperCommand, null);
 		}
 
 		@Override
 		public InputBuilder saltCommand(SaltCommand saltCommand) {
-			return new Builder(saltCommand, _pepperCommand);
+			return new Builder(_pepperCommand, saltCommand);
 		}
 
-		private Builder(SaltCommand saltCommand, PepperCommand pepperCommand) {
-			_saltCommand = saltCommand;
+		private Builder(
+			PepperCommand pepperCommand, SaltCommand saltCommand) {
+
 			_pepperCommand = pepperCommand;
+			_saltCommand = saltCommand;
 		}
 
 		private PepperCommand _pepperCommand;
@@ -70,11 +72,11 @@ public class HashRequest {
 	}
 
 	private HashRequest(
-		byte[] input, SaltCommand saltCommand, PepperCommand pepperCommand) {
+		PepperCommand pepperCommand, SaltCommand saltCommand, byte[] input) {
 
-		_input = input;
-		_saltCommand = saltCommand;
 		_pepperCommand = pepperCommand;
+		_saltCommand = saltCommand;
+		_input = input;
 	}
 
 	private final byte[] _input;
