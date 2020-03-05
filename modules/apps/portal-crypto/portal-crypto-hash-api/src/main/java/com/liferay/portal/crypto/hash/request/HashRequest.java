@@ -44,6 +44,10 @@ public class HashRequest {
 
 		@Override
 		public HashRequest input(byte[] input) {
+			if (input == null) {
+				throw new IllegalArgumentException("input can not be null");
+			}
+
 			return new HashRequest(_pepperCommand, _saltCommand, input);
 		}
 
@@ -53,11 +57,21 @@ public class HashRequest {
 
 		@Override
 		public SaltBuilder pepperCommand(PepperCommand pepperCommand) {
+			if (pepperCommand == null) {
+				throw new IllegalArgumentException(
+					"pepperCommand can not be null");
+			}
+
 			return new Builder(pepperCommand, null);
 		}
 
 		@Override
 		public InputBuilder saltCommand(SaltCommand saltCommand) {
+			if (saltCommand == null) {
+				throw new IllegalArgumentException(
+					"saltCommand can not be null");
+			}
+
 			return new Builder(_pepperCommand, saltCommand);
 		}
 
