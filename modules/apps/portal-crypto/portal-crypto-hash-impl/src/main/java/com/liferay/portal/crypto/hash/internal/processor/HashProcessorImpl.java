@@ -76,10 +76,21 @@ public class HashProcessorImpl implements HashProcessor {
 			for (SaltCommand each :
 					firstAvailableSaltCommand.getSaltCommands()) {
 
-				return each.accept(visitor);
+				byte[] salt;
+
+				try {
+					salt = each.accept(visitor);
+				}
+				catch (Exception exception) {
+					continue;
+				}
+
+				if (salt != null) {
+					return salt;
+				}
 			}
 
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
