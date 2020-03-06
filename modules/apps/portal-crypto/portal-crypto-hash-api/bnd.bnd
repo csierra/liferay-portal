@@ -5,7 +5,6 @@ Export-Package:\
 	com.liferay.portal.crypto.hash.processor,\
 	com.liferay.portal.crypto.hash.processor.factory,\
 	com.liferay.portal.crypto.hash.request,\
-	com.liferay.portal.crypto.hash.request.builder,\
 	com.liferay.portal.crypto.hash.request.command.pepper,\
 	com.liferay.portal.crypto.hash.request.command.salt,\
 	com.liferay.portal.crypto.hash.response

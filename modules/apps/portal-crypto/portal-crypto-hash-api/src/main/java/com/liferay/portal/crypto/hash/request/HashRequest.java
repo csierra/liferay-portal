@@ -14,9 +14,6 @@
 
 package com.liferay.portal.crypto.hash.request;
 
-import com.liferay.portal.crypto.hash.request.builder.InputBuilder;
-import com.liferay.portal.crypto.hash.request.builder.PepperBuilder;
-import com.liferay.portal.crypto.hash.request.builder.SaltBuilder;
 import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
 
@@ -82,6 +79,24 @@ public class HashRequest {
 
 		private PepperCommand _pepperCommand;
 		private SaltCommand _saltCommand;
+
+	}
+
+	public interface InputBuilder {
+
+		public HashRequest input(byte[] input);
+
+	}
+
+	public interface PepperBuilder extends SaltBuilder {
+
+		public SaltBuilder pepperCommand(PepperCommand pepperCommand);
+
+	}
+
+	public interface SaltBuilder extends InputBuilder {
+
+		public InputBuilder saltCommand(SaltCommand saltCommand);
 
 	}
 
