@@ -1,0 +1,6 @@
+dependencies {
+	compileOnly project(":apps:portal-crypto:portal-crypto-hash-api")
+	compileOnly project(":apps:portal-crypto:portal-crypto-hash-generator-spi")
+
+	testIntegrationCompile project(":test:arquillian-extension-junit-bridge")
+}
