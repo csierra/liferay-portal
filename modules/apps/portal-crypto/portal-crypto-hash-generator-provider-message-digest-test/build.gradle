@@ -8,7 +8,6 @@ dependencies {
 	testCompile project(":apps:portal-crypto:portal-crypto-hash-generator-provider-message-digest")
 	testCompile project(":apps:portal-crypto:portal-crypto-hash-generator-spi")
 	testCompile project(":core:petra:petra-lang")
-	testCompile project(":core:petra:petra-sql-dsl-api")
 	testCompile project(":core:petra:petra-string")
 	testCompile project(":core:registry-api")
 }
