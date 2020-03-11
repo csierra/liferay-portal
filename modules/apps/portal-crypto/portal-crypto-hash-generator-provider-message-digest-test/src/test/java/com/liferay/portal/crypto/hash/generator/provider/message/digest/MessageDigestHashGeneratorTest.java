@@ -48,7 +48,7 @@ public class MessageDigestHashGeneratorTest extends PowerMockito {
 	public void testGenerateDefaultSizeSalt() throws Exception {
 		byte[] salt = _hashGenerator.generateSalt();
 
-		Assert.assertTrue(salt.length == Long.BYTES);
+		Assert.assertEquals(salt.length, Long.BYTES);
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class MessageDigestHashGeneratorTest extends PowerMockito {
 
 		byte[] salt = variableSizeSaltGenerator.generateSalt(_VARIABLE_SIZE);
 
-		Assert.assertTrue(salt.length == _VARIABLE_SIZE);
+		Assert.assertEquals(salt.length, _VARIABLE_SIZE);
 	}
 
 	private String _toHex(byte[] hash) {
