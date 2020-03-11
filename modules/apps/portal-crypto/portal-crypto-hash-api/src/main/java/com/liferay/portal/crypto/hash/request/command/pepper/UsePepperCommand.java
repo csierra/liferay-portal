@@ -17,9 +17,9 @@ package com.liferay.portal.crypto.hash.request.command.pepper;
 /**
  * @author Carlos Sierra Andrés
  */
-public class PepperCommand {
+public class UsePepperCommand {
 
-	public PepperCommand(byte[] pepper) {
+	public UsePepperCommand(byte[] pepper) {
 		_pepper = pepper;
 	}
 

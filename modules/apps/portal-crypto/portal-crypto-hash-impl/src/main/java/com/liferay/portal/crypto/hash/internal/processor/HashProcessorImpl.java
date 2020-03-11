@@ -19,7 +19,7 @@ import com.liferay.portal.crypto.hash.generator.spi.salt.VariableSizeSaltGenerat
 import com.liferay.portal.crypto.hash.internal.response.HashResponseImpl;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.request.HashRequest;
-import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
+import com.liferay.portal.crypto.hash.request.command.pepper.UsePepperCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.FirstAvailableSaltCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.GenerateDefaultSizeSaltCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.GenerateVariableSizeSaltCommand;
@@ -42,11 +42,11 @@ public class HashProcessorImpl implements HashProcessor {
 
 	@Override
 	public HashResponse process(HashRequest hashRequest) throws Exception {
-		Optional<PepperCommand> optionalPepperCommand =
+		Optional<UsePepperCommand> optionalPepperCommand =
 			hashRequest.getPepperCommand();
 
 		Optional<byte[]> optionalPepper = optionalPepperCommand.map(
-			PepperCommand::getPepper);
+			UsePepperCommand::getPepper);
 
 		optionalPepper.ifPresent(_hashGenerator::setPepper);
 

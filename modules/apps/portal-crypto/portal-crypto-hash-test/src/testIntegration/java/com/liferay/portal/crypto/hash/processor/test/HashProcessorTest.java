@@ -18,7 +18,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.processor.factory.HashProcessorFactory;
 import com.liferay.portal.crypto.hash.request.HashRequest;
-import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
+import com.liferay.portal.crypto.hash.request.command.pepper.UsePepperCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.FirstAvailableSaltCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.GenerateDefaultSizeSaltCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.GenerateVariableSizeSaltCommand;
@@ -78,7 +78,7 @@ public class HashProcessorTest {
 	public void testBuilderCanBeReusedWithPepper() throws Exception {
 		HashRequest.InputBuilder inputBuilder = HashRequest.Builder.newBuilder(
 		).pepperCommand(
-			new PepperCommand(_PEPPER.getBytes())
+			new UsePepperCommand(_PEPPER.getBytes())
 		).saltCommand(
 			new GenerateVariableSizeSaltCommand(32)
 		);
@@ -184,7 +184,7 @@ public class HashProcessorTest {
 	public void testPepperCommandTest() throws Exception {
 		HashRequest hashRequest = HashRequest.Builder.newBuilder(
 		).pepperCommand(
-			new PepperCommand(_PEPPER.getBytes())
+			new UsePepperCommand(_PEPPER.getBytes())
 		).input(
 			"password".getBytes()
 		);
