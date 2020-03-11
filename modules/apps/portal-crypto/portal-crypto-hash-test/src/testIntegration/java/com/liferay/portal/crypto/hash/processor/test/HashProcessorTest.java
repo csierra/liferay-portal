@@ -55,6 +55,48 @@ public class HashProcessorTest {
 	}
 
 	@Test
+	public void testBuilderCanBeReused() throws Exception {
+		HashRequest.InputBuilder inputBuilder = HashRequest.Builder.newBuilder(
+		).saltCommand(
+			new GenerateVariableSizeSaltCommand(32)
+		);
+
+		HashResponse hashResponse1 = _hashProcessor.process(
+			inputBuilder.input("password".getBytes()));
+		HashResponse hashResponse2 = _hashProcessor.process(
+			inputBuilder.input("password".getBytes()));
+
+		Assert.assertNotEquals(
+			hashResponse1.getHash(), hashResponse2.getHash());
+		Assert.assertEquals(
+			hashResponse1.getPepper(), hashResponse2.getPepper());
+		Assert.assertNotEquals(
+			hashResponse1.getSalt(), hashResponse2.getSalt());
+	}
+
+	@Test
+	public void testBuilderCanBeReusedWithPepper() throws Exception {
+		HashRequest.InputBuilder inputBuilder = HashRequest.Builder.newBuilder(
+		).pepperCommand(
+			new PepperCommand(_PEPPER.getBytes())
+		).saltCommand(
+			new GenerateVariableSizeSaltCommand(32)
+		);
+
+		HashResponse hashResponse1 = _hashProcessor.process(
+			inputBuilder.input("password".getBytes()));
+		HashResponse hashResponse2 = _hashProcessor.process(
+			inputBuilder.input("password".getBytes()));
+
+		Assert.assertNotEquals(
+			hashResponse1.getHash(), hashResponse2.getHash());
+		Assert.assertEquals(
+			hashResponse1.getPepper(), hashResponse2.getPepper());
+		Assert.assertNotEquals(
+			hashResponse1.getSalt(), hashResponse2.getSalt());
+	}
+
+	@Test
 	public void testFirstAvailableSaltCommandTest() throws Exception {
 		HashRequest hashRequest = HashRequest.Builder.newBuilder(
 		).saltCommand(
