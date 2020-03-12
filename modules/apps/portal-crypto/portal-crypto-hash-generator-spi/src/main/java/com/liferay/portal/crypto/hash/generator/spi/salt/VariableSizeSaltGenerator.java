@@ -28,7 +28,7 @@ public interface VariableSizeSaltGenerator extends SaltGenerator {
 		byte[] salt = new byte[size];
 
 		for (int i = 0; i < size; ++i) {
-			salt[0] = SecureRandomUtil.nextByte();
+			salt[i] = SecureRandomUtil.nextByte();
 		}
 
 		return salt;
