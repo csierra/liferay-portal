@@ -16,10 +16,12 @@ package com.liferay.portal.crypto.hash.generator.spi.salt;
 
 import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.security.SecureRandomUtil;
+import org.osgi.annotation.versioning.ConsumerType;
 
 /**
  * @author Carlos Sierra Andrés
  */
+@ConsumerType
 public interface SaltGenerator {
 
 	public default byte[] generateSalt() {
