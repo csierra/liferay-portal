@@ -12,14 +12,11 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.request.command.salt;
-
-import org.osgi.annotation.versioning.ProviderType;
+package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@ProviderType
 public interface SaltCommandVisitor<T> {
 
 	public T visit(FirstAvailableSaltCommand firstAvailableSaltCommand);

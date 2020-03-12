@@ -12,14 +12,15 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.request.command.salt;
+package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
-import org.osgi.annotation.versioning.ProviderType;
+import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@ProviderType
-public interface SaltCommand {
+public abstract class BaseSaltCommand implements SaltCommand {
+
+	public abstract <T> T accept(SaltCommandVisitor<T> visitor);
 
 }
