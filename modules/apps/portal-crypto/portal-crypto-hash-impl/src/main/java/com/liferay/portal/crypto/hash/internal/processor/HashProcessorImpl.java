@@ -16,16 +16,18 @@ package com.liferay.portal.crypto.hash.internal.processor;
 
 import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
 import com.liferay.portal.crypto.hash.generator.spi.salt.VariableSizeSaltGenerator;
+import com.liferay.portal.crypto.hash.internal.request.command.pepper.UsePepperCommand;
+import com.liferay.portal.crypto.hash.internal.request.command.salt.BaseSaltCommand;
+import com.liferay.portal.crypto.hash.internal.request.command.salt.FirstAvailableSaltCommand;
+import com.liferay.portal.crypto.hash.internal.request.command.salt.GenerateDefaultSizeSaltCommand;
+import com.liferay.portal.crypto.hash.internal.request.command.salt.GenerateVariableSizeSaltCommand;
+import com.liferay.portal.crypto.hash.internal.request.command.salt.SaltCommandVisitor;
+import com.liferay.portal.crypto.hash.internal.request.command.salt.UseSaltCommand;
 import com.liferay.portal.crypto.hash.internal.response.HashResponseImpl;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.request.HashRequest;
-import com.liferay.portal.crypto.hash.request.command.pepper.UsePepperCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.FirstAvailableSaltCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.GenerateDefaultSizeSaltCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.GenerateVariableSizeSaltCommand;
+import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.SaltCommandVisitor;
-import com.liferay.portal.crypto.hash.request.command.salt.UseSaltCommand;
 import com.liferay.portal.crypto.hash.response.HashResponse;
 
 import java.util.Optional;
@@ -42,11 +44,14 @@ public class HashProcessorImpl implements HashProcessor {
 
 	@Override
 	public HashResponse process(HashRequest hashRequest) throws Exception {
-		Optional<UsePepperCommand> optionalPepperCommand =
+		Optional<PepperCommand> optionalPepperCommand =
 			hashRequest.getPepperCommand();
 
 		Optional<byte[]> optionalPepper = optionalPepperCommand.map(
-			UsePepperCommand::getPepper);
+			UsePepperCommand.class::cast
+		).map(
+			UsePepperCommand::getPepper
+		);
 
 		optionalPepper.ifPresent(_hashGenerator::setPepper);
 
@@ -54,7 +59,10 @@ public class HashProcessorImpl implements HashProcessor {
 			hashRequest.getSaltCommand();
 
 		Optional<byte[]> optionalSalt = optionalSaltCommand.map(
-			saltCommand -> saltCommand.accept(new GetSaltCommandVisitor()));
+			BaseSaltCommand.class::cast
+		).map(
+			saltCommand -> saltCommand.accept(new GetSaltCommandVisitor())
+		);
 
 		optionalSalt.ifPresent(_hashGenerator::setSalt);
 
@@ -73,13 +81,16 @@ public class HashProcessorImpl implements HashProcessor {
 
 			SaltCommandVisitor<byte[]> visitor = new GetSaltCommandVisitor();
 
-			for (SaltCommand each :
+			for (SaltCommand saltCommand :
 					firstAvailableSaltCommand.getSaltCommands()) {
 
 				byte[] salt;
 
 				try {
-					salt = each.accept(visitor);
+					final BaseSaltCommand baseSaltCommand =
+						(BaseSaltCommand)saltCommand;
+
+					salt = baseSaltCommand.accept(visitor);
 				}
 				catch (Exception exception) {
 					continue;
