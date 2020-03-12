@@ -18,11 +18,8 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.processor.factory.HashProcessorFactory;
 import com.liferay.portal.crypto.hash.request.HashRequest;
-import com.liferay.portal.crypto.hash.request.command.pepper.UsePepperCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.FirstAvailableSaltCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.GenerateDefaultSizeSaltCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.GenerateVariableSizeSaltCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.UseSaltCommand;
+import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommandProvider;
+import com.liferay.portal.crypto.hash.request.command.salt.SaltCommandProvider;
 import com.liferay.portal.crypto.hash.response.HashResponse;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.test.rule.Inject;
@@ -59,7 +56,7 @@ public class HashProcessorTest {
 	public void testBuilderCanBeReused() throws Exception {
 		HashRequest.InputBuilder inputBuilder = HashRequest.Builder.newBuilder(
 		).saltCommand(
-			new GenerateVariableSizeSaltCommand(32)
+			_saltCommandProvider.generateVariableSizeSaltCommand(32)
 		);
 
 		HashResponse hashResponse1 = _hashProcessor.process(
@@ -79,9 +76,9 @@ public class HashProcessorTest {
 	public void testBuilderCanBeReusedWithPepper() throws Exception {
 		HashRequest.InputBuilder inputBuilder = HashRequest.Builder.newBuilder(
 		).pepperCommand(
-			new UsePepperCommand(_PEPPER.getBytes())
+			_pepperCommandProvider.getUsePepperCommand(_PEPPER.getBytes())
 		).saltCommand(
-			new GenerateVariableSizeSaltCommand(32)
+			_saltCommandProvider.generateVariableSizeSaltCommand(32)
 		);
 
 		HashResponse hashResponse1 = _hashProcessor.process(
@@ -101,12 +98,12 @@ public class HashProcessorTest {
 	public void testFirstAvailableSaltCommandTest() throws Exception {
 		HashRequest hashRequest = HashRequest.Builder.newBuilder(
 		).saltCommand(
-			new FirstAvailableSaltCommand(
-				new FirstAvailableSaltCommand(
-					new UseSaltCommand(_USE_SALT.getBytes()),
-					new GenerateDefaultSizeSaltCommand(),
-					new GenerateVariableSizeSaltCommand(10)),
-				new GenerateDefaultSizeSaltCommand())
+			_saltCommandProvider.firstAvailableSaltCommand(
+				_saltCommandProvider.firstAvailableSaltCommand(
+					_saltCommandProvider.useSaltCommand(_USE_SALT.getBytes()),
+					_saltCommandProvider.generateDefaultSizeSaltCommand(),
+					_saltCommandProvider.generateVariableSizeSaltCommand(10)),
+				_saltCommandProvider.generateDefaultSizeSaltCommand())
 		).input(
 			"password".getBytes()
 		);
@@ -121,7 +118,7 @@ public class HashProcessorTest {
 	public void testGenerateDefaultSizeSaltCommandTest() throws Exception {
 		HashRequest hashRequest1 = HashRequest.Builder.newBuilder(
 		).saltCommand(
-			new GenerateDefaultSizeSaltCommand()
+			_saltCommandProvider.generateDefaultSizeSaltCommand()
 		).input(
 			"password".getBytes()
 		);
@@ -132,7 +129,7 @@ public class HashProcessorTest {
 
 		HashRequest hashRequest2 = HashRequest.Builder.newBuilder(
 		).saltCommand(
-			new UseSaltCommand(generatedSalt.get())
+			_saltCommandProvider.useSaltCommand(generatedSalt.get())
 		).input(
 			"password".getBytes()
 		);
@@ -159,7 +156,7 @@ public class HashProcessorTest {
 	public void testGenerateVariableSizeSaltCommandTest() throws Exception {
 		HashRequest hashRequest1 = HashRequest.Builder.newBuilder(
 		).saltCommand(
-			new GenerateVariableSizeSaltCommand(_VARIABLE_SIZE)
+			_saltCommandProvider.generateVariableSizeSaltCommand(_VARIABLE_SIZE)
 		).input(
 			"password".getBytes()
 		);
@@ -170,7 +167,7 @@ public class HashProcessorTest {
 
 		HashRequest hashRequest2 = HashRequest.Builder.newBuilder(
 		).saltCommand(
-			new UseSaltCommand(generatedSalt.get())
+			_saltCommandProvider.useSaltCommand(generatedSalt.get())
 		).input(
 			"password".getBytes()
 		);
@@ -185,7 +182,7 @@ public class HashProcessorTest {
 	public void testPepperCommandTest() throws Exception {
 		HashRequest hashRequest = HashRequest.Builder.newBuilder(
 		).pepperCommand(
-			new UsePepperCommand(_PEPPER.getBytes())
+			_pepperCommandProvider.getUsePepperCommand(_PEPPER.getBytes())
 		).input(
 			"password".getBytes()
 		);
@@ -200,7 +197,7 @@ public class HashProcessorTest {
 	public void testUseSaltCommandTest() throws Exception {
 		HashRequest hashRequest = HashRequest.Builder.newBuilder(
 		).saltCommand(
-			new UseSaltCommand(_USE_SALT.getBytes())
+			_saltCommandProvider.useSaltCommand(_USE_SALT.getBytes())
 		).input(
 			"password".getBytes()
 		);
@@ -242,5 +239,11 @@ public class HashProcessorTest {
 
 	@Inject
 	private HashProcessorFactory _hashProcessorFactory;
+
+	@Inject
+	private PepperCommandProvider _pepperCommandProvider;
+
+	@Inject
+	private SaltCommandProvider _saltCommandProvider;
 
 }
