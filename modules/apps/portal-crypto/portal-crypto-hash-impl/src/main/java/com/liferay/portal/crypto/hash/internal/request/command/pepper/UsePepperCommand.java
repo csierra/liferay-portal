@@ -12,12 +12,14 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.request.command.pepper;
+package com.liferay.portal.crypto.hash.internal.request.command.pepper;
+
+import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class UsePepperCommand {
+public final class UsePepperCommand implements PepperCommand {
 
 	public UsePepperCommand(byte[] pepper) {
 		_pepper = pepper;
