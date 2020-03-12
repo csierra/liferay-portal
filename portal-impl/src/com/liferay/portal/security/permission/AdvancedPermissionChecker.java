@@ -967,7 +967,9 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 					group.getCompanyId(), className, group.getClassPK(),
 					group.getCreatorUserId(), ActionKeys.UPDATE) ||
 				 hasPermission(
-					 null, className, group.getClassPK(), ActionKeys.UPDATE))) {
+					 null, className, group.getClassPK(), ActionKeys.UPDATE) ||
+				 hasPermission(
+				 	group, className, group.getClassPK(), ActionKeys.UPDATE))) {
 
 				return true;
 			}
