@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.generator.provider.message.digest;
+package com.liferay.portal.crypto.hash.generator.message.digest;
 
-import com.liferay.portal.crypto.hash.generator.provider.message.digest.factory.MessageDigestHashGeneratorFactory;
+import com.liferay.portal.crypto.hash.generator.message.digest.factory.MessageDigestHashGeneratorFactory;
 import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
 import com.liferay.portal.crypto.hash.generator.spi.salt.VariableSizeSaltGenerator;
 
