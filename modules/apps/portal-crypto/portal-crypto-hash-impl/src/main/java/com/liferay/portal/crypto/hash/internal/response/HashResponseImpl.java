@@ -16,6 +16,7 @@ package com.liferay.portal.crypto.hash.internal.response;
 
 import com.liferay.portal.crypto.hash.response.HashResponse;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -32,7 +33,7 @@ public class HashResponseImpl implements HashResponse {
 	}
 
 	public byte[] getHash() {
-		return _hash;
+		return Arrays.copyOf(_hash, _hash.length);
 	}
 
 	public Optional<byte[]> getPepper() {

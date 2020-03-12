@@ -17,6 +17,7 @@ package com.liferay.portal.crypto.hash.request;
 import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -26,7 +27,7 @@ import java.util.Optional;
 public class HashRequest {
 
 	public byte[] getInput() {
-		return _input;
+		return Arrays.copyOf(_input, _input.length);
 	}
 
 	public Optional<PepperCommand> getPepperCommand() {
