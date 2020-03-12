@@ -12,12 +12,12 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.request.command.salt;
+package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class GenerateDefaultSizeSaltCommand implements SaltCommand {
+public final class GenerateDefaultSizeSaltCommand extends BaseSaltCommand {
 
 	@Override
 	public <T> T accept(SaltCommandVisitor<T> visitor) {

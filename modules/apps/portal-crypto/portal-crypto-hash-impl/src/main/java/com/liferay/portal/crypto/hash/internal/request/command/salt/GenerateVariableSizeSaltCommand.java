@@ -12,15 +12,15 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.request.command.salt;
+package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public class FirstAvailableSaltCommand implements SaltCommand {
+public final class GenerateVariableSizeSaltCommand extends BaseSaltCommand {
 
-	public FirstAvailableSaltCommand(SaltCommand... saltCommands) {
-		_saltCommands = saltCommands;
+	public GenerateVariableSizeSaltCommand(int size) {
+		_size = size;
 	}
 
 	@Override
@@ -28,10 +28,10 @@ public class FirstAvailableSaltCommand implements SaltCommand {
 		return visitor.visit(this);
 	}
 
-	public SaltCommand[] getSaltCommands() {
-		return _saltCommands;
+	public int getSaltSize() {
+		return _size;
 	}
 
-	private final SaltCommand[] _saltCommands;
+	private final int _size;
 
 }
