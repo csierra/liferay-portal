@@ -14,7 +14,7 @@
 
 package com.liferay.portal.crypto.hash.request;
 
-import com.liferay.portal.crypto.hash.request.command.pepper.UsePepperCommand;
+import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
 import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
 
 import java.util.Optional;
@@ -29,7 +29,7 @@ public class HashRequest {
 		return _input;
 	}
 
-	public Optional<UsePepperCommand> getPepperCommand() {
+	public Optional<PepperCommand> getPepperCommand() {
 		return _pepperCommand;
 	}
 
@@ -53,7 +53,7 @@ public class HashRequest {
 		}
 
 		@Override
-		public SaltBuilder pepperCommand(UsePepperCommand pepperCommand) {
+		public SaltBuilder pepperCommand(PepperCommand pepperCommand) {
 			if (pepperCommand == null) {
 				throw new IllegalArgumentException(
 					"pepperCommand can not be null");
@@ -72,14 +72,12 @@ public class HashRequest {
 			return new Builder(_pepperCommand, saltCommand);
 		}
 
-		private Builder(
-			UsePepperCommand pepperCommand, SaltCommand saltCommand) {
-
+		private Builder(PepperCommand pepperCommand, SaltCommand saltCommand) {
 			_pepperCommand = pepperCommand;
 			_saltCommand = saltCommand;
 		}
 
-		private UsePepperCommand _pepperCommand;
+		private PepperCommand _pepperCommand;
 		private SaltCommand _saltCommand;
 
 	}
@@ -92,7 +90,7 @@ public class HashRequest {
 
 	public interface PepperBuilder extends SaltBuilder {
 
-		public SaltBuilder pepperCommand(UsePepperCommand pepperCommand);
+		public SaltBuilder pepperCommand(PepperCommand pepperCommand);
 
 	}
 
@@ -103,7 +101,7 @@ public class HashRequest {
 	}
 
 	private HashRequest(
-		UsePepperCommand pepperCommand, SaltCommand saltCommand, byte[] input) {
+		PepperCommand pepperCommand, SaltCommand saltCommand, byte[] input) {
 
 		_pepperCommand = Optional.ofNullable(pepperCommand);
 		_saltCommand = Optional.ofNullable(saltCommand);
@@ -111,7 +109,7 @@ public class HashRequest {
 	}
 
 	private final byte[] _input;
-	private Optional<UsePepperCommand> _pepperCommand;
+	private Optional<PepperCommand> _pepperCommand;
 	private Optional<SaltCommand> _saltCommand;
 
 }
