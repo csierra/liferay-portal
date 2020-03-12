@@ -61,7 +61,7 @@ public class HashProcessorImpl implements HashProcessor {
 		Optional<byte[]> optionalSalt = optionalSaltCommand.map(
 			BaseSaltCommand.class::cast
 		).map(
-			saltCommand -> saltCommand.accept(new GetSaltCommandVisitor())
+			saltCommand -> saltCommand.accept(_getSaltCommandVisitor)
 		);
 
 		optionalSalt.ifPresent(_hashGenerator::setSalt);
@@ -71,6 +71,8 @@ public class HashProcessorImpl implements HashProcessor {
 			_hashGenerator.hash(hashRequest.getInput()));
 	}
 
+	private final GetSaltCommandVisitor _getSaltCommandVisitor =
+		new GetSaltCommandVisitor();
 	private final HashGenerator _hashGenerator;
 
 	private class GetSaltCommandVisitor implements SaltCommandVisitor<byte[]> {
@@ -78,8 +80,6 @@ public class HashProcessorImpl implements HashProcessor {
 		@Override
 		public byte[] visit(
 			FirstAvailableSaltCommand firstAvailableSaltCommand) {
-
-			SaltCommandVisitor<byte[]> visitor = new GetSaltCommandVisitor();
 
 			for (SaltCommand saltCommand :
 					firstAvailableSaltCommand.getSaltCommands()) {
@@ -90,7 +90,7 @@ public class HashProcessorImpl implements HashProcessor {
 					final BaseSaltCommand baseSaltCommand =
 						(BaseSaltCommand)saltCommand;
 
-					salt = baseSaltCommand.accept(visitor);
+					salt = baseSaltCommand.accept(this);
 				}
 				catch (Exception exception) {
 					continue;
