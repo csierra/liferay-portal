@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
 public class PepperCommandProviderImpl implements PepperCommandProvider {
 
 	@Override
-	public PepperCommand getUsePepperCommand(byte[] pepperBytes) {
+	public PepperCommand usePepperCommand(byte[] pepperBytes) {
 		return new UsePepperCommand(pepperBytes);
 	}
 

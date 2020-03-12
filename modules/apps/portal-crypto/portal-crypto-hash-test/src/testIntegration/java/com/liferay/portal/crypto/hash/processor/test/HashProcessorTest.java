@@ -76,7 +76,7 @@ public class HashProcessorTest {
 	public void testBuilderCanBeReusedWithPepper() throws Exception {
 		HashRequest.InputBuilder inputBuilder = HashRequest.Builder.newBuilder(
 		).pepperCommand(
-			_pepperCommandProvider.getUsePepperCommand(_PEPPER.getBytes())
+			_pepperCommandProvider.usePepperCommand(_PEPPER.getBytes())
 		).saltCommand(
 			_saltCommandProvider.generateVariableSizeSaltCommand(32)
 		);
@@ -182,7 +182,7 @@ public class HashProcessorTest {
 	public void testPepperCommandTest() throws Exception {
 		HashRequest hashRequest = HashRequest.Builder.newBuilder(
 		).pepperCommand(
-			_pepperCommandProvider.getUsePepperCommand(_PEPPER.getBytes())
+			_pepperCommandProvider.usePepperCommand(_PEPPER.getBytes())
 		).input(
 			"password".getBytes()
 		);

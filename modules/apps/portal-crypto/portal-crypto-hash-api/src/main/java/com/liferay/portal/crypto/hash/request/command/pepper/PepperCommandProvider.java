@@ -22,6 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface PepperCommandProvider {
 
-	public PepperCommand getUsePepperCommand(byte[] pepperBytes);
+	public PepperCommand usePepperCommand(byte[] pepperBytes);
 
 }
