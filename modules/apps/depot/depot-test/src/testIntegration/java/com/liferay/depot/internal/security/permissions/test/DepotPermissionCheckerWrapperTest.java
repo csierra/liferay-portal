@@ -57,18 +57,40 @@ public class DepotPermissionCheckerWrapperTest {
 
 	@Test
 	public void testAssetLibraryAdminIsContentReviewer() throws Exception {
-		DepotEntry depotEntry = _addDepotEntry(TestPropsValues.getUserId());
+		User user = UserTestUtil.addUser();
 
-		DepotTestUtil.withAssetLibraryAdministrator(
-			depotEntry,
-			user -> {
-				PermissionChecker permissionChecker =
-					_permissionCheckerFactory.create(user);
+		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			Collections.emptyMap(),
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId(), TestPropsValues.getUserId()));
 
-				Assert.assertTrue(
-					permissionChecker.isContentReviewer(
-						depotEntry.getCompanyId(), depotEntry.getGroupId()));
-			});
+		Role role = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(),
+			DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR);
+
+		_userGroupRoleLocalService.addUserGroupRoles(
+			user.getUserId(), depotEntry.getGroupId(),
+			new long[] {role.getRoleId()});
+
+		_userLocalService.addGroupUsers(
+			depotEntry.getGroupId(), new long[] {user.getUserId()});
+
+		try {
+			PermissionChecker permissionChecker =
+				_permissionCheckerFactory.create(user);
+
+			Assert.assertTrue(
+				permissionChecker.isContentReviewer(
+					depotEntry.getCompanyId(), depotEntry.getGroupId()));
+		}
+		finally {
+			_depotEntryLocalService.deleteDepotEntry(depotEntry);
+
+			_userLocalService.deleteUser(user);
+		}
 	}
 
 	@Test
