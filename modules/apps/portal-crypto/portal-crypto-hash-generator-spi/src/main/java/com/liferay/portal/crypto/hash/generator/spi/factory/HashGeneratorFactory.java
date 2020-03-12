@@ -27,7 +27,7 @@ import org.osgi.annotation.versioning.ConsumerType;
 public interface HashGeneratorFactory {
 
 	/**
-	 * Construct a {@link com.liferay.portal.security.crypto.generator.spi.hashing.HasherGenerator} from given algorithm.
+	 * Construct a {@link HashGenerator} from given algorithm.
 	 *
 	 * @param generatorName The name of algorithm this generator is associated with
 	 * @param generatorMeta A JSON Object of meta info required by some algorithms
