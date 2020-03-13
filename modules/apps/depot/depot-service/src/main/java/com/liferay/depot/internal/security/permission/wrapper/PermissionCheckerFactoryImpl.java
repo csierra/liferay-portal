@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Cristina Gonzálaez
  */
 @Component(
-	property = "service.ranking:Integer=100",
+	enabled = false, property = "service.ranking:Integer=100",
 	service = PermissionCheckerWrapperFactory.class
 )
 public class PermissionCheckerFactoryImpl

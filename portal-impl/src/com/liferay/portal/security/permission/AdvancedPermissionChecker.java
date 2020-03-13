@@ -959,6 +959,21 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 				organization = parentOrganization;
 			}
 		}
+		else {
+			String className = group.getClassName();
+
+			if (!className.isEmpty() &&
+				(hasOwnerPermission(
+					group.getCompanyId(), className, group.getClassPK(),
+					group.getCreatorUserId(), ActionKeys.UPDATE) ||
+				 hasPermission(
+					 null, className, group.getClassPK(), ActionKeys.UPDATE) ||
+				 hasPermission(
+				 	group, className, group.getClassPK(), ActionKeys.UPDATE))) {
+
+				return true;
+			}
+		}
 
 		return false;
 	}

@@ -54,11 +54,18 @@ public class DepotMemberRoleContributor implements RoleContributor {
 				(userBag.hasUserGroup(group) ||
 				 userBag.hasUserOrgGroup(group))) {
 
-				Role role = _roleLocalService.getRole(
+				Role assetLibraryAdministratorRole = _roleLocalService.getRole(
+					group.getCompanyId(),
+					DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR);
+
+				roleCollection.addRoleId(
+					assetLibraryAdministratorRole.getRoleId());
+
+				Role assetLibraryMemberRole = _roleLocalService.getRole(
 					group.getCompanyId(),
 					DepotRolesConstants.ASSET_LIBRARY_MEMBER);
 
-				roleCollection.addRoleId(role.getRoleId());
+				roleCollection.addRoleId(assetLibraryMemberRole.getRoleId());
 			}
 		}
 		catch (PortalException portalException) {
