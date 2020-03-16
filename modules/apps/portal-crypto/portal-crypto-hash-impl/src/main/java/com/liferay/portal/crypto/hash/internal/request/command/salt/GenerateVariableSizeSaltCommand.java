@@ -14,6 +14,9 @@
 
 package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
+import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
+import com.liferay.portal.crypto.hash.generator.spi.salt.VariableSizeSaltGenerator;
+
 /**
  * @author Carlos Sierra Andrés
  */
@@ -24,8 +27,15 @@ public final class GenerateVariableSizeSaltCommand extends BaseSaltCommand {
 	}
 
 	@Override
-	public <T> T accept(SaltCommandVisitor<T> visitor) {
-		return visitor.visit(this);
+	public byte[] getSalt(HashGenerator hashGenerator) {
+		if (hashGenerator instanceof VariableSizeSaltGenerator) {
+			VariableSizeSaltGenerator generateVariableSizeSalt =
+				(VariableSizeSaltGenerator)hashGenerator;
+
+			return generateVariableSizeSalt.generateSalt(getSaltSize());
+		}
+
+		return null;
 	}
 
 	public int getSaltSize() {

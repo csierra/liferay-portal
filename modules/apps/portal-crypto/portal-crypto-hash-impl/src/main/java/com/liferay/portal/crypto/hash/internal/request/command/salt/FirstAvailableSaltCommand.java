@@ -14,6 +14,7 @@
 
 package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
+import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
 import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
 
 /**
@@ -26,8 +27,26 @@ public final class FirstAvailableSaltCommand extends BaseSaltCommand {
 	}
 
 	@Override
-	public <T> T accept(SaltCommandVisitor<T> visitor) {
-		return visitor.visit(this);
+	public byte[] getSalt(HashGenerator hashGenerator) {
+		for (SaltCommand saltCommand : getSaltCommands()) {
+			byte[] salt;
+
+			try {
+				final BaseSaltCommand baseSaltCommand =
+					(BaseSaltCommand)saltCommand;
+
+				salt = baseSaltCommand.getSalt(hashGenerator);
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			if (salt != null) {
+				return salt;
+			}
+		}
+
+		throw new UnsupportedOperationException();
 	}
 
 	public SaltCommand[] getSaltCommands() {

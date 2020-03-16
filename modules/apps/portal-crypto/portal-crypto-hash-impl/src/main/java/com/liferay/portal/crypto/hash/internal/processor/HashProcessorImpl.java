@@ -15,14 +15,8 @@
 package com.liferay.portal.crypto.hash.internal.processor;
 
 import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
-import com.liferay.portal.crypto.hash.generator.spi.salt.VariableSizeSaltGenerator;
 import com.liferay.portal.crypto.hash.internal.request.command.pepper.UsePepperCommand;
 import com.liferay.portal.crypto.hash.internal.request.command.salt.BaseSaltCommand;
-import com.liferay.portal.crypto.hash.internal.request.command.salt.FirstAvailableSaltCommand;
-import com.liferay.portal.crypto.hash.internal.request.command.salt.GenerateDefaultSizeSaltCommand;
-import com.liferay.portal.crypto.hash.internal.request.command.salt.GenerateVariableSizeSaltCommand;
-import com.liferay.portal.crypto.hash.internal.request.command.salt.SaltCommandVisitor;
-import com.liferay.portal.crypto.hash.internal.request.command.salt.UseSaltCommand;
 import com.liferay.portal.crypto.hash.internal.response.HashResponseImpl;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.request.HashRequest;
@@ -61,7 +55,7 @@ public class HashProcessorImpl implements HashProcessor {
 		Optional<byte[]> optionalSalt = optionalSaltCommand.map(
 			BaseSaltCommand.class::cast
 		).map(
-			saltCommand -> saltCommand.accept(_getSaltCommandVisitor)
+			baseSaltCommand -> baseSaltCommand.getSalt(_hashGenerator)
 		);
 
 		optionalSalt.ifPresent(_hashGenerator::setSalt);
@@ -71,66 +65,6 @@ public class HashProcessorImpl implements HashProcessor {
 			_hashGenerator.hash(hashRequest.getInput()));
 	}
 
-	private final GetSaltCommandVisitor _getSaltCommandVisitor =
-		new GetSaltCommandVisitor();
 	private final HashGenerator _hashGenerator;
-
-	private class GetSaltCommandVisitor implements SaltCommandVisitor<byte[]> {
-
-		@Override
-		public byte[] visit(
-			FirstAvailableSaltCommand firstAvailableSaltCommand) {
-
-			for (SaltCommand saltCommand :
-					firstAvailableSaltCommand.getSaltCommands()) {
-
-				byte[] salt;
-
-				try {
-					final BaseSaltCommand baseSaltCommand =
-						(BaseSaltCommand)saltCommand;
-
-					salt = baseSaltCommand.accept(this);
-				}
-				catch (Exception exception) {
-					continue;
-				}
-
-				if (salt != null) {
-					return salt;
-				}
-			}
-
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public byte[] visit(
-			GenerateDefaultSizeSaltCommand generateDefaultSizeSaltCommand) {
-
-			return _hashGenerator.generateSalt();
-		}
-
-		@Override
-		public byte[] visit(
-			GenerateVariableSizeSaltCommand generateVariableSizeSaltCommand) {
-
-			if (_hashGenerator instanceof VariableSizeSaltGenerator) {
-				VariableSizeSaltGenerator generateVariableSizeSalt =
-					(VariableSizeSaltGenerator)_hashGenerator;
-
-				return generateVariableSizeSalt.generateSalt(
-					generateVariableSizeSaltCommand.getSaltSize());
-			}
-
-			return null;
-		}
-
-		@Override
-		public byte[] visit(UseSaltCommand useSaltCommand) {
-			return useSaltCommand.getSalt();
-		}
-
-	}
 
 }

@@ -14,14 +14,16 @@
 
 package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
+import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
+
 /**
  * @author Carlos Sierra Andrés
  */
 public final class GenerateDefaultSizeSaltCommand extends BaseSaltCommand {
 
 	@Override
-	public <T> T accept(SaltCommandVisitor<T> visitor) {
-		return visitor.visit(this);
+	public byte[] getSalt(HashGenerator hashGenerator) {
+		return hashGenerator.generateSalt();
 	}
 
 }

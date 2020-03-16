@@ -14,6 +14,7 @@
 
 package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
+import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
 import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
 
 /**
@@ -21,6 +22,6 @@ import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
  */
 public abstract class BaseSaltCommand implements SaltCommand {
 
-	public abstract <T> T accept(SaltCommandVisitor<T> visitor);
+	public abstract byte[] getSalt(HashGenerator hashProcessor);
 
 }
