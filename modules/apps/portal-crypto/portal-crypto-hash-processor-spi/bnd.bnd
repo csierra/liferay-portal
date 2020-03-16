@@ -1,0 +1,7 @@
+Bundle-Name: Liferay Portal Crypto Hash Processor SPI
+Bundle-SymbolicName: com.liferay.portal.crypto.hash.processor.spi
+Bundle-Version: 1.0.0
+Export-Package:\
+	com.liferay.portal.crypto.hash.processor.spi,\
+	com.liferay.portal.crypto.hash.processor.spi.factory,\
+	com.liferay.portal.crypto.hash.processor.spi.salt
