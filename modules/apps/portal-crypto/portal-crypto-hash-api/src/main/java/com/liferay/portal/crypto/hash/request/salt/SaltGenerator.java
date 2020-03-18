@@ -12,22 +12,20 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.request.command.salt;
+package com.liferay.portal.crypto.hash.request.salt;
 
 import org.osgi.annotation.versioning.ProviderType;
+
+import java.util.Optional;
 
 /**
  * @author Carlos Sierra Andrés
  */
 @ProviderType
-public interface SaltCommandProvider {
+public interface SaltGenerator {
 
-	public SaltCommand firstAvailableSaltCommand(SaltCommand... saltCommands);
+	public byte[] generateDefaultSizeSalt();
 
-	public SaltCommand generateDefaultSizeSaltCommand();
-
-	public SaltCommand generateVariableSizeSaltCommand(int size);
-
-	public SaltCommand useSaltCommand(byte[] saltBytes);
+	public Optional<byte[]> generateVariableSizeSalt(int size);
 
 }

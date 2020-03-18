@@ -14,11 +14,11 @@
 
 package com.liferay.portal.crypto.hash.request;
 
-import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
+import com.liferay.portal.crypto.hash.request.salt.SaltGenerator;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Carlos Sierra Andrés
@@ -30,13 +30,6 @@ public class HashRequest {
 		return Arrays.copyOf(_input, _input.length);
 	}
 
-	public Optional<PepperCommand> getPepperCommand() {
-		return _pepperCommand;
-	}
-
-	public Optional<SaltCommand> getSaltCommand() {
-		return _saltCommand;
-	}
 
 	public static class Builder implements PepperBuilder {
 
@@ -54,17 +47,19 @@ public class HashRequest {
 		}
 
 		@Override
-		public SaltBuilder pepperCommand(PepperCommand pepperCommand) {
-			if (pepperCommand == null) {
+		public SaltBuilder pepper(byte[] pepper) {
+			if (pepper == null) {
 				throw new IllegalArgumentException(
 					"pepperCommand can not be null");
 			}
 
-			return new Builder(pepperCommand, null);
+			return new Builder(pepper, null);
 		}
 
 		@Override
-		public InputBuilder saltCommand(SaltCommand saltCommand) {
+		public InputBuilder salt(
+			Function<SaltGenerator, byte[]> saltCommand) {
+
 			if (saltCommand == null) {
 				throw new IllegalArgumentException(
 					"saltCommand can not be null");
@@ -73,13 +68,24 @@ public class HashRequest {
 			return new Builder(_pepperCommand, saltCommand);
 		}
 
-		private Builder(PepperCommand pepperCommand, SaltCommand saltCommand) {
+		@Override
+		public InputBuilder salt(byte[] salt) {
+			if (salt == null) {
+				throw new IllegalArgumentException(
+					"salt can not be null");
+			}
+
+			return new Builder(_pepperCommand, __ -> salt);
+		}
+
+		private Builder(
+			byte[] pepperCommand, Function<SaltGenerator, byte[]> saltCommand) {
 			_pepperCommand = pepperCommand;
 			_saltCommand = saltCommand;
 		}
 
-		private PepperCommand _pepperCommand;
-		private SaltCommand _saltCommand;
+		private byte[] _pepperCommand;
+		private Function<SaltGenerator, byte[]> _saltCommand;
 
 	}
 
@@ -91,18 +97,21 @@ public class HashRequest {
 
 	public interface PepperBuilder extends SaltBuilder {
 
-		public SaltBuilder pepperCommand(PepperCommand pepperCommand);
+		public SaltBuilder pepper(byte[] pepper);
 
 	}
 
 	public interface SaltBuilder extends InputBuilder {
 
-		public InputBuilder saltCommand(SaltCommand saltCommand);
+		public InputBuilder salt(
+			Function<SaltGenerator, byte[]> saltCommand);
+
+		public InputBuilder salt(byte[] salt);
 
 	}
 
 	private HashRequest(
-		PepperCommand pepperCommand, SaltCommand saltCommand, byte[] input) {
+		byte[] pepperCommand, Function<SaltGenerator, byte[]> saltCommand, byte[] input) {
 
 		_pepperCommand = Optional.ofNullable(pepperCommand);
 		_saltCommand = Optional.ofNullable(saltCommand);
@@ -110,7 +119,21 @@ public class HashRequest {
 	}
 
 	private final byte[] _input;
-	private Optional<PepperCommand> _pepperCommand;
-	private Optional<SaltCommand> _saltCommand;
+	private Optional<byte[]> _pepperCommand;
+	private Optional<Function<SaltGenerator, byte[]>> _saltCommand;
 
+	public static void main(String[] args) {
+		Builder.newBuilder().pepper(
+			"pepper".getBytes()
+		).salt(
+			saltGenerator -> {
+				Optional<byte[]> optionalBytes =
+					saltGenerator.generateVariableSizeSalt(32);
+
+				return optionalBytes.orElseGet(
+					saltGenerator::generateDefaultSizeSalt);
+			}
+		);
+
+	}
 }

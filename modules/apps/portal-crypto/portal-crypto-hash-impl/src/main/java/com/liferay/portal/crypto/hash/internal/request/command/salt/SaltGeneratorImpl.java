@@ -14,16 +14,15 @@
 
 package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
-import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.SaltCommandProvider;
+import com.liferay.portal.crypto.hash.request.salt.SaltGenerator;
 
 import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(service = SaltCommandProvider.class)
-public class SaltCommandProviderImpl implements SaltCommandProvider {
+@Component(service = SaltGenerator.class)
+public class SaltGeneratorImpl implements SaltGenerator {
 
 	@Override
 	public SaltCommand firstAvailableSaltCommand(SaltCommand... saltCommands) {
@@ -31,12 +30,12 @@ public class SaltCommandProviderImpl implements SaltCommandProvider {
 	}
 
 	@Override
-	public SaltCommand generateDefaultSizeSaltCommand() {
+	public SaltCommand generateDefaultSizeSalt() {
 		return new GenerateDefaultSizeSaltCommand();
 	}
 
 	@Override
-	public SaltCommand generateVariableSizeSaltCommand(int size) {
+	public SaltCommand generateVariableSizeSalt(int size) {
 		return new GenerateVariableSizeSaltCommand(size);
 	}
 

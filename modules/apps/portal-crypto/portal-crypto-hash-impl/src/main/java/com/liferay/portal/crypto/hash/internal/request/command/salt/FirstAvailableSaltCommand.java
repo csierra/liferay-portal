@@ -15,7 +15,6 @@
 package com.liferay.portal.crypto.hash.internal.request.command.salt;
 
 import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
-import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
 
 /**
  * @author Carlos Sierra Andrés

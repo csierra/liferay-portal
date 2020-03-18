@@ -21,7 +21,6 @@ import com.liferay.portal.crypto.hash.internal.response.HashResponseImpl;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.request.HashRequest;
 import com.liferay.portal.crypto.hash.request.command.pepper.PepperCommand;
-import com.liferay.portal.crypto.hash.request.command.salt.SaltCommand;
 import com.liferay.portal.crypto.hash.response.HashResponse;
 
 import java.util.Optional;
