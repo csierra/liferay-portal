@@ -22,7 +22,7 @@ import org.osgi.annotation.versioning.ConsumerType;
  * @author Arthur Chan
  */
 @ConsumerType
-public interface VariableSizeSaltGenerator {
+public interface VariableSizeSaltGenerator extends DefaultSizeSaltGenerator {
 
 	public default byte[] generateSalt(int size) {
 		byte[] salt = new byte[size];
