@@ -103,6 +103,8 @@ public class HashRequest {
 	public interface SaltBuilder extends InputBuilder {
 
 		public InputBuilder salt(Function<SaltCommand, byte[]> saltCommand);
+		public InputBuilder salt(byte[] saltBytes);
+
 
 	}
 
