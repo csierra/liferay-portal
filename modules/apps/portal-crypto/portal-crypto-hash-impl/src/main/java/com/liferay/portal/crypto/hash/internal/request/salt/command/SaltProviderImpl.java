@@ -15,51 +15,41 @@
 package com.liferay.portal.crypto.hash.internal.request.salt.command;
 
 import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
-import com.liferay.portal.crypto.hash.generator.spi.salt.DefaultSizeSaltGenerator;
 import com.liferay.portal.crypto.hash.generator.spi.salt.VariableSizeSaltGenerator;
-import com.liferay.portal.crypto.hash.request.salt.command.SaltCommand;
+import com.liferay.portal.crypto.hash.request.salt.command.SaltProvider;
+
+import java.util.Optional;
 
 /**
  * @author Arthur Chan
  */
-public class SaltCommandImpl implements SaltCommand {
+public class SaltProviderImpl implements SaltProvider {
 
-	public SaltCommandImpl(HashGenerator hashGenerator) {
+	public SaltProviderImpl(HashGenerator hashGenerator) {
 		_hashGenerator = hashGenerator;
 	}
 
 	@Override
-	public byte[] generateDefaultSizeSalt() {
-		if (_hashGenerator instanceof DefaultSizeSaltGenerator) {
-			DefaultSizeSaltGenerator defaultSizeSaltGenerator =
-				(DefaultSizeSaltGenerator)_hashGenerator;
-
-			try {
-				return defaultSizeSaltGenerator.generateSalt();
-			}
-			catch (Exception exception) {
-				return null;
-			}
-		}
-
-		return null;
+	public byte[] provideDefaultSizeSalt() {
+		return _hashGenerator.generateSalt();
 	}
 
 	@Override
-	public byte[] generateVariableSizeSalt(int size) {
+	public Optional<byte[]> provideVariableSizeSalt(int size) {
 		if (_hashGenerator instanceof VariableSizeSaltGenerator) {
 			VariableSizeSaltGenerator variableSizeSaltGenerator =
 				(VariableSizeSaltGenerator)_hashGenerator;
 
 			try {
-				return variableSizeSaltGenerator.generateSalt(size);
+				return Optional.of(
+					variableSizeSaltGenerator.generateSalt(size));
 			}
 			catch (Exception exception) {
-				return null;
+				return Optional.empty();
 			}
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 	private final HashGenerator _hashGenerator;

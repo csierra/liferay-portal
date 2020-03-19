@@ -14,27 +14,19 @@
 
 package com.liferay.portal.crypto.hash.request.salt.command;
 
+import java.util.Optional;
+
 /**
  * @author Carlos Sierra Andrés
  */
-public interface SaltCommand {
-
-	/**
-	 * A command to HashProcessor to use the given salt
-	 *
-	 * @param salt the given salt
-	 * @return the given salt
-	 */
-	public static byte[] useSalt(byte[] salt) {
-		return salt;
-	}
+public interface SaltProvider {
 
 	/**
 	 * A command to HashProcessor to use a new salt generated from underlying DefaultSizeSaltGenerator
 	 *
 	 * @return a default size salt or null if failed
 	 */
-	public byte[] generateDefaultSizeSalt();
+	public byte[] provideDefaultSizeSalt();
 
 	/**
 	 * A command to HashProcessor to use a new salt generated from underlying VariableSizeSaltGenerator
@@ -42,6 +34,6 @@ public interface SaltCommand {
 	 * @param size the size of generated salt
 	 * @return A variable size salt or null if failed
 	 */
-	public byte[] generateVariableSizeSalt(int size);
+	public Optional<byte[]> provideVariableSizeSalt(int size);
 
 }
