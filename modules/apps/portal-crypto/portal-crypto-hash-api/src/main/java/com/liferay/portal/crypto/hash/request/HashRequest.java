@@ -14,7 +14,6 @@
 
 package com.liferay.portal.crypto.hash.request;
 
-import com.liferay.portal.crypto.hash.request.pepper.command.PepperCommand;
 import com.liferay.portal.crypto.hash.request.salt.command.SaltCommand;
 
 import java.util.Arrays;
@@ -30,8 +29,8 @@ public class HashRequest {
 		return Arrays.copyOf(_input, _input.length);
 	}
 
-	public Function<PepperCommand, byte[]> getPepperCommand() {
-		return _pepperCommand;
+	public Optional<byte[]> getPepper() {
+		return _pepper;
 	}
 
 	public Function<SaltCommand, byte[]> getSaltCommand() {
@@ -54,12 +53,13 @@ public class HashRequest {
 		}
 
 		@Override
-		public SaltBuilder pepper(
-			Function<PepperCommand, byte[]> pepperCommand) {
+		public SaltBuilder pepper(byte[] pepper) {
+			if (pepper == null) {
+				throw new IllegalArgumentException("pepper can not be null");
+			}
 
-			if (pepperCommand == null) {
-				throw new IllegalArgumentException(
-					"pepperCommand can not be null");
+			return new Builder(pepper, null);
+		}
 			}
 
 			return new Builder(pepperCommand, null);
@@ -76,15 +76,15 @@ public class HashRequest {
 		}
 
 		private Builder(
-			Function<PepperCommand, byte[]> pepperCommand,
 			Function<SaltCommand, byte[]> saltCommand) {
+			byte[] pepperCommand,
 
 			_pepperCommand = pepperCommand;
 			_saltCommand = saltCommand;
 		}
 
-		private Function<PepperCommand, byte[]> _pepperCommand;
 		private Function<SaltCommand, byte[]> _saltCommand;
+		private final byte[] _pepperCommand;
 
 	}
 
@@ -96,8 +96,7 @@ public class HashRequest {
 
 	public interface PepperBuilder extends SaltBuilder {
 
-		public SaltBuilder pepper(
-			Function<PepperCommand, byte[]> pepperCommand);
+		public SaltBuilder pepper(byte[] pepper);
 
 	}
 
@@ -108,16 +107,16 @@ public class HashRequest {
 	}
 
 	private HashRequest(
-		Function<PepperCommand, byte[]> pepperCommand,
 		Function<SaltCommand, byte[]> saltCommand, byte[] input) {
+		byte[] pepper, Function<SaltProvider, SaltProvider.Salt> saltCommand,
 
-		_pepperCommand = pepperCommand;
 		_saltCommand = saltCommand;
+		_pepper = Optional.ofNullable(pepper);
 		_input = input;
 	}
 
 	private final byte[] _input;
-	private final Function<PepperCommand, byte[]> _pepperCommand;
 	private final Function<SaltCommand, byte[]> _saltCommand;
+	private final Optional<byte[]> _pepper;
 
 }
