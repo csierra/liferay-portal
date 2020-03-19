@@ -15,14 +15,14 @@
 package com.liferay.portal.crypto.hash.internal.processor;
 
 import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
-import com.liferay.portal.crypto.hash.internal.request.salt.command.SaltCommandImpl;
+import com.liferay.portal.crypto.hash.internal.request.salt.command.SaltProviderImpl;
 import com.liferay.portal.crypto.hash.internal.response.HashResponseImpl;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.request.HashRequest;
-import com.liferay.portal.crypto.hash.request.pepper.command.PepperCommand;
-import com.liferay.portal.crypto.hash.request.salt.command.SaltCommand;
+import com.liferay.portal.crypto.hash.request.salt.command.SaltProvider;
 import com.liferay.portal.crypto.hash.response.HashResponse;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -46,36 +46,21 @@ public class HashProcessorImpl implements HashProcessor {
 			_hashGenerator.hash(hashRequest.getInput()));
 	}
 
-	private byte[] _resolvePepperCommand(HashRequest hashRequest) {
-		Function<PepperCommand, byte[]> pepperCommand =
-			hashRequest.getPepperCommand();
+	private void _processPepper(HashRequest hashRequest) {
+		Optional<byte[]> optionalPepper = hashRequest.getPepper();
 
-		if (pepperCommand == null) {
-			return null;
-		}
-
-		byte[] pepper = pepperCommand.apply(
-			new PepperCommand() {
-			});
-
-		_hashGenerator.setPepper(pepper);
-
-		return pepper;
+		optionalPepper.ifPresent(_hashGenerator::setPepper);
 	}
 
-	private byte[] _resolveSaltCommand(HashRequest hashRequest) {
-		Function<SaltCommand, byte[]> saltCommand =
-			hashRequest.getSaltCommand();
+	private void _processSalt(HashRequest hashRequest) {
+		Optional<Function<SaltProvider, byte[]>> optionalFunction =
+			hashRequest.getSaltFunction();
 
-		if (saltCommand == null) {
-			return null;
-		}
-
-		byte[] salt = saltCommand.apply(new SaltCommandImpl(_hashGenerator));
-
-		_hashGenerator.setSalt(salt);
-
-		return salt;
+		optionalFunction.map(
+			sf -> sf.apply(new SaltProviderImpl(_hashGenerator))
+		).ifPresent(
+			_hashGenerator::setSalt
+		);
 	}
 
 	private final HashGenerator _hashGenerator;

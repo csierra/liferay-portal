@@ -24,9 +24,11 @@ import java.util.Optional;
  */
 public class HashResponseImpl implements HashResponse {
 
-	public HashResponseImpl(byte[] pepper, byte[] salt, byte[] hash) {
-		_pepper = Optional.ofNullable(pepper);
-		_salt = Optional.ofNullable(salt);
+	public HashResponseImpl(
+		Optional<byte[]> pepper, Optional<byte[]> salt, byte[] hash) {
+
+		_pepper = pepper;
+		_salt = salt;
 		_hash = hash;
 	}
 

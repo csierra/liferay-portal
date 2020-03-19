@@ -14,9 +14,10 @@
 
 package com.liferay.portal.crypto.hash.request;
 
-import com.liferay.portal.crypto.hash.request.salt.command.SaltCommand;
+import com.liferay.portal.crypto.hash.request.salt.command.SaltProvider;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -37,7 +38,7 @@ public class HashRequest {
 		return _pepper;
 	}
 
-	public Function<SaltCommand, byte[]> getSaltCommand() {
+	public Optional<Function<SaltProvider, byte[]>> getSaltFunction() {
 		return _saltCommand;
 	}
 
@@ -60,13 +61,22 @@ public class HashRequest {
 
 			return new Builder(pepper, null);
 		}
+
+		@Override
+		public InputBuilder salt(byte[] saltBytes) {
+			if (saltBytes == null) {
+				throw new IllegalArgumentException("saltBytes can not be null");
 			}
 
-			return new Builder(pepperCommand, null);
+			return new Builder(
+				_pepperCommand,
+				__ -> Arrays.copyOf(saltBytes, saltBytes.length));
 		}
 
 		@Override
-		public InputBuilder salt(Function<SaltCommand, byte[]> saltCommand) {
+		public InputBuilder saltProvider(
+			Function<SaltProvider, byte[]> saltCommand) {
+
 			if (saltCommand == null) {
 				throw new IllegalArgumentException(
 					"saltCommand can not be null");
@@ -76,15 +86,14 @@ public class HashRequest {
 		}
 
 		private Builder(
-			Function<SaltCommand, byte[]> saltCommand) {
-			byte[] pepperCommand,
+			byte[] pepperCommand, Function<SaltProvider, byte[]> saltCommand) {
 
 			_pepperCommand = pepperCommand;
 			_saltCommand = saltCommand;
 		}
 
-		private Function<SaltCommand, byte[]> _saltCommand;
 		private final byte[] _pepperCommand;
+		private Function<SaltProvider, byte[]> _saltCommand;
 
 	}
 
@@ -102,23 +111,24 @@ public class HashRequest {
 
 	public interface SaltBuilder extends InputBuilder {
 
-		public InputBuilder salt(Function<SaltCommand, byte[]> saltCommand);
 		public InputBuilder salt(byte[] saltBytes);
 
+		public InputBuilder saltProvider(
+			Function<SaltProvider, byte[]> saltCommand);
 
 	}
 
 	private HashRequest(
-		Function<SaltCommand, byte[]> saltCommand, byte[] input) {
-		byte[] pepper, Function<SaltProvider, SaltProvider.Salt> saltCommand,
+		byte[] pepper, Function<SaltProvider, byte[]> saltFunction,
+		byte[] input) {
 
-		_saltCommand = saltCommand;
 		_pepper = Optional.ofNullable(pepper);
+		_saltCommand = Optional.ofNullable(saltFunction);
 		_input = input;
 	}
 
 	private final byte[] _input;
-	private final Function<SaltCommand, byte[]> _saltCommand;
 	private final Optional<byte[]> _pepper;
+	private final Optional<Function<SaltProvider, byte[]>> _saltCommand;
 
 }
