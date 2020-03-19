@@ -20,6 +20,16 @@ package com.liferay.portal.crypto.hash.generator.spi;
 public abstract class BaseHashGenerator implements HashGenerator {
 
 	@Override
+	public byte[] getPepper() {
+		return pepper;
+	}
+
+	@Override
+	public byte[] getSalt() {
+		return salt;
+	}
+
+	@Override
 	public void setPepper(byte[] pepper) {
 		if (pepper == null) {
 			throw new IllegalArgumentException("pepper can not be null");

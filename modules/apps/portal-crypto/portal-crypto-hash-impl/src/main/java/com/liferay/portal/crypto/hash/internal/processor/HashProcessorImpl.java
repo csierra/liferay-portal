@@ -37,13 +37,13 @@ public class HashProcessorImpl implements HashProcessor {
 
 	@Override
 	public HashResponse process(HashRequest hashRequest) throws Exception {
-		byte[] pepper = _resolvePepperCommand(hashRequest);
+		_processPepper(hashRequest);
+		_processSalt(hashRequest);
 
-		byte[] salt = _resolveSaltCommand(hashRequest);
-
-		byte[] hash = _hashGenerator.hash(hashRequest.getInput());
-
-		return new HashResponseImpl(pepper, salt, hash);
+		return new HashResponseImpl(
+			Optional.ofNullable(_hashGenerator.getPepper()),
+			Optional.ofNullable(_hashGenerator.getSalt()),
+			_hashGenerator.hash(hashRequest.getInput()));
 	}
 
 	private byte[] _resolvePepperCommand(HashRequest hashRequest) {

@@ -24,6 +24,10 @@ import org.osgi.annotation.versioning.ConsumerType;
 @ConsumerType
 public interface HashGenerator extends DefaultSizeSaltGenerator {
 
+	public byte[] getPepper();
+
+	public byte[] getSalt();
+
 	public byte[] hash(byte[] toBeHashed) throws Exception;
 
 	public void setPepper(byte[] pepper);
