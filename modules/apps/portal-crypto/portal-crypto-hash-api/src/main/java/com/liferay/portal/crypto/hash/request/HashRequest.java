@@ -25,6 +25,10 @@ import java.util.function.Function;
  */
 public class HashRequest {
 
+	public static PepperBuilder newBuilder() {
+		return new Builder(null, null);
+	}
+
 	public byte[] getInput() {
 		return Arrays.copyOf(_input, _input.length);
 	}
@@ -38,10 +42,6 @@ public class HashRequest {
 	}
 
 	public static class Builder implements PepperBuilder {
-
-		public static PepperBuilder newBuilder() {
-			return new Builder(null, null);
-		}
 
 		@Override
 		public HashRequest input(byte[] input) {
