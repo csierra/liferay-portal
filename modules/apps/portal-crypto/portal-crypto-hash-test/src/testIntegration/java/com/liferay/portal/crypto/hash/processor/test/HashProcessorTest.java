@@ -210,6 +210,20 @@ public class HashProcessorTest {
 			_toHex(hashResponse.getHash()), _PASSWORD_PEPPER_HASH);
 	}
 
+	@Test(expected = UnsupportedOperationException.class)
+	public void testSaltProviderException() throws Exception {
+		HashRequest hashRequest = HashRequest.newBuilder(
+		).saltProvider(
+			saltProvider -> {
+				throw new UnsupportedOperationException();
+			}
+		).input(
+			_PASSWORD.getBytes()
+		);
+
+		_hashProcessor.process(hashRequest);
+	}
+
 	@Test
 	public void testUseSaltCommandTest() throws Exception {
 		HashRequest hashRequest = HashRequest.newBuilder(
