@@ -36,7 +36,8 @@ public class ServiceTrackerResourceBundleLoader
 	implements ResourceBundleLoader {
 
 	public ServiceTrackerResourceBundleLoader(
-			BundleContext bundleContext, String aggregate, int serviceRanking)
+			BundleContext bundleContext, String aggregate, int aggregateId,
+			int serviceRanking)
 		throws InvalidSyntaxException {
 
 		List<String> filterStrings = StringUtil.split(aggregate);
@@ -47,7 +48,8 @@ public class ServiceTrackerResourceBundleLoader
 			Filter filter = bundleContext.createFilter(
 				StringBundler.concat(
 					"(&(objectClass=", ResourceBundleLoader.class.getName(),
-					")", filterString, "(!(service.ranking>=", serviceRanking,
+					")", filterString, "(|(!(aggregateId=*))(!(aggregateId=",
+					aggregateId, ")))(!(service.ranking>=", serviceRanking,
 					")))"));
 
 			ServiceTracker<ResourceBundleLoader, ResourceBundleLoader>
@@ -78,9 +80,7 @@ public class ServiceTrackerResourceBundleLoader
 			ResourceBundleLoader resourceBundleLoader =
 				serviceTracker.getService();
 
-			if ((resourceBundleLoader != null) &&
-				(resourceBundleLoader != this)) {
-
+			if (resourceBundleLoader != null) {
 				ResourceBundle resourceBundle =
 					resourceBundleLoader.loadResourceBundle(locale);
 

@@ -91,7 +91,7 @@ public class LanguageExtension {
 				ServiceTrackerResourceBundleLoader
 					serviceTrackerResourceBundleLoader =
 						new ServiceTrackerResourceBundleLoader(
-							_bundleContext, (String)aggregate,
+							_bundleContext, (String)aggregate, aggregateId,
 							GetterUtil.getInteger(serviceRanking));
 
 				attributes.put("aggregateId", String.valueOf(aggregateId));
