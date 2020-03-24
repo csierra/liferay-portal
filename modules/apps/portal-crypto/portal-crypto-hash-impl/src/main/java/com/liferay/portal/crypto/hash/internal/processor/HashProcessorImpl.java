@@ -17,14 +17,13 @@ package com.liferay.portal.crypto.hash.internal.processor;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltGeneration;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
-import com.liferay.portal.crypto.hash.provider.spi.HashProvider;
-import com.liferay.portal.crypto.hash.provider.spi.factory.HashProviderFactory;
 import com.liferay.portal.crypto.hash.internal.generation.context.salt.SaltGenerationImpl;
 import com.liferay.portal.crypto.hash.internal.generation.response.HashGenerationResponseImpl;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
+import com.liferay.portal.crypto.hash.provider.spi.HashProvider;
+import com.liferay.portal.crypto.hash.provider.spi.factory.HashProviderFactory;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -69,8 +68,8 @@ public class HashProcessorImpl implements HashProcessor {
 
 	@Override
 	public boolean verify(
-			byte[] input,
-			List<HashVerificationContext> hashVerificationContexts, byte[] hash)
+			byte[] input, byte[] hash,
+			HashVerificationContext... hashVerificationContexts)
 		throws Exception {
 
 		for (HashVerificationContext hashVerificationContext :
