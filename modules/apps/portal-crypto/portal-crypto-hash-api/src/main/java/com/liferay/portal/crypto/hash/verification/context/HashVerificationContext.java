@@ -25,14 +25,14 @@ import org.json.JSONObject;
  */
 public class HashVerificationContext extends HashContext {
 
-	public Optional<byte[]> getSalt() {
-		return _salt;
-	}
-
 	public static Builder newBuilder(
 		String hashProviderName, JSONObject hashProviderMeta) {
 
 		return new Builder(hashProviderName, hashProviderMeta);
+	}
+
+	public Optional<byte[]> getSalt() {
+		return _salt;
 	}
 
 	public static class Builder extends HashContext.Builder {
