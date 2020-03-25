@@ -15,17 +15,17 @@
 package com.liferay.portal.crypto.hash.internal.processor;
 
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
-import com.liferay.portal.crypto.hash.generation.context.salt.SaltGeneration;
+import com.liferay.portal.crypto.hash.generation.context.salt.SaltGenerationCommand;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
-import com.liferay.portal.crypto.hash.internal.generation.context.salt.SaltGenerationImpl;
 import com.liferay.portal.crypto.hash.internal.generation.response.HashGenerationResponseImpl;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.provider.spi.HashProvider;
 import com.liferay.portal.crypto.hash.provider.spi.factory.HashProviderFactory;
+import com.liferay.portal.crypto.hash.provider.spi.salt.VariableSizeSaltProvider;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,11 +54,8 @@ public class HashProcessorImpl implements HashProcessor {
 
 		// process salt
 
-		Optional<Function<SaltGeneration, byte[]>> optionalFunction =
-			hashGenerationContext.getSaltGenerationFunction();
-
-		Optional<byte[]> optionalSalt = optionalFunction.map(
-			sf -> sf.apply(new SaltGenerationImpl(hashProvider)));
+		final Optional<byte[]> optionalSalt = _processSaltCommands(
+			hashGenerationContext.getSaltGenerationCommands(), hashProvider);
 
 		optionalSalt.ifPresent(hashProvider::setSalt);
 
@@ -112,6 +109,38 @@ public class HashProcessorImpl implements HashProcessor {
 		}
 
 		return false;
+	}
+
+	private Optional<byte[]> _processSaltCommands(
+		List<SaltGenerationCommand> saltGenerationCommands,
+		HashProvider hashProvider) {
+
+		if (saltGenerationCommands.isEmpty()) {
+			return Optional.empty();
+		}
+
+		for (SaltGenerationCommand saltGenerationCommand :
+				saltGenerationCommands) {
+
+			if (saltGenerationCommand instanceof
+					SaltGenerationCommand.VariableSizeSalt) {
+
+				SaltGenerationCommand.VariableSizeSalt variableSizeSalt =
+					(SaltGenerationCommand.VariableSizeSalt)
+						saltGenerationCommand;
+
+				if (hashProvider instanceof VariableSizeSaltProvider) {
+					return Optional.of(
+						((VariableSizeSaltProvider)hashProvider).generateSalt(
+							variableSizeSalt.getSaltSize()));
+				}
+			}
+			else {
+				return Optional.of(hashProvider.generateSalt());
+			}
+		}
+
+		throw new UnsupportedOperationException();
 	}
 
 	@Reference
