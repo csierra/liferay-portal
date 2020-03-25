@@ -14,29 +14,40 @@
 
 package com.liferay.portal.crypto.hash.generation.context.salt;
 
-import java.util.Optional;
-
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author Carlos Sierra Andrés
  */
-@ProviderType
-public interface SaltGeneration {
+public class SaltGenerationCommand {
 
 	/**
 	 * A command to HashProcessor to use a new salt generated from provided DefaultSizeSaltProvider
 	 *
 	 * @return a default size salt
 	 */
-	public byte[] generateDefaultSizeSalt();
+	public static final SaltGenerationCommand DEFAULT_SIZE_SALT =
+		new SaltGenerationCommand();
 
-	/**
-	 * A command to HashProcessor to use a new salt generated from provided VariableSizeSaltProvider
-	 *
-	 * @param size the size of generated salt
-	 * @return A variable size salt
-	 */
-	public Optional<byte[]> generateVariableSizeSalt(int size);
+	public static final class VariableSizeSalt extends SaltGenerationCommand {
+
+		/**
+		 * A command to HashProcessor to use a new salt generated from provided VariableSizeSaltProvider
+		 *
+		 * @param saltSize the size of generated salt
+		 * @return A variable size salt
+		 */
+		public VariableSizeSalt(int saltSize) {
+			_saltSize = saltSize;
+		}
+
+		public int getSaltSize() {
+			return _saltSize;
+		}
+
+		private final int _saltSize;
+
+	}
+
+	private SaltGenerationCommand() {
+	}
 
 }

@@ -15,10 +15,11 @@
 package com.liferay.portal.crypto.hash.generation.context;
 
 import com.liferay.portal.crypto.hash.context.HashContext;
-import com.liferay.portal.crypto.hash.generation.context.salt.SaltGeneration;
+import com.liferay.portal.crypto.hash.generation.context.salt.SaltGenerationCommand;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.json.JSONObject;
 
@@ -27,16 +28,14 @@ import org.json.JSONObject;
  */
 public class HashGenerationContext extends HashContext {
 
-	public Optional<Function<SaltGeneration, byte[]>>
-		getSaltGenerationFunction() {
-
-		return _saltGenerationFunction;
-	}
-
 	public static Builder newBuilder(
 		String hashProviderName, JSONObject hashProviderMeta) {
 
 		return new Builder(hashProviderName, hashProviderMeta);
+	}
+
+	public List<SaltGenerationCommand> getSaltGenerationCommands() {
+		return _saltGenerationCommands;
 	}
 
 	public static class Builder extends HashContext.Builder {
@@ -44,14 +43,13 @@ public class HashGenerationContext extends HashContext {
 		public HashGenerationContext build() {
 			return new HashGenerationContext(
 				hashProviderName, hashProviderMeta, pepper,
-				_saltGenerationFunction);
+				_saltGenerationCommands);
 		}
 
-		public Builder salt(
-			Function<SaltGeneration, byte[]> saltGenerationFunction) {
+		public Builder saltGeneration(
+			SaltGenerationCommand... saltGenerationCommands) {
 
-			_saltGenerationFunction = Optional.ofNullable(
-				saltGenerationFunction);
+			_saltGenerationCommands = Arrays.asList(saltGenerationCommands);
 
 			return this;
 		}
@@ -60,21 +58,20 @@ public class HashGenerationContext extends HashContext {
 			super(hashProviderName, hashProviderMeta);
 		}
 
-		private Optional<Function<SaltGeneration, byte[]>>
-			_saltGenerationFunction;
+		private List<SaltGenerationCommand> _saltGenerationCommands;
 
 	}
 
 	protected HashGenerationContext(
 		String hashProviderName, JSONObject hashProviderMeta,
 		Optional<byte[]> pepper,
-		Optional<Function<SaltGeneration, byte[]>> saltGenerationFunction) {
+		List<SaltGenerationCommand> saltGenerationCommands) {
 
 		super(hashProviderName, hashProviderMeta, pepper);
 
-		_saltGenerationFunction = saltGenerationFunction;
+		_saltGenerationCommands = saltGenerationCommands;
 	}
 
-	private Optional<Function<SaltGeneration, byte[]>> _saltGenerationFunction;
+	private List<SaltGenerationCommand> _saltGenerationCommands;
 
 }
