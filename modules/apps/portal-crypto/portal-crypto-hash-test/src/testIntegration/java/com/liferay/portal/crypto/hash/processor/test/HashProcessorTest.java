@@ -87,9 +87,9 @@ public class HashProcessorTest {
 		HashVerificationContext.Builder hashVerificationBuilder2 =
 			HashVerificationContext.newBuilder(_MESSAGE_DIGEST_ALGO_2, null);
 
-		hashVerificationBuilder1.pepper(_PEPPER.getBytes());
+		hashVerificationBuilder2.pepper(_PEPPER.getBytes());
 
-		hashVerificationBuilder1.salt(_SALT_2.getBytes());
+		hashVerificationBuilder2.salt(_SALT_2.getBytes());
 
 		Assert.assertTrue(
 			_hashProcessor.verify(
