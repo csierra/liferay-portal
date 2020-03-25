@@ -16,6 +16,7 @@ package com.liferay.portal.crypto.hash.processor.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
+import com.liferay.portal.crypto.hash.generation.context.salt.SaltGenerationCommand;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
@@ -51,8 +52,8 @@ public class HashProcessorTest {
 
 		hashGenerationBuilder.pepper(_PEPPER.getBytes());
 
-		hashGenerationBuilder.salt(
-			saltGeneration -> saltGeneration.generateDefaultSizeSalt());
+		hashGenerationBuilder.saltGeneration(
+			SaltGenerationCommand.DEFAULT_SIZE_SALT);
 
 		_testHashGenerationCommon(hashGenerationBuilder);
 	}
@@ -64,13 +65,8 @@ public class HashProcessorTest {
 
 		hashGenerationBuilder.pepper(_PEPPER.getBytes());
 
-		hashGenerationBuilder.salt(
-			saltGeneration -> {
-				Optional<byte[]> optionalSalt =
-					saltGeneration.generateVariableSizeSalt(_VARIABLE_SIZE);
-
-				return optionalSalt.get();
-			});
+		hashGenerationBuilder.saltGeneration(
+			new SaltGenerationCommand.VariableSizeSalt(_VARIABLE_SIZE));
 
 		_testHashGenerationCommon(hashGenerationBuilder);
 	}
@@ -111,8 +107,8 @@ public class HashProcessorTest {
 
 		hashGenerationBuilder.pepper(_PEPPER.getBytes());
 
-		hashGenerationBuilder.salt(
-			saltGeneration -> saltGeneration.generateDefaultSizeSalt());
+		hashGenerationBuilder.saltGeneration(
+			SaltGenerationCommand.DEFAULT_SIZE_SALT);
 
 		HashGenerationResponse hashGenerationResponse1 =
 			_hashProcessor.generate(
