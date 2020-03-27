@@ -47,8 +47,7 @@ public class MessageDigestHashProviderTest extends PowerMockito {
 
 	@Test
 	public void testGenerateDefaultSizeSalt() throws Exception {
-		DefaultSizeSaltProvider defaultSizeSaltProvider =
-			(DefaultSizeSaltProvider)_hashProvider;
+		DefaultSizeSaltProvider defaultSizeSaltProvider = _hashProvider;
 
 		byte[] salt = defaultSizeSaltProvider.generateSalt();
 
