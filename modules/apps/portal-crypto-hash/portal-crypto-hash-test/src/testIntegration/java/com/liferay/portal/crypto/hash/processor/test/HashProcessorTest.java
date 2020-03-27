@@ -69,7 +69,46 @@ public class HashProcessorTest {
 			).saltCommand(
 				SaltCommand.generateVariableSizeSalt(_VARIABLE_SIZE)
 			).hashProvider(
-				_MESSAGE_DIGEST_ALGO_1, null
+				_MESSAGE_DIGEST_ALGO_1
+			);
+
+		_testHashGenerationCommon(hashGenerationContext);
+	}
+
+	@Test
+	public void testHashGenerationWithoutPepperWithDefaultSizeSalt()
+		throws Exception {
+
+		HashGenerationContext hashGenerationContext =
+			HashGenerationContext.newBuilder(
+			).saltCommand(
+				SaltCommand.generateDefaultSizeSalt()
+			).hashProvider(
+				_MESSAGE_DIGEST_ALGO_1
+			);
+
+		_testHashGenerationCommon(hashGenerationContext);
+	}
+
+	@Test
+	public void testHashGenerationWithoutPepperWithoutSalt() throws Exception {
+		HashGenerationContext hashGenerationContext =
+			HashGenerationContext.newBuilder(
+			).hashProvider(
+				_MESSAGE_DIGEST_ALGO_1
+			);
+
+		_testHashGenerationCommon(hashGenerationContext);
+	}
+
+	@Test
+	public void testHashGenerationWithPepperWithoutSalt() throws Exception {
+		HashGenerationContext hashGenerationContext =
+			HashGenerationContext.newBuilder(
+			).pepper(
+				_PEPPER.getBytes()
+			).hashProvider(
+				_MESSAGE_DIGEST_ALGO_1
 			);
 
 		_testHashGenerationCommon(hashGenerationContext);
