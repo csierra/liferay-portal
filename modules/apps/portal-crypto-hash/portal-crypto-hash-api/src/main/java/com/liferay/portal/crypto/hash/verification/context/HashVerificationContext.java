@@ -37,6 +37,12 @@ public class HashVerificationContext extends HashContext {
 	public static class Builder implements PepperBuilder {
 
 		@Override
+		public HashVerificationContext hashProvider(String hashProviderName) {
+			return new HashVerificationContext(
+				hashProviderName, null, _pepper, _salt);
+		}
+
+		@Override
 		public HashVerificationContext hashProvider(
 			String hashProviderName, JSONObject hashProviderMeta) {
 
@@ -73,6 +79,8 @@ public class HashVerificationContext extends HashContext {
 	}
 
 	public interface HashProviderBuilder {
+
+		public HashVerificationContext hashProvider(String hashProviderName);
 
 		public HashVerificationContext hashProvider(
 			String hashProviderName, JSONObject hashProviderMeta);

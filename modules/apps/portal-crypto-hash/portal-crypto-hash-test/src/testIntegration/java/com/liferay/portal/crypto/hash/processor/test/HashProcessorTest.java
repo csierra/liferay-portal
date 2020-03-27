@@ -54,7 +54,7 @@ public class HashProcessorTest {
 			).saltCommand(
 				SaltCommand.generateDefaultSizeSalt()
 			).hashProvider(
-				_MESSAGE_DIGEST_ALGO_1, null
+				_MESSAGE_DIGEST_ALGO_1
 			);
 
 		_testHashGenerationCommon(hashGenerationContext);
@@ -123,7 +123,7 @@ public class HashProcessorTest {
 			).salt(
 				_SALT_1.getBytes()
 			).hashProvider(
-				_MESSAGE_DIGEST_ALGO_1, null
+				_MESSAGE_DIGEST_ALGO_1
 			);
 
 		HashVerificationContext hashVerificationContext2 =
@@ -133,7 +133,7 @@ public class HashProcessorTest {
 			).salt(
 				_SALT_2.getBytes()
 			).hashProvider(
-				_MESSAGE_DIGEST_ALGO_2, null
+				_MESSAGE_DIGEST_ALGO_2
 			);
 
 		Assert.assertTrue(
@@ -160,12 +160,12 @@ public class HashProcessorTest {
 		HashGenerationResponse hashGenerationResponse1 =
 			_hashProcessor.generate(
 				_PASSWORD.getBytes(),
-				hashProviderBuilder.hashProvider(_MESSAGE_DIGEST_ALGO_1, null));
+				hashProviderBuilder.hashProvider(_MESSAGE_DIGEST_ALGO_1));
 
 		HashGenerationResponse hashGenerationResponse2 =
 			_hashProcessor.generate(
 				_PASSWORD.getBytes(),
-				hashProviderBuilder.hashProvider(_MESSAGE_DIGEST_ALGO_1, null));
+				hashProviderBuilder.hashProvider(_MESSAGE_DIGEST_ALGO_1));
 
 		Optional<byte[]> optionalSalt1 = hashGenerationResponse1.getSalt();
 
@@ -236,7 +236,7 @@ public class HashProcessorTest {
 			).salt(
 				optionalSalt.get()
 			).hashProvider(
-				_MESSAGE_DIGEST_ALGO_1, null
+				_MESSAGE_DIGEST_ALGO_1
 			);
 
 		Assert.assertTrue(

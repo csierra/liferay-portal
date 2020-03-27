@@ -36,6 +36,12 @@ public class HashGenerationContext extends HashContext {
 	public static class Builder implements PepperBuilder {
 
 		@Override
+		public HashGenerationContext hashProvider(String hashProviderName) {
+			return new HashGenerationContext(
+				hashProviderName, null, _pepper, _saltCommands);
+		}
+
+		@Override
 		public HashGenerationContext hashProvider(
 			String hashProviderName, JSONObject hashProviderMeta) {
 
@@ -73,6 +79,8 @@ public class HashGenerationContext extends HashContext {
 	}
 
 	public interface HashProviderBuilder {
+
+		public HashGenerationContext hashProvider(String hashProviderName);
 
 		public HashGenerationContext hashProvider(
 			String hashProviderName, JSONObject hashProviderMeta);
