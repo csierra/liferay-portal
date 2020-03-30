@@ -11,5 +11,5 @@ Provide-Capability:\
 	liferay.resource.bundle;\
 		bundle.symbolic.name=language.test.symbolic.name.2;\
 		resource.bundle.aggregate:String="(bundle.symbolic.name=language.test.symbolic.name.3),(bundle.symbolic.name=language.test.symbolic.name.2)";\
-		resource.bundle.base.name="content.Language"
+		resource.bundle.base.name="content.Language";\
 		service.ranking="2"
