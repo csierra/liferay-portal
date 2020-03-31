@@ -143,6 +143,45 @@ public class HashProcessorTest {
 	}
 
 	@Test
+	public void testHashGenerationWithoutPepperWithDefaultSizeSalt()
+		throws Exception {
+
+		HashGenerationContext hashGenerationContext =
+			HashGenerationContext.newBuilder(
+			).saltCommand(
+				SaltCommand.generateDefaultSizeSalt()
+			).hashProvider(
+				_MESSAGE_DIGEST_ALGO_1
+			);
+
+		_testHashGenerationCommon(hashGenerationContext);
+	}
+
+	@Test
+	public void testHashGenerationWithoutPepperWithoutSalt() throws Exception {
+		HashGenerationContext hashGenerationContext =
+			HashGenerationContext.newBuilder(
+			).hashProvider(
+				_MESSAGE_DIGEST_ALGO_1
+			);
+
+		_testHashGenerationCommon(hashGenerationContext);
+	}
+
+	@Test
+	public void testHashGenerationWithPepperWithoutSalt() throws Exception {
+		HashGenerationContext hashGenerationContext =
+			HashGenerationContext.newBuilder(
+			).pepper(
+				_PEPPER.getBytes()
+			).hashProvider(
+				_MESSAGE_DIGEST_ALGO_1
+			);
+
+		_testHashGenerationCommon(hashGenerationContext);
+	}
+
+	@Test
 	public void testHashVerification() throws Exception {
 		HashVerificationContext hashVerificationContext1 =
 			HashVerificationContext.newBuilder(
@@ -173,6 +212,39 @@ public class HashProcessorTest {
 			_hashProcessor.verify(
 				_WRONG_PASSWORD.getBytes(), _FINAL_HASH,
 				hashVerificationContext1, hashVerificationContext2));
+	}
+
+	@Test
+	public void testReusableHashGenerationContextBuilder() throws Exception {
+		HashGenerationContext.HashProviderBuilder hashProviderBuilder =
+			HashGenerationContext.newBuilder(
+			).pepper(
+				_PEPPER.getBytes()
+			).saltCommand(
+				SaltCommand.generateDefaultSizeSalt()
+			);
+
+		HashGenerationResponse hashGenerationResponse1 =
+			_hashProcessor.generate(
+				_PASSWORD.getBytes(),
+				hashProviderBuilder.hashProvider(_MESSAGE_DIGEST_ALGO_1));
+
+		HashGenerationResponse hashGenerationResponse2 =
+			_hashProcessor.generate(
+				_PASSWORD.getBytes(),
+				hashProviderBuilder.hashProvider(_MESSAGE_DIGEST_ALGO_1));
+
+		Optional<byte[]> optionalSalt1 = hashGenerationResponse1.getSalt();
+
+		Optional<byte[]> optionalSalt2 = hashGenerationResponse2.getSalt();
+
+		Assert.assertFalse(
+			Arrays.equals(optionalSalt1.get(), optionalSalt2.get()));
+
+		Assert.assertFalse(
+			Arrays.equals(
+				hashGenerationResponse1.getHash(),
+				hashGenerationResponse2.getHash()));
 	}
 
 	private static int _getHexCharValue(char hexChar)
