@@ -80,10 +80,7 @@ public class HashVerificationContext extends HashContext {
 
 	public interface HashProviderBuilder {
 
-		public HashVerificationContext hashProvider(String hashProviderName);
-
-		public HashVerificationContext hashProvider(
-			String hashProviderName, JSONObject hashProviderMeta);
+		public HashVerificationContext build();
 
 	}
 
