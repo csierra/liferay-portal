@@ -51,10 +51,10 @@ public class DepotGroupMembershipCustomizer
 				user.getUserId(), group.getGroupId(),
 				DepotRolesConstants.ASSET_LIBRARY_OWNER, true)) {
 
-			return true;
+			return Boolean.TRUE;
 		}
 
-		return false;
+		return Boolean.FALSE;
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class DepotGroupMembershipCustomizer
 				user.getUserId(), group.getGroupId(),
 				DepotRolesConstants.ASSET_LIBRARY_MEMBER, true)) {
 
-			return true;
+			return Boolean.TRUE;
 		}
 
 		return null;
@@ -90,10 +90,10 @@ public class DepotGroupMembershipCustomizer
 				user.getUserId(), group.getGroupId(),
 				DepotRolesConstants.ASSET_LIBRARY_OWNER, true)) {
 
-			return true;
+			return Boolean.TRUE;
 		}
 
-		return false;
+		return Boolean.FALSE;
 	}
 
 	@Reference
