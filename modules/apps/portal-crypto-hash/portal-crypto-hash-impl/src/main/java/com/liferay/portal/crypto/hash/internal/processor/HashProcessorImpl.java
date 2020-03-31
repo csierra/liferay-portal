@@ -51,6 +51,11 @@ public class HashProcessorImpl implements HashProcessor {
 
 		optionalPepper.ifPresent(hashProvider::setPepper);
 
+		// process salt
+
+		Optional<byte[]> optionalSalt = _processSaltCommands(
+			hashProvider, hashGenerationContext.getSaltCommands());
+
 		optionalSalt.ifPresent(hashProvider::setSalt);
 
 		return new HashGenerationResponseImpl(
@@ -87,6 +92,35 @@ public class HashProcessorImpl implements HashProcessor {
 		}
 
 		return Arrays.equals(input, hash);
+	}
+
+	private Optional<byte[]> _processSaltCommands(
+		HashProvider hashProvider, SaltCommand... saltCommands) {
+
+		if ((saltCommands == null) || (saltCommands.length < 1)) {
+			return Optional.empty();
+		}
+
+		for (SaltCommand saltCommand : saltCommands) {
+			if (saltCommand instanceof SaltCommand.VariableSizeSaltCommand) {
+				SaltCommand.VariableSizeSaltCommand variableSizeSaltCommand =
+					(SaltCommand.VariableSizeSaltCommand)saltCommand;
+
+				if (hashProvider instanceof VariableSizeSaltProvider) {
+					VariableSizeSaltProvider variableSizeSaltProvider =
+						(VariableSizeSaltProvider)hashProvider;
+
+					return Optional.of(
+						variableSizeSaltProvider.generateSalt(
+							variableSizeSaltCommand.getSaltSize()));
+				}
+			}
+			else {
+				return Optional.of(hashProvider.generateSalt());
+			}
+		}
+
+		throw new UnsupportedOperationException();
 	}
 
 	@Reference
