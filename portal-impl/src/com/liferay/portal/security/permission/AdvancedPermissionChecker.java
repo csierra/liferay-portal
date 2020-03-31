@@ -60,7 +60,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.group.membership.GroupMembershipCustomizerRegistryUtil;
+import com.liferay.registry.collections.ServiceTrackerCollections;
+import com.liferay.registry.collections.ServiceTrackerMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -774,8 +775,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
 		GroupMembershipCustomizer groupMembershipCustomizer =
-			GroupMembershipCustomizerRegistryUtil.getGroupMembershipCustomizer(
-				group.getClassName());
+			_groupMembershipCustomizers.getService(group.getClassName());
 
 		if (groupMembershipCustomizer != null) {
 			Boolean groupContentReviewer =
@@ -851,8 +851,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 
 	protected boolean isGroupAdminImpl(Group group) throws Exception {
 		GroupMembershipCustomizer groupMembershipCustomizer =
-			GroupMembershipCustomizerRegistryUtil.getGroupMembershipCustomizer(
-				group.getClassName());
+			_groupMembershipCustomizers.getService(group.getClassName());
 
 		if (groupMembershipCustomizer != null) {
 			Boolean groupAdmin = groupMembershipCustomizer.isGroupAdmin(
@@ -1003,8 +1002,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
 		GroupMembershipCustomizer groupMembershipCustomizer =
-			GroupMembershipCustomizerRegistryUtil.getGroupMembershipCustomizer(
-				group.getClassName());
+			_groupMembershipCustomizers.getService(group.getClassName());
 
 		if (groupMembershipCustomizer != null) {
 			Boolean groupMember = groupMembershipCustomizer.isGroupMember(
@@ -1031,8 +1029,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 
 	protected boolean isGroupOwnerImpl(Group group) throws PortalException {
 		GroupMembershipCustomizer groupMembershipCustomizer =
-			GroupMembershipCustomizerRegistryUtil.getGroupMembershipCustomizer(
-				group.getClassName());
+			_groupMembershipCustomizers.getService(group.getClassName());
 
 		if (groupMembershipCustomizer != null) {
 			Boolean groupOwner = groupMembershipCustomizer.isGroupOwner(
@@ -1562,6 +1559,11 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AdvancedPermissionChecker.class);
+
+	private static final ServiceTrackerMap<String, GroupMembershipCustomizer>
+		_groupMembershipCustomizers =
+			ServiceTrackerCollections.openSingleValueMap(
+				GroupMembershipCustomizer.class, "group.class.name");
 
 	private Map<Long, long[]> _contributedRoleIds;
 	private long _guestGroupId;
