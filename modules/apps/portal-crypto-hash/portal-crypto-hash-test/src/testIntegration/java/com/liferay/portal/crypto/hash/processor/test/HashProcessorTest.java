@@ -247,6 +247,42 @@ public class HashProcessorTest {
 				hashGenerationResponse2.getHash()));
 	}
 
+	@Test
+	public void testReusableHashGenerationContextBuilderWithDifferentSalts()
+		throws Exception {
+
+		HashGenerationContext.SaltCommandBuilder saltCommandBuilder =
+			HashGenerationContext.newBuilder(
+			).pepper(
+				_PEPPER.getBytes()
+			);
+
+		HashGenerationResponse hashGenerationResponse1 =
+			_hashProcessor.generate(
+				_PASSWORD.getBytes(),
+				saltCommandBuilder.saltCommand(
+					SaltCommand.generateDefaultSizeSalt()
+				).hashProvider(
+					_MESSAGE_DIGEST_ALGO_1
+				));
+
+		HashGenerationResponse hashGenerationResponse2 =
+			_hashProcessor.generate(
+				_PASSWORD.getBytes(),
+				saltCommandBuilder.hashProvider(_MESSAGE_DIGEST_ALGO_2));
+
+		Optional<byte[]> optionalSalt1 = hashGenerationResponse1.getSalt();
+		Optional<byte[]> optionalSalt2 = hashGenerationResponse2.getSalt();
+
+		Assert.assertTrue(optionalSalt1.isPresent());
+		Assert.assertFalse(optionalSalt2.isPresent());
+
+		Assert.assertFalse(
+			Arrays.equals(
+				hashGenerationResponse1.getHash(),
+				hashGenerationResponse2.getHash()));
+	}
+
 	private static int _getHexCharValue(char hexChar)
 		throws IllegalArgumentException {
 
