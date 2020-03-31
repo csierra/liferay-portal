@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.model.User;
  */
 public interface GroupMembershipCustomizer {
 
+	public String getGroupClassName();
+
 	public Boolean isGroupAdmin(User user, Group group) throws PortalException;
 
 	public Boolean isGroupContentReviewer(User user, Group group)

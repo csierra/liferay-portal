@@ -15,6 +15,7 @@
 package com.liferay.depot.internal.security.permission;
 
 import com.liferay.depot.constants.DepotRolesConstants;
+import com.liferay.depot.model.DepotEntry;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -28,12 +29,14 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(
-	property = "group.class.name=com.liferay.depot.model.DepotEntry",
-	service = GroupMembershipCustomizer.class
-)
+@Component(service = GroupMembershipCustomizer.class)
 public class DepotGroupMembershipCustomizer
 	implements GroupMembershipCustomizer {
+
+	@Override
+	public String getGroupClassName() {
+		return DepotEntry.class.getName();
+	}
 
 	@Override
 	public Boolean isGroupAdmin(User user, Group group) throws PortalException {

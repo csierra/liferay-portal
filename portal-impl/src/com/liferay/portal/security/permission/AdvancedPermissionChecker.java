@@ -60,6 +60,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
 
@@ -1563,7 +1565,15 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	private static final ServiceTrackerMap<String, GroupMembershipCustomizer>
 		_groupMembershipCustomizers =
 			ServiceTrackerCollections.openSingleValueMap(
-				GroupMembershipCustomizer.class, "group.class.name");
+				GroupMembershipCustomizer.class, null,
+				(serviceReference, emitter) -> {
+					Registry registry = RegistryUtil.getRegistry();
+
+					GroupMembershipCustomizer groupMembershipCustomizer =
+						registry.getService(serviceReference);
+
+					emitter.emit(groupMembershipCustomizer.getGroupClassName());
+				});
 
 	private Map<Long, long[]> _contributedRoleIds;
 	private long _guestGroupId;
