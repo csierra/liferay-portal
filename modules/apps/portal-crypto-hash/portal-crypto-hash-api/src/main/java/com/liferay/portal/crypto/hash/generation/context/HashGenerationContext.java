@@ -80,10 +80,7 @@ public class HashGenerationContext extends HashContext {
 
 	public interface HashProviderBuilder {
 
-		public HashGenerationContext hashProvider(String hashProviderName);
-
-		public HashGenerationContext hashProvider(
-			String hashProviderName, JSONObject hashProviderMeta);
+		public HashGenerationContext input(byte[] input);
 
 	}
 
