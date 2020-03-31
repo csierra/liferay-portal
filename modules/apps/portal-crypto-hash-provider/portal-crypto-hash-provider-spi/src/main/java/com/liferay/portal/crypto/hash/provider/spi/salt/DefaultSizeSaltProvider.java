@@ -12,22 +12,26 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.provider.spi;
+package com.liferay.portal.crypto.hash.provider.spi.salt;
 
-import com.liferay.portal.crypto.hash.provider.spi.salt.DefaultSizeSaltProvider;
+import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.security.SecureRandomUtil;
 
 import org.osgi.annotation.versioning.ConsumerType;
 
 /**
+ * @author Carlos Sierra Andrés
  * @author Arthur Chan
  */
 @ConsumerType
-public interface HashProvider extends DefaultSizeSaltProvider {
+public interface DefaultSizeSaltProvider {
 
-	public byte[] hash(byte[] toBeHashed) throws Exception;
+	public default byte[] generateSalt() {
+		byte[] salt = new byte[Long.BYTES];
 
-	public void setPepper(byte[] pepper);
+		BigEndianCodec.putLong(salt, 0, SecureRandomUtil.nextLong());
 
-	public void setSalt(byte[] salt);
+		return salt;
+	}
 
 }
