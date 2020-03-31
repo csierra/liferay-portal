@@ -39,7 +39,7 @@ public interface HashProcessor {
 			String hashProviderName, JSONObject hashProviderMeta);
 
 	public HashGenerationResponse generate(
-			byte[] input, HashGenerationContext hashGenerationContext)
+			HashGenerationContext hashGenerationContext)
 		throws Exception;
 
 	public List<String> getProviderNames();
