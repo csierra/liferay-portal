@@ -41,7 +41,7 @@ public class DepotGroupMembershipCustomizer
 	@Override
 	public Boolean isGroupAdmin(User user, Group group) throws PortalException {
 		if (group.getType() != GroupConstants.TYPE_DEPOT) {
-			return false;
+			return null;
 		}
 
 		if (_userGroupRoleLocalService.hasUserGroupRole(
