@@ -18,7 +18,8 @@ import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
-import java.util.List;
+import java.util.Set;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -31,7 +32,7 @@ public interface HashProcessor {
 			byte[] input, HashGenerationContext hashGenerationContext)
 		throws Exception;
 
-	public List<String> getProviderNames();
+	public Set<String> getProviderNames();
 
 	public boolean verify(
 			byte[] input, byte[] hash,
