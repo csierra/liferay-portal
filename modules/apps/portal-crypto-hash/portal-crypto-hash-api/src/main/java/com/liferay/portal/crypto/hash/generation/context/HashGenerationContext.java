@@ -25,8 +25,12 @@ import org.json.JSONObject;
  */
 public class HashGenerationContext extends HashContext {
 
-	public static Builder newBuilder() {
-		return new Builder(null, (SaltCommand[])null);
+	public static Builder newBuilder(String hashProviderName) {
+		return new Builder(hashProviderName, null, null, (SaltCommand[])null);
+	}
+
+	public static Builder newBuilder(String hashProviderName, JSONObject hashProviderMeta) {
+		return new Builder(hashProviderName, hashProviderMeta, null, (SaltCommand[])null);
 	}
 
 	public SaltCommand[] getSaltCommands() {
@@ -36,17 +40,9 @@ public class HashGenerationContext extends HashContext {
 	public static class Builder implements PepperBuilder {
 
 		@Override
-		public HashGenerationContext hashProvider(String hashProviderName) {
+		public HashGenerationContext build() {
 			return new HashGenerationContext(
-				hashProviderName, null, _pepper, _saltCommands);
-		}
-
-		@Override
-		public HashGenerationContext hashProvider(
-			String hashProviderName, JSONObject hashProviderMeta) {
-
-			return new HashGenerationContext(
-				hashProviderName, hashProviderMeta, _pepper, _saltCommands);
+				_hashProviderName, _hashProviderMeta, _pepper, _saltCommands);
 		}
 
 		@Override
@@ -55,32 +51,36 @@ public class HashGenerationContext extends HashContext {
 				throw new IllegalArgumentException("pepper can not be null");
 			}
 
-			return new Builder(pepper, _saltCommands);
+			return new Builder(_hashProviderName, _hashProviderMeta, pepper, _saltCommands);
 		}
 
 		@Override
-		public Builder saltCommand(SaltCommand... saltCommands) {
+		public ContextBuilder saltCommand(SaltCommand... saltCommands) {
 			if (saltCommands == null) {
 				throw new IllegalArgumentException(
 					"saltCommands can not be null");
 			}
 
-			return new Builder(_pepper, saltCommands);
+			return new Builder(_hashProviderName, _hashProviderMeta, _pepper, saltCommands);
 		}
 
-		private Builder(byte[] pepper, SaltCommand... saltCommands) {
+		private Builder(String hashProviderName, JSONObject hashProviderMeta, byte[] pepper, SaltCommand... saltCommands) {
+			_hashProviderName = hashProviderName;
+			_hashProviderMeta = hashProviderMeta;
 			_pepper = pepper;
 			_saltCommands = saltCommands;
 		}
 
+		private final String _hashProviderName;
+		private final JSONObject _hashProviderMeta;
 		private final byte[] _pepper;
 		private final SaltCommand[] _saltCommands;
 
 	}
 
-	public interface HashProviderBuilder {
+	public interface ContextBuilder {
 
-		public HashGenerationContext input(byte[] input);
+		public HashGenerationContext build();
 
 	}
 
@@ -90,9 +90,9 @@ public class HashGenerationContext extends HashContext {
 
 	}
 
-	public interface SaltCommandBuilder extends HashProviderBuilder {
+	public interface SaltCommandBuilder extends ContextBuilder {
 
-		public HashProviderBuilder saltCommand(SaltCommand... saltCommands);
+		public ContextBuilder saltCommand(SaltCommand... saltCommands);
 
 	}
 
