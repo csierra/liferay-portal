@@ -15,6 +15,7 @@
 package com.liferay.portal.crypto.hash.verification.context;
 
 import com.liferay.portal.crypto.hash.context.HashContext;
+import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 
 import java.util.Optional;
 
@@ -26,8 +27,12 @@ import org.json.JSONObject;
  */
 public class HashVerificationContext extends HashContext {
 
-	public static Builder newBuilder() {
-		return new Builder(null, null);
+	public static Builder newBuilder(String hashProviderName) {
+		return new Builder(hashProviderName, null, null, null);
+	}
+
+	public static Builder newtBuilder(String hashProviderName, JSONObject hashProviderMeta) {
+		return new Builder(hashProviderName, hashProviderMeta, null, null);
 	}
 
 	public Optional<byte[]> getSalt() {
@@ -37,17 +42,8 @@ public class HashVerificationContext extends HashContext {
 	public static class Builder implements PepperBuilder {
 
 		@Override
-		public HashVerificationContext hashProvider(String hashProviderName) {
-			return new HashVerificationContext(
-				hashProviderName, null, _pepper, _salt);
-		}
-
-		@Override
-		public HashVerificationContext hashProvider(
-			String hashProviderName, JSONObject hashProviderMeta) {
-
-			return new HashVerificationContext(
-				hashProviderName, hashProviderMeta, _pepper, _salt);
+		public HashVerificationContext build() {
+			return new HashVerificationContext(_hashProviderName, _hashProviderMeta, _pepper, _salt);
 		}
 
 		@Override
@@ -56,31 +52,29 @@ public class HashVerificationContext extends HashContext {
 				throw new IllegalArgumentException("pepper can not be null");
 			}
 
-			return new Builder(pepper, _salt);
+			return new Builder(_hashProviderName, _hashProviderMeta, pepper, _salt);
 		}
 
 		@Override
-		public HashProviderBuilder salt(byte[] salt) {
+		public ContextBuilder salt(byte[] salt) {
 			if (salt == null) {
 				throw new IllegalArgumentException("salt can not be null");
 			}
 
-			return new Builder(_pepper, salt);
+			return new Builder(_hashProviderName, _hashProviderMeta, _pepper, salt);
 		}
 
-		private Builder(byte[] pepper, byte[] salt) {
+		private Builder(String hashProviderName, JSONObject hashProviderMeta, byte[] pepper, byte[] salt) {
+			_hashProviderName = hashProviderName;
+			_hashProviderMeta = hashProviderMeta;
 			_pepper = pepper;
 			_salt = salt;
 		}
 
+		private final String _hashProviderName;
+		private final JSONObject _hashProviderMeta;
 		private final byte[] _pepper;
 		private final byte[] _salt;
-
-	}
-
-	public interface HashProviderBuilder {
-
-		public HashVerificationContext build();
 
 	}
 
@@ -90,9 +84,15 @@ public class HashVerificationContext extends HashContext {
 
 	}
 
-	public interface SaltBuilder extends HashProviderBuilder {
+	public interface SaltBuilder extends ContextBuilder {
 
-		public HashProviderBuilder salt(byte[] salt);
+		public ContextBuilder salt(byte[] salt);
+
+	}
+
+	public interface ContextBuilder {
+
+		public HashVerificationContext build();
 
 	}
 

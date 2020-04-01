@@ -38,13 +38,6 @@ public interface HashProcessor {
 		createHashGenerationContextBuilder(
 			String hashProviderName, JSONObject hashProviderMeta);
 
-	public Optional<HashGenerationContext.Builder>
-		createHashVerificationContextBuilder(String hashProviderName);
-
-	public Optional<HashGenerationContext.Builder>
-		createHashVerificationContextBuilder(
-			String hashProviderName, JSONObject hashProviderMeta);
-
 	public HashGenerationResponse generate(
 			HashGenerationContext hashGenerationContext)
 		throws Exception;
