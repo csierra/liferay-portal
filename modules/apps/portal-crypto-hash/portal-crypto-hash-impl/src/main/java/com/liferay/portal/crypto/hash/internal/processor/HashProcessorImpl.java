@@ -14,6 +14,8 @@
 
 package com.liferay.portal.crypto.hash.internal.processor;
 
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
@@ -26,8 +28,12 @@ import com.liferay.portal.crypto.hash.verification.context.HashVerificationConte
 
 import java.util.Optional;
 
+import org.json.JSONObject;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.Deactivate;
 
 /**
  * @author Arthur Chan
@@ -41,7 +47,7 @@ public class HashProcessorImpl implements HashProcessor {
 			byte[] input, HashGenerationContext hashGenerationContext)
 		throws Exception {
 
-		HashProvider hashProvider = _hashProviderFactory.create(
+		HashProvider hashProvider = _createHashProvider(
 			hashGenerationContext.getHashProviderName(),
 			hashGenerationContext.getHashProviderMeta());
 
@@ -66,7 +72,7 @@ public class HashProcessorImpl implements HashProcessor {
 		for (HashVerificationContext hashVerificationContext :
 				hashVerificationContexts) {
 
-			HashProvider hashProvider = _hashProviderFactory.create(
+			HashProvider hashProvider = _createHashProvider(
 				hashVerificationContext.getHashProviderName(),
 				hashVerificationContext.getHashProviderMeta());
 
@@ -89,7 +95,34 @@ public class HashProcessorImpl implements HashProcessor {
 		return Arrays.equals(input, hash);
 	}
 
-	@Reference
-	private HashProviderFactory _hashProviderFactory;
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_hashProviderFactories = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, HashProviderFactory.class,
+			"crypto.hash.provider.name");
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_hashProviderFactories.close();
+	}
+
+	private HashProvider _createHashProvider(
+			String providerName, JSONObject providerMeta)
+		throws Exception {
+
+		HashProviderFactory hashProviderFactory =
+			_hashProviderFactories.getService(providerName);
+
+		if (hashProviderFactory == null) {
+			throw new IllegalArgumentException(
+				"There is no provider of the name: " + providerName);
+		}
+
+		return hashProviderFactory.create(providerName, providerMeta);
+	}
+
+	private ServiceTrackerMap<String, HashProviderFactory>
+		_hashProviderFactories;
 
 }
