@@ -26,7 +26,9 @@ import com.liferay.portal.crypto.hash.provider.spi.factory.HashProviderFactory;
 import com.liferay.portal.crypto.hash.provider.spi.salt.VariableSizeSaltProvider;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.json.JSONObject;
 
@@ -66,6 +68,11 @@ public class HashProcessorImpl implements HashProcessor {
 
 		return new HashGenerationResponseImpl(
 			optionalSalt, hashProvider.hash(input));
+	}
+
+	@Override
+	public Set<String> getProviderNames() {
+		return _hashProviderFactories.keySet();
 	}
 
 	@Override
