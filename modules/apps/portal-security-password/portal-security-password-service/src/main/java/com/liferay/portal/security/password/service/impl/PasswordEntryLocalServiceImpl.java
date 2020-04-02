@@ -100,32 +100,8 @@ public class PasswordEntryLocalServiceImpl
 
 		PasswordEntry entry = passwordEntryPersistence.create(entryId);
 
-		String hashProviderName =
-			_passwordHashProviderConfiguration.hashProviderName();
-
-		JSONObject hashProviderMeta = _convertHashProviderMeta(
-			_passwordHashProviderConfiguration.hashProviderMeta());
-
-		HashProviderConfiguration hashProviderConfiguration =
-			_hashProcessor.createHashProviderConfiguration(
-				_passwordHashProviderConfiguration.hashProviderName(),
-				_convertHashProviderMeta(
-					_passwordHashProviderConfiguration.hashProviderMeta()));
-
-		PasswordHashProvider passwordHashProvider =
-			_passwordHashProviderLocalService.addPasswordHashProvider(
-				hashProviderConfiguration.getHashProviderName(),
-				hashProviderConfiguration.getHashProviderMeta());
-
-		HashGenerationContext hashGenerationContext =
-			HashGenerationContext.newBuilder(
-				hashProviderConfiguration
-			).saltCommand(
-				SaltCommand.generateDefaultSizeSalt()
-			).build();
-
 		HashGenerationResponse hashGenerationResponse = _hashProcessor.generate(
-			password.getBytes(), hashGenerationContext);
+			password.getBytes(), _hashGenerationContext);
 	
 		PasswordMeta meta = _passwordMetaLocalService.addPasswordMeta(
 			entryId, passwordHashProvider.getPasswordHashProviderId(),
@@ -300,12 +276,32 @@ public class PasswordEntryLocalServiceImpl
 	protected void activate(Map<String, Object> properties) {
 		_passwordHashProviderConfiguration = ConfigurableUtil.createConfigurable(
 			PasswordHashProviderConfiguration.class, properties);
+
+		PasswordHashProvider passwordHashProvider =
+			_passwordHashProviderLocalService.addPasswordHashProvider(
+				_passwordHashProviderConfiguration.hashProviderName(),
+				_passwordHashProviderConfiguration.hashProviderMeta());
+
+		HashProviderConfiguration hashProviderConfiguration =
+			_hashProcessor.createHashProviderConfiguration(
+				_passwordHashProviderConfiguration.hashProviderName(),
+				_convertHashProviderMeta(
+					_passwordHashProviderConfiguration.hashProviderMeta()));
+
+		_hashGenerationContext = HashGenerationContext.newBuilder(
+			hashProviderConfiguration
+		).saltCommand(
+			SaltCommand.generateDefaultSizeSalt()
+		).build();
+
 	}
 
 	private volatile PasswordHashProviderConfiguration _passwordHashProviderConfiguration;
 
 	@Reference
 	private HashProcessor _hashProcessor;
+
+	private HashGenerationContext _hashGenerationContext;
 
 	@Reference
 	private PasswordHashProviderLocalService _passwordHashProviderLocalService;
