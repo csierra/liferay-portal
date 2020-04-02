@@ -16,6 +16,7 @@ package com.liferay.portal.crypto.hash.generation.context;
 
 import com.liferay.portal.crypto.hash.context.HashContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
+import com.liferay.portal.crypto.hash.provider.configuration.HashProviderConfiguration;
 
 import org.json.JSONObject;
 
@@ -25,8 +26,11 @@ import org.json.JSONObject;
  */
 public class HashGenerationContext extends HashContext {
 
-	public static Builder newBuilder() {
-		return new Builder(null, (SaltCommand[])null);
+	public static Builder newBuilder(
+		HashProviderConfiguration hashProviderConfiguration) {
+
+		return new Builder(
+			hashProviderConfiguration, null, (SaltCommand[])null);
 	}
 
 	public SaltCommand[] getSaltCommands() {
@@ -36,17 +40,11 @@ public class HashGenerationContext extends HashContext {
 	public static class Builder implements PepperBuilder {
 
 		@Override
-		public HashGenerationContext hashProvider(String hashProviderName) {
+		public HashGenerationContext build() {
 			return new HashGenerationContext(
-				hashProviderName, null, _pepper, _saltCommands);
-		}
-
-		@Override
-		public HashGenerationContext hashProvider(
-			String hashProviderName, JSONObject hashProviderMeta) {
-
-			return new HashGenerationContext(
-				hashProviderName, hashProviderMeta, _pepper, _saltCommands);
+				_hashProviderConfiguration.getHashProviderName(),
+				_hashProviderConfiguration.getHashProviderMeta(), _pepper,
+				_saltCommands);
 		}
 
 		@Override
@@ -55,7 +53,8 @@ public class HashGenerationContext extends HashContext {
 				throw new IllegalArgumentException("pepper can not be null");
 			}
 
-			return new Builder(pepper, _saltCommands);
+			return new Builder(
+				_hashProviderConfiguration, pepper, _saltCommands);
 		}
 
 		@Override
@@ -65,25 +64,28 @@ public class HashGenerationContext extends HashContext {
 					"saltCommands can not be null");
 			}
 
-			return new Builder(_pepper, saltCommands);
+			return new Builder(
+				_hashProviderConfiguration, _pepper, saltCommands);
 		}
 
-		private Builder(byte[] pepper, SaltCommand... saltCommands) {
+		private Builder(
+			HashProviderConfiguration hashProviderConfiguration, byte[] pepper,
+			SaltCommand... saltCommands) {
+
+			_hashProviderConfiguration = hashProviderConfiguration;
 			_pepper = pepper;
 			_saltCommands = saltCommands;
 		}
 
+		private final HashProviderConfiguration _hashProviderConfiguration;
 		private final byte[] _pepper;
 		private final SaltCommand[] _saltCommands;
 
 	}
 
-	public interface HashProviderBuilder {
+	public interface ContextBuilder {
 
-		public HashGenerationContext hashProvider(String hashProviderName);
-
-		public HashGenerationContext hashProvider(
-			String hashProviderName, JSONObject hashProviderMeta);
+		public HashGenerationContext build();
 
 	}
 
@@ -93,9 +95,9 @@ public class HashGenerationContext extends HashContext {
 
 	}
 
-	public interface SaltCommandBuilder extends HashProviderBuilder {
+	public interface SaltCommandBuilder extends ContextBuilder {
 
-		public HashProviderBuilder saltCommand(SaltCommand... saltCommands);
+		public ContextBuilder saltCommand(SaltCommand... saltCommands);
 
 	}
 

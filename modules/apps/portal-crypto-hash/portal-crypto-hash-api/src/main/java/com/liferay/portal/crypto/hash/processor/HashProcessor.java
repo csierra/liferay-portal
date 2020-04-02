@@ -16,6 +16,7 @@ package com.liferay.portal.crypto.hash.processor;
 
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
+import com.liferay.portal.crypto.hash.provider.configuration.HashProviderConfiguration;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
 import java.util.Set;
@@ -31,19 +32,13 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashProcessor {
 
-	public HashGenerationContext.Builder
-		createHashGenerationContextBuilder(String hashProviderName) throws Exception;
+	public HashProviderConfiguration createHashProviderConfiguration(
+			String hashProviderName)
+		throws Exception;
 
-	public HashGenerationContext.Builder
-		createHashGenerationContextBuilder(
-			String hashProviderName, JSONObject hashProviderMeta) throws Exception;
-
-	public HashVerificationContext.Builder
-		createHashVerificationContextBuilder(String hashProviderName) throws Exception;
-
-	public HashVerificationContext.Builder
-		createHashVerificationContextBuilder(
-			String hashProviderName, JSONObject hashProviderMeta) throws Exception;
+	public HashProviderConfiguration createHashProviderConfiguration(
+			String hashProviderName, JSONObject hashProviderMeta)
+		throws Exception;
 
 	public HashGenerationResponse generate(
 			byte[] input, HashGenerationContext hashGenerationContext)
