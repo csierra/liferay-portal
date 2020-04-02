@@ -31,6 +31,20 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashProcessor {
 
+	public HashGenerationContext.Builder
+		createHashGenerationContextBuilder(String hashProviderName) throws Exception;
+
+	public HashGenerationContext.Builder
+		createHashGenerationContextBuilder(
+			String hashProviderName, JSONObject hashProviderMeta) throws Exception;
+
+	public HashVerificationContext.Builder
+		createHashVerificationContextBuilder(String hashProviderName) throws Exception;
+
+	public HashVerificationContext.Builder
+		createHashVerificationContextBuilder(
+			String hashProviderName, JSONObject hashProviderMeta) throws Exception;
+
 	public HashGenerationResponse generate(
 			byte[] input, HashGenerationContext hashGenerationContext)
 		throws Exception;
