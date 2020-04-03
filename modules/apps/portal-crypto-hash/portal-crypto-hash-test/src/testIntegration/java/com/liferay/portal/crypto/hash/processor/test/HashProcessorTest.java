@@ -226,13 +226,46 @@ public class HashProcessorTest {
 	}
 
 	@Test
+	public void testReusableHashGenerationContext() throws Exception {
+		HashContextBuilder hashContextBuilder =
+			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_1);
+
+		HashGenerationContext hashGenerationContext =
+			hashContextBuilder.generationHashProvider(
+			).pepper(
+				_PEPPER.getBytes()
+			).saltCommand(
+				SaltCommand.generateDefaultSizeSalt()
+			).build();
+
+		HashGenerationResponse hashGenerationResponse1 =
+			_hashProcessor.generate(
+				_PASSWORD.getBytes(), hashGenerationContext);
+
+		HashGenerationResponse hashGenerationResponse2 =
+			_hashProcessor.generate(
+				_PASSWORD.getBytes(), hashGenerationContext);
+
+		Optional<byte[]> optionalSalt1 = hashGenerationResponse1.getSalt();
+
+		Optional<byte[]> optionalSalt2 = hashGenerationResponse2.getSalt();
+
+		Assert.assertFalse(
+			Arrays.equals(optionalSalt1.get(), optionalSalt2.get()));
+
+		Assert.assertFalse(
+			Arrays.equals(
+				hashGenerationResponse1.getHash(),
+				hashGenerationResponse2.getHash()));
+	}
+
+	@Test
 	public void testReusableHashGenerationContextBuilder() throws Exception {
 		HashContextBuilder hashContextBuilder =
-			_hashProcessor.createHashContextBuilder();
+			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_1);
 
 		HashGenerationContext.Builder hashProviderBuilder =
 			hashContextBuilder.generationHashProvider(
-				_MESSAGE_DIGEST_ALGO_1
 			).pepper(
 				_PEPPER.getBytes()
 			).saltCommand(
