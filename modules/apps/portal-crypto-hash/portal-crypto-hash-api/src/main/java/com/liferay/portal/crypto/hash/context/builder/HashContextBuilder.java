@@ -17,8 +17,6 @@ package com.liferay.portal.crypto.hash.context.builder;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
-import org.json.JSONObject;
-
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -27,20 +25,8 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashContextBuilder {
 
-	public HashGenerationContext.PepperBuilder generationHashProvider(
-			String hashProviderName)
-		throws Exception;
+	public HashGenerationContext.PepperBuilder generationHashProvider();
 
-	public HashGenerationContext.PepperBuilder generationHashProvider(
-			String hashProviderName, JSONObject hashProviderMeta)
-		throws Exception;
-
-	public HashVerificationContext.PepperBuilder verificationHashProvider(
-			String hashProviderName)
-		throws Exception;
-
-	public HashVerificationContext.PepperBuilder verificationHashProvider(
-			String hashProviderName, JSONObject hashProviderMeta)
-		throws Exception;
+	public HashVerificationContext.PepperBuilder verificationHashProvider();
 
 }

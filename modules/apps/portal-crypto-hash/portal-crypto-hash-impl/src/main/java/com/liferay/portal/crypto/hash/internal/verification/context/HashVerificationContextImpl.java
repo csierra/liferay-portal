@@ -34,12 +34,6 @@ public class HashVerificationContextImpl
 	public static class Builder
 		extends AbstractHashContext.Builder implements PepperBuilder {
 
-		public Builder(String hashProviderName) {
-			super(hashProviderName);
-
-			_salt = null;
-		}
-
 		public Builder(String hashProviderName, JSONObject hashProviderMeta) {
 			super(hashProviderName, hashProviderMeta);
 

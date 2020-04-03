@@ -18,10 +18,7 @@ import com.liferay.portal.crypto.hash.context.builder.HashContextBuilder;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.internal.generation.context.HashGenerationContextImpl;
 import com.liferay.portal.crypto.hash.internal.verification.context.HashVerificationContextImpl;
-import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
-
-import java.util.Set;
 
 import org.json.JSONObject;
 
@@ -30,76 +27,26 @@ import org.json.JSONObject;
  */
 public class HashContextBuilderImpl implements HashContextBuilder {
 
-	public HashContextBuilderImpl(HashProcessor hashProcessor) {
-		_hashProcessor = hashProcessor;
+	public HashContextBuilderImpl(
+		String hashProviderName, JSONObject hashProviderMeta) {
+
+		_hashProviderName = hashProviderName;
+		_hashProviderMeta = hashProviderMeta;
 	}
 
 	@Override
-	public HashGenerationContext.PepperBuilder generationHashProvider(
-			String hashProviderName)
-		throws Exception {
-
-		Set<String> availableHashProviderNames =
-			_hashProcessor.getAvailableHashProviderNames();
-
-		if (!availableHashProviderNames.contains(hashProviderName)) {
-			throw new IllegalArgumentException(
-				"There is no provider of name: " + hashProviderName);
-		}
-
-		return new HashGenerationContextImpl.Builder(hashProviderName);
-	}
-
-	@Override
-	public HashGenerationContext.PepperBuilder generationHashProvider(
-			String hashProviderName, JSONObject hashProviderMeta)
-		throws Exception {
-
-		Set<String> availableHashProviderNames =
-			_hashProcessor.getAvailableHashProviderNames();
-
-		if (!availableHashProviderNames.contains(hashProviderName)) {
-			throw new IllegalArgumentException(
-				"There is no provider of name: " + hashProviderName);
-		}
-
+	public HashGenerationContext.PepperBuilder generationHashProvider() {
 		return new HashGenerationContextImpl.Builder(
-			hashProviderName, hashProviderMeta);
+			_hashProviderName, _hashProviderMeta);
 	}
 
 	@Override
-	public HashVerificationContext.PepperBuilder verificationHashProvider(
-			String hashProviderName)
-		throws Exception {
-
-		Set<String> availableHashProviderNames =
-			_hashProcessor.getAvailableHashProviderNames();
-
-		if (!availableHashProviderNames.contains(hashProviderName)) {
-			throw new IllegalArgumentException(
-				"There is no provider of name: " + hashProviderName);
-		}
-
-		return new HashVerificationContextImpl.Builder(hashProviderName);
-	}
-
-	@Override
-	public HashVerificationContext.PepperBuilder verificationHashProvider(
-			String hashProviderName, JSONObject hashProviderMeta)
-		throws Exception {
-
-		Set<String> availableHashProviderNames =
-			_hashProcessor.getAvailableHashProviderNames();
-
-		if (!availableHashProviderNames.contains(hashProviderName)) {
-			throw new IllegalArgumentException(
-				"There is no provider of name: " + hashProviderName);
-		}
-
+	public HashVerificationContext.PepperBuilder verificationHashProvider() {
 		return new HashVerificationContextImpl.Builder(
-			hashProviderName, hashProviderMeta);
+			_hashProviderName, _hashProviderMeta);
 	}
 
-	private final HashProcessor _hashProcessor;
+	private final JSONObject _hashProviderMeta;
+	private final String _hashProviderName;
 
 }

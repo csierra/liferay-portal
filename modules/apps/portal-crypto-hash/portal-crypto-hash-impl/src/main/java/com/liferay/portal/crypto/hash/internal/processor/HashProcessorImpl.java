@@ -46,8 +46,25 @@ import org.osgi.service.component.annotations.Deactivate;
 public class HashProcessorImpl implements HashProcessor {
 
 	@Override
-	public HashContextBuilder createHashContextBuilder() {
-		return new HashContextBuilderImpl(this);
+	public HashContextBuilder createHashContextBuilder(
+		String hashProviderName) {
+
+		return createHashContextBuilder(hashProviderName, null);
+	}
+
+	@Override
+	public HashContextBuilder createHashContextBuilder(
+		String hashProviderName, JSONObject hashProviderMeta) {
+
+		Set<String> availableHashProviderNames =
+			getAvailableHashProviderNames();
+
+		if (!availableHashProviderNames.contains(hashProviderName)) {
+			throw new IllegalArgumentException(
+				"There is no provider of name: " + hashProviderName);
+		}
+
+		return new HashContextBuilderImpl(hashProviderName, hashProviderMeta);
 	}
 
 	@Override

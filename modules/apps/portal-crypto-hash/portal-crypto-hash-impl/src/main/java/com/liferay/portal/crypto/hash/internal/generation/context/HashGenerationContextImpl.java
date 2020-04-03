@@ -33,12 +33,6 @@ public class HashGenerationContextImpl
 	public static class Builder
 		extends AbstractHashContext.Builder implements PepperBuilder {
 
-		public Builder(String hashProviderName) {
-			super(hashProviderName);
-
-			_saltCommands = null;
-		}
-
 		public Builder(String hashProviderName, JSONObject hashProviderMeta) {
 			super(hashProviderName, hashProviderMeta);
 
