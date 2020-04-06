@@ -27,22 +27,4 @@ public interface HashGenerationContext extends HashContext {
 
 	public SaltCommand[] getSaltCommands();
 
-	public interface Builder {
-
-		public HashGenerationContext build();
-
-	}
-
-	public interface PepperBuilder extends SaltCommandBuilder {
-
-		public SaltCommandBuilder pepper(byte[] pepper);
-
-	}
-
-	public interface SaltCommandBuilder extends Builder {
-
-		public Builder saltCommand(SaltCommand... saltCommands);
-
-	}
-
 }

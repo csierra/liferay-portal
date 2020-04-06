@@ -14,20 +14,14 @@
 
 package com.liferay.portal.crypto.hash.context.builder;
 
-import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
-import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
-import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Carlos Sierra Andrés
  */
-public interface HashContextBuilder {
+@ProviderType
+public interface PepperContextBuilder extends HashContextBuilder {
 
-	public HashGenerationContext buildGenerationContext(
-		SaltCommand... saltCommands);
-
-	public HashVerificationContext buildVerificationContext();
-
-	public HashVerificationContext buildVerificationContext(byte[] saltBytes);
+	public HashContextBuilder pepper(byte[] pepper);
 
 }

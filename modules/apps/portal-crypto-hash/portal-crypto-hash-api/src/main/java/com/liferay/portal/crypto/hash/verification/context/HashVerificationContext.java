@@ -28,22 +28,4 @@ public interface HashVerificationContext extends HashContext {
 
 	public Optional<byte[]> getSalt();
 
-	public interface Builder {
-
-		public HashVerificationContext build();
-
-	}
-
-	public interface PepperBuilder extends SaltBuilder {
-
-		public SaltBuilder pepper(byte[] pepper);
-
-	}
-
-	public interface SaltBuilder extends Builder {
-
-		public Builder salt(byte[] salt);
-
-	}
-
 }

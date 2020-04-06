@@ -14,7 +14,7 @@
 
 package com.liferay.portal.crypto.hash.processor;
 
-import com.liferay.portal.crypto.hash.context.builder.HashContextBuilder;
+import com.liferay.portal.crypto.hash.context.builder.PepperContextBuilder;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
@@ -31,9 +31,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashProcessor {
 
-	public HashContextBuilder createHashContextBuilder(String hashProviderName);
+	public PepperContextBuilder createHashContextBuilder(
+		String hashProviderName);
 
-	public HashContextBuilder createHashContextBuilder(
+	public PepperContextBuilder createHashContextBuilder(
 		String hashProviderName, JSONObject hashProviderMeta);
 
 	public HashGenerationResponse generate(
