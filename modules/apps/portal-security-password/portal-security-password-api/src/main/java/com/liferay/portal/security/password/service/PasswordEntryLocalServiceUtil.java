@@ -374,11 +374,10 @@ public class PasswordEntryLocalServiceUtil {
 	 * @param UserId ID of user
 	 * @return A list of password entries
 	 */
-	public static java.util.List
-		<com.liferay.portal.security.password.model.PasswordEntry>
-			getPasswordEntriesByUserId(long userId) {
+	public static com.liferay.portal.security.password.model.PasswordEntry
+		getPasswordEntriesByUserId(long userId) {
 
-		return getService().getPasswordEntriesByUserId(userId);
+		return getService().fetchPasswordEntryByUserId(userId);
 	}
 
 	/**

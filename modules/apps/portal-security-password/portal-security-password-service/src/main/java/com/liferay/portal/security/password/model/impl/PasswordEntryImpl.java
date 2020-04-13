@@ -25,7 +25,7 @@ package com.liferay.portal.security.password.model.impl;
  */
 public class PasswordEntryImpl extends PasswordEntryBaseImpl {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. All methods that expect a password entry model instance should use the {@link com.liferay.portal.security.password.model.PasswordEntry} interface instead.

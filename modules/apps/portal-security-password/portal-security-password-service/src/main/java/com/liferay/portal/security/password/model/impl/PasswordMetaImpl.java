@@ -25,7 +25,7 @@ package com.liferay.portal.security.password.model.impl;
  */
 public class PasswordMetaImpl extends PasswordMetaBaseImpl {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. All methods that expect a password meta model instance should use the {@link com.liferay.portal.security.password.model.PasswordMeta} interface instead.

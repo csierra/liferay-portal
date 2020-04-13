@@ -42,9 +42,10 @@ import org.osgi.service.component.annotations.Component;
 public class PasswordHashProviderServiceImpl
 	extends PasswordHashProviderServiceBaseImpl {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. Always use <code>com.liferay.portal.security.password.service.PasswordHashProviderServiceUtil</code> to access the password hash provider remote service.
 	 */
+
 }

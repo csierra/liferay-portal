@@ -41,9 +41,10 @@ import org.osgi.service.component.annotations.Component;
 )
 public class PasswordMetaServiceImpl extends PasswordMetaServiceBaseImpl {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. Always use <code>com.liferay.portal.security.password.service.PasswordMetaServiceUtil</code> to access the password meta remote service.
 	 */
+
 }

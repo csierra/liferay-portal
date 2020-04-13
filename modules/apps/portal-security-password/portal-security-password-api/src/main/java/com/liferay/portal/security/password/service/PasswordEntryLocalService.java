@@ -305,7 +305,7 @@ public interface PasswordEntryLocalService
 	 * @return A list of password entries
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<PasswordEntry> getPasswordEntriesByUserId(long userId);
+	public PasswordEntry fetchPasswordEntryByUserId(long userId);
 
 	/**
 	 * Returns the number of password entries.

@@ -41,9 +41,10 @@ import org.osgi.service.component.annotations.Component;
 )
 public class PasswordEntryServiceImpl extends PasswordEntryServiceBaseImpl {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. Always use <code>com.liferay.portal.security.password.service.PasswordEntryServiceUtil</code> to access the password entry remote service.
 	 */
+
 }

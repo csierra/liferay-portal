@@ -395,11 +395,10 @@ public class PasswordEntryLocalServiceWrapper
 	 * @return A list of password entries
 	 */
 	@Override
-	public java.util.List
-		<com.liferay.portal.security.password.model.PasswordEntry>
-			getPasswordEntriesByUserId(long userId) {
+	public com.liferay.portal.security.password.model.PasswordEntry
+	fetchPasswordEntryByUserId(long userId) {
 
-		return _passwordEntryLocalService.getPasswordEntriesByUserId(userId);
+		return _passwordEntryLocalService.fetchPasswordEntryByUserId(userId);
 	}
 
 	/**

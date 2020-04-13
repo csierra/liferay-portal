@@ -340,139 +340,39 @@ public interface PasswordEntryPersistence
 	public int countByUuid_C(String uuid, long companyId);
 
 	/**
-	 * Returns all the password entries where userId = &#63;.
+	 * Returns the password entry where userId = &#63; or throws a <code>NoSuchEntryException</code> if it could not be found.
 	 *
 	 * @param userId the user ID
-	 * @return the matching password entries
+	 * @return the matching password entry
+	 * @throws NoSuchEntryException if a matching password entry could not be found
 	 */
-	public java.util.List<PasswordEntry> findByUserId(long userId);
+	public PasswordEntry findByUserId(long userId) throws NoSuchEntryException;
 
 	/**
-	 * Returns a range of all the password entries where userId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PasswordEntryModelImpl</code>.
-	 * </p>
+	 * Returns the password entry where userId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param userId the user ID
-	 * @param start the lower bound of the range of password entries
-	 * @param end the upper bound of the range of password entries (not inclusive)
-	 * @return the range of matching password entries
+	 * @return the matching password entry, or <code>null</code> if a matching password entry could not be found
 	 */
-	public java.util.List<PasswordEntry> findByUserId(
-		long userId, int start, int end);
+	public PasswordEntry fetchByUserId(long userId);
 
 	/**
-	 * Returns an ordered range of all the password entries where userId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PasswordEntryModelImpl</code>.
-	 * </p>
+	 * Returns the password entry where userId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param userId the user ID
-	 * @param start the lower bound of the range of password entries
-	 * @param end the upper bound of the range of password entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching password entries
-	 */
-	public java.util.List<PasswordEntry> findByUserId(
-		long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<PasswordEntry>
-			orderByComparator);
-
-	/**
-	 * Returns an ordered range of all the password entries where userId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PasswordEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param userId the user ID
-	 * @param start the lower bound of the range of password entries
-	 * @param end the upper bound of the range of password entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching password entries
+	 * @return the matching password entry, or <code>null</code> if a matching password entry could not be found
 	 */
-	public java.util.List<PasswordEntry> findByUserId(
-		long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<PasswordEntry>
-			orderByComparator,
-		boolean useFinderCache);
+	public PasswordEntry fetchByUserId(long userId, boolean useFinderCache);
 
 	/**
-	 * Returns the first password entry in the ordered set where userId = &#63;.
+	 * Removes the password entry where userId = &#63; from the database.
 	 *
 	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching password entry
-	 * @throws NoSuchEntryException if a matching password entry could not be found
+	 * @return the password entry that was removed
 	 */
-	public PasswordEntry findByUserId_First(
-			long userId,
-			com.liferay.portal.kernel.util.OrderByComparator<PasswordEntry>
-				orderByComparator)
+	public PasswordEntry removeByUserId(long userId)
 		throws NoSuchEntryException;
-
-	/**
-	 * Returns the first password entry in the ordered set where userId = &#63;.
-	 *
-	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching password entry, or <code>null</code> if a matching password entry could not be found
-	 */
-	public PasswordEntry fetchByUserId_First(
-		long userId,
-		com.liferay.portal.kernel.util.OrderByComparator<PasswordEntry>
-			orderByComparator);
-
-	/**
-	 * Returns the last password entry in the ordered set where userId = &#63;.
-	 *
-	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching password entry
-	 * @throws NoSuchEntryException if a matching password entry could not be found
-	 */
-	public PasswordEntry findByUserId_Last(
-			long userId,
-			com.liferay.portal.kernel.util.OrderByComparator<PasswordEntry>
-				orderByComparator)
-		throws NoSuchEntryException;
-
-	/**
-	 * Returns the last password entry in the ordered set where userId = &#63;.
-	 *
-	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching password entry, or <code>null</code> if a matching password entry could not be found
-	 */
-	public PasswordEntry fetchByUserId_Last(
-		long userId,
-		com.liferay.portal.kernel.util.OrderByComparator<PasswordEntry>
-			orderByComparator);
-
-	/**
-	 * Returns the password entries before and after the current password entry in the ordered set where userId = &#63;.
-	 *
-	 * @param passwordEntryId the primary key of the current password entry
-	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next password entry
-	 * @throws NoSuchEntryException if a password entry with the primary key could not be found
-	 */
-	public PasswordEntry[] findByUserId_PrevAndNext(
-			long passwordEntryId, long userId,
-			com.liferay.portal.kernel.util.OrderByComparator<PasswordEntry>
-				orderByComparator)
-		throws NoSuchEntryException;
-
-	/**
-	 * Removes all the password entries where userId = &#63; from the database.
-	 *
-	 * @param userId the user ID
-	 */
-	public void removeByUserId(long userId);
 
 	/**
 	 * Returns the number of password entries where userId = &#63;.

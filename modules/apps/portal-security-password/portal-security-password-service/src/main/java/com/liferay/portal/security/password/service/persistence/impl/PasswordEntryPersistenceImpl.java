@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.security.password.exception.NoSuchEntryException;
@@ -47,6 +48,7 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1218,134 +1220,87 @@ public class PasswordEntryPersistenceImpl
 	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
 		"passwordEntry.companyId = ?";
 
-	private FinderPath _finderPathWithPaginationFindByUserId;
-	private FinderPath _finderPathWithoutPaginationFindByUserId;
+	private FinderPath _finderPathFetchByUserId;
 	private FinderPath _finderPathCountByUserId;
 
 	/**
-	 * Returns all the password entries where userId = &#63;.
+	 * Returns the password entry where userId = &#63; or throws a <code>NoSuchEntryException</code> if it could not be found.
 	 *
 	 * @param userId the user ID
-	 * @return the matching password entries
+	 * @return the matching password entry
+	 * @throws NoSuchEntryException if a matching password entry could not be found
 	 */
 	@Override
-	public List<PasswordEntry> findByUserId(long userId) {
-		return findByUserId(userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public PasswordEntry findByUserId(long userId) throws NoSuchEntryException {
+		PasswordEntry passwordEntry = fetchByUserId(userId);
+
+		if (passwordEntry == null) {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			sb.append("userId=");
+			sb.append(userId);
+
+			sb.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(sb.toString());
+			}
+
+			throw new NoSuchEntryException(sb.toString());
+		}
+
+		return passwordEntry;
 	}
 
 	/**
-	 * Returns a range of all the password entries where userId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PasswordEntryModelImpl</code>.
-	 * </p>
+	 * Returns the password entry where userId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param userId the user ID
-	 * @param start the lower bound of the range of password entries
-	 * @param end the upper bound of the range of password entries (not inclusive)
-	 * @return the range of matching password entries
+	 * @return the matching password entry, or <code>null</code> if a matching password entry could not be found
 	 */
 	@Override
-	public List<PasswordEntry> findByUserId(long userId, int start, int end) {
-		return findByUserId(userId, start, end, null);
+	public PasswordEntry fetchByUserId(long userId) {
+		return fetchByUserId(userId, true);
 	}
 
 	/**
-	 * Returns an ordered range of all the password entries where userId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PasswordEntryModelImpl</code>.
-	 * </p>
+	 * Returns the password entry where userId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param userId the user ID
-	 * @param start the lower bound of the range of password entries
-	 * @param end the upper bound of the range of password entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching password entries
-	 */
-	@Override
-	public List<PasswordEntry> findByUserId(
-		long userId, int start, int end,
-		OrderByComparator<PasswordEntry> orderByComparator) {
-
-		return findByUserId(userId, start, end, orderByComparator, true);
-	}
-
-	/**
-	 * Returns an ordered range of all the password entries where userId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PasswordEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param userId the user ID
-	 * @param start the lower bound of the range of password entries
-	 * @param end the upper bound of the range of password entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching password entries
+	 * @return the matching password entry, or <code>null</code> if a matching password entry could not be found
 	 */
 	@Override
-	public List<PasswordEntry> findByUserId(
-		long userId, int start, int end,
-		OrderByComparator<PasswordEntry> orderByComparator,
-		boolean useFinderCache) {
-
-		FinderPath finderPath = null;
+	public PasswordEntry fetchByUserId(long userId, boolean useFinderCache) {
 		Object[] finderArgs = null;
 
-		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
-			if (useFinderCache) {
-				finderPath = _finderPathWithoutPaginationFindByUserId;
-				finderArgs = new Object[] {userId};
-			}
-		}
-		else if (useFinderCache) {
-			finderPath = _finderPathWithPaginationFindByUserId;
-			finderArgs = new Object[] {userId, start, end, orderByComparator};
+		if (useFinderCache) {
+			finderArgs = new Object[] {userId};
 		}
 
-		List<PasswordEntry> list = null;
+		Object result = null;
 
 		if (useFinderCache) {
-			list = (List<PasswordEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByUserId, finderArgs, this);
+		}
 
-			if ((list != null) && !list.isEmpty()) {
-				for (PasswordEntry passwordEntry : list) {
-					if (userId != passwordEntry.getUserId()) {
-						list = null;
+		if (result instanceof PasswordEntry) {
+			PasswordEntry passwordEntry = (PasswordEntry)result;
 
-						break;
-					}
-				}
+			if (userId != passwordEntry.getUserId()) {
+				result = null;
 			}
 		}
 
-		if (list == null) {
-			StringBundler sb = null;
-
-			if (orderByComparator != null) {
-				sb = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
-			}
-			else {
-				sb = new StringBundler(3);
-			}
+		if (result == null) {
+			StringBundler sb = new StringBundler(3);
 
 			sb.append(_SQL_SELECT_PASSWORDENTRY_WHERE);
 
 			sb.append(_FINDER_COLUMN_USERID_USERID_2);
-
-			if (orderByComparator != null) {
-				appendOrderByComparator(
-					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
-			}
-			else {
-				sb.append(PasswordEntryModelImpl.ORDER_BY_JPQL);
-			}
 
 			String sql = sb.toString();
 
@@ -1360,18 +1315,41 @@ public class PasswordEntryPersistenceImpl
 
 				queryPos.add(userId);
 
-				list = (List<PasswordEntry>)QueryUtil.list(
-					query, getDialect(), start, end);
+				List<PasswordEntry> list = query.list();
 
-				cacheResult(list);
+				if (list.isEmpty()) {
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByUserId, finderArgs, list);
+					}
+				}
+				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
 
-				if (useFinderCache) {
-					finderCache.putResult(finderPath, finderArgs, list);
+						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {userId};
+							}
+
+							_log.warn(
+								"PasswordEntryPersistenceImpl.fetchByUserId(long, boolean) with parameters (" +
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
+					PasswordEntry passwordEntry = list.get(0);
+
+					result = passwordEntry;
+
+					cacheResult(passwordEntry);
 				}
 			}
 			catch (Exception exception) {
 				if (useFinderCache) {
-					finderCache.removeResult(finderPath, finderArgs);
+					finderCache.removeResult(
+						_finderPathFetchByUserId, finderArgs);
 				}
 
 				throw processException(exception);
@@ -1381,285 +1359,27 @@ public class PasswordEntryPersistenceImpl
 			}
 		}
 
-		return list;
-	}
-
-	/**
-	 * Returns the first password entry in the ordered set where userId = &#63;.
-	 *
-	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching password entry
-	 * @throws NoSuchEntryException if a matching password entry could not be found
-	 */
-	@Override
-	public PasswordEntry findByUserId_First(
-			long userId, OrderByComparator<PasswordEntry> orderByComparator)
-		throws NoSuchEntryException {
-
-		PasswordEntry passwordEntry = fetchByUserId_First(
-			userId, orderByComparator);
-
-		if (passwordEntry != null) {
-			return passwordEntry;
-		}
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("userId=");
-		sb.append(userId);
-
-		sb.append("}");
-
-		throw new NoSuchEntryException(sb.toString());
-	}
-
-	/**
-	 * Returns the first password entry in the ordered set where userId = &#63;.
-	 *
-	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching password entry, or <code>null</code> if a matching password entry could not be found
-	 */
-	@Override
-	public PasswordEntry fetchByUserId_First(
-		long userId, OrderByComparator<PasswordEntry> orderByComparator) {
-
-		List<PasswordEntry> list = findByUserId(
-			userId, 0, 1, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the last password entry in the ordered set where userId = &#63;.
-	 *
-	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching password entry
-	 * @throws NoSuchEntryException if a matching password entry could not be found
-	 */
-	@Override
-	public PasswordEntry findByUserId_Last(
-			long userId, OrderByComparator<PasswordEntry> orderByComparator)
-		throws NoSuchEntryException {
-
-		PasswordEntry passwordEntry = fetchByUserId_Last(
-			userId, orderByComparator);
-
-		if (passwordEntry != null) {
-			return passwordEntry;
-		}
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("userId=");
-		sb.append(userId);
-
-		sb.append("}");
-
-		throw new NoSuchEntryException(sb.toString());
-	}
-
-	/**
-	 * Returns the last password entry in the ordered set where userId = &#63;.
-	 *
-	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching password entry, or <code>null</code> if a matching password entry could not be found
-	 */
-	@Override
-	public PasswordEntry fetchByUserId_Last(
-		long userId, OrderByComparator<PasswordEntry> orderByComparator) {
-
-		int count = countByUserId(userId);
-
-		if (count == 0) {
+		if (result instanceof List<?>) {
 			return null;
 		}
-
-		List<PasswordEntry> list = findByUserId(
-			userId, count - 1, count, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
+		else {
+			return (PasswordEntry)result;
 		}
-
-		return null;
 	}
 
 	/**
-	 * Returns the password entries before and after the current password entry in the ordered set where userId = &#63;.
+	 * Removes the password entry where userId = &#63; from the database.
 	 *
-	 * @param passwordEntryId the primary key of the current password entry
 	 * @param userId the user ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next password entry
-	 * @throws NoSuchEntryException if a password entry with the primary key could not be found
+	 * @return the password entry that was removed
 	 */
 	@Override
-	public PasswordEntry[] findByUserId_PrevAndNext(
-			long passwordEntryId, long userId,
-			OrderByComparator<PasswordEntry> orderByComparator)
+	public PasswordEntry removeByUserId(long userId)
 		throws NoSuchEntryException {
 
-		PasswordEntry passwordEntry = findByPrimaryKey(passwordEntryId);
+		PasswordEntry passwordEntry = findByUserId(userId);
 
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			PasswordEntry[] array = new PasswordEntryImpl[3];
-
-			array[0] = getByUserId_PrevAndNext(
-				session, passwordEntry, userId, orderByComparator, true);
-
-			array[1] = passwordEntry;
-
-			array[2] = getByUserId_PrevAndNext(
-				session, passwordEntry, userId, orderByComparator, false);
-
-			return array;
-		}
-		catch (Exception exception) {
-			throw processException(exception);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	protected PasswordEntry getByUserId_PrevAndNext(
-		Session session, PasswordEntry passwordEntry, long userId,
-		OrderByComparator<PasswordEntry> orderByComparator, boolean previous) {
-
-		StringBundler sb = null;
-
-		if (orderByComparator != null) {
-			sb = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
-					(orderByComparator.getOrderByFields().length * 3));
-		}
-		else {
-			sb = new StringBundler(3);
-		}
-
-		sb.append(_SQL_SELECT_PASSWORDENTRY_WHERE);
-
-		sb.append(_FINDER_COLUMN_USERID_USERID_2);
-
-		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
-
-			if (orderByConditionFields.length > 0) {
-				sb.append(WHERE_AND);
-			}
-
-			for (int i = 0; i < orderByConditionFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByConditionFields[i]);
-
-				if ((i + 1) < orderByConditionFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN);
-					}
-				}
-			}
-
-			sb.append(ORDER_BY_CLAUSE);
-
-			String[] orderByFields = orderByComparator.getOrderByFields();
-
-			for (int i = 0; i < orderByFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByFields[i]);
-
-				if ((i + 1) < orderByFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC_HAS_NEXT);
-					}
-					else {
-						sb.append(ORDER_BY_DESC_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC);
-					}
-					else {
-						sb.append(ORDER_BY_DESC);
-					}
-				}
-			}
-		}
-		else {
-			sb.append(PasswordEntryModelImpl.ORDER_BY_JPQL);
-		}
-
-		String sql = sb.toString();
-
-		Query query = session.createQuery(sql);
-
-		query.setFirstResult(0);
-		query.setMaxResults(2);
-
-		QueryPos queryPos = QueryPos.getInstance(query);
-
-		queryPos.add(userId);
-
-		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						passwordEntry)) {
-
-				queryPos.add(orderByConditionValue);
-			}
-		}
-
-		List<PasswordEntry> list = query.list();
-
-		if (list.size() == 2) {
-			return list.get(1);
-		}
-		else {
-			return null;
-		}
-	}
-
-	/**
-	 * Removes all the password entries where userId = &#63; from the database.
-	 *
-	 * @param userId the user ID
-	 */
-	@Override
-	public void removeByUserId(long userId) {
-		for (PasswordEntry passwordEntry :
-				findByUserId(
-					userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
-			remove(passwordEntry);
-		}
+		return remove(passwordEntry);
 	}
 
 	/**
@@ -1740,6 +1460,10 @@ public class PasswordEntryPersistenceImpl
 			entityCacheEnabled, PasswordEntryImpl.class,
 			passwordEntry.getPrimaryKey(), passwordEntry);
 
+		finderCache.putResult(
+			_finderPathFetchByUserId, new Object[] {passwordEntry.getUserId()},
+			passwordEntry);
+
 		passwordEntry.resetOriginalValues();
 	}
 
@@ -1794,6 +1518,8 @@ public class PasswordEntryPersistenceImpl
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache((PasswordEntryModelImpl)passwordEntry, true);
 	}
 
 	@Override
@@ -1805,6 +1531,9 @@ public class PasswordEntryPersistenceImpl
 			entityCache.removeResult(
 				entityCacheEnabled, PasswordEntryImpl.class,
 				passwordEntry.getPrimaryKey());
+
+			clearUniqueFindersCache(
+				(PasswordEntryModelImpl)passwordEntry, true);
 		}
 	}
 
@@ -1816,6 +1545,39 @@ public class PasswordEntryPersistenceImpl
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(
 				entityCacheEnabled, PasswordEntryImpl.class, primaryKey);
+		}
+	}
+
+	protected void cacheUniqueFindersCache(
+		PasswordEntryModelImpl passwordEntryModelImpl) {
+
+		Object[] args = new Object[] {passwordEntryModelImpl.getUserId()};
+
+		finderCache.putResult(
+			_finderPathCountByUserId, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByUserId, args, passwordEntryModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		PasswordEntryModelImpl passwordEntryModelImpl, boolean clearCurrent) {
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {passwordEntryModelImpl.getUserId()};
+
+			finderCache.removeResult(_finderPathCountByUserId, args);
+			finderCache.removeResult(_finderPathFetchByUserId, args);
+		}
+
+		if ((passwordEntryModelImpl.getColumnBitmask() &
+			 _finderPathFetchByUserId.getColumnBitmask()) != 0) {
+
+			Object[] args = new Object[] {
+				passwordEntryModelImpl.getOriginalUserId()
+			};
+
+			finderCache.removeResult(_finderPathCountByUserId, args);
+			finderCache.removeResult(_finderPathFetchByUserId, args);
 		}
 	}
 
@@ -2022,12 +1784,6 @@ public class PasswordEntryPersistenceImpl
 			finderCache.removeResult(
 				_finderPathWithoutPaginationFindByUuid_C, args);
 
-			args = new Object[] {passwordEntryModelImpl.getUserId()};
-
-			finderCache.removeResult(_finderPathCountByUserId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUserId, args);
-
 			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
 			finderCache.removeResult(
 				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
@@ -2074,30 +1830,14 @@ public class PasswordEntryPersistenceImpl
 				finderCache.removeResult(
 					_finderPathWithoutPaginationFindByUuid_C, args);
 			}
-
-			if ((passwordEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUserId.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					passwordEntryModelImpl.getOriginalUserId()
-				};
-
-				finderCache.removeResult(_finderPathCountByUserId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUserId, args);
-
-				args = new Object[] {passwordEntryModelImpl.getUserId()};
-
-				finderCache.removeResult(_finderPathCountByUserId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUserId, args);
-			}
 		}
 
 		entityCache.putResult(
 			entityCacheEnabled, PasswordEntryImpl.class,
 			passwordEntry.getPrimaryKey(), passwordEntry, false);
+
+		clearUniqueFindersCache(passwordEntryModelImpl, false);
+		cacheUniqueFindersCache(passwordEntryModelImpl);
 
 		passwordEntry.resetOriginalValues();
 
@@ -2430,20 +2170,11 @@ public class PasswordEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByUserId = new FinderPath(
+		_finderPathFetchByUserId = new FinderPath(
 			entityCacheEnabled, finderCacheEnabled, PasswordEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByUserId = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, PasswordEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
+			FINDER_CLASS_NAME_ENTITY, "fetchByUserId",
 			new String[] {Long.class.getName()},
-			PasswordEntryModelImpl.USERID_COLUMN_BITMASK |
-			PasswordEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
+			PasswordEntryModelImpl.USERID_COLUMN_BITMASK);
 
 		_finderPathCountByUserId = new FinderPath(
 			entityCacheEnabled, finderCacheEnabled, Long.class,

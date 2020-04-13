@@ -25,7 +25,7 @@ package com.liferay.portal.security.password.model.impl;
  */
 public class PasswordHashProviderImpl extends PasswordHashProviderBaseImpl {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never reference this class directly. All methods that expect a password hash provider model instance should use the {@link com.liferay.portal.security.password.model.PasswordHashProvider} interface instead.
