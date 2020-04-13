@@ -164,12 +164,11 @@ public class PasswordEntryLocalServiceImpl
 			PasswordHashProvider passwordHashProvider)
 		throws PortalException {
 
-		List<PasswordEntry> passwordEntries = getPasswordEntriesByUserId(
-			userId);
+		PasswordEntry passwordEntry = fetchPasswordEntryByUserId(userId);
 
-		if (!passwordEntries.isEmpty()) {
+		if (passwordEntry != null) {
 			throw new PortalException(
-				"user " + userId + " already has password entires.");
+				"user " + userId + " already has a password entry");
 		}
 
 		return _addPasswordEntry(userId, password, passwordHashProvider);
@@ -184,7 +183,7 @@ public class PasswordEntryLocalServiceImpl
 	@Override
 	public void deleteEntriesByUserId(long userId) throws PortalException {
 		List<PasswordEntry> passwordEntries =
-			passwordEntryLocalService.getPasswordEntriesByUserId(userId);
+			passwordEntryLocalService.fetchPasswordEntryByUserId(userId);
 
 		for (PasswordEntry passwordEntry : passwordEntries) {
 			passwordEntryLocalService.deletePasswordEntry(passwordEntry);
@@ -209,6 +208,17 @@ public class PasswordEntryLocalServiceImpl
 	}
 
 	/**
+	 * Return all password entries for given user, including current password and history passwords. Ordered by modified date.
+	 *
+	 * @param  UserId ID of user
+	 * @return A list of password entries
+	 */
+	@Override
+	public PasswordEntry fetchPasswordEntryByUserId(long userId) {
+		return passwordEntryPersistence.fetchByUserId(userId);
+	}
+
+	/**
 	 * Return current password for given user.
 	 *
 	 * @param  UserId ID of user
@@ -220,24 +230,13 @@ public class PasswordEntryLocalServiceImpl
 		throws PortalException {
 
 		List<PasswordEntry> entries =
-			passwordEntryLocalService.getPasswordEntriesByUserId(userId);
+			passwordEntryLocalService.fetchPasswordEntryByUserId(userId);
 
 		if (entries.isEmpty()) {
 			throw new NoSuchEntryException("for UserId: " + userId);
 		}
 
 		return entries.get(entries.size() - 1);
-	}
-
-	/**
-	 * Return all password entries for given user, including current password and history passwords. Ordered by modified date.
-	 *
-	 * @param  UserId ID of user
-	 * @return A list of password entries
-	 */
-	@Override
-	public List<PasswordEntry> getPasswordEntriesByUserId(long userId) {
-		return passwordEntryPersistence.findByUserId(userId);
 	}
 
 	/**
@@ -262,7 +261,7 @@ public class PasswordEntryLocalServiceImpl
 		PasswordPolicy passwordPolicy =
 			_passwordPolicyLocalService.getPasswordPolicyByUserId(userId);
 
-		List<PasswordEntry> passwordEntries = getPasswordEntriesByUserId(
+		List<PasswordEntry> passwordEntries = fetchPasswordEntryByUserId(
 			userId);
 
 		if ((passwordPolicy == null) || !passwordPolicy.isHistory()) {

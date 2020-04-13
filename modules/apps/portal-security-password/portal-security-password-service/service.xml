@@ -29,7 +29,7 @@
 
 		<!-- Finder methods -->
 
-		<finder name="UserId" return-type="Collection">
+		<finder name="UserId" return-type="PasswordEntry">
 			<finder-column name="userId" />
 		</finder>
 	</entity>
