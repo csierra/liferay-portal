@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,8 +11,17 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/init.jsp" %>
+package com.liferay.captcha.taglib.internal.publicpath;
 
-<liferay-captcha:captcha />
+import org.osgi.service.component.annotations.Component;
+
+/**
+ * @author Alejandro Tardín
+ */
+@Component(
+	immediate = true, property = "auth.public.path=/portal/captcha/get_image",
+	service = Object.class
+)
+public class AuthPublicPath {
+}
