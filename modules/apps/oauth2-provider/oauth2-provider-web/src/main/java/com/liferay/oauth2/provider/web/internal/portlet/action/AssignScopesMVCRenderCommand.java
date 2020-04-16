@@ -77,11 +77,11 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 			renderRequest.setAttribute(
 				OAuth2ProviderWebKeys.OAUTH2_ADMIN_PORTLET_DISPLAY_CONTEXT,
 				new AssignScopesDisplayContext(
-					_oAuth2ApplicationService,
+					_applicationDescriptorLocator, _dlURLHelper,
 					_oAuth2ApplicationScopeAliasesLocalService,
-					_oAuth2ScopeGrantLocalService, _oAuth2ProviderConfiguration,
-					renderRequest, themeDisplay, _applicationDescriptorLocator,
-					_scopeDescriptorLocator, _scopeLocator, _dlURLHelper));
+					_oAuth2ApplicationService, _oAuth2ProviderConfiguration,
+					_oAuth2ScopeGrantLocalService, renderRequest,
+					_scopeDescriptorLocator, _scopeLocator, themeDisplay));
 
 			PermissionChecker permissionChecker =
 				themeDisplay.getPermissionChecker();
@@ -93,14 +93,11 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 					new AssignScopesTreeDisplayContext(
 						_dlURLHelper,
 						_oAuth2ApplicationScopeAliasesLocalService,
-						_oAuth2ApplicationService,
-						_oAuth2ProviderConfiguration,
-						_oAuth2ScopeGrantLocalService,
-						renderRequest,
+						_oAuth2ApplicationService, _oAuth2ProviderConfiguration,
+						_oAuth2ScopeGrantLocalService, renderRequest,
 						_scopeDescriptorLocator, _scopeLocator,
 						getScopeMatcherFactory(themeDisplay.getCompanyId()),
-						themeDisplay
-					));
+						themeDisplay));
 			}
 		}
 		catch (PortalException portalException) {

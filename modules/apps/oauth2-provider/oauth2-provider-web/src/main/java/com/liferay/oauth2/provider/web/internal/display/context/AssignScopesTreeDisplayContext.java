@@ -52,22 +52,22 @@ public class AssignScopesTreeDisplayContext
 	extends OAuth2AdminPortletDisplayContext {
 
 	public AssignScopesTreeDisplayContext(
-		DLURLHelper dlURLHelper,
-		OAuth2ApplicationScopeAliasesLocalService
-			oAuth2ApplicationScopeAliasesLocalService,
-		OAuth2ApplicationService oAuth2ApplicationService,
-		OAuth2ProviderConfiguration oAuth2ProviderConfiguration,
-		OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService,
-		PortletRequest portletRequest,
-		ScopeDescriptorLocator scopeDescriptorLocator,
-		ScopeLocator scopeLocator, ScopeMatcherFactory scopeMatcherFactory,
-		ThemeDisplay themeDisplay)
+			DLURLHelper dlURLHelper,
+			OAuth2ApplicationScopeAliasesLocalService
+				oAuth2ApplicationScopeAliasesLocalService,
+			OAuth2ApplicationService oAuth2ApplicationService,
+			OAuth2ProviderConfiguration oAuth2ProviderConfiguration,
+			OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService,
+			PortletRequest portletRequest,
+			ScopeDescriptorLocator scopeDescriptorLocator,
+			ScopeLocator scopeLocator, ScopeMatcherFactory scopeMatcherFactory,
+			ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		super(
-			oAuth2ApplicationService, oAuth2ApplicationScopeAliasesLocalService,
-			oAuth2ProviderConfiguration, portletRequest, themeDisplay,
-			dlURLHelper);
+			dlURLHelper, oAuth2ApplicationScopeAliasesLocalService,
+			oAuth2ApplicationService, oAuth2ProviderConfiguration,
+			portletRequest, themeDisplay);
 
 		_scopeDescriptorLocator = scopeDescriptorLocator;
 		_scopeLocator = scopeLocator;
@@ -86,8 +86,7 @@ public class AssignScopesTreeDisplayContext
 
 		scopeAliases.addAll(_assignedScopeAliases);
 
-		_scopeAliasDescriptionMap = _getScopeAliasDescriptionMap(
-			scopeAliases);
+		_scopeAliasDescriptionMap = _getScopeAliasDescriptionMap(scopeAliases);
 
 		_scopeAliasTreeNode = ScopeTreeUtil.getScopeTreeNode(
 			scopeAliases, scopeMatcherFactory);
@@ -187,8 +186,9 @@ public class AssignScopesTreeDisplayContext
 		Map<String, String> map = new HashMap<>();
 
 		for (String scopeAlias : scopeAliases) {
-			map.put(scopeAlias, _getDescription(scopeAlias,
-				themeDisplay.getLocale()));
+			map.put(
+				scopeAlias,
+				_getDescription(scopeAlias, themeDisplay.getLocale()));
 		}
 
 		return map;
