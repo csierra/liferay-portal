@@ -21,7 +21,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
 
-Tree.Node<String> availableScopeAliases = assignScopesTreeDisplayContext.getScopeAliasTreeNode();
+Tree.Node<String> assignScopesNode = assignScopesTreeDisplayContext.getScopeAliasTreeNode();
 
 Set<String> assignedScopeAliases = assignScopesTreeDisplayContext.getAssignedScopeAliases();
 Set<String> deletedScopeAliases = assignScopesTreeDisplayContext.getAssignedDeletedScopeAliases();
@@ -71,7 +71,7 @@ pageContext.setAttribute("scopeAliasesDescriptions", scopeAliasesDescriptions);
 			<aui:form action="<%= assignScopesURL %>" name="fm">
 				<ul class="list-group">
 					<oauth2-tree:tree
-						trees="<%= availableScopeAliases.getTrees() %>"
+						trees="<%= assignScopesNode.getTrees() %>"
 					>
 						<jsp:attribute
 							name="nodeJspFragment"
