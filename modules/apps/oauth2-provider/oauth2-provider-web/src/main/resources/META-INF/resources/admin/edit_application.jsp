@@ -17,9 +17,9 @@
 <%@ include file="/admin/init.jsp" %>
 
 <%
-final String currentAppTab = ParamUtil.getString(request, "appTab", "credentials");
+String currentAppTab = ParamUtil.getString(request, "appTab", "credentials");
 
-final String redirect = ParamUtil.getString(request, "redirect");
+String redirect = ParamUtil.getString(request, "redirect");
 
 long oAuth2ApplicationId = 0;
 
@@ -29,8 +29,7 @@ if (oAuth2Application != null) {
 	oAuth2ApplicationId = oAuth2Application.getOAuth2ApplicationId();
 }
 
-final String oAuth2ApplicationIdString = String.valueOf(oAuth2ApplicationId);
-
+String oAuth2ApplicationIdString = String.valueOf(oAuth2ApplicationId);
 String headerTitle = LanguageUtil.get(request, "add-o-auth2-application");
 
 if (oAuth2Application != null) {
