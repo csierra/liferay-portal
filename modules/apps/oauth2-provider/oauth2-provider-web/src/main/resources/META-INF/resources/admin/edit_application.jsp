@@ -43,7 +43,7 @@ portletDisplay.setURLBack(redirect);
 
 boolean showTreeScopesView = false;
 
-if (request.getAttribute(OAuth2ProviderWebKeys.OAUTH2_ADMIN_PORTLET_TREE_DISPLAY_CONTEXT) != null) {
+if (request.getAttribute(OAuth2ProviderWebKeys.ASSIGN_SCOPES_TREE_DISPLAY_CONTEXT) != null) {
 	showTreeScopesView = true;
 }
 %>

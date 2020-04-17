@@ -88,8 +88,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 
 			if (!permissionChecker.isOmniadmin()) {
 				renderRequest.setAttribute(
-					OAuth2ProviderWebKeys.
-						OAUTH2_ADMIN_PORTLET_TREE_DISPLAY_CONTEXT,
+					OAuth2ProviderWebKeys.ASSIGN_SCOPES_TREE_DISPLAY_CONTEXT,
 					new AssignScopesTreeDisplayContext(
 						_dlURLHelper,
 						_oAuth2ApplicationScopeAliasesLocalService,
