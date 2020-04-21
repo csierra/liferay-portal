@@ -29,8 +29,7 @@ Map<String, String> scopeAliasesDescriptionsMap = assignScopesTreeDisplayContext
 
 pageContext.setAttribute("assignedScopeAliases", assignedScopeAliases);
 pageContext.setAttribute("assignedDeletedScopeAliases", assignedDeletedScopeAliases);
-pageContext.setAttribute("scopeAliasesDescriptionsMap",
-	scopeAliasesDescriptionsMap);
+pageContext.setAttribute("scopeAliasesDescriptionsMap", scopeAliasesDescriptionsMap);
 %>
 
 <div class="container-fluid container-fluid-max-xl container-view">
@@ -183,9 +182,8 @@ pageContext.setAttribute("scopeAliasesDescriptionsMap",
 							if (!this.attr('checked')) {
 								this.attr('checked', true);
 								var elementId = this.attr('value');
-								A.one('#' + elementId + '-container').addClass(
-									'added-scope'
-								);
+								var container = document.getElementById(elementId + '-container');
+								container.classList.add('added-scope')
 							}
 						}
 					);
