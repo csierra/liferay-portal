@@ -32,13 +32,13 @@ public class PepperContextBuilderImpl
 	}
 
 	@Override
-	public HashContextBuilder pepper(byte[] pepper) {
-		if (pepper == null) {
+	public HashContextBuilder pepperProvider(String pepperProviderName) {
+		if (pepperProviderName == null) {
 			throw new IllegalArgumentException("pepper can not be null");
 		}
 
 		return new HashContextBuilderImpl(
-			hashProviderName, hashProviderMeta, pepper);
+			hashProviderName, hashProviderMeta, pepperProviderName);
 	}
 
 }

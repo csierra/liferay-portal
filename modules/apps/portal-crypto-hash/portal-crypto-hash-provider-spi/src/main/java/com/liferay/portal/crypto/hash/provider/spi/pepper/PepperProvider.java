@@ -12,22 +12,15 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.context;
-
-import java.util.Optional;
-
-import com.liferay.portal.crypto.hash.verification.context.PepperContext;
-import org.json.JSONObject;
+package com.liferay.portal.crypto.hash.provider.spi.pepper;
 
 /**
- * @author Arthur Chan
+ * @author Carlos Sierra Andrés
  */
-public interface HashContext {
+public interface PepperProvider {
 
-	public JSONObject getHashProviderMeta();
+	public byte[] getCurrentPepper();
 
-	public String getHashProviderName();
-
-	public Optional<PepperContext> getPepperContext();
+	public byte[] getPepper(String pepperId);
 
 }

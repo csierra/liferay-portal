@@ -22,6 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface PepperContextBuilder extends HashContextBuilder {
 
-	public HashContextBuilder pepper(byte[] pepper);
+	public HashContextBuilder pepperProvider(String pepperProviderName);
 
 }

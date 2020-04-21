@@ -28,4 +28,6 @@ public interface HashVerificationContext extends HashContext {
 
 	public Optional<byte[]> getSalt();
 
+	public Optional<PepperContext> getPepper();
+
 }
