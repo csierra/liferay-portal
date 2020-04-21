@@ -182,8 +182,10 @@ pageContext.setAttribute("scopeAliasesDescriptionsMap", scopeAliasesDescriptions
 							if (!this.attr('checked')) {
 								this.attr('checked', true);
 								var elementId = this.attr('value');
-								var container = document.getElementById(elementId + '-container');
-								container.classList.add('added-scope')
+								var container = document.getElementById(
+									elementId + '-container'
+								);
+								container.classList.add('added-scope');
 							}
 						}
 					);
