@@ -14,8 +14,7 @@
 
 package com.liferay.portal.crypto.hash.internal.verification.context;
 
-import com.liferay.portal.crypto.hash.internal.context.AbstractHashContext;
-import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
+import com.liferay.portal.crypto.hash.header.HashHeader;
 
 import java.util.Optional;
 
@@ -24,22 +23,42 @@ import org.json.JSONObject;
 /**
  * @author Arthur Chan
  */
-public class HashVerificationContextImpl
-	extends AbstractHashContext implements HashVerificationContext {
+public class HashHeaderImpl implements HashHeader {
 
-	public HashVerificationContextImpl(
-		String hashProviderName, JSONObject hashProviderMeta, byte[] pepper,
+	public HashHeaderImpl(
+		String hashProviderName, JSONObject hashProviderMeta, String pepperId,
 		byte[] salt) {
 
-		super(hashProviderName, hashProviderMeta, pepper);
+		_hashProviderName = hashProviderName;
+		_hashProviderMeta = Optional.ofNullable(hashProviderMeta);
+
+		_pepperId = Optional.ofNullable(pepperId);
 
 		_salt = Optional.ofNullable(salt);
+	}
+
+	@Override
+	public Optional<JSONObject> getHashProviderMeta() {
+		return _hashProviderMeta;
+	}
+
+	@Override
+	public String getHashProviderName() {
+		return _hashProviderName;
+	}
+
+	@Override
+	public Optional<String> getPepperId() {
+		return _pepperId;
 	}
 
 	public Optional<byte[]> getSalt() {
 		return _salt;
 	}
 
+	private final Optional<JSONObject> _hashProviderMeta;
+	private final String _hashProviderName;
+	private final Optional<String> _pepperId;
 	private final Optional<byte[]> _salt;
 
 }

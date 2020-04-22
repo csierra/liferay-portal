@@ -14,14 +14,12 @@
 
 package com.liferay.portal.crypto.hash.processor;
 
-import com.liferay.portal.crypto.hash.context.builder.PepperContextBuilder;
+import com.liferay.portal.crypto.hash.builder.HashProviderBuilder;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
-import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
+import com.liferay.portal.crypto.hash.header.HashHeader;
 
 import java.util.Set;
-
-import org.json.JSONObject;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -31,11 +29,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashProcessor {
 
-	public PepperContextBuilder createHashContextBuilder(
-		String hashProviderName);
-
-	public PepperContextBuilder createHashContextBuilder(
-		String hashProviderName, JSONObject hashProviderMeta);
+	public HashProviderBuilder createHashBuilder(String hashProviderName);
 
 	public HashGenerationResponse generate(
 			byte[] input, HashGenerationContext hashGenerationContext)
@@ -43,9 +37,7 @@ public interface HashProcessor {
 
 	public Set<String> getAvailableHashProviderNames();
 
-	public boolean verify(
-			byte[] input, byte[] hash,
-			HashVerificationContext... hashVerificationContexts)
+	public boolean verify(byte[] input, byte[] hash, HashHeader... hashHeaders)
 		throws Exception;
 
 }

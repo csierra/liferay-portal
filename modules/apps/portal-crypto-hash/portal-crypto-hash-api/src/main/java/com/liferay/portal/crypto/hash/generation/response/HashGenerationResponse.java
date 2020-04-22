@@ -14,7 +14,8 @@
 
 package com.liferay.portal.crypto.hash.generation.response;
 
-import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
+import com.liferay.portal.crypto.hash.header.HashHeader;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -25,6 +26,6 @@ public interface HashGenerationResponse {
 
 	public byte[] getHash();
 
-	public HashVerificationContext getHashVerificationContext();
+	public HashHeader getHashHeader();
 
 }

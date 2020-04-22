@@ -14,8 +14,11 @@
 
 package com.liferay.portal.crypto.hash.generation.context;
 
-import com.liferay.portal.crypto.hash.context.HashContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
+
+import java.util.Optional;
+
+import org.json.JSONObject;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -23,7 +26,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Carlos Sierra Andrés
  */
 @ProviderType
-public interface HashGenerationContext extends HashContext {
+public interface HashGenerationContext {
+
+	public Optional<JSONObject> getHashProviderMeta();
+
+	public String getHashProviderName();
 
 	public SaltCommand[] getSaltCommands();
 

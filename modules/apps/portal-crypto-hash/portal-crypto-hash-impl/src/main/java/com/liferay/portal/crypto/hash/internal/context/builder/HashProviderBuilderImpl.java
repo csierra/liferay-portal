@@ -14,31 +14,25 @@
 
 package com.liferay.portal.crypto.hash.internal.context.builder;
 
-import com.liferay.portal.crypto.hash.context.builder.HashContextBuilder;
-import com.liferay.portal.crypto.hash.context.builder.PepperContextBuilder;
+import com.liferay.portal.crypto.hash.builder.HashProviderBuilder;
 
 import org.json.JSONObject;
 
 /**
  * @author Arthur Chan
  */
-public class PepperContextBuilderImpl
-	extends HashContextBuilderImpl implements PepperContextBuilder {
+public class HashProviderBuilderImpl
+	extends HashBuilderImpl implements HashProviderBuilder {
 
-	public PepperContextBuilderImpl(
+	public HashProviderBuilderImpl(
 		String hashProviderName, JSONObject hashProviderMeta) {
 
-		super(hashProviderName, hashProviderMeta, null);
+		super(hashProviderName, hashProviderMeta);
 	}
 
 	@Override
-	public HashContextBuilder pepperProvider(String pepperProviderName) {
-		if (pepperProviderName == null) {
-			throw new IllegalArgumentException("pepper can not be null");
-		}
-
-		return new HashContextBuilderImpl(
-			hashProviderName, hashProviderMeta, pepperProviderName);
+	public HashProviderBuilder hashProviderMeta(JSONObject hashProviderMeta) {
+		return new HashProviderBuilderImpl(hashProviderName, hashProviderMeta);
 	}
 
 }

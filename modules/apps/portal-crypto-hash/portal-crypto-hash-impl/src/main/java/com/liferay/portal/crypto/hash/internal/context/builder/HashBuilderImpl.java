@@ -14,30 +14,29 @@
 
 package com.liferay.portal.crypto.hash.internal.context.builder;
 
-import com.liferay.portal.crypto.hash.context.builder.HashContextBuilder;
+import com.liferay.portal.crypto.hash.builder.HashBuilder;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
+import com.liferay.portal.crypto.hash.header.HashHeader;
 import com.liferay.portal.crypto.hash.internal.generation.context.HashGenerationContextImpl;
-import com.liferay.portal.crypto.hash.internal.verification.context.HashVerificationContextImpl;
-import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
+import com.liferay.portal.crypto.hash.internal.verification.context.HashHeaderImpl;
 
 import org.json.JSONObject;
 
 /**
  * @author Arthur Chan
  */
-public class HashContextBuilderImpl implements HashContextBuilder {
+public class HashBuilderImpl implements HashBuilder {
 
-	public HashContextBuilderImpl(
-		String hashProviderName, JSONObject hashProviderMeta, byte[] pepper) {
+	public HashBuilderImpl(
+		String hashProviderName, JSONObject hashProviderMeta) {
 
-		this.pepper = pepper;
 		this.hashProviderName = hashProviderName;
 		this.hashProviderMeta = hashProviderMeta;
 	}
 
 	@Override
-	public HashGenerationContext buildGenerationContext(
+	public HashGenerationContext buildHashGenerationContext(
 		SaltCommand... saltCommands) {
 
 		if (saltCommands == null) {
@@ -47,28 +46,54 @@ public class HashContextBuilderImpl implements HashContextBuilder {
 		}
 
 		return new HashGenerationContextImpl(
-			hashProviderName, hashProviderMeta, pepper, saltCommands);
+			hashProviderName, hashProviderMeta, saltCommands);
 	}
 
 	@Override
-	public HashVerificationContext buildVerificationContext() {
-		return new HashVerificationContextImpl(
-			hashProviderName, hashProviderMeta, pepper, null);
+	public HashHeader buildHashHeader() {
+		return new HashHeaderImpl(
+			hashProviderName, hashProviderMeta, null, null);
 	}
 
 	@Override
-	public HashVerificationContext buildVerificationContext(byte[] salt) {
+	public HashHeader buildHashHeader(byte[] salt) {
 		if (salt == null) {
 			throw new IllegalArgumentException(
-				"use buildVerificationContext() if no salt is provided");
+				"use other overloaded method if no salt is provided");
 		}
 
-		return new HashVerificationContextImpl(
-			hashProviderName, hashProviderMeta, pepper, salt);
+		return new HashHeaderImpl(
+			hashProviderName, hashProviderMeta, null, salt);
+	}
+
+	@Override
+	public HashHeader buildHashHeader(String pepperId) {
+		if (pepperId == null) {
+			throw new IllegalArgumentException(
+				"use other overloaded method if no pepperId is provided");
+		}
+
+		return new HashHeaderImpl(
+			hashProviderName, hashProviderMeta, pepperId, null);
+	}
+
+	@Override
+	public HashHeader buildHashHeader(String pepperId, byte[] salt) {
+		if (pepperId == null) {
+			throw new IllegalArgumentException(
+				"use other overloaded method if no pepperId is provided");
+		}
+
+		if (salt == null) {
+			throw new IllegalArgumentException(
+				"use other overloaded method if no salt is provided");
+		}
+
+		return new HashHeaderImpl(
+			hashProviderName, hashProviderMeta, pepperId, salt);
 	}
 
 	protected final JSONObject hashProviderMeta;
 	protected final String hashProviderName;
-	protected final byte[] pepper;
 
 }

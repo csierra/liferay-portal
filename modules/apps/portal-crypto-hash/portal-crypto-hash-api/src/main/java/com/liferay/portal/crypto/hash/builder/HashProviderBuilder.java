@@ -12,22 +12,15 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.context.builder;
+package com.liferay.portal.crypto.hash.builder;
 
-import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
-import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
-import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
+import org.json.JSONObject;
 
 /**
- * @author Carlos Sierra Andrés
+ * @author Arthur Chan
  */
-public interface HashContextBuilder {
+public interface HashProviderBuilder extends HashBuilder {
 
-	public HashGenerationContext buildGenerationContext(
-		SaltCommand... saltCommands);
-
-	public HashVerificationContext buildVerificationContext();
-
-	public HashVerificationContext buildVerificationContext(byte[] salt);
+	public HashBuilder hashProviderMeta(JSONObject hashProviderMeta);
 
 }

@@ -12,22 +12,23 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.verification.context;
-
-import com.liferay.portal.crypto.hash.context.HashContext;
+package com.liferay.portal.crypto.hash.header;
 
 import java.util.Optional;
 
-import org.osgi.annotation.versioning.ProviderType;
+import org.json.JSONObject;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@ProviderType
-public interface HashVerificationContext extends HashContext {
+public interface HashHeader {
+
+	public Optional<JSONObject> getHashProviderMeta();
+
+	public String getHashProviderName();
+
+	public Optional<String> getPepperId();
 
 	public Optional<byte[]> getSalt();
-
-	public Optional<PepperContext> getPepper();
 
 }

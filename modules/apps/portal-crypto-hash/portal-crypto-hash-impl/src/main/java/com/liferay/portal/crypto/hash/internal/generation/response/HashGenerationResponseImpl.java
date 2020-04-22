@@ -15,29 +15,31 @@
 package com.liferay.portal.crypto.hash.internal.generation.response;
 
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
+import com.liferay.portal.crypto.hash.header.HashHeader;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * @author Arthur Chan
  */
 public class HashGenerationResponseImpl implements HashGenerationResponse {
 
-	public HashGenerationResponseImpl(Optional<byte[]> salt, byte[] hash) {
-		_salt = salt;
+	public HashGenerationResponseImpl(HashHeader hashHeader, byte[] hash) {
+		_hashHeader = hashHeader;
 		_hash = hash;
 	}
 
+	@Override
 	public byte[] getHash() {
 		return Arrays.copyOf(_hash, _hash.length);
 	}
 
-	public Optional<byte[]> getSalt() {
-		return _salt;
+	@Override
+	public HashHeader getHashHeader() {
+		return _hashHeader;
 	}
 
 	private final byte[] _hash;
-	private final Optional<byte[]> _salt;
+	private final HashHeader _hashHeader;
 
 }

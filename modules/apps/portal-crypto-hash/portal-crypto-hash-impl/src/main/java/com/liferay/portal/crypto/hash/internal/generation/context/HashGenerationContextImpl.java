@@ -16,29 +16,42 @@ package com.liferay.portal.crypto.hash.internal.generation.context;
 
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
-import com.liferay.portal.crypto.hash.internal.context.AbstractHashContext;
+
+import java.util.Optional;
 
 import org.json.JSONObject;
 
 /**
  * @author Arthur Chan
  */
-public class HashGenerationContextImpl
-	extends AbstractHashContext implements HashGenerationContext {
+public class HashGenerationContextImpl implements HashGenerationContext {
 
 	public HashGenerationContextImpl(
-		String hashProviderName, JSONObject hashProviderMeta, byte[] pepper,
+		String hashProviderName, JSONObject hashProviderMeta,
 		SaltCommand... saltCommands) {
 
-		super(hashProviderName, hashProviderMeta, pepper);
+		_hashProviderName = hashProviderName;
+		_hashProviderMeta = Optional.ofNullable(hashProviderMeta);
 
 		_saltCommands = saltCommands;
+	}
+
+	@Override
+	public Optional<JSONObject> getHashProviderMeta() {
+		return _hashProviderMeta;
+	}
+
+	@Override
+	public String getHashProviderName() {
+		return _hashProviderName;
 	}
 
 	public SaltCommand[] getSaltCommands() {
 		return _saltCommands;
 	}
 
+	private final Optional<JSONObject> _hashProviderMeta;
+	private final String _hashProviderName;
 	private final SaltCommand[] _saltCommands;
 
 }
