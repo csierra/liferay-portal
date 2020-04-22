@@ -89,7 +89,7 @@ public class AssignScopesTreeDisplayContext
 		_scopeAliasesDescriptionsMap = _getScopeAliasesDescriptionsMap(
 			scopeAliases);
 
-		_scopeAliasTreeNode = ScopeTreeUtil.getScopeTreeNode(
+		_scopeAliasTreeNode = ScopeTreeUtil.getScopeAliasTreeNode(
 			scopeAliases, scopeMatcherFactory);
 	}
 
