@@ -16,19 +16,19 @@ package com.liferay.portal.crypto.hash.internal.processor;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.portal.crypto.hash.builder.HashBuilder;
-import com.liferay.portal.crypto.hash.builder.HashProviderBuilder;
+import com.liferay.portal.crypto.hash.context.builder.HashProviderBuilder;
+import com.liferay.portal.crypto.hash.flavor.HashFlavor;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
-import com.liferay.portal.crypto.hash.header.HashHeader;
 import com.liferay.portal.crypto.hash.internal.context.builder.HashProviderBuilderImpl;
+import com.liferay.portal.crypto.hash.internal.flavor.HashFlavorImpl;
 import com.liferay.portal.crypto.hash.internal.generation.response.HashGenerationResponseImpl;
-import com.liferay.portal.crypto.hash.internal.verification.context.HashHeaderImpl;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.provider.spi.HashProvider;
 import com.liferay.portal.crypto.hash.provider.spi.factory.HashProviderFactory;
 import com.liferay.portal.crypto.hash.provider.spi.salt.VariableSizeSaltProvider;
+import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
 import java.util.Optional;
 import java.util.Set;
@@ -48,7 +48,9 @@ import org.osgi.service.component.annotations.Deactivate;
 public class HashProcessorImpl implements HashProcessor {
 
 	@Override
-	public HashProviderBuilder createHashBuilder(String hashProviderName) {
+	public HashProviderBuilder createHashContextBuilder(
+		String hashProviderName) {
+
 		Set<String> availableHashProviderNames =
 			getAvailableHashProviderNames();
 
@@ -61,50 +63,16 @@ public class HashProcessorImpl implements HashProcessor {
 	}
 
 	@Override
-	public HashHeader createHashHeader(String serializedHashHeader)
-		throws Exception {
-
-		JSONObject jsonObject = new JSONObject(serializedHashHeader);
-
-		HashProviderBuilder hashProviderBuilder = createHashBuilder(
-			jsonObject.getString("hashProviderName"));
-
-		HashBuilder hashBuilder = hashProviderBuilder;
-
-		if (jsonObject.has("hashProviderMeta")) {
-			hashBuilder = hashProviderBuilder.hashProviderMeta(
-				jsonObject.getJSONObject("hashProviderMeta"));
-		}
-
-		if (jsonObject.has("pepperId") && jsonObject.has("salt")) {
-			return hashBuilder.buildHashHeader(
-				jsonObject.getString("pepperId"),
-				(byte[])jsonObject.get("salt"));
-		}
-
-		if (jsonObject.has("pepperId")) {
-			return hashBuilder.buildHashHeader(
-				jsonObject.getString("pepperId"));
-		}
-
-		if (jsonObject.has("salt")) {
-			return hashBuilder.buildHashHeader((byte[])jsonObject.get("salt"));
-		}
-
-		return hashBuilder.buildHashHeader();
-	}
-
-	@Override
 	public HashGenerationResponse generate(
 			byte[] input, HashGenerationContext hashGenerationContext)
 		throws Exception {
 
-		String hashProviderName = hashGenerationContext.getHashProviderName();
 		Optional<JSONObject> optionalHashProviderMeta =
 			hashGenerationContext.getHashProviderMeta();
 
 		HashProvider hashProvider = _createHashProvider(
-			hashProviderName, optionalHashProviderMeta);
+			hashGenerationContext.getHashProviderName(),
+			optionalHashProviderMeta);
 
 		// process pepper
 
@@ -127,10 +95,7 @@ public class HashProcessorImpl implements HashProcessor {
 		optionalSalt.ifPresent(hashProvider::setSalt);
 
 		return new HashGenerationResponseImpl(
-			new HashHeaderImpl(
-				hashProviderName,
-				optionalHashProviderMeta.orElse(new JSONObject()), pepperId,
-				optionalSalt.orElse(new byte[0])),
+			new HashFlavorImpl(pepperId, optionalSalt.orElse(new byte[0])),
 			hashProvider.hash(input));
 	}
 
@@ -140,30 +105,33 @@ public class HashProcessorImpl implements HashProcessor {
 	}
 
 	@Override
-	public boolean verify(byte[] input, byte[] hash, HashHeader... hashHeaders)
+	public boolean verify(
+			byte[] input, byte[] hash,
+			HashVerificationContext... hashVerificationContexts)
 		throws Exception {
 
-		for (HashHeader hashHeader : hashHeaders) {
+		for (HashVerificationContext hashVerificationContext :
+				hashVerificationContexts) {
+
 			HashProvider hashProvider = _createHashProvider(
-				hashHeader.getHashProviderName(),
-				hashHeader.getHashProviderMeta());
+				hashVerificationContext.getHashProviderName(),
+				hashVerificationContext.getHashProviderMeta());
+
+			HashFlavor hashFlavor = hashVerificationContext.getHashFlavor();
 
 			// process pepper
 
-			byte[] pepper = null;
+			Optional<String> optionalPepperId = hashFlavor.getPepperId();
 
-			String pepperId = "";
+			if (optionalPepperId.isPresent()) {
+				//byte[] pepper = optionalPepperId.get();
 
-			//pepperId = _pepperProvider.getCurrentPepperId();
-			//pepper = _pepperProvider.getPepper(pepperId);
-
-			if (pepper != null) {
-				hashProvider.setPepper(pepper);
+				//hashProvider.setPepper(pepper);
 			}
 
 			// process salt
 
-			Optional<byte[]> optionalSalt = hashHeader.getSalt();
+			Optional<byte[]> optionalSalt = hashFlavor.getSalt();
 
 			optionalSalt.ifPresent(hashProvider::setSalt);
 

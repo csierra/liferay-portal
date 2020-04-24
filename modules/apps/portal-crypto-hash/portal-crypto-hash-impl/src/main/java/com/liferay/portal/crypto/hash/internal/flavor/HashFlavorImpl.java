@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.internal.verification.context;
+package com.liferay.portal.crypto.hash.internal.flavor;
 
-import com.liferay.portal.crypto.hash.header.HashHeader;
+import com.liferay.portal.crypto.hash.flavor.HashFlavor;
 
 import java.util.Optional;
 
@@ -23,28 +23,11 @@ import org.json.JSONObject;
 /**
  * @author Arthur Chan
  */
-public class HashHeaderImpl implements HashHeader {
+public class HashFlavorImpl implements HashFlavor {
 
-	public HashHeaderImpl(
-		String hashProviderName, JSONObject hashProviderMeta, String pepperId,
-		byte[] salt) {
-
-		_hashProviderName = hashProviderName;
-		_hashProviderMeta = Optional.ofNullable(hashProviderMeta);
-
+	public HashFlavorImpl(String pepperId, byte[] salt) {
 		_pepperId = Optional.ofNullable(pepperId);
-
 		_salt = Optional.ofNullable(salt);
-	}
-
-	@Override
-	public Optional<JSONObject> getHashProviderMeta() {
-		return _hashProviderMeta;
-	}
-
-	@Override
-	public String getHashProviderName() {
-		return _hashProviderName;
 	}
 
 	@Override
@@ -52,6 +35,7 @@ public class HashHeaderImpl implements HashHeader {
 		return _pepperId;
 	}
 
+	@Override
 	public Optional<byte[]> getSalt() {
 		return _salt;
 	}
@@ -59,12 +43,6 @@ public class HashHeaderImpl implements HashHeader {
 	@Override
 	public String toString() {
 		JSONObject jsonObject = new JSONObject();
-
-		jsonObject.put("hashProviderName", _hashProviderName);
-
-		if (_hashProviderMeta.isPresent()) {
-			jsonObject.put("hashProviderMeta", _hashProviderMeta.get());
-		}
 
 		if (_pepperId.isPresent()) {
 			jsonObject.put("pepperId", _pepperId.get());
@@ -77,8 +55,6 @@ public class HashHeaderImpl implements HashHeader {
 		return jsonObject.toString();
 	}
 
-	private final Optional<JSONObject> _hashProviderMeta;
-	private final String _hashProviderName;
 	private final Optional<String> _pepperId;
 	private final Optional<byte[]> _salt;
 

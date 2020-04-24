@@ -14,7 +14,8 @@
 
 package com.liferay.portal.crypto.hash.internal.context.builder;
 
-import com.liferay.portal.crypto.hash.builder.HashProviderBuilder;
+import com.liferay.portal.crypto.hash.context.builder.HashContextBuilder;
+import com.liferay.portal.crypto.hash.context.builder.HashProviderBuilder;
 
 import org.json.JSONObject;
 
@@ -22,7 +23,7 @@ import org.json.JSONObject;
  * @author Arthur Chan
  */
 public class HashProviderBuilderImpl
-	extends HashBuilderImpl implements HashProviderBuilder {
+	extends HashContextBuilderImpl implements HashProviderBuilder {
 
 	public HashProviderBuilderImpl(
 		String hashProviderName, JSONObject hashProviderMeta) {
@@ -31,7 +32,7 @@ public class HashProviderBuilderImpl
 	}
 
 	@Override
-	public HashProviderBuilder hashProviderMeta(JSONObject hashProviderMeta) {
+	public HashContextBuilder hashProviderMeta(JSONObject hashProviderMeta) {
 		return new HashProviderBuilderImpl(hashProviderName, hashProviderMeta);
 	}
 

@@ -14,10 +14,10 @@
 
 package com.liferay.portal.crypto.hash.processor;
 
-import com.liferay.portal.crypto.hash.builder.HashProviderBuilder;
+import com.liferay.portal.crypto.hash.context.builder.HashProviderBuilder;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
-import com.liferay.portal.crypto.hash.header.HashHeader;
+import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
 import java.util.Set;
 
@@ -29,10 +29,8 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashProcessor {
 
-	public HashProviderBuilder createHashBuilder(String hashProviderName);
-
-	public HashHeader createHashHeader(String serializedHashHeader)
-		throws Exception;
+	public HashProviderBuilder createHashContextBuilder(
+		String hashProviderName);
 
 	public HashGenerationResponse generate(
 			byte[] input, HashGenerationContext hashGenerationContext)
@@ -40,7 +38,9 @@ public interface HashProcessor {
 
 	public Set<String> getAvailableHashProviderNames();
 
-	public boolean verify(byte[] input, byte[] hash, HashHeader... hashHeaders)
+	public boolean verify(
+			byte[] input, byte[] hash,
+			HashVerificationContext... hashVerificationContexts)
 		throws Exception;
 
 }

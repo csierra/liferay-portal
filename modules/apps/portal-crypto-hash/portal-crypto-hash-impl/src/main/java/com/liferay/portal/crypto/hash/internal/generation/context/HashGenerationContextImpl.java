@@ -50,6 +50,32 @@ public class HashGenerationContextImpl implements HashGenerationContext {
 		return _saltCommands;
 	}
 
+	public static class BuilderImpl implements HashGenerationContext.Builder {
+
+		public BuilderImpl(
+			String hashProviderName, JSONObject hashProviderMeta) {
+
+			_hashProviderName = hashProviderName;
+			_hashProviderMeta = hashProviderMeta;
+		}
+
+		@Override
+		public HashGenerationContext build(SaltCommand... saltCommands) {
+			if (saltCommands == null) {
+				throw new IllegalArgumentException(
+					"saltCommands can not be null, remove argument if no" +
+						"saltCommand is providered");
+			}
+
+			return new HashGenerationContextImpl(
+				_hashProviderName, _hashProviderMeta, saltCommands);
+		}
+
+		private JSONObject _hashProviderMeta;
+		private String _hashProviderName;
+
+	}
+
 	private final Optional<JSONObject> _hashProviderMeta;
 	private final String _hashProviderName;
 	private final SaltCommand[] _saltCommands;

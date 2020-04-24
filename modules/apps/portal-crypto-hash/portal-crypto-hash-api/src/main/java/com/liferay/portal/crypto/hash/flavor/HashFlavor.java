@@ -12,15 +12,19 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.builder;
+package com.liferay.portal.crypto.hash.flavor;
 
-import org.json.JSONObject;
+import java.util.Optional;
 
 /**
  * @author Arthur Chan
  */
-public interface HashProviderBuilder extends HashBuilder {
+public interface HashFlavor {
 
-	public HashBuilder hashProviderMeta(JSONObject hashProviderMeta);
+	public Optional<String> getPepperId();
+
+	public Optional<byte[]> getSalt();
+
+	public String toString();
 
 }

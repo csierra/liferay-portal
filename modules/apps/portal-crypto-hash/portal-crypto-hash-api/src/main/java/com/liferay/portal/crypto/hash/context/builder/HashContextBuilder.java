@@ -12,23 +12,20 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.header;
+package com.liferay.portal.crypto.hash.context.builder;
 
-import java.util.Optional;
-
-import org.json.JSONObject;
+import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
+import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
 /**
  * @author Carlos Sierra Andrés
+ * @author Arthur Chan
  */
-public interface HashHeader {
+public interface HashContextBuilder {
 
-	public Optional<JSONObject> getHashProviderMeta();
+	public HashGenerationContext.Builder createHashGenerationContextBuilder();
 
-	public String getHashProviderName();
-
-	public Optional<String> getPepperId();
-
-	public Optional<byte[]> getSalt();
+	public HashVerificationContext.Builder
+		createHashVerificationContextBuilder();
 
 }

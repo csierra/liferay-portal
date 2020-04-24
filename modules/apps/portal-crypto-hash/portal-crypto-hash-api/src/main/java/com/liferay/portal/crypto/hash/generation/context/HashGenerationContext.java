@@ -34,4 +34,10 @@ public interface HashGenerationContext {
 
 	public SaltCommand[] getSaltCommands();
 
+	public interface Builder {
+
+		public HashGenerationContext build(SaltCommand... saltCommands);
+
+	}
+
 }

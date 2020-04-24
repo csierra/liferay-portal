@@ -12,20 +12,47 @@
  * details.
  */
 
-package com.liferay.portal.crypto.hash.generation.response;
+package com.liferay.portal.crypto.hash.verification.context;
 
 import com.liferay.portal.crypto.hash.flavor.HashFlavor;
 
-import org.osgi.annotation.versioning.ProviderType;
+import java.util.Optional;
+
+import org.json.JSONObject;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@ProviderType
-public interface HashGenerationResponse {
-
-	public byte[] getHash();
+public interface HashVerificationContext {
 
 	public HashFlavor getHashFlavor();
+
+	public Optional<JSONObject> getHashProviderMeta();
+
+	public String getHashProviderName();
+
+	public interface Builder extends PepperedBuilder {
+
+		public HashVerificationContext build(String serializedHashFlavor);
+
+	}
+
+	public interface HashVerificationContextBuilder {
+
+		public HashVerificationContext build();
+
+	}
+
+	public interface PepperedBuilder extends SaltedBuilder {
+
+		public SaltedBuilder pepper(String pepperId);
+
+	}
+
+	public interface SaltedBuilder extends HashVerificationContextBuilder {
+
+		public Builder salt(byte[] salt);
+
+	}
 
 }

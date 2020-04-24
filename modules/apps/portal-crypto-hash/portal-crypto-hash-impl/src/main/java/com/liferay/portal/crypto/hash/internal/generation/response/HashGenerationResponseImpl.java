@@ -14,8 +14,8 @@
 
 package com.liferay.portal.crypto.hash.internal.generation.response;
 
+import com.liferay.portal.crypto.hash.flavor.HashFlavor;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
-import com.liferay.portal.crypto.hash.header.HashHeader;
 
 import java.util.Arrays;
 
@@ -24,8 +24,8 @@ import java.util.Arrays;
  */
 public class HashGenerationResponseImpl implements HashGenerationResponse {
 
-	public HashGenerationResponseImpl(HashHeader hashHeader, byte[] hash) {
-		_hashHeader = hashHeader;
+	public HashGenerationResponseImpl(HashFlavor hashFlavor, byte[] hash) {
+		_hashFlavor = hashFlavor;
 		_hash = hash;
 	}
 
@@ -35,11 +35,11 @@ public class HashGenerationResponseImpl implements HashGenerationResponse {
 	}
 
 	@Override
-	public HashHeader getHashHeader() {
-		return _hashHeader;
+	public HashFlavor getHashFlavor() {
+		return _hashFlavor;
 	}
 
 	private final byte[] _hash;
-	private final HashHeader _hashHeader;
+	private final HashFlavor _hashFlavor;
 
 }
