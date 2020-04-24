@@ -16,6 +16,7 @@ package com.liferay.portal.crypto.hash.internal.processor;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.portal.crypto.hash.builder.HashBuilder;
 import com.liferay.portal.crypto.hash.builder.HashProviderBuilder;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
@@ -57,6 +58,40 @@ public class HashProcessorImpl implements HashProcessor {
 		}
 
 		return new HashProviderBuilderImpl(hashProviderName, null);
+	}
+
+	@Override
+	public HashHeader createHashHeader(String serializedHashHeader)
+		throws Exception {
+
+		JSONObject jsonObject = new JSONObject(serializedHashHeader);
+
+		HashProviderBuilder hashProviderBuilder = createHashBuilder(
+			jsonObject.getString("hashProviderName"));
+
+		HashBuilder hashBuilder = hashProviderBuilder;
+
+		if (jsonObject.has("hashProviderMeta")) {
+			hashBuilder = hashProviderBuilder.hashProviderMeta(
+				jsonObject.getJSONObject("hashProviderMeta"));
+		}
+
+		if (jsonObject.has("pepperId") && jsonObject.has("salt")) {
+			return hashBuilder.buildHashHeader(
+				jsonObject.getString("pepperId"),
+				(byte[])jsonObject.get("salt"));
+		}
+
+		if (jsonObject.has("pepperId")) {
+			return hashBuilder.buildHashHeader(
+				jsonObject.getString("pepperId"));
+		}
+
+		if (jsonObject.has("salt")) {
+			return hashBuilder.buildHashHeader((byte[])jsonObject.get("salt"));
+		}
+
+		return hashBuilder.buildHashHeader();
 	}
 
 	@Override

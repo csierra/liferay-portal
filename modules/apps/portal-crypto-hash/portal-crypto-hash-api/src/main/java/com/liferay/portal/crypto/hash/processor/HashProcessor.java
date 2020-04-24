@@ -31,6 +31,9 @@ public interface HashProcessor {
 
 	public HashProviderBuilder createHashBuilder(String hashProviderName);
 
+	public HashHeader createHashHeader(String serializedHashHeader)
+		throws Exception;
+
 	public HashGenerationResponse generate(
 			byte[] input, HashGenerationContext hashGenerationContext)
 		throws Exception;

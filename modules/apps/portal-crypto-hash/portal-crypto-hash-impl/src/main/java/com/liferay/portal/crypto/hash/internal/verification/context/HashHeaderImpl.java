@@ -56,6 +56,27 @@ public class HashHeaderImpl implements HashHeader {
 		return _salt;
 	}
 
+	@Override
+	public String toString() {
+		JSONObject jsonObject = new JSONObject();
+
+		jsonObject.put("hashProviderName", _hashProviderName);
+
+		if (_hashProviderMeta.isPresent()) {
+			jsonObject.put("hashProviderMeta", _hashProviderMeta.get());
+		}
+
+		if (_pepperId.isPresent()) {
+			jsonObject.put("pepperId", _pepperId.get());
+		}
+
+		if (_salt.isPresent()) {
+			jsonObject.put("salt", _salt.get());
+		}
+
+		return jsonObject.toString();
+	}
+
 	private final Optional<JSONObject> _hashProviderMeta;
 	private final String _hashProviderName;
 	private final Optional<String> _pepperId;
