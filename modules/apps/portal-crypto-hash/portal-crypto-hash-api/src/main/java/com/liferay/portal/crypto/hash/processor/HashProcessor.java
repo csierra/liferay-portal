@@ -14,12 +14,13 @@
 
 package com.liferay.portal.crypto.hash.processor;
 
-import com.liferay.portal.crypto.hash.context.builder.HashGeneratorBuilder;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
 import java.util.Set;
+
+import org.json.JSONObject;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -29,8 +30,11 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface HashProcessor {
 
-	public HashGeneratorBuilder createHashContextBuilder(
-		String hashGeneratorName);
+	public HashGenerationContext.Builder createHashGenerationContextBuilder(
+		String hashGeneratorName, JSONObject hashGenerationMeta);
+
+	public HashVerificationContext.Builder createHashVerificationContextBuilder(
+		String hashGeneratorName, JSONObject hashGenerationMeta);
 
 	public HashGenerationResponse generate(
 			byte[] input, HashGenerationContext hashGenerationContext)
