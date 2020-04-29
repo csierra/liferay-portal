@@ -15,7 +15,6 @@
 package com.liferay.portal.crypto.hash.processor.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.portal.crypto.hash.context.builder.HashContextBuilder;
 import com.liferay.portal.crypto.hash.flavor.HashFlavor;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
@@ -50,11 +49,9 @@ public class HashProcessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		HashContextBuilder hashContextBuilder1 =
-			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_1);
-
 		HashGenerationContext.Builder hashGenerationContextBuilder1 =
-			hashContextBuilder1.createHashGenerationContextBuilder();
+			_hashProcessor.createHashGenerationContextBuilder(
+				_MESSAGE_DIGEST_ALGO_1, null);
 
 		defaultSaltHashGenerationContext1 = hashGenerationContextBuilder1.build(
 			SaltCommand.generateDefaultSizeSalt());
@@ -65,11 +62,9 @@ public class HashProcessorTest {
 
 		notSaltHashGenerationContext1 = hashGenerationContextBuilder1.build();
 
-		HashContextBuilder hashContextBuilder2 =
-			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_2);
-
 		HashGenerationContext.Builder hashGenerationContextBuilder2 =
-			hashContextBuilder2.createHashGenerationContextBuilder();
+			_hashProcessor.createHashGenerationContextBuilder(
+				_MESSAGE_DIGEST_ALGO_2, null);
 
 		defaultSaltHashGenerationContext2 = hashGenerationContextBuilder2.build(
 			SaltCommand.generateDefaultSizeSalt());
@@ -102,11 +97,9 @@ public class HashProcessorTest {
 		Optional<String> optionalPepperId2 = hashFlavor2.getPepperId();
 		Optional<byte[]> optionalSalt2 = hashFlavor2.getSalt();
 
-		HashContextBuilder hashContextBuilder1 =
-			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_1);
-
 		HashVerificationContext.Builder hashVerificationContextBuilder1 =
-			hashContextBuilder1.createHashVerificationContextBuilder();
+			_hashProcessor.createHashVerificationContextBuilder(
+				_MESSAGE_DIGEST_ALGO_1, null);
 
 		HashVerificationContext hashVerificationContext1 =
 			hashVerificationContextBuilder1.pepper(
@@ -115,11 +108,9 @@ public class HashProcessorTest {
 				optionalSalt1.orElse(new byte[0])
 			).build();
 
-		HashContextBuilder hashContextBuilder2 =
-			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_2);
-
 		HashVerificationContext.Builder hashVerificationContextBuilder2 =
-			hashContextBuilder2.createHashVerificationContextBuilder();
+			_hashProcessor.createHashVerificationContextBuilder(
+				_MESSAGE_DIGEST_ALGO_2, null);
 
 		HashVerificationContext hashVerificationContext2 =
 			hashVerificationContextBuilder2.pepper(
@@ -165,11 +156,9 @@ public class HashProcessorTest {
 
 	@Test
 	public void testHashVerification() throws Exception {
-		HashContextBuilder hashContextBuilder1 =
-			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_1);
-
 		HashVerificationContext.Builder hashVerificationContextBuilder1 =
-			hashContextBuilder1.createHashVerificationContextBuilder();
+			_hashProcessor.createHashVerificationContextBuilder(
+				_MESSAGE_DIGEST_ALGO_1, null);
 
 		HashVerificationContext hashVerificationContext1 =
 			hashVerificationContextBuilder1.pepper(
@@ -178,11 +167,9 @@ public class HashProcessorTest {
 				_SALT_1.getBytes()
 			).build();
 
-		HashContextBuilder hashContextBuilder2 =
-			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_2);
-
 		HashVerificationContext.Builder hashVerificationContextBuilder2 =
-			hashContextBuilder2.createHashVerificationContextBuilder();
+			_hashProcessor.createHashVerificationContextBuilder(
+				_MESSAGE_DIGEST_ALGO_2, null);
 
 		HashVerificationContext hashVerificationContext2 =
 			hashVerificationContextBuilder2.pepper(
@@ -231,11 +218,9 @@ public class HashProcessorTest {
 
 	@Test
 	public void testReusableHashGenerationContextBuilder() throws Exception {
-		HashContextBuilder hashContextBuilder =
-			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_1);
-
 		HashGenerationContext.Builder hashGenerationContextBuilder =
-			hashContextBuilder.createHashGenerationContextBuilder();
+			_hashProcessor.createHashGenerationContextBuilder(
+				_MESSAGE_DIGEST_ALGO_1, null);
 
 		HashGenerationContext hashGenerationContext1 =
 			hashGenerationContextBuilder.build(
@@ -332,11 +317,9 @@ public class HashProcessorTest {
 
 		Optional<byte[]> optionalSalt = hashFlavor.getSalt();
 
-		HashContextBuilder hashContextBuilder =
-			_hashProcessor.createHashContextBuilder(_MESSAGE_DIGEST_ALGO_1);
-
 		HashVerificationContext.Builder hashVerificationContextBuilder =
-			hashContextBuilder.createHashVerificationContextBuilder();
+			_hashProcessor.createHashVerificationContextBuilder(
+				_MESSAGE_DIGEST_ALGO_1, null);
 
 		HashVerificationContext hashVerificationContext =
 			hashVerificationContextBuilder.pepper(
