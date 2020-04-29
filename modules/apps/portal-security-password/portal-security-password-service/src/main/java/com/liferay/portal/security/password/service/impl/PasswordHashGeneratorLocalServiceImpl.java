@@ -16,8 +16,6 @@ package com.liferay.portal.security.password.service.impl;
 
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.crypto.hash.context.builder.HashContextBuilder;
-import com.liferay.portal.crypto.hash.context.builder.HashGeneratorBuilder;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
@@ -142,28 +140,11 @@ public class PasswordHashGeneratorLocalServiceImpl
 					passwordHashGeneratorConfiguration.hashGeneratorName(),
 					passwordHashGeneratorConfiguration.hashGeneratorMetaJSON());
 
-			HashContextBuilder hashContextBuilder = null;
-
-			if (Validator.isNull(
-					passwordHashGeneratorConfiguration.
-						hashGeneratorMetaJSON())) {
-
-				hashContextBuilder = _hashProcessor.createHashContextBuilder(
-					passwordHashGenerator.getHashGeneratorName());
-			}
-			else {
-				HashGeneratorBuilder hashGeneratorBuilder =
-					_hashProcessor.createHashContextBuilder(
-						passwordHashGenerator.getHashGeneratorName());
-
-				hashContextBuilder = hashGeneratorBuilder.hashGeneratorMeta(
-					new JSONObject(
-						passwordHashGeneratorConfiguration.
-							hashGeneratorMetaJSON()));
-			}
-
 			HashGenerationContext.Builder hashGenerationContextBuilder =
-				hashContextBuilder.createHashGenerationContextBuilder();
+				_hashProcessor.createHashGenerationContextBuilder(
+					passwordHashGenerator.getHashGeneratorName(),
+					new JSONObject(
+						passwordHashGenerator.getHashGeneratorMeta()));
 
 			HashGenerationContext hashGenerationContext =
 				hashGenerationContextBuilder.build(
