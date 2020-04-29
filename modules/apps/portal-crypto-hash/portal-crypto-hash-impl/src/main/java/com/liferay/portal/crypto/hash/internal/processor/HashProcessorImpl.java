@@ -16,7 +16,6 @@ package com.liferay.portal.crypto.hash.internal.processor;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.portal.crypto.hash.context.builder.HashGeneratorBuilder;
 import com.liferay.portal.crypto.hash.flavor.HashFlavor;
 import com.liferay.portal.crypto.hash.generation.context.HashGenerationContext;
 import com.liferay.portal.crypto.hash.generation.context.salt.SaltCommand;
@@ -24,9 +23,10 @@ import com.liferay.portal.crypto.hash.generation.response.HashGenerationResponse
 import com.liferay.portal.crypto.hash.generator.spi.HashGenerator;
 import com.liferay.portal.crypto.hash.generator.spi.factory.HashGeneratorFactory;
 import com.liferay.portal.crypto.hash.generator.spi.salt.VariableSizeSaltGenerator;
-import com.liferay.portal.crypto.hash.internal.context.builder.HashGeneratorBuilderImpl;
 import com.liferay.portal.crypto.hash.internal.flavor.HashFlavorImpl;
+import com.liferay.portal.crypto.hash.internal.generation.context.HashGenerationContextImpl;
 import com.liferay.portal.crypto.hash.internal.generation.response.HashGenerationResponseImpl;
+import com.liferay.portal.crypto.hash.internal.verification.context.HashVerificationContextImpl;
 import com.liferay.portal.crypto.hash.pepper.storage.spi.HashPepperStorage;
 import com.liferay.portal.crypto.hash.processor.HashProcessor;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
@@ -51,18 +51,23 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 public class HashProcessorImpl implements HashProcessor {
 
 	@Override
-	public HashGeneratorBuilder createHashContextBuilder(
-		String hashGeneratorName) {
+	public HashGenerationContext.Builder createHashGenerationContextBuilder(
+		String hashGeneratorName, JSONObject hashGenerationMeta) {
 
-		Set<String> availableHashGeneratorNames =
-			getAvailableHashGeneratorNames();
+		_verifyHashGeneratorName(hashGeneratorName);
 
-		if (!availableHashGeneratorNames.contains(hashGeneratorName)) {
-			throw new IllegalArgumentException(
-				"There is no generator of name: " + hashGeneratorName);
-		}
+		return new HashGenerationContextImpl.BuilderImpl(
+			hashGeneratorName, hashGenerationMeta);
+	}
 
-		return new HashGeneratorBuilderImpl(hashGeneratorName, null);
+	@Override
+	public HashVerificationContext.Builder createHashVerificationContextBuilder(
+		String hashGeneratorName, JSONObject hashGenerationMeta) {
+
+		_verifyHashGeneratorName(hashGeneratorName);
+
+		return new HashVerificationContextImpl.BuilderImpl(
+			hashGeneratorName, hashGenerationMeta);
 	}
 
 	@Override
@@ -216,6 +221,16 @@ public class HashProcessorImpl implements HashProcessor {
 		}
 
 		throw new UnsupportedOperationException();
+	}
+
+	private void _verifyHashGeneratorName(String hashGeneratorName) {
+		Set<String> availableHashGeneratorNames =
+			getAvailableHashGeneratorNames();
+
+		if (!availableHashGeneratorNames.contains(hashGeneratorName)) {
+			throw new IllegalArgumentException(
+				"There is no generator of name: " + hashGeneratorName);
+		}
 	}
 
 	private ServiceTrackerMap<String, HashGeneratorFactory>
