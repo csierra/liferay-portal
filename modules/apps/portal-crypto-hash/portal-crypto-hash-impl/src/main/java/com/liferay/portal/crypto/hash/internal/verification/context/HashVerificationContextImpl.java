@@ -117,6 +117,16 @@ public class HashVerificationContextImpl implements HashVerificationContext {
 		private final String _pepperId;
 		private final byte[] _salt;
 
+		@Override
+		public HashVerificationContext hashFlavor(HashFlavor hashFlavor) {
+			return new HashVerificationContextImpl(
+				_hashGeneratorName, _hashGeneratorMeta,
+				new HashFlavorImpl(
+					hashFlavor.getPepperId().orElse(""),
+					hashFlavor.getSalt().orElse(new byte[0])
+				)
+			);
+		}
 	}
 
 	private final HashFlavor _hashFlavor;

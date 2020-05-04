@@ -16,6 +16,7 @@ package com.liferay.portal.crypto.hash.verification.context;
 
 import com.liferay.portal.crypto.hash.flavor.HashFlavor;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -31,7 +32,7 @@ public interface HashVerificationContext {
 
 	public String getHashGeneratorName();
 
-	public interface Builder extends PepperedBuilder {
+	public interface Builder extends PepperedBuilder, SaltedBuilder, HashFlavorBuilder {
 
 		public HashVerificationContext build(String serializedHashFlavor);
 
@@ -53,6 +54,13 @@ public interface HashVerificationContext {
 
 		public Builder salt(byte[] salt);
 
+	}
+
+	public interface HashFlavorBuilder extends HashVerificationContextBuilder {
+		public HashVerificationContext hashFlavor(HashFlavor hashFlavor);
+
+		public HashVerificationContext hashFlavorBytes(byte[] hashFlavorBytes)
+			throws IOException;
 	}
 
 }
