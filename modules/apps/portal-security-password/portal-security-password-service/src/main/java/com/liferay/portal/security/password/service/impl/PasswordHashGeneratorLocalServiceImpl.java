@@ -126,7 +126,6 @@ public class PasswordHashGeneratorLocalServiceImpl
 	 * @param properties the properties
 	 */
 	@Activate
-	@Modified
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
