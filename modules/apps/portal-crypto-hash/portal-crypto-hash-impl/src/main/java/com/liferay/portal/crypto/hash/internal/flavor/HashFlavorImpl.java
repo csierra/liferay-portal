@@ -16,6 +16,9 @@ package com.liferay.portal.crypto.hash.internal.flavor;
 
 import com.liferay.portal.crypto.hash.flavor.HashFlavor;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -53,6 +56,35 @@ public class HashFlavorImpl implements HashFlavor {
 		}
 
 		return jsonObject.toString();
+	}
+
+	@Override
+	public byte[] getBytes() throws IOException {
+		ByteArrayOutputStream byteArrayOutputStream =
+			new ByteArrayOutputStream();
+
+		DataOutputStream dataOutputStream = new DataOutputStream(
+			byteArrayOutputStream);
+
+		//version
+		dataOutputStream.writeByte(1);
+		dataOutputStream.writeUTF(_pepperId.orElse(""));
+
+		if (_salt.isPresent()) {
+			byte[] salt = _salt.get();
+
+			dataOutputStream.writeShort(salt.length);
+			dataOutputStream.write(salt);
+		}
+		else {
+			dataOutputStream.writeShort(0);
+		}
+
+		dataOutputStream.flush();
+
+		dataOutputStream.close();
+
+		return byteArrayOutputStream.toByteArray();
 	}
 
 	private final Optional<String> _pepperId;

@@ -18,6 +18,9 @@ import com.liferay.portal.crypto.hash.flavor.HashFlavor;
 import com.liferay.portal.crypto.hash.internal.flavor.HashFlavorImpl;
 import com.liferay.portal.crypto.hash.verification.context.HashVerificationContext;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -126,6 +129,32 @@ public class HashVerificationContextImpl implements HashVerificationContext {
 					hashFlavor.getSalt().orElse(new byte[0])
 				)
 			);
+		}
+
+		@Override
+		public HashVerificationContext hashFlavorBytes(byte[] hashFlavorBytes)
+			throws IOException {
+
+			DataInputStream dataInputStream =
+				new DataInputStream(new ByteArrayInputStream(hashFlavorBytes));
+
+			byte b = dataInputStream.readByte();
+
+			if (b != 1) {
+				throw new IllegalArgumentException(
+					"Version " + b + " is not supported");
+			}
+
+			String pepperId = dataInputStream.readUTF();
+			int unsignedByte = dataInputStream.readUnsignedShort();
+			byte[] salt = new byte[unsignedByte];
+			dataInputStream.readFully(salt);
+
+			return new HashVerificationContextImpl(
+				_hashGeneratorName, _hashGeneratorMeta,
+				new HashFlavorImpl(pepperId, salt)
+			);
+
 		}
 	}
 

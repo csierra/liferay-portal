@@ -14,6 +14,7 @@
 
 package com.liferay.portal.crypto.hash.flavor;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -25,6 +26,6 @@ public interface HashFlavor {
 
 	public Optional<byte[]> getSalt();
 
-	public String toString();
+	public byte[] getBytes() throws IOException;
 
 }
