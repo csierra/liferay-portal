@@ -102,22 +102,14 @@ public class HashProcessorTest {
 				_MESSAGE_DIGEST_ALGO_1, null);
 
 		HashVerificationContext hashVerificationContext1 =
-			hashVerificationContextBuilder1.pepper(
-				optionalPepperId1.orElse("")
-			).salt(
-				optionalSalt1.orElse(new byte[0])
-			).build();
+			hashVerificationContextBuilder1.hashFlavor(hashFlavor1);
 
 		HashVerificationContext.Builder hashVerificationContextBuilder2 =
 			_hashProcessor.createHashVerificationContextBuilder(
 				_MESSAGE_DIGEST_ALGO_2, null);
 
 		HashVerificationContext hashVerificationContext2 =
-			hashVerificationContextBuilder2.pepper(
-				optionalPepperId2.orElse("")
-			).salt(
-				optionalSalt2.orElse(new byte[0])
-			).build();
+			hashVerificationContextBuilder2.hashFlavor(hashFlavor2);
 
 		Assert.assertTrue(
 			_hashProcessor.verify(
