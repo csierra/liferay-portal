@@ -67,8 +67,8 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		UnicodeProperties unicodeProperties = PropertiesParamUtil.getProperties(
 			actionRequest, "settings--");
 
-		String keystoreCredentialPassword = getKeystoreCredentialPassword(
-			certificateUsage, unicodeProperties);
+		String keystoreCredentialPassword = unicodeProperties.getProperty(
+			getCeritifcateUsagePropertyKey(certificateUsage));
 
 		if (Validator.isNotNull(keystoreCredentialPassword)) {
 			_samlProviderConfigurationHelper.updateProperties(
@@ -117,20 +117,18 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	protected String getKeystoreCredentialPassword(
-			LocalEntityManager.CertificateUsage certificateUsage,
-			UnicodeProperties unicodeProperties)
+	protected String getCeritifcateUsagePropertyKey(
+			LocalEntityManager.CertificateUsage certificateUsage)
 		throws UnsupportedBindingException {
 
 		if (certificateUsage == LocalEntityManager.CertificateUsage.SIGNING) {
-			return unicodeProperties.getProperty(
-				PortletPropsKeys.SAML_KEYSTORE_CREDENTIAL_PASSWORD);
+			return PortletPropsKeys.SAML_KEYSTORE_CREDENTIAL_PASSWORD;
 		}
 		else if (certificateUsage ==
 					LocalEntityManager.CertificateUsage.ENCRYPTION) {
 
-			return unicodeProperties.getProperty(
-				PortletPropsKeys.SAML_KEYSTORE_ENCRYPTION_CREDENTIAL_PASSWORD);
+			return PortletPropsKeys.
+				SAML_KEYSTORE_ENCRYPTION_CREDENTIAL_PASSWORD;
 		}
 		else {
 			throw new UnsupportedBindingException(
@@ -148,8 +146,8 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 			LocalEntityManager.CertificateUsage.valueOf(
 				ParamUtil.getString(actionRequest, "certificateUsage"));
 
-		String keystoreCredentialPassword = getKeystoreCredentialPassword(
-			certificateUsage, unicodeProperties);
+		String keystoreCredentialPassword = unicodeProperties.getProperty(
+			getCeritifcateUsagePropertyKey(certificateUsage));
 
 		if (Validator.isNull(keystoreCredentialPassword)) {
 			throw new CertificateKeyPasswordException();
