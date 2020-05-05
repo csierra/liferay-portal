@@ -23,11 +23,7 @@ if (Validator.isNull(authType)) {
 	authType = company.getAuthType();
 }
 
-String login = (String)SessionErrors.get(renderRequest, "login");
-
-if (Validator.isNull(login)) {
-	login = LoginUtil.getLogin(request, "login", company);
-}
+String login = (String)portletSession.getAttribute(WebKeys.FORGOT_PASSWORD_REMINDER_USER_EMAIL_ADDRESS);
 
 Integer reminderAttempts = (Integer)portletSession.getAttribute(WebKeys.FORGOT_PASSWORD_REMINDER_ATTEMPTS);
 
