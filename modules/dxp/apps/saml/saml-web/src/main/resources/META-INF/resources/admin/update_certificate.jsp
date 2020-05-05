@@ -77,32 +77,32 @@ X509Certificate x509Certificate = (X509Certificate)request.getAttribute(SamlWebK
 </liferay-portlet:actionURL>
 
 <aui:form action="<%= updateCertificateURL.toString() %>" cssClass="" method="post" name="fm1">
-<c:choose>
-	<c:when test='<%= cmd.equals("import") && (x509Certificate == null) %>'>
-		<liferay-util:include page="/admin/import_certificate.jsp" servletContext="<%= application %>" />
-	</c:when>
-	<c:when test="<%= x509Certificate == null %>">
+	<c:choose>
+		<c:when test='<%= cmd.equals("import") && (x509Certificate == null) %>'>
+			<liferay-util:include page="/admin/import_certificate.jsp" servletContext="<%= application %>" />
+		</c:when>
+		<c:when test="<%= x509Certificate == null %>">
 
-		<%
-		String certificateCommonName = ParamUtil.getString(request, "certificateCommonName");
-		String certificateCountry = ParamUtil.getString(request, "certificateCountry");
-		String certificateLocality = ParamUtil.getString(request, "certificateLocality");
-		String certificateKeyAlgorithm = ParamUtil.getString(request, "certificateKeyAlgorithm", "RSA");
-		String certificateKeyLength = ParamUtil.getString(request, "certificateKeyLength", "2048");
-		String certificateOrganization = ParamUtil.getString(request, "certificateOrganization");
-		String certificateOrganizationUnit = ParamUtil.getString(request, "certificateOrganizationUnit");
-		String certificateState = ParamUtil.getString(request, "certificateState");
-		String certificateValidityDays = ParamUtil.getString(request, "certificateValidityDays", "356");
-		%>
+			<%
+			String certificateCommonName = ParamUtil.getString(request, "certificateCommonName");
+			String certificateCountry = ParamUtil.getString(request, "certificateCountry");
+			String certificateLocality = ParamUtil.getString(request, "certificateLocality");
+			String certificateKeyAlgorithm = ParamUtil.getString(request, "certificateKeyAlgorithm", "RSA");
+			String certificateKeyLength = ParamUtil.getString(request, "certificateKeyLength", "2048");
+			String certificateOrganization = ParamUtil.getString(request, "certificateOrganization");
+			String certificateOrganizationUnit = ParamUtil.getString(request, "certificateOrganizationUnit");
+			String certificateState = ParamUtil.getString(request, "certificateState");
+			String certificateValidityDays = ParamUtil.getString(request, "certificateValidityDays", "356");
+			%>
 
 			<div class="lfr-form-content" id="<portlet:namespace />certificateForm">
 				<div class="inline-alert-container lfr-alert-container"></div>
-	
+
 				<liferay-ui:error exception="<%= CertificateException.class %>" message="please-enter-a-valid-key-length-and-algorithm" />
 				<liferay-ui:error exception="<%= CertificateKeyPasswordException.class %>" message="please-enter-a-valid-key-password" />
 				<liferay-ui:error exception="<%= InvalidParameterException.class %>" message="please-enter-a-valid-key-length-and-algorithm" />
 				<liferay-ui:error key="certificateValidityDays" message="please-enter-a-valid-certificate-validity" />
-	
+
 				<c:choose>
 					<c:when test='<%= cmd.equals("replace") %>'>
 						<aui:input label="common-name" name="certificateCommonName" required="<%= true %>" value="<%= certificateCommonName %>" />
@@ -155,11 +155,11 @@ X509Certificate x509Certificate = (X509Certificate)request.getAttribute(SamlWebK
 				<aui:button cssClass="btn-lg" type="submit" value="save" />
 				<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "requestCloseDialog(false);" %>' type="cancel" value="cancel" />
 			</aui:button-row>
-	</c:when>
-	<c:otherwise>
-		<aui:script>
-			<portlet:namespace />requestCloseDialog(true);
-		</aui:script>
-	</c:otherwise>
-</c:choose>
+		</c:when>
+		<c:otherwise>
+			<aui:script>
+				<portlet:namespace />requestCloseDialog(true);
+			</aui:script>
+		</c:otherwise>
+	</c:choose>
 </aui:form>
