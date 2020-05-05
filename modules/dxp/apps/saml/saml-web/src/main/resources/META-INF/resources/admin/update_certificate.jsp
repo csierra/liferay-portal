@@ -70,6 +70,13 @@ X509Certificate x509Certificate = (X509Certificate)request.getAttribute(SamlWebK
 	/>
 </c:if>
 
+<liferay-portlet:actionURL name="/admin/updateCertificate" var="updateCertificateURL">
+	<portlet:param name="mvcRenderCommandName" value="/admin/updateCertificate" />
+	<portlet:param name="certificateUsage" value="<%= certificateUsage.name() %>" />
+	<portlet:param name="cmd" value="<%= cmd %>" />
+</liferay-portlet:actionURL>
+
+<aui:form action="<%= updateCertificateURL.toString() %>" cssClass="" method="post" name="fm1">
 <c:choose>
 	<c:when test='<%= cmd.equals("import") && (x509Certificate == null) %>'>
 		<liferay-util:include page="/admin/import_certificate.jsp" servletContext="<%= application %>" />
@@ -88,23 +95,14 @@ X509Certificate x509Certificate = (X509Certificate)request.getAttribute(SamlWebK
 		String certificateValidityDays = ParamUtil.getString(request, "certificateValidityDays", "356");
 		%>
 
-		<portlet:actionURL name="/admin/updateCertificate" var="updateCertificateURL">
-			<portlet:param name="mvcRenderCommandName" value="/admin/updateCertificate" />
-		</portlet:actionURL>
-
-		<aui:form action="<%= updateCertificateURL %>">
 			<div class="lfr-form-content" id="<portlet:namespace />certificateForm">
 				<div class="inline-alert-container lfr-alert-container"></div>
-
+	
 				<liferay-ui:error exception="<%= CertificateException.class %>" message="please-enter-a-valid-key-length-and-algorithm" />
 				<liferay-ui:error exception="<%= CertificateKeyPasswordException.class %>" message="please-enter-a-valid-key-password" />
 				<liferay-ui:error exception="<%= InvalidParameterException.class %>" message="please-enter-a-valid-key-length-and-algorithm" />
 				<liferay-ui:error key="certificateValidityDays" message="please-enter-a-valid-certificate-validity" />
-
-				<aui:input name="cmd" type="hidden" value="<%= cmd %>" />
-
-				<aui:input name="certificateUsage" required="<%= true %>" type="hidden" value="<%= certificateUsage.name() %>" />
-
+	
 				<c:choose>
 					<c:when test='<%= cmd.equals("replace") %>'>
 						<aui:input label="common-name" name="certificateCommonName" required="<%= true %>" value="<%= certificateCommonName %>" />
@@ -157,7 +155,6 @@ X509Certificate x509Certificate = (X509Certificate)request.getAttribute(SamlWebK
 				<aui:button cssClass="btn-lg" type="submit" value="save" />
 				<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "requestCloseDialog(false);" %>' type="cancel" value="cancel" />
 			</aui:button-row>
-		</aui:form>
 	</c:when>
 	<c:otherwise>
 		<aui:script>
@@ -165,3 +162,4 @@ X509Certificate x509Certificate = (X509Certificate)request.getAttribute(SamlWebK
 		</aui:script>
 	</c:otherwise>
 </c:choose>
+</aui:form>
