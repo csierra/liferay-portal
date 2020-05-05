@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.exception.UserLockoutException;
 import com.liferay.portal.kernel.exception.UserReminderQueryException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -38,6 +39,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -97,9 +99,10 @@ public class ForgotPasswordMVCActionCommand extends BaseMVCActionCommand {
 
 		User user = getUser(actionRequest);
 
+		String login = ParamUtil.getString(actionRequest, "login");
+
 		portletSession.setAttribute(
-			WebKeys.FORGOT_PASSWORD_REMINDER_USER_EMAIL_ADDRESS,
-			user.getEmailAddress());
+			WebKeys.FORGOT_PASSWORD_REMINDER_USER_EMAIL_ADDRESS, login);
 
 		actionRequest.setAttribute(WebKeys.FORGOT_PASSWORD_REMINDER_USER, user);
 
@@ -177,6 +180,12 @@ public class ForgotPasswordMVCActionCommand extends BaseMVCActionCommand {
 			else {
 				_portal.sendError(exception, actionRequest, actionResponse);
 			}
+
+			String login = ParamUtil.getString(actionRequest, "login");
+
+			if (Validator.isNotNull(login)) {
+				SessionErrors.add(actionRequest, "login", login);
+			}
 		}
 	}
 
@@ -198,36 +207,32 @@ public class ForgotPasswordMVCActionCommand extends BaseMVCActionCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String sessionEmailAddress = (String)portletSession.getAttribute(
+		String login = (String)portletSession.getAttribute(
 			WebKeys.FORGOT_PASSWORD_REMINDER_USER_EMAIL_ADDRESS);
+
+		if (Validator.isNull(login)) {
+			login = ParamUtil.getString(actionRequest, "login");
+		}
 
 		User user = null;
 
-		if (Validator.isNotNull(sessionEmailAddress)) {
+		Company company = themeDisplay.getCompany();
+
+		String authType = company.getAuthType();
+
+		if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
 			user = _userLocalService.getUserByEmailAddress(
-				themeDisplay.getCompanyId(), sessionEmailAddress);
+				themeDisplay.getCompanyId(), login);
+		}
+		else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
+			user = _userLocalService.getUserByScreenName(
+				themeDisplay.getCompanyId(), login);
+		}
+		else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
+			user = _userLocalService.getUserById(GetterUtil.getLong(login));
 		}
 		else {
-			long userId = ParamUtil.getLong(actionRequest, "userId");
-			String screenName = ParamUtil.getString(
-				actionRequest, "screenName");
-			String emailAddress = ParamUtil.getString(
-				actionRequest, "emailAddress");
-
-			if (Validator.isNotNull(emailAddress)) {
-				user = _userLocalService.getUserByEmailAddress(
-					themeDisplay.getCompanyId(), emailAddress);
-			}
-			else if (Validator.isNotNull(screenName)) {
-				user = _userLocalService.getUserByScreenName(
-					themeDisplay.getCompanyId(), screenName);
-			}
-			else if (userId > 0) {
-				user = _userLocalService.getUserById(userId);
-			}
-			else {
-				throw new NoSuchUserException("User does not exist");
-			}
+			throw new NoSuchUserException("User does not exist");
 		}
 
 		if (!user.isActive()) {
