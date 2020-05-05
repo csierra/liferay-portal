@@ -93,28 +93,27 @@ public class ForgotPasswordMVCActionCommand extends BaseMVCActionCommand {
 
 		int step = ParamUtil.getInteger(actionRequest, "step");
 
+		String login = (String)portletSession.getAttribute(
+			WebKeys.FORGOT_PASSWORD_REMINDER_USER_EMAIL_ADDRESS);
+
+		if (login == null) {
+			step = 1;
+		}
+
 		if (step == 1) {
 			checkCaptcha(actionRequest);
 
 			portletSession.removeAttribute(
 				WebKeys.FORGOT_PASSWORD_REMINDER_ATTEMPTS);
-			portletSession.removeAttribute(
-				WebKeys.FORGOT_PASSWORD_REMINDER_USER_EMAIL_ADDRESS);
-		}
 
-		User user = getUser(actionRequest);
-
-		String login = (String)portletSession.getAttribute(
-			WebKeys.FORGOT_PASSWORD_REMINDER_USER_EMAIL_ADDRESS);
-
-		if (Validator.isNull(login)) {
 			login = ParamUtil.getString(actionRequest, "login");
 
 			portletSession.setAttribute(
 				WebKeys.FORGOT_PASSWORD_REMINDER_USER_EMAIL_ADDRESS, login);
 		}
 
-		actionRequest.setAttribute(WebKeys.FORGOT_PASSWORD_REMINDER_USER, user);
+		actionRequest.setAttribute(
+			WebKeys.FORGOT_PASSWORD_REMINDER_USER, getUser(actionRequest));
 
 		if (step == 2) {
 			Integer reminderAttempts = (Integer)portletSession.getAttribute(
