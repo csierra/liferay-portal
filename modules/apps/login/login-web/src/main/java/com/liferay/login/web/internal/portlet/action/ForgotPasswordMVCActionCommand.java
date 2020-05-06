@@ -330,10 +330,16 @@ public class ForgotPasswordMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private User _getUser(ActionRequest actionRequest) throws Exception {
-		PortletSession portletSession = actionRequest.getPortletSession();
+		User user = null;
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		Company company = themeDisplay.getCompany();
+
+		String authType = company.getAuthType();
+
+		PortletSession portletSession = actionRequest.getPortletSession();
 
 		String login = (String)portletSession.getAttribute(
 			WebKeys.FORGOT_PASSWORD_REMINDER_USER_EMAIL_ADDRESS);
@@ -341,12 +347,6 @@ public class ForgotPasswordMVCActionCommand extends BaseMVCActionCommand {
 		if (Validator.isNull(login)) {
 			login = ParamUtil.getString(actionRequest, "login");
 		}
-
-		User user = null;
-
-		Company company = themeDisplay.getCompany();
-
-		String authType = company.getAuthType();
 
 		if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
 			user = _userLocalService.getUserByEmailAddress(
