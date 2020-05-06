@@ -211,10 +211,6 @@ public class ForgotPasswordMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	protected User getUser(ActionRequest actionRequest) throws Exception {
-		if (!PropsValues.LOGIN_SECURE_FORGOT_PASSWORD) {
-			return _getUser(actionRequest);
-		}
-
 		try {
 			return _getUser(actionRequest);
 		}
@@ -222,6 +218,10 @@ public class ForgotPasswordMVCActionCommand extends BaseMVCActionCommand {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"Unable to get user: " + exception.getMessage(), exception);
+			}
+
+			if (!PropsValues.LOGIN_SECURE_FORGOT_PASSWORD) {
+				throw exception;
 			}
 		}
 
