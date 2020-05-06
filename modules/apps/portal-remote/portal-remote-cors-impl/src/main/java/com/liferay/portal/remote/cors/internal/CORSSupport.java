@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -165,6 +166,12 @@ public class CORSSupport {
 		}
 
 		return false;
+	}
+
+	public void setCORSHeaders(List<Map<String, String>> corsHeaders) {
+		for (Map<String, String> oneMap : corsHeaders) {
+			_corsHeaders.putAll(oneMap);
+		}
 	}
 
 	public void setCORSHeaders(Map<String, String> corsHeaders) {
