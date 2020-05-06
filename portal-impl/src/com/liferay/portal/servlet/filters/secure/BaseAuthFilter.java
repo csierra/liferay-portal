@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.access.control.AccessControlUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.auth.http.HttpAuthManagerUtil;
 import com.liferay.portal.kernel.security.auth.http.HttpAuthorizationHeader;
@@ -65,8 +66,6 @@ public abstract class BaseAuthFilter extends BasePortalFilter {
 
 		_basicAuthEnabled = GetterUtil.getBoolean(
 			filterConfig.getInitParameter("basic_auth"));
-		_digestAuthEnabled = GetterUtil.getBoolean(
-			filterConfig.getInitParameter("digest_auth"));
 
 		String propertyPrefix = filterConfig.getInitParameter(
 			"portal_property_prefix");
@@ -145,54 +144,17 @@ public abstract class BaseAuthFilter extends BasePortalFilter {
 		return httpServletRequest;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	protected HttpServletRequest digestAuth(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		HttpSession session = httpServletRequest.getSession();
-
-		User user = (User)session.getAttribute(WebKeys.USER);
-
-		if (user == null) {
-			long userId = 0;
-
-			try {
-				userId = HttpAuthManagerUtil.getDigestUserId(
-					httpServletRequest);
-			}
-			catch (Exception exception) {
-				_log.error(exception, exception);
-			}
-
-			if (userId > 0) {
-				httpServletRequest = setCredentials(
-					httpServletRequest, session,
-					UserLocalServiceUtil.getUser(userId),
-					HttpServletRequest.DIGEST_AUTH);
-			}
-			else {
-				HttpAuthorizationHeader httpAuthorizationHeader =
-					new HttpAuthorizationHeader(
-						HttpAuthorizationHeader.SCHEME_DIGEST);
-
-				HttpAuthManagerUtil.generateChallenge(
-					httpServletRequest, httpServletResponse,
-					httpAuthorizationHeader);
-
-				return null;
-			}
-		}
-		else {
-			httpServletRequest = new ProtectedServletRequest(
-				httpServletRequest, String.valueOf(user.getUserId()),
-				HttpServletRequest.DIGEST_AUTH);
-
-			PrincipalThreadLocal.setPassword(
-				PortalUtil.getUserPassword(httpServletRequest));
-		}
-
-		return httpServletRequest;
+		throw new PrincipalException.MustBeAuthenticated(
+			HttpAuthManagerUtil.getDigestUserId(httpServletRequest));
 	}
 
 	protected void initThreadLocals(User user) throws Exception {
@@ -323,15 +285,9 @@ public abstract class BaseAuthFilter extends BasePortalFilter {
 					httpServletRequest, httpServletRequest.getSession(), user,
 					authType);
 			}
-			else {
-				if (_digestAuthEnabled) {
-					httpServletRequest = digestAuth(
-						httpServletRequest, httpServletResponse);
-				}
-				else if (_basicAuthEnabled) {
-					httpServletRequest = basicAuth(
-						httpServletRequest, httpServletResponse);
-				}
+			else if (_basicAuthEnabled) {
+				httpServletRequest = basicAuth(
+					httpServletRequest, httpServletResponse);
 			}
 
 			if (httpServletRequest != null) {
@@ -367,7 +323,6 @@ public abstract class BaseAuthFilter extends BasePortalFilter {
 	private static final Log _log = LogFactoryUtil.getLog(BaseAuthFilter.class);
 
 	private boolean _basicAuthEnabled;
-	private boolean _digestAuthEnabled;
 	private Set<String> _hostsAllowed;
 	private boolean _httpsRequired;
 	private boolean _usePermissionChecker;
