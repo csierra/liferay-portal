@@ -301,6 +301,10 @@
 		<filter-name>Sharepoint Filter</filter-name>
 		<filter-class>com.liferay.portal.sharepoint.SharepointFilter</filter-class>
 		<init-param>
+			<param-name>basic_auth</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
 			<param-name>digest_auth</param-name>
 			<param-value>true</param-value>
 		</init-param>
@@ -384,6 +388,10 @@
 	<filter>
 		<filter-name>WebDAV Servlet Filter</filter-name>
 		<filter-class>com.liferay.portal.servlet.filters.secure.SecureFilter</filter-class>
+		<init-param>
+			<param-name>basic_auth</param-name>
+			<param-value>true</param-value>
+		</init-param>
 		<init-param>
 			<param-name>digest_auth</param-name>
 			<param-value>true</param-value>
