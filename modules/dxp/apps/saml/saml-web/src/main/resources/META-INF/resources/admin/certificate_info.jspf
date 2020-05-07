@@ -15,10 +15,10 @@
 --%>
 
 <%
-Date now = new Date();
+Date date = new Date();
 %>
 
-<c:if test="<%= now.after(x509Certificate.getNotAfter()) %>">
+<c:if test="<%= date.after(x509Certificate.getNotAfter()) %>">
 	<div class="portlet-msg-alert"><liferay-ui:message arguments="<%= new Object[] {x509Certificate.getNotAfter()} %>" key="certificate-expired-on-x" /></div>
 </c:if>
 
