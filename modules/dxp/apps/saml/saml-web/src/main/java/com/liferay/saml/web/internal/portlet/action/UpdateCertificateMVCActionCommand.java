@@ -308,11 +308,11 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 
 		String keyAlgorithm = ParamUtil.getString(
 			actionRequest, "certificateKeyAlgorithm");
-		int keyLength = ParamUtil.getInteger(
-			actionRequest, "certificateKeyLength");
 
 		KeyPair keyPair = _certificateTool.generateKeyPair(
-			keyAlgorithm, keyLength);
+			keyAlgorithm,
+			ParamUtil.getInteger(
+				actionRequest, "certificateKeyLength"));
 
 		String commonName = ParamUtil.getString(
 			actionRequest, "certificateCommonName");
