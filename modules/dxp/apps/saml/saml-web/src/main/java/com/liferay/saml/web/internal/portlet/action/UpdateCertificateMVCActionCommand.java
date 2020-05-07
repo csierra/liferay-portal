@@ -176,14 +176,14 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 
 		KeyStore keyStore = null;
 
-		String selectUploadedFile = actionRequest.getParameter(
-			"selectUploadedFile");
+		String selectUploadedFile = ParamUtil.getString(
+			actionRequest, "selectUploadedFile");
 
 		FileEntry fileEntry = SamlTempFileEntryUtil.getTempFileEntry(
 			user, selectUploadedFile);
 
-		String keyStorePassword = actionRequest.getParameter(
-			"keyStorePassword");
+		String keyStorePassword = ParamUtil.getString(
+			actionRequest, "keyStorePassword");
 
 		char[] password = null;
 
