@@ -285,10 +285,10 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 			throw new CertificateKeyPasswordException();
 		}
 
-		int validityDays = ParamUtil.getInteger(
+		int certificateValidityDays = ParamUtil.getInteger(
 			actionRequest, "certificateValidityDays");
 
-		if (validityDays == 0) {
+		if (certificateValidityDays == 0) {
 			SessionErrors.add(actionRequest, "certificateValidityDays");
 
 			return;
@@ -298,7 +298,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 
 		Calendar endDate = (Calendar)startDate.clone();
 
-		endDate.add(Calendar.DAY_OF_YEAR, validityDays);
+		endDate.add(Calendar.DAY_OF_YEAR, certificateValidityDays);
 
 		if (endDate.get(Calendar.YEAR) > 9999) {
 			SessionErrors.add(actionRequest, "certificateValidityDays");
