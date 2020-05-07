@@ -136,15 +136,15 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		if (cmd.equals("auth")) {
 			authenticateCertificate(actionRequest, actionResponse);
 		}
-		else if (cmd.equals("replace")) {
-			replaceCertificate(actionRequest);
-		}
 		else if (cmd.equals("delete")) {
 			deleteCertificate(actionRequest);
 		}
 		else if (cmd.equals("import")) {
 			importCertificate(
 				actionRequest, actionResponse, themeDisplay.getUser());
+		}
+		else if (cmd.equals("replace")) {
+			replaceCertificate(actionRequest);
 		}
 	}
 
