@@ -95,7 +95,7 @@ public class UpdateCertificateMVCResourceCommand
 		else {
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse,
-				JSONUtil.putAll(new Object[0]));
+				JSONUtil.putAll());
 		}
 	}
 
