@@ -174,6 +174,8 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 
 		hideDefaultSuccessMessage(actionRequest);
 
+		KeyStore keyStore = null;
+
 		String selectUploadedFile = actionRequest.getParameter(
 			"selectUploadedFile");
 
@@ -182,16 +184,16 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 
 		String keyStorePassword = actionRequest.getParameter(
 			"keyStorePassword");
+
 		char[] password = null;
 
 		if (keyStorePassword != null) {
 			password = keyStorePassword.toCharArray();
 		}
 
-		KeyStore keyStore = null;
-		KeyStore.PrivateKeyEntry privateKeyEntry;
 		String selectKeyStoreAlias = actionRequest.getParameter(
 			"selectKeyStoreAlias");
+		KeyStore.PrivateKeyEntry privateKeyEntry;
 
 		try {
 			keyStore = KeyStore.getInstance("PKCS12");
