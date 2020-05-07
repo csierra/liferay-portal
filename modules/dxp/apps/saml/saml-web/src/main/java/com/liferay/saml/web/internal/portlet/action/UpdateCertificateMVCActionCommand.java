@@ -85,7 +85,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "settings--");
 
 		String keystoreCredentialPassword = unicodeProperties.getProperty(
-			getCeritifcateUsagePropertyKey(certificateUsage));
+			getCertificateUsagePropertyKey(certificateUsage));
 
 		if (Validator.isNotNull(keystoreCredentialPassword)) {
 			_samlProviderConfigurationHelper.updateProperties(
@@ -147,7 +147,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	protected String getCeritifcateUsagePropertyKey(
+	protected String getCertificateUsagePropertyKey(
 			LocalEntityManager.CertificateUsage certificateUsage)
 		throws UnsupportedBindingException {
 
@@ -258,7 +258,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		UnicodeProperties unicodeProperties = new UnicodeProperties();
 
 		unicodeProperties.setProperty(
-			getCeritifcateUsagePropertyKey(certificateUsage), keyStorePassword);
+			getCertificateUsagePropertyKey(certificateUsage), keyStorePassword);
 
 		_samlProviderConfigurationHelper.updateProperties(unicodeProperties);
 
@@ -279,7 +279,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 				ParamUtil.getString(actionRequest, "certificateUsage"));
 
 		String keystoreCredentialPassword = unicodeProperties.getProperty(
-			getCeritifcateUsagePropertyKey(certificateUsage));
+			getCertificateUsagePropertyKey(certificateUsage));
 
 		if (Validator.isNull(keystoreCredentialPassword)) {
 			throw new CertificateKeyPasswordException();
