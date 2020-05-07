@@ -106,7 +106,8 @@ public class UpdateCertificateMVCResourceCommand
 			ThemeDisplay themeDisplay)
 		throws Exception {
 
-		String sourceFileName = resourceRequest.getParameter("fileName");
+		String sourceFileName = ParamUtil.getString(
+			resourceRequest, "fileName");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
