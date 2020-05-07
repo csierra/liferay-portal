@@ -60,7 +60,7 @@ import org.osgi.service.component.annotations.Reference;
 public class UpdateCertificateMVCResourceCommand
 	extends BaseMVCResourceCommand {
 
-	public void getTempFile(
+	public void includeTempFile(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse,
 			User user)
 		throws IOException {
@@ -94,8 +94,7 @@ public class UpdateCertificateMVCResourceCommand
 		}
 		else {
 			JSONPortletResponseUtil.writeJSON(
-				resourceRequest, resourceResponse,
-				JSONUtil.putAll());
+				resourceRequest, resourceResponse, JSONUtil.putAll());
 		}
 	}
 
@@ -163,7 +162,7 @@ public class UpdateCertificateMVCResourceCommand
 			deleteTempFile(resourceRequest, resourceResponse, themeDisplay);
 		}
 		else if (cmd.equals(Constants.GET_TEMP)) {
-			getTempFile(
+			includeTempFile(
 				resourceRequest, resourceResponse, themeDisplay.getUser());
 		}
 	}
