@@ -140,8 +140,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 			deleteCertificate(actionRequest);
 		}
 		else if (cmd.equals("import")) {
-			importCertificate(
-				actionRequest, actionResponse, themeDisplay.getUser());
+			importCertificate(actionRequest, themeDisplay.getUser());
 		}
 		else if (cmd.equals("replace")) {
 			replaceCertificate(actionRequest);
@@ -167,9 +166,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	protected void importCertificate(
-			ActionRequest actionRequest, ActionResponse actionResponse,
-			User user)
+	protected void importCertificate(ActionRequest actionRequest, User user)
 		throws Exception {
 
 		hideDefaultSuccessMessage(actionRequest);
