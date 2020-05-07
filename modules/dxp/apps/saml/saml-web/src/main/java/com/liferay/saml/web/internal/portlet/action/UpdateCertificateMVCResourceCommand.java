@@ -74,28 +74,21 @@ public class UpdateCertificateMVCResourceCommand
 					SamlTempFileEntryUtil.getTempFileEntry(
 						user, selectUploadedFile);
 
-				if (tempFileEntry == null) {
-					selectUploadedFile = null;
+				if (tempFileEntry != null) {
+					JSONPortletResponseUtil.writeJSON(
+						resourceRequest, resourceResponse,
+						JSONUtil.put(selectUploadedFile));
 				}
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(portalException.toString(), portalException);
 				}
-
-				selectUploadedFile = null;
 			}
 		}
 
-		if (Validator.isNotNull(selectUploadedFile)) {
-			JSONPortletResponseUtil.writeJSON(
-				resourceRequest, resourceResponse,
-				JSONUtil.put(selectUploadedFile));
-		}
-		else {
-			JSONPortletResponseUtil.writeJSON(
-				resourceRequest, resourceResponse, JSONUtil.putAll());
-		}
+		JSONPortletResponseUtil.writeJSON(
+			resourceRequest, resourceResponse, JSONUtil.putAll());
 	}
 
 	protected void addTempFile(
