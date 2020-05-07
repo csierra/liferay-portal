@@ -182,8 +182,8 @@ if (Validator.isNotNull(tempFileName)) {
 
 		<portlet:renderURL var="backURL">
 			<portlet:param name="mvcRenderCommandName" value="/admin/updateCertificate" />
+			<portlet:param name="<%= Constants.CMD %>" value='<%= ParamUtil.getString(request, "cmd") %>' />
 			<portlet:param name="certificateUsage" value="<%= certificateUsage.name() %>" />
-			<portlet:param name="cmd" value='<%= ParamUtil.getString(request, "cmd") %>' />
 			<portlet:param name="selectUploadedFile" value="<%= fileEntry.getFileName() %>" />
 		</portlet:renderURL>
 
