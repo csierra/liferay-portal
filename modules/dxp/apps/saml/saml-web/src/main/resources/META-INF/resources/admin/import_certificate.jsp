@@ -18,15 +18,15 @@
 
 <%
 LocalEntityManager.CertificateUsage certificateUsage = LocalEntityManager.CertificateUsage.valueOf(ParamUtil.getString(request, "certificateUsage"));
+KeyStore keyStore = (KeyStore)request.getAttribute(SamlWebKeys.SAML_KEYSTORE);
+String keyStorePassword = ParamUtil.getString(request, "keyStorePassword", null);
 String tempFileName = ParamUtil.getString(request, "selectUploadedFile");
+
 FileEntry fileEntry = null;
 
 if (Validator.isNotNull(tempFileName)) {
 	fileEntry = SamlTempFileEntryUtil.getTempFileEntry(themeDisplay.getUser(), tempFileName);
 }
-
-KeyStore keyStore = (KeyStore)request.getAttribute(SamlWebKeys.SAML_KEYSTORE);
-String keyStorePassword = ParamUtil.getString(request, "keyStorePassword", null);
 %>
 
 <c:choose>
@@ -100,7 +100,7 @@ String keyStorePassword = ParamUtil.getString(request, "keyStorePassword", null)
 		List<String> aliases = new ArrayList<>();
 		CertificateTool certificateTool = (CertificateTool)request.getAttribute(SamlWebKeys.SAML_CERTIFICATE_TOOL);
 
-		Enumeration<String> e = keyStore.aliases();
+		Enumeration<String> enu = keyStore.aliases();
 		%>
 
 		<liferay-util:buffer
@@ -109,8 +109,8 @@ String keyStorePassword = ParamUtil.getString(request, "keyStorePassword", null)
 			<div data-keyStoreEntryAlias=""><liferay-ui:message key="select-a-keystore-entry-to-see-a-preview" /></div>
 
 			<%
-			while (e.hasMoreElements()) {
-				String alias = e.nextElement();
+			while (enu.hasMoreElements()) {
+				String alias = enu.nextElement();
 
 				if (!keyStore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
 					otherEntriesCount++;
