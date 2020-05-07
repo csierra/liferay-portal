@@ -311,25 +311,17 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 
 		KeyPair keyPair = _certificateTool.generateKeyPair(
 			keyAlgorithm,
-			ParamUtil.getInteger(
-				actionRequest, "certificateKeyLength"));
-
-		String commonName = ParamUtil.getString(
-			actionRequest, "certificateCommonName");
-		String organization = ParamUtil.getString(
-			actionRequest, "certificateOrganization");
-		String organizationUnit = ParamUtil.getString(
-			actionRequest, "certificateOrganizationUnit");
-		String locality = ParamUtil.getString(
-			actionRequest, "certificateLocality");
-		String state = ParamUtil.getString(actionRequest, "certificateState");
-		String country = ParamUtil.getString(
-			actionRequest, "certificateCountry");
+			ParamUtil.getInteger(actionRequest, "certificateKeyLength"));
 
 		CertificateEntityId subjectCertificateEntityId =
 			new CertificateEntityId(
-				commonName, organization, organizationUnit, locality, state,
-				country);
+				ParamUtil.getString(actionRequest, "certificateCommonName"),
+				ParamUtil.getString(actionRequest, "certificateOrganization"),
+				ParamUtil.getString(
+					actionRequest, "certificateOrganizationUnit"),
+				ParamUtil.getString(actionRequest, "certificateLocality"),
+				ParamUtil.getString(actionRequest, "certificateState"),
+				ParamUtil.getString(actionRequest, "certificateCountry"));
 
 		X509Certificate x509Certificate = _certificateTool.generateCertificate(
 			keyPair, subjectCertificateEntityId, subjectCertificateEntityId,
