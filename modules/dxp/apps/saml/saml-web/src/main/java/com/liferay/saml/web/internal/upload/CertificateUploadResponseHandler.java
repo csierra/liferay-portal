@@ -64,7 +64,7 @@ public class CertificateUploadResponseHandler implements UploadResponseHandler {
 			errorMessage = LanguageUtil.format(
 				resourceBundle,
 				"there-was-a-problem-reading-one-or-more-certificates-in-the-" +
-				"keystore",
+					"keystore",
 				null);
 		}
 		else if (portalException.getCause() instanceof KeyStoreException) {
