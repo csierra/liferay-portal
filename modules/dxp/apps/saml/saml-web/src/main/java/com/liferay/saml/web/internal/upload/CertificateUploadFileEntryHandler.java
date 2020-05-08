@@ -63,15 +63,14 @@ public class CertificateUploadFileEntryHandler
 		}
 
 		FileEntry fileEntry = null;
-		String sourceFileName = uploadPortletRequest.getFileName("file");
-		String contentType = uploadPortletRequest.getContentType("file");
 
 		try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
 				"file")) {
 
 			fileEntry = SamlTempFileEntryUtil.addTempFileEntry(
-				permissionChecker.getUser(), sourceFileName, inputStream,
-				contentType);
+				permissionChecker.getUser(),
+				uploadPortletRequest.getFileName("file"), inputStream,
+				uploadPortletRequest.getContentType("file"));
 		}
 		catch (PortalException portalException) {
 			throw new IOException(portalException);
