@@ -86,9 +86,9 @@ X509Certificate x509Certificate = (X509Certificate)request.getAttribute(SamlWebK
 			<%
 			String certificateCommonName = ParamUtil.getString(request, "certificateCommonName");
 			String certificateCountry = ParamUtil.getString(request, "certificateCountry");
-			String certificateLocality = ParamUtil.getString(request, "certificateLocality");
 			String certificateKeyAlgorithm = ParamUtil.getString(request, "certificateKeyAlgorithm", "RSA");
 			String certificateKeyLength = ParamUtil.getString(request, "certificateKeyLength", "2048");
+			String certificateLocality = ParamUtil.getString(request, "certificateLocality");
 			String certificateOrganization = ParamUtil.getString(request, "certificateOrganization");
 			String certificateOrganizationUnit = ParamUtil.getString(request, "certificateOrganizationUnit");
 			String certificateState = ParamUtil.getString(request, "certificateState");
