@@ -60,16 +60,16 @@ public class CertificateUploadResponseHandler implements UploadResponseHandler {
 				resourceBundle, "you-must-be-an-admin-to-complete-this-action",
 				null);
 		}
-		else if (portalException.getCause() instanceof KeyStoreException) {
-			errorMessage = LanguageUtil.format(
-				resourceBundle, "the-file-is-not-a-pkcs12-formatted-keystore",
-				null);
-		}
 		else if (portalException.getCause() instanceof CertificateException) {
 			errorMessage = LanguageUtil.format(
 				resourceBundle,
 				"there-was-a-problem-reading-one-or-more-certificates-in-the-" +
-					"keystore",
+				"keystore",
+				null);
+		}
+		else if (portalException.getCause() instanceof KeyStoreException) {
+			errorMessage = LanguageUtil.format(
+				resourceBundle, "the-file-is-not-a-pkcs12-formatted-keystore",
 				null);
 		}
 		else {
