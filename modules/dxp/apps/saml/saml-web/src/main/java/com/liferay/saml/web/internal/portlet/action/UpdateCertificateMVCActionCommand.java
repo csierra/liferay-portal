@@ -212,16 +212,8 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 			privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(
 				selectKeyStoreAlias, new KeyStore.PasswordProtection(password));
 		}
-		catch (KeyStoreException | NoSuchAlgorithmException exception) {
-			if (keyStore == null) {
-				SessionErrors.add(
-					actionRequest,
-					"keyStoreIntegrityCheckingAlgorithmNotSupported");
-			}
-			else {
-				SessionErrors.add(
-					actionRequest, "keyEncryptionAlgorithmNotSupported");
-			}
+		catch (CertificateException certificateException) {
+			SessionErrors.add(actionRequest, "certificateException");
 
 			return;
 		}
@@ -234,8 +226,16 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 
 			throw new PortalException(ioException);
 		}
-		catch (CertificateException certificateException) {
-			SessionErrors.add(actionRequest, "certificateException");
+		catch (KeyStoreException | NoSuchAlgorithmException exception) {
+			if (keyStore == null) {
+				SessionErrors.add(
+					actionRequest,
+					"keyStoreIntegrityCheckingAlgorithmNotSupported");
+			}
+			else {
+				SessionErrors.add(
+					actionRequest, "keyEncryptionAlgorithmNotSupported");
+			}
 
 			return;
 		}
