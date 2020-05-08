@@ -60,37 +60,6 @@ import org.osgi.service.component.annotations.Reference;
 public class UpdateCertificateMVCResourceCommand
 	extends BaseMVCResourceCommand {
 
-	public void includeTempFile(
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse,
-			User user)
-		throws IOException {
-
-		String selectUploadedFile = ParamUtil.getString(
-			resourceRequest, "selectUploadedFile");
-
-		if (Validator.isNotNull(selectUploadedFile)) {
-			try {
-				FileEntry tempFileEntry =
-					SamlTempFileEntryUtil.getTempFileEntry(
-						user, selectUploadedFile);
-
-				if (tempFileEntry != null) {
-					JSONPortletResponseUtil.writeJSON(
-						resourceRequest, resourceResponse,
-						JSONUtil.put(selectUploadedFile));
-				}
-			}
-			catch (PortalException portalException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(portalException.toString(), portalException);
-				}
-			}
-		}
-
-		JSONPortletResponseUtil.writeJSON(
-			resourceRequest, resourceResponse, JSONUtil.putAll());
-	}
-
 	protected void addTempFile(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
@@ -157,6 +126,37 @@ public class UpdateCertificateMVCResourceCommand
 			includeTempFile(
 				resourceRequest, resourceResponse, themeDisplay.getUser());
 		}
+	}
+
+	protected void includeTempFile(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse,
+			User user)
+		throws IOException {
+
+		String selectUploadedFile = ParamUtil.getString(
+			resourceRequest, "selectUploadedFile");
+
+		if (Validator.isNotNull(selectUploadedFile)) {
+			try {
+				FileEntry tempFileEntry =
+					SamlTempFileEntryUtil.getTempFileEntry(
+						user, selectUploadedFile);
+
+				if (tempFileEntry != null) {
+					JSONPortletResponseUtil.writeJSON(
+						resourceRequest, resourceResponse,
+						JSONUtil.put(selectUploadedFile));
+				}
+			}
+			catch (PortalException portalException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(portalException.toString(), portalException);
+				}
+			}
+		}
+
+		JSONPortletResponseUtil.writeJSON(
+			resourceRequest, resourceResponse, JSONUtil.putAll());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
