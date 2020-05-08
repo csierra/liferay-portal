@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.saml.web.internal.portlet.action.UpdateCertificateMVCActionCommand;
 import com.liferay.saml.web.internal.util.SamlTempFileEntryUtil;
 import com.liferay.upload.UploadFileEntryHandler;
 
