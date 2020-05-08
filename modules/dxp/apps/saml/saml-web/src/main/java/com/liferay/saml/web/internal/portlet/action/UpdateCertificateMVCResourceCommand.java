@@ -106,14 +106,12 @@ public class UpdateCertificateMVCResourceCommand
 			ThemeDisplay themeDisplay)
 		throws Exception {
 
-		String sourceFileName = ParamUtil.getString(
-			resourceRequest, "fileName");
-
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		try {
 			SamlTempFileEntryUtil.deleteTempFileEntry(
-				themeDisplay.getUser(), sourceFileName);
+				themeDisplay.getUser(),
+				ParamUtil.getString(resourceRequest, "fileName"));
 
 			jsonObject.put("deleted", Boolean.TRUE);
 		}
