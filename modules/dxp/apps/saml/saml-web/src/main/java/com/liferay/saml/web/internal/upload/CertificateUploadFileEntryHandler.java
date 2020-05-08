@@ -44,9 +44,6 @@ import org.osgi.service.component.annotations.Component;
 public class CertificateUploadFileEntryHandler
 	implements UploadFileEntryHandler {
 
-	public static final String TEMP_FOLDER_NAME =
-		UpdateCertificateMVCActionCommand.class.getName();
-
 	@Override
 	public FileEntry upload(UploadPortletRequest uploadPortletRequest)
 		throws IOException, PortalException {
