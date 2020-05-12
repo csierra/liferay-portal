@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * @author Arthur Chan
@@ -64,12 +65,10 @@ public class URLPathPatternMap {
 
 		// Second: search for wild card matching
 
-		_foundSlashIndexes = new ArrayList<>();
+		Stack<Integer> foundSlashIndexes = searchSlashIndexes(path);
 
-		searchSlashIndexes(path, 0, _wildCardRoot.next(path.charAt(0)), true);
-
-		if (_foundSlashIndexes.size() > 0) {
-			return path.substring(0, _foundSlashIndexes.get(0)) + "/*";
+		if (!foundSlashIndexes.empty()) {
+			return path.substring(0, foundSlashIndexes.peek()) + "/*";
 		}
 
 		// Third: search for extension matching
@@ -107,15 +106,10 @@ public class URLPathPatternMap {
 
 		// Second: search for wild card matching
 
-		_foundSlashIndexes = new ArrayList<>();
+		Stack<Integer> foundSlashIndexes = searchSlashIndexes(path);
 
-		searchSlashIndexes(path, 0, _wildCardRoot.next(path.charAt(0)), false);
-
-		if (_foundSlashIndexes.size() > 0) {
-			for (int i = 0; i < _foundSlashIndexes.size(); ++i) {
-				patterns.add(
-					path.substring(0, _foundSlashIndexes.get(i)) + "/*");
-			}
+		while (!foundSlashIndexes.empty()) {
+			patterns.add(path.substring(0, foundSlashIndexes.pop()) + "/*");
 		}
 
 		// Third: search for extension matching
@@ -425,66 +419,50 @@ public class URLPathPatternMap {
 		return true;
 	}
 
-	protected void searchSlashIndexes(
-		String path, int i, TrieNode current, boolean single) {
+	protected Stack<Integer> searchSlashIndexes(String path) {
+		Stack<Integer> foundSlashIndexes = new Stack<>();
 
-		// Base case for e.g.: (Trie: /abc/*), (Search: /acb)
+		TrieNode prev = _wildCardRoot;
+		TrieNode current = null;
 
-		if (current == null) {
-			return;
-		}
+		int i = 0;
 
-		// We are at the last character of given path
+		while (i < path.length()) {
+			current = prev.next(path.charAt(i));
 
-		if (i == (path.length() - 1)) {
-
-			// Base case for e.g.: (Trie: /*), (Search: /)
+			if (current == null) {
+				break;
+			}
 
 			if ((path.charAt(i) == '/') && current.isEnd()) {
-				_foundSlashIndexes.add(i);
-
-				return;
+				foundSlashIndexes.push(i);
 			}
 
-			// Base case for e.g.: Trie: /abc/*, Search: /abc
-
-			TrieNode next = current.next('/');
-
-			if ((next != null) && next.isEnd()) {
-				_foundSlashIndexes.add(i + 1);
-			}
-
-			// Base case for e.g.: (Trie: /abc/abc/*), (Search: /abc; /abc/)
-
-			return;
+			prev = current;
+			++i;
 		}
 
-		// Recurse down the path first to see if there is longer match
+		// if it's able to reach the last character in path, two cases:
+		//     1. the last character is '/', handled in while loop.
+		//     2. the last character is not '/':
+		//         we need to test if next node is an ending '/'. e.g.:
+		//         Trie: /abc/*, search for: /abc
 
-		searchSlashIndexes(
-			path, i + 1, current.next(path.charAt(i + 1)), single);
+		if ((i == path.length()) && (path.charAt(i - 1) != '/')) {
+			current = prev.next('/');
 
-		// Try add matching index to the list, if
-		// 1. single is false, or
-		// 2. _foundSlashIndexes is empty
-
-		if (!single || (_foundSlashIndexes.size() < 1)) {
-
-			// Given the last if is met, add matching index to the list, if
-			// 1. current character is slash, and
-			// 2. current slash node has marked as end
-
-			if ((path.charAt(i) == '/') && current.isEnd()) {
-				_foundSlashIndexes.add(i);
+			if ((current != null) && current.isEnd()) {
+				foundSlashIndexes.push(i);
 			}
 		}
+
+		return foundSlashIndexes;
 	}
 
 	private boolean _contextRoot;
 	private boolean _defaultServlet;
 	private final HashSet<String> _exactMappings;
 	private final HashSet<String> _extensionMappings;
-	private List<Integer> _foundSlashIndexes;
 	private final TrieNode _wildCardRoot;
 
 	private class TrieNode {
