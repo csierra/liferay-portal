@@ -12,16 +12,15 @@
  *
  */
 
-package com.liferay.multi.factor.authentication.email.otp.web.internal.portlet.action;
+package com.liferay.multi.factor.authentication.web.internal.portlet.action;
 
 import com.liferay.login.web.constants.LoginPortletKeys;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.checker.MFAEmailOTPChecker;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPPortletKeys;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
+import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
+import com.liferay.multi.factor.authentication.web.internal.constants.MFAPortletKeys;
+import com.liferay.multi.factor.authentication.web.internal.constants.MFAWebKeys;
+import com.liferay.multi.factor.authentication.web.internal.policy.MFAPolicy;
 import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactory;
@@ -65,6 +64,7 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tomas Polesovsky
+ * @author Marta Medio
  */
 @Component(
 	property = {
@@ -81,12 +81,9 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
-			ConfigurationProviderUtil.getCompanyConfiguration(
-				MFAEmailOTPConfiguration.class,
-				_portal.getCompanyId(actionRequest));
+		long companyId = _portal.getCompanyId(actionRequest);
 
-		if (!mfaEmailOTPConfiguration.enabled()) {
+		if (!_mfaPolicy.isMFAEnabled(companyId)) {
 			_loginMVCActionCommand.processAction(actionRequest, actionResponse);
 
 			return;
@@ -110,11 +107,12 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 				AuthenticatedSessionManagerUtil.getAuthenticatedUserId(
 					httpServletRequest, login, password, null);
 
-			if ((userId > 0) &&
-				!_mfaEmailOTPChecker.isBrowserVerified(
-					httpServletRequest, userId)) {
+			MFABrowserChecker verifiedBrowserChecker =
+				_getVerifiedBrowserChecker(
+					companyId, userId, httpServletRequest);
 
-				_redirectToVerify(userId, actionRequest, actionResponse);
+			if ((userId > 0) && (verifiedBrowserChecker == null)) {
+				_redirectToVerify(actionRequest, actionResponse, userId);
 
 				return;
 			}
@@ -133,18 +131,16 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
-		String mfaEmailOTPDigest = (String)httpSession.getAttribute(
-			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_DIGEST);
+		String mfaWebDigest = (String)httpSession.getAttribute(
+			MFAWebKeys.MFA_WEB_DIGEST);
 
-		if (!StringUtil.equals(DigesterUtil.digest(state), mfaEmailOTPDigest)) {
+		if (!StringUtil.equals(DigesterUtil.digest(state), mfaWebDigest)) {
 			throw new PrincipalException("User sent unverified state");
 		}
 
 		Map<String, Object> stateMap = _jsonFactory.looseDeserialize(
 			Encryptor.decrypt(
-				(Key)httpSession.getAttribute(
-					MFAEmailOTPWebKeys.MFA_EMAIL_OTP_KEY),
-				state),
+				(Key)httpSession.getAttribute(MFAWebKeys.MFA_WEB_KEY), state),
 			Map.class);
 
 		Map<String, Object> requestParameters =
@@ -201,14 +197,13 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		LiferayPortletURL liferayPortletURL = _portletURLFactory.create(
-			httpServletRequest,
-			MFAEmailOTPPortletKeys.MFA_EMAIL_OTP_VERIFY_PORTLET, plid,
+			httpServletRequest, MFAPortletKeys.MFA_VERIFY_PORTLET_KEY, plid,
 			PortletRequest.RENDER_PHASE);
 
 		liferayPortletURL.setParameter(
 			"saveLastPath", Boolean.FALSE.toString());
 		liferayPortletURL.setParameter(
-			"mvcRenderCommandName", "/mfa_email_otp_verify/verify");
+			"mvcRenderCommandName", "/mfa_verify/view");
 		liferayPortletURL.setParameter("redirect", redirectURL);
 		liferayPortletURL.setParameter(
 			"returnToFullPageURL", returnToFullPageURL);
@@ -216,9 +211,25 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 		return liferayPortletURL;
 	}
 
+	private MFABrowserChecker _getVerifiedBrowserChecker(
+		long companyId, long userId, HttpServletRequest httpServletRequest) {
+
+		for (MFABrowserChecker mfaBrowserChecker :
+				_mfaPolicy.getAvailableBrowserCheckers(companyId, userId)) {
+
+			if (mfaBrowserChecker.isBrowserVerified(
+					httpServletRequest, userId)) {
+
+				return mfaBrowserChecker;
+			}
+		}
+
+		return null;
+	}
+
 	private void _redirectToVerify(
-			long userId, ActionRequest actionRequest,
-			ActionResponse actionResponse)
+			ActionRequest actionRequest, ActionResponse actionResponse,
+			long userId)
 		throws Exception {
 
 		LiferayPortletResponse liferayPortletResponse =
@@ -270,12 +281,11 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
+		httpSession.setAttribute(MFAWebKeys.MFA_USER_ID, userId);
 		httpSession.setAttribute(
-			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_DIGEST,
+			MFAWebKeys.MFA_WEB_DIGEST,
 			DigesterUtil.digest(encryptedStateMapJSON));
-		httpSession.setAttribute(MFAEmailOTPWebKeys.MFA_EMAIL_OTP_KEY, key);
-		httpSession.setAttribute(
-			MFAEmailOTPWebKeys.MFA_EMAIL_OTP_USER_ID, userId);
+		httpSession.setAttribute(MFAWebKeys.MFA_WEB_KEY, key);
 	}
 
 	private static final Accessor<Object, String> _STRING_ACCESSOR =
@@ -307,7 +317,7 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 	private MVCActionCommand _loginMVCActionCommand;
 
 	@Reference
-	private MFAEmailOTPChecker _mfaEmailOTPChecker;
+	private MFAPolicy _mfaPolicy;
 
 	@Reference
 	private Portal _portal;
