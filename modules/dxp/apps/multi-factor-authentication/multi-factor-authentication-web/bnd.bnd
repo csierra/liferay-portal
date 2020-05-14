@@ -3,5 +3,5 @@ Bundle-SymbolicName: com.liferay.multi.factor.authentication.web
 Bundle-Version: 1.0.0
 Export-Package:\
 	com.liferay.multi.factor.authentication.web.internal.system.configuration,\
-	com.liferay.multi.factor.authentication.web.policy
+	com.liferay.multi.factor.authentication.web.internal.policy
 Web-ContextPath: /multi-factor-authentication-web
