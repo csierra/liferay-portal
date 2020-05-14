@@ -146,6 +146,8 @@ public class UpdateCertificateMVCResourceCommand
 					JSONPortletResponseUtil.writeJSON(
 						resourceRequest, resourceResponse,
 						JSONUtil.put(selectUploadedFile));
+
+					return;
 				}
 			}
 			catch (PortalException portalException) {
