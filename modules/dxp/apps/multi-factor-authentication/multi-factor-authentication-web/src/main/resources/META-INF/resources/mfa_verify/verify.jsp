@@ -49,7 +49,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 			<portlet:param name="saveLastPath" value="<%= Boolean.FALSE.toString() %>" />
 		</portlet:renderURL>
 
-		<b><a href="<%= HtmlUtil.escapeAttribute(useAnotherMFABrowserChecker) %>"><liferay-ui:message key="use-another-mfa-verifier" />: <%= mfaCheckerName %></a></b>
+		<b><a href="<%= HtmlUtil.escapeAttribute(useAnotherMFABrowserChecker) %>"><liferay-ui:message key="use-another-mfa-checker" />: <%= mfaCheckerName %></a></b>
 	</c:if>
 
 	<aui:button-row>
