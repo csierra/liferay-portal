@@ -12,7 +12,7 @@
  *
  */
 
-package com.liferay.multi.factor.authentication.email.otp.web.internal.configuration;
+package com.liferay.multi.factor.authentication.email.otp.web.internal.display;
 
 import com.liferay.configuration.admin.display.ConfigurationVisibilityController;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
