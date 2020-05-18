@@ -42,10 +42,10 @@ public class MFAPolicy {
 	public List<MFABrowserChecker> getAvailableBrowserCheckers(
 		long companyId, long userId) {
 
-		List<MFABrowserChecker> activeMfaBrowserCheckers =
+		List<MFABrowserChecker> mfaBrowserCheckers =
 			_mfaBrowserCheckerServiceTrackerMap.getService(companyId);
 
-		Stream<MFABrowserChecker> stream = activeMfaBrowserCheckers.stream();
+		Stream<MFABrowserChecker> stream = mfaBrowserCheckers.stream();
 
 		return stream.filter(
 			mfaBrowserChecker -> mfaBrowserChecker.isAvailable(userId)
