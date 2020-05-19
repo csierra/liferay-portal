@@ -335,7 +335,7 @@ public class URLPathPatternMap<T> {
 			_extensionMappings.put(pathPattern.substring(2), cargos);
 
 			System.out.println(
-				"Insert " + pathPattern + " as extenssion pattern");
+				"Insert " + pathPattern + " as extension pattern");
 
 			return;
 		}
