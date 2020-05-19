@@ -30,7 +30,7 @@ public class URLPathPatternMap<T> {
 
 	public URLPathPatternMap() {
 		_exactMappings = new HashMap<>();
-		_wildCardRoot = new TrieNode();
+		_wildCardRoot = new TrieNode<>();
 		_extensionMappings = new HashMap<>();
 	}
 
@@ -479,10 +479,10 @@ public class URLPathPatternMap<T> {
 	 * will be marked as end.
 	 */
 	protected void insertWildCardPattern(String pathPattern, T cargo) {
-		TrieNode prev = _wildCardRoot;
+		TrieNode<T> prev = _wildCardRoot;
 
 		for (int i = 0; i < (pathPattern.length() - 1); ++i) {
-			TrieNode current = prev.next(pathPattern.charAt(i));
+			TrieNode<T> current = prev.next(pathPattern.charAt(i));
 
 			if (current == null) {
 				current = prev.setNext(pathPattern.charAt(i));
@@ -564,9 +564,9 @@ public class URLPathPatternMap<T> {
 	}
 
 	protected boolean removeWildCardPattern(
-		TrieNode prev, String pathPattern, int i) {
+		TrieNode<T> prev, String pathPattern, int i) {
 
-		TrieNode current = prev.next(pathPattern.charAt(i));
+		TrieNode<T> current = prev.next(pathPattern.charAt(i));
 
 		if (current == null) {
 			return false;
@@ -608,8 +608,8 @@ public class URLPathPatternMap<T> {
 
 		List<List<T>> cargos = new ArrayList<>();
 
-		TrieNode prev = _wildCardRoot;
-		TrieNode current = null;
+		TrieNode<T> prev = _wildCardRoot;
+		TrieNode<T> current = null;
 
 		int i = 0;
 
@@ -656,8 +656,8 @@ public class URLPathPatternMap<T> {
 	protected Stack<Integer> searchIndexesInWildCardPatterns(String path) {
 		Stack<Integer> foundSlashIndexes = new Stack<>();
 
-		TrieNode prev = _wildCardRoot;
-		TrieNode current = null;
+		TrieNode<T> prev = _wildCardRoot;
+		TrieNode<T> current = null;
 
 		int i = 0;
 
@@ -698,8 +698,8 @@ public class URLPathPatternMap<T> {
 
 		Map<String, List<T>> matchings = new HashMap<>();
 
-		TrieNode prev = _wildCardRoot;
-		TrieNode current = null;
+		TrieNode<T> prev = _wildCardRoot;
+		TrieNode<T> current = null;
 
 		int i = 0;
 
@@ -747,9 +747,9 @@ public class URLPathPatternMap<T> {
 	private boolean _defaultServlet;
 	private final HashMap<String, List<T>> _exactMappings;
 	private final HashMap<String, List<T>> _extensionMappings;
-	private final TrieNode _wildCardRoot;
+	private final TrieNode<T> _wildCardRoot;
 
-	private class TrieNode {
+	private static class TrieNode<T> {
 
 		public TrieNode() {
 			_link = new HashMap<>();
@@ -789,16 +789,16 @@ public class URLPathPatternMap<T> {
 			return true;
 		}
 
-		public TrieNode next(char character) {
+		public TrieNode<T> next(char character) {
 			return _link.get(character);
 		}
 
-		public TrieNode removeNext(char character) {
+		public TrieNode<T> removeNext(char character) {
 			return _link.remove(character);
 		}
 
-		public TrieNode setNext(char character) {
-			TrieNode node = new TrieNode();
+		public TrieNode<T> setNext(char character) {
+			TrieNode<T> node = new TrieNode<>();
 
 			_link.put(character, node);
 
@@ -806,7 +806,7 @@ public class URLPathPatternMap<T> {
 		}
 
 		private List<T> _cargos;
-		private final HashMap<Character, TrieNode> _link;
+		private final HashMap<Character, TrieNode<T>> _link;
 
 	}
 
