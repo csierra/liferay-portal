@@ -78,14 +78,8 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 		}
 		else {
 			Map<String, CORSFactoryConfiguration> corsInstanceConfiguration =
-				_corsInstanceConfigurations.get(companyId);
-
-			if (corsInstanceConfiguration == null) {
-				corsInstanceConfiguration = new HashMap<>();
-
-				_corsInstanceConfigurations.put(
-					companyId, corsInstanceConfiguration);
-			}
+				_corsInstanceConfigurations.computeIfAbsent(
+					companyId, key -> new HashMap<>());
 
 			corsInstanceConfiguration.remove(pid);
 
@@ -168,14 +162,8 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 		}
 		else {
 			Map<String, CORSFactoryConfiguration> corsInstanceConfiguration =
-				_corsInstanceConfigurations.get(companyId);
-
-			if (corsInstanceConfiguration == null) {
-				corsInstanceConfiguration = new HashMap<>();
-
-				_corsInstanceConfigurations.put(
-					companyId, corsInstanceConfiguration);
-			}
+				_corsInstanceConfigurations.computeIfAbsent(
+					companyId, key -> new HashMap<>());
 
 			corsInstanceConfiguration.put(pid, corsFactoryConfiguration);
 
