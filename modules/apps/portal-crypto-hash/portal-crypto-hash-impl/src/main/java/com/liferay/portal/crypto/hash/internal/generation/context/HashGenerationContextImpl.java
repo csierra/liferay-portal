@@ -28,10 +28,12 @@ public class HashGenerationContextImpl implements HashGenerationContext {
 
 	public HashGenerationContextImpl(
 		String hashGeneratorName, JSONObject hashGeneratorMeta,
-		SaltCommand... saltCommands) {
+		String pepperAppId, SaltCommand... saltCommands) {
 
 		_hashGeneratorName = hashGeneratorName;
 		_hashGeneratorMeta = Optional.ofNullable(hashGeneratorMeta);
+
+		_pepperAppId = pepperAppId;
 
 		_saltCommands = saltCommands;
 	}
@@ -46,6 +48,11 @@ public class HashGenerationContextImpl implements HashGenerationContext {
 		return _hashGeneratorName;
 	}
 
+	@Override
+	public String getPepperAppId() {
+		return _pepperAppId;
+	}
+
 	public SaltCommand[] getSaltCommands() {
 		return _saltCommands;
 	}
@@ -55,8 +62,16 @@ public class HashGenerationContextImpl implements HashGenerationContext {
 		public BuilderImpl(
 			String hashGeneratorName, JSONObject hashGeneratorMeta) {
 
+			this(hashGeneratorName, hashGeneratorMeta, null);
+		}
+
+		public BuilderImpl(
+			String hashGeneratorName, JSONObject hashGeneratorMeta,
+			String pepperAppId) {
+
 			_hashGeneratorName = hashGeneratorName;
 			_hashGeneratorMeta = hashGeneratorMeta;
+			_pepperAppId = pepperAppId;
 		}
 
 		@Override
@@ -68,16 +83,26 @@ public class HashGenerationContextImpl implements HashGenerationContext {
 			}
 
 			return new HashGenerationContextImpl(
-				_hashGeneratorName, _hashGeneratorMeta, saltCommands);
+				_hashGeneratorName, _hashGeneratorMeta, _pepperAppId,
+				saltCommands);
+		}
+
+
+		@Override
+		public HashGenerationContextBuilder pepperApp(String pepperAppId) {
+			return new BuilderImpl(
+				_hashGeneratorName, _hashGeneratorMeta, pepperAppId);
 		}
 
 		private JSONObject _hashGeneratorMeta;
 		private String _hashGeneratorName;
+		private String _pepperAppId;
 
 	}
 
 	private final Optional<JSONObject> _hashGeneratorMeta;
 	private final String _hashGeneratorName;
 	private final SaltCommand[] _saltCommands;
+	private final String _pepperAppId;
 
 }
