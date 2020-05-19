@@ -14,6 +14,8 @@
 
 package com.liferay.portal.remote.cors.internal.url.path.pattern.map;
 
+import com.liferay.petra.string.StringUtil;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -398,7 +400,8 @@ public class URLPathPatternMap<T> {
 		// Wild Card path pattern 1
 
 		if (isValidWildCardPattern(pathPattern)) {
-			return removeWildCardPattern(_wildCardRoot, pathPattern, 0);
+			return removeWildCardPattern(
+				_wildCardRoot, StringUtil.split(pathPattern, '/'), 0);
 		}
 
 		// Wild Card path pattern 2, aka extension pattern
@@ -479,22 +482,23 @@ public class URLPathPatternMap<T> {
 	 * will be marked as end.
 	 */
 	protected void insertWildCardPattern(String pathPattern, T cargo) {
-		TrieNode<T> prev = _wildCardRoot;
+		TrieNode<String, T> current = null;
+		TrieNode<String, T> prev = _wildCardRoot;
 
-		for (int i = 0; i < (pathPattern.length() - 1); ++i) {
-			TrieNode<T> current = prev.next(pathPattern.charAt(i));
+		List<String> paths = StringUtil.split(pathPattern, '/');
+
+		for (String path: paths) {
+			current = prev.next(path);
 
 			if (current == null) {
-				current = prev.setNext(pathPattern.charAt(i));
-			}
-
-			// This character has to be slash, ensured by insert(String)
-
-			if (i == (pathPattern.length() - 2)) {
-				current.addCargo(cargo);
+				current = prev.setNext(path);
 			}
 
 			prev = current;
+		}
+
+		if (current != null) {
+			current.addCargo(cargo);
 		}
 	}
 
@@ -564,9 +568,9 @@ public class URLPathPatternMap<T> {
 	}
 
 	protected boolean removeWildCardPattern(
-		TrieNode<T> prev, String pathPattern, int i) {
+		TrieNode<String, T> prev, List<String> paths, int i) {
 
-		TrieNode<T> current = prev.next(pathPattern.charAt(i));
+		TrieNode<String, T> current = prev.next(paths.get(i));
 
 		if (current == null) {
 			return false;
@@ -575,13 +579,13 @@ public class URLPathPatternMap<T> {
 		// The last character is star, so the recursing ends at
 		// second last character.
 
-		if (i == (pathPattern.length() - 2)) {
+		if (i == (paths.size() - 1)) {
 			if (!current.isEnd()) {
 				return false;
 			}
 
 			if (!current.hasNext()) {
-				prev.removeNext(pathPattern.charAt(i));
+				prev.removeNext(paths.get(i));
 			}
 			else {
 				current.clearCargos();
@@ -590,14 +594,14 @@ public class URLPathPatternMap<T> {
 			return true;
 		}
 
-		boolean found = removeWildCardPattern(current, pathPattern, i + 1);
+		boolean found = removeWildCardPattern(current, paths, i + 1);
 
 		if (!found) {
 			return false;
 		}
 
 		if (!current.hasNext() && !current.isEnd()) {
-			prev.removeNext(pathPattern.charAt(i));
+			prev.removeNext(paths.get(i));
 		}
 
 		return true;
@@ -608,24 +612,27 @@ public class URLPathPatternMap<T> {
 
 		List<List<T>> cargos = new ArrayList<>();
 
-		TrieNode<T> prev = _wildCardRoot;
-		TrieNode<T> current = null;
+		TrieNode<String, T> prev = _wildCardRoot;
+		TrieNode<String, T> current = null;
 
 		int i = 0;
 
-		while (i < path.length()) {
-			current = prev.next(path.charAt(i));
+		List<String> paths = StringUtil.split(path, '/');
+
+		while (i < paths.size()) {
+			current = prev.next(paths.get(i));
 
 			if (current == null) {
 				break;
 			}
 
-			if ((path.charAt(i) == '/') && current.isEnd()) {
-				if (!all) {
-					cargos.clear();
+			if (current.isEnd()) {
+				if (all) {
+					cargos.add(current.getCargos());
 				}
-
-				cargos.add(current.getCargos());
+				else {
+					cargos.add(0, current.getCargos());
+				}
 			}
 
 			prev = current;
@@ -638,15 +645,16 @@ public class URLPathPatternMap<T> {
 		//         we need to test if next node is an ending '/'. e.g.:
 		//         Trie: /abc/*, search for: /abc
 
-		if ((i == path.length()) && (path.charAt(i - 1) != '/')) {
-			current = prev.next('/');
+		if ((i == paths.size()) && (path.charAt(path.length() - 1) != '/')) {
+			current = prev.next("*");
 
 			if ((current != null) && current.isEnd()) {
-				if (!all) {
-					cargos.clear();
+				if (all) {
+					cargos.add(current.getCargos());
 				}
-
-				cargos.add(current.getCargos());
+				else {
+					cargos.add(0, current.getCargos());
+				}
 			}
 		}
 
@@ -656,19 +664,20 @@ public class URLPathPatternMap<T> {
 	protected Stack<Integer> searchIndexesInWildCardPatterns(String path) {
 		Stack<Integer> foundSlashIndexes = new Stack<>();
 
-		TrieNode<T> prev = _wildCardRoot;
-		TrieNode<T> current = null;
+		TrieNode<String, T> prev = _wildCardRoot;
+		TrieNode<String, T> current = null;
 
 		int i = 0;
+		List<String> paths = StringUtil.split(path, '/');
 
-		while (i < path.length()) {
-			current = prev.next(path.charAt(i));
+		while (i < paths.size()) {
+			current = prev.next(paths.get(i));
 
 			if (current == null) {
 				break;
 			}
 
-			if ((path.charAt(i) == '/') && current.isEnd()) {
+			if (current.isEnd()) {
 				foundSlashIndexes.push(i);
 			}
 
@@ -682,8 +691,8 @@ public class URLPathPatternMap<T> {
 		//         we need to test if next node is an ending '/'. e.g.:
 		//         Trie: /abc/*, search for: /abc
 
-		if ((i == path.length()) && (path.charAt(i - 1) != '/')) {
-			current = prev.next('/');
+		if ((i == paths.size()) && (path.charAt(path.length() - 1) != '/')) {
+			current = prev.next("*");
 
 			if ((current != null) && current.isEnd()) {
 				foundSlashIndexes.push(i);
@@ -698,19 +707,20 @@ public class URLPathPatternMap<T> {
 
 		Map<String, List<T>> matchings = new HashMap<>();
 
-		TrieNode<T> prev = _wildCardRoot;
-		TrieNode<T> current = null;
+		TrieNode<String, T> prev = _wildCardRoot;
+		TrieNode<String, T> current = null;
 
 		int i = 0;
+		List<String> paths = StringUtil.split(path, '/');
 
-		while (i < path.length()) {
-			current = prev.next(path.charAt(i));
+		while (i < paths.size()) {
+			current = prev.next(paths.get(i));
 
 			if (current == null) {
 				break;
 			}
 
-			if ((path.charAt(i) == '/') && current.isEnd()) {
+			if (current.isEnd()) {
 				if (!all) {
 					matchings.clear();
 				}
@@ -728,8 +738,8 @@ public class URLPathPatternMap<T> {
 		//         we need to test if next node is an ending '/'. e.g.:
 		//         Trie: /abc/*, search for: /abc
 
-		if ((i == path.length()) && (path.charAt(i - 1) != '/')) {
-			current = prev.next('/');
+		if ((i == paths.size()) && (path.charAt(path.length() - 1) != '/')) {
+			current = prev.next("*");
 
 			if ((current != null) && current.isEnd()) {
 				if (!all) {
@@ -747,9 +757,9 @@ public class URLPathPatternMap<T> {
 	private boolean _defaultServlet;
 	private final HashMap<String, List<T>> _exactMappings;
 	private final HashMap<String, List<T>> _extensionMappings;
-	private final TrieNode<T> _wildCardRoot;
+	private final TrieNode<String, T> _wildCardRoot;
 
-	private static class TrieNode<T> {
+	private static class TrieNode<K, T> {
 
 		public TrieNode() {
 			_link = new HashMap<>();
@@ -789,24 +799,24 @@ public class URLPathPatternMap<T> {
 			return true;
 		}
 
-		public TrieNode<T> next(char character) {
-			return _link.get(character);
+		public TrieNode<K, T> next(K key) {
+			return _link.get(key);
 		}
 
-		public TrieNode<T> removeNext(char character) {
-			return _link.remove(character);
+		public TrieNode<K, T> removeNext(K key) {
+			return _link.remove(key);
 		}
 
-		public TrieNode<T> setNext(char character) {
-			TrieNode<T> node = new TrieNode<>();
+		public TrieNode<K, T> setNext(K key) {
+			TrieNode<K, T> node = new TrieNode<>();
 
-			_link.put(character, node);
+			_link.put(key, node);
 
 			return node;
 		}
 
 		private List<T> _cargos;
-		private final HashMap<Character, TrieNode<T>> _link;
+		private final HashMap<K, TrieNode<K, T>> _link;
 
 	}
 
