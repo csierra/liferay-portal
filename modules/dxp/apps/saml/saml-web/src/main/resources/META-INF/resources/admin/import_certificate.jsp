@@ -141,7 +141,7 @@ if (Validator.isNotNull(tempFileName)) {
 
 		<div class="container-fluid lfr-form-content">
 			<liferay-ui:error key="incorrectKeyPassword" message="incorrect-key-password" />
-			<liferay-ui:error key="keyEncryptionAlgorithmNotSupported" message="the-private-key-associated-with-the-alias-is-encrypted-with-an-algorithm-which-is-not-supported" />
+			<liferay-ui:error key="keyEncryptionAlgorithmNotSupported" message="the-private-key-associated-with-the-alias-is-encrypted-with-an-unsupported-algorithm" />
 
 			<div class="row">
 				<div class="col-lg-12">
