@@ -62,7 +62,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = MFABrowserChecker.class
 )
-public class MFAEmailOTPChecker implements MFABrowserChecker {
+public class MFAEmailOTPMFABrowserChecker implements MFABrowserChecker {
 
 	@Override
 	public void includeBrowserVerification(
@@ -357,7 +357,7 @@ public class MFAEmailOTPChecker implements MFABrowserChecker {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		MFAEmailOTPChecker.class);
+		MFAEmailOTPMFABrowserChecker.class);
 
 	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
 	private MFAEmailOTPAuditMessageBuilder _mfaEmailOTPAuditMessageBuilder;
