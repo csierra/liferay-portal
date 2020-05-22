@@ -57,9 +57,9 @@ public class MFAVerifyMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		long userId = _getMFAUserId(actionRequest);
+		long mfaUserId = _getMFAUserId(actionRequest);
 
-		if (userId == 0) {
+		if (mfaUserId == 0) {
 			SessionErrors.add(actionRequest, "sessionExpired");
 
 			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
@@ -70,7 +70,7 @@ public class MFAVerifyMVCActionCommand extends BaseMVCActionCommand {
 
 		List<MFABrowserChecker> availableBrowserCheckers =
 			_mfaPolicy.getAvailableBrowserCheckers(
-				_portal.getCompanyId(actionRequest), userId);
+				_portal.getCompanyId(actionRequest), mfaUserId);
 
 		int mfaCheckerIndex = ParamUtil.getInteger(
 			actionRequest, "mfaCheckerIndex");
@@ -89,7 +89,7 @@ public class MFAVerifyMVCActionCommand extends BaseMVCActionCommand {
 		try {
 			if (!mfaBrowserChecker.verifyBrowserRequest(
 					_portal.getHttpServletRequest(actionRequest),
-					_portal.getHttpServletResponse(actionResponse), userId)) {
+					_portal.getHttpServletResponse(actionResponse), mfaUserId)) {
 
 				SessionErrors.add(actionRequest, "mfaFailedVerification");
 			}
