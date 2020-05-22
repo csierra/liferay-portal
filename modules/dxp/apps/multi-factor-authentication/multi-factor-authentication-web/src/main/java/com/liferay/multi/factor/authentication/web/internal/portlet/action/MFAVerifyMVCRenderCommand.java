@@ -50,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = {
-		"javax.portlet.name=" + MFAPortletKeys.MFA_VERIFY_PORTLET_KEY,
+		"javax.portlet.name=" + MFAPortletKeys.VERIFY,
 		"mvc.command.name=/mfa_verify/view"
 	},
 	service = MVCRenderCommand.class
