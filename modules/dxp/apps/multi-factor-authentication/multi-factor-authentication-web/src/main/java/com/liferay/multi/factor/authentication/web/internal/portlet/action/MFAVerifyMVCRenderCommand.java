@@ -69,7 +69,7 @@ public class MFAVerifyMVCRenderCommand implements MVCRenderCommand {
 			return "/error.jsp";
 		}
 
-		List<MFABrowserChecker> availableBrowserCheckers =
+		List<MFABrowserChecker> mfaBrowserCheckers =
 			_mfaPolicy.getAvailableBrowserCheckers(
 				_portal.getCompanyId(renderRequest), mfaUserId);
 
@@ -79,19 +79,19 @@ public class MFAVerifyMVCRenderCommand implements MVCRenderCommand {
 		MFABrowserChecker mfaBrowserChecker;
 
 		if ((mfaCheckerIndex > -1) &&
-			(mfaCheckerIndex < availableBrowserCheckers.size())) {
+			(mfaCheckerIndex < mfaBrowserCheckers.size())) {
 
-			mfaBrowserChecker = availableBrowserCheckers.get(mfaCheckerIndex);
+			mfaBrowserChecker = mfaBrowserCheckers.get(mfaCheckerIndex);
 		}
 		else {
-			mfaBrowserChecker = availableBrowserCheckers.get(0);
+			mfaBrowserChecker = mfaBrowserCheckers.get(0);
 		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		renderRequest.setAttribute(
-			MFAWebKeys.MFA_AVAILABLE_CHECKERS, availableBrowserCheckers);
+			MFAWebKeys.MFA_AVAILABLE_CHECKERS, mfaBrowserCheckers);
 		renderRequest.setAttribute(MFAWebKeys.MFA_CHECKER, mfaBrowserChecker);
 		renderRequest.setAttribute(
 			MFAWebKeys.MFA_CHECKER_NAME,
