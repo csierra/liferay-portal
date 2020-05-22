@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-List<MFABrowserChecker> availableBrowserCheckers = (List<MFABrowserChecker>)request.getAttribute(MFAWebKeys.MFA_AVAILABLE_CHECKERS);
+List<MFABrowserChecker> mfaBrowserCheckers = (List<MFABrowserChecker>)request.getAttribute(MFAWebKeys.MFA_AVAILABLE_CHECKERS);
 MFABrowserChecker mfaBrowserChecker = (MFABrowserChecker)request.getAttribute(MFAWebKeys.MFA_CHECKER);
 int mfaCheckerIndex = ParamUtil.getInteger(request, "mfaCheckerIndex");
 long mfaUserId = (Long)request.getAttribute(MFAWebKeys.MFA_USER_ID);
@@ -41,7 +41,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 	mfaBrowserChecker.includeBrowserVerification(request, response, mfaUserId);
 	%>
 
-	<c:if test="<%= availableBrowserCheckers.size() > 1 %>">
+	<c:if test="<%= mfaBrowserCheckers.size() > 1 %>">
 		<portlet:renderURL copyCurrentRenderParameters="<%= true %>" var="useAnotherMFABrowserChecker">
 			<portlet:param name="saveLastPath" value="<%= Boolean.FALSE.toString() %>" />
 			<portlet:param name="mvcRenderCommandName" value="/mfa_verify/view" />
