@@ -35,7 +35,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 	<aui:input name="saveLastPath" type="hidden" value="<%= false %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 
-	<liferay-ui:error key="mfaFailedVerification" message="multi-factor-authentication-has-failed" />
+	<liferay-ui:error key="mfaVerificationFailed" message="multi-factor-authentication-has-failed" />
 
 	<%
 	mfaBrowserChecker.includeBrowserVerification(request, response, mfaUserId);
