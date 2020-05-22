@@ -68,7 +68,7 @@ public class MFAVerifyMVCActionCommand extends BaseMVCActionCommand {
 			return;
 		}
 
-		List<MFABrowserChecker> availableBrowserCheckers =
+		List<MFABrowserChecker> mfaBrowserCheckers =
 			_mfaPolicy.getAvailableBrowserCheckers(
 				_portal.getCompanyId(actionRequest), mfaUserId);
 
@@ -78,18 +78,19 @@ public class MFAVerifyMVCActionCommand extends BaseMVCActionCommand {
 		MFABrowserChecker mfaBrowserChecker;
 
 		if ((mfaCheckerIndex > -1) &&
-			(mfaCheckerIndex < availableBrowserCheckers.size())) {
+			(mfaCheckerIndex < mfaBrowserCheckers.size())) {
 
-			mfaBrowserChecker = availableBrowserCheckers.get(mfaCheckerIndex);
+			mfaBrowserChecker = mfaBrowserCheckers.get(mfaCheckerIndex);
 		}
 		else {
-			mfaBrowserChecker = availableBrowserCheckers.get(0);
+			mfaBrowserChecker = mfaBrowserCheckers.get(0);
 		}
 
 		try {
 			if (!mfaBrowserChecker.verifyBrowserRequest(
 					_portal.getHttpServletRequest(actionRequest),
-					_portal.getHttpServletResponse(actionResponse), mfaUserId)) {
+					_portal.getHttpServletResponse(actionResponse),
+					mfaUserId)) {
 
 				SessionErrors.add(actionRequest, "mfaFailedVerification");
 			}
