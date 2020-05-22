@@ -107,11 +107,10 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 				AuthenticatedSessionManagerUtil.getAuthenticatedUserId(
 					httpServletRequest, login, password, null);
 
-			MFABrowserChecker verifiedBrowserChecker =
-				_getVerifiedBrowserChecker(
-					companyId, userId, httpServletRequest);
+			MFABrowserChecker mfaBrowserChecker = _getVerifiedBrowserChecker(
+				companyId, userId, httpServletRequest);
 
-			if ((userId > 0) && (verifiedBrowserChecker == null)) {
+			if ((userId > 0) && (mfaBrowserChecker == null)) {
 				_redirectToVerify(actionRequest, actionResponse, userId);
 
 				return;
