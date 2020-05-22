@@ -31,9 +31,9 @@ String redirect = ParamUtil.getString(request, "redirect");
 </portlet:actionURL>
 
 <aui:form action="<%= verifyURL %>" cssClass="container-fluid-1280 sign-in-form" data-senna-off="true" method="post" name="fm">
-	<aui:input name="mfaCheckerIndex" type="hidden" value="<%= mfaCheckerIndex %>" />
 	<aui:input name="saveLastPath" type="hidden" value="<%= false %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+	<aui:input name="mfaCheckerIndex" type="hidden" value="<%= mfaCheckerIndex %>" />
 
 	<liferay-ui:error key="mfaVerificationFailed" message="multi-factor-authentication-has-failed" />
 
@@ -43,10 +43,10 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 	<c:if test="<%= availableBrowserCheckers.size() > 1 %>">
 		<portlet:renderURL copyCurrentRenderParameters="<%= true %>" var="useAnotherMFABrowserChecker">
-			<portlet:param name="mfaCheckerIndex" value='<%= ((mfaCheckerIndex + 1) < availableBrowserCheckers.size()) ? String.valueOf(mfaCheckerIndex + 1) : "0" %>' />
+			<portlet:param name="saveLastPath" value="<%= Boolean.FALSE.toString() %>" />
 			<portlet:param name="mvcRenderCommandName" value="/mfa_verify/view" />
 			<portlet:param name="redirect" value='<%= ParamUtil.getString(request, "redirect") %>' />
-			<portlet:param name="saveLastPath" value="<%= Boolean.FALSE.toString() %>" />
+			<portlet:param name="mfaCheckerIndex" value='<%= ((mfaCheckerIndex + 1) < mfaBrowserCheckers.size()) ? String.valueOf(mfaCheckerIndex + 1) : "0" %>' />
 		</portlet:renderURL>
 
 		<b><a href="<%= HtmlUtil.escapeAttribute(useAnotherMFABrowserChecker) %>"><liferay-ui:message key="use-another-mfa-checker" />: <%= mfaCheckerName %></a></b>
