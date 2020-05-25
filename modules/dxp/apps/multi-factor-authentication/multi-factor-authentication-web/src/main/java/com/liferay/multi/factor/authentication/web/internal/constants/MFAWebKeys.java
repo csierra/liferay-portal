@@ -19,12 +19,12 @@ package com.liferay.multi.factor.authentication.web.internal.constants;
  */
 public class MFAWebKeys {
 
-	public static final String MFA_AVAILABLE_CHECKERS =
-		"MFA_AVAILABLE_CHECKERS";
+	public static final String MFA_BROWSER_CHECKER = "MFA_BROWSER_CHECKER";
 
-	public static final String MFA_CHECKER = "MFA_CHECKER";
+	public static final String MFA_BROWSER_CHECKER_NAME =
+		"MFA_BROWSER_CHECKER_NAME";
 
-	public static final String MFA_CHECKER_NAME = "MFA_CHECKER_NAME";
+	public static final String MFA_BROWSER_CHECKERS = "MFA_BROWSER_CHECKERS";
 
 	public static final String MFA_USER_ACCOUNT_LABEL =
 		"MFA_USER_ACCOUNT_LABEL";

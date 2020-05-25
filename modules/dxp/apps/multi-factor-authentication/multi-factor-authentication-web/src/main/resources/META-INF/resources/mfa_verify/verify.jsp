@@ -17,13 +17,14 @@
 <%@ include file="/init.jsp" %>
 
 <%
-List<MFABrowserChecker> mfaBrowserCheckers = (List<MFABrowserChecker>)request.getAttribute(MFAWebKeys.MFA_AVAILABLE_CHECKERS);
-MFABrowserChecker mfaBrowserChecker = (MFABrowserChecker)request.getAttribute(MFAWebKeys.MFA_CHECKER);
-int mfaCheckerIndex = ParamUtil.getInteger(request, "mfaCheckerIndex");
-long mfaUserId = (Long)request.getAttribute(MFAWebKeys.MFA_USER_ID);
-String mfaCheckerName = (String)request.getAttribute(MFAWebKeys.MFA_CHECKER_NAME);
-
 String redirect = ParamUtil.getString(request, "redirect");
+
+MFABrowserChecker mfaBrowserChecker = (MFABrowserChecker)request.getAttribute(MFAWebKeys.MFA_BROWSER_CHECKER);
+String mfaBrowserCheckerName = (String)request.getAttribute(MFAWebKeys.MFA_BROWSER_CHECKER_NAME);
+List<MFABrowserChecker> mfaBrowserCheckers = (List<MFABrowserChecker>)request.getAttribute(MFAWebKeys.MFA_BROWSER_CHECKERS);
+long mfaUserId = (Long)request.getAttribute(MFAWebKeys.MFA_USER_ID);
+
+int mfaCheckerIndex = ParamUtil.getInteger(request, "mfaCheckerIndex");
 %>
 
 <portlet:actionURL name="/mfa_verify/verify" var="verifyURL">
@@ -49,7 +50,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 			<portlet:param name="mfaCheckerIndex" value='<%= ((mfaCheckerIndex + 1) < mfaBrowserCheckers.size()) ? String.valueOf(mfaCheckerIndex + 1) : "0" %>' />
 		</portlet:renderURL>
 
-		<b><a href="<%= HtmlUtil.escapeAttribute(useAnotherMFABrowserChecker) %>"><liferay-ui:message key="use-another-mfa-checker" />: <%= mfaCheckerName %></a></b>
+		<b><a href="<%= HtmlUtil.escapeAttribute(useAnotherMFABrowserChecker) %>"><liferay-ui:message key="use-another-mfa-checker" />: <%= mfaBrowserCheckerName %></a></b>
 	</c:if>
 
 	<aui:button-row>
