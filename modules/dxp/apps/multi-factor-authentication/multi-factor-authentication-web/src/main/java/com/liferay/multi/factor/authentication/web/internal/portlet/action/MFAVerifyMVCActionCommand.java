@@ -69,7 +69,7 @@ public class MFAVerifyMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		List<MFABrowserChecker> mfaBrowserCheckers =
-			_mfaPolicy.getAvailableBrowserCheckers(
+			_mfaPolicy.getAvailableMFABrowserCheckers(
 				_portal.getCompanyId(actionRequest), mfaUserId);
 
 		int mfaCheckerIndex = ParamUtil.getInteger(

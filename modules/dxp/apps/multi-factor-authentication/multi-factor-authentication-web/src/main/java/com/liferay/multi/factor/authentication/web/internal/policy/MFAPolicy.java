@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Deactivate;
 @Component(service = MFAPolicy.class)
 public class MFAPolicy {
 
-	public List<MFABrowserChecker> getAvailableBrowserCheckers(
+	public List<MFABrowserChecker> getAvailableMFABrowserCheckers(
 		long companyId, long userId) {
 
 		List<MFABrowserChecker> mfaBrowserCheckers =
