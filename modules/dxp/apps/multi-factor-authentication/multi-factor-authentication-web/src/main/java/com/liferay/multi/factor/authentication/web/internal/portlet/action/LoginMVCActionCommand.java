@@ -137,10 +137,10 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			throw new PrincipalException("User sent unverified state");
 		}
 
+		Key mfaWebKey = (Key)httpSession.getAttribute(MFAWebKeys.MFA_WEB_KEY);
+
 		Map<String, Object> stateMap = _jsonFactory.looseDeserialize(
-			Encryptor.decrypt(
-				(Key)httpSession.getAttribute(MFAWebKeys.MFA_WEB_KEY), state),
-			Map.class);
+			Encryptor.decrypt(mfaWebKey, state), Map.class);
 
 		Map<String, Object> requestParameters =
 			(Map<String, Object>)stateMap.get("requestParameters");
