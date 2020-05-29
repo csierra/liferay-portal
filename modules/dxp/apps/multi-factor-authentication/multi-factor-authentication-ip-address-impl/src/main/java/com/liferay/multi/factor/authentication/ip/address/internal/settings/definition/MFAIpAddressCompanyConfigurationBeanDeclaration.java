@@ -22,7 +22,10 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Marta Medio
  */
-@Component(service = ConfigurationBeanDeclaration.class)
+@Component(
+	property = "mfa.visibility.configuration.pid=com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIpAddressConfiguration",
+	service = ConfigurationBeanDeclaration.class
+)
 public class MFAIpAddressCompanyConfigurationBeanDeclaration
 	implements ConfigurationBeanDeclaration {
 
