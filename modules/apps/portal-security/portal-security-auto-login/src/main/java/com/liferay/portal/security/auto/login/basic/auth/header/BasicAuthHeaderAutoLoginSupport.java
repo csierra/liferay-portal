@@ -89,23 +89,13 @@ public class BasicAuthHeaderAutoLoginSupport extends BaseAutoLogin {
 	}
 
 	protected boolean isEnabled(long companyId) {
-		BasicAuthHeaderSupportConfiguration
-			basicAuthHeaderSupportConfiguration =
-				_getBasicAuthHeaderSupportConfiguration(companyId);
-
-		if (basicAuthHeaderSupportConfiguration == null) {
-			return false;
-		}
-
-		return basicAuthHeaderSupportConfiguration.enabled();
-	}
-
-	private BasicAuthHeaderSupportConfiguration
-		_getBasicAuthHeaderSupportConfiguration(long companyId) {
-
 		try {
-			return _configurationProvider.getCompanyConfiguration(
-				BasicAuthHeaderSupportConfiguration.class, companyId);
+			BasicAuthHeaderSupportConfiguration
+				basicAuthHeaderSupportConfiguration =
+					_configurationProvider.getCompanyConfiguration(
+						BasicAuthHeaderSupportConfiguration.class, companyId);
+
+			return basicAuthHeaderSupportConfiguration.enabled();
 		}
 		catch (ConfigurationException configurationException) {
 			_log.error(
@@ -113,7 +103,7 @@ public class BasicAuthHeaderAutoLoginSupport extends BaseAutoLogin {
 				configurationException);
 		}
 
-		return null;
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
