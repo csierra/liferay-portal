@@ -15,7 +15,7 @@
 package com.liferay.portal.security.auto.login.internal.basic.auth.header.settings.definition;
 
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
-import com.liferay.portal.security.auto.login.internal.basic.auth.header.configuration.BasicAuthHeaderSupportConfiguration;
+import com.liferay.portal.security.configuration.BasicAuthHeaderSupportConfiguration;
 
 import org.osgi.service.component.annotations.Component;
 
