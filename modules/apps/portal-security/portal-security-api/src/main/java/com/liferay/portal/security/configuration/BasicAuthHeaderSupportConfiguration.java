@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.security.auto.login.internal.basic.auth.header.configuration;
+package com.liferay.portal.security.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
 
@@ -26,7 +26,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 	scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
-	id = "com.liferay.portal.security.auto.login.internal.basic.auth.header.configuration.BasicAuthHeaderSupportConfiguration",
+	id = "com.liferay.portal.security.configuration.BasicAuthHeaderSupportConfiguration",
 	localization = "content/Language",
 	name = "basic-auth-header-support-configuration-name"
 )

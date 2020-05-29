@@ -16,6 +16,8 @@ package com.liferay.portal.security.auth.verifier.internal.basic.auth.header;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.http.HttpAuthManagerUtil;
@@ -26,6 +28,8 @@ import com.liferay.portal.kernel.security.auto.login.AutoLogin;
 import com.liferay.portal.kernel.security.auto.login.AutoLoginException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.security.configuration.BasicAuthHeaderSupportConfiguration;
 
 import java.util.Properties;
 
@@ -36,8 +40,13 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class BasicAuthHeaderAuthVerifier implements AuthVerifier {
 
-	public BasicAuthHeaderAuthVerifier(AutoLogin autoLogin) {
+	public BasicAuthHeaderAuthVerifier(
+		AutoLogin autoLogin, ConfigurationProvider configurationProvider,
+		Portal portal) {
+
 		_autoLogin = autoLogin;
+		_configurationProvider = configurationProvider;
+		_portal = portal;
 	}
 
 	@Override
@@ -50,9 +59,13 @@ public class BasicAuthHeaderAuthVerifier implements AuthVerifier {
 			AccessControlContext accessControlContext, Properties properties)
 		throws AuthException {
 
-		try {
-			AuthVerifierResult authVerifierResult = new AuthVerifierResult();
+		AuthVerifierResult authVerifierResult = new AuthVerifierResult();
 
+		if (!_isEnabled(accessControlContext)) {
+			return authVerifierResult;
+		}
+
+		try {
 			String[] credentials = _autoLogin.login(
 				accessControlContext.getRequest(),
 				accessControlContext.getResponse());
@@ -114,9 +127,27 @@ public class BasicAuthHeaderAuthVerifier implements AuthVerifier {
 		return basicAuth;
 	}
 
+	private boolean _isEnabled(AccessControlContext accessControlContext) {
+		try {
+			BasicAuthHeaderSupportConfiguration
+				basicAuthHeaderSupportConfiguration =
+					_configurationProvider.getCompanyConfiguration(
+						BasicAuthHeaderSupportConfiguration.class,
+						_portal.getCompanyId(
+							accessControlContext.getRequest()));
+
+			return basicAuthHeaderSupportConfiguration.enabled();
+		}
+		catch (ConfigurationException configurationException) {
+			return false;
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		BasicAuthHeaderAuthVerifier.class);
 
 	private final AutoLogin _autoLogin;
+	private final ConfigurationProvider _configurationProvider;
+	private final Portal _portal;
 
 }
