@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.security.auto.login.AutoLogin;
 import com.liferay.portal.kernel.security.auto.login.BaseAutoLogin;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.security.auto.login.internal.basic.auth.header.configuration.BasicAuthHeaderSupportConfiguration;
+import com.liferay.portal.security.configuration.BasicAuthHeaderSupportConfiguration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
