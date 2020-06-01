@@ -15,6 +15,7 @@
 package com.liferay.multi.factor.authentication.web.internal.policy;
 
 import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
+import com.liferay.multi.factor.authentication.spi.checker.headless.MFAHeadlessChecker;
 import com.liferay.multi.factor.authentication.web.internal.system.configuration.MFASystemConfiguration;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
@@ -24,6 +25,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,10 +47,33 @@ public class MFAPolicy {
 		List<MFABrowserChecker> mfaBrowserCheckers =
 			_mfaBrowserCheckerServiceTrackerMap.getService(companyId);
 
+		if (mfaBrowserCheckers == null) {
+			return Collections.emptyList();
+		}
+
 		Stream<MFABrowserChecker> stream = mfaBrowserCheckers.stream();
 
 		return stream.filter(
 			mfaBrowserChecker -> mfaBrowserChecker.isAvailable(userId)
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	public List<MFAHeadlessChecker> getAvailableMFAHeadlessCheckers(
+		long companyId, long userId) {
+
+		List<MFAHeadlessChecker> mfaHeadlessCheckers =
+			_mfaHeadlessCheckerServiceTrackerMap.getService(companyId);
+
+		if (mfaHeadlessCheckers == null) {
+			return Collections.emptyList();
+		}
+
+		Stream<MFAHeadlessChecker> stream = mfaHeadlessCheckers.stream();
+
+		return stream.filter(
+			mfaHeadlessChecker -> mfaHeadlessChecker.isAvailable(userId)
 		).collect(
 			Collectors.toList()
 		);
@@ -78,6 +103,11 @@ public class MFAPolicy {
 			ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, MFABrowserChecker.class, "(companyId=*)",
 				new PropertyServiceReferenceMapper<>("companyId"));
+
+		_mfaHeadlessCheckerServiceTrackerMap =
+			ServiceTrackerMapFactory.openMultiValueMap(
+				bundleContext, MFAHeadlessChecker.class, "(companyId=*)",
+				new PropertyServiceReferenceMapper<>("companyId"));
 	}
 
 	@Deactivate
@@ -87,5 +117,7 @@ public class MFAPolicy {
 
 	private ServiceTrackerMap<Long, List<MFABrowserChecker>>
 		_mfaBrowserCheckerServiceTrackerMap;
+	private ServiceTrackerMap<Long, List<MFAHeadlessChecker>>
+		_mfaHeadlessCheckerServiceTrackerMap;
 
 }
