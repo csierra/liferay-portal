@@ -23,7 +23,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +36,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marta Medio
@@ -84,12 +85,12 @@ public class MFAPolicy {
 	public boolean isMFAEnabled(long companyId) {
 		try {
 			MFASystemConfiguration mfaSystemConfiguration =
-				ConfigurationProviderUtil.getSystemConfiguration(
+				_configurationProvider.getSystemConfiguration(
 					MFASystemConfiguration.class);
 
 			if (!mfaSystemConfiguration.disableGlobally()) {
 				MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
-					ConfigurationProviderUtil.getCompanyConfiguration(
+					_configurationProvider.getCompanyConfiguration(
 						MFAEmailOTPConfiguration.class, companyId);
 
 				return mfaEmailOTPConfiguration.enabled();
@@ -145,6 +146,9 @@ public class MFAPolicy {
 	protected void deactivate() {
 		_mfaBrowserCheckerServiceTrackerMap.close();
 	}
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
 
 	private ServiceTrackerMap<Long, List<MFABrowserChecker>>
 		_mfaBrowserCheckerServiceTrackerMap;
