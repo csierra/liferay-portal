@@ -12,7 +12,7 @@
  *
  */
 
-package com.liferay.multi.factor.authentication.email.otp.web.internal.configuration;
+package com.liferay.multi.factor.authentication.email.otp.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
 
@@ -28,7 +28,7 @@ import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 	scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
-	id = "com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration",
+	id = "com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration",
 	localization = "content/Language", name = "mfa-email-otp-configuration-name"
 )
 public interface MFAEmailOTPConfiguration {
@@ -71,13 +71,13 @@ public interface MFAEmailOTPConfiguration {
 	public String emailFromName();
 
 	@Meta.AD(
-		deflt = "${resource:com/liferay/multi/factor/authentication/email/otp/web/internal/configuration/dependencies/email_otp_sent_subject.tmpl}",
+		deflt = "${resource:com/liferay/multi/factor/authentication/email/otp/configuration/dependencies/email_otp_sent_subject.tmpl}",
 		name = "email-otp-sent-subject", required = false
 	)
 	public LocalizedValuesMap emailOTPSentSubject();
 
 	@Meta.AD(
-		deflt = "${resource:com/liferay/multi/factor/authentication/email/otp/web/internal/configuration/dependencies/email_otp_sent_body.tmpl}",
+		deflt = "${resource:com/liferay/multi/factor/authentication/email/otp/configuration/dependencies/email_otp_sent_body.tmpl}",
 		name = "email-otp-sent-body", required = false
 	)
 	public LocalizedValuesMap emailOTPSentBody();

@@ -14,6 +14,7 @@
 
 package com.liferay.multi.factor.authentication.web.internal.policy;
 
+import com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
 import com.liferay.multi.factor.authentication.spi.checker.headless.MFAHeadlessChecker;
 import com.liferay.multi.factor.authentication.web.internal.system.configuration.MFASystemConfiguration;
@@ -23,7 +24,6 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -88,8 +88,11 @@ public class MFAPolicy {
 					MFASystemConfiguration.class);
 
 			if (!mfaSystemConfiguration.disableGlobally()) {
-				return !ListUtil.isEmpty(
-					_mfaBrowserCheckerServiceTrackerMap.getService(companyId));
+				MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
+					ConfigurationProviderUtil.getCompanyConfiguration(
+						MFAEmailOTPConfiguration.class, companyId);
+
+				return mfaEmailOTPConfiguration.enabled();
 			}
 
 			return false;

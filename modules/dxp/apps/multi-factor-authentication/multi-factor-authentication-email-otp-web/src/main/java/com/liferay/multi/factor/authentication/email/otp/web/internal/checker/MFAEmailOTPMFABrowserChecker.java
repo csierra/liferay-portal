@@ -14,10 +14,10 @@
 
 package com.liferay.multi.factor.authentication.email.otp.web.internal.checker;
 
+import com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTPEntry;
 import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPEntryLocalService;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.audit.MFAEmailOTPAuditMessageBuilder;
-import com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
 import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
  * @author Marta Medio
  */
 @Component(
-	configurationPid = "com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration.scoped",
+	configurationPid = "com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration.scoped",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = MFABrowserChecker.class
 )
