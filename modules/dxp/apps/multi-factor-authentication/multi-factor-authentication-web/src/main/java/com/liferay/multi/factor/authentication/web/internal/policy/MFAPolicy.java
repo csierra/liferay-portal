@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -95,6 +97,32 @@ public class MFAPolicy {
 		catch (ConfigurationException configurationException) {
 			throw new SystemException(configurationException);
 		}
+	}
+
+	public boolean isSatisfied(
+		long companyId, HttpServletRequest httpServletRequest, long userId) {
+
+		for (MFAHeadlessChecker mfaHeadlessChecker :
+				getAvailableMFAHeadlessCheckers(companyId, userId)) {
+
+			if (mfaHeadlessChecker.verifyHeadlessRequest(
+					httpServletRequest, userId)) {
+
+				return true;
+			}
+		}
+
+		for (MFABrowserChecker mfaBrowserChecker :
+				getAvailableMFABrowserCheckers(companyId, userId)) {
+
+			if (mfaBrowserChecker.isBrowserVerified(
+					httpServletRequest, userId)) {
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Activate
