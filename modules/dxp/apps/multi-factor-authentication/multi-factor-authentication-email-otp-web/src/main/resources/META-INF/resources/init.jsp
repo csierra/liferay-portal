@@ -22,7 +22,7 @@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page import="com.liferay.multi.factor.authentication.email.otp.web.internal.configuration.MFAEmailOTPConfiguration" %><%@
+<%@ page import="com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration" %><%@
 page import="com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPPortletKeys" %><%@
 page import="com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys" %><%@
 page import="com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil" %><%@
