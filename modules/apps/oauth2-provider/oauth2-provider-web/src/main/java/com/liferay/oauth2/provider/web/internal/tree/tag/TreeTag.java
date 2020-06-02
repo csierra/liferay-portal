@@ -91,10 +91,14 @@ public class TreeTag extends SimpleTagSupport {
 			jspContext.setAttribute("tree", tree);
 
 			if (tree instanceof Tree.Leaf) {
-				getLeafJspFragment().invoke(null);
+				JspFragment leafJspFragment = getLeafJspFragment();
+
+				leafJspFragment.invoke(null);
 			}
 			else {
-				getNodeJspFragment().invoke(null);
+				JspFragment nodeJspFragment = getNodeJspFragment();
+
+				nodeJspFragment.invoke(null);
 			}
 		}
 		finally {
