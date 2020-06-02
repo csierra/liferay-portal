@@ -15,7 +15,6 @@
 package com.liferay.multi.factor.authentication.web.internal.portlet.action;
 
 import com.liferay.login.web.constants.LoginPortletKeys;
-import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
 import com.liferay.multi.factor.authentication.web.internal.constants.MFAPortletKeys;
 import com.liferay.multi.factor.authentication.web.internal.constants.MFAWebKeys;
 import com.liferay.multi.factor.authentication.web.internal.policy.MFAPolicy;
@@ -107,17 +106,17 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 				AuthenticatedSessionManagerUtil.getAuthenticatedUserId(
 					httpServletRequest, login, password, null);
 
-			MFABrowserChecker mfaBrowserChecker = _getVerifiedMFABrowserChecker(
-				companyId, httpServletRequest, userId);
-
-			if ((userId > 0) && (mfaBrowserChecker == null)) {
-				_redirectToVerify(actionRequest, actionResponse, userId);
+			if (_mfaPolicy.isSatisfied(companyId, httpServletRequest, userId)) {
+				_loginMVCActionCommand.processAction(
+					actionRequest, actionResponse);
 
 				return;
 			}
-		}
 
-		_loginMVCActionCommand.processAction(actionRequest, actionResponse);
+			if (userId > 0) {
+				_redirectToVerify(actionRequest, actionResponse, userId);
+			}
+		}
 	}
 
 	private ActionRequest _getActionRequest(
@@ -208,22 +207,6 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			"returnToFullPageURL", returnToFullPageURL);
 
 		return liferayPortletURL;
-	}
-
-	private MFABrowserChecker _getVerifiedMFABrowserChecker(
-		long companyId, HttpServletRequest httpServletRequest, long userId) {
-
-		for (MFABrowserChecker mfaBrowserChecker :
-				_mfaPolicy.getAvailableMFABrowserCheckers(companyId, userId)) {
-
-			if (mfaBrowserChecker.isBrowserVerified(
-					httpServletRequest, userId)) {
-
-				return mfaBrowserChecker;
-			}
-		}
-
-		return null;
 	}
 
 	private void _redirectToVerify(

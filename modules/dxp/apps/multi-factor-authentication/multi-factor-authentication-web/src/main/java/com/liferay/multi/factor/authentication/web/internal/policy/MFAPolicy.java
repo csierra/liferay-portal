@@ -14,24 +14,29 @@
 
 package com.liferay.multi.factor.authentication.web.internal.policy;
 
+import com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration;
 import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
+import com.liferay.multi.factor.authentication.spi.checker.headless.MFAHeadlessChecker;
 import com.liferay.multi.factor.authentication.web.internal.system.configuration.MFASystemConfiguration;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
-import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marta Medio
@@ -45,6 +50,10 @@ public class MFAPolicy {
 		List<MFABrowserChecker> mfaBrowserCheckers =
 			_mfaBrowserCheckerServiceTrackerMap.getService(companyId);
 
+		if (mfaBrowserCheckers == null) {
+			return Collections.emptyList();
+		}
+
 		Stream<MFABrowserChecker> stream = mfaBrowserCheckers.stream();
 
 		return stream.filter(
@@ -54,15 +63,37 @@ public class MFAPolicy {
 		);
 	}
 
+	public List<MFAHeadlessChecker> getAvailableMFAHeadlessCheckers(
+		long companyId, long userId) {
+
+		List<MFAHeadlessChecker> mfaHeadlessCheckers =
+			_mfaHeadlessCheckerServiceTrackerMap.getService(companyId);
+
+		if (mfaHeadlessCheckers == null) {
+			return Collections.emptyList();
+		}
+
+		Stream<MFAHeadlessChecker> stream = mfaHeadlessCheckers.stream();
+
+		return stream.filter(
+			mfaHeadlessChecker -> mfaHeadlessChecker.isAvailable(userId)
+		).collect(
+			Collectors.toList()
+		);
+	}
+
 	public boolean isMFAEnabled(long companyId) {
 		try {
 			MFASystemConfiguration mfaSystemConfiguration =
-				ConfigurationProviderUtil.getSystemConfiguration(
+				_configurationProvider.getSystemConfiguration(
 					MFASystemConfiguration.class);
 
 			if (!mfaSystemConfiguration.disableGlobally()) {
-				return !ListUtil.isEmpty(
-					_mfaBrowserCheckerServiceTrackerMap.getService(companyId));
+				MFAEmailOTPConfiguration mfaEmailOTPConfiguration =
+					_configurationProvider.getCompanyConfiguration(
+						MFAEmailOTPConfiguration.class, companyId);
+
+				return mfaEmailOTPConfiguration.enabled();
 			}
 
 			return false;
@@ -72,11 +103,42 @@ public class MFAPolicy {
 		}
 	}
 
+	public boolean isSatisfied(
+		long companyId, HttpServletRequest httpServletRequest, long userId) {
+
+		for (MFAHeadlessChecker mfaHeadlessChecker :
+				getAvailableMFAHeadlessCheckers(companyId, userId)) {
+
+			if (mfaHeadlessChecker.verifyHeadlessRequest(
+					httpServletRequest, userId)) {
+
+				return true;
+			}
+		}
+
+		for (MFABrowserChecker mfaBrowserChecker :
+				getAvailableMFABrowserCheckers(companyId, userId)) {
+
+			if (mfaBrowserChecker.isBrowserVerified(
+					httpServletRequest, userId)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_mfaBrowserCheckerServiceTrackerMap =
 			ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, MFABrowserChecker.class, "(companyId=*)",
+				new PropertyServiceReferenceMapper<>("companyId"));
+
+		_mfaHeadlessCheckerServiceTrackerMap =
+			ServiceTrackerMapFactory.openMultiValueMap(
+				bundleContext, MFAHeadlessChecker.class, "(companyId=*)",
 				new PropertyServiceReferenceMapper<>("companyId"));
 	}
 
@@ -85,7 +147,12 @@ public class MFAPolicy {
 		_mfaBrowserCheckerServiceTrackerMap.close();
 	}
 
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+
 	private ServiceTrackerMap<Long, List<MFABrowserChecker>>
 		_mfaBrowserCheckerServiceTrackerMap;
+	private ServiceTrackerMap<Long, List<MFAHeadlessChecker>>
+		_mfaHeadlessCheckerServiceTrackerMap;
 
 }
