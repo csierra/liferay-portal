@@ -17,7 +17,9 @@ package com.liferay.frontend.taglib.clay.servlet.taglib;
 import com.liferay.frontend.taglib.clay.internal.servlet.taglib.BaseContainerTag;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.util.TagResourceBundleUtil;
 
 import java.util.Set;
@@ -256,17 +258,32 @@ public class ButtonTag extends BaseContainerTag {
 		super.processStartTag();
 
 		if (Validator.isNotNull(_icon) || Validator.isNotNull(_label)) {
+			JspWriter jspWriter = pageContext.getOut();
+
 			if (Validator.isNotNull(_icon)) {
-				IconTag iconTag = new IconTag();
+				jspWriter.write("<svg");
+				jspWriter.write(
+					" class=\"lexicon-icon lexicon-icon" + _icon + "\"");
+				jspWriter.write(" role=\"presentation\"");
+				jspWriter.write(" viewBox=\"0 0 512 512\">");
+				jspWriter.write("<use xlink:href=\"");
 
-				iconTag.setSymbol(_icon);
+				ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+					WebKeys.THEME_DISPLAY);
 
-				iconTag.doTag(pageContext);
+				String pathThemeImages = themeDisplay.getPathThemeImages();
+
+				String spritemap = pathThemeImages.concat("/clay/icons.svg");
+
+				jspWriter.write(spritemap);
+
+				jspWriter.write("#");
+				jspWriter.write(_icon);
+				jspWriter.write("\" />");
+				jspWriter.write("</svg>");
 			}
 
 			if (Validator.isNotNull(_label)) {
-				JspWriter jspWriter = pageContext.getOut();
-
 				jspWriter.write(
 					LanguageUtil.get(
 						TagResourceBundleUtil.getResourceBundle(pageContext),
