@@ -26,11 +26,11 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 	scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
-	id = "com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIpAddressConfiguration",
+	id = "com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIPAddressConfiguration",
 	localization = "content/Language",
 	name = "mfa-ip-address-configuration-name"
 )
-public interface MFAIpAddressConfiguration {
+public interface MFAIPAddressConfiguration {
 
 	@Meta.AD(
 		deflt = "false", description = "mfa-ip-address-enabled-description",

@@ -17,7 +17,7 @@ package com.liferay.multi.factor.authentication.ip.address.internal.constants;
 /**
  * @author Marta Medio
  */
-public interface MFAIpAddressEventTypes {
+public interface MFAIPAddressEventTypes {
 
 	public static final String MFA_IP_ADDRESS_VERIFICATION_FAILURE =
 		"MFA_IP_OTP_VERIFICATION_FAILURE";

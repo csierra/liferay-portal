@@ -14,7 +14,7 @@
 
 package com.liferay.multi.factor.authentication.ip.address.internal.settings.definition;
 
-import com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIpAddressConfiguration;
+import com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIPAddressConfiguration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
 
 import org.osgi.service.component.annotations.Component;
@@ -23,15 +23,15 @@ import org.osgi.service.component.annotations.Component;
  * @author Marta Medio
  */
 @Component(
-	property = "mfa.visibility.configuration.pid=com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIpAddressConfiguration",
+	property = "mfa.visibility.configuration.pid=com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIPAddressConfiguration",
 	service = ConfigurationBeanDeclaration.class
 )
-public class MFAIpAddressCompanyConfigurationBeanDeclaration
+public class MFAIPAddressCompanyConfigurationBeanDeclaration
 	implements ConfigurationBeanDeclaration {
 
 	@Override
 	public Class<?> getConfigurationBeanClass() {
-		return MFAIpAddressConfiguration.class;
+		return MFAIPAddressConfiguration.class;
 	}
 
 }

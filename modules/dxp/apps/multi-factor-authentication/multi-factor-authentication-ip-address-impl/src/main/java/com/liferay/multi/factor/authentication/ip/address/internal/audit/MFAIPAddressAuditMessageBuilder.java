@@ -14,7 +14,7 @@
 
 package com.liferay.multi.factor.authentication.ip.address.internal.audit;
 
-import com.liferay.multi.factor.authentication.ip.address.internal.constants.MFAIpAddressEventTypes;
+import com.liferay.multi.factor.authentication.ip.address.internal.constants.MFAIPAddressEventTypes;
 import com.liferay.portal.kernel.audit.AuditException;
 import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.audit.AuditRouter;
@@ -29,14 +29,14 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marta Medio
  */
-@Component(service = MFAIpAddressAuditMessageBuilder.class)
-public class MFAIpAddressAuditMessageBuilder {
+@Component(service = MFAIPAddressAuditMessageBuilder.class)
+public class MFAIPAddressAuditMessageBuilder {
 
 	public AuditMessage buildNonexistentUserVerificationFailureAuditMessage(
 		long companyId, long userId, String checkerClassName) {
 
 		return new AuditMessage(
-			MFAIpAddressEventTypes.MFA_IP_ADDRESS_VERIFICATION_FAILURE,
+			MFAIPAddressEventTypes.MFA_IP_ADDRESS_VERIFICATION_FAILURE,
 			companyId, userId, "Nonexistent", checkerClassName,
 			String.valueOf(userId), null,
 			JSONUtil.put("reason", "Nonexistent User"));
@@ -46,7 +46,7 @@ public class MFAIpAddressAuditMessageBuilder {
 		User user, String checkerClassName, String reason) {
 
 		return new AuditMessage(
-			MFAIpAddressEventTypes.MFA_IP_ADDRESS_VERIFICATION_FAILURE,
+			MFAIPAddressEventTypes.MFA_IP_ADDRESS_VERIFICATION_FAILURE,
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null,
 			JSONUtil.put("reason", reason));
@@ -56,7 +56,7 @@ public class MFAIpAddressAuditMessageBuilder {
 		User user, String checkerClassName) {
 
 		return new AuditMessage(
-			MFAIpAddressEventTypes.MFA_IP_ADDRESS_VERIFICATION_SUCCESS,
+			MFAIPAddressEventTypes.MFA_IP_ADDRESS_VERIFICATION_SUCCESS,
 			user.getCompanyId(), user.getUserId(), user.getFullName(),
 			checkerClassName, String.valueOf(user.getPrimaryKey()), null, null);
 	}
@@ -78,7 +78,7 @@ public class MFAIpAddressAuditMessageBuilder {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		MFAIpAddressAuditMessageBuilder.class);
+		MFAIPAddressAuditMessageBuilder.class);
 
 	@Reference
 	private AuditRouter _auditRouter;

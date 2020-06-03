@@ -14,8 +14,8 @@
 
 package com.liferay.multi.factor.authentication.ip.address.internal.checker;
 
-import com.liferay.multi.factor.authentication.ip.address.internal.audit.MFAIpAddressAuditMessageBuilder;
-import com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIpAddressConfiguration;
+import com.liferay.multi.factor.authentication.ip.address.internal.audit.MFAIPAddressAuditMessageBuilder;
+import com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIPAddressConfiguration;
 import com.liferay.multi.factor.authentication.spi.checker.headless.HeadlessMFAChecker;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.audit.AuditMessage;
@@ -47,7 +47,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
  * @author Marta Medio
  */
 @Component(
-	configurationPid = "com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIpAddressConfiguration.scoped",
+	configurationPid = "com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIPAddressConfiguration.scoped",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, service = {}
 )
 public class IPAddressHeadlessMFAChecker implements HeadlessMFAChecker {
@@ -66,7 +66,7 @@ public class IPAddressHeadlessMFAChecker implements HeadlessMFAChecker {
 			}
 
 			_routeAuditMessage(
-				_mfaIpAddressAuditMessageBuilder.
+				_mfaIPAddressAuditMessageBuilder.
 					buildNonexistentUserVerificationFailureAuditMessage(
 						CompanyThreadLocal.getCompanyId(), userId,
 						_getClassName()));
@@ -78,7 +78,7 @@ public class IPAddressHeadlessMFAChecker implements HeadlessMFAChecker {
 				httpServletRequest, _allowedIpAddressesAndNetmasks)) {
 
 			_routeAuditMessage(
-				_mfaIpAddressAuditMessageBuilder.
+				_mfaIPAddressAuditMessageBuilder.
 					buildVerificationSuccessAuditMessage(
 						user, _getClassName()));
 
@@ -86,7 +86,7 @@ public class IPAddressHeadlessMFAChecker implements HeadlessMFAChecker {
 		}
 
 		_routeAuditMessage(
-			_mfaIpAddressAuditMessageBuilder.
+			_mfaIPAddressAuditMessageBuilder.
 				buildVerificationFailureAuditMessage(
 					user, _getClassName(), "Ip not allowed"));
 
@@ -97,9 +97,9 @@ public class IPAddressHeadlessMFAChecker implements HeadlessMFAChecker {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		MFAIpAddressConfiguration mfaIpAddressConfiguration =
+		MFAIPAddressConfiguration mfaIpAddressConfiguration =
 			ConfigurableUtil.createConfigurable(
-				MFAIpAddressConfiguration.class, properties);
+				MFAIPAddressConfiguration.class, properties);
 
 		if (!mfaIpAddressConfiguration.enabled()) {
 			return;
@@ -130,8 +130,8 @@ public class IPAddressHeadlessMFAChecker implements HeadlessMFAChecker {
 	}
 
 	private void _routeAuditMessage(AuditMessage auditMessage) {
-		if (_mfaIpAddressAuditMessageBuilder != null) {
-			_mfaIpAddressAuditMessageBuilder.routeAuditMessage(auditMessage);
+		if (_mfaIPAddressAuditMessageBuilder != null) {
+			_mfaIPAddressAuditMessageBuilder.routeAuditMessage(auditMessage);
 		}
 	}
 
@@ -141,7 +141,7 @@ public class IPAddressHeadlessMFAChecker implements HeadlessMFAChecker {
 	private Set<String> _allowedIpAddressesAndNetmasks;
 
 	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
-	private MFAIpAddressAuditMessageBuilder _mfaIpAddressAuditMessageBuilder;
+	private MFAIPAddressAuditMessageBuilder _mfaIPAddressAuditMessageBuilder;
 
 	private ServiceRegistration<HeadlessMFAChecker> _serviceRegistration;
 
