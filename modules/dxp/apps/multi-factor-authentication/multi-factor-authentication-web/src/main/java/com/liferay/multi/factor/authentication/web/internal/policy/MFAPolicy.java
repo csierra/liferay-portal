@@ -147,11 +147,12 @@ public class MFAPolicy {
 		_browserMFACheckerServiceTrackerMap.close();
 	}
 
+	private ServiceTrackerMap<Long, List<BrowserMFAChecker>>
+		_browserMFACheckerServiceTrackerMap;
+
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 
-	private ServiceTrackerMap<Long, List<BrowserMFAChecker>>
-		_browserMFACheckerServiceTrackerMap;
 	private ServiceTrackerMap<Long, List<HeadlessMFAChecker>>
 		_headlessMFACheckerServiceTrackerMap;
 
