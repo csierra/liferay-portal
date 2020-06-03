@@ -19,9 +19,9 @@
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
-BrowserMFAChecker browserMFAChecker = (BrowserMFAChecker)request.getAttribute(MFAWebKeys.MFA_BROWSER_CHECKER);
-String browserMFACheckerName = (String)request.getAttribute(MFAWebKeys.MFA_BROWSER_CHECKER_NAME);
-List<BrowserMFAChecker> browserMFACheckers = (List<BrowserMFAChecker>)request.getAttribute(MFAWebKeys.MFA_BROWSER_CHECKERS);
+BrowserMFAChecker browserMFAChecker = (BrowserMFAChecker)request.getAttribute(MFAWebKeys.BROWSER_MFA_CHECKER);
+String browserMFACheckerName = (String)request.getAttribute(MFAWebKeys.BROWSER_MFA_CHECKER_NAME);
+List<BrowserMFAChecker> browserMFACheckers = (List<BrowserMFAChecker>)request.getAttribute(MFAWebKeys.BROWSER_MFA_CHECKERS);
 long mfaUserId = (Long)request.getAttribute(MFAWebKeys.MFA_USER_ID);
 
 int mfaCheckerIndex = ParamUtil.getInteger(request, "mfaCheckerIndex");

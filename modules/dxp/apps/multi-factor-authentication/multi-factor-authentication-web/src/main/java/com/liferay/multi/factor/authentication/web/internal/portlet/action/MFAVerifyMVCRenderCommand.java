@@ -91,12 +91,12 @@ public class MFAVerifyMVCRenderCommand implements MVCRenderCommand {
 			WebKeys.THEME_DISPLAY);
 
 		renderRequest.setAttribute(
-			MFAWebKeys.MFA_BROWSER_CHECKER, browserMFAChecker);
+			MFAWebKeys.BROWSER_MFA_CHECKER, browserMFAChecker);
 		renderRequest.setAttribute(
-			MFAWebKeys.MFA_BROWSER_CHECKER_NAME,
+			MFAWebKeys.BROWSER_MFA_CHECKER_NAME,
 			_getMFACheckerName(themeDisplay.getLocale(), browserMFAChecker));
 		renderRequest.setAttribute(
-			MFAWebKeys.MFA_BROWSER_CHECKERS, browserMFACheckers);
+			MFAWebKeys.BROWSER_MFA_CHECKERS, browserMFACheckers);
 		renderRequest.setAttribute(MFAWebKeys.MFA_USER_ID, mfaUserId);
 
 		return "/mfa_verify/verify.jsp";
