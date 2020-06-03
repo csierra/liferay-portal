@@ -50,7 +50,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 	configurationPid = "com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIpAddressConfiguration.scoped",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, service = {}
 )
-public class MFAIpAddressMFAHeadlessChecker implements HeadlessMFAChecker {
+public class IPAddressHeadlessMFAChecker implements HeadlessMFAChecker {
 
 	@Override
 	public boolean verifyHeadlessRequest(
@@ -136,7 +136,7 @@ public class MFAIpAddressMFAHeadlessChecker implements HeadlessMFAChecker {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		MFAIpAddressMFAHeadlessChecker.class);
+		IPAddressHeadlessMFAChecker.class);
 
 	private Set<String> _allowedIpAddressesAndNetmasks;
 
