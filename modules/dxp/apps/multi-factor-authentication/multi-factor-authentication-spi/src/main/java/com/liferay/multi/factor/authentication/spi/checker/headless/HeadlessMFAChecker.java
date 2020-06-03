@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Tomas Polesovsky
  * @author Marta Medio
  */
-public interface MFAHeadlessChecker extends MFAChecker {
+public interface HeadlessMFAChecker extends MFAChecker {
 
 	public boolean verifyHeadlessRequest(
 		HttpServletRequest httpServletRequest, long userId);

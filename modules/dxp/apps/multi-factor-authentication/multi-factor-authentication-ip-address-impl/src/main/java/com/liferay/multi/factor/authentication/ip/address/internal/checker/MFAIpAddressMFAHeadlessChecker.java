@@ -16,7 +16,7 @@ package com.liferay.multi.factor.authentication.ip.address.internal.checker;
 
 import com.liferay.multi.factor.authentication.ip.address.internal.audit.MFAIpAddressAuditMessageBuilder;
 import com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIpAddressConfiguration;
-import com.liferay.multi.factor.authentication.spi.checker.headless.MFAHeadlessChecker;
+import com.liferay.multi.factor.authentication.spi.checker.headless.HeadlessMFAChecker;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.log.Log;
@@ -50,7 +50,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 	configurationPid = "com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIpAddressConfiguration.scoped",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, service = {}
 )
-public class MFAIpAddressMFAHeadlessChecker implements MFAHeadlessChecker {
+public class MFAIpAddressMFAHeadlessChecker implements HeadlessMFAChecker {
 
 	@Override
 	public boolean verifyHeadlessRequest(
@@ -110,7 +110,7 @@ public class MFAIpAddressMFAHeadlessChecker implements MFAHeadlessChecker {
 				mfaIpAddressConfiguration.allowedIpAddressAndNetMask()));
 
 		_serviceRegistration = bundleContext.registerService(
-			MFAHeadlessChecker.class, this,
+			HeadlessMFAChecker.class, this,
 			new HashMapDictionary<>(properties));
 	}
 
@@ -143,7 +143,7 @@ public class MFAIpAddressMFAHeadlessChecker implements MFAHeadlessChecker {
 	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
 	private MFAIpAddressAuditMessageBuilder _mfaIpAddressAuditMessageBuilder;
 
-	private ServiceRegistration<MFAHeadlessChecker> _serviceRegistration;
+	private ServiceRegistration<HeadlessMFAChecker> _serviceRegistration;
 
 	@Reference
 	private UserLocalService _userLocalService;
