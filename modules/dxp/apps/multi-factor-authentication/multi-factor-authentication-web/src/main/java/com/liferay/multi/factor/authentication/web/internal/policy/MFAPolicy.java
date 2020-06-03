@@ -44,11 +44,11 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = MFAPolicy.class)
 public class MFAPolicy {
 
-	public List<BrowserMFAChecker> getAvailableMFABrowserCheckers(
+	public List<BrowserMFAChecker> getAvailableBrowserMFACheckers(
 		long companyId, long userId) {
 
 		List<BrowserMFAChecker> browserMFACheckers =
-			_mfaBrowserCheckerServiceTrackerMap.getService(companyId);
+			_browserMFACheckerServiceTrackerMap.getService(companyId);
 
 		if (browserMFACheckers == null) {
 			return Collections.emptyList();
@@ -57,17 +57,17 @@ public class MFAPolicy {
 		Stream<BrowserMFAChecker> stream = browserMFACheckers.stream();
 
 		return stream.filter(
-			mfaBrowserChecker -> mfaBrowserChecker.isAvailable(userId)
+			browserMFAChecker -> browserMFAChecker.isAvailable(userId)
 		).collect(
 			Collectors.toList()
 		);
 	}
 
-	public List<HeadlessMFAChecker> getAvailableMFAHeadlessCheckers(
+	public List<HeadlessMFAChecker> getAvailableHeadlessMFACheckers(
 		long companyId, long userId) {
 
 		List<HeadlessMFAChecker> headlessMFACheckers =
-			_mfaHeadlessCheckerServiceTrackerMap.getService(companyId);
+			_headlessMFACheckerServiceTrackerMap.getService(companyId);
 
 		if (headlessMFACheckers == null) {
 			return Collections.emptyList();
@@ -107,7 +107,7 @@ public class MFAPolicy {
 		long companyId, HttpServletRequest httpServletRequest, long userId) {
 
 		for (HeadlessMFAChecker headlessMFAChecker :
-				getAvailableMFAHeadlessCheckers(companyId, userId)) {
+				getAvailableHeadlessMFACheckers(companyId, userId)) {
 
 			if (headlessMFAChecker.verifyHeadlessRequest(
 					httpServletRequest, userId)) {
@@ -117,7 +117,7 @@ public class MFAPolicy {
 		}
 
 		for (BrowserMFAChecker browserMFAChecker :
-				getAvailableMFABrowserCheckers(companyId, userId)) {
+				getAvailableBrowserMFACheckers(companyId, userId)) {
 
 			if (browserMFAChecker.isBrowserVerified(
 					httpServletRequest, userId)) {
@@ -131,12 +131,12 @@ public class MFAPolicy {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_mfaBrowserCheckerServiceTrackerMap =
+		_browserMFACheckerServiceTrackerMap =
 			ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, BrowserMFAChecker.class, "(companyId=*)",
 				new PropertyServiceReferenceMapper<>("companyId"));
 
-		_mfaHeadlessCheckerServiceTrackerMap =
+		_headlessMFACheckerServiceTrackerMap =
 			ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, HeadlessMFAChecker.class, "(companyId=*)",
 				new PropertyServiceReferenceMapper<>("companyId"));
@@ -144,15 +144,15 @@ public class MFAPolicy {
 
 	@Deactivate
 	protected void deactivate() {
-		_mfaBrowserCheckerServiceTrackerMap.close();
+		_browserMFACheckerServiceTrackerMap.close();
 	}
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 
 	private ServiceTrackerMap<Long, List<BrowserMFAChecker>>
-		_mfaBrowserCheckerServiceTrackerMap;
+		_browserMFACheckerServiceTrackerMap;
 	private ServiceTrackerMap<Long, List<HeadlessMFAChecker>>
-		_mfaHeadlessCheckerServiceTrackerMap;
+		_headlessMFACheckerServiceTrackerMap;
 
 }

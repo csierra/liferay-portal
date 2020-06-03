@@ -70,7 +70,7 @@ public class MFAVerifyMVCRenderCommand implements MVCRenderCommand {
 		}
 
 		List<BrowserMFAChecker> browserMFACheckers =
-			_mfaPolicy.getAvailableMFABrowserCheckers(
+			_mfaPolicy.getAvailableBrowserMFACheckers(
 				_portal.getCompanyId(renderRequest), mfaUserId);
 
 		int mfaCheckerIndex = ParamUtil.getInteger(
