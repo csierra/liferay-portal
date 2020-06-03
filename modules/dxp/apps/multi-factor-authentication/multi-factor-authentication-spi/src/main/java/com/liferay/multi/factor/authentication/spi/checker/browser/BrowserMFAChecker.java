@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Tomas Polesovsky
  * @author Marta Medio
  */
-public interface MFABrowserChecker extends MFAChecker {
+public interface BrowserMFAChecker extends MFAChecker {
 
 	public void includeBrowserVerification(
 			HttpServletRequest httpServletRequest,

@@ -14,7 +14,7 @@
 
 package com.liferay.multi.factor.authentication.web.internal.portlet.action;
 
-import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
+import com.liferay.multi.factor.authentication.spi.checker.browser.BrowserMFAChecker;
 import com.liferay.multi.factor.authentication.web.internal.constants.MFAPortletKeys;
 import com.liferay.multi.factor.authentication.web.internal.constants.MFAWebKeys;
 import com.liferay.multi.factor.authentication.web.internal.policy.MFAPolicy;
@@ -68,26 +68,26 @@ public class MFAVerifyMVCActionCommand extends BaseMVCActionCommand {
 			return;
 		}
 
-		List<MFABrowserChecker> mfaBrowserCheckers =
+		List<BrowserMFAChecker> browserMFACheckers =
 			_mfaPolicy.getAvailableMFABrowserCheckers(
 				_portal.getCompanyId(actionRequest), mfaUserId);
 
 		int mfaCheckerIndex = ParamUtil.getInteger(
 			actionRequest, "mfaCheckerIndex");
 
-		MFABrowserChecker mfaBrowserChecker = null;
+		BrowserMFAChecker browserMFAChecker = null;
 
 		if ((mfaCheckerIndex > -1) &&
-			(mfaCheckerIndex < mfaBrowserCheckers.size())) {
+			(mfaCheckerIndex < browserMFACheckers.size())) {
 
-			mfaBrowserChecker = mfaBrowserCheckers.get(mfaCheckerIndex);
+			browserMFAChecker = browserMFACheckers.get(mfaCheckerIndex);
 		}
 		else {
-			mfaBrowserChecker = mfaBrowserCheckers.get(0);
+			browserMFAChecker = browserMFACheckers.get(0);
 		}
 
 		try {
-			if (!mfaBrowserChecker.verifyBrowserRequest(
+			if (!browserMFAChecker.verifyBrowserRequest(
 					_portal.getHttpServletRequest(actionRequest),
 					_portal.getHttpServletResponse(actionResponse),
 					mfaUserId)) {

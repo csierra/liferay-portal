@@ -14,7 +14,7 @@
 
 package com.liferay.multi.factor.authentication.web.internal.portlet.action;
 
-import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
+import com.liferay.multi.factor.authentication.spi.checker.browser.BrowserMFAChecker;
 import com.liferay.multi.factor.authentication.web.internal.constants.MFAPortletKeys;
 import com.liferay.multi.factor.authentication.web.internal.constants.MFAWebKeys;
 import com.liferay.multi.factor.authentication.web.internal.policy.MFAPolicy;
@@ -69,43 +69,43 @@ public class MFAVerifyMVCRenderCommand implements MVCRenderCommand {
 			return "/error.jsp";
 		}
 
-		List<MFABrowserChecker> mfaBrowserCheckers =
+		List<BrowserMFAChecker> browserMFACheckers =
 			_mfaPolicy.getAvailableMFABrowserCheckers(
 				_portal.getCompanyId(renderRequest), mfaUserId);
 
 		int mfaCheckerIndex = ParamUtil.getInteger(
 			renderRequest, "mfaCheckerIndex");
 
-		MFABrowserChecker mfaBrowserChecker = null;
+		BrowserMFAChecker browserMFAChecker = null;
 
 		if ((mfaCheckerIndex > -1) &&
-			(mfaCheckerIndex < mfaBrowserCheckers.size())) {
+			(mfaCheckerIndex < browserMFACheckers.size())) {
 
-			mfaBrowserChecker = mfaBrowserCheckers.get(mfaCheckerIndex);
+			browserMFAChecker = browserMFACheckers.get(mfaCheckerIndex);
 		}
 		else {
-			mfaBrowserChecker = mfaBrowserCheckers.get(0);
+			browserMFAChecker = browserMFACheckers.get(0);
 		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		renderRequest.setAttribute(
-			MFAWebKeys.MFA_BROWSER_CHECKER, mfaBrowserChecker);
+			MFAWebKeys.MFA_BROWSER_CHECKER, browserMFAChecker);
 		renderRequest.setAttribute(
 			MFAWebKeys.MFA_BROWSER_CHECKER_NAME,
-			_getMFACheckerName(themeDisplay.getLocale(), mfaBrowserChecker));
+			_getMFACheckerName(themeDisplay.getLocale(), browserMFAChecker));
 		renderRequest.setAttribute(
-			MFAWebKeys.MFA_BROWSER_CHECKERS, mfaBrowserCheckers);
+			MFAWebKeys.MFA_BROWSER_CHECKERS, browserMFACheckers);
 		renderRequest.setAttribute(MFAWebKeys.MFA_USER_ID, mfaUserId);
 
 		return "/mfa_verify/verify.jsp";
 	}
 
 	private String _getMFACheckerName(
-		Locale locale, MFABrowserChecker mfaBrowserChecker) {
+		Locale locale, BrowserMFAChecker browserMFAChecker) {
 
-		Class<? extends MFABrowserChecker> clazz = mfaBrowserChecker.getClass();
+		Class<? extends BrowserMFAChecker> clazz = browserMFAChecker.getClass();
 
 		Bundle bundle = FrameworkUtil.getBundle(clazz);
 

@@ -15,7 +15,7 @@
 package com.liferay.multi.factor.authentication.web.internal.policy;
 
 import com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration;
-import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
+import com.liferay.multi.factor.authentication.spi.checker.browser.BrowserMFAChecker;
 import com.liferay.multi.factor.authentication.spi.checker.headless.MFAHeadlessChecker;
 import com.liferay.multi.factor.authentication.web.internal.system.configuration.MFASystemConfiguration;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
@@ -44,17 +44,17 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = MFAPolicy.class)
 public class MFAPolicy {
 
-	public List<MFABrowserChecker> getAvailableMFABrowserCheckers(
+	public List<BrowserMFAChecker> getAvailableMFABrowserCheckers(
 		long companyId, long userId) {
 
-		List<MFABrowserChecker> mfaBrowserCheckers =
+		List<BrowserMFAChecker> browserMFACheckers =
 			_mfaBrowserCheckerServiceTrackerMap.getService(companyId);
 
-		if (mfaBrowserCheckers == null) {
+		if (browserMFACheckers == null) {
 			return Collections.emptyList();
 		}
 
-		Stream<MFABrowserChecker> stream = mfaBrowserCheckers.stream();
+		Stream<BrowserMFAChecker> stream = browserMFACheckers.stream();
 
 		return stream.filter(
 			mfaBrowserChecker -> mfaBrowserChecker.isAvailable(userId)
@@ -116,10 +116,10 @@ public class MFAPolicy {
 			}
 		}
 
-		for (MFABrowserChecker mfaBrowserChecker :
+		for (BrowserMFAChecker browserMFAChecker :
 				getAvailableMFABrowserCheckers(companyId, userId)) {
 
-			if (mfaBrowserChecker.isBrowserVerified(
+			if (browserMFAChecker.isBrowserVerified(
 					httpServletRequest, userId)) {
 
 				return true;
@@ -133,7 +133,7 @@ public class MFAPolicy {
 	protected void activate(BundleContext bundleContext) {
 		_mfaBrowserCheckerServiceTrackerMap =
 			ServiceTrackerMapFactory.openMultiValueMap(
-				bundleContext, MFABrowserChecker.class, "(companyId=*)",
+				bundleContext, BrowserMFAChecker.class, "(companyId=*)",
 				new PropertyServiceReferenceMapper<>("companyId"));
 
 		_mfaHeadlessCheckerServiceTrackerMap =
@@ -150,7 +150,7 @@ public class MFAPolicy {
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 
-	private ServiceTrackerMap<Long, List<MFABrowserChecker>>
+	private ServiceTrackerMap<Long, List<BrowserMFAChecker>>
 		_mfaBrowserCheckerServiceTrackerMap;
 	private ServiceTrackerMap<Long, List<MFAHeadlessChecker>>
 		_mfaHeadlessCheckerServiceTrackerMap;

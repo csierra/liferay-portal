@@ -23,7 +23,7 @@ taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page import="com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker" %><%@
+<%@ page import="com.liferay.multi.factor.authentication.spi.checker.browser.BrowserMFAChecker" %><%@
 page import="com.liferay.multi.factor.authentication.web.internal.constants.MFAWebKeys" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %>

@@ -19,7 +19,7 @@ import com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTPEntry;
 import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPEntryLocalService;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.audit.MFAEmailOTPAuditMessageBuilder;
 import com.liferay.multi.factor.authentication.email.otp.web.internal.constants.MFAEmailOTPWebKeys;
-import com.liferay.multi.factor.authentication.spi.checker.browser.MFABrowserChecker;
+import com.liferay.multi.factor.authentication.spi.checker.browser.BrowserMFAChecker;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.log.Log;
@@ -60,9 +60,9 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 @Component(
 	configurationPid = "com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration.scoped",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL,
-	service = MFABrowserChecker.class
+	service = BrowserMFAChecker.class
 )
-public class MFAEmailOTPMFABrowserChecker implements MFABrowserChecker {
+public class MFAEmailOTPMFABrowserChecker implements BrowserMFAChecker {
 
 	@Override
 	public void includeBrowserVerification(
