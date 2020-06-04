@@ -10,6 +10,11 @@
 	<tlib-version>1.0</tlib-version>
 	<short-name>liferay-ratings</short-name>
 	<uri>http://liferay.com/tld/ratings</uri>
+	<tag-file>
+		<name>ratings</name>
+		<path>/META-INF/tags/ratings.tag</path>
+	</tag-file>
+	<!--
 	<tag>
 		<description>Creates a ratings component.</description>
 		<name>ratings</name>
@@ -56,4 +61,5 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
+-->
 </taglib>

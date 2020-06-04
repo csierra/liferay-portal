@@ -4,3 +4,5 @@ Bundle-Version: 5.0.18
 Liferay-JS-Config: /META-INF/resources/blogs/js/config.js
 Web-ContextPath: /blogs-web
 -dsannotations-options: inherit
+Require-Capability:\
+	osgi.extender;filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/react))"
