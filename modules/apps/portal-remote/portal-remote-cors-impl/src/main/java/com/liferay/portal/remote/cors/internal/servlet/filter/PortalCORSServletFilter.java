@@ -285,7 +285,7 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 
 		Set<String> addedPatterns = new HashSet<>();
 
-		for (int i = corsFactoryConfigurations.size() - 1; i > -1; ++i) {
+		for (int i = corsFactoryConfigurations.size() - 1; i > -1; --i) {
 			CORSFactoryConfiguration corsFactoryConfiguration =
 				corsFactoryConfigurations.get(i);
 
@@ -303,7 +303,7 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 		corsFactoryConfigurations =
 			systemCORSFactoryConfigurationStore.getCORSFactoryConfigurations();
 
-		for (int i = corsFactoryConfigurations.size() - 1; i > -1; ++i) {
+		for (int i = corsFactoryConfigurations.size() - 1; i > -1; --i) {
 			CORSFactoryConfiguration corsFactoryConfiguration =
 				corsFactoryConfigurations.get(i);
 
