@@ -279,47 +279,42 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 			_pathPatternMatchers.computeIfAbsent(
 				companyId, cid -> new DynamicPathPatternMatcher<>());
 
-		List<CORSFactoryConfiguration> corsFactoryConfigurations =
-			instanceCORSFactoryConfigurationStore.
-				getCORSFactoryConfigurations();
-
 		Set<String> addedPatterns = new HashSet<>();
 
-		for (int i = corsFactoryConfigurations.size() - 1; i > -1; --i) {
-			CORSFactoryConfiguration corsFactoryConfiguration =
-				corsFactoryConfigurations.get(i);
+		_insertPatternMatcher(
+			pathPatternMatcher,
+			instanceCORSFactoryConfigurationStore.
+				getCORSFactoryConfigurations(),
+			addedPatterns);
 
-			for (String pattern : corsFactoryConfiguration._pathPatterns) {
-				if (addedPatterns.contains(pattern)) {
-					continue;
-				}
-
-				pathPatternMatcher.insert(
-					pattern, corsFactoryConfiguration._corsHeaders);
-				addedPatterns.add(pattern);
-			}
-		}
-
-		corsFactoryConfigurations =
-			systemCORSFactoryConfigurationStore.getCORSFactoryConfigurations();
-
-		for (int i = corsFactoryConfigurations.size() - 1; i > -1; --i) {
-			CORSFactoryConfiguration corsFactoryConfiguration =
-				corsFactoryConfigurations.get(i);
-
-			for (String pattern : corsFactoryConfiguration._pathPatterns) {
-				if (addedPatterns.contains(pattern)) {
-					continue;
-				}
-
-				pathPatternMatcher.insert(
-					pattern, corsFactoryConfiguration._corsHeaders);
-				addedPatterns.add(pattern);
-			}
-		}
+		_insertPatternMatcher(
+			pathPatternMatcher,
+			systemCORSFactoryConfigurationStore.getCORSFactoryConfigurations(),
+			addedPatterns);
 	}
 
 	protected final CORSSupport corsSupport = new CORSSupport();
+
+	private void _insertPatternMatcher(
+		PathPatternMatcher<Map<String, String>> pathPatternMatcher,
+		List<CORSFactoryConfiguration> corsFactoryConfigurations,
+		Set<String> alreadyExistingPatterns) {
+
+		for (int i = corsFactoryConfigurations.size() - 1; i > -1; --i) {
+			CORSFactoryConfiguration corsFactoryConfiguration =
+				corsFactoryConfigurations.get(i);
+
+			for (String pattern : corsFactoryConfiguration._pathPatterns) {
+				if (alreadyExistingPatterns.contains(pattern)) {
+					continue;
+				}
+
+				pathPatternMatcher.insert(
+					pattern, corsFactoryConfiguration._corsHeaders);
+				alreadyExistingPatterns.add(pattern);
+			}
+		}
+	}
 
 	private void _updatePatternMatcher(
 		long companyId,
@@ -354,12 +349,12 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 	@Reference
 	private Http _http;
 
-	@Reference
-	private Portal _portal;
-
 	private final Map<Long, PathPatternMatcher<Map<String, String>>>
 		_pathPatternMatchers = new HashMap<>(16);
 	private final Map<String, Long> _pidToCompany = new HashMap<>(16);
+
+	@Reference
+	private Portal _portal;
 
 	private class CORSFactoryConfiguration {
 
