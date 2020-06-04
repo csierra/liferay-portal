@@ -356,7 +356,7 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 	@Reference
 	private Portal _portal;
 
-	private class CORSFactoryConfiguration {
+	private static class CORSFactoryConfiguration {
 
 		public CORSFactoryConfiguration(
 			String[] pathPatterns, Map<String, String> corsHeaders) {
@@ -373,7 +373,7 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 
 	}
 
-	private class CORSFactoryConfigurationStore {
+	private static class CORSFactoryConfigurationStore {
 
 		public CORSFactoryConfigurationStore() {
 			_pidIndexes = new HashMap<>();
