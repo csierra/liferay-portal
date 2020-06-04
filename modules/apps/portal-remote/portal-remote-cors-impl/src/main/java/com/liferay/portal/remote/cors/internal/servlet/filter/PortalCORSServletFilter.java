@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
@@ -31,6 +32,7 @@ import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternM
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -215,9 +217,9 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 			HttpServletResponse httpServletResponse, FilterChain filterChain)
 		throws Exception {
 
-		Long companyId = (Long)httpServletRequest.getAttribute("COMPANY_ID");
+		long companyId = _portal.getCompanyId(httpServletRequest);
 
-		if ((companyId == null) || (companyId == 0)) {
+		if (companyId == 0) {
 			return;
 		}
 
@@ -350,6 +352,9 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 	@Reference
 	private Http _http;
 
+	@Reference
+	private Portal _portal;
+
 	private final Map<Long, PathPatternMatcher<Map<String, String>>>
 		_pathPatternMatchers = new HashMap<>(16);
 	private final Map<String, Long> _pidToCompany = new HashMap<>(16);
@@ -361,9 +366,7 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 
 			_pathPatterns = new HashSet<>(pathPatterns.length);
 
-			for (String pattern : pathPatterns) {
-				_pathPatterns.add(pattern);
-			}
+			Collections.addAll(_pathPatterns, pathPatterns);
 
 			_corsHeaders = corsHeaders;
 		}
