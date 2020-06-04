@@ -234,6 +234,8 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 			pathPatternMatcher = _pathPatternMatchers.get((long)0);
 
 			if (pathPatternMatcher == null) {
+				filterChain.doFilter(httpServletRequest, httpServletResponse);
+
 				return;
 			}
 		}
