@@ -19,6 +19,7 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -50,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -83,26 +85,7 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 			corsFactoryConfigurationStore.removeCORSFactoryConfiguration(pid);
 		}
 
-		if (companyId != CompanyConstants.SYSTEM) {
-			setPathPatternMatcher(
-				_corsFactoryConfigurationStores.get(CompanyConstants.SYSTEM),
-				corsFactoryConfigurationStore, companyId);
-
-			return;
-		}
-
-		setPathPatternMatcher(corsFactoryConfigurationStore, null, companyId);
-
-		for (long existingCompanyId : _pathPatternMatchers.keySet()) {
-			if (existingCompanyId == 0) {
-				continue;
-			}
-
-			setPathPatternMatcher(
-				corsFactoryConfigurationStore,
-				_corsFactoryConfigurationStores.get(existingCompanyId),
-				existingCompanyId);
-		}
+		_updatePatternMatcher(companyId, corsFactoryConfigurationStore);
 	}
 
 	@Override
@@ -183,26 +166,35 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 		corsFactoryConfigurationStore.setCORSFactoryConfiguration(
 			pid, corsFactoryConfiguration);
 
-		if (companyId != CompanyConstants.SYSTEM) {
-			setPathPatternMatcher(
-				_corsFactoryConfigurationStores.get(CompanyConstants.SYSTEM),
-				corsFactoryConfigurationStore, companyId);
+		_updatePatternMatcher(companyId, corsFactoryConfigurationStore);
+	}
 
-			return;
-		}
+	@Activate
+	protected void activate() {
+		PortalCORSConfiguration portalCORSConfiguration =
+			ConfigurableUtil.createConfigurable(
+				PortalCORSConfiguration.class, new HashMapDictionary<>());
 
-		setPathPatternMatcher(corsFactoryConfigurationStore, null, companyId);
+		Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+			portalCORSConfiguration.headers());
 
-		for (long existingCompanyId : _pathPatternMatchers.keySet()) {
-			if (existingCompanyId == 0) {
-				continue;
-			}
+		String[] urlPathPatterns =
+			portalCORSConfiguration.filterMappingURLPatterns();
 
-			setPathPatternMatcher(
-				corsFactoryConfigurationStore,
-				_corsFactoryConfigurationStores.get(existingCompanyId),
-				existingCompanyId);
-		}
+		CORSFactoryConfiguration corsFactoryConfiguration =
+			new CORSFactoryConfiguration(urlPathPatterns, corsHeaders);
+
+		CORSFactoryConfigurationStore corsFactoryConfigurationStore =
+			new CORSFactoryConfigurationStore();
+
+		_corsFactoryConfigurationStores.put(
+			CompanyConstants.SYSTEM, corsFactoryConfigurationStore);
+
+		corsFactoryConfigurationStore.setCORSFactoryConfiguration(
+			"default", corsFactoryConfiguration);
+
+		_updatePatternMatcher(
+			CompanyConstants.SYSTEM, corsFactoryConfigurationStore);
 	}
 
 	protected String getURI(HttpServletRequest httpServletRequest) {
@@ -328,6 +320,32 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 	}
 
 	protected final CORSSupport corsSupport = new CORSSupport();
+
+	private void _updatePatternMatcher(
+		long companyId,
+		CORSFactoryConfigurationStore corsFactoryConfigurationStore) {
+
+		if (companyId != CompanyConstants.SYSTEM) {
+			setPathPatternMatcher(
+				_corsFactoryConfigurationStores.get(CompanyConstants.SYSTEM),
+				corsFactoryConfigurationStore, companyId);
+
+			return;
+		}
+
+		setPathPatternMatcher(corsFactoryConfigurationStore, null, companyId);
+
+		for (long existingCompanyId : _pathPatternMatchers.keySet()) {
+			if (existingCompanyId == 0) {
+				continue;
+			}
+
+			setPathPatternMatcher(
+				corsFactoryConfigurationStore,
+				_corsFactoryConfigurationStores.get(existingCompanyId),
+				existingCompanyId);
+		}
+	}
 
 	private String _contextPath;
 	private final Map<Long, CORSFactoryConfigurationStore>
