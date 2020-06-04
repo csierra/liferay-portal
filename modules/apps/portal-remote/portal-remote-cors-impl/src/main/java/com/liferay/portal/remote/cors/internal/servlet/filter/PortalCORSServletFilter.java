@@ -272,12 +272,8 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 		long companyId) {
 
 		PathPatternMatcher<Map<String, String>> pathPatternMatcher =
-			_pathPatternMatchers.get(companyId);
-
-		if (pathPatternMatcher == null) {
-			_pathPatternMatchers.put(
-				companyId, new DynamicPathPatternMatcher<>());
-		}
+			_pathPatternMatchers.computeIfAbsent(
+				companyId, cid -> new DynamicPathPatternMatcher<>());
 
 		List<CORSFactoryConfiguration> corsFactoryConfigurations =
 			instanceCORSFactoryConfigurationStore.
