@@ -15,12 +15,14 @@
 package com.liferay.portal.remote.cors.internal.servlet.filter;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.DynamicPathPatternMatcher;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcher;
@@ -152,11 +154,15 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 
 		_pidToCompany.put(pid, companyId);
 
-		Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
-			(String[])properties.get("headers"));
+		PortalCORSConfiguration portalCORSConfiguration =
+			ConfigurableUtil.createConfigurable(
+				PortalCORSConfiguration.class, properties);
 
-		String[] urlPathPatterns = (String[])properties.get(
-			"filter.mapping.url.pattern");
+		Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+			portalCORSConfiguration.headers());
+
+		String[] urlPathPatterns =
+			portalCORSConfiguration.filterMappingURLPatterns();
 
 		CORSFactoryConfiguration corsFactoryConfiguration =
 			new CORSFactoryConfiguration(urlPathPatterns, corsHeaders);
