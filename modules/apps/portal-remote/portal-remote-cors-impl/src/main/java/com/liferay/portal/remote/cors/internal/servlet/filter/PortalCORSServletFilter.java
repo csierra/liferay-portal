@@ -243,7 +243,9 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 		List<Map<String, String>> headersList = pathPatternMatcher.getCargoList(
 			getURI(httpServletRequest));
 
-		corsSupport.setCORSHeaders(headersList.get(0));
+		if (headersList != null) {
+			corsSupport.setCORSHeaders(headersList.get(0));
+		}
 
 		if (StringUtil.equals(
 				HttpMethods.OPTIONS, httpServletRequest.getMethod())) {
@@ -281,11 +283,13 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 
 		Set<String> addedPatterns = new HashSet<>();
 
-		_insertPatternMatcher(
-			pathPatternMatcher,
-			instanceCORSFactoryConfigurationStore.
-				getCORSFactoryConfigurations(),
-			addedPatterns);
+		if (instanceCORSFactoryConfigurationStore != null) {
+			_insertPatternMatcher(
+				pathPatternMatcher,
+				instanceCORSFactoryConfigurationStore.
+					getCORSFactoryConfigurations(),
+				addedPatterns);
+		}
 
 		_insertPatternMatcher(
 			pathPatternMatcher,
