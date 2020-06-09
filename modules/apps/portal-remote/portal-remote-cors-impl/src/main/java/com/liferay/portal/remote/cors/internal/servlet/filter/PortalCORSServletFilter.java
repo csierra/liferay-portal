@@ -28,6 +28,7 @@ import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.DynamicPathPatternMatcher;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcher;
+import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternPackage;
 
 import java.io.IOException;
 
@@ -240,10 +241,13 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 			}
 		}
 
-		List<Map<String, String>> headersList = pathPatternMatcher.getCargoList(
-			getURI(httpServletRequest));
+		PatternPackage<Map<String, String>> patternPackage =
+			pathPatternMatcher.getPatternPackage(getURI(httpServletRequest));
 
-		if (headersList != null) {
+		if (patternPackage != null) {
+			List<Map<String, String>> headersList =
+				patternPackage.getCargoList();
+
 			corsSupport.setCORSHeaders(headersList.get(0));
 		}
 

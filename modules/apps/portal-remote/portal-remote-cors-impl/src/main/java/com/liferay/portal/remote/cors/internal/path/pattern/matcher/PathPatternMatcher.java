@@ -17,7 +17,6 @@ package com.liferay.portal.remote.cors.internal.path.pattern.matcher;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,13 +26,63 @@ public abstract class PathPatternMatcher<T> {
 
 	public abstract void clear();
 
-	public abstract List<T> getCargoList(String urlPattern);
+	/**
+	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
+	 *
+	 * Get the matching pattern of the given urlPath, following the order of:
+	 * 1. Exact matching pattern
+	 * 2. Wild card matching the longest pattern
+	 * 3. Extension pattern
+	 * 4. Default pattern
+	 *
+	 * @param urlPath a legal urlPath from a URL
+	 * @return the matched pattern
+	 */
+	public PatternPackage<T> getPatternPackage(String urlPath) {
+		PatternPackage<T> patternPackage = getExactPatternPackage(urlPath);
 
-	public abstract List<List<T>> getCargoLists(String urlPattern);
+		if (patternPackage != null) {
+			return patternPackage;
+		}
 
-	public abstract String getPattern(String urlPattern);
+		patternPackage = getWildcardPatternPackage(urlPath);
 
-	public abstract List<String> getPatterns(String urlPattern);
+		if (patternPackage != null) {
+			return patternPackage;
+		}
+
+		return getExtensionPatternPackage(urlPath);
+	}
+
+	/**
+	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
+	 *
+	 * Get all matching patterns of the given urlPath, including:
+	 * 1. Exact matching pattern
+	 * 2. Wild card matching patterns
+	 * 3. Extension pattern
+	 *
+	 * @param urlPath a legal urlPath from a URL
+	 * @return all the matched patterns
+	 */
+	public List<PatternPackage<T>> getPatternPackages(String urlPath) {
+		List<PatternPackage<T>> patternPackages = getWildcardPatternPackages(
+			urlPath);
+
+		PatternPackage<T> patternPackage = getExactPatternPackage(urlPath);
+
+		if (patternPackage != null) {
+			patternPackages.add(patternPackage);
+		}
+
+		patternPackage = getExtensionPatternPackage(urlPath);
+
+		if (patternPackage != null) {
+			patternPackages.add(patternPackage);
+		}
+
+		return patternPackages;
+	}
 
 	public void insert(String urlPattern, T cargo)
 		throws IllegalArgumentException {
@@ -70,6 +119,17 @@ public abstract class PathPatternMatcher<T> {
 
 		return false;
 	}
+
+	protected abstract PatternPackage<T> getExactPatternPackage(String urlPath);
+
+	protected abstract PatternPackage<T> getExtensionPatternPackage(
+		String urlPath);
+
+	protected abstract PatternPackage<T> getWildcardPatternPackage(
+		String urlPath);
+
+	protected abstract List<PatternPackage<T>> getWildcardPatternPackages(
+		String urlPath);
 
 	/**
 	 * A valid ExtensionPattern:
@@ -150,47 +210,5 @@ public abstract class PathPatternMatcher<T> {
 
 	protected boolean contextRoot;
 	protected boolean defaultServlet;
-
-	protected static class PatternPackage<T> {
-
-		public PatternPackage() {
-			_cargoList = new ArrayList<>(_BIG_ENOUGH);
-		}
-
-		public void clear() {
-			_pattern = null;
-			_cargoList.clear();
-		}
-
-		public List<T> getCargoList() {
-			return _cargoList;
-		}
-
-		public String getPattern() {
-			return _pattern;
-		}
-
-		public boolean isEmpty() {
-			if (_pattern == null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public void set(String pattern, T cargo) {
-			if (_pattern == null) {
-				_pattern = pattern;
-			}
-
-			_cargoList.add(cargo);
-		}
-
-		private static final byte _BIG_ENOUGH = 32;
-
-		private final List<T> _cargoList;
-		private String _pattern;
-
-	}
 
 }

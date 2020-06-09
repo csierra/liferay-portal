@@ -40,160 +40,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	/**
-	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
-	 *
-	 * Get cargos of the best matching pattern of the given urlPath.
-	 *
-	 * The best matching pattern is searched in the order of:
-	 * 1. Exact matching pattern
-	 * 2. Wild card matching the longest pattern
-	 * 3. Extension pattern
-	 * 4. Default pattern
-	 *
-	 * The returned cargos preserve their natural order during insertion, e.g.
-	 * the first inserted cargo is always returned before rest cargos.
-	 *
-	 * @param urlPath a legal urlPath from a URL
-	 * @return cargos of the best matching pattern, preserving insertion order
-	 */
-	public List<T> getCargoList(String urlPath) {
-		PatternPackage<T> patternPackage = getExactPatternPackage(urlPath);
-
-		if (patternPackage != null) {
-			return patternPackage.getCargoList();
-		}
-
-		List<PatternPackage<T>> patternPackages = getWildcardPatternPackages(
-			urlPath, true);
-
-		if (!patternPackages.isEmpty()) {
-			patternPackage = patternPackages.get(0);
-
-			return patternPackage.getCargoList();
-		}
-
-		patternPackage = getExtensionPatternPackage(urlPath);
-
-		if (patternPackage != null) {
-			return patternPackage.getCargoList();
-		}
-
-		return null;
-	}
-
-	/**
-	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
-	 *
-	 * Get cargos of all matching patterns of the given urlPath.
-	 *
-	 * patterns include:
-	 * 1. Exact matching pattern
-	 * 2. Wild card matching patterns
-	 * 3. Extension pattern
-	 * 4. Default pattern
-	 *
-	 * @param urlPath a legal urlPath from a URL
-	 * @return cargos of all matching patterns
-	 */
-	public List<List<T>> getCargoLists(String urlPath) {
-		List<PatternPackage<T>> patternPackages = getWildcardPatternPackages(
-			urlPath, false);
-
-		List<List<T>> cargoLists = new ArrayList<>(patternPackages.size() + 2);
-
-		for (PatternPackage<T> patternPackage : patternPackages) {
-			cargoLists.add(patternPackage.getCargoList());
-		}
-
-		PatternPackage<T> patternPackage = getExactPatternPackage(urlPath);
-
-		if (patternPackage != null) {
-			cargoLists.add(patternPackage.getCargoList());
-		}
-
-		patternPackage = getExtensionPatternPackage(urlPath);
-
-		if (patternPackage != null) {
-			cargoLists.add(patternPackage.getCargoList());
-		}
-
-		return cargoLists;
-	}
-
-	/**
-	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
-	 *
-	 * Get the matching pattern of the given urlPath, following the order of:
-	 * 1. Exact matching pattern
-	 * 2. Wild card matching the longest pattern
-	 * 3. Extension pattern
-	 * 4. Default pattern
-	 *
-	 * @param urlPath a legal urlPath from a URL
-	 * @return the matched pattern
-	 */
-	public String getPattern(String urlPath) {
-		PatternPackage<T> patternPackage = getExactPatternPackage(urlPath);
-
-		if (patternPackage != null) {
-			return patternPackage.getPattern();
-		}
-
-		List<PatternPackage<T>> patternPackages = getWildcardPatternPackages(
-			urlPath, true);
-
-		if (!patternPackages.isEmpty()) {
-			patternPackage = patternPackages.get(0);
-
-			return patternPackage.getPattern();
-		}
-
-		patternPackage = getExtensionPatternPackage(urlPath);
-
-		if (patternPackage != null) {
-			return patternPackage.getPattern();
-		}
-
-		return null;
-	}
-
-	/**
-	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
-	 *
-	 * Get all matching patterns of the given urlPath, including:
-	 * 1. Exact matching pattern
-	 * 2. Wild card matching patterns
-	 * 3. Extension pattern
-	 *
-	 * @param urlPath a legal urlPath from a URL
-	 * @return all the matched patterns
-	 */
-	public List<String> getPatterns(String urlPath) {
-		List<PatternPackage<T>> patternPackages = getWildcardPatternPackages(
-			urlPath, false);
-
-		List<String> patterns = new ArrayList<>(patternPackages.size() + 2);
-
-		for (PatternPackage<T> patternPackage : patternPackages) {
-			patterns.add(patternPackage.getPattern());
-		}
-
-		PatternPackage<T> patternPackage = getExactPatternPackage(urlPath);
-
-		if (patternPackage != null) {
-			patterns.add(patternPackage.getPattern());
-		}
-
-		patternPackage = getExtensionPatternPackage(urlPath);
-
-		if (patternPackage != null) {
-			patterns.add(patternPackage.getPattern());
-		}
-
-		return patterns;
-	}
-
-	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
 	 * In the Web application deployment descriptor, the following syntax is
@@ -248,6 +94,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		insert(urlPattern, cargo, 0);
 	}
 
+	@Override
 	protected PatternPackage<T> getExactPatternPackage(String urlPath) {
 		TrieNode<T> prev = _exactTrie;
 
@@ -272,6 +119,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return null;
 	}
 
+	@Override
 	protected PatternPackage<T> getExtensionPatternPackage(String urlPath) {
 		TrieNode<T> prev = _extentionTrie;
 
@@ -306,28 +154,13 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return null;
 	}
 
-	protected List<PatternPackage<T>> getWildcardPatternPackages(
-		String urlPath, boolean bestMatch) {
-
-		List<PatternPackage<T>> patternPackages = null;
-
-		if (bestMatch) {
-			patternPackages = new ArrayList<>(1);
-		}
-		else {
-			patternPackages = new ArrayList<>(32);
-		}
+	@Override
+	protected PatternPackage<T> getWildcardPatternPackage(String urlPath) {
+		PatternPackage<T> bestMatch = null;
 
 		TrieNode<T> prev = _wildCardTrie;
 
 		TrieNode<T> current = null;
-
-		// Use a local variable to store best match, instead
-		// of pushing current best to patternPackages and remove
-		// it everytime for better performance.
-		// There is around 16% performance increase for best match.
-
-		PatternPackage<T> bestMatchSoFar = null;
 
 		for (int i = 0; i < urlPath.length(); ++i) {
 			current = prev.next(urlPath.charAt(i));
@@ -340,12 +173,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				TrieNode<T> next = current.next('*');
 
 				if ((next != null) && next.isEnd()) {
-					if (bestMatch) {
-						bestMatchSoFar = next.getPatternPackage();
-					}
-					else {
-						patternPackages.add(next.getPatternPackage());
-					}
+					bestMatch = next.getPatternPackage();
 				}
 			}
 
@@ -355,35 +183,63 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// if current node is null, it means trie travesaling
 		// did not match every character.
 
-		if (current == null) {
-			if (bestMatch && (bestMatchSoFar != null)) {
-				patternPackages.add(bestMatchSoFar);
-			}
+		if (current != null) {
+			current = current.next('/');
 
-			return patternPackages;
+			if (current != null) {
+				current = current.next('*');
+
+				if ((current != null) && current.isEnd()) {
+					bestMatch = current.getPatternPackage();
+				}
+			}
 		}
 
-		TrieNode<T> next = current.next('/');
+		return bestMatch;
+	}
 
-		if (next == null) {
-			if (bestMatch && (bestMatchSoFar != null)) {
-				patternPackages.add(bestMatchSoFar);
+	@Override
+	protected List<PatternPackage<T>> getWildcardPatternPackages(
+		String urlPath) {
+
+		List<PatternPackage<T>> patternPackages = new ArrayList<>(64);
+
+		TrieNode<T> prev = _wildCardTrie;
+
+		TrieNode<T> current = null;
+
+		for (int i = 0; i < urlPath.length(); ++i) {
+			current = prev.next(urlPath.charAt(i));
+
+			if (current == null) {
+				break;
 			}
 
-			return patternPackages;
-		}
+			if (urlPath.charAt(i) == '/') {
+				TrieNode<T> next = current.next('*');
 
-		next = next.next('*');
-
-		if ((next == null) || !next.isEnd()) {
-			if (bestMatch && (bestMatchSoFar != null)) {
-				patternPackages.add(bestMatchSoFar);
+				if ((next != null) && next.isEnd()) {
+					patternPackages.add(next.getPatternPackage());
+				}
 			}
 
-			return patternPackages;
+			prev = current;
 		}
 
-		patternPackages.add(next.getPatternPackage());
+		// if current node is null, it means trie travesaling
+		// did not match every character.
+
+		if (current != null) {
+			current = current.next('/');
+
+			if (current != null) {
+				current = current.next('*');
+
+				if ((current != null) && current.isEnd()) {
+					patternPackages.add(current.getPatternPackage());
+				}
+			}
+		}
 
 		return patternPackages;
 	}
