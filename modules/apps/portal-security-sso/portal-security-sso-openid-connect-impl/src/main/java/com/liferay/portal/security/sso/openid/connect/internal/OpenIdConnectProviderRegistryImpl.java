@@ -102,7 +102,10 @@ public class OpenIdConnectProviderRegistryImpl
 			<String,
 			 OpenIdConnectProvider<OIDCClientMetadata, OIDCProviderMetadata>>
 				openIdConnectProviderMap =
-					_companyIdProviderNameOpenIdConnectProviders.get(companyId);
+					_companyIdProviderNameOpenIdConnectProviders.putIfAbsent(
+						companyId,
+						_companyIdProviderNameOpenIdConnectProviders.get(
+							CompanyConstants.SYSTEM));
 
 		if (openIdConnectProviderMap == null) {
 			return null;
@@ -117,7 +120,10 @@ public class OpenIdConnectProviderRegistryImpl
 			<String,
 			 OpenIdConnectProvider<OIDCClientMetadata, OIDCProviderMetadata>>
 				openIdConnectProviderMap =
-					_companyIdProviderNameOpenIdConnectProviders.get(companyId);
+					_companyIdProviderNameOpenIdConnectProviders.putIfAbsent(
+						companyId,
+						_companyIdProviderNameOpenIdConnectProviders.get(
+							CompanyConstants.SYSTEM));
 
 		if (openIdConnectProviderMap == null) {
 			return Collections.emptySet();
