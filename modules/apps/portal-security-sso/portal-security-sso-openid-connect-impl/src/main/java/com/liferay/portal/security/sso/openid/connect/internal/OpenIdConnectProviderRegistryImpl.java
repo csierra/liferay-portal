@@ -83,7 +83,8 @@ public class OpenIdConnectProviderRegistryImpl
 
 		if (openIdConnectProvider == null) {
 			throw new OpenIdConnectServiceException.ProviderException(
-				"Unable to find an OpenId Connect provider with name " + name);
+				"Unable to find an OpenId Connect provider with name \"" +
+					name + "\"");
 		}
 
 		return openIdConnectProvider;
@@ -182,8 +183,8 @@ public class OpenIdConnectProviderRegistryImpl
 			throw new ConfigurationException(
 				null,
 				StringBundler.concat(
-					"Unable to instantiate provider metadata factory for ",
-					openIdConnectProviderConfiguration.providerName(), ": ",
+					"Unable to instantiate provider metadata factory for \"",
+					openIdConnectProviderConfiguration.providerName(), "\": ",
 					exception.getMessage()),
 				exception);
 		}
