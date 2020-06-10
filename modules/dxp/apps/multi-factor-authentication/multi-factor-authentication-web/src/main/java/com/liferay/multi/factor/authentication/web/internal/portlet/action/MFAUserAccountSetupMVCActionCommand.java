@@ -15,7 +15,9 @@
 package com.liferay.multi.factor.authentication.web.internal.portlet.action;
 
 import com.liferay.multi.factor.authentication.spi.checker.setup.SetupMFAChecker;
-import com.liferay.multi.factor.authentication.web.internal.policy.MFAPolicy;
+import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -28,12 +30,13 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 
-import java.util.Optional;
-
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -49,37 +52,47 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class MFAUserAccountSetupMVCActionCommand extends BaseMVCActionCommand {
 
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_mfaCheckerServiceTrackerMap =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, SetupMFAChecker.class, "(service.id=*)",
+				new PropertyServiceReferenceMapper<>("service.id"));
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_mfaCheckerServiceTrackerMap.close();
+	}
+
 	@Override
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		Optional<SetupMFAChecker> optionalMfaSetupChecker =
-			_mfaPolicy.getSetupMFAChecker(_portal.getCompanyId(actionRequest));
+		long setupMFACheckerServiceId = ParamUtil.getLong(
+			actionRequest, "setupMFACheckerServiceId");
 
-		if (!optionalMfaSetupChecker.isPresent()) {
+		SetupMFAChecker setupMFAChecker =
+			_mfaCheckerServiceTrackerMap.getService(setupMFACheckerServiceId);
+
+		if (setupMFAChecker == null) {
 			_log.error(
-				"Unable to generate user account setup for Multi-Factor " +
-					"Authentication: Setup verifier not present");
+				"Unable to find SetupMFAChecker with service.id " +
+					setupMFACheckerServiceId);
 
 			return;
 		}
 
-		SetupMFAChecker mfaSetupChecker = optionalMfaSetupChecker.get();
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		boolean mfaRemoveTimeBasedOTP = ParamUtil.getBoolean(
-			actionRequest, "mfaRemoveTimeBasedOTP");
-
-		if (mfaRemoveTimeBasedOTP) {
-			mfaSetupChecker.removeExistingSetup(themeDisplay.getUserId());
+		if (ParamUtil.getBoolean(actionRequest, "mfaRemoveExistingSetup")) {
+			setupMFAChecker.removeExistingSetup(themeDisplay.getUserId());
 		}
-
-		if (mfaSetupChecker.setUp(
-				_portal.getHttpServletRequest(actionRequest),
-				themeDisplay.getUserId())) {
+		else if (setupMFAChecker.setUp(
+					_portal.getHttpServletRequest(actionRequest),
+					themeDisplay.getUserId())) {
 
 			String redirect = _portal.escapeRedirect(
 				ParamUtil.getString(actionRequest, "redirect"));
@@ -89,11 +102,8 @@ public class MFAUserAccountSetupMVCActionCommand extends BaseMVCActionCommand {
 			}
 
 			actionResponse.sendRedirect(redirect);
-
-			return;
 		}
-
-		if (!mfaRemoveTimeBasedOTP) {
+		else {
 			SessionErrors.add(actionRequest, "userAccountSetupFailed");
 		}
 	}
@@ -101,8 +111,8 @@ public class MFAUserAccountSetupMVCActionCommand extends BaseMVCActionCommand {
 	private static final Log _log = LogFactoryUtil.getLog(
 		MFAUserAccountSetupMVCActionCommand.class);
 
-	@Reference
-	private MFAPolicy _mfaPolicy;
+	private ServiceTrackerMap<Long, SetupMFAChecker>
+		_mfaCheckerServiceTrackerMap;
 
 	@Reference
 	private Portal _portal;
