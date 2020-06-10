@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Marta Medio
@@ -45,10 +45,18 @@ public class MFAUserAccountSetupScreenNavigationEntry
 	implements ScreenNavigationEntry<User> {
 
 	public MFAUserAccountSetupScreenNavigationEntry(
-		SetupMFAChecker mfaSetupChecker, ServletContext servletContext) {
+		ServiceReference<SetupMFAChecker> serviceReference,
+		SetupMFAChecker setupMFAChecker, ServletContext servletContext) {
 
-		_mfaSetupChecker = mfaSetupChecker;
+		_serviceReference = serviceReference;
+		_setupMFAChecker = setupMFAChecker;
 		_servletContext = servletContext;
+
+		_bundle = _serviceReference.getBundle();
+
+		Class<? extends SetupMFAChecker> clazz = _setupMFAChecker.getClass();
+
+		_resourceBundleKey = clazz.getName();
 	}
 
 	@Override
@@ -58,28 +66,23 @@ public class MFAUserAccountSetupScreenNavigationEntry
 
 	@Override
 	public String getEntryKey() {
-		Class<? extends SetupMFAChecker> clazz = _mfaSetupChecker.getClass();
+		Class<? extends SetupMFAChecker> clazz = _setupMFAChecker.getClass();
 
 		return clazz.getName();
 	}
 
 	@Override
 	public String getLabel(Locale locale) {
-		Class<? extends SetupMFAChecker> clazz = _mfaSetupChecker.getClass();
-
-		Bundle bundle = FrameworkUtil.getBundle(clazz);
-
 		ResourceBundleLoader resourceBundleLoader =
 			ResourceBundleLoaderUtil.
 				getResourceBundleLoaderByBundleSymbolicName(
-					bundle.getSymbolicName());
-
-		String name = clazz.getName();
+					_bundle.getSymbolicName());
 
 		return GetterUtil.getString(
 			ResourceBundleUtil.getString(
-				resourceBundleLoader.loadResourceBundle(locale), name),
-			name);
+				resourceBundleLoader.loadResourceBundle(locale),
+				_resourceBundleKey),
+			_resourceBundleKey);
 	}
 
 	@Override
@@ -89,11 +92,7 @@ public class MFAUserAccountSetupScreenNavigationEntry
 
 	@Override
 	public boolean isVisible(User user, User context) {
-		if (_mfaSetupChecker != null) {
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	@Override
@@ -103,11 +102,14 @@ public class MFAUserAccountSetupScreenNavigationEntry
 		throws IOException {
 
 		httpServletRequest.setAttribute(
-			SetupMFAChecker.class.getName(), _mfaSetupChecker);
-
-		httpServletRequest.setAttribute(
 			MFAWebKeys.MFA_USER_ACCOUNT_LABEL,
 			getLabel(httpServletRequest.getLocale()));
+		httpServletRequest.setAttribute(
+			MFAWebKeys.SETUP_MFA_CHECKER_SERVICE_ID,
+			GetterUtil.getLong(_serviceReference.getProperty("service.id")));
+
+		httpServletRequest.setAttribute(
+			SetupMFAChecker.class.getName(), _setupMFAChecker);
 
 		RequestDispatcher requestDispatcher =
 			_servletContext.getRequestDispatcher(
@@ -123,7 +125,10 @@ public class MFAUserAccountSetupScreenNavigationEntry
 		}
 	}
 
-	private final SetupMFAChecker _mfaSetupChecker;
+	private final Bundle _bundle;
+	private final String _resourceBundleKey;
+	private final ServiceReference<SetupMFAChecker> _serviceReference;
 	private final ServletContext _servletContext;
+	private final SetupMFAChecker _setupMFAChecker;
 
 }

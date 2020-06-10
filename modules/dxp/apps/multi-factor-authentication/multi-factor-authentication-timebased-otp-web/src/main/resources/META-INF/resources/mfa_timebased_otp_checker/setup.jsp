@@ -20,9 +20,8 @@
 String mfaTimeBasedOTPAlgorithm = GetterUtil.getString(request.getAttribute(MFATimeBasedOTPWebKeys.MFA_TIME_BASED_OTP_ALGORITHM));
 String mfaTimeBasedOTPCompanyName = GetterUtil.getString(request.getAttribute(MFATimeBasedOTPWebKeys.MFA_TIME_BASED_OTP_COMPANY_NAME));
 int mfaTimeBasedOTPDigits = GetterUtil.getInteger(request.getAttribute(MFATimeBasedOTPWebKeys.MFA_TIME_BASED_OTP_DIGITS));
-String mfaTimeBasedOTPSharedSecret = (String)session.getAttribute(MFATimeBasedOTPWebKeys.MFA_TIME_BASED_OTP_SHARED_SECRET);
+String mfaTimeBasedOTPSharedSecret = GetterUtil.getString(request.getAttribute(MFATimeBasedOTPWebKeys.MFA_TIME_BASED_OTP_SHARED_SECRET));
 int mfaTimeBasedOTPTimeCounter = GetterUtil.getInteger(request.getAttribute(MFATimeBasedOTPWebKeys.MFA_TIME_BASED_OTP_TIME_COUNTER));
-String userEmailAddress = user.getEmailAddress();
 %>
 
 <div class="sheet-section">
@@ -34,7 +33,7 @@ String userEmailAddress = user.getEmailAddress();
 
 	<aui:input disabled="<%= true %>" label="shared-secret" name="sharedSecret" type="text" value="<%= mfaTimeBasedOTPSharedSecret %>" />
 
-	<div id="<portlet:namespace/>qrcode"></div>
+	<div class="qrcode-setup" id="<portlet:namespace/>qrcode"></div>
 </div>
 
 <div class="sheet-footer">
@@ -42,26 +41,19 @@ String userEmailAddress = user.getEmailAddress();
 </div>
 
 <aui:script require='<%= npmResolvedPackageName + "/qrcode/generateQRCode as generateQRCode" %>'>
-	var account = '<%= HtmlUtil.escapeJS(userEmailAddress) %>';
+	var account = '<%= HtmlUtil.escapeJS(user.getEmailAddress()) %>';
 	var algorithm = '<%= HtmlUtil.escapeJS(mfaTimeBasedOTPAlgorithm) %>';
+	var counter = '<%= mfaTimeBasedOTPTimeCounter %>';
 	var digits = '<%= mfaTimeBasedOTPDigits %>';
 	var issuer = '<%= HtmlUtil.escapeJS(mfaTimeBasedOTPCompanyName) %>';
 	var secret = '<%= HtmlUtil.escapeJS(mfaTimeBasedOTPSharedSecret) %>';
-	var timeCounter = '<%= mfaTimeBasedOTPTimeCounter %>';
 
-	var qrCodeUrl = 'otpauth://totp/';
-	qrCodeUrl += encodeURIComponent(issuer) + ':' + encodeURIComponent(account);
-	qrCodeUrl +=
-		'?secret=' +
-		encodeURIComponent(secret) +
-		'&issuer=' +
-		encodeURIComponent(issuer);
-	qrCodeUrl +=
-		'&algorithm=' +
-		encodeURIComponent(algorithm) +
-		'&digits=' +
-		encodeURIComponent(digits);
-	qrCodeUrl += '&counter=' + encodeURIComponent(timeCounter);
-
-	generateQRCode.default('<portlet:namespace/>qrcode', qrCodeUrl);
+	generateQRCode.default('<portlet:namespace/>qrcode', {
+		account: account,
+		algorithm: algorithm,
+		counter: counter,
+		digits: digits,
+		issuer: issuer,
+		secret: secret,
+	});
 </aui:script>
