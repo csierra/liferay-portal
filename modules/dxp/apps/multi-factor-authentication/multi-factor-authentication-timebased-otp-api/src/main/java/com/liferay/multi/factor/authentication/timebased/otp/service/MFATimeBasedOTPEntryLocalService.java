@@ -73,7 +73,7 @@ public interface MFATimeBasedOTPEntryLocalService
 		MFATimeBasedOTPEntry mfaTimeBasedOTPEntry);
 
 	public MFATimeBasedOTPEntry addTimeBasedOTPEntry(
-			String sharedSecret, long userId)
+			long userId, String sharedSecret)
 		throws PortalException;
 
 	/**

@@ -52,11 +52,11 @@ public class MFATimeBasedOTPEntryLocalServiceWrapper
 	@Override
 	public com.liferay.multi.factor.authentication.timebased.otp.model.
 		MFATimeBasedOTPEntry addTimeBasedOTPEntry(
-				String sharedSecret, long userId)
+				long userId, String sharedSecret)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _mfaTimeBasedOTPEntryLocalService.addTimeBasedOTPEntry(
-			sharedSecret, userId);
+			userId, sharedSecret);
 	}
 
 	/**
