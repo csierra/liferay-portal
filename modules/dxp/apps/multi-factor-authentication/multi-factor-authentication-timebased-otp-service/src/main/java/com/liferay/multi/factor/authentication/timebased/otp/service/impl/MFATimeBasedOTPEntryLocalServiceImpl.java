@@ -37,7 +37,7 @@ public class MFATimeBasedOTPEntryLocalServiceImpl
 	extends MFATimeBasedOTPEntryLocalServiceBaseImpl {
 
 	public MFATimeBasedOTPEntry addTimeBasedOTPEntry(
-			String sharedSecret, long userId)
+			long userId, String sharedSecret)
 		throws PortalException {
 
 		MFATimeBasedOTPEntry mfaTimeBasedOTPEntry =
