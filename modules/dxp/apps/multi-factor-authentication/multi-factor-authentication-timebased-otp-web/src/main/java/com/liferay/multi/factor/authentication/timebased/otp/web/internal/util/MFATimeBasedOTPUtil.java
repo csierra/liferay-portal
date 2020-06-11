@@ -82,17 +82,17 @@ public class MFATimeBasedOTPUtil {
 		return false;
 	}
 
-	private static byte[] _generateHmac(byte[] key, String text) {
+	private static byte[] _generateHMAC(byte[] key, String text) {
 		try {
-			Mac hmac = Mac.getInstance(MFA_TIMEBASED_OTP_ALGORITHM);
+			Mac mac = Mac.getInstance(MFA_TIMEBASED_OTP_ALGORITHM);
 
-			hmac.init(new SecretKeySpec(key, "RAW"));
+			mac.init(new SecretKeySpec(key, "RAW"));
 
 			BigInteger bigInteger = new BigInteger("10" + text, 16);
 
 			byte[] byteArray = bigInteger.toByteArray();
 
-			return hmac.doFinal(
+			return mac.doFinal(
 				Arrays.copyOfRange(byteArray, 1, byteArray.length));
 		}
 		catch (InvalidKeyException invalidKeyException) {
@@ -111,7 +111,7 @@ public class MFATimeBasedOTPUtil {
 	private static String _generateTimeBasedOTP(
 		byte[] sharedSecret, String timeCountHex) {
 
-		byte[] hash = _generateHmac(sharedSecret, timeCountHex);
+		byte[] hash = _generateHMAC(sharedSecret, timeCountHex);
 
 		int offset = hash[hash.length - 1] & 0xf;
 
