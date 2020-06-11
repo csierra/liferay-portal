@@ -54,10 +54,10 @@ public class MFATimeBasedOTPEntryLocalServiceUtil {
 
 	public static com.liferay.multi.factor.authentication.timebased.otp.model.
 		MFATimeBasedOTPEntry addTimeBasedOTPEntry(
-				String sharedSecret, long userId)
+				long userId, String sharedSecret)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
-		return getService().addTimeBasedOTPEntry(sharedSecret, userId);
+		return getService().addTimeBasedOTPEntry(userId, sharedSecret);
 	}
 
 	/**
