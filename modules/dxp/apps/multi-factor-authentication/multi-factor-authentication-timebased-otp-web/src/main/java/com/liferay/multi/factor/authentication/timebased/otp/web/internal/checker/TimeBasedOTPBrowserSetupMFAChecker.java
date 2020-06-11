@@ -205,7 +205,7 @@ public class TimeBasedOTPBrowserSetupMFAChecker
 
 				MFATimeBasedOTPEntry timeBasedOTPEntry =
 					_mfaTimeBasedOTPEntryLocalService.addTimeBasedOTPEntry(
-						mfaTimeBasedOTPSharedSecret, userId);
+						userId, mfaTimeBasedOTPSharedSecret);
 
 				if (timeBasedOTPEntry != null) {
 					return true;
