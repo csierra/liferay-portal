@@ -15,21 +15,10 @@
 package com.liferay.multi.factor.authentication.timebased.otp.model.impl;
 
 /**
- * The extended model implementation for the MFATimeBasedOTPEntry service. Represents a row in the &quot;MFATimeBasedOTPEntry&quot; database table, with each column mapped to a property of this class.
- *
- * <p>
- * Helper methods and all application logic should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the <code>com.liferay.multi.factor.authentication.timebased.otp.model.MFATimeBasedOTPEntry</code> interface.
- * </p>
- *
  * @author Arthur Chan
  */
 public class MFATimeBasedOTPEntryImpl extends MFATimeBasedOTPEntryBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. All methods that expect a mfa timebased otp entry model instance should use the {@link com.liferay.multi.factor.authentication.timebased.otp.model.MFATimeBasedOTPEntry} interface instead.
-	 */
 	public MFATimeBasedOTPEntryImpl() {
 	}
 

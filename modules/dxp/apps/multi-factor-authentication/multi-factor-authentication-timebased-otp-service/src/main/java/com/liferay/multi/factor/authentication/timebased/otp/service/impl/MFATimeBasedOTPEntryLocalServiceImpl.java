@@ -27,17 +27,7 @@ import java.util.Date;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * The implementation of the mfa timebased otp entry local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the <code>com.liferay.multi.factor.authentication.timebased.otp.service.MFATimeBasedOTPEntryLocalService</code> interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
  * @author Arthur Chan
- * @see MFATimeBasedOTPEntryLocalServiceBaseImpl
  */
 @Component(
 	property = "model.class.name=com.liferay.multi.factor.authentication.timebased.otp.model.MFATimeBasedOTPEntry",
