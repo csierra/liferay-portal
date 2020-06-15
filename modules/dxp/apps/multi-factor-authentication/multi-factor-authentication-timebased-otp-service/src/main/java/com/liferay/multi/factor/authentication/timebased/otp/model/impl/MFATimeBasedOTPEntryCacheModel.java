@@ -37,17 +37,17 @@ public class MFATimeBasedOTPEntryCacheModel
 	implements CacheModel<MFATimeBasedOTPEntry>, Externalizable, MVCCModel {
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof MFATimeBasedOTPEntryCacheModel)) {
+		if (!(object instanceof MFATimeBasedOTPEntryCacheModel)) {
 			return false;
 		}
 
 		MFATimeBasedOTPEntryCacheModel mfaTimeBasedOTPEntryCacheModel =
-			(MFATimeBasedOTPEntryCacheModel)obj;
+			(MFATimeBasedOTPEntryCacheModel)object;
 
 		if ((mfaTimeBasedOTPEntryId ==
 				mfaTimeBasedOTPEntryCacheModel.mfaTimeBasedOTPEntryId) &&
