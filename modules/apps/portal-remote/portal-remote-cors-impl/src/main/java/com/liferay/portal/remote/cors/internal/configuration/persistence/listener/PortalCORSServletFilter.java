@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.servlet.BaseFilter;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -50,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -69,6 +71,11 @@ import org.osgi.service.component.annotations.Reference;
 public class PortalCORSServletFilter
 	extends BaseFilter
 	implements ConfigurationModelListener, ManagedServiceFactory {
+
+	@Activate
+	protected void activate() {
+		_rebuild();
+	}
 
 	@Override
 	public void deleted(String pid) {
@@ -318,12 +325,16 @@ public class PortalCORSServletFilter
 			}
 		}
 
+		boolean existsSystemConfig = false;
+
 		for (Dictionary<String, ?> properties :
 				_configurationPidsProperties.values()) {
 
 			if (companyId != CompanyConstants.SYSTEM) {
 				continue;
 			}
+
+			existsSystemConfig = true;
 
 			PortalCORSConfiguration portalCORSConfiguration =
 				ConfigurableUtil.createConfigurable(
@@ -340,6 +351,23 @@ public class PortalCORSServletFilter
 					portalCORSConfiguration.filterMappingURLPatterns()) {
 
 				patternsHeadersMap.putIfAbsent(urlPathPattern, corsHeaders);
+			}
+		}
+
+		if (!existsSystemConfig) {
+			PortalCORSConfiguration portalCORSConfiguration =
+				ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, new HashMapDictionary<>());
+
+			if (!processedNames.contains(portalCORSConfiguration.name())) {
+				Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+					portalCORSConfiguration.headers());
+
+				for (String urlPathPattern :
+					portalCORSConfiguration.filterMappingURLPatterns()) {
+
+					patternsHeadersMap.putIfAbsent(urlPathPattern, corsHeaders);
+				}
 			}
 		}
 
