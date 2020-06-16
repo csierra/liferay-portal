@@ -78,7 +78,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			insert(urlPattern, cargo, _wildcardPatternTypeState);
+			_wildcardPatternTypeState.insert(urlPattern, cargo);
 		}
 
 		// Wild Card path pattern 2, aka extension pattern
@@ -89,7 +89,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			insert(urlPattern, cargo, _exactPatternTypeState);
+			_extensionPatternTypeState.insert(urlPattern, cargo);
 		}
 
 		// Exact pattern
@@ -100,7 +100,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			insert(urlPattern, cargo, _exactPatternTypeState);
+			_exactPatternTypeState.insert(urlPattern, cargo);
 		}
 	}
 
@@ -155,54 +155,9 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return n;
 	}
 
-	protected byte getExactIndex(
-		String urlPath, PatternTypeState<T> patternTypeState) {
-
-		long current = _ALL_BITS;
-
-		byte row = 0;
-
-		int col = 0;
-
-		for (; row < urlPath.length(); ++row) {
-			if (row > (_maxPatternLength - 1)) {
-				current = 0;
-
-				break;
-			}
-
-			char character = '/';
-
-			if (patternTypeState.invertIndex) {
-				character = urlPath.charAt(row);
-			}
-			else {
-				character = urlPath.charAt(urlPath.length() - 1 - row);
-			}
-
-			col = character - PRINTABLE_OFFSET;
-
-			current &= patternTypeState.trieMap[0][row][col];
-
-			if (current == 0) {
-				break;
-			}
-		}
-
-		if (current != 0) {
-			current &= patternTypeState.trieMap[1][row - 1][col];
-
-			if (current != 0) {
-				return getSetBitIndex(current);
-			}
-		}
-
-		return -1;
-	}
-
 	@Override
 	protected PatternTuple<T> getExactPatternPackage(String urlPath) {
-		byte index = getExactIndex(urlPath, _exactPatternTypeState);
+		byte index = _exactPatternTypeState.getExactIndex(urlPath);
 
 		if (index < 0) {
 			return null;
@@ -382,54 +337,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return patternTuples;
 	}
 
-	protected void insert(
-		String urlPattern, T cargo, PatternTypeState<T> patternTypeState) {
-
-		byte bitIndex = getExactIndex(urlPattern, patternTypeState);
-
-		if (bitIndex > -1) {
-
-			// Indicating the end of the pattern
-
-			patternTypeState.patternTuples.add(
-				bitIndex, new PatternTuple<>(urlPattern, cargo));
-
-			return;
-		}
-
-		patternTypeState.count++;
-
-		long bitMask = 1;
-
-		bitMask <<= bitIndex;
-
-		int row = 0;
-		int col = 0;
-
-		for (; row < urlPattern.length(); ++row) {
-			char character = '\0';
-
-			if (patternTypeState.invertIndex) {
-				character = urlPattern.charAt(row);
-			}
-			else {
-				character = urlPattern.charAt(urlPattern.length() - 1 - row);
-			}
-
-			col = character - PRINTABLE_OFFSET;
-
-			patternTypeState.trieMap[0][row][col] |= bitMask;
-		}
-
-		// Indicating the end of the pattern
-
-		PatternTuple<T> patternTuple = new PatternTuple<>(urlPattern, cargo);
-
-		patternTypeState.trieMap[1][row - 1][col] |= bitMask;
-
-		patternTypeState.patternTuples.add(bitIndex, patternTuple);
-	}
-
 	private static final long _ALL_BITS = ~0;
 
 	private static final byte _LONG_BITS_SIZE = 64;
@@ -461,6 +368,97 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		public List<PatternTuple<T>> patternTuples = new ArrayList<>(
 			_LONG_BITS_SIZE);
 		public final long[][][] trieMap;
+
+		protected byte getExactIndex(String urlPath) {
+			long current = _ALL_BITS;
+
+			byte row = 0;
+
+			int col = 0;
+
+			for (; row < urlPath.length(); ++row) {
+				if (row > (_maxPatternLength - 1)) {
+					current = 0;
+
+					break;
+				}
+
+				char character = '/';
+
+				if (invertIndex) {
+					character = urlPath.charAt(row);
+				}
+				else {
+					character = urlPath.charAt(urlPath.length() - 1 - row);
+				}
+
+				col = character - PRINTABLE_OFFSET;
+
+				current &= trieMap[0][row][col];
+
+				if (current == 0) {
+					break;
+				}
+			}
+
+			if (current != 0) {
+				current &= trieMap[1][row - 1][col];
+
+				if (current != 0) {
+					return getSetBitIndex(current);
+				}
+			}
+
+			return -1;
+		}
+
+		protected void insert(String urlPattern, T cargo) {
+			byte bitIndex = getExactIndex(urlPattern);
+
+			if (bitIndex > -1) {
+
+				// Indicating the end of the pattern
+
+				patternTuples.add(
+					bitIndex, new PatternTuple<>(urlPattern, cargo));
+
+				return;
+			}
+
+			count++;
+
+			long bitMask = 1;
+
+			bitMask <<= bitIndex;
+
+			int row = 0;
+			int col = 0;
+
+			for (; row < urlPattern.length(); ++row) {
+				char character = '\0';
+
+				if (invertIndex) {
+					character = urlPattern.charAt(row);
+				}
+				else {
+					character = urlPattern.charAt(
+						urlPattern.length() - 1 - row);
+				}
+
+				col = character - PRINTABLE_OFFSET;
+
+				trieMap[0][row][col] |= bitMask;
+			}
+
+			// Indicating the end of the pattern
+
+			PatternTuple<T> patternTuple = new PatternTuple<>(
+				urlPattern, cargo);
+
+			trieMap[1][row - 1][col] |= bitMask;
+
+			patternTuples.add(bitIndex, patternTuple);
+		}
 
 		private byte _maxPatternLength;
 
