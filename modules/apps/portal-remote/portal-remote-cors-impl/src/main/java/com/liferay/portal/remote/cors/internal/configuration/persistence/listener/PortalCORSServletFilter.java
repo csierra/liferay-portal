@@ -18,7 +18,10 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.servlet.BaseFilter;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
@@ -31,8 +34,6 @@ import com.liferay.portal.remote.cors.internal.path.pattern.matcher.DynamicPathP
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcher;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternPackage;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.StaticPathPatternMatcher;
-
-import java.io.IOException;
 
 import java.util.Comparator;
 import java.util.Dictionary;
@@ -48,9 +49,6 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -74,7 +72,8 @@ import org.osgi.service.component.annotations.Reference;
 	service = {Filter.class, ManagedServiceFactory.class}
 )
 public class PortalCORSServletFilter
-	implements ConfigurationModelListener, Filter, ManagedServiceFactory {
+	extends BaseFilter
+	implements ConfigurationModelListener, ManagedServiceFactory {
 
 	@Override
 	public void deleted(String pid) {
@@ -96,39 +95,23 @@ public class PortalCORSServletFilter
 	}
 
 	@Override
-	public final void doFilter(
-			ServletRequest servletRequest, ServletResponse servletResponse,
-			FilterChain filterChain)
-		throws IOException, ServletException {
-
-		HttpServletRequest httpServletRequest =
-			(HttpServletRequest)servletRequest;
-
-		if (CORSSupport.isCORSRequest(httpServletRequest::getHeader)) {
-			try {
-				processCORSRequest(
-					httpServletRequest, (HttpServletResponse)servletResponse,
-					filterChain);
-			}
-			catch (Exception exception) {
-				throw new ServletException(exception);
-			}
-		}
-		else {
-			filterChain.doFilter(servletRequest, servletResponse);
-		}
-	}
-
-	@Override
 	public String getName() {
 		return StringPool.BLANK;
 	}
 
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
+	public void init(FilterConfig filterConfig) {
 		ServletContext servletContext = filterConfig.getServletContext();
 
 		_contextPath = servletContext.getContextPath();
+	}
+
+	@Override
+	public boolean isFilterEnabled(
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
+
+		return CORSSupport.isCORSRequest(httpServletRequest::getHeader);
 	}
 
 	@Override
@@ -225,6 +208,11 @@ public class PortalCORSServletFilter
 		_rebuild(companyId);
 	}
 
+	@Override
+	protected Log getLog() {
+		return _log;
+	}
+
 	protected String getURI(HttpServletRequest httpServletRequest) {
 		String uri = httpServletRequest.getRequestURI();
 
@@ -238,7 +226,8 @@ public class PortalCORSServletFilter
 		return _http.normalizePath(uri);
 	}
 
-	protected void processCORSRequest(
+	@Override
+	protected void processFilter(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, FilterChain filterChain)
 		throws Exception {
@@ -397,6 +386,9 @@ public class PortalCORSServletFilter
 		_pathPatternMatchers.put(
 			companyId, _createPatternMatcher(patternsHeadersMap));
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortalCORSServletFilter.class);
 
 	private final Map<String, Dictionary<String, ?>>
 		_configurationPidsProperties = new ConcurrentHashMap<>();
