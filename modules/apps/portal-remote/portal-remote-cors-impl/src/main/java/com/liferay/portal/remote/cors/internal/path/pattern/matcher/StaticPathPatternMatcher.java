@@ -64,9 +64,9 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	 * pattern: All other strings are used for exact matches only.
 	 *
 	 * @param urlPattern the pattern of path, used for pattern matching
-	 * @param cargo      an non null object associated with urlPattern
+	 * @param value      an non null object associated with urlPattern
 	 */
-	public void insert(String urlPattern, T cargo)
+	public void insert(String urlPattern, T value)
 		throws IllegalArgumentException {
 
 		// Wild Card path pattern 1
@@ -77,7 +77,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			_wildcardPatternTypeState.insert(urlPattern, cargo);
+			_wildcardPatternTypeState.insert(urlPattern, value);
 		}
 
 		// Wild Card path pattern 2, aka extension pattern
@@ -88,7 +88,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			_extensionPatternTypeState.insert(urlPattern, cargo);
+			_extensionPatternTypeState.insert(urlPattern, value);
 		}
 
 		// Exact pattern
@@ -99,7 +99,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			_exactPatternTypeState.insert(urlPattern, cargo);
+			_exactPatternTypeState.insert(urlPattern, value);
 		}
 	}
 
@@ -155,22 +155,22 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternTuple<T> getExactPatternPackage(String urlPath) {
+	protected PatternTuple<T> getExactPatternTuple(String urlPath) {
 		return _exactPatternTypeState.getPatternTuple(urlPath);
 	}
 
 	@Override
-	protected PatternTuple<T> getExtensionPatternPackage(String urlPath) {
+	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
 		return _extensionPatternTypeState.getPatternTuple(urlPath);
 	}
 
 	@Override
-	protected PatternTuple<T> getWildcardPatternPackage(String urlPath) {
+	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
 		return _wildcardPatternTypeState.getPatternTuple(urlPath);
 	}
 
 	@Override
-	protected List<PatternTuple<T>> getWildcardPatternPackages(String urlPath) {
+	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
 		return _wildcardPatternTypeState.getPatternTuples(urlPath);
 	}
 
@@ -251,7 +251,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return -1;
 		}
 
-		protected void insert(String urlPattern, T cargo) {
+		protected void insert(String urlPattern, T value) {
 			byte bitIndex = getExactIndex(urlPattern);
 
 			if (bitIndex > -1) {
@@ -259,7 +259,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				// Indicating the end of the pattern
 
 				patternTuples.add(
-					bitIndex, new PatternTuple<>(urlPattern, cargo));
+					bitIndex, new PatternTuple<>(urlPattern, value));
 
 				return;
 			}
@@ -292,7 +292,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// Indicating the end of the pattern
 
 			PatternTuple<T> patternTuple = new PatternTuple<>(
-				urlPattern, cargo);
+				urlPattern, value);
 
 			trieMap[1][row - 1][col] |= bitMask;
 

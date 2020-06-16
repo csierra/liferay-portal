@@ -55,19 +55,19 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	 *        All other strings are used for exact matches only.
 	 *
 	 * @param urlPattern the pattern of urlPath, used for pattern matching
-	 * @param cargo an non null object associated with urlPattern
+	 * @param value an non null object associated with urlPattern
 	 */
-	public void insert(String urlPattern, T cargo)
+	public void insert(String urlPattern, T value)
 		throws IllegalArgumentException {
 
-		if (cargo == null) {
-			throw new IllegalArgumentException("cargo cannot be null");
+		if (value == null) {
+			throw new IllegalArgumentException("Value can not be null");
 		}
 
 		// Wild Card urlPath pattern 1
 
 		if (isValidWildCardPattern(urlPattern)) {
-			insert(urlPattern, cargo, _wildCardTrie, false);
+			insert(urlPattern, value, _wildCardTrie, false);
 
 			return;
 		}
@@ -75,18 +75,18 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// Wild Card urlPath pattern 2, aka extension pattern
 
 		if (isValidExtensionPattern(urlPattern)) {
-			insert(urlPattern, cargo, _extensionTrie, true);
+			insert(urlPattern, value, _extensionTrie, true);
 
 			return;
 		}
 
 		// Exact pattern
 
-		insert(urlPattern, cargo, _exactTrie, false);
+		insert(urlPattern, value, _exactTrie, false);
 	}
 
 	@Override
-	protected PatternTuple<T> getExactPatternPackage(String urlPath) {
+	protected PatternTuple<T> getExactPatternTuple(String urlPath) {
 		TrieNode<T> prev = _exactTrie;
 
 		TrieNode<T> current = null;
@@ -111,7 +111,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternTuple<T> getExtensionPatternPackage(String urlPath) {
+	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
 		TrieNode<T> prev = _extensionTrie;
 
 		TrieNode<T> current = null;
@@ -146,7 +146,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternTuple<T> getWildcardPatternPackage(String urlPath) {
+	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
 		PatternTuple<T> bestMatch = null;
 
 		TrieNode<T> prev = _wildCardTrie;
@@ -190,7 +190,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected List<PatternTuple<T>> getWildcardPatternPackages(String urlPath) {
+	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(64);
 
 		TrieNode<T> prev = _wildCardTrie;
@@ -234,7 +234,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	protected void insert(
-		String urlPattern, T cargo, TrieNode<T> prev, boolean reverseIndex) {
+		String urlPattern, T value, TrieNode<T> prev, boolean reverseIndex) {
 
 		TrieNode<T> current = null;
 
@@ -255,20 +255,13 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		if (current != null) {
-			current.fillPatternPackage(urlPattern, cargo);
+			current.fillPatternPackage(urlPattern, value);
 		}
 	}
 
 	private final TrieNode<T> _exactTrie;
 	private final TrieNode<T> _extensionTrie;
-
-	/**
-	 * Continuously instantiate a certain number of trieNode
-	 * at beginning for continuous memory block, and better
-	 * cache locality.
-	 */
 	private final TrieNodeHeap<T> _trieNodeHeap;
-
 	private final TrieNode<T> _wildCardTrie;
 
 	private static class TrieNode<T> {
@@ -281,8 +274,8 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			}
 		}
 
-		public void fillPatternPackage(String urlPattern, T cargo) {
-			_patternTuple = new PatternTuple<>(urlPattern, cargo);
+		public void fillPatternPackage(String urlPattern, T value) {
+			_patternTuple = new PatternTuple<>(urlPattern, value);
 		}
 
 		public PatternTuple<T> getPatternTuple() {
@@ -290,11 +283,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public boolean isEnd() {
-			if (_patternTuple != null) {
-				return true;
-			}
-
-			return false;
+			return _patternTuple != null;
 		}
 
 		public TrieNode<T> next(char character) {

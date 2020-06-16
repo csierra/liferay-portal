@@ -37,19 +37,19 @@ public abstract class PathPatternMatcher<T> {
 	 * @return the matched pattern
 	 */
 	public PatternTuple<T> getPatternPackage(String urlPath) {
-		PatternTuple<T> patternTuple = getExactPatternPackage(urlPath);
+		PatternTuple<T> patternTuple = getExactPatternTuple(urlPath);
 
 		if (patternTuple != null) {
 			return patternTuple;
 		}
 
-		patternTuple = getWildcardPatternPackage(urlPath);
+		patternTuple = getWildcardPatternTuple(urlPath);
 
 		if (patternTuple != null) {
 			return patternTuple;
 		}
 
-		return getExtensionPatternPackage(urlPath);
+		return getExtensionPatternTuple(urlPath);
 	}
 
 	/**
@@ -64,16 +64,16 @@ public abstract class PathPatternMatcher<T> {
 	 * @return all the matched patterns
 	 */
 	public List<PatternTuple<T>> getPatternPackages(String urlPath) {
-		List<PatternTuple<T>> patternTuples = getWildcardPatternPackages(
+		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(
 			urlPath);
 
-		PatternTuple<T> patternTuple = getExactPatternPackage(urlPath);
+		PatternTuple<T> patternTuple = getExactPatternTuple(urlPath);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
 		}
 
-		patternTuple = getExtensionPatternPackage(urlPath);
+		patternTuple = getExtensionPatternTuple(urlPath);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
@@ -82,18 +82,18 @@ public abstract class PathPatternMatcher<T> {
 		return patternTuples;
 	}
 
-	public abstract void insert(String urlPattern, T cargo)
+	public abstract void insert(String urlPattern, T value)
 		throws IllegalArgumentException;
 
-	protected abstract PatternTuple<T> getExactPatternPackage(String urlPath);
+	protected abstract PatternTuple<T> getExactPatternTuple(String urlPath);
 
-	protected abstract PatternTuple<T> getExtensionPatternPackage(
+	protected abstract PatternTuple<T> getExtensionPatternTuple(
 		String urlPath);
 
-	protected abstract PatternTuple<T> getWildcardPatternPackage(
+	protected abstract PatternTuple<T> getWildcardPatternTuple(
 		String urlPath);
 
-	protected abstract List<PatternTuple<T>> getWildcardPatternPackages(
+	protected abstract List<PatternTuple<T>> getWildcardPatternTuples(
 		String urlPath);
 
 	/**
