@@ -30,20 +30,16 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
-import com.liferay.portal.remote.cors.internal.path.pattern.matcher.DynamicPathPatternMatcher;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcher;
+import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcherFactory;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternPackage;
-import com.liferay.portal.remote.cors.internal.path.pattern.matcher.StaticPathPatternMatcher;
 
-import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -288,38 +284,6 @@ public class PortalCORSServletFilter
 
 	protected final CORSSupport corsSupport = new CORSSupport();
 
-	private PathPatternMatcher<Map<String, String>> _createPatternMatcher(
-		HashMap<String, Map<String, String>> patternsHeadersMap) {
-
-		PathPatternMatcher<Map<String, String>> pathPatternMatcher;
-
-		if (patternsHeadersMap.size() > 64) {
-			pathPatternMatcher = new DynamicPathPatternMatcher<>();
-		}
-		else {
-			Set<String> keySet = patternsHeadersMap.keySet();
-
-			Stream<String> stream = keySet.stream();
-
-			pathPatternMatcher = new StaticPathPatternMatcher<>(
-				stream.map(
-					String::length
-				).max(
-					Comparator.naturalOrder()
-				).orElse(
-					0
-				));
-		}
-
-		for (Map.Entry<String, Map<String, String>> entry :
-				patternsHeadersMap.entrySet()) {
-
-			pathPatternMatcher.insert(entry.getKey(), entry.getValue());
-		}
-
-		return pathPatternMatcher;
-	}
-
 	private void _rebuild() {
 		_rebuild(CompanyConstants.SYSTEM);
 
@@ -384,7 +348,9 @@ public class PortalCORSServletFilter
 		}
 
 		_pathPatternMatchers.put(
-			companyId, _createPatternMatcher(patternsHeadersMap));
+			companyId,
+			_pathPatternMatcherFactory.createPatternMatcher(
+				patternsHeadersMap));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -396,6 +362,10 @@ public class PortalCORSServletFilter
 
 	@Reference
 	private Http _http;
+
+	@Reference
+	private PathPatternMatcherFactory<Map<String, String>>
+		_pathPatternMatcherFactory;
 
 	private final Map<Long, PathPatternMatcher<Map<String, String>>>
 		_pathPatternMatchers = new ConcurrentHashMap<>();
