@@ -290,7 +290,11 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public boolean isEnd() {
-			return _patternTuple != null;
+			if (_patternTuple != null) {
+				return true;
+			}
+
+			return false;
 		}
 
 		public TrieNode<T> next(char character) {
