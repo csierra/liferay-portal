@@ -292,11 +292,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public boolean isEnd() {
-			if (_patternTuple != null) {
-				return true;
-			}
-
-			return false;
+			return _patternTuple != null;
 		}
 
 		public TrieNode<T> next(char character) {
@@ -346,7 +342,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			_trieNodeHeap = new ArrayList<>(_INIT_SIZE);
 
 			for (int i = 0; i < _INIT_SIZE; ++i) {
-				_trieNodeHeap.add(new TrieNode<T>());
+				_trieNodeHeap.add(new TrieNode<>());
 			}
 		}
 
@@ -355,7 +351,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				_trieNodeHeap.ensureCapacity(_trieNodeHeap.size() + _INIT_SIZE);
 
 				for (int i = 0; i < _INIT_SIZE; ++i) {
-					_trieNodeHeap.add(new TrieNode<T>());
+					_trieNodeHeap.add(new TrieNode<>());
 				}
 			}
 
