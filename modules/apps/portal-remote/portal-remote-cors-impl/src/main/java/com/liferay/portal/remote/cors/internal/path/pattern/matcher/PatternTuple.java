@@ -14,50 +14,25 @@
 
 package com.liferay.portal.remote.cors.internal.path.pattern.matcher;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Arthur Chan
  */
-public class PatternPackage<T> {
+public class PatternTuple<T> {
 
-	public PatternPackage() {
-		_cargoList = new ArrayList<>(_BIG_ENOUGH);
+	public PatternTuple(String pattern, T value) {
+		_pattern = pattern;
+		_value = value;
 	}
 
-	public void clear() {
-		_pattern = null;
-		_cargoList.clear();
-	}
-
-	public List<T> getCargoList() {
-		return _cargoList;
+	public T getValue() {
+		return _value;
 	}
 
 	public String getPattern() {
 		return _pattern;
 	}
 
-	public boolean isEmpty() {
-		if (_pattern == null) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public void set(String pattern, T cargo) {
-		if (_pattern == null) {
-			_pattern = pattern;
-		}
-
-		_cargoList.add(cargo);
-	}
-
-	private static final byte _BIG_ENOUGH = 32;
-
-	private final List<T> _cargoList;
-	private String _pattern;
+	private final T _value;
+	private final String _pattern;
 
 }

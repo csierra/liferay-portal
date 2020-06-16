@@ -86,7 +86,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternPackage<T> getExactPatternPackage(String urlPath) {
+	protected PatternTuple<T> getExactPatternPackage(String urlPath) {
 		TrieNode<T> prev = _exactTrie;
 
 		TrieNode<T> current = null;
@@ -104,14 +104,14 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		if ((current != null) && current.isEnd()) {
-			return current.getPatternPackage();
+			return current.getPatternTuple();
 		}
 
 		return null;
 	}
 
 	@Override
-	protected PatternPackage<T> getExtensionPatternPackage(String urlPath) {
+	protected PatternTuple<T> getExtensionPatternPackage(String urlPath) {
 		TrieNode<T> prev = _extensionTrie;
 
 		TrieNode<T> current = null;
@@ -135,7 +135,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				TrieNode<T> next = current.next('*');
 
 				if ((next != null) && next.isEnd()) {
-					return next.getPatternPackage();
+					return next.getPatternTuple();
 				}
 			}
 
@@ -146,8 +146,8 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternPackage<T> getWildcardPatternPackage(String urlPath) {
-		PatternPackage<T> bestMatch = null;
+	protected PatternTuple<T> getWildcardPatternPackage(String urlPath) {
+		PatternTuple<T> bestMatch = null;
 
 		TrieNode<T> prev = _wildCardTrie;
 
@@ -164,7 +164,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				TrieNode<T> next = current.next('*');
 
 				if ((next != null) && next.isEnd()) {
-					bestMatch = next.getPatternPackage();
+					bestMatch = next.getPatternTuple();
 				}
 			}
 
@@ -181,7 +181,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				current = current.next('*');
 
 				if ((current != null) && current.isEnd()) {
-					bestMatch = current.getPatternPackage();
+					bestMatch = current.getPatternTuple();
 				}
 			}
 		}
@@ -190,10 +190,10 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected List<PatternPackage<T>> getWildcardPatternPackages(
+	protected List<PatternTuple<T>> getWildcardPatternPackages(
 		String urlPath) {
 
-		List<PatternPackage<T>> patternPackages = new ArrayList<>(64);
+		List<PatternTuple<T>> patternTuples = new ArrayList<>(64);
 
 		TrieNode<T> prev = _wildCardTrie;
 
@@ -210,7 +210,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				TrieNode<T> next = current.next('*');
 
 				if ((next != null) && next.isEnd()) {
-					patternPackages.add(next.getPatternPackage());
+					patternTuples.add(next.getPatternTuple());
 				}
 			}
 
@@ -227,12 +227,12 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				current = current.next('*');
 
 				if ((current != null) && current.isEnd()) {
-					patternPackages.add(current.getPatternPackage());
+					patternTuples.add(current.getPatternTuple());
 				}
 			}
 		}
 
-		return patternPackages;
+		return patternTuples;
 	}
 
 	protected void insert(
@@ -281,20 +281,22 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			for (int i = 0; i < CHARACTER_RANGE; ++i) {
 				_link.add(null);
 			}
-
-			_patternPackage = new PatternPackage<>();
 		}
 
 		public void fillPatternPackage(String urlPattern, T cargo) {
-			_patternPackage.set(urlPattern, cargo);
+			_patternTuple = new PatternTuple<>(urlPattern, cargo);
 		}
 
-		public PatternPackage<T> getPatternPackage() {
-			return _patternPackage;
+		public PatternTuple<T> getPatternTuple() {
+			return _patternTuple;
 		}
 
 		public boolean isEnd() {
-			return !_patternPackage.isEmpty();
+			if (_patternTuple != null) {
+				return true;
+			}
+
+			return false;
 		}
 
 		public TrieNode<T> next(char character) {
@@ -334,7 +336,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		 */
 		private final List<TrieNode<T>> _link;
 
-		private final PatternPackage<T> _patternPackage;
+		private PatternTuple<T> _patternTuple;
 
 	}
 

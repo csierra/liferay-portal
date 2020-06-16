@@ -36,17 +36,17 @@ public abstract class PathPatternMatcher<T> {
 	 * @param urlPath a legal urlPath from a URL
 	 * @return the matched pattern
 	 */
-	public PatternPackage<T> getPatternPackage(String urlPath) {
-		PatternPackage<T> patternPackage = getExactPatternPackage(urlPath);
+	public PatternTuple<T> getPatternPackage(String urlPath) {
+		PatternTuple<T> patternTuple = getExactPatternPackage(urlPath);
 
-		if (patternPackage != null) {
-			return patternPackage;
+		if (patternTuple != null) {
+			return patternTuple;
 		}
 
-		patternPackage = getWildcardPatternPackage(urlPath);
+		patternTuple = getWildcardPatternPackage(urlPath);
 
-		if (patternPackage != null) {
-			return patternPackage;
+		if (patternTuple != null) {
+			return patternTuple;
 		}
 
 		return getExtensionPatternPackage(urlPath);
@@ -63,37 +63,37 @@ public abstract class PathPatternMatcher<T> {
 	 * @param urlPath a legal urlPath from a URL
 	 * @return all the matched patterns
 	 */
-	public List<PatternPackage<T>> getPatternPackages(String urlPath) {
-		List<PatternPackage<T>> patternPackages = getWildcardPatternPackages(
+	public List<PatternTuple<T>> getPatternPackages(String urlPath) {
+		List<PatternTuple<T>> patternTuples = getWildcardPatternPackages(
 			urlPath);
 
-		PatternPackage<T> patternPackage = getExactPatternPackage(urlPath);
+		PatternTuple<T> patternTuple = getExactPatternPackage(urlPath);
 
-		if (patternPackage != null) {
-			patternPackages.add(patternPackage);
+		if (patternTuple != null) {
+			patternTuples.add(patternTuple);
 		}
 
-		patternPackage = getExtensionPatternPackage(urlPath);
+		patternTuple = getExtensionPatternPackage(urlPath);
 
-		if (patternPackage != null) {
-			patternPackages.add(patternPackage);
+		if (patternTuple != null) {
+			patternTuples.add(patternTuple);
 		}
 
-		return patternPackages;
+		return patternTuples;
 	}
 
 	public abstract void insert(String urlPattern, T cargo)
 		throws IllegalArgumentException;
 
-	protected abstract PatternPackage<T> getExactPatternPackage(String urlPath);
+	protected abstract PatternTuple<T> getExactPatternPackage(String urlPath);
 
-	protected abstract PatternPackage<T> getExtensionPatternPackage(
+	protected abstract PatternTuple<T> getExtensionPatternPackage(
 		String urlPath);
 
-	protected abstract PatternPackage<T> getWildcardPatternPackage(
+	protected abstract PatternTuple<T> getWildcardPatternPackage(
 		String urlPath);
 
-	protected abstract List<PatternPackage<T>> getWildcardPatternPackages(
+	protected abstract List<PatternTuple<T>> getWildcardPatternPackages(
 		String urlPath);
 
 	/**

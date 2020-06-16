@@ -50,12 +50,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		wildcardList = new ArrayList<>(_LONG_BITS_SIZE);
 
 		extensionList = new ArrayList<>(_LONG_BITS_SIZE);
-
-		for (byte i = 0; i < _LONG_BITS_SIZE; ++i) {
-			exactList.add(new PatternPackage<>());
-			wildcardList.add(new PatternPackage<>());
-			extensionList.add(new PatternPackage<>());
-		}
 	}
 
 	/**
@@ -226,7 +220,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternPackage<T> getExactPatternPackage(String urlPath) {
+	protected PatternTuple<T> getExactPatternPackage(String urlPath) {
 		byte index = getExactIndex(urlPath, 0);
 
 		if (index < 0) {
@@ -237,7 +231,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternPackage<T> getExtensionPatternPackage(String urlPath) {
+	protected PatternTuple<T> getExtensionPatternPackage(String urlPath) {
 		long current = _ALL_BITS;
 
 		for (byte row = 0; row < urlPath.length(); ++row) {
@@ -275,7 +269,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternPackage<T> getWildcardPatternPackage(String urlPath) {
+	protected PatternTuple<T> getWildcardPatternPackage(String urlPath) {
 		byte row = 0;
 
 		long current = _ALL_BITS;
@@ -338,10 +332,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected List<PatternPackage<T>> getWildcardPatternPackages(
+	protected List<PatternTuple<T>> getWildcardPatternPackages(
 		String urlPath) {
 
-		List<PatternPackage<T>> patternPackages = new ArrayList<>(
+		List<PatternTuple<T>> patternTuples = new ArrayList<>(
 			_LONG_BITS_SIZE);
 
 		byte row = 0;
@@ -377,7 +371,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					current & _wildcardTrieMap[1][row + 1][_STAR_INDEX];
 
 				if (wildcardPattern != 0) {
-					patternPackages.add(
+					patternTuples.add(
 						wildcardList.get(getSetBitIndex(wildcardPattern)));
 				}
 			}
@@ -393,33 +387,30 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			extra &= _wildcardTrieMap[1][row + 1][_STAR_INDEX];
 
 			if (extra != 0) {
-				patternPackages.add(wildcardList.get(getSetBitIndex(extra)));
+				patternTuples.add(wildcardList.get(getSetBitIndex(extra)));
 			}
 		}
 
-		return patternPackages;
+		return patternTuples;
 	}
 
 	protected void insert(String urlPattern, T cargo, int insertType) {
-		PatternPackage<T> patternPackage = null;
-
 		byte bitIndex = getExactIndex(urlPattern, insertType);
 
 		if (bitIndex > -1) {
-
 			// Indicating the end of the pattern
+			PatternTuple<T> patternTuple =
+				new PatternTuple<>(urlPattern, cargo);
 
 			if (insertType == 0) {
-				patternPackage = exactList.get(bitIndex);
+				exactList.add(bitIndex, patternTuple);
 			}
 			else if (insertType == 1) {
-				patternPackage = wildcardList.get(bitIndex);
+				wildcardList.add(bitIndex, patternTuple);
 			}
 			else {
-				patternPackage = extensionList.get(bitIndex);
+				extensionList.add(bitIndex, patternTuple);
 			}
-
-			patternPackage.set(urlPattern, cargo);
 
 			return;
 		}
@@ -466,27 +457,30 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		// Indicating the end of the pattern
 
+		PatternTuple<T> patternTuple = new PatternTuple<>(urlPattern, cargo);
+
 		if (insertType == 0) {
 			_exactTrieMap[1][row - 1][col] |= bitMask;
-			patternPackage = exactList.get(bitIndex);
+
+			exactList.add(bitIndex, patternTuple);
 		}
 		else if (insertType == 1) {
 			_wildcardTrieMap[1][row - 1][col] |= bitMask;
-			patternPackage = wildcardList.get(bitIndex);
+
+			wildcardList.add(bitIndex, patternTuple);
 		}
 		else {
 			_extensionTrieMap[1][row - 1][col] |= bitMask;
-			patternPackage = extensionList.get(bitIndex);
-		}
 
-		patternPackage.set(urlPattern, cargo);
+			extensionList.add(bitIndex, patternTuple);
+		}
 	}
 
-	protected List<PatternPackage<T>> exactList;
+	protected List<PatternTuple<T>> exactList;
 	protected byte exactPatterns;
-	protected List<PatternPackage<T>> extensionList;
+	protected List<PatternTuple<T>> extensionList;
 	protected byte extensionPatterns;
-	protected List<PatternPackage<T>> wildcardList;
+	protected List<PatternTuple<T>> wildcardList;
 	protected byte wildcardPatterns;
 
 	private static final long _ALL_BITS = ~0;

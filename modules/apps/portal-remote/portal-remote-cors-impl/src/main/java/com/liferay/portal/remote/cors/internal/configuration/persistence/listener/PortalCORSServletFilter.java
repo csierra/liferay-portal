@@ -32,7 +32,7 @@ import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcher;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcherFactory;
-import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternPackage;
+import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternTuple;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -247,12 +247,12 @@ public class PortalCORSServletFilter
 			}
 		}
 
-		PatternPackage<Map<String, String>> patternPackage =
+		PatternTuple<Map<String, String>> patternTuple =
 			pathPatternMatcher.getPatternPackage(getURI(httpServletRequest));
 
-		if (patternPackage != null) {
+		if (patternTuple != null) {
 			List<Map<String, String>> headersList =
-				patternPackage.getCargoList();
+				patternTuple.getValue();
 
 			corsSupport.setCORSHeaders(headersList.get(0));
 		}
