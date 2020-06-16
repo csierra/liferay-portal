@@ -296,7 +296,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public TrieNode<T> next(char character) {
-			int index = character - '\0' - PRINTABLE_OFFSET;
+			int index = character - PRINTABLE_OFFSET;
 
 			if ((index < 0) ||
 				(index >= (CHARACTER_RANGE + PRINTABLE_OFFSET))) {
@@ -312,7 +312,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			TrieNode<T> node = trieNodeHeap.nextNode();
 
-			int index = character - '\0' - PRINTABLE_OFFSET;
+			int index = character - PRINTABLE_OFFSET;
 
 			if ((index < 0) ||
 				(index >= (CHARACTER_RANGE + PRINTABLE_OFFSET))) {

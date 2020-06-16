@@ -183,7 +183,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				character = urlPath.charAt(urlPath.length() - 1 - row);
 			}
 
-			col = character - '\0' - PRINTABLE_OFFSET;
+			col = character - PRINTABLE_OFFSET;
 
 			if (type == 0) {
 				current &= _exactTrieMap[0][row][col];
@@ -245,7 +245,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				break;
 			}
 
-			int col = character - '\0' - PRINTABLE_OFFSET;
+			int col = character - PRINTABLE_OFFSET;
 
 			current &= _extensionTrieMap[0][row][col];
 
@@ -290,7 +290,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			char character = urlPath.charAt(row);
 
-			int col = character - '\0' - PRINTABLE_OFFSET;
+			int col = character - PRINTABLE_OFFSET;
 
 			current &= _wildcardTrieMap[0][row][col];
 
@@ -356,7 +356,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			char character = urlPath.charAt(row);
 
-			int col = character - '\0' - PRINTABLE_OFFSET;
+			int col = character - PRINTABLE_OFFSET;
 
 			current &= _wildcardTrieMap[0][row][col];
 
@@ -442,7 +442,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				character = urlPattern.charAt(urlPattern.length() - 1 - row);
 			}
 
-			col = character - '\0' - PRINTABLE_OFFSET;
+			col = character - PRINTABLE_OFFSET;
 
 			if (insertType == 0) {
 				_exactTrieMap[0][row][col] |= bitMask;
