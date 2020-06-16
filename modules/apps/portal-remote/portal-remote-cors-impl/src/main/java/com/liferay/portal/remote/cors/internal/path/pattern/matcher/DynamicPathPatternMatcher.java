@@ -76,7 +76,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// Wild Card urlPath pattern 1
 
 		if (isValidWildCardPattern(urlPattern)) {
-			insert(urlPattern, cargo, 1);
+			insert(urlPattern, cargo, _wildCardTrie, false);
 
 			return;
 		}
@@ -84,14 +84,14 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// Wild Card urlPath pattern 2, aka extension pattern
 
 		if (isValidExtensionPattern(urlPattern)) {
-			insert(urlPattern, cargo, 2);
+			insert(urlPattern, cargo, _extensionTrie, true);
 
 			return;
 		}
 
 		// Exact pattern
 
-		insert(urlPattern, cargo, 0);
+		insert(urlPattern, cargo, _exactTrie, false);
 	}
 
 	@Override
@@ -244,25 +244,15 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return patternPackages;
 	}
 
-	protected void insert(String urlPattern, T cargo, int insertType) {
-		TrieNode<T> prev = null;
-
-		if (insertType == 0) {
-			prev = _exactTrie;
-		}
-		else if (insertType == 1) {
-			prev = _wildCardTrie;
-		}
-		else {
-			prev = _extensionTrie;
-		}
+	protected void insert(
+		String urlPattern, T cargo, TrieNode<T> prev, boolean reverseIndex) {
 
 		TrieNode<T> current = null;
 
 		for (int i = 0; i < urlPattern.length(); ++i) {
 			int index = i;
 
-			if ((insertType != 0) && (insertType != 1)) {
+			if (reverseIndex) {
 				index = urlPattern.length() - 1 - i;
 			}
 
