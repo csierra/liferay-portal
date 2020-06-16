@@ -81,8 +81,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	public void insert(String urlPattern, T cargo)
 		throws IllegalArgumentException {
 
-		super.insert(urlPattern, cargo);
-
 		// Wild Card path pattern 1
 
 		if (isValidWildCardPattern(urlPattern)) {
