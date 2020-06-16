@@ -58,32 +58,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 	}
 
-	public void clear() {
-		for (int i = 0; i < 2; ++i) {
-			for (int j = 0; j < _maxPatternLength; ++j) {
-				for (int k = 0; k < CHARACTER_RANGE; ++k) {
-					_exactTrieMap[i][j][k] = 0;
-					_wildcardTrieMap[i][j][k] = 0;
-					_extensionTrieMap[i][j][k] = 0;
-				}
-			}
-		}
-
-		for (byte i = 0; i < _LONG_BITS_SIZE; ++i) {
-			PatternPackage<T> patternPackage = exactList.get(i);
-
-			patternPackage.clear();
-
-			patternPackage = wildcardList.get(i);
-
-			patternPackage.clear();
-
-			patternPackage = extensionList.get(i);
-
-			patternPackage.clear();
-		}
-	}
-
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *

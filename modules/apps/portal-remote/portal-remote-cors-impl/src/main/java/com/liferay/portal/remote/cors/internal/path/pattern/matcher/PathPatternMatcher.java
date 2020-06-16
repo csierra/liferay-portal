@@ -24,8 +24,6 @@ import java.util.List;
  */
 public abstract class PathPatternMatcher<T> {
 
-	public abstract void clear();
-
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
 	 *

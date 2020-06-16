@@ -31,15 +31,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	/**
-	 * Removes all of the urlPath patterns.
-	 */
-	public void clear() {
-		_extensionTrie.clear();
-		_exactTrie.clear();
-		_wildCardTrie.clear();
-	}
-
-	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
 	 * In the Web application deployment descriptor, the following syntax is
