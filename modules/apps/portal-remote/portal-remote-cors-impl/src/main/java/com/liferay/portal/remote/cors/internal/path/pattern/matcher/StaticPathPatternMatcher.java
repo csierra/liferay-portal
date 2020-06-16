@@ -264,7 +264,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				return;
 			}
 
-			count++;
+			bitIndex = count++;
 
 			long bitMask = 1;
 
