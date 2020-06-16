@@ -256,7 +256,9 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			prev = current;
 		}
 
-		current.fillPatternPackage(urlPattern, cargo);
+		if (current != null) {
+			current.fillPatternPackage(urlPattern, cargo);
+		}
 	}
 
 	private final TrieNode<T> _exactTrie;
@@ -281,11 +283,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			}
 
 			_patternPackage = new PatternPackage<>();
-		}
-
-		public void clear() {
-			_patternPackage.clear();
-			_link.clear();
 		}
 
 		public void fillPatternPackage(String urlPattern, T cargo) {
