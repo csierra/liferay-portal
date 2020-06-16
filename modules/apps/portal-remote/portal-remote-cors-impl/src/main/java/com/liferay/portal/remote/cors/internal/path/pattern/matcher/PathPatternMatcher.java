@@ -85,14 +85,6 @@ public abstract class PathPatternMatcher<T> {
 	public abstract void insert(String urlPattern, T cargo)
 		throws IllegalArgumentException;
 
-	public boolean isContextRoot(String urlPath) {
-		return contextRoot & urlPath.equals("/");
-	}
-
-	public boolean isDefautServlet(String urlPath) {
-		return defaultServlet & urlPath.equals("");
-	}
-
 	protected abstract PatternPackage<T> getExactPatternPackage(String urlPath);
 
 	protected abstract PatternPackage<T> getExtensionPatternPackage(
@@ -180,8 +172,5 @@ public abstract class PathPatternMatcher<T> {
 	 * Index from 32(space) to 127(delete)
 	 */
 	protected static final byte PRINTABLE_OFFSET = 32;
-
-	protected boolean contextRoot;
-	protected boolean defaultServlet;
 
 }
