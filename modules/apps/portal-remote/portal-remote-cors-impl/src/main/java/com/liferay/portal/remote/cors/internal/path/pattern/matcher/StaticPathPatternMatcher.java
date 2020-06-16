@@ -39,12 +39,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		_maxPatternLength = (byte)longestURLPatternSize;
 
-		_exactPatternTypeState = new PatternTypeState<>(
-			_maxPatternLength, false);
-		_extensionPatternTypeState = new PatternTypeState<>(
-			_maxPatternLength, true);
-		_wildcardPatternTypeState = new PatternTypeState<>(
-			_maxPatternLength, false);
+		_exactPatternTypeState = new ExactPatternMatcher<>(_maxPatternLength);
+		_extensionPatternTypeState = new ExtensionPatternMatcher<>(
+			_maxPatternLength);
+		_wildcardPatternTypeState = new WildcardPatternMatcher<>(
+			_maxPatternLength);
 	}
 
 	/**
@@ -157,184 +156,22 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	@Override
 	protected PatternTuple<T> getExactPatternPackage(String urlPath) {
-		byte index = _exactPatternTypeState.getExactIndex(urlPath);
-
-		if (index < 0) {
-			return null;
-		}
-
-		return _exactPatternTypeState.patternTuples.get(index);
+		return _exactPatternTypeState.getPatternTuple(urlPath);
 	}
 
 	@Override
 	protected PatternTuple<T> getExtensionPatternPackage(String urlPath) {
-		long current = _ALL_BITS;
-
-		for (byte row = 0; row < urlPath.length(); ++row) {
-			if (row > (_maxPatternLength - 1)) {
-				break;
-			}
-
-			char character = urlPath.charAt(urlPath.length() - 1 - row);
-
-			if (character == '/') {
-				break;
-			}
-
-			int col = character - PRINTABLE_OFFSET;
-
-			current &= _extensionPatternTypeState.trieMap[0][row][col];
-
-			if (current == 0) {
-				break;
-			}
-
-			if ((character == '.') && ((row + 1) < _maxPatternLength)) {
-				long extensionPattern =
-					current &
-					_extensionPatternTypeState.trieMap[1][row + 1][_STAR_INDEX];
-
-				if (extensionPattern != 0) {
-					return _extensionPatternTypeState.patternTuples.get(
-						getSetBitIndex(extensionPattern));
-				}
-
-				break;
-			}
-		}
-
-		return null;
+		return _extensionPatternTypeState.getPatternTuple(urlPath);
 	}
 
 	@Override
 	protected PatternTuple<T> getWildcardPatternPackage(String urlPath) {
-		byte row = 0;
-
-		long current = _ALL_BITS;
-
-		long bestMatch = 0;
-
-		// This loop tries to find every wildcard match at
-		// every '/' character.
-		// Variable current indicates if current character
-		// exists as part of a pattern in the matrix.
-
-		long[][][] trieMap = _wildcardPatternTypeState.trieMap;
-
-		for (; row < urlPath.length(); ++row) {
-			if (row > (_maxPatternLength - 1)) {
-				current = 0;
-
-				break;
-			}
-
-			char character = urlPath.charAt(row);
-
-			int col = character - PRINTABLE_OFFSET;
-
-			current &= trieMap[0][row][col];
-
-			if (current == 0) {
-				row++;
-
-				break;
-			}
-
-			if ((character == '/') && ((row + 1) < _maxPatternLength)) {
-				long wildcardPattern =
-					current & trieMap[1][row + 1][_STAR_INDEX];
-
-				if (wildcardPattern != 0) {
-					bestMatch = wildcardPattern;
-				}
-			}
-		}
-
-		// if current is zero, it means trie travesaling
-		// did not match till the last character.
-
-		if ((current != 0) && ((row + 1) < _maxPatternLength)) {
-			long extra = current & trieMap[0][row][_SLASH_INDEX];
-
-			extra &= trieMap[0][row + 1][_STAR_INDEX];
-			extra &= trieMap[1][row + 1][_STAR_INDEX];
-
-			if (extra != 0) {
-				bestMatch = extra;
-			}
-		}
-
-		if (bestMatch == 0) {
-			return null;
-		}
-
-		return _wildcardPatternTypeState.patternTuples.get(
-			getSetBitIndex(bestMatch));
+		return _wildcardPatternTypeState.getPatternTuple(urlPath);
 	}
 
 	@Override
 	protected List<PatternTuple<T>> getWildcardPatternPackages(String urlPath) {
-		List<PatternTuple<T>> patternTuples = new ArrayList<>(_LONG_BITS_SIZE);
-
-		byte row = 0;
-
-		long current = _ALL_BITS;
-
-		// This loop tries to find every wildcard match at
-		// every '/' character.
-		// Variable current indicates if current character
-		// exists as part of a pattern in the matrix.
-
-		long[][][] trieMap = _wildcardPatternTypeState.trieMap;
-
-		for (; row < urlPath.length(); ++row) {
-			if (row > (_maxPatternLength - 1)) {
-				current = 0;
-
-				break;
-			}
-
-			char character = urlPath.charAt(row);
-
-			int col = character - PRINTABLE_OFFSET;
-
-			current &= trieMap[0][row][col];
-
-			if (current == 0) {
-				row++;
-
-				break;
-			}
-
-			if ((character == '/') && ((row + 1) < _maxPatternLength)) {
-				long wildcardPattern =
-					current & trieMap[1][row + 1][_STAR_INDEX];
-
-				if (wildcardPattern != 0) {
-					patternTuples.add(
-						_wildcardPatternTypeState.patternTuples.get(
-							getSetBitIndex(wildcardPattern)));
-				}
-			}
-		}
-
-		// if current is zero, it means trie travesaling
-		// did not match till the last character.
-
-		if ((current != 0) && ((row + 1) < _maxPatternLength)) {
-			long extra = current & trieMap[0][row][_SLASH_INDEX];
-
-			extra &= trieMap[0][row + 1][_STAR_INDEX];
-			extra &= trieMap[1][row + 1][_STAR_INDEX];
-
-			if (extra != 0) {
-				patternTuples.add(
-					_wildcardPatternTypeState.patternTuples.get(
-						getSetBitIndex(extra)));
-			}
-		}
-
-		return patternTuples;
+		return _wildcardPatternTypeState.getPatternTuples(urlPath);
 	}
 
 	private static final long _ALL_BITS = ~0;
@@ -345,23 +182,25 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	private static final byte _STAR_INDEX = 42 - PRINTABLE_OFFSET;
 
-	private final PatternTypeState<T> _exactPatternTypeState;
-	private final PatternTypeState<T> _extensionPatternTypeState;
+	private final ExactPatternMatcher<T> _exactPatternTypeState;
+	private final ExtensionPatternMatcher<T> _extensionPatternTypeState;
 
 	/**
 	 * Length of longest URL pattern
 	 */
 	private final byte _maxPatternLength;
 
-	private final PatternTypeState<T> _wildcardPatternTypeState;
+	private final WildcardPatternMatcher<T> _wildcardPatternTypeState;
 
-	private static class PatternTypeState<T> {
+	private abstract static class BasePatternMatcher<T> {
 
-		public PatternTypeState(byte maxPatternLength, boolean invertIndex) {
-			_maxPatternLength = maxPatternLength;
+		public BasePatternMatcher(byte maxPatternLength, boolean invertIndex) {
+			this.maxPatternLength = maxPatternLength;
 			this.invertIndex = invertIndex;
-			trieMap = new long[2][_maxPatternLength][CHARACTER_RANGE];
+			trieMap = new long[2][maxPatternLength][CHARACTER_RANGE];
 		}
+
+		public abstract PatternTuple<T> getPatternTuple(String urlPath);
 
 		public byte count;
 		public boolean invertIndex;
@@ -377,7 +216,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			int col = 0;
 
 			for (; row < urlPath.length(); ++row) {
-				if (row > (_maxPatternLength - 1)) {
+				if (row > (maxPatternLength - 1)) {
 					current = 0;
 
 					break;
@@ -460,7 +299,206 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			patternTuples.add(bitIndex, patternTuple);
 		}
 
-		private byte _maxPatternLength;
+		protected byte maxPatternLength;
+
+	}
+
+	private static class ExactPatternMatcher<T> extends BasePatternMatcher<T> {
+
+		public ExactPatternMatcher(byte maxPatternLength) {
+			super(maxPatternLength, false);
+		}
+
+		@Override
+		public PatternTuple<T> getPatternTuple(String urlPath) {
+			byte index = getExactIndex(urlPath);
+
+			if (index < 0) {
+				return null;
+			}
+
+			return patternTuples.get(index);
+		}
+
+	}
+
+	private static class ExtensionPatternMatcher<T>
+		extends BasePatternMatcher<T> {
+
+		public ExtensionPatternMatcher(byte maxPatternLength) {
+			super(maxPatternLength, true);
+		}
+
+		@Override
+		public PatternTuple<T> getPatternTuple(String urlPath) {
+			long current = _ALL_BITS;
+
+			for (byte row = 0; row < urlPath.length(); ++row) {
+				if (row > (maxPatternLength - 1)) {
+					break;
+				}
+
+				char character = urlPath.charAt(urlPath.length() - 1 - row);
+
+				if (character == '/') {
+					break;
+				}
+
+				int col = character - PRINTABLE_OFFSET;
+
+				current &= trieMap[0][row][col];
+
+				if (current == 0) {
+					break;
+				}
+
+				if ((character == '.') && ((row + 1) < maxPatternLength)) {
+					long extensionPattern =
+						current & trieMap[1][row + 1][_STAR_INDEX];
+
+					if (extensionPattern != 0) {
+						return patternTuples.get(
+							getSetBitIndex(extensionPattern));
+					}
+
+					break;
+				}
+			}
+
+			return null;
+		}
+
+	}
+
+	private static class WildcardPatternMatcher<T>
+		extends BasePatternMatcher<T> {
+
+		public WildcardPatternMatcher(byte maxPatternLength) {
+			super(maxPatternLength, false);
+		}
+
+		@Override
+		public PatternTuple<T> getPatternTuple(String urlPath) {
+			byte row = 0;
+
+			long current = _ALL_BITS;
+
+			long bestMatch = 0;
+
+			// This loop tries to find every wildcard match at
+			// every '/' character.
+			// Variable current indicates if current character
+			// exists as part of a pattern in the matrix.
+
+			for (; row < urlPath.length(); ++row) {
+				if (row > (maxPatternLength - 1)) {
+					current = 0;
+
+					break;
+				}
+
+				char character = urlPath.charAt(row);
+
+				int col = character - PRINTABLE_OFFSET;
+
+				current &= trieMap[0][row][col];
+
+				if (current == 0) {
+					row++;
+
+					break;
+				}
+
+				if ((character == '/') && ((row + 1) < maxPatternLength)) {
+					long wildcardPattern =
+						current & trieMap[1][row + 1][_STAR_INDEX];
+
+					if (wildcardPattern != 0) {
+						bestMatch = wildcardPattern;
+					}
+				}
+			}
+
+			// if current is zero, it means trie travesaling
+			// did not match till the last character.
+
+			if ((current != 0) && ((row + 1) < maxPatternLength)) {
+				long extra = current & trieMap[0][row][_SLASH_INDEX];
+
+				extra &= trieMap[0][row + 1][_STAR_INDEX];
+				extra &= trieMap[1][row + 1][_STAR_INDEX];
+
+				if (extra != 0) {
+					bestMatch = extra;
+				}
+			}
+
+			if (bestMatch == 0) {
+				return null;
+			}
+
+			return patternTuples.get(getSetBitIndex(bestMatch));
+		}
+
+		public List<PatternTuple<T>> getPatternTuples(String urlPath) {
+			List<PatternTuple<T>> patternTuples = new ArrayList<>(
+				_LONG_BITS_SIZE);
+
+			byte row = 0;
+
+			long current = _ALL_BITS;
+
+			// This loop tries to find every wildcard match at
+			// every '/' character.
+			// Variable current indicates if current character
+			// exists as part of a pattern in the matrix.
+
+			for (; row < urlPath.length(); ++row) {
+				if (row > (maxPatternLength - 1)) {
+					current = 0;
+
+					break;
+				}
+
+				char character = urlPath.charAt(row);
+
+				int col = character - PRINTABLE_OFFSET;
+
+				current &= trieMap[0][row][col];
+
+				if (current == 0) {
+					row++;
+
+					break;
+				}
+
+				if ((character == '/') && ((row + 1) < maxPatternLength)) {
+					long wildcardPattern =
+						current & trieMap[1][row + 1][_STAR_INDEX];
+
+					if (wildcardPattern != 0) {
+						patternTuples.add(
+							patternTuples.get(getSetBitIndex(wildcardPattern)));
+					}
+				}
+			}
+
+			// if current is zero, it means trie travesaling
+			// did not match till the last character.
+
+			if ((current != 0) && ((row + 1) < maxPatternLength)) {
+				long extra = current & trieMap[0][row][_SLASH_INDEX];
+
+				extra &= trieMap[0][row + 1][_STAR_INDEX];
+				extra &= trieMap[1][row + 1][_STAR_INDEX];
+
+				if (extra != 0) {
+					patternTuples.add(patternTuples.get(getSetBitIndex(extra)));
+				}
+			}
+
+			return patternTuples;
+		}
 
 	}
 
