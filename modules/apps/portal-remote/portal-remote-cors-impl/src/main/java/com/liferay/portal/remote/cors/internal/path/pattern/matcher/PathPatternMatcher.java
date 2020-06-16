@@ -82,40 +82,15 @@ public abstract class PathPatternMatcher<T> {
 		return patternPackages;
 	}
 
-	public void insert(String urlPattern, T cargo)
-		throws IllegalArgumentException {
-
-		if (cargo == null) {
-			throw new IllegalArgumentException("cargo cannot be null");
-		}
-
-		// Special path pattern 1
-
-		if (urlPattern.length() < 1) {
-			contextRoot = true;
-		}
-
-		// Special path pattern 2
-
-		else if ((urlPattern.length() == 1) && (urlPattern.charAt(0) == '/')) {
-			defaultServlet = true;
-		}
-	}
+	public abstract void insert(String urlPattern, T cargo)
+		throws IllegalArgumentException;
 
 	public boolean isContextRoot(String urlPath) {
-		if (contextRoot & urlPath.equals("/")) {
-			return true;
-		}
-
-		return false;
+		return contextRoot & urlPath.equals("/");
 	}
 
 	public boolean isDefautServlet(String urlPath) {
-		if (defaultServlet & urlPath.equals("")) {
-			return true;
-		}
-
-		return false;
+		return defaultServlet & urlPath.equals("");
 	}
 
 	protected abstract PatternPackage<T> getExactPatternPackage(String urlPath);
