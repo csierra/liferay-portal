@@ -190,9 +190,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected List<PatternTuple<T>> getWildcardPatternPackages(
-		String urlPath) {
-
+	protected List<PatternTuple<T>> getWildcardPatternPackages(String urlPath) {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(64);
 
 		TrieNode<T> prev = _wildCardTrie;

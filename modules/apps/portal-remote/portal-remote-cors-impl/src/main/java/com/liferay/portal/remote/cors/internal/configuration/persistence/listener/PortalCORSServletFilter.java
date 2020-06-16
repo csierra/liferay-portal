@@ -37,7 +37,6 @@ import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternTuple
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -251,10 +250,7 @@ public class PortalCORSServletFilter
 			pathPatternMatcher.getPatternPackage(getURI(httpServletRequest));
 
 		if (patternTuple != null) {
-			List<Map<String, String>> headersList =
-				patternTuple.getValue();
-
-			corsSupport.setCORSHeaders(headersList.get(0));
+			corsSupport.setCORSHeaders(patternTuple.getValue());
 		}
 
 		if (StringUtil.equals(

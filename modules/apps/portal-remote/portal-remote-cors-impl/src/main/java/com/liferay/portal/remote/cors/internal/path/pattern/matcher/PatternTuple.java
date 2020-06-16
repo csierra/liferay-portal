@@ -24,15 +24,15 @@ public class PatternTuple<T> {
 		_value = value;
 	}
 
-	public T getValue() {
-		return _value;
-	}
-
 	public String getPattern() {
 		return _pattern;
 	}
 
-	private final T _value;
+	public T getValue() {
+		return _value;
+	}
+
 	private final String _pattern;
+	private final T _value;
 
 }

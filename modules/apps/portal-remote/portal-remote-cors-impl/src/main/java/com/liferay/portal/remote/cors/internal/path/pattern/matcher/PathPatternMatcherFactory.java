@@ -51,9 +51,7 @@ public class PathPatternMatcherFactory<T> {
 				));
 		}
 
-		for (Map.Entry<String, T> entry :
-				patternsHeadersMap.entrySet()) {
-
+		for (Map.Entry<String, T> entry : patternsHeadersMap.entrySet()) {
 			pathPatternMatcher.insert(entry.getKey(), entry.getValue());
 		}
 
