@@ -225,10 +225,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				char character = '/';
 
 				if (invertIndex) {
-					character = urlPath.charAt(row);
+					character = urlPath.charAt(urlPath.length() - 1 - row);
 				}
 				else {
-					character = urlPath.charAt(urlPath.length() - 1 - row);
+					character = urlPath.charAt(row);
 				}
 
 				col = character - PRINTABLE_OFFSET;
@@ -277,11 +277,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				char character = '\0';
 
 				if (invertIndex) {
-					character = urlPattern.charAt(row);
-				}
-				else {
 					character = urlPattern.charAt(
 						urlPattern.length() - 1 - row);
+				}
+				else {
+					character = urlPattern.charAt(row);
 				}
 
 				col = character - PRINTABLE_OFFSET;
