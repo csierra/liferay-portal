@@ -26,7 +26,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		_trieNodeHeap = new TrieNodeHeap<>();
 
 		_exactTrie = _trieNodeHeap.nextNode();
-		_extentionTrie = _trieNodeHeap.nextNode();
+		_extensionTrie = _trieNodeHeap.nextNode();
 		_wildCardTrie = _trieNodeHeap.nextNode();
 	}
 
@@ -34,7 +34,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	 * Removes all of the urlPath patterns.
 	 */
 	public void clear() {
-		_extentionTrie.clear();
+		_extensionTrie.clear();
 		_exactTrie.clear();
 		_wildCardTrie.clear();
 	}
@@ -121,7 +121,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	@Override
 	protected PatternPackage<T> getExtensionPatternPackage(String urlPath) {
-		TrieNode<T> prev = _extentionTrie;
+		TrieNode<T> prev = _extensionTrie;
 
 		TrieNode<T> current = null;
 
@@ -254,7 +254,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			prev = _wildCardTrie;
 		}
 		else {
-			prev = _extentionTrie;
+			prev = _extensionTrie;
 		}
 
 		TrieNode<T> current = null;
@@ -279,7 +279,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	private final TrieNode<T> _exactTrie;
-	private final TrieNode<T> _extentionTrie;
+	private final TrieNode<T> _extensionTrie;
 
 	/**
 	 * Continuously instantiate a certain number of trieNode
