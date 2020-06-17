@@ -63,23 +63,7 @@ public abstract class PathPatternMatcher<T> {
 	 * @param urlPath a legal urlPath from a URL
 	 * @return all the matched patterns
 	 */
-	public List<PatternTuple<T>> getPatternPackages(String urlPath) {
-		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(urlPath);
-
-		PatternTuple<T> patternTuple = getExactPatternTuple(urlPath);
-
-		if (patternTuple != null) {
-			patternTuples.add(patternTuple);
-		}
-
-		patternTuple = getExtensionPatternTuple(urlPath);
-
-		if (patternTuple != null) {
-			patternTuples.add(patternTuple);
-		}
-
-		return patternTuples;
-	}
+	public abstract List<PatternTuple<T>> getPatternPackages(String urlPath);
 
 	public abstract void insert(String urlPattern, T value)
 		throws IllegalArgumentException;
@@ -89,9 +73,6 @@ public abstract class PathPatternMatcher<T> {
 	protected abstract PatternTuple<T> getExtensionPatternTuple(String urlPath);
 
 	protected abstract PatternTuple<T> getWildcardPatternTuple(String urlPath);
-
-	protected abstract List<PatternTuple<T>> getWildcardPatternTuples(
-		String urlPath);
 
 	/**
 	 * A valid ExtensionPattern:

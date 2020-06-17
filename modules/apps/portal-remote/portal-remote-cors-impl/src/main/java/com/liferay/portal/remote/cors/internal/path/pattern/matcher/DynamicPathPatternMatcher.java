@@ -30,6 +30,25 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		_wildCardTrie = _trieNodeHeap.nextNode();
 	}
 
+	@Override
+	public List<PatternTuple<T>> getPatternPackages(String urlPath) {
+		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(urlPath);
+
+		PatternTuple<T> patternTuple = getExactPatternTuple(urlPath);
+
+		if (patternTuple != null) {
+			patternTuples.add(patternTuple);
+		}
+
+		patternTuple = getExtensionPatternTuple(urlPath);
+
+		if (patternTuple != null) {
+			patternTuples.add(patternTuple);
+		}
+
+		return patternTuples;
+	}
+
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
@@ -189,7 +208,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return bestMatch;
 	}
 
-	@Override
 	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(64);
 
@@ -283,11 +301,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public boolean isEnd() {
-			if (_patternTuple != null) {
-				return true;
-			}
-
-			return false;
+			return _patternTuple != null;
 		}
 
 		public TrieNode<T> next(char character) {

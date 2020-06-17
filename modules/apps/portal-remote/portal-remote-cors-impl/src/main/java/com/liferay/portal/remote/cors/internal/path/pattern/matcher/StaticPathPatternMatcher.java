@@ -47,6 +47,54 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			_maxPatternLength);
 	}
 
+	public PatternTuple<T> getPatternPackage(String urlPath) {
+		PatternTuple<T> patternTuple = _exactPathPatternMatcher.getPatternTuple(
+			urlPath);
+
+		if (patternTuple != null) {
+			return patternTuple;
+		}
+
+		patternTuple = _wildcardPathPatternMatcher.getPatternTuple(urlPath);
+
+		if (patternTuple != null) {
+			return patternTuple;
+		}
+
+		return _exactPathPatternMatcher.getPatternTuple(urlPath);
+	}
+
+	@Override
+	public List<PatternTuple<T>> getPatternPackages(String urlPath) {
+		long wildcardMatches = _wildcardPathPatternMatcher.getPatternTuples(
+			urlPath);
+
+		List<PatternTuple<T>> patterns = new ArrayList<>(_LONG_BITS_SIZE + 2);
+
+		while (wildcardMatches != 0) {
+			patterns.add(
+				_wildcardPathPatternMatcher.patternTuples.get(
+					getSetBitIndex(wildcardMatches)));
+
+			wildcardMatches &= wildcardMatches - 1;
+		}
+
+		PatternTuple<T> patternTuple = _exactPathPatternMatcher.getPatternTuple(
+			urlPath);
+
+		if (patternTuple != null) {
+			patterns.add(patternTuple);
+		}
+
+		patternTuple = _extensionPathPatternMatcher.getPatternTuple(urlPath);
+
+		if (patternTuple != null) {
+			patterns.add(patternTuple);
+		}
+
+		return patterns;
+	}
+
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
@@ -145,11 +193,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	@Override
 	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
 		return _wildcardPathPatternMatcher.getPatternTuple(urlPath);
-	}
-
-	@Override
-	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
-		return _wildcardPathPatternMatcher.getPatternTuples(urlPath);
 	}
 
 	private static final long _ALL_BITS = ~0;
@@ -425,8 +468,8 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return patternTuples.get(getSetBitIndex(bestMatch));
 		}
 
-		public List<PatternTuple<T>> getPatternTuples(String urlPath) {
-			List<PatternTuple<T>> result = new ArrayList<>(_LONG_BITS_SIZE);
+		public long getPatternTuples(String urlPath) {
+			long matches = 0;
 
 			byte row = 0;
 
@@ -461,8 +504,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 						current & trieArray[1][row + 1][_STAR_INDEX];
 
 					if (wildcardPattern != 0) {
-						result.add(
-							patternTuples.get(getSetBitIndex(wildcardPattern)));
+						matches |= wildcardPattern;
 					}
 				}
 			}
@@ -477,11 +519,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				extra &= trieArray[1][row + 1][_STAR_INDEX];
 
 				if (extra != 0) {
-					result.add(patternTuples.get(getSetBitIndex(extra)));
+					matches |= extra;
 				}
 			}
 
-			return result;
+			return matches;
 		}
 
 	}
