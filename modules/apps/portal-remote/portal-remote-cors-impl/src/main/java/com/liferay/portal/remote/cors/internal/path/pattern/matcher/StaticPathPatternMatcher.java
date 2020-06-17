@@ -361,12 +361,14 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		public PatternTuple<T> getPatternTuple(String urlPath) {
 			long current = _ALL_BITS;
 
-			for (byte row = 0; row < urlPath.length(); ++row) {
+			int urlPathLength = urlPath.length();
+
+			for (byte row = 0; row < urlPathLength; ++row) {
 				if (row > (maxPatternLength - 1)) {
 					break;
 				}
 
-				char character = urlPath.charAt(urlPath.length() - 1 - row);
+				char character = urlPath.charAt(urlPathLength - 1 - row);
 
 				if (character == '/') {
 					break;
