@@ -70,36 +70,13 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	public void insert(String urlPattern, T value)
 		throws IllegalArgumentException {
 
-		// Wild Card path pattern 1
-
 		if (isValidWildCardPattern(urlPattern)) {
-			if (_wildcardPathPatternMatcher.count > 63) {
-				throw new IllegalArgumentException(
-					"Exceeding maximum number of allowed URL patterns");
-			}
-
 			_wildcardPathPatternMatcher.insert(urlPattern, value);
 		}
-
-		// Wild Card path pattern 2, aka extension pattern
-
 		else if (isValidExtensionPattern(urlPattern)) {
-			if (_extensionPathPatternMatcher.count > 63) {
-				throw new IllegalArgumentException(
-					"Exceeding maximum number of allowed URL patterns");
-			}
-
 			_extensionPathPatternMatcher.insert(urlPattern, value);
 		}
-
-		// Exact pattern
-
 		else {
-			if (_exactPathPatternMatcher.count > 63) {
-				throw new IllegalArgumentException(
-					"Exceeding maximum number of allowed URL patterns");
-			}
-
 			_exactPathPatternMatcher.insert(urlPattern, value);
 		}
 	}
@@ -195,19 +172,14 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	private abstract static class BasePatternMatcher<T> {
 
-		public BasePatternMatcher(byte maxPatternLength, boolean invertIndex) {
+		public BasePatternMatcher(boolean invertIndex, byte maxPatternLength) {
+			_invertIndex = invertIndex;
 			this.maxPatternLength = maxPatternLength;
-			this.invertIndex = invertIndex;
+
 			trieMap = new long[2][maxPatternLength][CHARACTER_RANGE];
 		}
 
 		public abstract PatternTuple<T> getPatternTuple(String urlPath);
-
-		public byte count;
-		public boolean invertIndex;
-		public List<PatternTuple<T>> patternTuples = new ArrayList<>(
-			_LONG_BITS_SIZE);
-		public final long[][][] trieMap;
 
 		protected byte getExactIndex(String urlPath) {
 			long current = _ALL_BITS;
@@ -225,7 +197,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				char character = '/';
 
-				if (invertIndex) {
+				if (_invertIndex) {
 					character = urlPath.charAt(urlPath.length() - 1 - row);
 				}
 				else {
@@ -253,6 +225,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		protected void insert(String urlPattern, T value) {
+			if (_count > 63) {
+				throw new IllegalArgumentException(
+					"Exceeding maximum number of allowed URL patterns");
+			}
+
 			byte bitIndex = getExactIndex(urlPattern);
 
 			if (bitIndex > -1) {
@@ -265,7 +242,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				return;
 			}
 
-			bitIndex = count++;
+			bitIndex = _count++;
 
 			long bitMask = 1;
 
@@ -277,7 +254,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			for (; row < urlPattern.length(); ++row) {
 				char character = '\0';
 
-				if (invertIndex) {
+				if (_invertIndex) {
 					character = urlPattern.charAt(
 						urlPattern.length() - 1 - row);
 				}
@@ -301,6 +278,12 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		protected byte maxPatternLength;
+		protected List<PatternTuple<T>> patternTuples = new ArrayList<>(
+			_LONG_BITS_SIZE);
+		protected final long[][][] trieMap;
+
+		private byte _count;
+		private final boolean _invertIndex;
 
 	}
 
@@ -308,7 +291,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		extends BasePatternMatcher<T> {
 
 		public ExactPathPatternMatcher(byte maxPatternLength) {
-			super(maxPatternLength, false);
+			super(false, maxPatternLength);
 		}
 
 		@Override
@@ -328,7 +311,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		extends BasePatternMatcher<T> {
 
 		public ExtensionPathPatternMatcher(byte maxPatternLength) {
-			super(maxPatternLength, true);
+			super(true, maxPatternLength);
 		}
 
 		@Override
@@ -376,7 +359,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		extends BasePatternMatcher<T> {
 
 		public WildcardPathPatternMatcher(byte maxPatternLength) {
-			super(maxPatternLength, false);
+			super(false, maxPatternLength);
 		}
 
 		@Override
