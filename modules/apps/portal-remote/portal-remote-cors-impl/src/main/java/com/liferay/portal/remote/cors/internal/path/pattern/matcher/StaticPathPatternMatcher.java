@@ -61,7 +61,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return patternTuple;
 		}
 
-		return _exactPathPatternMatcher.getPatternTuple(urlPath);
+		return _extensionPathPatternMatcher.getPatternTuple(urlPath);
 	}
 
 	@Override
