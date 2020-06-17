@@ -176,7 +176,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			_invertIndex = invertIndex;
 			this.maxPatternLength = maxPatternLength;
 
-			trieMap = new long[2][maxPatternLength][CHARACTER_RANGE];
+			trieArray = new long[2][maxPatternLength][CHARACTER_RANGE];
 		}
 
 		public abstract PatternTuple<T> getPatternTuple(String urlPath);
@@ -206,7 +206,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				col = character - PRINTABLE_OFFSET;
 
-				current &= trieMap[0][row][col];
+				current &= trieArray[0][row][col];
 
 				if (current == 0) {
 					break;
@@ -214,7 +214,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			}
 
 			if (current != 0) {
-				current &= trieMap[1][row - 1][col];
+				current &= trieArray[1][row - 1][col];
 
 				if (current != 0) {
 					return getSetBitIndex(current);
@@ -264,7 +264,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				col = character - PRINTABLE_OFFSET;
 
-				trieMap[0][row][col] |= bitMask;
+				trieArray[0][row][col] |= bitMask;
 			}
 
 			// Indicating the end of the pattern
@@ -272,7 +272,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			PatternTuple<T> patternTuple = new PatternTuple<>(
 				urlPattern, value);
 
-			trieMap[1][row - 1][col] |= bitMask;
+			trieArray[1][row - 1][col] |= bitMask;
 
 			patternTuples.add(bitIndex, patternTuple);
 		}
@@ -280,7 +280,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		protected byte maxPatternLength;
 		protected List<PatternTuple<T>> patternTuples = new ArrayList<>(
 			_LONG_BITS_SIZE);
-		protected final long[][][] trieMap;
+		protected final long[][][] trieArray;
 
 		private byte _count;
 		private final boolean _invertIndex;
@@ -331,7 +331,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				int col = character - PRINTABLE_OFFSET;
 
-				current &= trieMap[0][row][col];
+				current &= trieArray[0][row][col];
 
 				if (current == 0) {
 					break;
@@ -339,7 +339,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				if ((character == '.') && ((row + 1) < maxPatternLength)) {
 					long extensionPattern =
-						current & trieMap[1][row + 1][_STAR_INDEX];
+						current & trieArray[1][row + 1][_STAR_INDEX];
 
 					if (extensionPattern != 0) {
 						return patternTuples.get(
@@ -386,7 +386,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				int col = character - PRINTABLE_OFFSET;
 
-				current &= trieMap[0][row][col];
+				current &= trieArray[0][row][col];
 
 				if (current == 0) {
 					row++;
@@ -396,7 +396,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				if ((character == '/') && ((row + 1) < maxPatternLength)) {
 					long wildcardPattern =
-						current & trieMap[1][row + 1][_STAR_INDEX];
+						current & trieArray[1][row + 1][_STAR_INDEX];
 
 					if (wildcardPattern != 0) {
 						bestMatch = wildcardPattern;
@@ -408,10 +408,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// did not match till the last character.
 
 			if ((current != 0) && ((row + 1) < maxPatternLength)) {
-				long extra = current & trieMap[0][row][_SLASH_INDEX];
+				long extra = current & trieArray[0][row][_SLASH_INDEX];
 
-				extra &= trieMap[0][row + 1][_STAR_INDEX];
-				extra &= trieMap[1][row + 1][_STAR_INDEX];
+				extra &= trieArray[0][row + 1][_STAR_INDEX];
+				extra &= trieArray[1][row + 1][_STAR_INDEX];
 
 				if (extra != 0) {
 					bestMatch = extra;
@@ -448,7 +448,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				int col = character - PRINTABLE_OFFSET;
 
-				current &= trieMap[0][row][col];
+				current &= trieArray[0][row][col];
 
 				if (current == 0) {
 					row++;
@@ -458,7 +458,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				if ((character == '/') && ((row + 1) < maxPatternLength)) {
 					long wildcardPattern =
-						current & trieMap[1][row + 1][_STAR_INDEX];
+						current & trieArray[1][row + 1][_STAR_INDEX];
 
 					if (wildcardPattern != 0) {
 						result.add(
@@ -471,10 +471,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// did not match till the last character.
 
 			if ((current != 0) && ((row + 1) < maxPatternLength)) {
-				long extra = current & trieMap[0][row][_SLASH_INDEX];
+				long extra = current & trieArray[0][row][_SLASH_INDEX];
 
-				extra &= trieMap[0][row + 1][_STAR_INDEX];
-				extra &= trieMap[1][row + 1][_STAR_INDEX];
+				extra &= trieArray[0][row + 1][_STAR_INDEX];
+				extra &= trieArray[1][row + 1][_STAR_INDEX];
 
 				if (extra != 0) {
 					result.add(patternTuples.get(getSetBitIndex(extra)));
