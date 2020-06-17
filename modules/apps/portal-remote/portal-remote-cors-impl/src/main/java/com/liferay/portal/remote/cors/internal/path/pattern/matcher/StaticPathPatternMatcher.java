@@ -39,10 +39,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		_maxPatternLength = (byte)longestURLPatternSize;
 
-		_exactPatternTypeState = new ExactPatternMatcher<>(_maxPatternLength);
-		_extensionPatternTypeState = new ExtensionPatternMatcher<>(
+		_exactPathPatternMatcher = new ExactPathPatternMatcher<>(
 			_maxPatternLength);
-		_wildcardPatternTypeState = new WildcardPatternMatcher<>(
+		_extensionPathPatternMatcher = new ExtensionPathPatternMatcher<>(
+			_maxPatternLength);
+		_wildcardPathPatternMatcher = new WildcardPathPatternMatcher<>(
 			_maxPatternLength);
 	}
 
@@ -72,34 +73,34 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// Wild Card path pattern 1
 
 		if (isValidWildCardPattern(urlPattern)) {
-			if (_wildcardPatternTypeState.count > 63) {
+			if (_wildcardPathPatternMatcher.count > 63) {
 				throw new IllegalArgumentException(
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			_wildcardPatternTypeState.insert(urlPattern, value);
+			_wildcardPathPatternMatcher.insert(urlPattern, value);
 		}
 
 		// Wild Card path pattern 2, aka extension pattern
 
 		else if (isValidExtensionPattern(urlPattern)) {
-			if (_extensionPatternTypeState.count > 63) {
+			if (_extensionPathPatternMatcher.count > 63) {
 				throw new IllegalArgumentException(
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			_extensionPatternTypeState.insert(urlPattern, value);
+			_extensionPathPatternMatcher.insert(urlPattern, value);
 		}
 
 		// Exact pattern
 
 		else {
-			if (_exactPatternTypeState.count > 63) {
+			if (_exactPathPatternMatcher.count > 63) {
 				throw new IllegalArgumentException(
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			_exactPatternTypeState.insert(urlPattern, value);
+			_exactPathPatternMatcher.insert(urlPattern, value);
 		}
 	}
 
@@ -156,22 +157,22 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	@Override
 	protected PatternTuple<T> getExactPatternTuple(String urlPath) {
-		return _exactPatternTypeState.getPatternTuple(urlPath);
+		return _exactPathPatternMatcher.getPatternTuple(urlPath);
 	}
 
 	@Override
 	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
-		return _extensionPatternTypeState.getPatternTuple(urlPath);
+		return _extensionPathPatternMatcher.getPatternTuple(urlPath);
 	}
 
 	@Override
 	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
-		return _wildcardPatternTypeState.getPatternTuple(urlPath);
+		return _wildcardPathPatternMatcher.getPatternTuple(urlPath);
 	}
 
 	@Override
 	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
-		return _wildcardPatternTypeState.getPatternTuples(urlPath);
+		return _wildcardPathPatternMatcher.getPatternTuples(urlPath);
 	}
 
 	private static final long _ALL_BITS = ~0;
@@ -182,15 +183,15 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	private static final byte _STAR_INDEX = 42 - PRINTABLE_OFFSET;
 
-	private final ExactPatternMatcher<T> _exactPatternTypeState;
-	private final ExtensionPatternMatcher<T> _extensionPatternTypeState;
+	private final ExactPathPatternMatcher<T> _exactPathPatternMatcher;
+	private final ExtensionPathPatternMatcher<T> _extensionPathPatternMatcher;
 
 	/**
 	 * Length of longest URL pattern
 	 */
 	private final byte _maxPatternLength;
 
-	private final WildcardPatternMatcher<T> _wildcardPatternTypeState;
+	private final WildcardPathPatternMatcher<T> _wildcardPathPatternMatcher;
 
 	private abstract static class BasePatternMatcher<T> {
 
@@ -303,9 +304,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	}
 
-	private static class ExactPatternMatcher<T> extends BasePatternMatcher<T> {
+	private static class ExactPathPatternMatcher<T>
+		extends BasePatternMatcher<T> {
 
-		public ExactPatternMatcher(byte maxPatternLength) {
+		public ExactPathPatternMatcher(byte maxPatternLength) {
 			super(maxPatternLength, false);
 		}
 
@@ -322,10 +324,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	}
 
-	private static class ExtensionPatternMatcher<T>
+	private static class ExtensionPathPatternMatcher<T>
 		extends BasePatternMatcher<T> {
 
-		public ExtensionPatternMatcher(byte maxPatternLength) {
+		public ExtensionPathPatternMatcher(byte maxPatternLength) {
 			super(maxPatternLength, true);
 		}
 
@@ -370,10 +372,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	}
 
-	private static class WildcardPatternMatcher<T>
+	private static class WildcardPathPatternMatcher<T>
 		extends BasePatternMatcher<T> {
 
-		public WildcardPatternMatcher(byte maxPatternLength) {
+		public WildcardPathPatternMatcher(byte maxPatternLength) {
 			super(maxPatternLength, false);
 		}
 
