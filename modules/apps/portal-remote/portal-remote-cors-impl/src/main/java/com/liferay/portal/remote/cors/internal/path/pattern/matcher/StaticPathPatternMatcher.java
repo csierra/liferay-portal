@@ -426,8 +426,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public List<PatternTuple<T>> getPatternTuples(String urlPath) {
-			List<PatternTuple<T>> patternTuples = new ArrayList<>(
-				_LONG_BITS_SIZE);
+			List<PatternTuple<T>> result = new ArrayList<>(_LONG_BITS_SIZE);
 
 			byte row = 0;
 
@@ -462,7 +461,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 						current & trieMap[1][row + 1][_STAR_INDEX];
 
 					if (wildcardPattern != 0) {
-						patternTuples.add(
+						result.add(
 							patternTuples.get(getSetBitIndex(wildcardPattern)));
 					}
 				}
@@ -478,11 +477,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				extra &= trieMap[1][row + 1][_STAR_INDEX];
 
 				if (extra != 0) {
-					patternTuples.add(patternTuples.get(getSetBitIndex(extra)));
+					result.add(patternTuples.get(getSetBitIndex(extra)));
 				}
 			}
 
-			return patternTuples;
+			return result;
 		}
 
 	}
