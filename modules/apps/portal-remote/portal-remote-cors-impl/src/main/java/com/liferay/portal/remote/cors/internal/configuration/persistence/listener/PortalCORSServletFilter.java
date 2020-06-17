@@ -72,11 +72,6 @@ public class PortalCORSServletFilter
 	extends BaseFilter
 	implements ConfigurationModelListener, ManagedServiceFactory {
 
-	@Activate
-	protected void activate() {
-		_rebuild();
-	}
-
 	@Override
 	public void deleted(String pid) {
 		Dictionary<String, ?> properties = _configurationPidsProperties.remove(
@@ -208,6 +203,11 @@ public class PortalCORSServletFilter
 		}
 
 		_rebuild(companyId);
+	}
+
+	@Activate
+	protected void activate() {
+		_rebuild();
 	}
 
 	@Override
@@ -364,7 +364,7 @@ public class PortalCORSServletFilter
 					portalCORSConfiguration.headers());
 
 				for (String urlPathPattern :
-					portalCORSConfiguration.filterMappingURLPatterns()) {
+						portalCORSConfiguration.filterMappingURLPatterns()) {
 
 					patternsHeadersMap.putIfAbsent(urlPathPattern, corsHeaders);
 				}
