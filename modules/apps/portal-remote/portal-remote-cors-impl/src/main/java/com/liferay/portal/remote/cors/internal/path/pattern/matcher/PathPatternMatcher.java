@@ -64,8 +64,7 @@ public abstract class PathPatternMatcher<T> {
 	 * @return all the matched patterns
 	 */
 	public List<PatternTuple<T>> getPatternPackages(String urlPath) {
-		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(
-			urlPath);
+		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(urlPath);
 
 		PatternTuple<T> patternTuple = getExactPatternTuple(urlPath);
 
@@ -87,11 +86,9 @@ public abstract class PathPatternMatcher<T> {
 
 	protected abstract PatternTuple<T> getExactPatternTuple(String urlPath);
 
-	protected abstract PatternTuple<T> getExtensionPatternTuple(
-		String urlPath);
+	protected abstract PatternTuple<T> getExtensionPatternTuple(String urlPath);
 
-	protected abstract PatternTuple<T> getWildcardPatternTuple(
-		String urlPath);
+	protected abstract PatternTuple<T> getWildcardPatternTuple(String urlPath);
 
 	protected abstract List<PatternTuple<T>> getWildcardPatternTuples(
 		String urlPath);
