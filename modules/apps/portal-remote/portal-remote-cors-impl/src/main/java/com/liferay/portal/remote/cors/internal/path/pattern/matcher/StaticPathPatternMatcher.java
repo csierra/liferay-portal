@@ -225,7 +225,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			byte row = 0;
 
-			int col = 0;
+			int column = 0;
 
 			for (; row < urlPath.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
@@ -236,9 +236,9 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				char character = urlPath.charAt(row);
 
-				col = character - ASCII_PRINTABLE_OFFSET;
+				column = character - ASCII_PRINTABLE_OFFSET;
 
-				current &= trieArray[0][row][col];
+				current &= trieArray[0][row][column];
 
 				if (current == 0) {
 					break;
@@ -246,7 +246,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			}
 
 			if (current != 0) {
-				current &= trieArray[1][row - 1][col];
+				current &= trieArray[1][row - 1][column];
 
 				if (current != 0) {
 					return getSetBitIndex(current);
