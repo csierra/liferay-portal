@@ -169,8 +169,8 @@ public class CORSSupport {
 	}
 
 	public void setCORSHeaders(List<Map<String, String>> corsHeaders) {
-		for (Map<String, String> oneMap : corsHeaders) {
-			_corsHeaders.putAll(oneMap);
+		for (Map<String, String> corsHeader : corsHeaders) {
+			_corsHeaders.putAll(corsHeader);
 		}
 	}
 
