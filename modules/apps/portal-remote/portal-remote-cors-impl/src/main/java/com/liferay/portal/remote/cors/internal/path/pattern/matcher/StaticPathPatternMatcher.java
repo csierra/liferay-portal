@@ -37,14 +37,12 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				"URL Pattern Size has to be least 1");
 		}
 
-		_maxPatternLength = (byte)longestURLPatternSize;
-
 		_exactPathPatternMatcher = new ExactPathPatternMatcher<>(
-			_maxPatternLength);
+			(byte)longestURLPatternSize);
 		_extensionPathPatternMatcher = new ExtensionPathPatternMatcher<>(
-			_maxPatternLength);
+			(byte)longestURLPatternSize);
 		_wildcardPathPatternMatcher = new WildcardPathPatternMatcher<>(
-			_maxPatternLength);
+			(byte)longestURLPatternSize);
 	}
 
 	public PatternTuple<T> getPatternTuple(String urlPath) {
@@ -212,18 +210,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	private final ExactPathPatternMatcher<T> _exactPathPatternMatcher;
 	private final ExtensionPathPatternMatcher<T> _extensionPathPatternMatcher;
-
-	/**
-	 * Length of longest URL pattern
-	 */
-	private final byte _maxPatternLength;
-
 	private final WildcardPathPatternMatcher<T> _wildcardPathPatternMatcher;
 
 	private abstract static class BasePatternMatcher<T> {
 
-		public BasePatternMatcher(boolean invertIndex, byte maxPatternLength) {
-			_invertIndex = invertIndex;
+		public BasePatternMatcher(byte maxPatternLength) {
 			this.maxPatternLength = maxPatternLength;
 
 			trieArray = new long[2][maxPatternLength][ASCII_CHARACTER_RANGE];
@@ -243,14 +234,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					break;
 				}
 
-				char character = '/';
-
-				if (_invertIndex) {
-					character = urlPath.charAt(urlPath.length() - 1 - row);
-				}
-				else {
-					character = urlPath.charAt(row);
-				}
+				char character = urlPath.charAt(row);
 
 				col = character - ASCII_PRINTABLE_OFFSET;
 
@@ -284,8 +268,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				// Indicating the end of the pattern
 
-				patternTuples.add(
-					index, new PatternTuple<>(urlPattern, value));
+				patternTuples.add(index, new PatternTuple<>(urlPattern, value));
 
 				return;
 			}
@@ -297,15 +280,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			long bitMask = 1 << index;
 
 			for (; row < urlPattern.length(); ++row) {
-				char character = '\0';
-
-				if (_invertIndex) {
-					character = urlPattern.charAt(
-						urlPattern.length() - 1 - row);
-				}
-				else {
-					character = urlPattern.charAt(row);
-				}
+				char character = urlPattern.charAt(row);
 
 				col = character - ASCII_PRINTABLE_OFFSET;
 
@@ -328,7 +303,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		protected final long[][][] trieArray;
 
 		private byte _count;
-		private final boolean _invertIndex;
 
 	}
 
@@ -336,7 +310,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		extends BasePatternMatcher<T> {
 
 		public ExactPathPatternMatcher(byte maxPatternLength) {
-			super(false, maxPatternLength);
+			super(maxPatternLength);
 		}
 
 		public PatternTuple<T> getPatternTuple(String urlPath) {
@@ -355,7 +329,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		extends BasePatternMatcher<T> {
 
 		public ExtensionPathPatternMatcher(byte maxPatternLength) {
-			super(true, maxPatternLength);
+			super(maxPatternLength);
 		}
 
 		public PatternTuple<T> getPatternTuple(String urlPath) {
@@ -398,13 +372,22 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return null;
 		}
 
+		@Override
+		protected void insert(String urlPattern, T value) {
+			StringBuilder stringBuilder = new StringBuilder(urlPattern);
+
+			stringBuilder.reverse();
+
+			super.insert(stringBuilder.toString(), value);
+		}
+
 	}
 
 	private static class WildcardPathPatternMatcher<T>
 		extends BasePatternMatcher<T> {
 
 		public WildcardPathPatternMatcher(byte maxPatternLength) {
-			super(false, maxPatternLength);
+			super(maxPatternLength);
 		}
 
 		public PatternTuple<T> getPatternTuple(String urlPath) {
