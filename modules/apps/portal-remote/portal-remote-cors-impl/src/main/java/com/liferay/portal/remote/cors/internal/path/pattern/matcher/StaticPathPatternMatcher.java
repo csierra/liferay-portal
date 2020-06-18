@@ -116,7 +116,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 	}
 
-	protected static byte getSetBitIndex(long x) {
+	protected static byte getFirstSetBitIndex(long x) {
 		if (x == 0) {
 			return -1;
 		}
@@ -187,7 +187,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		while (wildcardMatchesBitset != 0) {
 			patternTuples.add(
 				_wildcardPathPatternMatcher.patternTuples.get(
-					getSetBitIndex(wildcardMatchesBitset)));
+					getFirstSetBitIndex(wildcardMatchesBitset)));
 
 			wildcardMatchesBitset &= wildcardMatchesBitset - 1;
 		}
@@ -248,7 +248,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				current &= trieArray[1][row - 1][column];
 
 				if (current != 0) {
-					return getSetBitIndex(current);
+					return getFirstSetBitIndex(current);
 				}
 			}
 
@@ -361,7 +361,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 					if (extensionPattern != 0) {
 						return patternTuples.get(
-							getSetBitIndex(extensionPattern));
+							getFirstSetBitIndex(extensionPattern));
 					}
 
 					break;
@@ -448,7 +448,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				return null;
 			}
 
-			return patternTuples.get(getSetBitIndex(bestMatch));
+			return patternTuples.get(getFirstSetBitIndex(bestMatch));
 		}
 
 		public long getWildcardMatchesBitset(String urlPath) {
