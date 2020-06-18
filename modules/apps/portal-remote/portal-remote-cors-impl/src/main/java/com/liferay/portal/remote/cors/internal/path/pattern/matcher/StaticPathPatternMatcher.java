@@ -332,9 +332,8 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public PatternTuple<T> getPatternTuple(String urlPath) {
-			long current = _ALL_BITS_SET;
-
 			int urlPathLength = urlPath.length();
+			long current = _ALL_BITS_SET;
 
 			for (byte row = 0; row < urlPathLength; ++row) {
 				if (row > (maxPatternLength - 1)) {
@@ -347,21 +346,19 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					break;
 				}
 
-				int col = character - ASCII_PRINTABLE_OFFSET;
+				int column = character - ASCII_PRINTABLE_OFFSET;
 
-				current &= trieArray[0][row][col];
+				current &= trieArray[0][row][column];
 
 				if (current == 0) {
 					break;
 				}
 
 				if ((character == '.') && ((row + 1) < maxPatternLength)) {
-					long extensionPattern =
-						current & trieArray[1][row + 1][_STAR_INDEX];
+					long bitMask = current & trieArray[1][row + 1][_STAR_INDEX];
 
-					if (extensionPattern != 0) {
-						return patternTuples.get(
-							getFirstSetBitIndex(extensionPattern));
+					if (bitMask != 0) {
+						return patternTuples.get(getFirstSetBitIndex(bitMask));
 					}
 
 					break;
