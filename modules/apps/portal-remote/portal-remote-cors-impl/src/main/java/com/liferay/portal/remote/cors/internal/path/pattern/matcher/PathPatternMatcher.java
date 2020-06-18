@@ -143,12 +143,12 @@ public abstract class PathPatternMatcher<T> {
 	 * Total number of printable ASCII characters
 	 * Index from 32(space) to 127(delete)
 	 */
-	protected static final byte CHARACTER_RANGE = 96;
+	protected static final byte ASCII_CHARACTER_RANGE = 96;
 
 	/**
 	 * Total number of printable ASCII characters
 	 * Index from 32(space) to 127(delete)
 	 */
-	protected static final byte PRINTABLE_OFFSET = 32;
+	protected static final byte ASCII_PRINTABLE_OFFSET = 32;
 
 }

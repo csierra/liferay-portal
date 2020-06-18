@@ -205,10 +205,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	private static final long _ALL_BITS_SET = ~0;
 
 	private static final byte _SLASH_INDEX =
-		(byte)(Character.getNumericValue('/') - PRINTABLE_OFFSET);
+		(byte)(Character.getNumericValue('/') - ASCII_PRINTABLE_OFFSET);
 
 	private static final byte _STAR_INDEX =
-		(byte)(Character.getNumericValue('*') - PRINTABLE_OFFSET);
+		(byte)(Character.getNumericValue('*') - ASCII_PRINTABLE_OFFSET);
 
 	private final ExactPathPatternMatcher<T> _exactPathPatternMatcher;
 	private final ExtensionPathPatternMatcher<T> _extensionPathPatternMatcher;
@@ -226,7 +226,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			_invertIndex = invertIndex;
 			this.maxPatternLength = maxPatternLength;
 
-			trieArray = new long[2][maxPatternLength][CHARACTER_RANGE];
+			trieArray = new long[2][maxPatternLength][ASCII_CHARACTER_RANGE];
 		}
 
 		protected byte getExactIndex(String urlPath) {
@@ -252,7 +252,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					character = urlPath.charAt(row);
 				}
 
-				col = character - PRINTABLE_OFFSET;
+				col = character - ASCII_PRINTABLE_OFFSET;
 
 				current &= trieArray[0][row][col];
 
@@ -310,7 +310,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					character = urlPattern.charAt(row);
 				}
 
-				col = character - PRINTABLE_OFFSET;
+				col = character - ASCII_PRINTABLE_OFFSET;
 
 				trieArray[0][row][col] |= bitMask;
 			}
@@ -377,7 +377,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					break;
 				}
 
-				int col = character - PRINTABLE_OFFSET;
+				int col = character - ASCII_PRINTABLE_OFFSET;
 
 				current &= trieArray[0][row][col];
 
@@ -431,7 +431,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				char character = urlPath.charAt(row);
 
-				int col = character - PRINTABLE_OFFSET;
+				int col = character - ASCII_PRINTABLE_OFFSET;
 
 				current &= trieArray[0][row][col];
 
@@ -493,7 +493,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				char character = urlPath.charAt(row);
 
-				int col = character - PRINTABLE_OFFSET;
+				int col = character - ASCII_PRINTABLE_OFFSET;
 
 				current &= trieArray[0][row][col];
 

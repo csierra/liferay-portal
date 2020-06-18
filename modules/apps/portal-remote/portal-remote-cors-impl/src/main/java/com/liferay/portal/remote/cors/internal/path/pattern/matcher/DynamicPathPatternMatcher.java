@@ -285,9 +285,9 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	private static class TrieNode<T> {
 
 		public TrieNode() {
-			_link = new ArrayList<>(CHARACTER_RANGE);
+			_link = new ArrayList<>(ASCII_CHARACTER_RANGE);
 
-			for (int i = 0; i < CHARACTER_RANGE; ++i) {
+			for (int i = 0; i < ASCII_CHARACTER_RANGE; ++i) {
 				_link.add(null);
 			}
 		}
@@ -305,10 +305,10 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public TrieNode<T> next(char character) {
-			int index = character - PRINTABLE_OFFSET;
+			int index = character - ASCII_PRINTABLE_OFFSET;
 
 			if ((index < 0) ||
-				(index >= (CHARACTER_RANGE + PRINTABLE_OFFSET))) {
+				(index >= (ASCII_CHARACTER_RANGE + ASCII_PRINTABLE_OFFSET))) {
 
 				throw new IllegalArgumentException();
 			}
@@ -321,10 +321,10 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			TrieNode<T> node = trieNodeHeap.nextNode();
 
-			int index = character - PRINTABLE_OFFSET;
+			int index = character - ASCII_PRINTABLE_OFFSET;
 
 			if ((index < 0) ||
-				(index >= (CHARACTER_RANGE + PRINTABLE_OFFSET))) {
+				(index >= (ASCII_CHARACTER_RANGE + ASCII_PRINTABLE_OFFSET))) {
 
 				throw new IllegalArgumentException();
 			}
