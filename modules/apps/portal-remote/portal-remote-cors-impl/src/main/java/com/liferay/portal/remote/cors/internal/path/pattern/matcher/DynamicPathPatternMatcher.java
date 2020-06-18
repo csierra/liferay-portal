@@ -284,10 +284,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			_trieNodes = new ArrayList<>(ASCII_CHARACTER_RANGE);
 		}
 
-		public void setPatternTuple(PatternTuple<T> patternTuple) {
-			_patternTuple = patternTuple;
-		}
-
 		public PatternTuple<T> getPatternTuple() {
 			return _patternTuple;
 		}
@@ -330,14 +326,18 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return trieNode;
 		}
 
+		public void setPatternTuple(PatternTuple<T> patternTuple) {
+			_patternTuple = patternTuple;
+		}
+
+		private PatternTuple<T> _patternTuple;
+
 		/**
 		 * Use list over hashMap for better performance
 		 * There is around 70% performance increase for best match,
 		 * and 40% performance increase for all matches.
 		 */
 		private final List<TrieNode<T>> _trieNodes;
-
-		private PatternTuple<T> _patternTuple;
 
 	}
 
