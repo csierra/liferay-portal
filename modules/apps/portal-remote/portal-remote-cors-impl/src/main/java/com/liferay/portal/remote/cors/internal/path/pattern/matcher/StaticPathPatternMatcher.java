@@ -202,7 +202,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return _wildcardPathPatternMatcher.getPatternTuple(urlPath);
 	}
 
-	private static final long _ALL_BITS = ~0;
+	private static final long _ALL_BITS_SET = ~0;
 
 	private static final byte _SLASH_INDEX = 47 - PRINTABLE_OFFSET;
 
@@ -228,7 +228,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		protected byte getExactIndex(String urlPath) {
-			long current = _ALL_BITS;
+			long current = _ALL_BITS_SET;
 
 			byte row = 0;
 
@@ -360,7 +360,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public PatternTuple<T> getPatternTuple(String urlPath) {
-			long current = _ALL_BITS;
+			long current = _ALL_BITS_SET;
 
 			int urlPathLength = urlPath.length();
 
@@ -411,7 +411,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		public PatternTuple<T> getPatternTuple(String urlPath) {
 			byte row = 0;
 
-			long current = _ALL_BITS;
+			long current = _ALL_BITS_SET;
 
 			long bestMatch = 0;
 
@@ -475,7 +475,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			byte row = 0;
 
-			long current = _ALL_BITS;
+			long current = _ALL_BITS_SET;
 
 			// This loop tries to find every wildcard match at
 			// every '/' character.
