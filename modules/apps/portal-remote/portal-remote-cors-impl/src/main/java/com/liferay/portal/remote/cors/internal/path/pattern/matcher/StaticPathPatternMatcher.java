@@ -66,19 +66,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	@Override
 	public List<PatternTuple<T>> getPatternTuples(String urlPath) {
-		List<PatternTuple<T>> patternTuples = new ArrayList<>(
-			_LONG_BITS_SIZE + 2);
-
-		long wildcardMatches = _wildcardPathPatternMatcher.getPatternTuples(
-			urlPath);
-
-		while (wildcardMatches != 0) {
-			patternTuples.add(
-				_wildcardPathPatternMatcher.patternTuples.get(
-					getSetBitIndex(wildcardMatches)));
-
-			wildcardMatches &= wildcardMatches - 1;
-		}
+		List<PatternTuple<T>> patternTuples = getWilcardPatternTuples(urlPath);
 
 		PatternTuple<T> patternTuple = _exactPathPatternMatcher.getPatternTuple(
 			urlPath);
@@ -189,6 +177,24 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	@Override
 	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
 		return _extensionPathPatternMatcher.getPatternTuple(urlPath);
+	}
+
+	protected List<PatternTuple<T>> getWilcardPatternTuples(String urlPath) {
+		List<PatternTuple<T>> patternTuples = new ArrayList<>(
+			_LONG_BITS_SIZE + 2);
+
+		long wildcardMatchesBitset =
+			_wildcardPathPatternMatcher.getWildcardMatchesBitset(urlPath);
+
+		while (wildcardMatchesBitset != 0) {
+			patternTuples.add(
+				_wildcardPathPatternMatcher.patternTuples.get(
+					getSetBitIndex(wildcardMatchesBitset)));
+
+			wildcardMatchesBitset &= wildcardMatchesBitset - 1;
+		}
+
+		return patternTuples;
 	}
 
 	@Override
@@ -471,7 +477,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return patternTuples.get(getSetBitIndex(bestMatch));
 		}
 
-		public long getPatternTuples(String urlPath) {
+		public long getWildcardMatchesBitset(String urlPath) {
 			long matches = 0;
 
 			byte row = 0;
