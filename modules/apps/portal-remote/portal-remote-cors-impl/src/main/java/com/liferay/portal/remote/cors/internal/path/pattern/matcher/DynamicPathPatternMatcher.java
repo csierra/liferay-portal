@@ -86,7 +86,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// Wild Card urlPath pattern 1
 
 		if (isValidWildCardPattern(urlPattern)) {
-			insert(urlPattern, value, _wildCardTrieNode, false);
+			insert(urlPattern, value, _wildCardTrieNode);
 
 			return;
 		}
@@ -94,14 +94,18 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// Wild Card urlPath pattern 2, aka extension pattern
 
 		if (isValidExtensionPattern(urlPattern)) {
-			insert(urlPattern, value, _extensionTrieNode, true);
+			StringBuilder stringBuilder = new StringBuilder(urlPattern);
+
+			stringBuilder.reverse();
+
+			insert(stringBuilder.toString(), value, _extensionTrieNode);
 
 			return;
 		}
 
 		// Exact pattern
 
-		insert(urlPattern, value, _exactTrieNode, false);
+		insert(urlPattern, value, _exactTrieNode);
 	}
 
 	@Override
@@ -252,16 +256,12 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	protected void insert(
-		String urlPattern, T value, TrieNode<T> prev, boolean reverseIndex) {
+		String urlPattern, T value, TrieNode<T> prev) {
 
 		TrieNode<T> current = null;
 
 		for (int i = 0; i < urlPattern.length(); ++i) {
 			int index = i;
-
-			if (reverseIndex) {
-				index = urlPattern.length() - 1 - i;
-			}
 
 			current = prev.next(urlPattern.charAt(index));
 
@@ -301,11 +301,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public boolean isEnd() {
-			if (_patternTuple != null) {
-				return true;
-			}
-
-			return false;
+			return _patternTuple != null;
 		}
 
 		public TrieNode<T> next(char character) {
