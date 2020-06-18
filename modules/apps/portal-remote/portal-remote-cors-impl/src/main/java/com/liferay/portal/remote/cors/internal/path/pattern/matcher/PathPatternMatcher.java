@@ -51,7 +51,7 @@ public abstract class PathPatternMatcher<T> {
 	 */
 	public abstract List<PatternTuple<T>> getPatternTuples(String path);
 
-	public abstract void insert(String urlPattern, T value)
+	public abstract void insert(String pathPattern, T value)
 		throws IllegalArgumentException;
 
 	/**
@@ -62,22 +62,22 @@ public abstract class PathPatternMatcher<T> {
 	 *         https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1.3, and
 	 *         https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
-	 * @param urlPattern the given urlPattern
-	 * @return a boolean value indicating if the urlPattern a valid extensionPattern
+	 * @param pathPattern the given pathPattern
+	 * @return a boolean value indicating if the pathPattern a valid extensionPattern
 	 */
-	protected boolean isValidExtensionPattern(String urlPattern) {
-		if ((urlPattern.length() < 3) || (urlPattern.charAt(0) != '*') ||
-			(urlPattern.charAt(1) != '.')) {
+	protected boolean isValidExtensionPattern(String pathPattern) {
+		if ((pathPattern.length() < 3) || (pathPattern.charAt(0) != '*') ||
+			(pathPattern.charAt(1) != '.')) {
 
 			return false;
 		}
 
-		for (int i = 2; i < urlPattern.length(); ++i) {
-			if (urlPattern.charAt(i) == '/') {
+		for (int i = 2; i < pathPattern.length(); ++i) {
+			if (pathPattern.charAt(i) == '/') {
 				return false;
 			}
 
-			if (urlPattern.charAt(i) == '.') {
+			if (pathPattern.charAt(i) == '.') {
 				return false;
 			}
 		}
@@ -92,19 +92,19 @@ public abstract class PathPatternMatcher<T> {
 	 * 2. It also abides by:
 	 *         https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
-	 * @param urlPattern the given urlPattern
-	 * @return a boolean value indicating if the urlPattern a valid wildCardPattern
+	 * @param pathPattern the given pathPattern
+	 * @return a boolean value indicating if the pathPattern a valid wildCardPattern
 	 */
-	protected boolean isValidWildCardPattern(String urlPattern) {
-		if ((urlPattern.length() < 2) || (urlPattern.charAt(0) != '/') ||
-			(urlPattern.charAt(urlPattern.length() - 1) != '*') ||
-			(urlPattern.charAt(urlPattern.length() - 2) != '/')) {
+	protected boolean isValidWildCardPattern(String pathPattern) {
+		if ((pathPattern.length() < 2) || (pathPattern.charAt(0) != '/') ||
+			(pathPattern.charAt(pathPattern.length() - 1) != '*') ||
+			(pathPattern.charAt(pathPattern.length() - 2) != '/')) {
 
 			return false;
 		}
 
 		try {
-			String path = urlPattern.substring(0, urlPattern.length() - 1);
+			String path = pathPattern.substring(0, pathPattern.length() - 1);
 
 			URI uri = new URI("https://test" + path);
 

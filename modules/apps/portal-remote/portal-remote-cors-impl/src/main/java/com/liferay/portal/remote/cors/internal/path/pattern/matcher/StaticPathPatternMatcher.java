@@ -23,27 +23,28 @@ import java.util.List;
 public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	/**
-	 * If all URL patterns are known before hand, use staticURLPatternMapper over
-	 * dynamciURLPatternMapper for better READ performance of higher CPU cache
+	 * If all URL patterns are known before hand, use staticpathPatternMapper over
+	 * dynamcipathPatternMapper for better READ performance of higher CPU cache
 	 * localities.
 	 *
 	 * Limitation: number of URL patterns of exact match and wildcard match need to
 	 * not exceed 64. number of URL patterns of extension match need to not exceed
 	 * 64.
 	 */
-	public StaticPathPatternMatcher(int longestURLPatternSize) {
-		if (longestURLPatternSize < 1) {
+	public StaticPathPatternMatcher(int longestpathPatternSize) {
+		if (longestpathPatternSize < 1) {
 			throw new IllegalArgumentException(
 				"URL Pattern Size has to be least 1");
 		}
 
 		_exactStaticPathPatternMatcher = new ExactStaticPathPatternMatcher<>(
-			(byte)longestURLPatternSize);
+			(byte)longestpathPatternSize);
 		_extensionStaticPathPatternMatcher =
 			new ExtensionStaticPathPatternMatcher<>(
-				(byte)longestURLPatternSize);
+				(byte)longestpathPatternSize);
 		_wildcardStaticPathPatternMatcher =
-			new WildcardStaticPathPatternMatcher<>((byte)longestURLPatternSize);
+			new WildcardStaticPathPatternMatcher<>(
+				(byte)longestpathPatternSize);
 	}
 
 	public PatternTuple<T> getPatternTuple(String path) {
@@ -100,20 +101,20 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	 * request URI minus the context path and the path info is null. 5. Exact path
 	 * pattern: All other strings are used for exact matches only.
 	 *
-	 * @param urlPattern the pattern of path, used for pattern matching
-	 * @param value      an non null object associated with urlPattern
+	 * @param pathPattern the pattern of path, used for pattern matching
+	 * @param value      an non null object associated with pathPattern
 	 */
-	public void insert(String urlPattern, T value)
+	public void insert(String pathPattern, T value)
 		throws IllegalArgumentException {
 
-		if (isValidWildCardPattern(urlPattern)) {
-			_wildcardStaticPathPatternMatcher.insert(urlPattern, value);
+		if (isValidWildCardPattern(pathPattern)) {
+			_wildcardStaticPathPatternMatcher.insert(pathPattern, value);
 		}
-		else if (isValidExtensionPattern(urlPattern)) {
-			_extensionStaticPathPatternMatcher.insert(urlPattern, value);
+		else if (isValidExtensionPattern(pathPattern)) {
+			_extensionStaticPathPatternMatcher.insert(pathPattern, value);
 		}
 		else {
-			_exactStaticPathPatternMatcher.insert(urlPattern, value);
+			_exactStaticPathPatternMatcher.insert(pathPattern, value);
 		}
 	}
 
@@ -243,19 +244,20 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return -1;
 		}
 
-		protected void insert(String urlPattern, T value) {
+		protected void insert(String pathPattern, T value) {
 			if (_count > 63) {
 				throw new IllegalArgumentException(
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			byte index = getExactIndex(urlPattern);
+			byte index = getExactIndex(pathPattern);
 
 			if (index > -1) {
 
 				// Indicating the end of the pattern
 
-				patternTuples.add(index, new PatternTuple<>(urlPattern, value));
+				patternTuples.add(
+					index, new PatternTuple<>(pathPattern, value));
 
 				return;
 			}
@@ -266,8 +268,8 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			int column = 0;
 			long bitMask = 1 << index;
 
-			for (; row < urlPattern.length(); ++row) {
-				char character = urlPattern.charAt(row);
+			for (; row < pathPattern.length(); ++row) {
+				char character = pathPattern.charAt(row);
 
 				column = character - ASCII_PRINTABLE_OFFSET;
 
@@ -277,7 +279,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// Indicating the end of the pattern
 
 			PatternTuple<T> patternTuple = new PatternTuple<>(
-				urlPattern, value);
+				pathPattern, value);
 
 			trieArray[1][row - 1][column] |= bitMask;
 
@@ -358,8 +360,8 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		@Override
-		protected void insert(String urlPattern, T value) {
-			StringBuilder stringBuilder = new StringBuilder(urlPattern);
+		protected void insert(String pathPattern, T value) {
+			StringBuilder stringBuilder = new StringBuilder(pathPattern);
 
 			stringBuilder.reverse();
 

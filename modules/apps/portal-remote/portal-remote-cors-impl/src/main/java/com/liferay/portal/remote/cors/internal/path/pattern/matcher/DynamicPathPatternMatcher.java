@@ -90,28 +90,24 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	 * 5. Exact path pattern:
 	 *        All other strings are used for exact matches only.
 	 *
-	 * @param urlPattern the pattern of path, used for pattern matching
-	 * @param value an non null object associated with urlPattern
+	 * @param pathPattern the pattern of path, used for pattern matching
+	 * @param value an non null object associated with pathPattern
 	 */
-	public void insert(String urlPattern, T value)
+	public void insert(String pathPattern, T value)
 		throws IllegalArgumentException {
 
 		if (value == null) {
 			throw new IllegalArgumentException("Value can not be null");
 		}
 
-		// Wild Card path pattern 1
-
-		if (isValidWildCardPattern(urlPattern)) {
-			insert(urlPattern, value, _wildCardTrieNode);
+		if (isValidWildCardPattern(pathPattern)) {
+			insert(pathPattern, value, _wildCardTrieNode);
 
 			return;
 		}
 
-		// Wild Card path pattern 2, aka extension pattern
-
-		if (isValidExtensionPattern(urlPattern)) {
-			StringBuilder stringBuilder = new StringBuilder(urlPattern);
+		if (isValidExtensionPattern(pathPattern)) {
+			StringBuilder stringBuilder = new StringBuilder(pathPattern);
 
 			stringBuilder.reverse();
 
@@ -120,9 +116,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return;
 		}
 
-		// Exact pattern
-
-		insert(urlPattern, value, _exactTrieNode);
+		insert(pathPattern, value, _exactTrieNode);
 	}
 
 	protected PatternTuple<T> getExactPatternTuple(String path) {
@@ -266,16 +260,16 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	protected void insert(
-		String urlPattern, T value, TrieNode<T> previousTrieNode) {
+		String pathPattern, T value, TrieNode<T> previousTrieNode) {
 
 		TrieNode<T> currentTrieNode = null;
 
-		for (int i = 0; i < urlPattern.length(); ++i) {
-			currentTrieNode = previousTrieNode.next(urlPattern.charAt(i));
+		for (int i = 0; i < pathPattern.length(); ++i) {
+			currentTrieNode = previousTrieNode.next(pathPattern.charAt(i));
 
 			if (currentTrieNode == null) {
 				currentTrieNode = previousTrieNode.setNext(
-					urlPattern.charAt(i), _trieNodeArrayList);
+					pathPattern.charAt(i), _trieNodeArrayList);
 			}
 
 			previousTrieNode = currentTrieNode;
@@ -283,7 +277,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		if (currentTrieNode != null) {
 			currentTrieNode.setPatternTuple(
-				new PatternTuple<>(urlPattern, value));
+				new PatternTuple<>(pathPattern, value));
 		}
 	}
 
