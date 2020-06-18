@@ -25,9 +25,9 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	public DynamicPathPatternMatcher() {
 		_trieNodeHeap = new TrieNodeHeap<>();
 
-		_exactTrie = _trieNodeHeap.nextNode();
-		_extensionTrie = _trieNodeHeap.nextNode();
-		_wildCardTrie = _trieNodeHeap.nextNode();
+		_exactTrieNode = _trieNodeHeap.nextNode();
+		_extensionTrieNode = _trieNodeHeap.nextNode();
+		_wildCardTrieNode = _trieNodeHeap.nextNode();
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// Wild Card urlPath pattern 1
 
 		if (isValidWildCardPattern(urlPattern)) {
-			insert(urlPattern, value, _wildCardTrie, false);
+			insert(urlPattern, value, _wildCardTrieNode, false);
 
 			return;
 		}
@@ -94,19 +94,19 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// Wild Card urlPath pattern 2, aka extension pattern
 
 		if (isValidExtensionPattern(urlPattern)) {
-			insert(urlPattern, value, _extensionTrie, true);
+			insert(urlPattern, value, _extensionTrieNode, true);
 
 			return;
 		}
 
 		// Exact pattern
 
-		insert(urlPattern, value, _exactTrie, false);
+		insert(urlPattern, value, _exactTrieNode, false);
 	}
 
 	@Override
 	protected PatternTuple<T> getExactPatternTuple(String urlPath) {
-		TrieNode<T> prev = _exactTrie;
+		TrieNode<T> prev = _exactTrieNode;
 
 		TrieNode<T> current = null;
 
@@ -131,7 +131,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	@Override
 	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
-		TrieNode<T> prev = _extensionTrie;
+		TrieNode<T> prev = _extensionTrieNode;
 
 		TrieNode<T> current = null;
 
@@ -168,7 +168,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
 		PatternTuple<T> bestMatch = null;
 
-		TrieNode<T> prev = _wildCardTrie;
+		TrieNode<T> prev = _wildCardTrieNode;
 
 		TrieNode<T> current = null;
 
@@ -211,7 +211,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(64);
 
-		TrieNode<T> prev = _wildCardTrie;
+		TrieNode<T> prev = _wildCardTrieNode;
 
 		TrieNode<T> current = null;
 
@@ -277,10 +277,10 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 	}
 
-	private final TrieNode<T> _exactTrie;
-	private final TrieNode<T> _extensionTrie;
+	private final TrieNode<T> _exactTrieNode;
+	private final TrieNode<T> _extensionTrieNode;
 	private final TrieNodeHeap<T> _trieNodeHeap;
-	private final TrieNode<T> _wildCardTrie;
+	private final TrieNode<T> _wildCardTrieNode;
 
 	private static class TrieNode<T> {
 
