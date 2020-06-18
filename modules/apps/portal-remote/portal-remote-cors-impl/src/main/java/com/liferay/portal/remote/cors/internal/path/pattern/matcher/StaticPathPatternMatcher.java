@@ -46,37 +46,35 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			new WildcardStaticPathPatternMatcher<>((byte)longestURLPatternSize);
 	}
 
-	public PatternTuple<T> getPatternTuple(String urlPath) {
+	public PatternTuple<T> getPatternTuple(String path) {
 		PatternTuple<T> patternTuple =
-			_exactStaticPathPatternMatcher.getPatternTuple(urlPath);
+			_exactStaticPathPatternMatcher.getPatternTuple(path);
 
 		if (patternTuple != null) {
 			return patternTuple;
 		}
 
-		patternTuple = _wildcardStaticPathPatternMatcher.getPatternTuple(
-			urlPath);
+		patternTuple = _wildcardStaticPathPatternMatcher.getPatternTuple(path);
 
 		if (patternTuple != null) {
 			return patternTuple;
 		}
 
-		return _extensionStaticPathPatternMatcher.getPatternTuple(urlPath);
+		return _extensionStaticPathPatternMatcher.getPatternTuple(path);
 	}
 
 	@Override
-	public List<PatternTuple<T>> getPatternTuples(String urlPath) {
-		List<PatternTuple<T>> patternTuples = getWilcardPatternTuples(urlPath);
+	public List<PatternTuple<T>> getPatternTuples(String path) {
+		List<PatternTuple<T>> patternTuples = getWilcardPatternTuples(path);
 
 		PatternTuple<T> patternTuple =
-			_exactStaticPathPatternMatcher.getPatternTuple(urlPath);
+			_exactStaticPathPatternMatcher.getPatternTuple(path);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
 		}
 
-		patternTuple = _extensionStaticPathPatternMatcher.getPatternTuple(
-			urlPath);
+		patternTuple = _extensionStaticPathPatternMatcher.getPatternTuple(path);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
@@ -171,22 +169,21 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternTuple<T> getExactPatternTuple(String urlPath) {
-		return _exactStaticPathPatternMatcher.getPatternTuple(urlPath);
+	protected PatternTuple<T> getExactPatternTuple(String path) {
+		return _exactStaticPathPatternMatcher.getPatternTuple(path);
 	}
 
 	@Override
-	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
-		return _extensionStaticPathPatternMatcher.getPatternTuple(urlPath);
+	protected PatternTuple<T> getExtensionPatternTuple(String path) {
+		return _extensionStaticPathPatternMatcher.getPatternTuple(path);
 	}
 
-	protected List<PatternTuple<T>> getWilcardPatternTuples(String urlPath) {
+	protected List<PatternTuple<T>> getWilcardPatternTuples(String path) {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(
 			(byte)Long.SIZE + 2);
 
 		long wildcardMatchesBitMask =
-			_wildcardStaticPathPatternMatcher.getWildcardMatchesBitMask(
-				urlPath);
+			_wildcardStaticPathPatternMatcher.getWildcardMatchesBitMask(path);
 
 		while (wildcardMatchesBitMask != 0) {
 			patternTuples.add(
@@ -200,8 +197,8 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
-		return _wildcardStaticPathPatternMatcher.getPatternTuple(urlPath);
+	protected PatternTuple<T> getWildcardPatternTuple(String path) {
+		return _wildcardStaticPathPatternMatcher.getPatternTuple(path);
 	}
 
 	private static final long _ALL_BITS_SET = ~0;
@@ -227,19 +224,19 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			trieArray = new long[2][maxPatternLength][ASCII_CHARACTER_RANGE];
 		}
 
-		protected byte getExactIndex(String urlPath) {
+		protected byte getExactIndex(String path) {
 			byte row = 0;
 			long current = _ALL_BITS_SET;
 			int column = 0;
 
-			for (; row < urlPath.length(); ++row) {
+			for (; row < path.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
 					current = 0;
 
 					break;
 				}
 
-				char character = urlPath.charAt(row);
+				char character = path.charAt(row);
 
 				column = character - ASCII_PRINTABLE_OFFSET;
 
@@ -318,8 +315,8 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			super(maxPatternLength);
 		}
 
-		public PatternTuple<T> getPatternTuple(String urlPath) {
-			byte index = getExactIndex(urlPath);
+		public PatternTuple<T> getPatternTuple(String path) {
+			byte index = getExactIndex(path);
 
 			if (index < 0) {
 				return null;
@@ -337,16 +334,16 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			super(maxPatternLength);
 		}
 
-		public PatternTuple<T> getPatternTuple(String urlPath) {
-			int urlPathLength = urlPath.length();
+		public PatternTuple<T> getPatternTuple(String path) {
+			int pathLength = path.length();
 			long currentBitMask = _ALL_BITS_SET;
 
-			for (byte row = 0; row < urlPathLength; ++row) {
+			for (byte row = 0; row < pathLength; ++row) {
 				if (row > (maxPatternLength - 1)) {
 					break;
 				}
 
-				char character = urlPath.charAt(urlPathLength - 1 - row);
+				char character = path.charAt(pathLength - 1 - row);
 
 				if (character == '/') {
 					break;
@@ -393,7 +390,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			super(maxPatternLength);
 		}
 
-		public PatternTuple<T> getPatternTuple(String urlPath) {
+		public PatternTuple<T> getPatternTuple(String path) {
 			byte row = 0;
 			long currentBitMask = _ALL_BITS_SET;
 			long bestMatchBitMask = 0;
@@ -403,14 +400,14 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// Variable current indicates if current character
 			// exists as part of a pattern in the matrix.
 
-			for (; row < urlPath.length(); ++row) {
+			for (; row < path.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
 					currentBitMask = 0;
 
 					break;
 				}
 
-				char character = urlPath.charAt(row);
+				char character = path.charAt(row);
 
 				int column = character - ASCII_PRINTABLE_OFFSET;
 
@@ -454,7 +451,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return patternTuples.get(getFirstSetBitIndex(bestMatchBitMask));
 		}
 
-		public long getWildcardMatchesBitMask(String urlPath) {
+		public long getWildcardMatchesBitMask(String path) {
 			byte row = 0;
 			long current = _ALL_BITS_SET;
 			long bitMask = 0;
@@ -464,14 +461,14 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// Variable current indicates if current character
 			// exists as part of a pattern in the matrix.
 
-			for (; row < urlPath.length(); ++row) {
+			for (; row < path.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
 					current = 0;
 
 					break;
 				}
 
-				char character = urlPath.charAt(row);
+				char character = path.charAt(row);
 
 				int column = character - ASCII_PRINTABLE_OFFSET;
 

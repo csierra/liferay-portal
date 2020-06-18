@@ -131,8 +131,8 @@ public class PortalCORSServletFilter
 			String pid, Dictionary<String, Object> newProperties)
 		throws ConfigurationModelListenerException {
 
-		HashSet<String> urlPathPatternsSet = new HashSet<>();
-		HashSet<String> duplicatedUrlPathPatterns = new HashSet<>();
+		HashSet<String> pathPatternSet = new HashSet<>();
+		HashSet<String> duplicatedPathPatternsSet = new HashSet<>();
 
 		long companyId = GetterUtil.getLong(newProperties.get("companyId"));
 
@@ -153,19 +153,19 @@ public class PortalCORSServletFilter
 				ConfigurableUtil.createConfigurable(
 					PortalCORSConfiguration.class, properties);
 
-			String[] urlPathPatterns =
+			String[] pathPatterns =
 				portalCORSConfiguration.filterMappingURLPatterns();
 
-			for (String urlPathPattern : urlPathPatterns) {
-				if (!urlPathPatternsSet.add(urlPathPattern)) {
-					duplicatedUrlPathPatterns.add(urlPathPattern);
+			for (String pathPattern : pathPatterns) {
+				if (!pathPatternSet.add(pathPattern)) {
+					duplicatedPathPatternsSet.add(pathPattern);
 				}
 			}
 		}
 
-		if (!duplicatedUrlPathPatterns.isEmpty()) {
+		if (!duplicatedPathPatternsSet.isEmpty()) {
 			throw new ConfigurationModelListenerException(
-				"Duplicated url path patterns: " + duplicatedUrlPathPatterns,
+				"Duplicated url path patterns: " + duplicatedPathPatternsSet,
 				PortalCORSConfiguration.class, PortalCORSServletFilter.class,
 				newProperties);
 		}
@@ -318,10 +318,10 @@ public class PortalCORSServletFilter
 			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 				portalCORSConfiguration.headers());
 
-			for (String urlPathPattern :
+			for (String pathPattern :
 					portalCORSConfiguration.filterMappingURLPatterns()) {
 
-				patternsHeadersMap.put(urlPathPattern, corsHeaders);
+				patternsHeadersMap.put(pathPattern, corsHeaders);
 			}
 		}
 
@@ -347,10 +347,10 @@ public class PortalCORSServletFilter
 			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 				portalCORSConfiguration.headers());
 
-			for (String urlPathPattern :
+			for (String pathPattern :
 					portalCORSConfiguration.filterMappingURLPatterns()) {
 
-				patternsHeadersMap.putIfAbsent(urlPathPattern, corsHeaders);
+				patternsHeadersMap.putIfAbsent(pathPattern, corsHeaders);
 			}
 		}
 
@@ -363,10 +363,10 @@ public class PortalCORSServletFilter
 				Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 					portalCORSConfiguration.headers());
 
-				for (String urlPathPattern :
+				for (String pathPattern :
 						portalCORSConfiguration.filterMappingURLPatterns()) {
 
-					patternsHeadersMap.putIfAbsent(urlPathPattern, corsHeaders);
+					patternsHeadersMap.putIfAbsent(pathPattern, corsHeaders);
 				}
 			}
 		}

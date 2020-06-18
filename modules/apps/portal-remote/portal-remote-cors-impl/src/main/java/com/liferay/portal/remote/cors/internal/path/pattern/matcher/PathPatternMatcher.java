@@ -27,52 +27,52 @@ public abstract class PathPatternMatcher<T> {
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
 	 *
-	 * Get the matching pattern of the given urlPath, following the order of:
+	 * Get the matching pattern of the given path, following the order of:
 	 * 1. Exact matching pattern
 	 * 2. Wild card matching the longest pattern
 	 * 3. Extension pattern
 	 * 4. Default pattern
 	 *
-	 * @param urlPath a legal urlPath from a URL
+	 * @param path a legal path from a URL
 	 * @return the matched pattern
 	 */
-	public PatternTuple<T> getPatternTuple(String urlPath) {
-		PatternTuple<T> patternTuple = getExactPatternTuple(urlPath);
+	public PatternTuple<T> getPatternTuple(String path) {
+		PatternTuple<T> patternTuple = getExactPatternTuple(path);
 
 		if (patternTuple != null) {
 			return patternTuple;
 		}
 
-		patternTuple = getWildcardPatternTuple(urlPath);
+		patternTuple = getWildcardPatternTuple(path);
 
 		if (patternTuple != null) {
 			return patternTuple;
 		}
 
-		return getExtensionPatternTuple(urlPath);
+		return getExtensionPatternTuple(path);
 	}
 
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
 	 *
-	 * Get all matching patterns of the given urlPath, including:
+	 * Get all matching patterns of the given path, including:
 	 * 1. Exact matching pattern
 	 * 2. Wild card matching patterns
 	 * 3. Extension pattern
 	 *
-	 * @param urlPath a legal urlPath from a URL
+	 * @param path a legal path from a URL
 	 * @return all the matched patterns
 	 */
-	public abstract List<PatternTuple<T>> getPatternTuples(String urlPath);
+	public abstract List<PatternTuple<T>> getPatternTuples(String path);
 
 	public abstract void insert(String urlPattern, T value)
 		throws IllegalArgumentException;
 
-	protected abstract PatternTuple<T> getExactPatternTuple(String urlPath);
+	protected abstract PatternTuple<T> getExactPatternTuple(String path);
 
-	protected abstract PatternTuple<T> getExtensionPatternTuple(String urlPath);
+	protected abstract PatternTuple<T> getExtensionPatternTuple(String path);
 
-	protected abstract PatternTuple<T> getWildcardPatternTuple(String urlPath);
+	protected abstract PatternTuple<T> getWildcardPatternTuple(String path);
 
 	/**
 	 * A valid ExtensionPattern:

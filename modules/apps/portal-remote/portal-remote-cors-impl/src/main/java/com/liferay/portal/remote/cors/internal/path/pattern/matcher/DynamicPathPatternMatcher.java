@@ -31,16 +31,16 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	public List<PatternTuple<T>> getPatternTuples(String urlPath) {
-		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(urlPath);
+	public List<PatternTuple<T>> getPatternTuples(String path) {
+		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(path);
 
-		PatternTuple<T> patternTuple = getExactPatternTuple(urlPath);
+		PatternTuple<T> patternTuple = getExactPatternTuple(path);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
 		}
 
-		patternTuple = getExtensionPatternTuple(urlPath);
+		patternTuple = getExtensionPatternTuple(path);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
@@ -54,26 +54,26 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	 *
 	 * In the Web application deployment descriptor, the following syntax is
 	 * used to define mappings:
-	 * 1. Wild Card urlPath pattern 1:
+	 * 1. Wild Card path pattern 1:
 	 *        A string beginning with a ' / ' character and ending with a ' /* '
-	 *        suffix is used for urlPath mapping.
-	 * 2. Wild Card urlPath pattern 2, aka extension matching:
+	 *        suffix is used for path mapping.
+	 * 2. Wild Card path pattern 2, aka extension matching:
 	 *        A string beginning with a ' *. ' prefix is used as an extension
 	 *        mapping.
-	 * 3. Special urlPath pattern 1:
+	 * 3. Special path pattern 1:
 	 *        The empty string ("") is a special URL pattern that exactly maps
 	 *        to the application's context root, i.e., requests of the form
-	 *        http://host:port/'<'context-root'>'/. In this case the urlPath info is
-	 *        ' / ' and the servlet urlPath and context urlPath is empty string ("").
-	 * 4. Special urlPath pattern 2:
+	 *        http://host:port/'<'context-root'>'/. In this case the path info is
+	 *        ' / ' and the servlet path and context path is empty string ("").
+	 * 4. Special path pattern 2:
 	 *        A string containing only the ' / ' character indicates the
 	 *        "default" servlet of the application. In this case the servlet
-	 *        urlPath is the request URI minus the context urlPath and the urlPath info
+	 *        path is the request URI minus the context path and the path info
 	 *        is null.
-	 * 5. Exact urlPath pattern:
+	 * 5. Exact path pattern:
 	 *        All other strings are used for exact matches only.
 	 *
-	 * @param urlPattern the pattern of urlPath, used for pattern matching
+	 * @param urlPattern the pattern of path, used for pattern matching
 	 * @param value an non null object associated with urlPattern
 	 */
 	public void insert(String urlPattern, T value)
@@ -83,7 +83,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			throw new IllegalArgumentException("Value can not be null");
 		}
 
-		// Wild Card urlPath pattern 1
+		// Wild Card path pattern 1
 
 		if (isValidWildCardPattern(urlPattern)) {
 			insert(urlPattern, value, _wildCardTrieNode);
@@ -91,7 +91,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return;
 		}
 
-		// Wild Card urlPath pattern 2, aka extension pattern
+		// Wild Card path pattern 2, aka extension pattern
 
 		if (isValidExtensionPattern(urlPattern)) {
 			StringBuilder stringBuilder = new StringBuilder(urlPattern);
@@ -109,12 +109,12 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternTuple<T> getExactPatternTuple(String urlPath) {
+	protected PatternTuple<T> getExactPatternTuple(String path) {
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _exactTrieNode;
 
-		for (int i = 0; i < urlPath.length(); ++i) {
-			char character = urlPath.charAt(i);
+		for (int i = 0; i < path.length(); ++i) {
+			char character = path.charAt(i);
 
 			currentTrieNode = previousTrieNode.next(character);
 
@@ -133,14 +133,14 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
+	protected PatternTuple<T> getExtensionPatternTuple(String path) {
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _extensionTrieNode;
 
-		for (int i = 0; i < urlPath.length(); ++i) {
-			int index = urlPath.length() - 1 - i;
+		for (int i = 0; i < path.length(); ++i) {
+			int index = path.length() - 1 - i;
 
-			char character = urlPath.charAt(index);
+			char character = path.charAt(index);
 
 			if (character == '/') {
 				break;
@@ -152,7 +152,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				break;
 			}
 
-			if (urlPath.charAt(index) == '.') {
+			if (path.charAt(index) == '.') {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
@@ -167,20 +167,20 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
+	protected PatternTuple<T> getWildcardPatternTuple(String path) {
 		PatternTuple<T> patternTuple = null;
 
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _wildCardTrieNode;
 
-		for (int i = 0; i < urlPath.length(); ++i) {
-			currentTrieNode = previousTrieNode.next(urlPath.charAt(i));
+		for (int i = 0; i < path.length(); ++i) {
+			currentTrieNode = previousTrieNode.next(path.charAt(i));
 
 			if (currentTrieNode == null) {
 				break;
 			}
 
-			if (urlPath.charAt(i) == '/') {
+			if (path.charAt(i) == '/') {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
@@ -209,20 +209,20 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return patternTuple;
 	}
 
-	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
+	protected List<PatternTuple<T>> getWildcardPatternTuples(String path) {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(64);
 
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _wildCardTrieNode;
 
-		for (int i = 0; i < urlPath.length(); ++i) {
-			currentTrieNode = previousTrieNode.next(urlPath.charAt(i));
+		for (int i = 0; i < path.length(); ++i) {
+			currentTrieNode = previousTrieNode.next(path.charAt(i));
 
 			if (currentTrieNode == null) {
 				break;
 			}
 
-			if (urlPath.charAt(i) == '/') {
+			if (path.charAt(i) == '/') {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
