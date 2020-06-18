@@ -268,7 +268,8 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		if (currentTrieNode != null) {
-			currentTrieNode.fillPatternPackage(urlPattern, value);
+			currentTrieNode.setPatternTuple(
+				new PatternTuple<>(urlPattern, value));
 		}
 	}
 
@@ -283,8 +284,8 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			_trieNodes = new ArrayList<>(ASCII_CHARACTER_RANGE);
 		}
 
-		public void fillPatternPackage(String urlPattern, T value) {
-			_patternTuple = new PatternTuple<>(urlPattern, value);
+		public void setPatternTuple(PatternTuple<T> patternTuple) {
+			_patternTuple = patternTuple;
 		}
 
 		public PatternTuple<T> getPatternTuple() {
