@@ -110,24 +110,23 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	@Override
 	protected PatternTuple<T> getExactPatternTuple(String urlPath) {
-		TrieNode<T> prev = _exactTrieNode;
-
-		TrieNode<T> current = null;
+		TrieNode<T> currentTrieNode = null;
+		TrieNode<T> previousTrieNode = _exactTrieNode;
 
 		for (int i = 0; i < urlPath.length(); ++i) {
 			char character = urlPath.charAt(i);
 
-			current = prev.next(character);
+			currentTrieNode = previousTrieNode.next(character);
 
-			if (current == null) {
+			if (currentTrieNode == null) {
 				break;
 			}
 
-			prev = current;
+			previousTrieNode = currentTrieNode;
 		}
 
-		if ((current != null) && current.isEnd()) {
-			return current.getPatternTuple();
+		if ((currentTrieNode != null) && currentTrieNode.isEnd()) {
+			return currentTrieNode.getPatternTuple();
 		}
 
 		return null;
@@ -135,9 +134,8 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	@Override
 	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
-		TrieNode<T> prev = _extensionTrieNode;
-
-		TrieNode<T> current = null;
+		TrieNode<T> currentTrieNode = null;
+		TrieNode<T> previousTrieNode = _extensionTrieNode;
 
 		for (int i = 0; i < urlPath.length(); ++i) {
 			int index = urlPath.length() - 1 - i;
@@ -148,21 +146,21 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				break;
 			}
 
-			current = prev.next(character);
+			currentTrieNode = previousTrieNode.next(character);
 
-			if (current == null) {
+			if (currentTrieNode == null) {
 				break;
 			}
 
 			if (urlPath.charAt(index) == '.') {
-				TrieNode<T> next = current.next('*');
+				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
-				if ((next != null) && next.isEnd()) {
-					return next.getPatternTuple();
+				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
+					return nextTrieNode.getPatternTuple();
 				}
 			}
 
-			prev = current;
+			previousTrieNode = currentTrieNode;
 		}
 
 		return null;
@@ -170,84 +168,82 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	@Override
 	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
-		PatternTuple<T> bestMatch = null;
+		PatternTuple<T> patternTuple = null;
 
-		TrieNode<T> prev = _wildCardTrieNode;
-
-		TrieNode<T> current = null;
+		TrieNode<T> currentTrieNode = null;
+		TrieNode<T> previousTrieNode = _wildCardTrieNode;
 
 		for (int i = 0; i < urlPath.length(); ++i) {
-			current = prev.next(urlPath.charAt(i));
+			currentTrieNode = previousTrieNode.next(urlPath.charAt(i));
 
-			if (current == null) {
+			if (currentTrieNode == null) {
 				break;
 			}
 
 			if (urlPath.charAt(i) == '/') {
-				TrieNode<T> next = current.next('*');
+				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
-				if ((next != null) && next.isEnd()) {
-					bestMatch = next.getPatternTuple();
+				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
+					patternTuple = nextTrieNode.getPatternTuple();
 				}
 			}
 
-			prev = current;
+			previousTrieNode = currentTrieNode;
 		}
 
 		// if current node is null, it means trie travesaling
 		// did not match every character.
 
-		if (current != null) {
-			current = current.next('/');
+		if (currentTrieNode != null) {
+			currentTrieNode = currentTrieNode.next('/');
 
-			if (current != null) {
-				current = current.next('*');
+			if (currentTrieNode != null) {
+				currentTrieNode = currentTrieNode.next('*');
 
-				if ((current != null) && current.isEnd()) {
-					bestMatch = current.getPatternTuple();
+				if ((currentTrieNode != null) && currentTrieNode.isEnd()) {
+					patternTuple = currentTrieNode.getPatternTuple();
 				}
 			}
 		}
 
-		return bestMatch;
+		return patternTuple;
 	}
 
 	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(64);
 
-		TrieNode<T> prev = _wildCardTrieNode;
-
-		TrieNode<T> current = null;
+		TrieNode<T> currentTrieNode = null;
+		TrieNode<T> previousTrieNode = _wildCardTrieNode;
 
 		for (int i = 0; i < urlPath.length(); ++i) {
-			current = prev.next(urlPath.charAt(i));
+			currentTrieNode = previousTrieNode.next(urlPath.charAt(i));
 
-			if (current == null) {
+			if (currentTrieNode == null) {
 				break;
 			}
 
 			if (urlPath.charAt(i) == '/') {
-				TrieNode<T> next = current.next('*');
+				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
-				if ((next != null) && next.isEnd()) {
-					patternTuples.add(next.getPatternTuple());
+				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
+					patternTuples.add(nextTrieNode.getPatternTuple());
 				}
 			}
 
-			prev = current;
+			previousTrieNode = currentTrieNode;
 		}
 
 		// if current node is null, it means trie travesaling
 		// did not match every character.
 
-		if (current != null) {
-			current = current.next('/');
+		if (currentTrieNode != null) {
+			currentTrieNode = currentTrieNode.next('/');
 
-			if (current != null) {
-				current = current.next('*');
+			if (currentTrieNode != null) {
+				currentTrieNode = currentTrieNode.next('*');
 
-				if ((current != null) && current.isEnd()) {
-					patternTuples.add(current.getPatternTuple());
+				if ((currentTrieNode != null) && currentTrieNode.isEnd()) {
+					patternTuples.add(currentTrieNode.getPatternTuple());
 				}
 			}
 		}
@@ -256,24 +252,23 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	protected void insert(
-		String urlPattern, T value, TrieNode<T> prev) {
+		String urlPattern, T value, TrieNode<T> previousTrieNode) {
 
-		TrieNode<T> current = null;
+		TrieNode<T> currentTrieNode = null;
 
 		for (int i = 0; i < urlPattern.length(); ++i) {
-			int index = i;
+			currentTrieNode = previousTrieNode.next(urlPattern.charAt(i));
 
-			current = prev.next(urlPattern.charAt(index));
-
-			if (current == null) {
-				current = prev.setNext(urlPattern.charAt(index), _trieNodeHeap);
+			if (currentTrieNode == null) {
+				currentTrieNode = previousTrieNode.setNext(
+					urlPattern.charAt(i), _trieNodeHeap);
 			}
 
-			prev = current;
+			previousTrieNode = currentTrieNode;
 		}
 
-		if (current != null) {
-			current.fillPatternPackage(urlPattern, value);
+		if (currentTrieNode != null) {
+			currentTrieNode.fillPatternPackage(urlPattern, value);
 		}
 	}
 
