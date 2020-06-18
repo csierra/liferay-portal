@@ -229,8 +229,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			trieArray = new long[2][maxPatternLength][CHARACTER_RANGE];
 		}
 
-		public abstract PatternTuple<T> getPatternTuple(String urlPath);
-
 		protected byte getExactIndex(String urlPath) {
 			long current = _ALL_BITS;
 
@@ -344,7 +342,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			super(false, maxPatternLength);
 		}
 
-		@Override
 		public PatternTuple<T> getPatternTuple(String urlPath) {
 			byte index = getExactIndex(urlPath);
 
@@ -364,7 +361,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			super(true, maxPatternLength);
 		}
 
-		@Override
 		public PatternTuple<T> getPatternTuple(String urlPath) {
 			long current = _ALL_BITS;
 
@@ -414,7 +410,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			super(false, maxPatternLength);
 		}
 
-		@Override
 		public PatternTuple<T> getPatternTuple(String urlPath) {
 			byte row = 0;
 
