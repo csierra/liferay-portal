@@ -181,15 +181,15 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(
 			(byte)Long.SIZE + 2);
 
-		long wildcardMatchesBitset =
-			_wildcardPathPatternMatcher.getWildcardMatchesBitset(urlPath);
+		long wildcardMatchesBitMask =
+			_wildcardPathPatternMatcher.getWildcardMatchesBitMask(urlPath);
 
-		while (wildcardMatchesBitset != 0) {
+		while (wildcardMatchesBitMask != 0) {
 			patternTuples.add(
 				_wildcardPathPatternMatcher.patternTuples.get(
-					getFirstSetBitIndex(wildcardMatchesBitset)));
+					getFirstSetBitIndex(wildcardMatchesBitMask)));
 
-			wildcardMatchesBitset &= wildcardMatchesBitset - 1;
+			wildcardMatchesBitMask &= wildcardMatchesBitMask - 1;
 		}
 
 		return patternTuples;
@@ -333,7 +333,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		public PatternTuple<T> getPatternTuple(String urlPath) {
 			int urlPathLength = urlPath.length();
-			long current = _ALL_BITS_SET;
+			long currentBitMask = _ALL_BITS_SET;
 
 			for (byte row = 0; row < urlPathLength; ++row) {
 				if (row > (maxPatternLength - 1)) {
@@ -348,14 +348,15 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				int column = character - ASCII_PRINTABLE_OFFSET;
 
-				current &= trieArray[0][row][column];
+				currentBitMask &= trieArray[0][row][column];
 
-				if (current == 0) {
+				if (currentBitMask == 0) {
 					break;
 				}
 
 				if ((character == '.') && ((row + 1) < maxPatternLength)) {
-					long bitMask = current & trieArray[1][row + 1][_STAR_INDEX];
+					long bitMask =
+						currentBitMask & trieArray[1][row + 1][_STAR_INDEX];
 
 					if (bitMask != 0) {
 						return patternTuples.get(getFirstSetBitIndex(bitMask));
@@ -388,10 +389,8 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		public PatternTuple<T> getPatternTuple(String urlPath) {
 			byte row = 0;
-
-			long current = _ALL_BITS_SET;
-
-			long bestMatch = 0;
+			long currentBitMask = _ALL_BITS_SET;
+			long bestMatchBitMask = 0;
 
 			// This loop tries to find every wildcard match at
 			// every '/' character.
@@ -400,29 +399,29 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			for (; row < urlPath.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
-					current = 0;
+					currentBitMask = 0;
 
 					break;
 				}
 
 				char character = urlPath.charAt(row);
 
-				int col = character - ASCII_PRINTABLE_OFFSET;
+				int column = character - ASCII_PRINTABLE_OFFSET;
 
-				current &= trieArray[0][row][col];
+				currentBitMask &= trieArray[0][row][column];
 
-				if (current == 0) {
+				if (currentBitMask == 0) {
 					row++;
 
 					break;
 				}
 
 				if ((character == '/') && ((row + 1) < maxPatternLength)) {
-					long wildcardPattern =
-						current & trieArray[1][row + 1][_STAR_INDEX];
+					long bitMask =
+						currentBitMask & trieArray[1][row + 1][_STAR_INDEX];
 
-					if (wildcardPattern != 0) {
-						bestMatch = wildcardPattern;
+					if (bitMask != 0) {
+						bestMatchBitMask = bitMask;
 					}
 				}
 			}
@@ -430,30 +429,29 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// if current is zero, it means trie travesaling
 			// did not match till the last character.
 
-			if ((current != 0) && ((row + 1) < maxPatternLength)) {
-				long extra = current & trieArray[0][row][_SLASH_INDEX];
+			if ((currentBitMask != 0) && ((row + 1) < maxPatternLength)) {
+				long extraBitMask =
+					currentBitMask & trieArray[0][row][_SLASH_INDEX];
 
-				extra &= trieArray[0][row + 1][_STAR_INDEX];
-				extra &= trieArray[1][row + 1][_STAR_INDEX];
+				extraBitMask &= trieArray[0][row + 1][_STAR_INDEX];
+				extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
 
-				if (extra != 0) {
-					bestMatch = extra;
+				if (extraBitMask != 0) {
+					bestMatchBitMask = extraBitMask;
 				}
 			}
 
-			if (bestMatch == 0) {
+			if (bestMatchBitMask == 0) {
 				return null;
 			}
 
-			return patternTuples.get(getFirstSetBitIndex(bestMatch));
+			return patternTuples.get(getFirstSetBitIndex(bestMatchBitMask));
 		}
 
-		public long getWildcardMatchesBitset(String urlPath) {
-			long matches = 0;
-
+		public long getWildcardMatchesBitMask(String urlPath) {
 			byte row = 0;
-
 			long current = _ALL_BITS_SET;
+			long bitMask = 0;
 
 			// This loop tries to find every wildcard match at
 			// every '/' character.
@@ -469,9 +467,9 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				char character = urlPath.charAt(row);
 
-				int col = character - ASCII_PRINTABLE_OFFSET;
+				int column = character - ASCII_PRINTABLE_OFFSET;
 
-				current &= trieArray[0][row][col];
+				current &= trieArray[0][row][column];
 
 				if (current == 0) {
 					row++;
@@ -480,11 +478,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				}
 
 				if ((character == '/') && ((row + 1) < maxPatternLength)) {
-					long wildcardPattern =
+					long nextBitMask =
 						current & trieArray[1][row + 1][_STAR_INDEX];
 
-					if (wildcardPattern != 0) {
-						matches |= wildcardPattern;
+					if (nextBitMask != 0) {
+						bitMask |= nextBitMask;
 					}
 				}
 			}
@@ -493,17 +491,17 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// did not match till the last character.
 
 			if ((current != 0) && ((row + 1) < maxPatternLength)) {
-				long extra = current & trieArray[0][row][_SLASH_INDEX];
+				long extraBitMask = current & trieArray[0][row][_SLASH_INDEX];
 
-				extra &= trieArray[0][row + 1][_STAR_INDEX];
-				extra &= trieArray[1][row + 1][_STAR_INDEX];
+				extraBitMask &= trieArray[0][row + 1][_STAR_INDEX];
+				extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
 
-				if (extra != 0) {
-					matches |= extra;
+				if (extraBitMask != 0) {
+					bitMask |= extraBitMask;
 				}
 			}
 
-			return matches;
+			return bitMask;
 		}
 
 	}
