@@ -278,26 +278,23 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			byte bitIndex = getExactIndex(urlPattern);
+			byte index = getExactIndex(urlPattern);
 
-			if (bitIndex > -1) {
+			if (index > -1) {
 
 				// Indicating the end of the pattern
 
 				patternTuples.add(
-					bitIndex, new PatternTuple<>(urlPattern, value));
+					index, new PatternTuple<>(urlPattern, value));
 
 				return;
 			}
 
-			bitIndex = _count++;
-
-			long bitMask = 1;
-
-			bitMask <<= bitIndex;
+			index = _count++;
 
 			int row = 0;
 			int col = 0;
+			long bitMask = 1 << index;
 
 			for (; row < urlPattern.length(); ++row) {
 				char character = '\0';
@@ -322,7 +319,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			trieArray[1][row - 1][col] |= bitMask;
 
-			patternTuples.add(bitIndex, patternTuple);
+			patternTuples.add(index, patternTuple);
 		}
 
 		protected byte maxPatternLength;
