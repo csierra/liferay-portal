@@ -36,21 +36,7 @@ public abstract class PathPatternMatcher<T> {
 	 * @param path a legal path from a URL
 	 * @return the matched pattern
 	 */
-	public PatternTuple<T> getPatternTuple(String path) {
-		PatternTuple<T> patternTuple = getExactPatternTuple(path);
-
-		if (patternTuple != null) {
-			return patternTuple;
-		}
-
-		patternTuple = getWildcardPatternTuple(path);
-
-		if (patternTuple != null) {
-			return patternTuple;
-		}
-
-		return getExtensionPatternTuple(path);
-	}
+	public abstract PatternTuple<T> getPatternTuple(String path);
 
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
@@ -67,12 +53,6 @@ public abstract class PathPatternMatcher<T> {
 
 	public abstract void insert(String urlPattern, T value)
 		throws IllegalArgumentException;
-
-	protected abstract PatternTuple<T> getExactPatternTuple(String path);
-
-	protected abstract PatternTuple<T> getExtensionPatternTuple(String path);
-
-	protected abstract PatternTuple<T> getWildcardPatternTuple(String path);
 
 	/**
 	 * A valid ExtensionPattern:

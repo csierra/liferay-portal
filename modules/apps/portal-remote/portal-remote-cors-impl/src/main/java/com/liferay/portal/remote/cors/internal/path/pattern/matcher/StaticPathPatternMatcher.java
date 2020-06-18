@@ -168,16 +168,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return n;
 	}
 
-	@Override
-	protected PatternTuple<T> getExactPatternTuple(String path) {
-		return _exactStaticPathPatternMatcher.getPatternTuple(path);
-	}
-
-	@Override
-	protected PatternTuple<T> getExtensionPatternTuple(String path) {
-		return _extensionStaticPathPatternMatcher.getPatternTuple(path);
-	}
-
 	protected List<PatternTuple<T>> getWilcardPatternTuples(String path) {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(
 			(byte)Long.SIZE + 2);
@@ -194,11 +184,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		return patternTuples;
-	}
-
-	@Override
-	protected PatternTuple<T> getWildcardPatternTuple(String path) {
-		return _wildcardStaticPathPatternMatcher.getPatternTuple(path);
 	}
 
 	private static final long _ALL_BITS_SET = ~0;

@@ -31,6 +31,23 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
+	public PatternTuple<T> getPatternTuple(String path) {
+		PatternTuple<T> patternTuple = getExactPatternTuple(path);
+
+		if (patternTuple != null) {
+			return patternTuple;
+		}
+
+		patternTuple = getWildcardPatternTuple(path);
+
+		if (patternTuple != null) {
+			return patternTuple;
+		}
+
+		return getExtensionPatternTuple(path);
+	}
+
+	@Override
 	public List<PatternTuple<T>> getPatternTuples(String path) {
 		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(path);
 
@@ -108,7 +125,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		insert(urlPattern, value, _exactTrieNode);
 	}
 
-	@Override
 	protected PatternTuple<T> getExactPatternTuple(String path) {
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _exactTrieNode;
@@ -132,7 +148,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return null;
 	}
 
-	@Override
 	protected PatternTuple<T> getExtensionPatternTuple(String path) {
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _extensionTrieNode;
@@ -166,7 +181,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return null;
 	}
 
-	@Override
 	protected PatternTuple<T> getWildcardPatternTuple(String path) {
 		PatternTuple<T> patternTuple = null;
 
