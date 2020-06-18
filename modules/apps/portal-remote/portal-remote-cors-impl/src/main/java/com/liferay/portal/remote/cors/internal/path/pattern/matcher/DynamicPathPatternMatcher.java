@@ -31,7 +31,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	public List<PatternTuple<T>> getPatternPackages(String urlPath) {
+	public List<PatternTuple<T>> getPatternTuples(String urlPath) {
 		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(urlPath);
 
 		PatternTuple<T> patternTuple = getExactPatternTuple(urlPath);

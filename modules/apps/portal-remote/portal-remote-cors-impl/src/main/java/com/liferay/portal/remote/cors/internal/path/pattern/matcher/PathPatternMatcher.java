@@ -36,7 +36,7 @@ public abstract class PathPatternMatcher<T> {
 	 * @param urlPath a legal urlPath from a URL
 	 * @return the matched pattern
 	 */
-	public PatternTuple<T> getPatternPackage(String urlPath) {
+	public PatternTuple<T> getPatternTuple(String urlPath) {
 		PatternTuple<T> patternTuple = getExactPatternTuple(urlPath);
 
 		if (patternTuple != null) {
@@ -63,7 +63,7 @@ public abstract class PathPatternMatcher<T> {
 	 * @param urlPath a legal urlPath from a URL
 	 * @return all the matched patterns
 	 */
-	public abstract List<PatternTuple<T>> getPatternPackages(String urlPath);
+	public abstract List<PatternTuple<T>> getPatternTuples(String urlPath);
 
 	public abstract void insert(String urlPattern, T value)
 		throws IllegalArgumentException;

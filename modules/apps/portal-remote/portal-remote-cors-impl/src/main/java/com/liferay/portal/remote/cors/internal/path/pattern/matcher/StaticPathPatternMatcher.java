@@ -47,7 +47,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			_maxPatternLength);
 	}
 
-	public PatternTuple<T> getPatternPackage(String urlPath) {
+	public PatternTuple<T> getPatternTuple(String urlPath) {
 		PatternTuple<T> patternTuple = _exactPathPatternMatcher.getPatternTuple(
 			urlPath);
 
@@ -65,14 +65,15 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	@Override
-	public List<PatternTuple<T>> getPatternPackages(String urlPath) {
+	public List<PatternTuple<T>> getPatternTuples(String urlPath) {
+		List<PatternTuple<T>> patternTuples = new ArrayList<>(
+			_LONG_BITS_SIZE + 2);
+
 		long wildcardMatches = _wildcardPathPatternMatcher.getPatternTuples(
 			urlPath);
 
-		List<PatternTuple<T>> patterns = new ArrayList<>(_LONG_BITS_SIZE + 2);
-
 		while (wildcardMatches != 0) {
-			patterns.add(
+			patternTuples.add(
 				_wildcardPathPatternMatcher.patternTuples.get(
 					getSetBitIndex(wildcardMatches)));
 
@@ -83,16 +84,16 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			urlPath);
 
 		if (patternTuple != null) {
-			patterns.add(patternTuple);
+			patternTuples.add(patternTuple);
 		}
 
 		patternTuple = _extensionPathPatternMatcher.getPatternTuple(urlPath);
 
 		if (patternTuple != null) {
-			patterns.add(patternTuple);
+			patternTuples.add(patternTuple);
 		}
 
-		return patterns;
+		return patternTuples;
 	}
 
 	/**

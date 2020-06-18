@@ -254,7 +254,7 @@ public class PortalCORSServletFilter
 		}
 
 		PatternTuple<Map<String, String>> patternTuple =
-			pathPatternMatcher.getPatternPackage(getURI(httpServletRequest));
+			pathPatternMatcher.getPatternTuple(getURI(httpServletRequest));
 
 		if (patternTuple != null) {
 			corsSupport.setCORSHeaders(patternTuple.getValue());
