@@ -204,9 +204,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	private static final long _ALL_BITS_SET = ~0;
 
-	private static final byte _SLASH_INDEX = 47 - PRINTABLE_OFFSET;
+	private static final byte _SLASH_INDEX =
+		(byte)(Character.getNumericValue('/') - PRINTABLE_OFFSET);
 
-	private static final byte _STAR_INDEX = 42 - PRINTABLE_OFFSET;
+	private static final byte _STAR_INDEX =
+		(byte)(Character.getNumericValue('*') - PRINTABLE_OFFSET);
 
 	private final ExactPathPatternMatcher<T> _exactPathPatternMatcher;
 	private final ExtensionPathPatternMatcher<T> _extensionPathPatternMatcher;
