@@ -274,16 +274,16 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			index = _count++;
 
-			int row = 0;
-			int col = 0;
+			byte row = 0;
+			int column = 0;
 			long bitMask = 1 << index;
 
 			for (; row < urlPattern.length(); ++row) {
 				char character = urlPattern.charAt(row);
 
-				col = character - ASCII_PRINTABLE_OFFSET;
+				column = character - ASCII_PRINTABLE_OFFSET;
 
-				trieArray[0][row][col] |= bitMask;
+				trieArray[0][row][column] |= bitMask;
 			}
 
 			// Indicating the end of the pattern
@@ -291,7 +291,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			PatternTuple<T> patternTuple = new PatternTuple<>(
 				urlPattern, value);
 
-			trieArray[1][row - 1][col] |= bitMask;
+			trieArray[1][row - 1][column] |= bitMask;
 
 			patternTuples.add(index, patternTuple);
 		}
