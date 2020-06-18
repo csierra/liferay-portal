@@ -221,10 +221,9 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		protected byte getExactIndex(String urlPath) {
-			long current = _ALL_BITS_SET;
 
 			byte row = 0;
-
+			long current = _ALL_BITS_SET;
 			int column = 0;
 
 			for (; row < urlPath.length(); ++row) {
