@@ -23,11 +23,11 @@ import java.util.List;
 public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	public DynamicPathPatternMatcher() {
-		_trieNodeHeap = new TrieNodeHeap<>();
+		_trieNodeArrayList = new TrieNodeArrayList<>();
 
-		_exactTrieNode = _trieNodeHeap.nextNode();
-		_extensionTrieNode = _trieNodeHeap.nextNode();
-		_wildCardTrieNode = _trieNodeHeap.nextNode();
+		_exactTrieNode = _trieNodeArrayList.nextNode();
+		_extensionTrieNode = _trieNodeArrayList.nextNode();
+		_wildCardTrieNode = _trieNodeArrayList.nextNode();
 	}
 
 	@Override
@@ -261,7 +261,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			if (currentTrieNode == null) {
 				currentTrieNode = previousTrieNode.setNext(
-					urlPattern.charAt(i), _trieNodeHeap);
+					urlPattern.charAt(i), _trieNodeArrayList);
 			}
 
 			previousTrieNode = currentTrieNode;
@@ -275,7 +275,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	private final TrieNode<T> _exactTrieNode;
 	private final TrieNode<T> _extensionTrieNode;
-	private final TrieNodeHeap<T> _trieNodeHeap;
+	private final TrieNodeArrayList<T> _trieNodeArrayList;
 	private final TrieNode<T> _wildCardTrieNode;
 
 	private static class TrieNode<T> {
@@ -313,9 +313,9 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public TrieNode<T> setNext(
-			char character, TrieNodeHeap<T> trieNodeHeap) {
+			char character, TrieNodeArrayList<T> trieNodeArrayList) {
 
-			TrieNode<T> node = trieNodeHeap.nextNode();
+			TrieNode<T> trieNode = trieNodeArrayList.nextNode();
 
 			int index = character - ASCII_PRINTABLE_OFFSET;
 
@@ -325,9 +325,9 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				throw new IllegalArgumentException();
 			}
 
-			_trieNodes.set(index, node);
+			_trieNodes.set(index, trieNode);
 
-			return node;
+			return trieNode;
 		}
 
 		/**
@@ -341,32 +341,32 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	}
 
-	private static class TrieNodeHeap<T> {
+	private static class TrieNodeArrayList<T> {
 
-		public TrieNodeHeap() {
-			_trieNodeHeap = new ArrayList<>(_INIT_SIZE);
+		public TrieNodeArrayList() {
+			_trieNodes = new ArrayList<>(_INIT_SIZE);
 
 			for (int i = 0; i < _INIT_SIZE; ++i) {
-				_trieNodeHeap.add(new TrieNode<>());
+				_trieNodes.add(new TrieNode<>());
 			}
 		}
 
 		public TrieNode<T> nextNode() {
-			if (_index >= _trieNodeHeap.size()) {
-				_trieNodeHeap.ensureCapacity(_trieNodeHeap.size() + _INIT_SIZE);
+			if (_index >= _trieNodes.size()) {
+				_trieNodes.ensureCapacity(_trieNodes.size() + _INIT_SIZE);
 
 				for (int i = 0; i < _INIT_SIZE; ++i) {
-					_trieNodeHeap.add(new TrieNode<>());
+					_trieNodes.add(new TrieNode<>());
 				}
 			}
 
-			return _trieNodeHeap.get(_index++);
+			return _trieNodes.get(_index++);
 		}
 
 		private static final int _INIT_SIZE = 1024;
 
 		private int _index;
-		private ArrayList<TrieNode<T>> _trieNodeHeap;
+		private ArrayList<TrieNode<T>> _trieNodes;
 
 	}
 
