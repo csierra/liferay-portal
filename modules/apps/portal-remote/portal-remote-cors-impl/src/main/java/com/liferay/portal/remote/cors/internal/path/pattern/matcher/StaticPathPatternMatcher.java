@@ -181,7 +181,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	protected List<PatternTuple<T>> getWilcardPatternTuples(String urlPath) {
 		List<PatternTuple<T>> patternTuples = new ArrayList<>(
-			_LONG_BITS_SIZE + 2);
+			(byte)Long.SIZE + 2);
 
 		long wildcardMatchesBitset =
 			_wildcardPathPatternMatcher.getWildcardMatchesBitset(urlPath);
@@ -203,8 +203,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	private static final long _ALL_BITS = ~0;
-
-	private static final byte _LONG_BITS_SIZE = 64;
 
 	private static final byte _SLASH_INDEX = 47 - PRINTABLE_OFFSET;
 
@@ -327,7 +325,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		protected byte maxPatternLength;
 		protected List<PatternTuple<T>> patternTuples = new ArrayList<>(
-			_LONG_BITS_SIZE);
+			(byte)Long.SIZE);
 		protected final long[][][] trieArray;
 
 		private byte _count;
