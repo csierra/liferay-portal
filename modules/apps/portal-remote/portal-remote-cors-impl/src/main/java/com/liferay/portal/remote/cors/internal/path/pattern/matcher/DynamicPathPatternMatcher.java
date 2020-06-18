@@ -280,10 +280,10 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	private static class TrieNode<T> {
 
 		public TrieNode() {
-			_link = new ArrayList<>(ASCII_CHARACTER_RANGE);
+			_trieNodes = new ArrayList<>(ASCII_CHARACTER_RANGE);
 
 			for (int i = 0; i < ASCII_CHARACTER_RANGE; ++i) {
-				_link.add(null);
+				_trieNodes.add(null);
 			}
 		}
 
@@ -308,7 +308,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				throw new IllegalArgumentException();
 			}
 
-			return _link.get(index);
+			return _trieNodes.get(index);
 		}
 
 		public TrieNode<T> setNext(
@@ -324,7 +324,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				throw new IllegalArgumentException();
 			}
 
-			_link.set(index, node);
+			_trieNodes.set(index, node);
 
 			return node;
 		}
@@ -334,7 +334,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		 * There is around 70% performance increase for best match,
 		 * and 40% performance increase for all matches.
 		 */
-		private final List<TrieNode<T>> _link;
+		private final List<TrieNode<T>> _trieNodes;
 
 		private PatternTuple<T> _patternTuple;
 
