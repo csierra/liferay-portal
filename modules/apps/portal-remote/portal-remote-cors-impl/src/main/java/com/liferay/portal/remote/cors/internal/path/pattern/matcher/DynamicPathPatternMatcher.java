@@ -25,20 +25,13 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	public DynamicPathPatternMatcher() {
 		_trieNodeArrayList = new TrieNodeArrayList<>();
 
-		_exactTrieNode = _trieNodeArrayList.nextNode();
 		_extensionTrieNode = _trieNodeArrayList.nextNode();
 		_wildCardTrieNode = _trieNodeArrayList.nextNode();
 	}
 
 	@Override
 	public PatternTuple<T> getPatternTuple(String path) {
-		PatternTuple<T> patternTuple = getExactPatternTuple(path);
-
-		if (patternTuple != null) {
-			return patternTuple;
-		}
-
-		patternTuple = getWildcardPatternTuple(path);
+		PatternTuple<T> patternTuple = getWildcardPatternTuple(path);
 
 		if (patternTuple != null) {
 			return patternTuple;
@@ -51,13 +44,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	public List<PatternTuple<T>> getPatternTuples(String path) {
 		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(path);
 
-		PatternTuple<T> patternTuple = getExactPatternTuple(path);
-
-		if (patternTuple != null) {
-			patternTuples.add(patternTuple);
-		}
-
-		patternTuple = getExtensionPatternTuple(path);
+		PatternTuple<T> patternTuple = getExtensionPatternTuple(path);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
@@ -112,30 +99,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return;
 		}
 
-		insert(pathPattern, value, _exactTrieNode, true);
-	}
-
-	protected PatternTuple<T> getExactPatternTuple(String path) {
-		TrieNode<T> currentTrieNode = null;
-		TrieNode<T> previousTrieNode = _exactTrieNode;
-
-		for (int i = 0; i < path.length(); ++i) {
-			char character = path.charAt(i);
-
-			currentTrieNode = previousTrieNode.next(character);
-
-			if (currentTrieNode == null) {
-				break;
-			}
-
-			previousTrieNode = currentTrieNode;
-		}
-
-		if ((currentTrieNode != null) && currentTrieNode.isEnd()) {
-			return currentTrieNode.getPatternTuple();
-		}
-
-		return null;
+		insert(pathPattern, value, _wildCardTrieNode, true);
 	}
 
 	protected PatternTuple<T> getExtensionPatternTuple(String path) {
@@ -199,6 +163,10 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// did not match every character.
 
 		if (currentTrieNode != null) {
+			if (currentTrieNode.isEnd()) {
+				return currentTrieNode.getPatternTuple();
+			}
+
 			currentTrieNode = currentTrieNode.next('/');
 
 			if (currentTrieNode != null) {
@@ -226,7 +194,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				break;
 			}
 
-			if (path.charAt(i) == '/') {
+			if (i != path.length() - 2 && path.charAt(i) == '/') {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
@@ -241,6 +209,10 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		// did not match every character.
 
 		if (currentTrieNode != null) {
+			if (currentTrieNode.isEnd()) {
+				patternTuples.add(currentTrieNode.getPatternTuple());
+			}
+
 			currentTrieNode = currentTrieNode.next('/');
 
 			if (currentTrieNode != null) {
@@ -256,36 +228,35 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	protected void insert(
-			String pathPattern, T value, TrieNode<T> previousTrieNode,
-			boolean forward) {
+		String pathPattern, T value, TrieNode<T> previousTrieNode,
+		boolean forward) {
 
-			TrieNode<T> currentTrieNode = null;
+		TrieNode<T> currentTrieNode = null;
 
-			for (int i = 0; i < pathPattern.length(); ++i) {
+		for (int i = 0; i < pathPattern.length(); ++i) {
 
-				int index = i;
+			int index = i;
 
-				if (!forward) {
-					index = pathPattern.length() - 1 - i;
-				}
-
-				currentTrieNode = previousTrieNode.next(pathPattern.charAt(index));
-
-				if (currentTrieNode == null) {
-					currentTrieNode = previousTrieNode.setNext(
-						pathPattern.charAt(index), _trieNodeArrayList);
-				}
-
-				previousTrieNode = currentTrieNode;
+			if (!forward) {
+				index = pathPattern.length() - 1 - i;
 			}
 
-			if (currentTrieNode != null) {
-				currentTrieNode.setPatternTuple(
-					new PatternTuple<>(pathPattern, value));
+			currentTrieNode = previousTrieNode.next(pathPattern.charAt(index));
+
+			if (currentTrieNode == null) {
+				currentTrieNode = previousTrieNode.setNext(
+					pathPattern.charAt(index), _trieNodeArrayList);
 			}
+
+			previousTrieNode = currentTrieNode;
 		}
 
-	private final TrieNode<T> _exactTrieNode;
+		if (currentTrieNode != null) {
+			currentTrieNode.setPatternTuple(
+				new PatternTuple<>(pathPattern, value));
+		}
+	}
+
 	private final TrieNode<T> _extensionTrieNode;
 	private final TrieNodeArrayList<T> _trieNodeArrayList;
 	private final TrieNode<T> _wildCardTrieNode;
