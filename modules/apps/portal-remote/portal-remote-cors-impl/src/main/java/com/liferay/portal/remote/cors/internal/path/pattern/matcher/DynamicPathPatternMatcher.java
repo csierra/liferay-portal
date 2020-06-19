@@ -101,22 +101,18 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		if (isValidWildCardPattern(pathPattern)) {
-			insert(pathPattern, value, _wildCardTrieNode);
+			insert(pathPattern, value, _wildCardTrieNode, true);
 
 			return;
 		}
 
 		if (isValidExtensionPattern(pathPattern)) {
-			StringBuilder stringBuilder = new StringBuilder(pathPattern);
-
-			stringBuilder.reverse();
-
-			insert(stringBuilder.toString(), value, _extensionTrieNode);
+			insert(pathPattern, value, _extensionTrieNode, false);
 
 			return;
 		}
 
-		insert(pathPattern, value, _exactTrieNode);
+		insert(pathPattern, value, _exactTrieNode, true);
 	}
 
 	protected PatternTuple<T> getExactPatternTuple(String path) {
@@ -260,26 +256,34 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	}
 
 	protected void insert(
-		String pathPattern, T value, TrieNode<T> previousTrieNode) {
+			String pathPattern, T value, TrieNode<T> previousTrieNode,
+			boolean forward) {
 
-		TrieNode<T> currentTrieNode = null;
+			TrieNode<T> currentTrieNode = null;
 
-		for (int i = 0; i < pathPattern.length(); ++i) {
-			currentTrieNode = previousTrieNode.next(pathPattern.charAt(i));
+			for (int i = 0; i < pathPattern.length(); ++i) {
 
-			if (currentTrieNode == null) {
-				currentTrieNode = previousTrieNode.setNext(
-					pathPattern.charAt(i), _trieNodeArrayList);
+				int index = i;
+
+				if (!forward) {
+					index = pathPattern.length() - 1 - i;
+				}
+
+				currentTrieNode = previousTrieNode.next(pathPattern.charAt(index));
+
+				if (currentTrieNode == null) {
+					currentTrieNode = previousTrieNode.setNext(
+						pathPattern.charAt(index), _trieNodeArrayList);
+				}
+
+				previousTrieNode = currentTrieNode;
 			}
 
-			previousTrieNode = currentTrieNode;
+			if (currentTrieNode != null) {
+				currentTrieNode.setPatternTuple(
+					new PatternTuple<>(pathPattern, value));
+			}
 		}
-
-		if (currentTrieNode != null) {
-			currentTrieNode.setPatternTuple(
-				new PatternTuple<>(pathPattern, value));
-		}
-	}
 
 	private final TrieNode<T> _exactTrieNode;
 	private final TrieNode<T> _extensionTrieNode;
