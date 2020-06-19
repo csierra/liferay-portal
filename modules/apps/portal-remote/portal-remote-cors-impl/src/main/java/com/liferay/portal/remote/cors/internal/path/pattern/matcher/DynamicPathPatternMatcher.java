@@ -194,7 +194,7 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				break;
 			}
 
-			if (i != path.length() - 2 && path.charAt(i) == '/') {
+			if ((i != (path.length() - 2)) && (path.charAt(i) == '/')) {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
@@ -234,7 +234,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		TrieNode<T> currentTrieNode = null;
 
 		for (int i = 0; i < pathPattern.length(); ++i) {
-
 			int index = i;
 
 			if (!forward) {

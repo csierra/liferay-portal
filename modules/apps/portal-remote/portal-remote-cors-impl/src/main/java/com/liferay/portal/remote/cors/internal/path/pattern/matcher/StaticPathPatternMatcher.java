@@ -98,7 +98,8 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			_wildcardStaticPathPatternMatcher.insert(pathPattern, value, true);
 		}
 		else if (isValidExtensionPattern(pathPattern)) {
-			_extensionStaticPathPatternMatcher.insert(pathPattern, value, false);
+			_extensionStaticPathPatternMatcher.insert(
+				pathPattern, value, false);
 		}
 		else {
 			_wildcardStaticPathPatternMatcher.insert(pathPattern, value, true);
@@ -414,13 +415,16 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					break;
 				}
 
-				if (row != path.length() - 2 && (character == '/') && ((row + 1) < maxPatternLength)) {
+				if ((row != (path.length() - 2)) && (character == '/') &&
+					((row + 1) < maxPatternLength)) {
 
 					long nextBitMask =
 						current & trieArray[1][row + 1][_STAR_INDEX];
 
 					if (nextBitMask != 0) {
-						result.add(patternTuples.get(getFirstSetBitIndex(nextBitMask)));
+						result.add(
+							patternTuples.get(
+								getFirstSetBitIndex(nextBitMask)));
 					}
 				}
 			}
@@ -429,21 +433,23 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// did not match till the last character.
 
 			if (current != 0) {
-				long bitMask =
-					current & trieArray[1][row - 1][_STAR_INDEX];
+				long bitMask = current & trieArray[1][row - 1][_STAR_INDEX];
 
 				if (bitMask != 0) {
 					result.add(patternTuples.get(getFirstSetBitIndex(bitMask)));
 				}
 
 				if ((row + 1) < maxPatternLength) {
-					long extraBitMask = current & trieArray[0][row][_SLASH_INDEX];
+					long extraBitMask =
+						current & trieArray[0][row][_SLASH_INDEX];
 
 					extraBitMask &= trieArray[0][row + 1][_STAR_INDEX];
 					extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
 
 					if (extraBitMask != 0) {
-						result.add(patternTuples.get(getFirstSetBitIndex(extraBitMask)));
+						result.add(
+							patternTuples.get(
+								getFirstSetBitIndex(extraBitMask)));
 					}
 				}
 			}
