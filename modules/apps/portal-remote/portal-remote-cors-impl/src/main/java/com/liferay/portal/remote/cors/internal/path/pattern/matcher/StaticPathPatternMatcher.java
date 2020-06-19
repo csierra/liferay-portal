@@ -108,13 +108,13 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		throws IllegalArgumentException {
 
 		if (isValidWildCardPattern(pathPattern)) {
-			_wildcardStaticPathPatternMatcher.insert(pathPattern, value);
+			_wildcardStaticPathPatternMatcher.insert(pathPattern, value, true);
 		}
 		else if (isValidExtensionPattern(pathPattern)) {
-			_extensionStaticPathPatternMatcher.insert(pathPattern, value);
+			_extensionStaticPathPatternMatcher.insert(pathPattern, value, false);
 		}
 		else {
-			_exactStaticPathPatternMatcher.insert(pathPattern, value);
+			_exactStaticPathPatternMatcher.insert(pathPattern, value, true);
 		}
 	}
 
@@ -242,7 +242,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return -1;
 		}
 
-		protected void insert(String pathPattern, T value) {
+		protected void insert(String pathPattern, T value, boolean forward) {
 			if (_count > 63) {
 				throw new IllegalArgumentException(
 					"Exceeding maximum number of allowed URL patterns");
@@ -268,6 +268,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			for (; row < pathPattern.length(); ++row) {
 				char character = pathPattern.charAt(row);
+
+				if (!forward) {
+					character = pathPattern.charAt(
+						pathPattern.length() - 1 - row);
+				}
 
 				column = character - ASCII_PRINTABLE_OFFSET;
 
@@ -358,12 +363,8 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		@Override
-		protected void insert(String pathPattern, T value) {
-			StringBuilder stringBuilder = new StringBuilder(pathPattern);
-
-			stringBuilder.reverse();
-
-			super.insert(stringBuilder.toString(), value);
+		protected void insert(String pathPattern, T value, boolean forward) {
+			super.insert(pathPattern, value, forward);
 		}
 
 	}
