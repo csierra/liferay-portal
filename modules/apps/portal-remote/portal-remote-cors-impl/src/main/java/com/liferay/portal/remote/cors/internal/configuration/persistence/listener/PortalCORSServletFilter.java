@@ -15,45 +15,49 @@
 package com.liferay.portal.remote.cors.internal.configuration.persistence.listener;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
+import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.servlet.BaseFilter;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
-import com.liferay.portal.remote.cors.internal.path.pattern.matcher.DynamicPathPatternMatcher;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcher;
+import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcherFactory;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternTuple;
 
-import java.io.IOException;
-
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Arthur Chan
+ * @author Carlos Sierra Andrés
  */
 @Component(
 	immediate = true,
@@ -65,42 +69,22 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = {Filter.class, ManagedServiceFactory.class}
 )
-public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
+public class PortalCORSServletFilter
+	extends BaseFilter
+	implements ConfigurationModelListener, ManagedServiceFactory {
 
 	@Override
 	public void deleted(String pid) {
-		Long companyId = _pidToCompany.remove(pid);
+		Dictionary<String, ?> properties = _configurationPidsProperties.remove(
+			pid);
 
-		if (companyId == null) {
-			return;
+		long companyId = GetterUtil.getLong(properties.get("companyId"));
+
+		if (companyId == CompanyConstants.SYSTEM) {
+			_rebuild();
 		}
-
-		CORSFactoryConfigurationStore corsFactoryConfigurationStore =
-			_corsFactoryConfigurationStores.get(companyId);
-
-		if (corsFactoryConfigurationStore != null) {
-			corsFactoryConfigurationStore.removeCORSFactoryConfiguration(pid);
-		}
-
-		if (companyId != CompanyConstants.SYSTEM) {
-			setPathPatternMatcher(
-				_corsFactoryConfigurationStores.get(CompanyConstants.SYSTEM),
-				corsFactoryConfigurationStore, companyId);
-
-			return;
-		}
-
-		setPathPatternMatcher(corsFactoryConfigurationStore, null, companyId);
-
-		for (long existingCompanyId : _pathPatternMatchers.keySet()) {
-			if (existingCompanyId == 0) {
-				continue;
-			}
-
-			setPathPatternMatcher(
-				corsFactoryConfigurationStore,
-				_corsFactoryConfigurationStores.get(existingCompanyId),
-				existingCompanyId);
+		else {
+			_rebuild(companyId);
 		}
 	}
 
@@ -109,95 +93,127 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 	}
 
 	@Override
-	public final void doFilter(
-			ServletRequest servletRequest, ServletResponse servletResponse,
-			FilterChain filterChain)
-		throws IOException, ServletException {
-
-		HttpServletRequest httpServletRequest =
-			(HttpServletRequest)servletRequest;
-
-		if (CORSSupport.isCORSRequest(httpServletRequest::getHeader)) {
-			try {
-				processCORSRequest(
-					httpServletRequest, (HttpServletResponse)servletResponse,
-					filterChain);
-			}
-			catch (Exception exception) {
-				throw new ServletException(exception);
-			}
-		}
-		else {
-			filterChain.doFilter(servletRequest, servletResponse);
-		}
-	}
-
-	@Override
 	public String getName() {
 		return StringPool.BLANK;
 	}
 
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
+	public void init(FilterConfig filterConfig) {
 		ServletContext servletContext = filterConfig.getServletContext();
 
 		_contextPath = servletContext.getContextPath();
 	}
 
 	@Override
+	public boolean isFilterEnabled(
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
+
+		return CORSSupport.isCORSRequest(httpServletRequest::getHeader);
+	}
+
+	@Override
+	public void onAfterDelete(String pid)
+		throws ConfigurationModelListenerException {
+	}
+
+	@Override
+	public void onAfterSave(String pid, Dictionary<String, Object> properties)
+		throws ConfigurationModelListenerException {
+	}
+
+	@Override
+	public void onBeforeDelete(String pid)
+		throws ConfigurationModelListenerException {
+	}
+
+	@Override
+	public void onBeforeSave(
+			String pid, Dictionary<String, Object> newProperties)
+		throws ConfigurationModelListenerException {
+
+		HashSet<String> pathPatternSet = new HashSet<>();
+		HashSet<String> duplicatedPathPatternsSet = new HashSet<>();
+
+		long companyId = GetterUtil.getLong(newProperties.get("companyId"));
+
+		for (Map.Entry<String, Dictionary<String, ?>> entry :
+				_configurationPidsProperties.entrySet()) {
+
+			if (StringUtil.equals(pid, entry.getKey())) {
+				continue;
+			}
+
+			Dictionary<String, ?> properties = entry.getValue();
+
+			if (companyId != GetterUtil.getLong(properties.get("companyId"))) {
+				continue;
+			}
+
+			PortalCORSConfiguration portalCORSConfiguration =
+				ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, properties);
+
+			String[] pathPatterns =
+				portalCORSConfiguration.filterMappingURLPatterns();
+
+			for (String pathPattern : pathPatterns) {
+				if (!pathPatternSet.add(pathPattern)) {
+					duplicatedPathPatternsSet.add(pathPattern);
+				}
+			}
+		}
+
+		if (!duplicatedPathPatternsSet.isEmpty()) {
+			throw new ConfigurationModelListenerException(
+				"Duplicated url path patterns: " + duplicatedPathPatternsSet,
+				PortalCORSConfiguration.class, PortalCORSServletFilter.class,
+				newProperties);
+		}
+	}
+
+	@Override
 	public void updated(String pid, Dictionary<String, ?> properties)
 		throws ConfigurationException {
+
+		Dictionary<String, ?> oldProperties = _configurationPidsProperties.put(
+			pid, properties);
 
 		long companyId = GetterUtil.getLong(
 			properties.get("companyId"), CompanyConstants.SYSTEM);
 
-		_pidToCompany.put(pid, companyId);
-
-		Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
-			(String[])properties.get("headers"));
-
-		String[] urlPathPatterns = (String[])properties.get(
-			"filter.mapping.url.pattern");
-
-		CORSFactoryConfiguration corsFactoryConfiguration =
-			new CORSFactoryConfiguration(urlPathPatterns, corsHeaders);
-
-		CORSFactoryConfigurationStore corsFactoryConfigurationStore =
-			_corsFactoryConfigurationStores.get(companyId);
-
-		// first time adding configuration for a company
-
-		if (corsFactoryConfigurationStore == null) {
-			_corsFactoryConfigurationStores.put(
-				companyId, new CORSFactoryConfigurationStore());
-
-			corsFactoryConfigurationStore = _corsFactoryConfigurationStores.get(
-				companyId);
-		}
-
-		corsFactoryConfigurationStore.setCORSFactoryConfiguration(
-			pid, corsFactoryConfiguration);
-
-		if (companyId != CompanyConstants.SYSTEM) {
-			setPathPatternMatcher(
-				_corsFactoryConfigurationStores.get(CompanyConstants.SYSTEM),
-				corsFactoryConfigurationStore, companyId);
+		if (companyId == CompanyConstants.SYSTEM) {
+			_rebuild();
 
 			return;
 		}
 
-		setPathPatternMatcher(corsFactoryConfigurationStore, null, companyId);
+		if (oldProperties != null) {
+			long oldCompanyId = GetterUtil.getLong(
+				oldProperties.get("companyId"));
 
-		for (long existingCompanyId : _pathPatternMatchers.keySet()) {
-			if (existingCompanyId == 0) {
-				continue;
+			if (oldCompanyId == CompanyConstants.SYSTEM) {
+				_rebuild();
+
+				return;
 			}
 
-			setPathPatternMatcher(
-				corsFactoryConfigurationStore,
-				_corsFactoryConfigurationStores.get(existingCompanyId),
-				existingCompanyId);
+			if (oldCompanyId != companyId) {
+				_rebuild(oldCompanyId);
+			}
 		}
+
+		_rebuild(companyId);
+	}
+
+	@Activate
+	protected void activate() {
+		_rebuild();
+	}
+
+	@Override
+	protected Log getLog() {
+		return _log;
 	}
 
 	protected String getURI(HttpServletRequest httpServletRequest) {
@@ -213,14 +229,15 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 		return _http.normalizePath(uri);
 	}
 
-	protected void processCORSRequest(
+	@Override
+	protected void processFilter(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, FilterChain filterChain)
 		throws Exception {
 
-		Long companyId = (Long)httpServletRequest.getAttribute("COMPANY_ID");
+		long companyId = _portal.getCompanyId(httpServletRequest);
 
-		if ((companyId == null) || (companyId == 0)) {
+		if (companyId == 0) {
 			return;
 		}
 
@@ -228,13 +245,11 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 			_pathPatternMatchers.get(companyId);
 
 		if (pathPatternMatcher == null) {
-
-			// if cannot find an CORS instance setting, we still need
-			// to check if there is a system setting
-
-			pathPatternMatcher = _pathPatternMatchers.get((long)0);
+			pathPatternMatcher = _pathPatternMatchers.get(0L);
 
 			if (pathPatternMatcher == null) {
+				filterChain.doFilter(httpServletRequest, httpServletResponse);
+
 				return;
 			}
 		}
@@ -242,7 +257,9 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 		PatternTuple<Map<String, String>> patternTuple =
 			pathPatternMatcher.getPatternTuple(getURI(httpServletRequest));
 
-		corsSupport.setCORSHeaders(patternTuple.getValue());
+		if (patternTuple != null) {
+			corsSupport.setCORSHeaders(patternTuple.getValue());
+		}
 
 		if (StringUtil.equals(
 				HttpMethods.OPTIONS, httpServletRequest.getMethod())) {
@@ -269,130 +286,121 @@ public class PortalCORSServletFilter implements Filter, ManagedServiceFactory {
 		filterChain.doFilter(httpServletRequest, httpServletResponse);
 	}
 
-	protected void setPathPatternMatcher(
-		CORSFactoryConfigurationStore systemCORSFactoryConfigurationStore,
-		CORSFactoryConfigurationStore instanceCORSFactoryConfigurationStore,
-		long companyId) {
+	protected final CORSSupport corsSupport = new CORSSupport();
 
-		PathPatternMatcher<Map<String, String>> pathPatternMatcher =
-			_pathPatternMatchers.get(companyId);
+	private void _rebuild() {
+		_rebuild(CompanyConstants.SYSTEM);
 
-		if (pathPatternMatcher == null) {
-			_pathPatternMatchers.put(
-				companyId, new DynamicPathPatternMatcher<>());
-		}
-
-		List<CORSFactoryConfiguration> corsFactoryConfigurations =
-			instanceCORSFactoryConfigurationStore.
-				getCORSFactoryConfigurations();
-
-		Set<String> addedPatterns = new HashSet<>();
-
-		for (int i = corsFactoryConfigurations.size() - 1; i > -1; ++i) {
-			CORSFactoryConfiguration corsFactoryConfiguration =
-				corsFactoryConfigurations.get(i);
-
-			for (String pattern : corsFactoryConfiguration._pathPatterns) {
-				if (addedPatterns.contains(pattern)) {
-					continue;
-				}
-
-				pathPatternMatcher.insert(
-					pattern, corsFactoryConfiguration._corsHeaders);
-				addedPatterns.add(pattern);
-			}
-		}
-
-		corsFactoryConfigurations =
-			systemCORSFactoryConfigurationStore.getCORSFactoryConfigurations();
-
-		for (int i = corsFactoryConfigurations.size() - 1; i > -1; ++i) {
-			CORSFactoryConfiguration corsFactoryConfiguration =
-				corsFactoryConfigurations.get(i);
-
-			for (String pattern : corsFactoryConfiguration._pathPatterns) {
-				if (addedPatterns.contains(pattern)) {
-					continue;
-				}
-
-				pathPatternMatcher.insert(
-					pattern, corsFactoryConfiguration._corsHeaders);
-				addedPatterns.add(pattern);
+		for (long companyId : _pathPatternMatchers.keySet()) {
+			if (companyId != CompanyConstants.SYSTEM) {
+				_rebuild(companyId);
 			}
 		}
 	}
 
-	protected final CORSSupport corsSupport = new CORSSupport();
+	private void _rebuild(long companyId) {
+		HashSet<String> portalCorsConfigurationNamesSet = new HashSet<>();
+		HashMap<String, Map<String, String>> pathPatternsHeadersMap =
+			new HashMap<>();
 
+		for (Dictionary<String, ?> properties :
+				_configurationPidsProperties.values()) {
+
+			if (companyId != GetterUtil.getLong(properties.get("companyId"))) {
+				continue;
+			}
+
+			PortalCORSConfiguration portalCORSConfiguration =
+				ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, properties);
+
+			portalCorsConfigurationNamesSet.add(portalCORSConfiguration.name());
+
+			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+				portalCORSConfiguration.headers());
+
+			for (String pathPattern :
+					portalCORSConfiguration.filterMappingURLPatterns()) {
+
+				pathPatternsHeadersMap.put(pathPattern, corsHeaders);
+			}
+		}
+
+		boolean existsSystemConfig = false;
+
+		for (Dictionary<String, ?> properties :
+				_configurationPidsProperties.values()) {
+
+			if (companyId != CompanyConstants.SYSTEM) {
+				continue;
+			}
+
+			existsSystemConfig = true;
+
+			PortalCORSConfiguration portalCORSConfiguration =
+				ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, properties);
+
+			if (portalCorsConfigurationNamesSet.contains(
+					portalCORSConfiguration.name())) {
+
+				continue;
+			}
+
+			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+				portalCORSConfiguration.headers());
+
+			for (String pathPattern :
+					portalCORSConfiguration.filterMappingURLPatterns()) {
+
+				pathPatternsHeadersMap.putIfAbsent(pathPattern, corsHeaders);
+			}
+		}
+
+		if (!existsSystemConfig) {
+			PortalCORSConfiguration portalCORSConfiguration =
+				ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, new HashMapDictionary<>());
+
+			if (!portalCorsConfigurationNamesSet.contains(
+					portalCORSConfiguration.name())) {
+
+				Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+					portalCORSConfiguration.headers());
+
+				for (String pathPattern :
+						portalCORSConfiguration.filterMappingURLPatterns()) {
+
+					pathPatternsHeadersMap.putIfAbsent(
+						pathPattern, corsHeaders);
+				}
+			}
+		}
+
+		_pathPatternMatchers.put(
+			companyId,
+			_pathPatternMatcherFactory.createPatternMatcher(
+				pathPatternsHeadersMap));
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortalCORSServletFilter.class);
+
+	private final Map<String, Dictionary<String, ?>>
+		_configurationPidsProperties = new ConcurrentHashMap<>();
 	private String _contextPath;
-	private final Map<Long, CORSFactoryConfigurationStore>
-		_corsFactoryConfigurationStores = new HashMap<>(16);
 
 	@Reference
 	private Http _http;
 
+	@Reference
+	private PathPatternMatcherFactory<Map<String, String>>
+		_pathPatternMatcherFactory;
+
 	private final Map<Long, PathPatternMatcher<Map<String, String>>>
-		_pathPatternMatchers = new HashMap<>(16);
-	private final Map<String, Long> _pidToCompany = new HashMap<>(16);
+		_pathPatternMatchers = new ConcurrentHashMap<>();
 
-	private class CORSFactoryConfiguration {
-
-		public CORSFactoryConfiguration(
-			String[] pathPatterns, Map<String, String> corsHeaders) {
-
-			_pathPatterns = new HashSet<>(pathPatterns.length);
-
-			for (String pattern : pathPatterns) {
-				_pathPatterns.add(pattern);
-			}
-
-			_corsHeaders = corsHeaders;
-		}
-
-		private final Map<String, String> _corsHeaders;
-		private final Set<String> _pathPatterns;
-
-	}
-
-	private class CORSFactoryConfigurationStore {
-
-		public CORSFactoryConfigurationStore() {
-			_pidIndexes = new HashMap<>();
-
-			_factoryConfigurations = new ArrayList<>();
-		}
-
-		public List<CORSFactoryConfiguration> getCORSFactoryConfigurations() {
-			return _factoryConfigurations;
-		}
-
-		public void removeCORSFactoryConfiguration(String pid) {
-			Integer index = _pidIndexes.remove(pid);
-
-			if (index != null) {
-				_factoryConfigurations.remove((int)index);
-			}
-		}
-
-		public void setCORSFactoryConfiguration(
-			String pid, CORSFactoryConfiguration corsFactoryConfiguration) {
-
-			Integer index = _pidIndexes.get(pid);
-
-			if (index != null) {
-				_factoryConfigurations.set(index, corsFactoryConfiguration);
-
-				return;
-			}
-
-			_factoryConfigurations.add(corsFactoryConfiguration);
-
-			_pidIndexes.put(pid, _factoryConfigurations.size() - 1);
-		}
-
-		private final List<CORSFactoryConfiguration> _factoryConfigurations;
-		private final Map<String, Integer> _pidIndexes;
-
-	}
+	@Reference
+	private Portal _portal;
 
 }
