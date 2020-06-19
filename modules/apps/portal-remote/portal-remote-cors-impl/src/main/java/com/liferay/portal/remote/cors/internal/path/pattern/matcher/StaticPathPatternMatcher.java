@@ -37,8 +37,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				"URL Pattern Size has to be least 1");
 		}
 
-		_exactStaticPathPatternMatcher = new ExactStaticPathPatternMatcher<>(
-			(byte)longestpathPatternSize);
 		_extensionStaticPathPatternMatcher =
 			new ExtensionStaticPathPatternMatcher<>(
 				(byte)longestpathPatternSize);
@@ -49,13 +47,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	public PatternTuple<T> getPatternTuple(String path) {
 		PatternTuple<T> patternTuple =
-			_exactStaticPathPatternMatcher.getPatternTuple(path);
-
-		if (patternTuple != null) {
-			return patternTuple;
-		}
-
-		patternTuple = _wildcardStaticPathPatternMatcher.getPatternTuple(path);
+			_wildcardStaticPathPatternMatcher.getPatternTuple(path);
 
 		if (patternTuple != null) {
 			return patternTuple;
@@ -66,16 +58,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	@Override
 	public List<PatternTuple<T>> getPatternTuples(String path) {
-		List<PatternTuple<T>> patternTuples = getWilcardPatternTuples(path);
+		List<PatternTuple<T>> patternTuples =
+			_wildcardStaticPathPatternMatcher.getPatternTuples(path);
 
 		PatternTuple<T> patternTuple =
-			_exactStaticPathPatternMatcher.getPatternTuple(path);
-
-		if (patternTuple != null) {
-			patternTuples.add(patternTuple);
-		}
-
-		patternTuple = _extensionStaticPathPatternMatcher.getPatternTuple(path);
+			_extensionStaticPathPatternMatcher.getPatternTuple(path);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
@@ -114,7 +101,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			_extensionStaticPathPatternMatcher.insert(pathPattern, value, false);
 		}
 		else {
-			_exactStaticPathPatternMatcher.insert(pathPattern, value, true);
+			_wildcardStaticPathPatternMatcher.insert(pathPattern, value, true);
 		}
 	}
 
@@ -169,32 +156,12 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		return n;
 	}
 
-	protected List<PatternTuple<T>> getWilcardPatternTuples(String path) {
-		List<PatternTuple<T>> patternTuples = new ArrayList<>(
-			(byte)Long.SIZE + 2);
-
-		long wildcardMatchesBitMask =
-			_wildcardStaticPathPatternMatcher.getWildcardMatchesBitMask(path);
-
-		while (wildcardMatchesBitMask != 0) {
-			patternTuples.add(
-				_wildcardStaticPathPatternMatcher.patternTuples.get(
-					getFirstSetBitIndex(wildcardMatchesBitMask)));
-
-			wildcardMatchesBitMask &= wildcardMatchesBitMask - 1;
-		}
-
-		return patternTuples;
-	}
-
 	private static final long _ALL_BITS_SET = ~0;
 
 	private static final byte _SLASH_INDEX = '/' - ASCII_PRINTABLE_OFFSET;
 
 	private static final byte _STAR_INDEX = '*' - ASCII_PRINTABLE_OFFSET;
 
-	private final ExactStaticPathPatternMatcher<T>
-		_exactStaticPathPatternMatcher;
 	private final ExtensionStaticPathPatternMatcher<T>
 		_extensionStaticPathPatternMatcher;
 	private final WildcardStaticPathPatternMatcher<T>
@@ -298,25 +265,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	}
 
-	private static class ExactStaticPathPatternMatcher<T>
-		extends BaseStaticPathPatternMatcher<T> {
-
-		public ExactStaticPathPatternMatcher(byte maxPatternLength) {
-			super(maxPatternLength);
-		}
-
-		public PatternTuple<T> getPatternTuple(String path) {
-			byte index = getExactIndex(path);
-
-			if (index < 0) {
-				return null;
-			}
-
-			return patternTuples.get(index);
-		}
-
-	}
-
 	private static class ExtensionStaticPathPatternMatcher<T>
 		extends BaseStaticPathPatternMatcher<T> {
 
@@ -362,11 +310,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return null;
 		}
 
-		@Override
-		protected void insert(String pathPattern, T value, boolean forward) {
-			super.insert(pathPattern, value, forward);
-		}
-
 	}
 
 	private static class WildcardStaticPathPatternMatcher<T>
@@ -400,8 +343,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				currentBitMask &= trieArray[0][row][column];
 
 				if (currentBitMask == 0) {
-					row++;
-
 					break;
 				}
 
@@ -418,15 +359,23 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// if current is zero, it means trie travesaling
 			// did not match till the last character.
 
-			if ((currentBitMask != 0) && ((row + 1) < maxPatternLength)) {
-				long extraBitMask =
-					currentBitMask & trieArray[0][row][_SLASH_INDEX];
+			if (currentBitMask != 0) {
+				long bitMask =
+					currentBitMask & trieArray[1][row - 1][_STAR_INDEX];
 
-				extraBitMask &= trieArray[0][row + 1][_STAR_INDEX];
-				extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
+				if (bitMask != 0) {
+					bestMatchBitMask = bitMask;
+				}
+				else if ((row + 1) < maxPatternLength) {
+					long extraBitMask =
+						currentBitMask & trieArray[0][row][_SLASH_INDEX];
 
-				if (extraBitMask != 0) {
-					bestMatchBitMask = extraBitMask;
+					extraBitMask &= trieArray[0][row + 1][_STAR_INDEX];
+					extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
+
+					if (extraBitMask != 0) {
+						bestMatchBitMask = extraBitMask;
+					}
 				}
 			}
 
@@ -437,10 +386,11 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			return patternTuples.get(getFirstSetBitIndex(bestMatchBitMask));
 		}
 
-		public long getWildcardMatchesBitMask(String path) {
+		public List<PatternTuple<T>> getPatternTuples(String path) {
+			List<PatternTuple<T>> result = new ArrayList<>(Long.SIZE);
+
 			byte row = 0;
 			long current = _ALL_BITS_SET;
-			long bitMask = 0;
 
 			// This loop tries to find every wildcard match at
 			// every '/' character.
@@ -461,17 +411,16 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 				current &= trieArray[0][row][column];
 
 				if (current == 0) {
-					row++;
-
 					break;
 				}
 
-				if ((character == '/') && ((row + 1) < maxPatternLength)) {
+				if (row != path.length() - 2 && (character == '/') && ((row + 1) < maxPatternLength)) {
+
 					long nextBitMask =
 						current & trieArray[1][row + 1][_STAR_INDEX];
 
 					if (nextBitMask != 0) {
-						bitMask |= nextBitMask;
+						result.add(patternTuples.get(getFirstSetBitIndex(nextBitMask)));
 					}
 				}
 			}
@@ -479,18 +428,27 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// if current is zero, it means trie travesaling
 			// did not match till the last character.
 
-			if ((current != 0) && ((row + 1) < maxPatternLength)) {
-				long extraBitMask = current & trieArray[0][row][_SLASH_INDEX];
+			if (current != 0) {
+				long bitMask =
+					current & trieArray[1][row - 1][_STAR_INDEX];
 
-				extraBitMask &= trieArray[0][row + 1][_STAR_INDEX];
-				extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
+				if (bitMask != 0) {
+					result.add(patternTuples.get(getFirstSetBitIndex(bitMask)));
+				}
 
-				if (extraBitMask != 0) {
-					bitMask |= extraBitMask;
+				if ((row + 1) < maxPatternLength) {
+					long extraBitMask = current & trieArray[0][row][_SLASH_INDEX];
+
+					extraBitMask &= trieArray[0][row + 1][_STAR_INDEX];
+					extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
+
+					if (extraBitMask != 0) {
+						result.add(patternTuples.get(getFirstSetBitIndex(extraBitMask)));
+					}
 				}
 			}
 
-			return bitMask;
+			return result;
 		}
 
 	}
