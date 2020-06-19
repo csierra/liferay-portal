@@ -290,6 +290,10 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		public TrieNode() {
 			_trieNodes = new ArrayList<>(ASCII_CHARACTER_RANGE);
+
+			for (int i = 0; i < ASCII_CHARACTER_RANGE; ++i) {
+				_trieNodes.add(null);
+			}
 		}
 
 		public PatternTuple<T> getPatternTuple() {
