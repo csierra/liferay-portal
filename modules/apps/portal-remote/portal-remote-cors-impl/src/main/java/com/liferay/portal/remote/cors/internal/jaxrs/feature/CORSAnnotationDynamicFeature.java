@@ -17,6 +17,15 @@ package com.liferay.portal.remote.cors.internal.jaxrs.feature;
 import com.liferay.oauth2.provider.scope.liferay.OAuth2ProviderScopeLiferayAccessControlContext;
 import com.liferay.petra.reflect.AnnotationLocator;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.remote.cors.annotation.CORS;
@@ -40,6 +49,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 
 /**
@@ -101,10 +111,16 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 		return corsSupport;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		CORSAnnotationDynamicFeature.class);
+
+	@Reference
+	private CompanyService _companyService;
+
 	@Context
 	private ResourceInfo _resourceInfo;
 
-	private static class CORSContainerRequestFilter
+	private class CORSContainerRequestFilter
 		implements ContainerResponseFilter {
 
 		public CORSContainerRequestFilter(CORSSupport corsSupport) {
@@ -120,8 +136,9 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 			MultivaluedMap<String, String> headers =
 				containerRequestContext.getHeaders();
 
-			if (OAuth2ProviderScopeLiferayAccessControlContext.
-					isOAuth2AuthVerified() &&
+			if ((_isGuestUser() ||
+				 OAuth2ProviderScopeLiferayAccessControlContext.
+					 isOAuth2AuthVerified()) &&
 				_corsSupport.isCORSRequest(headers::getFirst) &&
 				_corsSupport.isValidCORSRequest(
 					containerRequestContext.getMethod(), headers::getFirst)) {
@@ -134,12 +151,37 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 			}
 		}
 
+		private boolean _isGuestUser() {
+			try {
+				PermissionChecker permissionChecker =
+					PermissionThreadLocal.getPermissionChecker();
+
+				User user = permissionChecker.getUser();
+
+				Company companyById = _companyService.getCompanyById(
+					CompanyThreadLocal.getCompanyId());
+
+				User defaultUser = companyById.getDefaultUser();
+
+				if (defaultUser.getUserId() == user.getUserId())
+
+					return true;
+			}
+			catch (PortalException portalException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(portalException, portalException);
+				}
+			}
+
+			return false;
+		}
+
 		private final CORSSupport _corsSupport;
 
 	}
 
 	@PreMatching
-	private static class CORSPreflighContainerRequestFilter
+	private class CORSPreflighContainerRequestFilter
 		implements ContainerRequestFilter {
 
 		public CORSPreflighContainerRequestFilter(CORSSupport corsSupport) {

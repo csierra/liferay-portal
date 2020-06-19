@@ -15,8 +15,15 @@
 package com.liferay.portal.remote.cors.internal.servlet.filter;
 
 import com.liferay.oauth2.provider.scope.liferay.OAuth2ProviderScopeLiferayAccessControlContext;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.CompanyServiceUtil;
 import com.liferay.portal.kernel.servlet.BaseFilter;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -65,8 +72,9 @@ public class CORSServletFilter extends BaseFilter {
 			return;
 		}
 
-		if (OAuth2ProviderScopeLiferayAccessControlContext.
-				isOAuth2AuthVerified() &&
+		if ((_isGuestUser() ||
+			 OAuth2ProviderScopeLiferayAccessControlContext.
+				 isOAuth2AuthVerified()) &&
 			corsSupport.isValidCORSRequest(
 				httpServletRequest.getMethod(),
 				httpServletRequest::getHeader)) {
@@ -103,6 +111,31 @@ public class CORSServletFilter extends BaseFilter {
 	}
 
 	protected final CORSSupport corsSupport = new CORSSupport();
+
+	private boolean _isGuestUser() {
+		try {
+			PermissionChecker permissionChecker =
+				PermissionThreadLocal.getPermissionChecker();
+
+			User user = permissionChecker.getUser();
+
+			Company companyById = CompanyServiceUtil.getCompanyById(
+				CompanyThreadLocal.getCompanyId());
+
+			User defaultUser = companyById.getDefaultUser();
+
+			if (defaultUser.getUserId() == user.getUserId())
+
+				return true;
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException, portalException);
+			}
+		}
+
+		return false;
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CORSServletFilter.class);
