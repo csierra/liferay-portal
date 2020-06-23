@@ -110,7 +110,11 @@ public class PortalCORSServletFilter
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
-		return CORSSupport.isCORSRequest(httpServletRequest::getHeader);
+		if (CORSSupport.isCORSRequest(httpServletRequest::getHeader)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
