@@ -246,7 +246,7 @@ public class PortalCORSServletFilter
 			return;
 		}
 
-		PathPatternMatcher<Map<String, String>> pathPatternMatcher =
+		PathPatternMatcher<CORSSupport> pathPatternMatcher =
 			_pathPatternMatchers.get(companyId);
 
 		if (pathPatternMatcher == null) {
@@ -259,41 +259,40 @@ public class PortalCORSServletFilter
 			}
 		}
 
-		PatternTuple<Map<String, String>> patternTuple =
+		PatternTuple<CORSSupport> patternTuple =
 			pathPatternMatcher.getPatternTuple(getURI(httpServletRequest));
 
 		if (patternTuple != null) {
-			corsSupport.setCORSHeaders(patternTuple.getValue());
-		}
+			CORSSupport corsSupport = patternTuple.getValue();
 
-		if (StringUtil.equals(
-				HttpMethods.OPTIONS, httpServletRequest.getMethod())) {
+			if (StringUtil.equals(
+					HttpMethods.OPTIONS, httpServletRequest.getMethod())) {
 
-			if (corsSupport.isValidCORSPreflightRequest(
+				if (corsSupport.isValidCORSPreflightRequest(
+						httpServletRequest::getHeader)) {
+
+					corsSupport.writeResponseHeaders(
+						httpServletRequest::getHeader,
+						httpServletResponse::setHeader);
+				}
+
+				return;
+			}
+
+			if (OAuth2ProviderScopeLiferayAccessControlContext.
+					isOAuth2AuthVerified() &&
+				corsSupport.isValidCORSRequest(
+					httpServletRequest.getMethod(),
 					httpServletRequest::getHeader)) {
 
 				corsSupport.writeResponseHeaders(
 					httpServletRequest::getHeader,
 					httpServletResponse::setHeader);
 			}
-
-			return;
-		}
-
-		if (OAuth2ProviderScopeLiferayAccessControlContext.
-				isOAuth2AuthVerified() &&
-			corsSupport.isValidCORSRequest(
-				httpServletRequest.getMethod(),
-				httpServletRequest::getHeader)) {
-
-			corsSupport.writeResponseHeaders(
-				httpServletRequest::getHeader, httpServletResponse::setHeader);
 		}
 
 		filterChain.doFilter(httpServletRequest, httpServletResponse);
 	}
-
-	protected final CORSSupport corsSupport = new CORSSupport();
 
 	private void _rebuild() {
 		_rebuild(CompanyConstants.SYSTEM);
@@ -307,8 +306,7 @@ public class PortalCORSServletFilter
 
 	private void _rebuild(long companyId) {
 		HashSet<String> portalCorsConfigurationNamesSet = new HashSet<>();
-		HashMap<String, Map<String, String>> pathPatternsHeadersMap =
-			new HashMap<>();
+		HashMap<String, CORSSupport> pathPatternsHeadersMap = new HashMap<>();
 
 		for (Dictionary<String, ?> properties :
 				_configurationPidsProperties.values()) {
@@ -326,10 +324,14 @@ public class PortalCORSServletFilter
 			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 				portalCORSConfiguration.headers());
 
+			CORSSupport corsSupport = new CORSSupport();
+
+			corsSupport.setCORSHeaders(corsHeaders);
+
 			for (String pathPattern :
 					portalCORSConfiguration.filterMappingURLPatterns()) {
 
-				pathPatternsHeadersMap.put(pathPattern, corsHeaders);
+				pathPatternsHeadersMap.put(pathPattern, corsSupport);
 			}
 		}
 
@@ -357,10 +359,14 @@ public class PortalCORSServletFilter
 			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 				portalCORSConfiguration.headers());
 
+			CORSSupport corsSupport = new CORSSupport();
+
+			corsSupport.setCORSHeaders(corsHeaders);
+
 			for (String pathPattern :
 					portalCORSConfiguration.filterMappingURLPatterns()) {
 
-				pathPatternsHeadersMap.putIfAbsent(pathPattern, corsHeaders);
+				pathPatternsHeadersMap.putIfAbsent(pathPattern, corsSupport);
 			}
 		}
 
@@ -375,19 +381,24 @@ public class PortalCORSServletFilter
 				Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 					portalCORSConfiguration.headers());
 
+				CORSSupport corsSupport = new CORSSupport();
+
+				corsSupport.setCORSHeaders(corsHeaders);
+
 				for (String pathPattern :
 						portalCORSConfiguration.filterMappingURLPatterns()) {
 
 					pathPatternsHeadersMap.putIfAbsent(
-						pathPattern, corsHeaders);
+						pathPattern, corsSupport);
 				}
 			}
 		}
 
-		_pathPatternMatchers.put(
-			companyId,
+		PathPatternMatcher<CORSSupport> patternMatcher =
 			_pathPatternMatcherFactory.createPatternMatcher(
-				pathPatternsHeadersMap));
+				pathPatternsHeadersMap);
+
+		_pathPatternMatchers.put(companyId, patternMatcher);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -401,10 +412,9 @@ public class PortalCORSServletFilter
 	private Http _http;
 
 	@Reference
-	private PathPatternMatcherFactory<Map<String, String>>
-		_pathPatternMatcherFactory;
+	private PathPatternMatcherFactory _pathPatternMatcherFactory;
 
-	private final Map<Long, PathPatternMatcher<Map<String, String>>>
+	private final Map<Long, PathPatternMatcher<CORSSupport>>
 		_pathPatternMatchers = new ConcurrentHashMap<>();
 
 	@Reference

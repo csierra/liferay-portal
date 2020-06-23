@@ -26,9 +26,9 @@ import org.osgi.service.component.annotations.Component;
  * @author Carlos Sierra Andrés
  */
 @Component(service = PathPatternMatcherFactory.class)
-public class PathPatternMatcherFactory<T> {
+public class PathPatternMatcherFactory {
 
-	public PathPatternMatcher<T> createPatternMatcher(
+	public <T> PathPatternMatcher<T> createPatternMatcher(
 		HashMap<String, T> patternsHeadersMap) {
 
 		PathPatternMatcher<T> pathPatternMatcher;
