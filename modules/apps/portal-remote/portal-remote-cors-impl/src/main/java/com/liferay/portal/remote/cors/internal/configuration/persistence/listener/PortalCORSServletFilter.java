@@ -14,6 +14,7 @@
 
 package com.liferay.portal.remote.cors.internal.configuration.persistence.listener;
 
+import com.liferay.oauth2.provider.scope.liferay.OAuth2ProviderScopeLiferayAccessControlContext;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
@@ -63,7 +64,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		Constants.SERVICE_PID + "=com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration",
-		"before-filter=Auto Login Filter", "dispatcher=FORWARD",
+		"before-filter=Upload Servlet Request Filter", "dispatcher=FORWARD",
 		"dispatcher=REQUEST", "servlet-context-name=",
 		"servlet-filter-name=Portal CORS Servlet Filter", "url-pattern=/*"
 	},
@@ -275,7 +276,9 @@ public class PortalCORSServletFilter
 			return;
 		}
 
-		if (corsSupport.isValidCORSRequest(
+		if (OAuth2ProviderScopeLiferayAccessControlContext.
+				isOAuth2AuthVerified() &&
+			corsSupport.isValidCORSRequest(
 				httpServletRequest.getMethod(),
 				httpServletRequest::getHeader)) {
 
