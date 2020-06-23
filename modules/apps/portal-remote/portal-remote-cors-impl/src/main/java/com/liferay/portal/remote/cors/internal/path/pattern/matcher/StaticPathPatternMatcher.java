@@ -411,9 +411,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 
 		public long getPatternTuplesBitMask(String path) {
+			long patternTuplesBitMask = 0;
+
 			boolean onlyExact = false;
 			boolean onlyWildcard = false;
-			long matches = 0;
 
 			if (path.charAt(0) != '/') {
 				onlyExact = true;
@@ -458,7 +459,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 						currentBitMask & trieArray[1][row + 1][_STAR_INDEX];
 
 					if (bitMask != 0) {
-						matches |= bitMask;
+						patternTuplesBitMask |= bitMask;
 					}
 				}
 			}
@@ -467,24 +468,24 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			// did not match till the last character.
 
 			if (currentBitMask == 0) {
-				return matches;
+				return patternTuplesBitMask;
 			}
 
 			if (onlyExact) {
 				long bitMask = currentBitMask & trieArray[1][row - 1][col];
 
 				if (bitMask != 0) {
-					matches |= bitMask;
+					patternTuplesBitMask |= bitMask;
 				}
 
-				return matches;
+				return patternTuplesBitMask;
 			}
 
 			if (!onlyWildcard) {
 				long bitMask = currentBitMask & trieArray[1][row - 1][col];
 
 				if (bitMask != 0) {
-					matches |= bitMask;
+					patternTuplesBitMask |= bitMask;
 				}
 			}
 
@@ -495,10 +496,10 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
 
 			if (extraBitMask != 0) {
-				matches |= extraBitMask;
+				patternTuplesBitMask |= extraBitMask;
 			}
 
-			return matches;
+			return patternTuplesBitMask;
 		}
 
 	}
