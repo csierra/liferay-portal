@@ -50,9 +50,7 @@ public class CORSAnnotationClientTest extends BaseCORSClientTestCase {
 	}
 
 	@Test
-	public void testApplicationAnnotationCORSForGuestUser()
-		throws Exception {
-
+	public void testApplicationAnnotationCORSForGuestUser() throws Exception {
 		assertJaxRSUrl("/test/cors-app", HttpMethod.OPTIONS, true, true);
 		assertJaxRSUrl("/test/cors-app", HttpMethod.GET, true, false);
 	}

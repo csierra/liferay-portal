@@ -84,7 +84,8 @@ public abstract class BaseCORSClientTestCase {
 	}
 
 	protected void assertJaxRSUrl(
-			String urlString, String method, boolean authenticate, boolean allowOrigin)
+			String urlString, String method, boolean authenticate,
+			boolean allowOrigin)
 		throws Exception {
 
 		ProcessConfig.Builder builder = _generateTestBuilder();
