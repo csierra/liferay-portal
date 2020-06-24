@@ -22,6 +22,9 @@ import com.liferay.portal.configuration.persistence.listener.ConfigurationModelL
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.servlet.BaseFilter;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -279,11 +282,12 @@ public class PortalCORSServletFilter
 				return;
 			}
 
-			if (OAuth2ProviderScopeLiferayAccessControlContext.
-					isOAuth2AuthVerified() &&
-				corsSupport.isValidCORSRequest(
+			if ((corsSupport.isValidCORSRequest(
 					httpServletRequest.getMethod(),
-					httpServletRequest::getHeader)) {
+					httpServletRequest::getHeader) &&
+				 OAuth2ProviderScopeLiferayAccessControlContext.
+					 isOAuth2AuthVerified()) ||
+				_isGuest()) {
 
 				corsSupport.writeResponseHeaders(
 					httpServletRequest::getHeader,
@@ -292,6 +296,19 @@ public class PortalCORSServletFilter
 		}
 
 		filterChain.doFilter(httpServletRequest, httpServletResponse);
+	}
+
+	private boolean _isGuest() {
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (permissionChecker == null) {
+			return false;
+		}
+
+		User user = permissionChecker.getUser();
+
+		return user.isDefaultUser();
 	}
 
 	private void _rebuild() {
