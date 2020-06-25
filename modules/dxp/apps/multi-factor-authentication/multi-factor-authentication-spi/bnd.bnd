@@ -5,4 +5,5 @@ Export-Package:\
 	com.liferay.multi.factor.authentication.spi.checker,\
 	com.liferay.multi.factor.authentication.spi.checker.browser,\
 	com.liferay.multi.factor.authentication.spi.checker.headless,\
-	com.liferay.multi.factor.authentication.spi.checker.setup
+	com.liferay.multi.factor.authentication.spi.checker.setup,\
+	com.liferay.multi.factor.authentication.spi.exception
