@@ -56,9 +56,7 @@ public class CORSAnnotationClientTest extends BaseCORSClientTestCase {
 	}
 
 	@Test
-	public void testApplicationAnnotationNoCORSWithoutOAuth2()
-		throws Exception {
-
+	public void testApplicationAnnotationCORSWithoutOAuth2() throws Exception {
 		assertJaxRSUrl("/test/cors-app", HttpMethod.OPTIONS, true, true);
 		assertJaxRSUrl("/test/cors-app", HttpMethod.GET, true, false);
 	}

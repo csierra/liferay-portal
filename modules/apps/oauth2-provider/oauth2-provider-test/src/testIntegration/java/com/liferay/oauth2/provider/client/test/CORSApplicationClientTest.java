@@ -74,7 +74,7 @@ public class CORSApplicationClientTest extends BaseClientTestCase {
 	}
 
 	@Test
-	public void testInvalidCORSRequest() throws Exception {
+	public void testCORSRequestInvalidToken() throws Exception {
 		WebTarget webTarget = getJsonWebTarget("user", "get-current-user");
 
 		String tokenString = "wrong-token";
@@ -117,7 +117,7 @@ public class CORSApplicationClientTest extends BaseClientTestCase {
 	}
 
 	@Test
-	public void testValidCORSRequest() throws Exception {
+	public void testCORSRequest() throws Exception {
 		WebTarget webTarget = getJsonWebTarget("user", "get-current-user");
 
 		String tokenString = getToken(

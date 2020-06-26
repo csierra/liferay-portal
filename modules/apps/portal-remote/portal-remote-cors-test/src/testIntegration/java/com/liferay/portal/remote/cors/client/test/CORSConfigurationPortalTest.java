@@ -41,7 +41,7 @@ public class CORSConfigurationPortalTest extends BaseCORSClientTestCase {
 		new LiferayIntegrationTestRule();
 
 	@Test
-	public void testNoCORSUsingBasic() throws Exception {
+	public void testCORSUsingBasic() throws Exception {
 		assertJsonWSUrl("/user/get-current-user", HttpMethod.OPTIONS, true);
 		assertJsonWSUrl("/user/get-current-user", HttpMethod.GET, false);
 
