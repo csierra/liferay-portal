@@ -74,6 +74,28 @@ public class CORSApplicationClientTest extends BaseClientTestCase {
 	}
 
 	@Test
+	public void testCORSRequest() throws Exception {
+		WebTarget webTarget = getJsonWebTarget("user", "get-current-user");
+
+		String tokenString = getToken(
+			"oauthTestApplicationRO", null,
+			getResourceOwnerPasswordBiFunction("test@liferay.com", "test"),
+			this::parseTokenString);
+
+		Invocation.Builder invocationBuilder = authorize(
+			webTarget.request(), tokenString);
+
+		invocationBuilder.header("Origin", _TEST_CORS_URI);
+
+		Response response = invocationBuilder.get();
+
+		String corsHeaderString = response.getHeaderString(
+			"Access-Control-Allow-Origin");
+
+		Assert.assertEquals(_TEST_CORS_URI, corsHeaderString);
+	}
+
+	@Test
 	public void testCORSRequestInvalidToken() throws Exception {
 		WebTarget webTarget = getJsonWebTarget("user", "get-current-user");
 
@@ -89,7 +111,9 @@ public class CORSApplicationClientTest extends BaseClientTestCase {
 		String corsHeaderString = response.getHeaderString(
 			"Access-Control-Allow-Origin");
 
-		Assert.assertNotEquals(_TEST_CORS_URI, corsHeaderString);
+		Assert.assertEquals(_TEST_CORS_URI, corsHeaderString);
+
+		Assert.assertEquals(403, response.getStatus());
 	}
 
 	@Test
@@ -109,28 +133,6 @@ public class CORSApplicationClientTest extends BaseClientTestCase {
 		invocationBuilder.header("Origin", _TEST_CORS_URI);
 
 		Response response = invocationBuilder.options();
-
-		String corsHeaderString = response.getHeaderString(
-			"Access-Control-Allow-Origin");
-
-		Assert.assertEquals(_TEST_CORS_URI, corsHeaderString);
-	}
-
-	@Test
-	public void testCORSRequest() throws Exception {
-		WebTarget webTarget = getJsonWebTarget("user", "get-current-user");
-
-		String tokenString = getToken(
-			"oauthTestApplicationRO", null,
-			getResourceOwnerPasswordBiFunction("test@liferay.com", "test"),
-			this::parseTokenString);
-
-		Invocation.Builder invocationBuilder = authorize(
-			webTarget.request(), tokenString);
-
-		invocationBuilder.header("Origin", _TEST_CORS_URI);
-
-		Response response = invocationBuilder.get();
 
 		String corsHeaderString = response.getHeaderString(
 			"Access-Control-Allow-Origin");
