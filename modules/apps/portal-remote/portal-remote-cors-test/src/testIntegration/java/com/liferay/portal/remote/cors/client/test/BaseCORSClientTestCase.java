@@ -88,6 +88,18 @@ public abstract class BaseCORSClientTestCase {
 			boolean allowOrigin)
 		throws Exception {
 
+		assertJaxRSUrl(urlString, method, authenticate, allowOrigin, null);
+	}
+
+	protected void assertJaxRSUrl(
+			String urlString, String method, boolean authenticate,
+			boolean allowOrigin, String allowedOrigin)
+		throws Exception {
+
+		if (allowedOrigin == null) {
+			allowedOrigin = _TEST_CORS_URI;
+		}
+
 		ProcessConfig.Builder builder = _generateTestBuilder();
 
 		ProcessExecutor processExecutor = new LocalProcessExecutor();
@@ -103,7 +115,7 @@ public abstract class BaseCORSClientTestCase {
 		String[] results = future.get();
 
 		if (allowOrigin) {
-			Assert.assertEquals(_TEST_CORS_URI, results[0]);
+			Assert.assertEquals(allowedOrigin, results[0]);
 		}
 		else {
 			Assert.assertNull(results[0]);
