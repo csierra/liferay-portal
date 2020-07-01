@@ -117,9 +117,8 @@ public class ExportImportPermissionUtil {
 			long roleId = roleIdsToActionIds.getKey();
 
 			if (importedRoleIdsToActionIds.containsKey(roleId)) {
-				String[] actionIds = importedRoleIdsToActionIds.remove(roleId);
-
-				mergedRoleIdsToActionIds.put(roleId, actionIds);
+				mergedRoleIdsToActionIds.put(
+					roleId, importedRoleIdsToActionIds.remove(roleId));
 			}
 		}
 
