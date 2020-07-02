@@ -39,11 +39,13 @@ import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternM
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcherFactory;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternTuple;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -347,41 +349,26 @@ public class PortalCORSServletFilter
 			}
 		}
 
-		boolean existsSystemConfig = false;
+		List<Dictionary<String, ?>> systemProperties = new ArrayList<>();
 
 		for (Dictionary<String, ?> properties :
 				_configurationPidsProperties.values()) {
 
-			if (GetterUtil.getLong(properties.get("companyId")) !=
+			if (GetterUtil.getLong(properties.get("companyId")) ==
 					CompanyConstants.SYSTEM) {
 
-				continue;
-			}
-
-			existsSystemConfig = true;
-
-			PortalCORSConfiguration portalCORSConfiguration =
-				ConfigurableUtil.createConfigurable(
-					PortalCORSConfiguration.class, properties);
-
-			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
-				portalCORSConfiguration.headers());
-
-			CORSSupport corsSupport = new CORSSupport();
-
-			corsSupport.setCORSHeaders(corsHeaders);
-
-			for (String pathPattern :
-					portalCORSConfiguration.filterMappingURLPatterns()) {
-
-				pathPatternsHeadersMap.putIfAbsent(pathPattern, corsSupport);
+				systemProperties.add(properties);
 			}
 		}
 
-		if (!existsSystemConfig) {
+		if (systemProperties.isEmpty()) {
+			systemProperties.add(new HashMapDictionary<>());
+		}
+
+		for (Dictionary<String, ?> properties : systemProperties) {
 			PortalCORSConfiguration portalCORSConfiguration =
 				ConfigurableUtil.createConfigurable(
-					PortalCORSConfiguration.class, new HashMapDictionary<>());
+					PortalCORSConfiguration.class, properties);
 
 			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 				portalCORSConfiguration.headers());
