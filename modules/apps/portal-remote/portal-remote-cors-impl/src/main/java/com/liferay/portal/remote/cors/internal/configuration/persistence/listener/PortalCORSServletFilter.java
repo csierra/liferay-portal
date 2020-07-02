@@ -318,7 +318,6 @@ public class PortalCORSServletFilter
 	}
 
 	private void _rebuild(long companyId) {
-		HashSet<String> portalCorsConfigurationNamesSet = new HashSet<>();
 		HashMap<String, CORSSupport> pathPatternsHeadersMap = new HashMap<>();
 
 		for (Dictionary<String, ?> properties :
@@ -331,8 +330,6 @@ public class PortalCORSServletFilter
 			PortalCORSConfiguration portalCORSConfiguration =
 				ConfigurableUtil.createConfigurable(
 					PortalCORSConfiguration.class, properties);
-
-			portalCorsConfigurationNamesSet.add(portalCORSConfiguration.name());
 
 			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 				portalCORSConfiguration.headers());
@@ -363,12 +360,6 @@ public class PortalCORSServletFilter
 				ConfigurableUtil.createConfigurable(
 					PortalCORSConfiguration.class, properties);
 
-			if (portalCorsConfigurationNamesSet.contains(
-					portalCORSConfiguration.name())) {
-
-				continue;
-			}
-
 			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
 				portalCORSConfiguration.headers());
 
@@ -388,22 +379,17 @@ public class PortalCORSServletFilter
 				ConfigurableUtil.createConfigurable(
 					PortalCORSConfiguration.class, new HashMapDictionary<>());
 
-			if (!portalCorsConfigurationNamesSet.contains(
-					portalCORSConfiguration.name())) {
+			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+				portalCORSConfiguration.headers());
 
-				Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
-					portalCORSConfiguration.headers());
+			CORSSupport corsSupport = new CORSSupport();
 
-				CORSSupport corsSupport = new CORSSupport();
+			corsSupport.setCORSHeaders(corsHeaders);
 
-				corsSupport.setCORSHeaders(corsHeaders);
+			for (String pathPattern :
+					portalCORSConfiguration.filterMappingURLPatterns()) {
 
-				for (String pathPattern :
-						portalCORSConfiguration.filterMappingURLPatterns()) {
-
-					pathPatternsHeadersMap.putIfAbsent(
-						pathPattern, corsSupport);
-				}
+				pathPatternsHeadersMap.putIfAbsent(pathPattern, corsSupport);
 			}
 		}
 
