@@ -352,7 +352,9 @@ public class PortalCORSServletFilter
 		for (Dictionary<String, ?> properties :
 				_configurationPidsProperties.values()) {
 
-			if (companyId != CompanyConstants.SYSTEM) {
+			if (GetterUtil.getLong(properties.get("companyId")) !=
+					CompanyConstants.SYSTEM) {
+
 				continue;
 			}
 
