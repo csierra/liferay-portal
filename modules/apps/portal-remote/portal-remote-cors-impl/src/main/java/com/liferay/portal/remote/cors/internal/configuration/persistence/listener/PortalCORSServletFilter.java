@@ -411,11 +411,15 @@ public class PortalCORSServletFilter
 			}
 		}
 
-		PathPatternMatcher<CORSSupport> patternMatcher =
-			_pathPatternMatcherFactory.createPatternMatcher(
-				pathPatternsHeadersMap);
-
-		_pathPatternMatchers.put(companyId, patternMatcher);
+		if (pathPatternsHeadersMap.isEmpty()) {
+			_pathPatternMatchers.remove(companyId);
+		}
+		else {
+			_pathPatternMatchers.put(
+				companyId,
+				_pathPatternMatcherFactory.createPatternMatcher(
+					pathPatternsHeadersMap));
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
