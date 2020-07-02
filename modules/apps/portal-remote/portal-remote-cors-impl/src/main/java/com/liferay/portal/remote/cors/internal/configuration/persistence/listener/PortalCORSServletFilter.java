@@ -333,6 +333,30 @@ public class PortalCORSServletFilter
 		}
 	}
 
+	private void _mergeSystemCompanyProperties(
+		Map<String, CORSSupport> pathPatternsHeadersMap) {
+
+		List<Dictionary<String, ?>> systemProperties = new ArrayList<>();
+
+		for (Dictionary<String, ?> properties :
+				_configurationPidsProperties.values()) {
+
+			if (GetterUtil.getLong(properties.get("companyId")) ==
+					CompanyConstants.SYSTEM) {
+
+				systemProperties.add(properties);
+			}
+		}
+
+		if (systemProperties.isEmpty()) {
+			systemProperties.add(new HashMapDictionary<>());
+		}
+
+		for (Dictionary<String, ?> properties : systemProperties) {
+			_mergeCorsConfiguration(pathPatternsHeadersMap, properties);
+		}
+	}
+
 	private void _rebuild() {
 		_rebuild(CompanyConstants.SYSTEM);
 
@@ -356,25 +380,7 @@ public class PortalCORSServletFilter
 			_mergeCorsConfiguration(pathPatternsHeadersMap, properties);
 		}
 
-		List<Dictionary<String, ?>> systemProperties = new ArrayList<>();
-
-		for (Dictionary<String, ?> properties :
-				_configurationPidsProperties.values()) {
-
-			if (GetterUtil.getLong(properties.get("companyId")) ==
-					CompanyConstants.SYSTEM) {
-
-				systemProperties.add(properties);
-			}
-		}
-
-		if (systemProperties.isEmpty()) {
-			systemProperties.add(new HashMapDictionary<>());
-		}
-
-		for (Dictionary<String, ?> properties : systemProperties) {
-			_mergeCorsConfiguration(pathPatternsHeadersMap, properties);
-		}
+		_mergeSystemCompanyProperties(pathPatternsHeadersMap);
 
 		if (pathPatternsHeadersMap.isEmpty()) {
 			_pathPatternMatchers.remove(companyId);
