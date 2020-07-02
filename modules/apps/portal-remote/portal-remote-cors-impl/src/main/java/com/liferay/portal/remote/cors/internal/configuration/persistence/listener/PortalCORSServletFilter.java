@@ -380,7 +380,9 @@ public class PortalCORSServletFilter
 			_mergeCorsConfiguration(pathPatternsHeadersMap, properties);
 		}
 
-		_mergeSystemCompanyProperties(pathPatternsHeadersMap);
+		if (companyId != CompanyConstants.SYSTEM) {
+			_mergeSystemCompanyProperties(pathPatternsHeadersMap);
+		}
 
 		if (pathPatternsHeadersMap.isEmpty()) {
 			_pathPatternMatchers.remove(companyId);
