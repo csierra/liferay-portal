@@ -341,9 +341,9 @@ public class PortalCORSServletFilter
 		for (Dictionary<String, ?> properties :
 				_configurationPidsProperties.values()) {
 
-			if (GetterUtil.getLong(properties.get("companyId")) ==
-					CompanyConstants.SYSTEM) {
+			long companyId = GetterUtil.getLong(properties.get("companyId"));
 
+			if (companyId == CompanyConstants.SYSTEM) {
 				systemProperties.add(properties);
 			}
 		}
