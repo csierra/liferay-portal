@@ -253,13 +253,9 @@ public class PortalCORSServletFilter
 			_pathPatternMatchers.get(companyId);
 
 		if (pathPatternMatcher == null) {
-			pathPatternMatcher = _pathPatternMatchers.get(0L);
+			filterChain.doFilter(httpServletRequest, httpServletResponse);
 
-			if (pathPatternMatcher == null) {
-				filterChain.doFilter(httpServletRequest, httpServletResponse);
-
-				return;
-			}
+			return;
 		}
 
 		PatternTuple<CORSSupport> patternTuple =
