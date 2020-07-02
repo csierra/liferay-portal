@@ -311,6 +311,28 @@ public class PortalCORSServletFilter
 		return user.isDefaultUser();
 	}
 
+	private void _mergeCorsConfiguration(
+		Map<String, CORSSupport> pathPatternsHeadersMap,
+		Dictionary<String, ?> properties) {
+
+		PortalCORSConfiguration portalCORSConfiguration =
+			ConfigurableUtil.createConfigurable(
+				PortalCORSConfiguration.class, properties);
+
+		Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+			portalCORSConfiguration.headers());
+
+		CORSSupport corsSupport = new CORSSupport();
+
+		corsSupport.setCORSHeaders(corsHeaders);
+
+		for (String pathPattern :
+				portalCORSConfiguration.filterMappingURLPatterns()) {
+
+			pathPatternsHeadersMap.putIfAbsent(pathPattern, corsSupport);
+		}
+	}
+
 	private void _rebuild() {
 		_rebuild(CompanyConstants.SYSTEM);
 
@@ -331,22 +353,7 @@ public class PortalCORSServletFilter
 				continue;
 			}
 
-			PortalCORSConfiguration portalCORSConfiguration =
-				ConfigurableUtil.createConfigurable(
-					PortalCORSConfiguration.class, properties);
-
-			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
-				portalCORSConfiguration.headers());
-
-			CORSSupport corsSupport = new CORSSupport();
-
-			corsSupport.setCORSHeaders(corsHeaders);
-
-			for (String pathPattern :
-					portalCORSConfiguration.filterMappingURLPatterns()) {
-
-				pathPatternsHeadersMap.putIfAbsent(pathPattern, corsSupport);
-			}
+			_mergeCorsConfiguration(pathPatternsHeadersMap, properties);
 		}
 
 		List<Dictionary<String, ?>> systemProperties = new ArrayList<>();
@@ -366,22 +373,7 @@ public class PortalCORSServletFilter
 		}
 
 		for (Dictionary<String, ?> properties : systemProperties) {
-			PortalCORSConfiguration portalCORSConfiguration =
-				ConfigurableUtil.createConfigurable(
-					PortalCORSConfiguration.class, properties);
-
-			Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
-				portalCORSConfiguration.headers());
-
-			CORSSupport corsSupport = new CORSSupport();
-
-			corsSupport.setCORSHeaders(corsHeaders);
-
-			for (String pathPattern :
-					portalCORSConfiguration.filterMappingURLPatterns()) {
-
-				pathPatternsHeadersMap.putIfAbsent(pathPattern, corsSupport);
-			}
+			_mergeCorsConfiguration(pathPatternsHeadersMap, properties);
 		}
 
 		if (pathPatternsHeadersMap.isEmpty()) {
