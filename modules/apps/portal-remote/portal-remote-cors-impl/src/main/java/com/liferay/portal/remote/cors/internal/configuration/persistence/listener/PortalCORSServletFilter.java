@@ -39,9 +39,11 @@ import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternM
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcherFactory;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternTuple;
 
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -341,7 +343,7 @@ public class PortalCORSServletFilter
 			for (String pathPattern :
 					portalCORSConfiguration.filterMappingURLPatterns()) {
 
-				pathPatternsHeadersMap.put(pathPattern, corsSupport);
+				pathPatternsHeadersMap.putIfAbsent(pathPattern, corsSupport);
 			}
 		}
 
@@ -408,7 +410,8 @@ public class PortalCORSServletFilter
 		PortalCORSServletFilter.class);
 
 	private final Map<String, Dictionary<String, ?>>
-		_configurationPidsProperties = new ConcurrentHashMap<>();
+		_configurationPidsProperties = Collections.synchronizedMap(
+			new LinkedHashMap<>());
 	private String _contextPath;
 
 	@Reference
