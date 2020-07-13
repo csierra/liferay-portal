@@ -14,25 +14,29 @@
 
 package com.liferay.portal.remote.cors.internal.servlet.filter;
 
+import com.liferay.oauth2.provider.scope.liferay.OAuth2ProviderScopeLiferayAccessControlContext;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.servlet.BaseFilter;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
+import com.liferay.portal.remote.cors.internal.configuration.manager.PortalCORSConfigurationManager;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcher;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternTuple;
-
-import java.io.IOException;
-
-import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,41 +45,18 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Arthur Chan
+ * @author Carlos Sierra Andrés
  */
 @Component(
 	immediate = true,
 	property = {
-		"before-filter=Auto Login Filter", "dispatcher=FORWARD",
+		"before-filter=Upload Servlet Request Filter", "dispatcher=FORWARD",
 		"dispatcher=REQUEST", "servlet-context-name=",
 		"servlet-filter-name=Portal CORS Servlet Filter", "url-pattern=/*"
 	},
 	service = Filter.class
 )
-public class PortalCORSServletFilter implements Filter {
-
-	@Override
-	public final void doFilter(
-			ServletRequest servletRequest, ServletResponse servletResponse,
-			FilterChain filterChain)
-		throws IOException, ServletException {
-
-		HttpServletRequest httpServletRequest =
-			(HttpServletRequest)servletRequest;
-
-		if (CORSSupport.isCORSRequest(httpServletRequest::getHeader)) {
-			try {
-				processCORSRequest(
-					httpServletRequest, (HttpServletResponse)servletResponse,
-					filterChain);
-			}
-			catch (Exception exception) {
-				throw new ServletException(exception);
-			}
-		}
-		else {
-			filterChain.doFilter(servletRequest, servletResponse);
-		}
-	}
+public class PortalCORSServletFilter extends BaseFilter {
 
 	@Override
 	public void init(FilterConfig filterConfig) {
@@ -84,65 +65,24 @@ public class PortalCORSServletFilter implements Filter {
 		_contextPath = servletContext.getContextPath();
 	}
 
-	protected void processCORSRequest(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, FilterChain filterChain)
-		throws Exception {
+	@Override
+	public boolean isFilterEnabled(
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
 
-		Long companyId = (Long)httpServletRequest.getAttribute("COMPANY_ID");
-
-		if ((companyId == null) || (companyId == 0)) {
-			return;
+		if (CORSSupport.isCORSRequest(httpServletRequest::getHeader)) {
+			return true;
 		}
 
-		PathPatternMatcher<Map<String, String>> pathPatternMatcher =
-			_pathPatternMatchers.get(companyId);
-
-		if (pathPatternMatcher == null) {
-
-			// if cannot find an CORS instance setting, we still need
-			// to check if there is a system setting
-
-			pathPatternMatcher = _pathPatternMatchers.get((long)0);
-
-			if (pathPatternMatcher == null) {
-				return;
-			}
-		}
-
-		PatternTuple<Map<String, String>> patternTuple =
-			pathPatternMatcher.getPatternTuple(_getURI(httpServletRequest));
-
-		corsSupport.setCORSHeaders(patternTuple.getValue());
-
-		if (StringUtil.equals(
-				HttpMethods.OPTIONS, httpServletRequest.getMethod())) {
-
-			if (corsSupport.isValidCORSPreflightRequest(
-					httpServletRequest::getHeader)) {
-
-				corsSupport.writeResponseHeaders(
-					httpServletRequest::getHeader,
-					httpServletResponse::setHeader);
-			}
-
-			return;
-		}
-
-		if (corsSupport.isValidCORSRequest(
-				httpServletRequest.getMethod(),
-				httpServletRequest::getHeader)) {
-
-			corsSupport.writeResponseHeaders(
-				httpServletRequest::getHeader, httpServletResponse::setHeader);
-		}
-
-		filterChain.doFilter(httpServletRequest, httpServletResponse);
+		return false;
 	}
 
-	protected final CORSSupport corsSupport = new CORSSupport();
+	@Override
+	protected Log getLog() {
+		return _log;
+	}
 
-	private String _getURI(HttpServletRequest httpServletRequest) {
+	protected String getURI(HttpServletRequest httpServletRequest) {
 		String uri = httpServletRequest.getRequestURI();
 
 		if (Validator.isNotNull(_contextPath) &&
@@ -155,9 +95,88 @@ public class PortalCORSServletFilter implements Filter {
 		return _http.normalizePath(uri);
 	}
 
+	@Override
+	protected void processFilter(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, FilterChain filterChain)
+		throws Exception {
+
+		long companyId = _portal.getCompanyId(httpServletRequest);
+
+		if (companyId == 0) {
+			return;
+		}
+
+		PathPatternMatcher<CORSSupport> pathPatternMatcher =
+			_portalCORSConfigurationManager.getPathPatternMatcher(companyId);
+
+		if (pathPatternMatcher == null) {
+			pathPatternMatcher =
+				_portalCORSConfigurationManager.getPathPatternMatcher(
+					CompanyConstants.SYSTEM);
+		}
+
+		PatternTuple<CORSSupport> patternTuple =
+			pathPatternMatcher.getPatternTuple(getURI(httpServletRequest));
+
+		if (patternTuple != null) {
+			CORSSupport corsSupport = patternTuple.getValue();
+
+			if (StringUtil.equals(
+					HttpMethods.OPTIONS, httpServletRequest.getMethod())) {
+
+				if (corsSupport.isValidCORSPreflightRequest(
+						httpServletRequest::getHeader)) {
+
+					corsSupport.writeResponseHeaders(
+						httpServletRequest::getHeader,
+						httpServletResponse::setHeader);
+				}
+
+				return;
+			}
+
+			if (corsSupport.isValidCORSRequest(
+					httpServletRequest.getMethod(),
+					httpServletRequest::getHeader) &&
+				(OAuth2ProviderScopeLiferayAccessControlContext.
+					isOAuth2AuthVerified() ||
+				 _isGuest())) {
+
+				corsSupport.writeResponseHeaders(
+					httpServletRequest::getHeader,
+					httpServletResponse::setHeader);
+			}
+		}
+
+		filterChain.doFilter(httpServletRequest, httpServletResponse);
+	}
+
+	private boolean _isGuest() {
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (permissionChecker == null) {
+			return true;
+		}
+
+		User user = permissionChecker.getUser();
+
+		return user.isDefaultUser();
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortalCORSServletFilter.class);
+
 	private String _contextPath;
 
 	@Reference
 	private Http _http;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortalCORSConfigurationManager _portalCORSConfigurationManager;
 
 }
