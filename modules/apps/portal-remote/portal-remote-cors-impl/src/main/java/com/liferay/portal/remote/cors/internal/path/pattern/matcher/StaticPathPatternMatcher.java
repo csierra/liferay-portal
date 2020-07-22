@@ -24,13 +24,13 @@ import java.util.List;
 public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 	/**
-	 * If all URL patterns are known before hand, use staticpathPatternMapper over
-	 * dynamcipathPatternMapper for better READ performance of higher CPU cache
-	 * localities.
+	 * If all URL patterns are known before hand, use staticpathPatternMapper
+	 * over dynamcipathPatternMapper for better READ performance of higher CPU
+	 * cache localities.
 	 *
-	 * Limitation: number of URL patterns of exact match and wildcard match need to
-	 * not exceed 64. number of URL patterns of extension match need to not exceed
-	 * 64.
+	 * Limitation: number of URL patterns of exact match and wildcard match
+	 * need to not exceed 64. number of URL patterns of extension match need
+	 * to not exceed 64.
 	 */
 	public StaticPathPatternMatcher(int longestpathPatternSize) {
 		if (longestpathPatternSize < 1) {
@@ -234,7 +234,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		protected int maxPatternLength;
 		protected List<PatternTuple<T>> patternTuples = new ArrayList<>(
-			(int)Long.SIZE);
+			Long.SIZE);
 		protected final long[][][] trieArray;
 
 		private int _count;
