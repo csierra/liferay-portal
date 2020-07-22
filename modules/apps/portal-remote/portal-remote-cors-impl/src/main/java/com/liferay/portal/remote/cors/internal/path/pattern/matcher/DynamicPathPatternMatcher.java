@@ -146,9 +146,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			previousTrieNode = currentTrieNode;
 		}
 
-		// if current node is null, it means trie travesaling
-		// did not match every character.
-
 		if (currentTrieNode != null) {
 			if (onlyExact) {
 				if (!currentTrieNode.isEnd()) {
@@ -212,9 +209,6 @@ public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 			previousTrieNode = currentTrieNode;
 		}
-
-		// if current node is null, it means trie travesaling
-		// did not match every character.
 
 		if (currentTrieNode != null) {
 			if (onlyExact) {
