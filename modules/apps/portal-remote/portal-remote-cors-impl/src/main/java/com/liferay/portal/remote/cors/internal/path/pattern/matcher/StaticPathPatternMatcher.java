@@ -156,12 +156,12 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 		protected int getExactIndex(String path) {
 			int row = 0;
-			long current = _ALL_BITS_SET;
+			long bitMask = _ALL_BITS_SET;
 			int column = 0;
 
 			for (; row < path.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
-					current = 0;
+					bitMask = 0;
 
 					break;
 				}
@@ -170,18 +170,18 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				column = character - ASCII_PRINTABLE_OFFSET;
 
-				current &= trieArray[0][row][column];
+				bitMask &= trieArray[0][row][column];
 
-				if (current == 0) {
+				if (bitMask == 0) {
 					break;
 				}
 			}
 
-			if (current != 0) {
-				current &= trieArray[1][row - 1][column];
+			if (bitMask != 0) {
+				bitMask &= trieArray[1][row - 1][column];
 
-				if (current != 0) {
-					return getFirstSetBitIndex(current);
+				if (bitMask != 0) {
+					return getFirstSetBitIndex(bitMask);
 				}
 			}
 
