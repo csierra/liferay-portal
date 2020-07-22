@@ -84,55 +84,57 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 		}
 	}
 
-	protected static int getFirstSetBitIndex(long x) {
-		if (x == 0) {
-			return -1;
+	protected static int getFirstSetBitIndex(long bitMask) {
+		int firstSetBitIndex = -1;
+
+		if (bitMask == 0) {
+			return firstSetBitIndex;
 		}
 
-		int n = 63;
+		firstSetBitIndex = 63;
 
-		long y = x << 32;
+		long currentBitMask = bitMask << 32;
 
-		if (y != 0) {
-			n -= 32;
-			x = y;
+		if (currentBitMask != 0) {
+			firstSetBitIndex -= 32;
+			bitMask = currentBitMask;
 		}
 
-		y = x << 16;
+		currentBitMask = bitMask << 16;
 
-		if (y != 0) {
-			n -= 16;
-			x = y;
+		if (currentBitMask != 0) {
+			firstSetBitIndex -= 16;
+			bitMask = currentBitMask;
 		}
 
-		y = x << 8;
+		currentBitMask = bitMask << 8;
 
-		if (y != 0) {
-			n -= 8;
-			x = y;
+		if (currentBitMask != 0) {
+			firstSetBitIndex -= 8;
+			bitMask = currentBitMask;
 		}
 
-		y = x << 4;
+		currentBitMask = bitMask << 4;
 
-		if (y != 0) {
-			n -= 4;
-			x = y;
+		if (currentBitMask != 0) {
+			firstSetBitIndex -= 4;
+			bitMask = currentBitMask;
 		}
 
-		y = x << 2;
+		currentBitMask = bitMask << 2;
 
-		if (y != 0) {
-			n -= 2;
-			x = y;
+		if (currentBitMask != 0) {
+			firstSetBitIndex -= 2;
+			bitMask = currentBitMask;
 		}
 
-		y = x << 1;
+		currentBitMask = bitMask << 1;
 
-		if (y != 0) {
-			n -= 1;
+		if (currentBitMask != 0) {
+			firstSetBitIndex -= 1;
 		}
 
-		return n;
+		return firstSetBitIndex;
 	}
 
 	private static final long _ALL_BITS_SET = ~0;
