@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.remote.cors.internal.configuration.persistence.listener;
+package com.liferay.portal.remote.cors.internal.servlet.filter;
 
 import com.liferay.oauth2.provider.scope.liferay.OAuth2ProviderScopeLiferayAccessControlContext;
 import com.liferay.petra.string.StringPool;
@@ -56,11 +56,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -78,8 +81,7 @@ import org.osgi.service.component.annotations.Reference;
 	service = {Filter.class, ManagedServiceFactory.class}
 )
 public class PortalCORSServletFilter
-	extends BaseFilter
-	implements ConfigurationModelListener, ManagedServiceFactory {
+	extends BaseFilter implements ManagedServiceFactory {
 
 	@Override
 	public void deleted(String pid) {
@@ -125,66 +127,6 @@ public class PortalCORSServletFilter
 	}
 
 	@Override
-	public void onAfterDelete(String pid)
-		throws ConfigurationModelListenerException {
-	}
-
-	@Override
-	public void onAfterSave(String pid, Dictionary<String, Object> properties)
-		throws ConfigurationModelListenerException {
-	}
-
-	@Override
-	public void onBeforeDelete(String pid)
-		throws ConfigurationModelListenerException {
-	}
-
-	@Override
-	public void onBeforeSave(
-			String pid, Dictionary<String, Object> newProperties)
-		throws ConfigurationModelListenerException {
-
-		HashSet<String> pathPatternSet = new HashSet<>();
-		HashSet<String> duplicatedPathPatternsSet = new HashSet<>();
-
-		long companyId = GetterUtil.getLong(newProperties.get("companyId"));
-
-		for (Map.Entry<String, Dictionary<String, ?>> entry :
-				_configurationPidsProperties.entrySet()) {
-
-			if (StringUtil.equals(pid, entry.getKey())) {
-				continue;
-			}
-
-			Dictionary<String, ?> properties = entry.getValue();
-
-			if (companyId != GetterUtil.getLong(properties.get("companyId"))) {
-				continue;
-			}
-
-			PortalCORSConfiguration portalCORSConfiguration =
-				ConfigurableUtil.createConfigurable(
-					PortalCORSConfiguration.class, properties);
-
-			String[] pathPatterns =
-				portalCORSConfiguration.filterMappingURLPatterns();
-
-			for (String pathPattern : pathPatterns) {
-				if (!pathPatternSet.add(pathPattern)) {
-					duplicatedPathPatternsSet.add(pathPattern);
-				}
-			}
-		}
-
-		if (!duplicatedPathPatternsSet.isEmpty()) {
-			throw new ConfigurationModelListenerException(
-				"Duplicated url path patterns: " + duplicatedPathPatternsSet,
-				PortalCORSConfiguration.class, PortalCORSServletFilter.class,
-				newProperties);
-		}
-	}
-
-	@Override
 	public void updated(String pid, Dictionary<String, ?> properties)
 		throws ConfigurationException {
 
@@ -218,9 +160,92 @@ public class PortalCORSServletFilter
 		_rebuild(companyId);
 	}
 
+	public class PortalCORSConfigurationModelListener
+		implements ConfigurationModelListener {
+
+		@Override
+		public void onAfterDelete(String pid)
+			throws ConfigurationModelListenerException {
+		}
+
+		@Override
+		public void onAfterSave(
+				String pid, Dictionary<String, Object> properties)
+			throws ConfigurationModelListenerException {
+		}
+
+		@Override
+		public void onBeforeDelete(String pid)
+			throws ConfigurationModelListenerException {
+		}
+
+		@Override
+		public void onBeforeSave(
+				String pid, Dictionary<String, Object> newProperties)
+			throws ConfigurationModelListenerException {
+
+			HashSet<String> pathPatternSet = new HashSet<>();
+			HashSet<String> duplicatedPathPatternsSet = new HashSet<>();
+
+			long companyId = GetterUtil.getLong(newProperties.get("companyId"));
+
+			for (Map.Entry<String, Dictionary<String, ?>> entry :
+					_configurationPidsProperties.entrySet()) {
+
+				if (StringUtil.equals(pid, entry.getKey())) {
+					continue;
+				}
+
+				Dictionary<String, ?> properties = entry.getValue();
+
+				if (companyId != GetterUtil.getLong(
+						properties.get("companyId"))) {
+
+					continue;
+				}
+
+				PortalCORSConfiguration portalCORSConfiguration =
+					ConfigurableUtil.createConfigurable(
+						PortalCORSConfiguration.class, properties);
+
+				String[] pathPatterns =
+					portalCORSConfiguration.filterMappingURLPatterns();
+
+				for (String pathPattern : pathPatterns) {
+					if (!pathPatternSet.add(pathPattern)) {
+						duplicatedPathPatternsSet.add(pathPattern);
+					}
+				}
+			}
+
+			if (!duplicatedPathPatternsSet.isEmpty()) {
+				throw new ConfigurationModelListenerException(
+					"Duplicated url path patterns: " +
+						duplicatedPathPatternsSet,
+					PortalCORSConfiguration.class,
+					PortalCORSServletFilter.class, newProperties);
+			}
+		}
+
+	}
+
 	@Activate
-	protected void activate() {
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
+		_serviceRegistration = bundleContext.registerService(
+			ConfigurationModelListener.class,
+			new PortalCORSConfigurationModelListener(),
+			new HashMapDictionary<>(properties));
+
 		_rebuild();
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
+		}
 	}
 
 	@Override
@@ -414,5 +439,8 @@ public class PortalCORSServletFilter
 
 	@Reference
 	private Portal _portal;
+
+	private ServiceRegistration<ConfigurationModelListener>
+		_serviceRegistration;
 
 }
