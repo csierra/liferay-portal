@@ -199,9 +199,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			int index = getExactIndex(pathPattern);
 
 			if (index > -1) {
-
-				// Indicating the end of the pattern
-
 				patternTuples.add(
 					index, new PatternTuple<>(pathPattern, value));
 
@@ -226,8 +223,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 
 				trieArray[0][row][column] |= bitMask;
 			}
-
-			// Indicating the end of the pattern
 
 			PatternTuple<T> patternTuple = new PatternTuple<>(
 				pathPattern, value);
@@ -319,11 +314,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			long currentBitMask = _ALL_BITS_SET;
 			long bestMatchBitMask = 0;
 
-			// This loop tries to find every wildcard match at
-			// every '/' character.
-			// Variable current indicates if current character
-			// exists as part of a pattern in the matrix.
-
 			for (; row < path.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
 					currentBitMask = 0;
@@ -352,9 +342,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					}
 				}
 			}
-
-			// if current is zero, it means trie travesaling
-			// did not match till the last character.
 
 			if (currentBitMask == 0) {
 				if (bestMatchBitMask == 0) {
@@ -431,11 +418,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 			int col = 0;
 			long currentBitMask = _ALL_BITS_SET;
 
-			// This loop tries to find every wildcard match at
-			// every '/' character.
-			// Variable current indicates if current character
-			// exists as part of a pattern in the matrix.
-
 			for (; row < path.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
 					currentBitMask = 0;
@@ -464,9 +446,6 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 					}
 				}
 			}
-
-			// if current is zero, it means trie travesaling
-			// did not match till the last character.
 
 			if (currentBitMask == 0) {
 				return patternTuplesBitMask;
