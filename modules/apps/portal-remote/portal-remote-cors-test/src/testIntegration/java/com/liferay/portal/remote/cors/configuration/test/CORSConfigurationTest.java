@@ -15,6 +15,7 @@
 package com.liferay.portal.remote.cors.configuration.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.service.CompanyLocalService;
@@ -30,6 +31,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -66,22 +68,16 @@ public class CORSConfigurationTest extends BaseCORSClientTestCase {
 		_createFactoryConfiguration(
 			_companyId, _DUPLICATE_PATTERNS, "http://www.liferay.com");
 
-		_createFactoryConfiguration(
-			_companyId, _DUPLICATE_PATTERNS, "http://www.google.com");
+		try {
+			_createFactoryConfiguration(
+				_companyId, _DUPLICATE_PATTERNS, "http://www.google.com");
+		}
+		catch (RuntimeException runtimeException) {
+			Throwable throwable = runtimeException.getCause();
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put("osgi.jaxrs.name", "test-cors-1");
-
-		registerJaxRsApplication(new CORSTestApplication(), "", properties);
-
-		assertJaxRSUrl(
-			"/cors-app/duplicate/path/whatever", "GET", false, false,
-			"http://www.google.com");
-
-		assertJaxRSUrl(
-			"/cors-app/duplicate/path/whatever", "GET", false, true,
-			"http://www.liferay.com");
+			Assert.assertTrue(
+				throwable instanceof ConfigurationModelListenerException);
+		}
 	}
 
 	@Test
