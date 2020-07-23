@@ -188,6 +188,25 @@ public class PortalCORSServletFilter
 
 			long companyId = GetterUtil.getLong(newProperties.get("companyId"));
 
+			PortalCORSConfiguration portalCORSConfiguration =
+				ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, newProperties);
+
+			String[] pathPatterns =
+				portalCORSConfiguration.filterMappingURLPatterns();
+
+			for (String pathPattern : pathPatterns) {
+				if (pathPatternSet.contains(pathPattern)) {
+					throw new ConfigurationModelListenerException(
+						"Duplicated url path patterns: " + pathPattern,
+						PortalCORSConfiguration.class,
+						PortalCORSConfigurationModelListener.class,
+						newProperties);
+				}
+
+				pathPatternSet.add(pathPattern);
+			}
+
 			for (Map.Entry<String, Dictionary<String, ?>> entry :
 					_configurationPidsProperties.entrySet()) {
 
@@ -203,11 +222,10 @@ public class PortalCORSServletFilter
 					continue;
 				}
 
-				PortalCORSConfiguration portalCORSConfiguration =
-					ConfigurableUtil.createConfigurable(
-						PortalCORSConfiguration.class, properties);
+				portalCORSConfiguration = ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, properties);
 
-				String[] pathPatterns =
+				pathPatterns =
 					portalCORSConfiguration.filterMappingURLPatterns();
 
 				for (String pathPattern : pathPatterns) {
@@ -222,7 +240,7 @@ public class PortalCORSServletFilter
 					"Duplicated url path patterns: " +
 						duplicatedPathPatternsSet,
 					PortalCORSConfiguration.class,
-					PortalCORSServletFilter.class, newProperties);
+					PortalCORSConfigurationModelListener.class, newProperties);
 			}
 		}
 
