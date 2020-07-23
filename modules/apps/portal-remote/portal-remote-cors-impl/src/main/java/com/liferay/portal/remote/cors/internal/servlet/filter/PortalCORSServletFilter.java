@@ -99,10 +99,6 @@ public class PortalCORSServletFilter
 	}
 
 	@Override
-	public void destroy() {
-	}
-
-	@Override
 	public String getName() {
 		return StringPool.BLANK;
 	}
