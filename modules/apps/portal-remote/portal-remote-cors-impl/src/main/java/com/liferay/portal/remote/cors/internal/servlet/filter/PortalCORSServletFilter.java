@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.servlet.BaseFilter;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
@@ -216,7 +217,14 @@ public class PortalCORSServletFilter
 		_serviceRegistration = bundleContext.registerService(
 			ConfigurationModelListener.class,
 			new PortalCORSConfigurationModelListener(),
-			new HashMapDictionary<>(properties));
+			new HashMapDictionary<>(
+				HashMapBuilder.putAll(
+					properties
+				).put(
+					"model.class.name",
+					"com.liferay.portal.remote.cors.configuration." +
+						"PortalCORSConfiguration"
+				).build()));
 
 		_rebuild();
 	}
