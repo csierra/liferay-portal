@@ -19,8 +19,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
+import com.liferay.portal.instance.lifecycle.Clusterable;
+import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -78,10 +81,15 @@ import org.osgi.service.component.annotations.Reference;
 		"dispatcher=REQUEST", "servlet-context-name=",
 		"servlet-filter-name=Portal CORS Servlet Filter", "url-pattern=/*"
 	},
-	service = {Filter.class, ManagedServiceFactory.class}
+	service = {
+		Filter.class, ManagedServiceFactory.class,
+		PortalInstanceLifecycleListener.class
+	}
 )
 public class PortalCORSServletFilter
-	extends BaseFilter implements ManagedServiceFactory {
+	extends BaseFilter
+	implements Clusterable, ManagedServiceFactory,
+			   PortalInstanceLifecycleListener {
 
 	@Override
 	public void deleted(String pid) {
@@ -124,6 +132,16 @@ public class PortalCORSServletFilter
 		}
 
 		return false;
+	}
+
+	@Override
+	public void portalInstanceRegistered(Company company) throws Exception {
+		_rebuild(company.getCompanyId());
+	}
+
+	@Override
+	public void portalInstanceUnregistered(Company company) throws Exception {
+		_pathPatternMatchers.remove(company.getCompanyId());
 	}
 
 	@Override
@@ -395,19 +413,21 @@ public class PortalCORSServletFilter
 	private void _rebuild(long companyId) {
 		HashMap<String, CORSSupport> pathPatternsHeadersMap = new HashMap<>();
 
-		for (Dictionary<String, ?> properties :
-				_configurationPidsProperties.values()) {
-
-			if (companyId != GetterUtil.getLong(properties.get("companyId"))) {
-				continue;
-			}
-
-			_mergeCORSConfiguration(pathPatternsHeadersMap, properties);
-		}
-
 		if (companyId != CompanyConstants.SYSTEM) {
-			_mergeSystemCompanyProperties(pathPatternsHeadersMap);
+			for (Dictionary<String, ?> properties :
+					_configurationPidsProperties.values()) {
+
+				if (companyId != GetterUtil.getLong(
+						properties.get("companyId"))) {
+
+					continue;
+				}
+
+				_mergeCORSConfiguration(pathPatternsHeadersMap, properties);
+			}
 		}
+
+		_mergeSystemCompanyProperties(pathPatternsHeadersMap);
 
 		if (pathPatternsHeadersMap.isEmpty()) {
 			_pathPatternMatchers.remove(companyId);
