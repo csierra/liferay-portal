@@ -336,7 +336,7 @@ public class PortalCORSServletFilter
 		return user.isDefaultUser();
 	}
 
-	private void _mergeCorsConfiguration(
+	private void _mergeCORSConfiguration(
 		Map<String, CORSSupport> pathPatternsHeadersMap,
 		Dictionary<String, ?> properties) {
 
@@ -378,7 +378,7 @@ public class PortalCORSServletFilter
 		}
 
 		for (Dictionary<String, ?> properties : systemProperties) {
-			_mergeCorsConfiguration(pathPatternsHeadersMap, properties);
+			_mergeCORSConfiguration(pathPatternsHeadersMap, properties);
 		}
 	}
 
@@ -402,7 +402,7 @@ public class PortalCORSServletFilter
 				continue;
 			}
 
-			_mergeCorsConfiguration(pathPatternsHeadersMap, properties);
+			_mergeCORSConfiguration(pathPatternsHeadersMap, properties);
 		}
 
 		if (companyId != CompanyConstants.SYSTEM) {
