@@ -164,22 +164,6 @@ public class PortalCORSServletFilter
 		implements ConfigurationModelListener {
 
 		@Override
-		public void onAfterDelete(String pid)
-			throws ConfigurationModelListenerException {
-		}
-
-		@Override
-		public void onAfterSave(
-				String pid, Dictionary<String, Object> properties)
-			throws ConfigurationModelListenerException {
-		}
-
-		@Override
-		public void onBeforeDelete(String pid)
-			throws ConfigurationModelListenerException {
-		}
-
-		@Override
 		public void onBeforeSave(
 				String pid, Dictionary<String, Object> newProperties)
 			throws ConfigurationModelListenerException {
