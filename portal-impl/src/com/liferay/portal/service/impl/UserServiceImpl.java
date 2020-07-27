@@ -424,7 +424,13 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         attribute), asset category IDs, asset tag names, and expando
 	 *         bridge attributes for the user.
 	 * @return the new user
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #addUser(long, boolean, String, String, boolean, String,
+	 *             String, Locale, String, String, String, long, long, boolean,
+	 *             int, int, int, String, long[], long[], long[], long[],
+	 *             boolean, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public User addUser(
 			long companyId, boolean autoPassword, String password1,
@@ -503,7 +509,13 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         attribute), asset category IDs, asset tag names, and expando
 	 *         bridge attributes for the user.
 	 * @return the new user
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #addUser(long, boolean, String, String, boolean, String,
+	 *             String, Locale, String, String, String, long, long, boolean,
+	 *             int, int, int, String, long[], long[], long[], long[], List,
+	 *             List, List, List, List, boolean, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public User addUser(
 			long companyId, boolean autoPassword, String password1,
@@ -742,7 +754,13 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         attribute), asset category IDs, asset tag names, and expando
 	 *         bridge attributes for the user.
 	 * @return the new user
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #addUserWithWorkflow(long, boolean, String, String, boolean,
+	 *             String, String, Locale, String, String, String, long, long,
+	 *             boolean, int, int, int, String, long[], long[], long[],
+	 *             long[], boolean, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public User addUserWithWorkflow(
 			long companyId, boolean autoPassword, String password1,
@@ -839,7 +857,14 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         attribute), asset category IDs, asset tag names, and expando
 	 *         bridge attributes for the user.
 	 * @return the new user
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #addUserWithWorkflow(long, boolean, String, String, boolean,
+	 *             String, String, Locale, String, String, String, long, long,
+	 *             boolean, int, int, int, String, long[], long[], long[],
+	 *             long[], List, List, List, List, List, boolean, ServiceContext
+	 *             )}
 	 */
+	@Deprecated
 	@Override
 	public User addUserWithWorkflow(
 			long companyId, boolean autoPassword, String password1,
@@ -1969,7 +1994,13 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         <code>null</code>). Can set the expando bridge attributes for the
 	 *         user.
 	 * @return the user
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #updateIncompleteUser(long, long, boolean, String, String,
+	 *             boolean, String, String, Locale, String, String, String,
+	 *             long, long, boolean, int, int, int, String, boolean, boolean,
+	 *             ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public User updateIncompleteUser(
 			long companyId, boolean autoPassword, String password1,
@@ -2306,7 +2337,15 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         attribute), asset category IDs, asset tag names, and expando
 	 *         bridge attributes for the user.
 	 * @return the user
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #updateUser(long, String, String, String, boolean, String,
+	 *             String, String, String, boolean, byte[], String, String,
+	 *             String, String, String, String, String, long, long, boolean,
+	 *             int, int, int, String, String, String, String, String,
+	 *             String, long[], long[], long[], List, long[], List, List,
+	 *             List, List, List, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public User updateUser(
 			long userId, String oldPassword, String newPassword1,
@@ -2661,7 +2700,14 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         attribute), asset category IDs, asset tag names, and expando
 	 *         bridge attributes for the user.
 	 * @return the user
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #updateUser(long, String, String, String, boolean, String,
+	 *             String, String, String, String, String, String, String,
+	 *             String, String, String, long, long, boolean, int, int, int,
+	 *             String, String, String, String, String, String, long[],
+	 *             long[], long[], List, long[], ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public User updateUser(
 			long userId, String oldPassword, String newPassword1,
