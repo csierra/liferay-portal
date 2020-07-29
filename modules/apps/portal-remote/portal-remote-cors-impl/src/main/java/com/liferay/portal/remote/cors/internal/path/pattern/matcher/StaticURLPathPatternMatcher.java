@@ -48,11 +48,12 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		throws IllegalArgumentException {
 
 		if (isValidExtensionPattern(urlPathPattern)) {
-			_extensionStaticTrieArrayMatcher.insert(
+			_extensionStaticTrieArrayMatcher.putValue(
 				urlPathPattern, value, false);
 		}
 		else {
-			_wildcardStaticTrieArrayMatcher.insert(urlPathPattern, value, true);
+			_wildcardStaticTrieArrayMatcher.putValue(
+				urlPathPattern, value, true);
 		}
 	}
 
@@ -163,7 +164,9 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			return -1;
 		}
 
-		protected void insert(String urlPathPattern, T value, boolean forward) {
+		protected void putValue(
+			String urlPathPattern, T value, boolean forward) {
+
 			if (_count > 63) {
 				throw new IllegalArgumentException(
 					"Exceeding maximum number of allowed URL patterns");
