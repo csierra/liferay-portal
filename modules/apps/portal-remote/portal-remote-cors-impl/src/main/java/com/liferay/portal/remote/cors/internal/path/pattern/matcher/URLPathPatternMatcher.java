@@ -76,10 +76,10 @@ public abstract class URLPathPatternMatcher<T> {
 	 * 5. Exact path pattern:
 	 *        All other strings are used for exact matches only.
 	 *
-	 * @param pathPattern the pattern of path, used for pattern matching
-	 * @param value an non null object associated with pathPattern
+	 * @param urlPathPattern the pattern of path, used for pattern matching
+	 * @param value an non null object associated with urlPathPattern
 	 */
-	public abstract void insert(String pathPattern, T value)
+	public abstract void insert(String urlPathPattern, T value)
 		throws IllegalArgumentException;
 
 	/**
@@ -90,22 +90,23 @@ public abstract class URLPathPatternMatcher<T> {
 	 *         https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1.3, and
 	 *         https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
-	 * @param pathPattern the given pathPattern
-	 * @return a boolean value indicating if the pathPattern a valid extensionPattern
+	 * @param urlPathPattern the given urlPathPattern
+	 * @return a boolean value indicating if the urlPathPattern a valid extensionPattern
 	 */
-	protected boolean isValidExtensionPattern(String pathPattern) {
-		if ((pathPattern.length() < 3) || (pathPattern.charAt(0) != '*') ||
-			(pathPattern.charAt(1) != '.')) {
+	protected boolean isValidExtensionPattern(String urlPathPattern) {
+		if ((urlPathPattern.length() < 3) ||
+			(urlPathPattern.charAt(0) != '*') ||
+			(urlPathPattern.charAt(1) != '.')) {
 
 			return false;
 		}
 
-		for (int i = 2; i < pathPattern.length(); ++i) {
-			if (pathPattern.charAt(i) == '/') {
+		for (int i = 2; i < urlPathPattern.length(); ++i) {
+			if (urlPathPattern.charAt(i) == '/') {
 				return false;
 			}
 
-			if (pathPattern.charAt(i) == '.') {
+			if (urlPathPattern.charAt(i) == '.') {
 				return false;
 			}
 		}
@@ -120,19 +121,21 @@ public abstract class URLPathPatternMatcher<T> {
 	 * 2. It also abides by:
 	 *         https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
-	 * @param pathPattern the given pathPattern
-	 * @return a boolean value indicating if the pathPattern a valid wildCardPattern
+	 * @param urlPathPattern the given urlPathPattern
+	 * @return a boolean value indicating if the urlPathPattern a valid wildCardPattern
 	 */
-	protected boolean isValidWildCardPattern(String pathPattern) {
-		if ((pathPattern.length() < 2) || (pathPattern.charAt(0) != '/') ||
-			(pathPattern.charAt(pathPattern.length() - 1) != '*') ||
-			(pathPattern.charAt(pathPattern.length() - 2) != '/')) {
+	protected boolean isValidWildCardPattern(String urlPathPattern) {
+		if ((urlPathPattern.length() < 2) ||
+			(urlPathPattern.charAt(0) != '/') ||
+			(urlPathPattern.charAt(urlPathPattern.length() - 1) != '*') ||
+			(urlPathPattern.charAt(urlPathPattern.length() - 2) != '/')) {
 
 			return false;
 		}
 
 		try {
-			String path = pathPattern.substring(0, pathPattern.length() - 1);
+			String path = urlPathPattern.substring(
+				0, urlPathPattern.length() - 1);
 
 			URI uri = new URI("https://test" + path);
 

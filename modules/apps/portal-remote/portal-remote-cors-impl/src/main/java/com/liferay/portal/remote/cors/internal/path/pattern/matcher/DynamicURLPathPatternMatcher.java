@@ -54,26 +54,26 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return patternTuples;
 	}
 
-	public void insert(String pathPattern, T value)
+	public void insert(String urlPathPattern, T value)
 		throws IllegalArgumentException {
 
 		if (value == null) {
 			throw new IllegalArgumentException("Value can not be null");
 		}
 
-		if (isValidWildCardPattern(pathPattern)) {
-			insert(pathPattern, value, _wildCardTrieNode, true);
+		if (isValidWildCardPattern(urlPathPattern)) {
+			insert(urlPathPattern, value, _wildCardTrieNode, true);
 
 			return;
 		}
 
-		if (isValidExtensionPattern(pathPattern)) {
-			insert(pathPattern, value, _extensionTrieNode, false);
+		if (isValidExtensionPattern(urlPathPattern)) {
+			insert(urlPathPattern, value, _extensionTrieNode, false);
 
 			return;
 		}
 
-		insert(pathPattern, value, _wildCardTrieNode, true);
+		insert(urlPathPattern, value, _wildCardTrieNode, true);
 	}
 
 	protected PatternTuple<T> getExtensionPatternTuple(String path) {
@@ -238,23 +238,24 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 	}
 
 	protected void insert(
-		String pathPattern, T value, TrieNode<T> previousTrieNode,
+		String urlPathPattern, T value, TrieNode<T> previousTrieNode,
 		boolean forward) {
 
 		TrieNode<T> currentTrieNode = null;
 
-		for (int i = 0; i < pathPattern.length(); ++i) {
+		for (int i = 0; i < urlPathPattern.length(); ++i) {
 			int index = i;
 
 			if (!forward) {
-				index = pathPattern.length() - 1 - i;
+				index = urlPathPattern.length() - 1 - i;
 			}
 
-			currentTrieNode = previousTrieNode.next(pathPattern.charAt(index));
+			currentTrieNode = previousTrieNode.next(
+				urlPathPattern.charAt(index));
 
 			if (currentTrieNode == null) {
 				currentTrieNode = previousTrieNode.setNext(
-					pathPattern.charAt(index), _trieNodeArrayList);
+					urlPathPattern.charAt(index), _trieNodeArrayList);
 			}
 
 			previousTrieNode = currentTrieNode;
@@ -262,7 +263,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
 		if (currentTrieNode != null) {
 			currentTrieNode.setPatternTuple(
-				new PatternTuple<>(pathPattern, value));
+				new PatternTuple<>(urlPathPattern, value));
 		}
 	}
 

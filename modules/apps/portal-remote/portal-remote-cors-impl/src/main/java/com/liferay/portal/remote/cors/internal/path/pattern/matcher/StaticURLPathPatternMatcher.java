@@ -24,23 +24,23 @@ import java.util.List;
 public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
 	/**
-	 * If all URL patterns are known before hand, use staticpathPatternMapper
-	 * over dynamcipathPatternMapper for better READ performance of higher CPU
+	 * If all URL patterns are known before hand, use staticurlPathPatternMapper
+	 * over dynamciurlPathPatternMapper for better READ performance of higher CPU
 	 * cache localities.
 	 *
 	 * Limitation: number of URL patterns of exact match and wildcard match
 	 * need to not exceed 64. number of URL patterns of extension match need
 	 * to not exceed 64.
 	 */
-	public StaticURLPathPatternMatcher(int longestpathPatternSize) {
-		if (longestpathPatternSize < 1) {
-			longestpathPatternSize = 64;
+	public StaticURLPathPatternMatcher(int longesturlPathPatternSize) {
+		if (longesturlPathPatternSize < 1) {
+			longesturlPathPatternSize = 64;
 		}
 
 		_extensionStaticPathPatternMatcher =
-			new ExtensionStaticPathPatternMatcher<>(longestpathPatternSize);
+			new ExtensionStaticPathPatternMatcher<>(longesturlPathPatternSize);
 		_wildcardStaticPathPatternMatcher =
-			new WildcardStaticPathPatternMatcher<>(longestpathPatternSize);
+			new WildcardStaticPathPatternMatcher<>(longesturlPathPatternSize);
 	}
 
 	public PatternTuple<T> getPatternTuple(String path) {
@@ -69,18 +69,20 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return patternTuples;
 	}
 
-	public void insert(String pathPattern, T value)
+	public void insert(String urlPathPattern, T value)
 		throws IllegalArgumentException {
 
-		if (isValidWildCardPattern(pathPattern)) {
-			_wildcardStaticPathPatternMatcher.insert(pathPattern, value, true);
+		if (isValidWildCardPattern(urlPathPattern)) {
+			_wildcardStaticPathPatternMatcher.insert(
+				urlPathPattern, value, true);
 		}
-		else if (isValidExtensionPattern(pathPattern)) {
+		else if (isValidExtensionPattern(urlPathPattern)) {
 			_extensionStaticPathPatternMatcher.insert(
-				pathPattern, value, false);
+				urlPathPattern, value, false);
 		}
 		else {
-			_wildcardStaticPathPatternMatcher.insert(pathPattern, value, true);
+			_wildcardStaticPathPatternMatcher.insert(
+				urlPathPattern, value, true);
 		}
 	}
 
@@ -190,17 +192,17 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			return -1;
 		}
 
-		protected void insert(String pathPattern, T value, boolean forward) {
+		protected void insert(String urlPathPattern, T value, boolean forward) {
 			if (_count > 63) {
 				throw new IllegalArgumentException(
 					"Exceeding maximum number of allowed URL patterns");
 			}
 
-			int index = getExactIndex(pathPattern);
+			int index = getExactIndex(urlPathPattern);
 
 			if (index > -1) {
 				patternTuples.add(
-					index, new PatternTuple<>(pathPattern, value));
+					index, new PatternTuple<>(urlPathPattern, value));
 
 				return;
 			}
@@ -211,12 +213,12 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			int column = 0;
 			long bitMask = 1 << index;
 
-			for (; row < pathPattern.length(); ++row) {
-				char character = pathPattern.charAt(row);
+			for (; row < urlPathPattern.length(); ++row) {
+				char character = urlPathPattern.charAt(row);
 
 				if (!forward) {
-					character = pathPattern.charAt(
-						pathPattern.length() - 1 - row);
+					character = urlPathPattern.charAt(
+						urlPathPattern.length() - 1 - row);
 				}
 
 				column = character - ASCII_PRINTABLE_OFFSET;
@@ -225,7 +227,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			}
 
 			PatternTuple<T> patternTuple = new PatternTuple<>(
-				pathPattern, value);
+				urlPathPattern, value);
 
 			trieArray[1][row - 1][column] |= bitMask;
 

@@ -183,7 +183,7 @@ public class PortalCORSServletFilter
 				String pid, Dictionary<String, Object> newProperties)
 			throws ConfigurationModelListenerException {
 
-			HashSet<String> pathPatternSet = new HashSet<>();
+			HashSet<String> urlPathPatternSet = new HashSet<>();
 			HashSet<String> duplicatedPathPatternsSet = new HashSet<>();
 
 			long companyId = GetterUtil.getLong(newProperties.get("companyId"));
@@ -192,19 +192,19 @@ public class PortalCORSServletFilter
 				ConfigurableUtil.createConfigurable(
 					PortalCORSConfiguration.class, newProperties);
 
-			String[] pathPatterns =
+			String[] urlPathPatterns =
 				portalCORSConfiguration.filterMappingURLPatterns();
 
-			for (String pathPattern : pathPatterns) {
-				if (pathPatternSet.contains(pathPattern)) {
+			for (String urlPathPattern : urlPathPatterns) {
+				if (urlPathPatternSet.contains(urlPathPattern)) {
 					throw new ConfigurationModelListenerException(
-						"Duplicated url path patterns: " + pathPattern,
+						"Duplicated url path patterns: " + urlPathPattern,
 						PortalCORSConfiguration.class,
 						PortalCORSConfigurationModelListener.class,
 						newProperties);
 				}
 
-				pathPatternSet.add(pathPattern);
+				urlPathPatternSet.add(urlPathPattern);
 			}
 
 			for (Map.Entry<String, Dictionary<String, ?>> entry :
@@ -225,12 +225,12 @@ public class PortalCORSServletFilter
 				portalCORSConfiguration = ConfigurableUtil.createConfigurable(
 					PortalCORSConfiguration.class, properties);
 
-				pathPatterns =
+				urlPathPatterns =
 					portalCORSConfiguration.filterMappingURLPatterns();
 
-				for (String pathPattern : pathPatterns) {
-					if (!pathPatternSet.add(pathPattern)) {
-						duplicatedPathPatternsSet.add(pathPattern);
+				for (String urlPathPattern : urlPathPatterns) {
+					if (!urlPathPatternSet.add(urlPathPattern)) {
+						duplicatedPathPatternsSet.add(urlPathPattern);
 					}
 				}
 			}
@@ -361,7 +361,7 @@ public class PortalCORSServletFilter
 	}
 
 	private void _mergeCORSConfiguration(
-		Map<String, CORSSupport> pathPatternsHeadersMap,
+		Map<String, CORSSupport> urlPathPatternsHeadersMap,
 		Dictionary<String, ?> properties) {
 
 		PortalCORSConfiguration portalCORSConfiguration =
@@ -375,15 +375,15 @@ public class PortalCORSServletFilter
 
 		corsSupport.setCORSHeaders(corsHeaders);
 
-		for (String pathPattern :
+		for (String urlPathPattern :
 				portalCORSConfiguration.filterMappingURLPatterns()) {
 
-			pathPatternsHeadersMap.putIfAbsent(pathPattern, corsSupport);
+			urlPathPatternsHeadersMap.putIfAbsent(urlPathPattern, corsSupport);
 		}
 	}
 
 	private void _mergeSystemCompanyProperties(
-		Map<String, CORSSupport> pathPatternsHeadersMap) {
+		Map<String, CORSSupport> urlPathPatternsHeadersMap) {
 
 		List<Dictionary<String, ?>> systemProperties = new ArrayList<>();
 
@@ -402,7 +402,7 @@ public class PortalCORSServletFilter
 		}
 
 		for (Dictionary<String, ?> properties : systemProperties) {
-			_mergeCORSConfiguration(pathPatternsHeadersMap, properties);
+			_mergeCORSConfiguration(urlPathPatternsHeadersMap, properties);
 		}
 	}
 
@@ -417,7 +417,8 @@ public class PortalCORSServletFilter
 	}
 
 	private void _rebuild(long companyId) {
-		HashMap<String, CORSSupport> pathPatternsHeadersMap = new HashMap<>();
+		HashMap<String, CORSSupport> urlPathPatternsHeadersMap =
+			new HashMap<>();
 
 		if (companyId != CompanyConstants.SYSTEM) {
 			for (Dictionary<String, ?> properties :
@@ -429,20 +430,20 @@ public class PortalCORSServletFilter
 					continue;
 				}
 
-				_mergeCORSConfiguration(pathPatternsHeadersMap, properties);
+				_mergeCORSConfiguration(urlPathPatternsHeadersMap, properties);
 			}
 		}
 
-		_mergeSystemCompanyProperties(pathPatternsHeadersMap);
+		_mergeSystemCompanyProperties(urlPathPatternsHeadersMap);
 
-		if (pathPatternsHeadersMap.isEmpty()) {
+		if (urlPathPatternsHeadersMap.isEmpty()) {
 			_urlPathPatternMatchers.remove(companyId);
 		}
 		else {
 			_urlPathPatternMatchers.put(
 				companyId,
 				_pathPatternMatcherFactory.createPatternMatcher(
-					pathPatternsHeadersMap));
+					urlPathPatternsHeadersMap));
 		}
 	}
 
