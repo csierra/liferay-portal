@@ -25,18 +25,13 @@ public class DynamicURLPathPatternMatcherTest
 
 	@Before
 	public void setUp() throws Exception {
-		matcher = new DynamicURLPathPatternMatcher<>();
+		urlPathPatternMatcher = new DynamicURLPathPatternMatcher<>();
 		super.setUp();
 	}
 
 	@Test
-	public void testAllMatches() throws Exception {
-		super.testAllMatches();
-	}
-
-	@Test
-	public void testBestMatch() throws Exception {
-		super.testBestMatch();
+	public void testGetValue() throws Exception {
+		super.testGetValue();
 	}
 
 }

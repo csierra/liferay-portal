@@ -14,12 +14,8 @@
 
 package com.liferay.portal.remote.cors.internal.path.pattern.matcher;
 
-import com.liferay.portal.kernel.util.HashMapBuilder;
-
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Assert;
 
@@ -29,67 +25,40 @@ import org.junit.Assert;
 public abstract class BasePathPatternMatcherTestCase {
 
 	public void setUp() throws Exception {
-		int iteration = 0;
-
 		for (String pattern : PATTERNS) {
-			matcher.putValue(
-				pattern,
-				HashMapBuilder.put(
-					pattern, "cargo" + iteration++
-				).build());
+			urlPathPatternMatcher.putValue(pattern, pattern);
 		}
 
-		buildTestResults();
-	}
-
-	public void testBestMatch() throws Exception {
-		for (String urlPath : PATHS) {
-			String bestMatch = bestMatchResults.get(urlPath);
-
-			Map<String, String> value = matcher.getValue(urlPath);
-
-			if (value == null) {
-				Assert.assertTrue(bestMatch == null);
-			}
-		}
-	}
-
-	protected void addResult(
-		String urlPath, Map<String, String> bestMatches,
-		Map<String, Set<String>> allMatches, int... patternIndexs) {
-
-		if (patternIndexs.length > 0) {
-			bestMatches.put(urlPath, PATTERNS[patternIndexs[0]]);
-
-			Set<String> allPatterns = new HashSet<>();
-
-			for (int i : patternIndexs) {
-				allPatterns.add(PATTERNS[i]);
-			}
-
-			allMatches.put(urlPath, allPatterns);
-		}
-	}
-
-	protected void buildTestResults() {
-		bestMatchResults = new HashMap<>();
-		allMatchResults = new HashMap<>();
+		urlPathsValuesMap = new HashMap<>();
 
 		for (int i = 0; i < PATHS.length; ++i) {
-			addResult(
-				PATHS[i], bestMatchResults, allMatchResults,
-				MATCHED_PATTERNS[i]);
+			if (MATCHED_PATTERNS_INDICES[i] > -1) {
+				urlPathsValuesMap.put(
+					PATHS[i], PATTERNS[MATCHED_PATTERNS_INDICES[i]]);
+			}
 		}
 	}
 
-	protected static final int[][] MATCHED_PATTERNS = {
-		{12, 11}, {13, 11}, {14, 13, 11}, {15, 11}, {15, 11}, {16, 15, 11},
-		{16, 15, 11}, {17, 15, 11}, {17, 15, 11}, {15, 11}, {15, 11},
-		{18, 16, 15, 11}, {18, 16, 15, 11}, {19, 16, 15, 11}, {19, 16, 15, 11},
-		{20, 17, 15, 11}, {20, 17, 15, 11}, {21, 17, 15, 11}, {21, 17, 15, 11},
-		{15, 11}, {15, 11}, {15, 11}, {15, 11}, {22, 15, 11, 24}, {22, 15, 11},
-		{23, 15, 11, 25}, {23, 15, 11}, {11}, {11}, {24}, {}, {25}, {}, {}, {},
-		{6}, {}, {}, {}, {1, 26, 11}
+	public void testGetValue() throws Exception {
+		for (String urlPath : PATHS) {
+			String expectedValue = urlPathsValuesMap.get(urlPath);
+
+			String value = urlPathPatternMatcher.getValue(urlPath);
+
+			if (value == null) {
+				Assert.assertNull(expectedValue);
+
+				continue;
+			}
+
+			Assert.assertEquals(expectedValue, value);
+		}
+	}
+
+	protected static final int[] MATCHED_PATTERNS_INDICES = {
+		12, 13, 14, 15, 15, 16, 16, 17, 17, 15, 15, 18, 18, 19, 19, 20, 20, 21,
+		21, 15, 15, 15, 15, 22, 22, 23, 23, 11, 11, 24, -1, 25, -1, -1, -1, 6,
+		-1, -1, -1, 1
 	};
 
 	protected static final String[] PATHS = {
@@ -121,8 +90,7 @@ public abstract class BasePathPatternMatcherTestCase {
 		"/c/portal/j_login/*"
 	};
 
-	protected Map<String, Set<String>> allMatchResults;
-	protected Map<String, String> bestMatchResults;
-	protected URLPathPatternMatcher<Map<String, String>> matcher;
+	protected URLPathPatternMatcher<String> urlPathPatternMatcher;
+	protected Map<String, String> urlPathsValuesMap;
 
 }

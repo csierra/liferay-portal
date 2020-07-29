@@ -25,19 +25,14 @@ public class StaticURLPathPatternMatcherTest
 
 	@Before
 	public void setUp() throws Exception {
-		matcher = new StaticURLPathPatternMatcher<>(64);
+		urlPathPatternMatcher = new StaticURLPathPatternMatcher<>(64);
 
 		super.setUp();
 	}
 
 	@Test
-	public void testAllMatches() throws Exception {
-		super.testAllMatches();
-	}
-
-	@Test
-	public void testBestMatch() throws Exception {
-		super.testBestMatch();
+	public void testGetValue() throws Exception {
+		super.testGetValue();
 	}
 
 }
