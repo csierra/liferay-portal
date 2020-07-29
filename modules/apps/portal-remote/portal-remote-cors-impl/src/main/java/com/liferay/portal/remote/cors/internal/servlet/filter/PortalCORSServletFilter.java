@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
-import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternTuple;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.URLPathPatternMatcher;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.URLPathPatternMatcherFactory;
 
@@ -311,12 +310,10 @@ public class PortalCORSServletFilter
 			return;
 		}
 
-		PatternTuple<CORSSupport> patternTuple =
-			urlPathPatternMatcher.getPatternTuple(getURI(httpServletRequest));
+		CORSSupport corsSupport = urlPathPatternMatcher.getValue(
+			getURI(httpServletRequest));
 
-		if (patternTuple != null) {
-			CORSSupport corsSupport = patternTuple.getValue();
-
+		if (corsSupport != null) {
 			if (StringUtil.equals(
 					HttpMethods.OPTIONS, httpServletRequest.getMethod())) {
 

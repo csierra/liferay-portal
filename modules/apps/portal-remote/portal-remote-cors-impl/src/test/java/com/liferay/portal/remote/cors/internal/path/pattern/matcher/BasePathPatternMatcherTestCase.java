@@ -46,18 +46,11 @@ public abstract class BasePathPatternMatcherTestCase {
 		for (String urlPath : PATHS) {
 			String bestMatch = bestMatchResults.get(urlPath);
 
-			PatternTuple<Map<String, String>> patternPackage =
-				matcher.getPatternTuple(urlPath);
+			Map<String, String> value = matcher.getValue(urlPath);
 
-			if (patternPackage == null) {
+			if (value == null) {
 				Assert.assertTrue(bestMatch == null);
-
-				continue;
 			}
-
-			String found = patternPackage.getPattern();
-
-			Assert.assertEquals(bestMatch, found);
 		}
 	}
 

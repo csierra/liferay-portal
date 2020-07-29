@@ -31,14 +31,14 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 	}
 
 	@Override
-	public PatternTuple<T> getPatternTuple(String urlPath) {
-		PatternTuple<T> patternTuple = getWildcardPatternTuple(urlPath);
+	public T getValue(String urlPath) {
+		T value = getWildcardValue(urlPath);
 
-		if (patternTuple != null) {
-			return patternTuple;
+		if (value != null) {
+			return value;
 		}
 
-		return getExtensionPatternTuple(urlPath);
+		return getExtensionValue(urlPath);
 	}
 
 	public void insert(String urlPathPattern, T value)
@@ -63,7 +63,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		insert(urlPathPattern, value, _wildCardTrieNode, true);
 	}
 
-	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
+	protected T getExtensionValue(String urlPath) {
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _extensionTrieNode;
 
@@ -86,7 +86,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
-					return nextTrieNode.getPatternTuple();
+					return nextTrieNode.getValue();
 				}
 			}
 
@@ -96,7 +96,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return null;
 	}
 
-	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
+	protected T getWildcardValue(String urlPath) {
 		boolean onlyExact = false;
 		boolean onlyWildcard = false;
 
@@ -110,7 +110,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			onlyWildcard = true;
 		}
 
-		PatternTuple<T> patternTuple = null;
+		T value = null;
 
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _wildCardTrieNode;
@@ -126,7 +126,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
-					patternTuple = nextTrieNode.getPatternTuple();
+					value = nextTrieNode.getValue();
 				}
 			}
 
@@ -139,11 +139,11 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 					return null;
 				}
 
-				return currentTrieNode.getPatternTuple();
+				return currentTrieNode.getValue();
 			}
 
 			if (!onlyWildcard && currentTrieNode.isEnd()) {
-				return currentTrieNode.getPatternTuple();
+				return currentTrieNode.getValue();
 			}
 
 			currentTrieNode = currentTrieNode.next('/');
@@ -152,12 +152,12 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 				currentTrieNode = currentTrieNode.next('*');
 
 				if ((currentTrieNode != null) && currentTrieNode.isEnd()) {
-					patternTuple = currentTrieNode.getPatternTuple();
+					value = currentTrieNode.getValue();
 				}
 			}
 		}
 
-		return patternTuple;
+		return value;
 	}
 
 	protected void insert(
@@ -185,8 +185,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		}
 
 		if (currentTrieNode != null) {
-			currentTrieNode.setPatternTuple(
-				new PatternTuple<>(urlPathPattern, value));
+			currentTrieNode.setValue(value);
 		}
 	}
 
@@ -204,12 +203,12 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			}
 		}
 
-		public PatternTuple<T> getPatternTuple() {
-			return _patternTuple;
+		public T getValue() {
+			return _value;
 		}
 
 		public boolean isEnd() {
-			if (_patternTuple != null) {
+			if (_value != null) {
 				return true;
 			}
 
@@ -246,11 +245,9 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			return trieNode;
 		}
 
-		public void setPatternTuple(PatternTuple<T> patternTuple) {
-			_patternTuple = patternTuple;
+		public void setValue(T value) {
+			_value = value;
 		}
-
-		private PatternTuple<T> _patternTuple;
 
 		/**
 		 * Use list over hashMap for better performance
@@ -258,6 +255,8 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		 * and 40% performance increase for all matches.
 		 */
 		private final List<TrieNode<T>> _trieNodes;
+
+		private T _value;
 
 	}
 

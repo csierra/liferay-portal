@@ -35,7 +35,7 @@ public abstract class URLPathPatternMatcher<T> {
 	 * @param urlPath a legal urlPath from a URL
 	 * @return the matched pattern
 	 */
-	public abstract PatternTuple<T> getPatternTuple(String urlPath);
+	public abstract T getValue(String urlPath);
 
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2

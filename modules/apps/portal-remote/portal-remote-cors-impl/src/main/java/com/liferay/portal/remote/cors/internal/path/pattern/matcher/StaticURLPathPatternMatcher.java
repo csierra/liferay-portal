@@ -43,15 +43,14 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			new WildcardStaticPathPatternMatcher<>(longesturlPathPatternSize);
 	}
 
-	public PatternTuple<T> getPatternTuple(String urlPath) {
-		PatternTuple<T> patternTuple =
-			_wildcardStaticPathPatternMatcher.getPatternTuple(urlPath);
+	public T getValue(String urlPath) {
+		T value = _wildcardStaticPathPatternMatcher.getValue(urlPath);
 
-		if (patternTuple != null) {
-			return patternTuple;
+		if (value != null) {
+			return value;
 		}
 
-		return _extensionStaticPathPatternMatcher.getPatternTuple(urlPath);
+		return _extensionStaticPathPatternMatcher.getValue(urlPath);
 	}
 
 	public void insert(String urlPathPattern, T value)
@@ -186,8 +185,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			int index = getExactIndex(urlPathPattern);
 
 			if (index > -1) {
-				patternTuples.add(
-					index, new PatternTuple<>(urlPathPattern, value));
+				values.add(index, value);
 
 				return;
 			}
@@ -211,18 +209,14 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 				trieArray[0][row][column] |= bitMask;
 			}
 
-			PatternTuple<T> patternTuple = new PatternTuple<>(
-				urlPathPattern, value);
-
 			trieArray[1][row - 1][column] |= bitMask;
 
-			patternTuples.add(index, patternTuple);
+			values.add(index, value);
 		}
 
 		protected int maxPatternLength;
-		protected List<PatternTuple<T>> patternTuples = new ArrayList<>(
-			Long.SIZE);
 		protected final long[][][] trieArray;
+		protected List<T> values = new ArrayList<>(Long.SIZE);
 
 		private int _count;
 
@@ -235,7 +229,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			super(maxPatternLength);
 		}
 
-		public PatternTuple<T> getPatternTuple(String urlPath) {
+		public T getValue(String urlPath) {
 			int urlPathLength = urlPath.length();
 			long currentBitMask = _ALL_BITS_SET;
 
@@ -263,7 +257,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 						currentBitMask & trieArray[1][row + 1][_STAR_INDEX];
 
 					if (bitMask != 0) {
-						return patternTuples.get(getFirstSetBitIndex(bitMask));
+						return values.get(getFirstSetBitIndex(bitMask));
 					}
 
 					break;
@@ -282,7 +276,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			super(maxPatternLength);
 		}
 
-		public PatternTuple<T> getPatternTuple(String urlPath) {
+		public T getValue(String urlPath) {
 			boolean onlyExact = false;
 			boolean onlyWildcard = false;
 
@@ -335,14 +329,14 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 					return null;
 				}
 
-				return patternTuples.get(getFirstSetBitIndex(bestMatchBitMask));
+				return values.get(getFirstSetBitIndex(bestMatchBitMask));
 			}
 
 			if (onlyExact) {
 				long bitMask = currentBitMask & trieArray[1][row - 1][col];
 
 				if (bitMask != 0) {
-					return patternTuples.get(getFirstSetBitIndex(bitMask));
+					return values.get(getFirstSetBitIndex(bitMask));
 				}
 
 				return null;
@@ -352,7 +346,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 				long bitMask = currentBitMask & trieArray[1][row - 1][col];
 
 				if (bitMask != 0) {
-					return patternTuples.get(getFirstSetBitIndex(bitMask));
+					return values.get(getFirstSetBitIndex(bitMask));
 				}
 			}
 
@@ -363,10 +357,10 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
 
 			if (extraBitMask != 0) {
-				return patternTuples.get(getFirstSetBitIndex(extraBitMask));
+				return values.get(getFirstSetBitIndex(extraBitMask));
 			}
 
-			return patternTuples.get(getFirstSetBitIndex(bestMatchBitMask));
+			return values.get(getFirstSetBitIndex(bestMatchBitMask));
 		}
 
 	}
