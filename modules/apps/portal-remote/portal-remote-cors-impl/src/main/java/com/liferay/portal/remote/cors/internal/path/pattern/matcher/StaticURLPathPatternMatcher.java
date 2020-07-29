@@ -23,15 +23,6 @@ import java.util.List;
  */
 public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
-	/**
-	 * If all URL patterns are known before hand, use staticurlPathPatternMapper
-	 * over dynamciurlPathPatternMapper for better READ performance of higher CPU
-	 * cache localities.
-	 *
-	 * Limitation: number of URL patterns of exact match and wildcard match
-	 * need to not exceed 64. number of URL patterns of extension match need
-	 * to not exceed 64.
-	 */
 	public StaticURLPathPatternMatcher(int longesturlPathPatternSize) {
 		if (longesturlPathPatternSize < 1) {
 			longesturlPathPatternSize = 64;

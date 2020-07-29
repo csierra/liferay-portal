@@ -249,11 +249,6 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			_value = value;
 		}
 
-		/**
-		 * Use list over hashMap for better performance
-		 * There is around 70% performance increase for best match,
-		 * and 40% performance increase for all matches.
-		 */
 		private final List<TrieNode<T>> _trieNodes;
 
 		private T _value;
