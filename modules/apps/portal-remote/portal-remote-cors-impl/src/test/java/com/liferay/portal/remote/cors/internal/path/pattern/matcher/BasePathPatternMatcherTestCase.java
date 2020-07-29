@@ -164,6 +164,6 @@ public abstract class BasePathPatternMatcherTestCase {
 
 	protected Map<String, Set<String>> allMatchResults;
 	protected Map<String, String> bestMatchResults;
-	protected PathPatternMatcher<Map<String, String>> matcher;
+	protected URLPathPatternMatcher<Map<String, String>> matcher;
 
 }

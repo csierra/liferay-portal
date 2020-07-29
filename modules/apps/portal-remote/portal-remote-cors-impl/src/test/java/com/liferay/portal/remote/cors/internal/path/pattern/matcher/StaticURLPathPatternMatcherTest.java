@@ -20,12 +20,13 @@ import org.junit.Test;
 /**
  * @author Arthur Chan
  */
-public class DynamicPathPatternMatcherTest
+public class StaticURLPathPatternMatcherTest
 	extends BasePathPatternMatcherTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		matcher = new DynamicPathPatternMatcher<>();
+		matcher = new StaticURLPathPatternMatcher<>(64);
+
 		super.setUp();
 	}
 

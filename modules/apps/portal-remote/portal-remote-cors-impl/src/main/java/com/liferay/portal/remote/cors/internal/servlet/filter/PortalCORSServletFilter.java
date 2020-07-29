@@ -39,9 +39,9 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
-import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcher;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcherFactory;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternTuple;
+import com.liferay.portal.remote.cors.internal.path.pattern.matcher.URLPathPatternMatcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -138,7 +138,7 @@ public class PortalCORSServletFilter
 
 	@Override
 	public void portalInstanceUnregistered(Company company) throws Exception {
-		_pathPatternMatchers.remove(company.getCompanyId());
+		_urlPathPatternMatchers.remove(company.getCompanyId());
 	}
 
 	@Override
@@ -302,17 +302,17 @@ public class PortalCORSServletFilter
 			return;
 		}
 
-		PathPatternMatcher<CORSSupport> pathPatternMatcher =
-			_pathPatternMatchers.get(companyId);
+		URLPathPatternMatcher<CORSSupport> urlPathPatternMatcher =
+			_urlPathPatternMatchers.get(companyId);
 
-		if (pathPatternMatcher == null) {
+		if (urlPathPatternMatcher == null) {
 			filterChain.doFilter(httpServletRequest, httpServletResponse);
 
 			return;
 		}
 
 		PatternTuple<CORSSupport> patternTuple =
-			pathPatternMatcher.getPatternTuple(getURI(httpServletRequest));
+			urlPathPatternMatcher.getPatternTuple(getURI(httpServletRequest));
 
 		if (patternTuple != null) {
 			CORSSupport corsSupport = patternTuple.getValue();
@@ -409,7 +409,7 @@ public class PortalCORSServletFilter
 	private void _rebuild() {
 		_rebuild(CompanyConstants.SYSTEM);
 
-		for (long companyId : _pathPatternMatchers.keySet()) {
+		for (long companyId : _urlPathPatternMatchers.keySet()) {
 			if (companyId != CompanyConstants.SYSTEM) {
 				_rebuild(companyId);
 			}
@@ -436,10 +436,10 @@ public class PortalCORSServletFilter
 		_mergeSystemCompanyProperties(pathPatternsHeadersMap);
 
 		if (pathPatternsHeadersMap.isEmpty()) {
-			_pathPatternMatchers.remove(companyId);
+			_urlPathPatternMatchers.remove(companyId);
 		}
 		else {
-			_pathPatternMatchers.put(
+			_urlPathPatternMatchers.put(
 				companyId,
 				_pathPatternMatcherFactory.createPatternMatcher(
 					pathPatternsHeadersMap));
@@ -460,13 +460,12 @@ public class PortalCORSServletFilter
 	@Reference
 	private PathPatternMatcherFactory _pathPatternMatcherFactory;
 
-	private final Map<Long, PathPatternMatcher<CORSSupport>>
-		_pathPatternMatchers = new ConcurrentHashMap<>();
-
 	@Reference
 	private Portal _portal;
 
 	private ServiceRegistration<ConfigurationModelListener>
 		_serviceRegistration;
+	private final Map<Long, URLPathPatternMatcher<CORSSupport>>
+		_urlPathPatternMatchers = new ConcurrentHashMap<>();
 
 }

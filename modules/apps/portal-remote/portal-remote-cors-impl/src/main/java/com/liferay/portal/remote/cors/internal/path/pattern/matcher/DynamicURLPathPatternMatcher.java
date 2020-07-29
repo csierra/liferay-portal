@@ -21,9 +21,9 @@ import java.util.List;
  * @author Arthur Chan
  * @author Carlos Sierra Andrés
  */
-public class DynamicPathPatternMatcher<T> extends PathPatternMatcher<T> {
+public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
-	public DynamicPathPatternMatcher() {
+	public DynamicURLPathPatternMatcher() {
 		_trieNodeArrayList = new TrieNodeArrayList<>();
 
 		_extensionTrieNode = _trieNodeArrayList.nextNode();

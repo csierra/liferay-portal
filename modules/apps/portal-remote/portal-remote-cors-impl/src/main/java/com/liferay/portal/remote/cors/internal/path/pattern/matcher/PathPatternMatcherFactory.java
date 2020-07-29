@@ -15,7 +15,6 @@
 package com.liferay.portal.remote.cors.internal.path.pattern.matcher;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -28,20 +27,20 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = PathPatternMatcherFactory.class)
 public class PathPatternMatcherFactory {
 
-	public <T> PathPatternMatcher<T> createPatternMatcher(
+	public <T> URLPathPatternMatcher<T> createPatternMatcher(
 		Map<String, T> patternsHeadersMap) {
 
-		PathPatternMatcher<T> pathPatternMatcher;
+		URLPathPatternMatcher<T> urlPathPatternMatcher;
 
 		if (patternsHeadersMap.size() > 64) {
-			pathPatternMatcher = new DynamicPathPatternMatcher<>();
+			urlPathPatternMatcher = new DynamicURLPathPatternMatcher<>();
 		}
 		else {
 			Set<String> keySet = patternsHeadersMap.keySet();
 
 			Stream<String> stream = keySet.stream();
 
-			pathPatternMatcher = new StaticPathPatternMatcher<>(
+			urlPathPatternMatcher = new StaticURLPathPatternMatcher<>(
 				stream.map(
 					String::length
 				).max(
@@ -52,10 +51,10 @@ public class PathPatternMatcherFactory {
 		}
 
 		for (Map.Entry<String, T> entry : patternsHeadersMap.entrySet()) {
-			pathPatternMatcher.insert(entry.getKey(), entry.getValue());
+			urlPathPatternMatcher.insert(entry.getKey(), entry.getValue());
 		}
 
-		return pathPatternMatcher;
+		return urlPathPatternMatcher;
 	}
 
 }

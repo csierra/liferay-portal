@@ -23,7 +23,7 @@ import java.util.List;
  * @author Arthur Chan
  * @author Carlos Sierra Andrés
  */
-public abstract class PathPatternMatcher<T> {
+public abstract class URLPathPatternMatcher<T> {
 
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1

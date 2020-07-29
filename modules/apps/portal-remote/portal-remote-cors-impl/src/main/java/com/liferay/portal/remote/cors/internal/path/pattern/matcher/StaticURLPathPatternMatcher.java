@@ -21,7 +21,7 @@ import java.util.List;
  * @author Arthur Chan
  * @author Carlos Sierra Andrés
  */
-public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
+public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
 	/**
 	 * If all URL patterns are known before hand, use staticpathPatternMapper
@@ -32,7 +32,7 @@ public class StaticPathPatternMatcher<T> extends PathPatternMatcher<T> {
 	 * need to not exceed 64. number of URL patterns of extension match need
 	 * to not exceed 64.
 	 */
-	public StaticPathPatternMatcher(int longestpathPatternSize) {
+	public StaticURLPathPatternMatcher(int longestpathPatternSize) {
 		if (longestpathPatternSize < 1) {
 			longestpathPatternSize = 64;
 		}
