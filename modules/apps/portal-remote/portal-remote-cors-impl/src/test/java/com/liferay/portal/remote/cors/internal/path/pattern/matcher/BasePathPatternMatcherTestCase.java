@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,39 +40,6 @@ public abstract class BasePathPatternMatcherTestCase {
 		}
 
 		buildTestResults();
-	}
-
-	public void testAllMatches() throws Exception {
-		for (String urlPath : PATHS) {
-			Set<String> allMatches = allMatchResults.get(urlPath);
-
-			List<PatternTuple<Map<String, String>>> patternPackages =
-				matcher.getPatternTuples(urlPath);
-
-			if (patternPackages.isEmpty()) {
-				Assert.assertTrue(allMatches == null);
-
-				continue;
-			}
-
-			if (allMatches == null) {
-				Assert.assertTrue(patternPackages.isEmpty());
-
-				continue;
-			}
-
-			Assert.assertEquals(
-				urlPath, allMatches.size(), patternPackages.size());
-
-			for (PatternTuple<Map<String, String>> patternPackage :
-					patternPackages) {
-
-				Assert.assertTrue(
-					allMatches.remove(patternPackage.getPattern()));
-			}
-
-			Assert.assertTrue(allMatches.isEmpty());
-		}
 	}
 
 	public void testBestMatch() throws Exception {

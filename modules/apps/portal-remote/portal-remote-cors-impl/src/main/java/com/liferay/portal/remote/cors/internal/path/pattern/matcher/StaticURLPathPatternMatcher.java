@@ -54,21 +54,6 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return _extensionStaticPathPatternMatcher.getPatternTuple(urlPath);
 	}
 
-	@Override
-	public List<PatternTuple<T>> getPatternTuples(String urlPath) {
-		List<PatternTuple<T>> patternTuples =
-			_wildcardStaticPathPatternMatcher.getPatternTuples(urlPath);
-
-		PatternTuple<T> patternTuple =
-			_extensionStaticPathPatternMatcher.getPatternTuple(urlPath);
-
-		if (patternTuple != null) {
-			patternTuples.add(patternTuple);
-		}
-
-		return patternTuples;
-	}
-
 	public void insert(String urlPathPattern, T value)
 		throws IllegalArgumentException {
 
@@ -382,106 +367,6 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			}
 
 			return patternTuples.get(getFirstSetBitIndex(bestMatchBitMask));
-		}
-
-		public List<PatternTuple<T>> getPatternTuples(String urlPath) {
-			long patternTuplesBitMask = getPatternTuplesBitMask(urlPath);
-
-			List<PatternTuple<T>> patterns = new ArrayList<>(Long.SIZE);
-
-			while (patternTuplesBitMask != 0) {
-				patterns.add(
-					patternTuples.get(
-						getFirstSetBitIndex(patternTuplesBitMask)));
-
-				patternTuplesBitMask &= patternTuplesBitMask - 1;
-			}
-
-			return patterns;
-		}
-
-		public long getPatternTuplesBitMask(String urlPath) {
-			long patternTuplesBitMask = 0;
-
-			boolean onlyExact = false;
-			boolean onlyWildcard = false;
-
-			if (urlPath.charAt(0) != '/') {
-				onlyExact = true;
-			}
-			else if ((urlPath.length() > 1) &&
-					 (urlPath.charAt(urlPath.length() - 2) == '/') &&
-					 (urlPath.charAt(urlPath.length() - 1) == '*')) {
-
-				onlyWildcard = true;
-			}
-
-			int row = 0;
-			int col = 0;
-			long currentBitMask = _ALL_BITS_SET;
-
-			for (; row < urlPath.length(); ++row) {
-				if (row > (maxPatternLength - 1)) {
-					currentBitMask = 0;
-
-					break;
-				}
-
-				char character = urlPath.charAt(row);
-
-				col = character - ASCII_PRINTABLE_OFFSET;
-
-				currentBitMask &= trieArray[0][row][col];
-
-				if (currentBitMask == 0) {
-					break;
-				}
-
-				if (!onlyExact && (character == '/') &&
-					((row + 1) < maxPatternLength)) {
-
-					long bitMask =
-						currentBitMask & trieArray[1][row + 1][_STAR_INDEX];
-
-					if (bitMask != 0) {
-						patternTuplesBitMask |= bitMask;
-					}
-				}
-			}
-
-			if (currentBitMask == 0) {
-				return patternTuplesBitMask;
-			}
-
-			if (onlyExact) {
-				long bitMask = currentBitMask & trieArray[1][row - 1][col];
-
-				if (bitMask != 0) {
-					patternTuplesBitMask |= bitMask;
-				}
-
-				return patternTuplesBitMask;
-			}
-
-			if (!onlyWildcard) {
-				long bitMask = currentBitMask & trieArray[1][row - 1][col];
-
-				if (bitMask != 0) {
-					patternTuplesBitMask |= bitMask;
-				}
-			}
-
-			long extraBitMask =
-				currentBitMask & trieArray[0][row][_SLASH_INDEX];
-
-			extraBitMask &= trieArray[0][row + 1][_STAR_INDEX];
-			extraBitMask &= trieArray[1][row + 1][_STAR_INDEX];
-
-			if (extraBitMask != 0) {
-				patternTuplesBitMask |= extraBitMask;
-			}
-
-			return patternTuplesBitMask;
 		}
 
 	}

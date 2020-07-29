@@ -17,8 +17,6 @@ package com.liferay.portal.remote.cors.internal.path.pattern.matcher;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.util.List;
-
 /**
  * @author Arthur Chan
  * @author Carlos Sierra Andrés
@@ -38,19 +36,6 @@ public abstract class URLPathPatternMatcher<T> {
 	 * @return the matched pattern
 	 */
 	public abstract PatternTuple<T> getPatternTuple(String urlPath);
-
-	/**
-	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
-	 *
-	 * Get all matching patterns of the given urlPath, including:
-	 * 1. Exact matching pattern
-	 * 2. Wild card matching patterns
-	 * 3. Extension pattern
-	 *
-	 * @param urlPath a legal urlPath from a URL
-	 * @return all the matched patterns
-	 */
-	public abstract List<PatternTuple<T>> getPatternTuples(String urlPath);
 
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2

@@ -41,19 +41,6 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return getExtensionPatternTuple(urlPath);
 	}
 
-	@Override
-	public List<PatternTuple<T>> getPatternTuples(String urlPath) {
-		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(urlPath);
-
-		PatternTuple<T> patternTuple = getExtensionPatternTuple(urlPath);
-
-		if (patternTuple != null) {
-			patternTuples.add(patternTuple);
-		}
-
-		return patternTuples;
-	}
-
 	public void insert(String urlPathPattern, T value)
 		throws IllegalArgumentException {
 
@@ -171,70 +158,6 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		}
 
 		return patternTuple;
-	}
-
-	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
-		boolean onlyExact = false;
-		boolean onlyWildcard = false;
-
-		if (urlPath.charAt(0) != '/') {
-			onlyExact = true;
-		}
-		else if ((urlPath.length() > 1) &&
-				 (urlPath.charAt(urlPath.length() - 2) == '/') &&
-				 (urlPath.charAt(urlPath.length() - 1) == '*')) {
-
-			onlyWildcard = true;
-		}
-
-		List<PatternTuple<T>> patternTuples = new ArrayList<>(64);
-
-		TrieNode<T> currentTrieNode = null;
-		TrieNode<T> previousTrieNode = _wildCardTrieNode;
-
-		for (int i = 0; i < urlPath.length(); ++i) {
-			currentTrieNode = previousTrieNode.next(urlPath.charAt(i));
-
-			if (currentTrieNode == null) {
-				break;
-			}
-
-			if (!onlyExact && (urlPath.charAt(i) == '/')) {
-				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
-
-				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
-					patternTuples.add(nextTrieNode.getPatternTuple());
-				}
-			}
-
-			previousTrieNode = currentTrieNode;
-		}
-
-		if (currentTrieNode != null) {
-			if (onlyExact) {
-				if (currentTrieNode.isEnd()) {
-					patternTuples.add(currentTrieNode.getPatternTuple());
-				}
-
-				return patternTuples;
-			}
-
-			if (!onlyWildcard && currentTrieNode.isEnd()) {
-				patternTuples.add(currentTrieNode.getPatternTuple());
-			}
-
-			currentTrieNode = currentTrieNode.next('/');
-
-			if (currentTrieNode != null) {
-				currentTrieNode = currentTrieNode.next('*');
-
-				if ((currentTrieNode != null) && currentTrieNode.isEnd()) {
-					patternTuples.add(currentTrieNode.getPatternTuple());
-				}
-			}
-		}
-
-		return patternTuples;
 	}
 
 	protected void insert(
