@@ -24,8 +24,8 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(service = PathPatternMatcherFactory.class)
-public class PathPatternMatcherFactory {
+@Component(service = URLPathPatternMatcherFactory.class)
+public class URLPathPatternMatcherFactory {
 
 	public <T> URLPathPatternMatcher<T> createPatternMatcher(
 		Map<String, T> patternsHeadersMap) {

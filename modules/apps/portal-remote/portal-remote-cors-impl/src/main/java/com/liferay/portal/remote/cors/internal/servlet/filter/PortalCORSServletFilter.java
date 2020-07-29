@@ -39,9 +39,9 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
-import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PathPatternMatcherFactory;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.PatternTuple;
 import com.liferay.portal.remote.cors.internal.path.pattern.matcher.URLPathPatternMatcher;
+import com.liferay.portal.remote.cors.internal.path.pattern.matcher.URLPathPatternMatcherFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -442,7 +442,7 @@ public class PortalCORSServletFilter
 		else {
 			_urlPathPatternMatchers.put(
 				companyId,
-				_pathPatternMatcherFactory.createPatternMatcher(
+				_urlPathPatternMatcherFactory.createPatternMatcher(
 					urlPathPatternsHeadersMap));
 		}
 	}
@@ -459,13 +459,14 @@ public class PortalCORSServletFilter
 	private Http _http;
 
 	@Reference
-	private PathPatternMatcherFactory _pathPatternMatcherFactory;
-
-	@Reference
 	private Portal _portal;
 
 	private ServiceRegistration<ConfigurationModelListener>
 		_serviceRegistration;
+
+	@Reference
+	private URLPathPatternMatcherFactory _urlPathPatternMatcherFactory;
+
 	private final Map<Long, URLPathPatternMatcher<CORSSupport>>
 		_urlPathPatternMatchers = new ConcurrentHashMap<>();
 
