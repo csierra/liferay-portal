@@ -41,7 +41,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return getExtensionValue(urlPath);
 	}
 
-	public void insert(String urlPathPattern, T value)
+	public void putValue(String urlPathPattern, T value)
 		throws IllegalArgumentException {
 
 		if (value == null) {
@@ -49,18 +49,18 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		}
 
 		if (isValidWildCardPattern(urlPathPattern)) {
-			insert(urlPathPattern, value, _wildCardTrieNode, true);
+			putValue(urlPathPattern, value, _wildCardTrieNode, true);
 
 			return;
 		}
 
 		if (isValidExtensionPattern(urlPathPattern)) {
-			insert(urlPathPattern, value, _extensionTrieNode, false);
+			putValue(urlPathPattern, value, _extensionTrieNode, false);
 
 			return;
 		}
 
-		insert(urlPathPattern, value, _wildCardTrieNode, true);
+		putValue(urlPathPattern, value, _wildCardTrieNode, true);
 	}
 
 	protected T getExtensionValue(String urlPath) {
@@ -160,7 +160,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return value;
 	}
 
-	protected void insert(
+	protected void putValue(
 		String urlPathPattern, T value, TrieNode<T> previousTrieNode,
 		boolean forward) {
 
@@ -250,7 +250,6 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		}
 
 		private final List<TrieNode<T>> _trieNodes;
-
 		private T _value;
 
 	}

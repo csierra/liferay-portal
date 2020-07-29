@@ -51,7 +51,7 @@ public class URLPathPatternMatcherFactory {
 		}
 
 		for (Map.Entry<String, T> entry : patternsHeadersMap.entrySet()) {
-			urlPathPatternMatcher.insert(entry.getKey(), entry.getValue());
+			urlPathPatternMatcher.putValue(entry.getKey(), entry.getValue());
 		}
 
 		return urlPathPatternMatcher;

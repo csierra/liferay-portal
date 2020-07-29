@@ -32,7 +32,7 @@ public abstract class BasePathPatternMatcherTestCase {
 		int iteration = 0;
 
 		for (String pattern : PATTERNS) {
-			matcher.insert(
+			matcher.putValue(
 				pattern,
 				HashMapBuilder.put(
 					pattern, "cargo" + iteration++

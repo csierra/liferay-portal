@@ -44,7 +44,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return _extensionStaticTrieArrayMatcher.getValue(urlPath);
 	}
 
-	public void insert(String urlPathPattern, T value)
+	public void putValue(String urlPathPattern, T value)
 		throws IllegalArgumentException {
 
 		if (isValidExtensionPattern(urlPathPattern)) {

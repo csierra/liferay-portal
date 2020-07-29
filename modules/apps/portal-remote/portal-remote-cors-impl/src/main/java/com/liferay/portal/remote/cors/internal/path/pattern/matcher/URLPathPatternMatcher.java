@@ -37,7 +37,7 @@ public abstract class URLPathPatternMatcher<T> {
 	 * @param urlPathPattern the pattern of urlPath, used for pattern matching
 	 * @param value an non null object associated with urlPathPattern
 	 */
-	public abstract void insert(String urlPathPattern, T value)
+	public abstract void putValue(String urlPathPattern, T value)
 		throws IllegalArgumentException;
 
 	/**
