@@ -37,31 +37,33 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			longesturlPathPatternSize = 64;
 		}
 
-		_extensionStaticPathPatternMatcher =
-			new ExtensionStaticPathPatternMatcher<>(longesturlPathPatternSize);
-		_wildcardStaticPathPatternMatcher =
-			new WildcardStaticPathPatternMatcher<>(longesturlPathPatternSize);
+		_extensionStaticURLPathPatternMatcher =
+			new ExtensionStaticURLPathPatternMatcher<>(
+				longesturlPathPatternSize);
+		_wildcardStaticURLPathPatternMatcher =
+			new WildcardStaticURLPathPatternMatcher<>(
+				longesturlPathPatternSize);
 	}
 
 	public T getValue(String urlPath) {
-		T value = _wildcardStaticPathPatternMatcher.getValue(urlPath);
+		T value = _wildcardStaticURLPathPatternMatcher.getValue(urlPath);
 
 		if (value != null) {
 			return value;
 		}
 
-		return _extensionStaticPathPatternMatcher.getValue(urlPath);
+		return _extensionStaticURLPathPatternMatcher.getValue(urlPath);
 	}
 
 	public void insert(String urlPathPattern, T value)
 		throws IllegalArgumentException {
 
 		if (isValidExtensionPattern(urlPathPattern)) {
-			_extensionStaticPathPatternMatcher.insert(
+			_extensionStaticURLPathPatternMatcher.insert(
 				urlPathPattern, value, false);
 		}
 		else {
-			_wildcardStaticPathPatternMatcher.insert(
+			_wildcardStaticURLPathPatternMatcher.insert(
 				urlPathPattern, value, true);
 		}
 	}
@@ -125,17 +127,18 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
 	private static final int _STAR_INDEX = '*' - ASCII_PRINTABLE_OFFSET;
 
-	private final ExtensionStaticPathPatternMatcher<T>
-		_extensionStaticPathPatternMatcher;
-	private final WildcardStaticPathPatternMatcher<T>
-		_wildcardStaticPathPatternMatcher;
+	private final ExtensionStaticURLPathPatternMatcher<T>
+		_extensionStaticURLPathPatternMatcher;
+	private final WildcardStaticURLPathPatternMatcher<T>
+		_wildcardStaticURLPathPatternMatcher;
 
-	private abstract static class BaseStaticPathPatternMatcher<T> {
+	private abstract static class BaseStaticURLPathPatternMatcher<T> {
 
-		public BaseStaticPathPatternMatcher(int maxPatternLength) {
-			this.maxPatternLength = maxPatternLength;
+		public BaseStaticURLPathPatternMatcher(int maxUrlPathPatternLength) {
+			this.maxUrlPathPatternLength = maxUrlPathPatternLength;
 
-			trieArray = new long[2][maxPatternLength][ASCII_CHARACTER_RANGE];
+			trieArray =
+				new long[2][maxUrlPathPatternLength][ASCII_CHARACTER_RANGE];
 		}
 
 		protected int getExactIndex(String urlPath) {
@@ -144,7 +147,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			int column = 0;
 
 			for (; row < urlPath.length(); ++row) {
-				if (row > (maxPatternLength - 1)) {
+				if (row > (maxUrlPathPatternLength - 1)) {
 					bitMask = 0;
 
 					break;
@@ -210,7 +213,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			values.add(index, value);
 		}
 
-		protected int maxPatternLength;
+		protected int maxUrlPathPatternLength;
 		protected final long[][][] trieArray;
 		protected List<T> values = new ArrayList<>(Long.SIZE);
 
@@ -218,11 +221,13 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
 	}
 
-	private static class ExtensionStaticPathPatternMatcher<T>
-		extends BaseStaticPathPatternMatcher<T> {
+	private static class ExtensionStaticURLPathPatternMatcher<T>
+		extends BaseStaticURLPathPatternMatcher<T> {
 
-		public ExtensionStaticPathPatternMatcher(int maxPatternLength) {
-			super(maxPatternLength);
+		public ExtensionStaticURLPathPatternMatcher(
+			int maxUrlPathPatternLength) {
+
+			super(maxUrlPathPatternLength);
 		}
 
 		public T getValue(String urlPath) {
@@ -230,7 +235,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			long currentBitMask = _ALL_BITS_SET;
 
 			for (int row = 0; row < urlPathLength; ++row) {
-				if (row > (maxPatternLength - 1)) {
+				if (row > (maxUrlPathPatternLength - 1)) {
 					break;
 				}
 
@@ -248,7 +253,9 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 					break;
 				}
 
-				if ((character == '.') && ((row + 1) < maxPatternLength)) {
+				if ((character == '.') &&
+					((row + 1) < maxUrlPathPatternLength)) {
+
 					long bitMask =
 						currentBitMask & trieArray[1][row + 1][_STAR_INDEX];
 
@@ -265,11 +272,13 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
 	}
 
-	private static class WildcardStaticPathPatternMatcher<T>
-		extends BaseStaticPathPatternMatcher<T> {
+	private static class WildcardStaticURLPathPatternMatcher<T>
+		extends BaseStaticURLPathPatternMatcher<T> {
 
-		public WildcardStaticPathPatternMatcher(int maxPatternLength) {
-			super(maxPatternLength);
+		public WildcardStaticURLPathPatternMatcher(
+			int maxUrlPathPatternLength) {
+
+			super(maxUrlPathPatternLength);
 		}
 
 		public T getValue(String urlPath) {
@@ -292,7 +301,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			long bestMatchBitMask = 0;
 
 			for (; row < urlPath.length(); ++row) {
-				if (row > (maxPatternLength - 1)) {
+				if (row > (maxUrlPathPatternLength - 1)) {
 					currentBitMask = 0;
 
 					break;
@@ -309,7 +318,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 				}
 
 				if (!onlyExact && (character == '/') &&
-					((row + 1) < maxPatternLength)) {
+					((row + 1) < maxUrlPathPatternLength)) {
 
 					long bitMask =
 						currentBitMask & trieArray[1][row + 1][_STAR_INDEX];
