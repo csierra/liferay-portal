@@ -56,11 +56,7 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 	public void insert(String urlPathPattern, T value)
 		throws IllegalArgumentException {
 
-		if (isValidWildCardPattern(urlPathPattern)) {
-			_wildcardStaticPathPatternMatcher.insert(
-				urlPathPattern, value, true);
-		}
-		else if (isValidExtensionPattern(urlPathPattern)) {
+		if (isValidExtensionPattern(urlPathPattern)) {
 			_extensionStaticPathPatternMatcher.insert(
 				urlPathPattern, value, false);
 		}
