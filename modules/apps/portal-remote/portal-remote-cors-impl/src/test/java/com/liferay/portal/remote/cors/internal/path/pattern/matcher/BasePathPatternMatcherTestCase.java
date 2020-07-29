@@ -43,15 +43,14 @@ public abstract class BasePathPatternMatcherTestCase {
 		for (String urlPath : PATHS) {
 			String expectedValue = urlPathsValuesMap.get(urlPath);
 
-			String value = urlPathPatternMatcher.getValue(urlPath);
-
-			if (value == null) {
+			if (urlPathPatternMatcher.getValue(urlPath) == null) {
 				Assert.assertNull(expectedValue);
 
 				continue;
 			}
 
-			Assert.assertEquals(expectedValue, value);
+			Assert.assertEquals(
+				expectedValue, urlPathPatternMatcher.getValue(urlPath));
 		}
 	}
 
