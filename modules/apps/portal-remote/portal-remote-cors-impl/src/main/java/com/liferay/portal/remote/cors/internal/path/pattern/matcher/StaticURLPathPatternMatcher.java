@@ -43,24 +43,24 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			new WildcardStaticPathPatternMatcher<>(longesturlPathPatternSize);
 	}
 
-	public PatternTuple<T> getPatternTuple(String path) {
+	public PatternTuple<T> getPatternTuple(String urlPath) {
 		PatternTuple<T> patternTuple =
-			_wildcardStaticPathPatternMatcher.getPatternTuple(path);
+			_wildcardStaticPathPatternMatcher.getPatternTuple(urlPath);
 
 		if (patternTuple != null) {
 			return patternTuple;
 		}
 
-		return _extensionStaticPathPatternMatcher.getPatternTuple(path);
+		return _extensionStaticPathPatternMatcher.getPatternTuple(urlPath);
 	}
 
 	@Override
-	public List<PatternTuple<T>> getPatternTuples(String path) {
+	public List<PatternTuple<T>> getPatternTuples(String urlPath) {
 		List<PatternTuple<T>> patternTuples =
-			_wildcardStaticPathPatternMatcher.getPatternTuples(path);
+			_wildcardStaticPathPatternMatcher.getPatternTuples(urlPath);
 
 		PatternTuple<T> patternTuple =
-			_extensionStaticPathPatternMatcher.getPatternTuple(path);
+			_extensionStaticPathPatternMatcher.getPatternTuple(urlPath);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
@@ -158,19 +158,19 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			trieArray = new long[2][maxPatternLength][ASCII_CHARACTER_RANGE];
 		}
 
-		protected int getExactIndex(String path) {
+		protected int getExactIndex(String urlPath) {
 			int row = 0;
 			long bitMask = _ALL_BITS_SET;
 			int column = 0;
 
-			for (; row < path.length(); ++row) {
+			for (; row < urlPath.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
 					bitMask = 0;
 
 					break;
 				}
 
-				char character = path.charAt(row);
+				char character = urlPath.charAt(row);
 
 				column = character - ASCII_PRINTABLE_OFFSET;
 
@@ -250,16 +250,16 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			super(maxPatternLength);
 		}
 
-		public PatternTuple<T> getPatternTuple(String path) {
-			int pathLength = path.length();
+		public PatternTuple<T> getPatternTuple(String urlPath) {
+			int urlPathLength = urlPath.length();
 			long currentBitMask = _ALL_BITS_SET;
 
-			for (int row = 0; row < pathLength; ++row) {
+			for (int row = 0; row < urlPathLength; ++row) {
 				if (row > (maxPatternLength - 1)) {
 					break;
 				}
 
-				char character = path.charAt(pathLength - 1 - row);
+				char character = urlPath.charAt(urlPathLength - 1 - row);
 
 				if (character == '/') {
 					break;
@@ -297,16 +297,16 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			super(maxPatternLength);
 		}
 
-		public PatternTuple<T> getPatternTuple(String path) {
+		public PatternTuple<T> getPatternTuple(String urlPath) {
 			boolean onlyExact = false;
 			boolean onlyWildcard = false;
 
-			if (path.charAt(0) != '/') {
+			if (urlPath.charAt(0) != '/') {
 				onlyExact = true;
 			}
-			else if ((path.length() > 1) &&
-					 (path.charAt(path.length() - 2) == '/') &&
-					 (path.charAt(path.length() - 1) == '*')) {
+			else if ((urlPath.length() > 1) &&
+					 (urlPath.charAt(urlPath.length() - 2) == '/') &&
+					 (urlPath.charAt(urlPath.length() - 1) == '*')) {
 
 				onlyWildcard = true;
 			}
@@ -316,14 +316,14 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			long currentBitMask = _ALL_BITS_SET;
 			long bestMatchBitMask = 0;
 
-			for (; row < path.length(); ++row) {
+			for (; row < urlPath.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
 					currentBitMask = 0;
 
 					break;
 				}
 
-				char character = path.charAt(row);
+				char character = urlPath.charAt(row);
 
 				col = character - ASCII_PRINTABLE_OFFSET;
 
@@ -384,8 +384,8 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			return patternTuples.get(getFirstSetBitIndex(bestMatchBitMask));
 		}
 
-		public List<PatternTuple<T>> getPatternTuples(String path) {
-			long patternTuplesBitMask = getPatternTuplesBitMask(path);
+		public List<PatternTuple<T>> getPatternTuples(String urlPath) {
+			long patternTuplesBitMask = getPatternTuplesBitMask(urlPath);
 
 			List<PatternTuple<T>> patterns = new ArrayList<>(Long.SIZE);
 
@@ -400,18 +400,18 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			return patterns;
 		}
 
-		public long getPatternTuplesBitMask(String path) {
+		public long getPatternTuplesBitMask(String urlPath) {
 			long patternTuplesBitMask = 0;
 
 			boolean onlyExact = false;
 			boolean onlyWildcard = false;
 
-			if (path.charAt(0) != '/') {
+			if (urlPath.charAt(0) != '/') {
 				onlyExact = true;
 			}
-			else if ((path.length() > 1) &&
-					 (path.charAt(path.length() - 2) == '/') &&
-					 (path.charAt(path.length() - 1) == '*')) {
+			else if ((urlPath.length() > 1) &&
+					 (urlPath.charAt(urlPath.length() - 2) == '/') &&
+					 (urlPath.charAt(urlPath.length() - 1) == '*')) {
 
 				onlyWildcard = true;
 			}
@@ -420,14 +420,14 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			int col = 0;
 			long currentBitMask = _ALL_BITS_SET;
 
-			for (; row < path.length(); ++row) {
+			for (; row < urlPath.length(); ++row) {
 				if (row > (maxPatternLength - 1)) {
 					currentBitMask = 0;
 
 					break;
 				}
 
-				char character = path.charAt(row);
+				char character = urlPath.charAt(row);
 
 				col = character - ASCII_PRINTABLE_OFFSET;
 

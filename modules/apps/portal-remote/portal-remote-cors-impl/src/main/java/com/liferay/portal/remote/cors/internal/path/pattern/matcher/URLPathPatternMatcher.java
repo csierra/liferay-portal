@@ -28,55 +28,55 @@ public abstract class URLPathPatternMatcher<T> {
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
 	 *
-	 * Get the matching pattern of the given path, following the order of:
+	 * Get the matching pattern of the given urlPath, following the order of:
 	 * 1. Exact matching pattern
 	 * 2. Wild card matching the longest pattern
 	 * 3. Extension pattern
 	 * 4. Default pattern
 	 *
-	 * @param path a legal path from a URL
+	 * @param urlPath a legal urlPath from a URL
 	 * @return the matched pattern
 	 */
-	public abstract PatternTuple<T> getPatternTuple(String path);
+	public abstract PatternTuple<T> getPatternTuple(String urlPath);
 
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1
 	 *
-	 * Get all matching patterns of the given path, including:
+	 * Get all matching patterns of the given urlPath, including:
 	 * 1. Exact matching pattern
 	 * 2. Wild card matching patterns
 	 * 3. Extension pattern
 	 *
-	 * @param path a legal path from a URL
+	 * @param urlPath a legal urlPath from a URL
 	 * @return all the matched patterns
 	 */
-	public abstract List<PatternTuple<T>> getPatternTuples(String path);
+	public abstract List<PatternTuple<T>> getPatternTuples(String urlPath);
 
 	/**
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
 	 * In the Web application deployment descriptor, the following syntax is
 	 * used to define mappings:
-	 * 1. Wild Card path pattern 1:
+	 * 1. Wild Card urlPath pattern 1:
 	 *        A string beginning with a ' / ' character and ending with a ' /* '
-	 *        suffix is used for path mapping.
-	 * 2. Wild Card path pattern 2, aka extension matching:
+	 *        suffix is used for urlPath mapping.
+	 * 2. Wild Card urlPath pattern 2, aka extension matching:
 	 *        A string beginning with a ' *. ' prefix is used as an extension
 	 *        mapping.
-	 * 3. Special path pattern 1:
+	 * 3. Special urlPath pattern 1:
 	 *        The empty string ("") is a special URL pattern that exactly maps
 	 *        to the application's context root, i.e., requests of the form
-	 *        http://host:port/'<'context-root'>'/. In this case the path info is
-	 *        ' / ' and the servlet path and context path is empty string ("").
-	 * 4. Special path pattern 2:
+	 *        http://host:port/'<'context-root'>'/. In this case the urlPath info is
+	 *        ' / ' and the servlet urlPath and context urlPath is empty string ("").
+	 * 4. Special urlPath pattern 2:
 	 *        A string containing only the ' / ' character indicates the
 	 *        "default" servlet of the application. In this case the servlet
-	 *        path is the request URI minus the context path and the path info
+	 *        urlPath is the request URI minus the context urlPath and the urlPath info
 	 *        is null.
-	 * 5. Exact path pattern:
+	 * 5. Exact urlPath pattern:
 	 *        All other strings are used for exact matches only.
 	 *
-	 * @param urlPathPattern the pattern of path, used for pattern matching
+	 * @param urlPathPattern the pattern of urlPath, used for pattern matching
 	 * @param value an non null object associated with urlPathPattern
 	 */
 	public abstract void insert(String urlPathPattern, T value)
@@ -84,7 +84,7 @@ public abstract class URLPathPatternMatcher<T> {
 
 	/**
 	 * A valid ExtensionPattern:
-	 * 1. Without the leading '*', it abides by the format of a segment of path
+	 * 1. Without the leading '*', it abides by the format of a segment of urlPath
 	 *         of URI specification: https://tools.ietf.org/html/rfc3986#section-3.3
 	 * 2. It also abides by:
 	 *         https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.1.3, and
@@ -116,7 +116,7 @@ public abstract class URLPathPatternMatcher<T> {
 
 	/**
 	 * A valid WildCardPattern:
-	 * 1. Without the trailing '*', it abides by the format of path of URI specification:
+	 * 1. Without the trailing '*', it abides by the format of urlPath of URI specification:
 	 *         https://tools.ietf.org/html/rfc3986#section-3.3
 	 * 2. It also abides by:
 	 *         https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
@@ -134,12 +134,12 @@ public abstract class URLPathPatternMatcher<T> {
 		}
 
 		try {
-			String path = urlPathPattern.substring(
+			String urlPath = urlPathPattern.substring(
 				0, urlPathPattern.length() - 1);
 
-			URI uri = new URI("https://test" + path);
+			URI uri = new URI("https://test" + urlPath);
 
-			if (!path.contentEquals(uri.getPath())) {
+			if (!urlPath.contentEquals(uri.getPath())) {
 				return false;
 			}
 		}

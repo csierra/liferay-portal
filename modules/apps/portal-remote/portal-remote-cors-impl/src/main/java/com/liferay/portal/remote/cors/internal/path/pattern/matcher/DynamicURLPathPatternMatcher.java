@@ -31,21 +31,21 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 	}
 
 	@Override
-	public PatternTuple<T> getPatternTuple(String path) {
-		PatternTuple<T> patternTuple = getWildcardPatternTuple(path);
+	public PatternTuple<T> getPatternTuple(String urlPath) {
+		PatternTuple<T> patternTuple = getWildcardPatternTuple(urlPath);
 
 		if (patternTuple != null) {
 			return patternTuple;
 		}
 
-		return getExtensionPatternTuple(path);
+		return getExtensionPatternTuple(urlPath);
 	}
 
 	@Override
-	public List<PatternTuple<T>> getPatternTuples(String path) {
-		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(path);
+	public List<PatternTuple<T>> getPatternTuples(String urlPath) {
+		List<PatternTuple<T>> patternTuples = getWildcardPatternTuples(urlPath);
 
-		PatternTuple<T> patternTuple = getExtensionPatternTuple(path);
+		PatternTuple<T> patternTuple = getExtensionPatternTuple(urlPath);
 
 		if (patternTuple != null) {
 			patternTuples.add(patternTuple);
@@ -76,14 +76,14 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		insert(urlPathPattern, value, _wildCardTrieNode, true);
 	}
 
-	protected PatternTuple<T> getExtensionPatternTuple(String path) {
+	protected PatternTuple<T> getExtensionPatternTuple(String urlPath) {
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _extensionTrieNode;
 
-		for (int i = 0; i < path.length(); ++i) {
-			int index = path.length() - 1 - i;
+		for (int i = 0; i < urlPath.length(); ++i) {
+			int index = urlPath.length() - 1 - i;
 
-			char character = path.charAt(index);
+			char character = urlPath.charAt(index);
 
 			if (character == '/') {
 				break;
@@ -95,7 +95,7 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 				break;
 			}
 
-			if (path.charAt(index) == '.') {
+			if (urlPath.charAt(index) == '.') {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
@@ -109,16 +109,16 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return null;
 	}
 
-	protected PatternTuple<T> getWildcardPatternTuple(String path) {
+	protected PatternTuple<T> getWildcardPatternTuple(String urlPath) {
 		boolean onlyExact = false;
 		boolean onlyWildcard = false;
 
-		if (path.charAt(0) != '/') {
+		if (urlPath.charAt(0) != '/') {
 			onlyExact = true;
 		}
-		else if ((path.length() > 1) &&
-				 (path.charAt(path.length() - 2) == '/') &&
-				 (path.charAt(path.length() - 1) == '*')) {
+		else if ((urlPath.length() > 1) &&
+				 (urlPath.charAt(urlPath.length() - 2) == '/') &&
+				 (urlPath.charAt(urlPath.length() - 1) == '*')) {
 
 			onlyWildcard = true;
 		}
@@ -128,14 +128,14 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _wildCardTrieNode;
 
-		for (int i = 0; i < path.length(); ++i) {
-			currentTrieNode = previousTrieNode.next(path.charAt(i));
+		for (int i = 0; i < urlPath.length(); ++i) {
+			currentTrieNode = previousTrieNode.next(urlPath.charAt(i));
 
 			if (currentTrieNode == null) {
 				break;
 			}
 
-			if (!onlyExact && (path.charAt(i) == '/')) {
+			if (!onlyExact && (urlPath.charAt(i) == '/')) {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {
@@ -173,16 +173,16 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		return patternTuple;
 	}
 
-	protected List<PatternTuple<T>> getWildcardPatternTuples(String path) {
+	protected List<PatternTuple<T>> getWildcardPatternTuples(String urlPath) {
 		boolean onlyExact = false;
 		boolean onlyWildcard = false;
 
-		if (path.charAt(0) != '/') {
+		if (urlPath.charAt(0) != '/') {
 			onlyExact = true;
 		}
-		else if ((path.length() > 1) &&
-				 (path.charAt(path.length() - 2) == '/') &&
-				 (path.charAt(path.length() - 1) == '*')) {
+		else if ((urlPath.length() > 1) &&
+				 (urlPath.charAt(urlPath.length() - 2) == '/') &&
+				 (urlPath.charAt(urlPath.length() - 1) == '*')) {
 
 			onlyWildcard = true;
 		}
@@ -192,14 +192,14 @@ public class DynamicURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 		TrieNode<T> currentTrieNode = null;
 		TrieNode<T> previousTrieNode = _wildCardTrieNode;
 
-		for (int i = 0; i < path.length(); ++i) {
-			currentTrieNode = previousTrieNode.next(path.charAt(i));
+		for (int i = 0; i < urlPath.length(); ++i) {
+			currentTrieNode = previousTrieNode.next(urlPath.charAt(i));
 
 			if (currentTrieNode == null) {
 				break;
 			}
 
-			if (!onlyExact && (path.charAt(i) == '/')) {
+			if (!onlyExact && (urlPath.charAt(i) == '/')) {
 				TrieNode<T> nextTrieNode = currentTrieNode.next('*');
 
 				if ((nextTrieNode != null) && nextTrieNode.isEnd()) {

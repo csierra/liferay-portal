@@ -44,11 +44,11 @@ public abstract class BasePathPatternMatcherTestCase {
 	}
 
 	public void testAllMatches() throws Exception {
-		for (String path : PATHS) {
-			Set<String> allMatches = allMatchResults.get(path);
+		for (String urlPath : PATHS) {
+			Set<String> allMatches = allMatchResults.get(urlPath);
 
 			List<PatternTuple<Map<String, String>>> patternPackages =
-				matcher.getPatternTuples(path);
+				matcher.getPatternTuples(urlPath);
 
 			if (patternPackages.isEmpty()) {
 				Assert.assertTrue(allMatches == null);
@@ -63,7 +63,7 @@ public abstract class BasePathPatternMatcherTestCase {
 			}
 
 			Assert.assertEquals(
-				path, allMatches.size(), patternPackages.size());
+				urlPath, allMatches.size(), patternPackages.size());
 
 			for (PatternTuple<Map<String, String>> patternPackage :
 					patternPackages) {
@@ -77,11 +77,11 @@ public abstract class BasePathPatternMatcherTestCase {
 	}
 
 	public void testBestMatch() throws Exception {
-		for (String path : PATHS) {
-			String bestMatch = bestMatchResults.get(path);
+		for (String urlPath : PATHS) {
+			String bestMatch = bestMatchResults.get(urlPath);
 
 			PatternTuple<Map<String, String>> patternPackage =
-				matcher.getPatternTuple(path);
+				matcher.getPatternTuple(urlPath);
 
 			if (patternPackage == null) {
 				Assert.assertTrue(bestMatch == null);
@@ -96,11 +96,11 @@ public abstract class BasePathPatternMatcherTestCase {
 	}
 
 	protected void addResult(
-		String path, Map<String, String> bestMatches,
+		String urlPath, Map<String, String> bestMatches,
 		Map<String, Set<String>> allMatches, int... patternIndexs) {
 
 		if (patternIndexs.length > 0) {
-			bestMatches.put(path, PATTERNS[patternIndexs[0]]);
+			bestMatches.put(urlPath, PATTERNS[patternIndexs[0]]);
 
 			Set<String> allPatterns = new HashSet<>();
 
@@ -108,7 +108,7 @@ public abstract class BasePathPatternMatcherTestCase {
 				allPatterns.add(PATTERNS[i]);
 			}
 
-			allMatches.put(path, allPatterns);
+			allMatches.put(urlPath, allPatterns);
 		}
 	}
 
