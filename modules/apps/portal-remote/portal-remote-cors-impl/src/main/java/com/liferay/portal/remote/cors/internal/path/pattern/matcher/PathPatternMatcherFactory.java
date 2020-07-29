@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Component;
 public class PathPatternMatcherFactory {
 
 	public <T> PathPatternMatcher<T> createPatternMatcher(
-		HashMap<String, T> patternsHeadersMap) {
+		Map<String, T> patternsHeadersMap) {
 
 		PathPatternMatcher<T> pathPatternMatcher;
 
