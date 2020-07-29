@@ -28,34 +28,31 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 			longesturlPathPatternSize = 64;
 		}
 
-		_extensionStaticURLPathPatternMatcher =
-			new ExtensionStaticURLPathPatternMatcher<>(
-				longesturlPathPatternSize);
-		_wildcardStaticURLPathPatternMatcher =
-			new WildcardStaticURLPathPatternMatcher<>(
-				longesturlPathPatternSize);
+		_extensionStaticTrieArrayMatcher =
+			new ExtensionStaticTrieArrayMatcher<>(longesturlPathPatternSize);
+		_wildcardStaticTrieArrayMatcher = new WildcardStaticTrieArrayMatcher<>(
+			longesturlPathPatternSize);
 	}
 
 	public T getValue(String urlPath) {
-		T value = _wildcardStaticURLPathPatternMatcher.getValue(urlPath);
+		T value = _wildcardStaticTrieArrayMatcher.getValue(urlPath);
 
 		if (value != null) {
 			return value;
 		}
 
-		return _extensionStaticURLPathPatternMatcher.getValue(urlPath);
+		return _extensionStaticTrieArrayMatcher.getValue(urlPath);
 	}
 
 	public void insert(String urlPathPattern, T value)
 		throws IllegalArgumentException {
 
 		if (isValidExtensionPattern(urlPathPattern)) {
-			_extensionStaticURLPathPatternMatcher.insert(
+			_extensionStaticTrieArrayMatcher.insert(
 				urlPathPattern, value, false);
 		}
 		else {
-			_wildcardStaticURLPathPatternMatcher.insert(
-				urlPathPattern, value, true);
+			_wildcardStaticTrieArrayMatcher.insert(urlPathPattern, value, true);
 		}
 	}
 
@@ -118,14 +115,14 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
 	private static final int _STAR_INDEX = '*' - ASCII_PRINTABLE_OFFSET;
 
-	private final ExtensionStaticURLPathPatternMatcher<T>
-		_extensionStaticURLPathPatternMatcher;
-	private final WildcardStaticURLPathPatternMatcher<T>
-		_wildcardStaticURLPathPatternMatcher;
+	private final ExtensionStaticTrieArrayMatcher<T>
+		_extensionStaticTrieArrayMatcher;
+	private final WildcardStaticTrieArrayMatcher<T>
+		_wildcardStaticTrieArrayMatcher;
 
-	private abstract static class BaseStaticURLPathPatternMatcher<T> {
+	private abstract static class BaseStaticTrieArrayMatcher<T> {
 
-		public BaseStaticURLPathPatternMatcher(int maxUrlPathPatternLength) {
+		public BaseStaticTrieArrayMatcher(int maxUrlPathPatternLength) {
 			this.maxUrlPathPatternLength = maxUrlPathPatternLength;
 
 			trieArray =
@@ -212,12 +209,10 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
 	}
 
-	private static class ExtensionStaticURLPathPatternMatcher<T>
-		extends BaseStaticURLPathPatternMatcher<T> {
+	private static class ExtensionStaticTrieArrayMatcher<T>
+		extends BaseStaticTrieArrayMatcher<T> {
 
-		public ExtensionStaticURLPathPatternMatcher(
-			int maxUrlPathPatternLength) {
-
+		public ExtensionStaticTrieArrayMatcher(int maxUrlPathPatternLength) {
 			super(maxUrlPathPatternLength);
 		}
 
@@ -263,12 +258,10 @@ public class StaticURLPathPatternMatcher<T> extends URLPathPatternMatcher<T> {
 
 	}
 
-	private static class WildcardStaticURLPathPatternMatcher<T>
-		extends BaseStaticURLPathPatternMatcher<T> {
+	private static class WildcardStaticTrieArrayMatcher<T>
+		extends BaseStaticTrieArrayMatcher<T> {
 
-		public WildcardStaticURLPathPatternMatcher(
-			int maxUrlPathPatternLength) {
-
+		public WildcardStaticTrieArrayMatcher(int maxUrlPathPatternLength) {
 			super(maxUrlPathPatternLength);
 		}
 
