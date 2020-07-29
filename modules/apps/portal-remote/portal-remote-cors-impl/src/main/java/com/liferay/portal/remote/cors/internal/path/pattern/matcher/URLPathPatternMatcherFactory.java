@@ -28,17 +28,17 @@ import org.osgi.service.component.annotations.Component;
 public class URLPathPatternMatcherFactory {
 
 	public <T> URLPathPatternMatcher<T> createPatternMatcher(
-		Map<String, T> patternsHeadersMap) {
+		Map<String, T> urlPathPatternsMap) {
 
 		URLPathPatternMatcher<T> urlPathPatternMatcher;
 
-		if (patternsHeadersMap.size() > 64) {
+		if (urlPathPatternsMap.size() > 64) {
 			urlPathPatternMatcher = new DynamicURLPathPatternMatcher<>();
 		}
 		else {
-			Set<String> keySet = patternsHeadersMap.keySet();
+			Set<String> urlPathPatterns = urlPathPatternsMap.keySet();
 
-			Stream<String> stream = keySet.stream();
+			Stream<String> stream = urlPathPatterns.stream();
 
 			urlPathPatternMatcher = new StaticURLPathPatternMatcher<>(
 				stream.map(
@@ -50,7 +50,7 @@ public class URLPathPatternMatcherFactory {
 				));
 		}
 
-		for (Map.Entry<String, T> entry : patternsHeadersMap.entrySet()) {
+		for (Map.Entry<String, T> entry : urlPathPatternsMap.entrySet()) {
 			urlPathPatternMatcher.putValue(entry.getKey(), entry.getValue());
 		}
 
