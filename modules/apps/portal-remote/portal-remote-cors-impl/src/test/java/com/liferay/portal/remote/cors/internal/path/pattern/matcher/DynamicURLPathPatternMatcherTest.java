@@ -26,6 +26,7 @@ public class DynamicURLPathPatternMatcherTest
 	@Before
 	public void setUp() throws Exception {
 		urlPathPatternMatcher = new DynamicURLPathPatternMatcher<>();
+
 		super.setUp();
 	}
 
