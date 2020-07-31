@@ -55,8 +55,7 @@ public class SimpleURLPatternMatcher<T> extends URLPatternMatcher<T> {
 
 		if (URLPatternMatcher.isWildcardPattern(urlPattern)) {
 			if (!_wildcardPatternCORSSupports.containsKey(urlPattern)) {
-				_wildcardPatternCORSSupports.put(
-					urlPattern.substring(0), value);
+				_wildcardPatternCORSSupports.put(urlPattern, value);
 			}
 
 			return;
@@ -64,8 +63,7 @@ public class SimpleURLPatternMatcher<T> extends URLPatternMatcher<T> {
 
 		if (URLPatternMatcher.isExtensionPattern(urlPattern)) {
 			if (!_extensionPatternCORSSupports.containsKey(urlPattern)) {
-				_extensionPatternCORSSupports.put(
-					urlPattern.substring(0), value);
+				_extensionPatternCORSSupports.put(urlPattern, value);
 			}
 
 			return;
