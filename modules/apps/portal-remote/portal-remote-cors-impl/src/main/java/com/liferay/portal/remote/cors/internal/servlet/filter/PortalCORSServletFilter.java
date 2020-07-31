@@ -228,7 +228,7 @@ public class PortalCORSServletFilter
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		_buildDefault();
+		_defaultURLPatternMatcher = _buildDefaultURLPatternMatcher();
 
 		_serviceRegistration = bundleContext.registerService(
 			ConfigurationModelListener.class,
@@ -317,13 +317,7 @@ public class PortalCORSServletFilter
 		filterChain.doFilter(httpServletRequest, httpServletResponse);
 	}
 
-	/**
-	 * Backward compatibility with current portal behavior:
-	 * Add default configuration to CORSSupport when there is no entry in
-	 * properties map, because empty properties map means no CORS
-	 * settings is configured.
-	 */
-	private void _buildDefault() {
+	private URLPatternMatcher<CORSSupport> _buildDefaultURLPatternMatcher() {
 		Map<String, CORSSupport> urlPatternMap = new HashMap<>();
 
 		_buildURLPatternMap(
@@ -331,8 +325,8 @@ public class PortalCORSServletFilter
 			ConfigurableUtil.createConfigurable(
 				PortalCORSConfiguration.class, new HashMapDictionary<>()));
 
-		_defaultURLPatternMatcher =
-			_urlPatternMatcherFactory.createURLPatternMatcher(urlPatternMap);
+			return _urlPatternMatcherFactory.createURLPatternMatcher(
+				urlPatternMap);
 	}
 
 	private void _buildURLPatternMap(
