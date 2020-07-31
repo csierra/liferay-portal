@@ -325,8 +325,7 @@ public class PortalCORSServletFilter
 			ConfigurableUtil.createConfigurable(
 				PortalCORSConfiguration.class, new HashMapDictionary<>()));
 
-			return _urlPatternMatcherFactory.createURLPatternMatcher(
-				urlPatternMap);
+		return _urlPatternMatcherFactory.createURLPatternMatcher(urlPatternMap);
 	}
 
 	private void _buildURLPatternMap(
