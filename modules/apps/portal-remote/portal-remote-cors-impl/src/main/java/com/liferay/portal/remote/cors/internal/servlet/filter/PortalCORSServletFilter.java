@@ -71,9 +71,30 @@ import org.osgi.service.component.annotations.Reference;
 		"dispatcher=REQUEST", "servlet-context-name=",
 		"servlet-filter-name=Portal CORS Servlet Filter", "url-pattern=/*"
 	},
-	service = Filter.class
+	service = {Filter.class, ManagedServiceFactory.class}
 )
-public class PortalCORSServletFilter extends BaseFilter {
+public class PortalCORSServletFilter
+	extends BaseFilter implements ManagedServiceFactory {
+
+	@Override
+	public void deleted(String pid) {
+		Dictionary<String, ?> properties = _configurationPidsProperties.remove(
+			pid);
+
+		long companyId = GetterUtil.getLong(properties.get("companyId"));
+
+		if (companyId == CompanyConstants.SYSTEM) {
+			_rebuild();
+		}
+		else {
+			_rebuild(companyId);
+		}
+	}
+
+	@Override
+	public String getName() {
+		return StringPool.BLANK;
+	}
 
 	@Override
 	public void init(FilterConfig filterConfig) {
@@ -94,9 +115,45 @@ public class PortalCORSServletFilter extends BaseFilter {
 		return false;
 	}
 
+	@Override
+	public void updated(String pid, Dictionary<String, ?> properties)
+		throws ConfigurationException {
+
+		Dictionary<String, ?> oldProperties = _configurationPidsProperties.put(
+			pid, properties);
+
+		long companyId = GetterUtil.getLong(
+			properties.get("companyId"), CompanyConstants.SYSTEM);
+
+		if (companyId == CompanyConstants.SYSTEM) {
+			_rebuild();
+
+			return;
+		}
+
+		if (oldProperties != null) {
+			long oldCompanyId = GetterUtil.getLong(
+				oldProperties.get("companyId"));
+
+			if (oldCompanyId == CompanyConstants.SYSTEM) {
+				_rebuild();
+
+				return;
+			}
+
+			if (oldCompanyId != companyId) {
+				_rebuild(oldCompanyId);
+			}
+		}
+
+		_rebuild(companyId);
+	}
+
 	@Activate
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
+
+		_buildDefault();
 	}
 
 	@Deactivate
@@ -172,6 +229,100 @@ public class PortalCORSServletFilter extends BaseFilter {
 		filterChain.doFilter(httpServletRequest, httpServletResponse);
 	}
 
+	private void _buildCORSSupportMaps(
+		PortalCORSConfiguration portalCORSConfiguration,
+		Map<String, CORSSupport> exactPatternCORSSupport,
+		Map<String, CORSSupport> extensionPatternCORSSupport,
+		Map<String, CORSSupport> wildcardPatternCORSSupport) {
+
+		Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+			portalCORSConfiguration.headers());
+
+		CORSSupport corsSupport = new CORSSupport();
+
+		corsSupport.setCORSHeaders(corsHeaders);
+
+		for (String pattern :
+				portalCORSConfiguration.filterMappingURLPatterns()) {
+
+			if (URLPatternMatcher.isWildcardPattern(pattern)) {
+				if (!wildcardPatternCORSSupport.containsKey(pattern)) {
+					wildcardPatternCORSSupport.put(
+						pattern.substring(0), corsSupport);
+				}
+
+				continue;
+			}
+
+			if (URLPatternMatcher.isExtensionPattern(pattern)) {
+				if (!extensionPatternCORSSupport.containsKey(pattern)) {
+					extensionPatternCORSSupport.put(
+						pattern.substring(0), corsSupport);
+				}
+
+				continue;
+			}
+
+			if (!exactPatternCORSSupport.containsKey(pattern)) {
+				exactPatternCORSSupport.put(pattern, corsSupport);
+			}
+		}
+	}
+
+	/**
+	 * Backward compatibility with current portal behavior:
+	 * Add default configuration to CORSSupport when there is no entry in
+	 * properties map, because empty properties map means no CORS
+	 * settings is configured.
+	 */
+	private void _buildDefault() {
+		Map<String, CORSSupport> exactPatternCORSSupport = new HashMap<>();
+		Map<String, CORSSupport> extensionPatternCORSSupport = new HashMap<>();
+		Map<String, CORSSupport> wildcardPatternCORSSupport = new HashMap<>();
+
+		_buildCORSSupportMaps(
+			ConfigurableUtil.createConfigurable(
+				PortalCORSConfiguration.class, new HashMapDictionary<>()),
+			exactPatternCORSSupport, extensionPatternCORSSupport,
+			wildcardPatternCORSSupport);
+
+		_defaultURLPatternMatcher = new URLPatternMatcher(
+			exactPatternCORSSupport, wildcardPatternCORSSupport,
+			extensionPatternCORSSupport);
+	}
+
+	private URLPatternMatcher _getURLPatternMatcher(long companyId) {
+		URLPatternMatcher urlPatternMatcher = _urlPatternMatchers.get(
+			companyId);
+
+		if (urlPatternMatcher != null) {
+			return urlPatternMatcher;
+		}
+
+		urlPatternMatcher = _urlPatternMatchers.get(CompanyConstants.SYSTEM);
+
+		if (urlPatternMatcher != null) {
+			return urlPatternMatcher;
+		}
+
+		return _defaultURLPatternMatcher;
+	}
+
+	private boolean _isCORSSupportEmpty(
+		Map<String, CORSSupport> exactPatternCORSSupport,
+		Map<String, CORSSupport> extensionPatternCORSSupport,
+		Map<String, CORSSupport> wildcardPatternCORSSupport) {
+
+		if (exactPatternCORSSupport.isEmpty() &&
+			extensionPatternCORSSupport.isEmpty() &&
+			wildcardPatternCORSSupport.isEmpty()) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private boolean _isGuest() {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -185,10 +336,95 @@ public class PortalCORSServletFilter extends BaseFilter {
 		return user.isDefaultUser();
 	}
 
+	private void _mergeCORSConfiguration(
+		Map<String, CORSSupport> exactPatternCORSSupport,
+		Map<String, CORSSupport> extensionPatternCORSSupport,
+		Map<String, CORSSupport> wildcardPatternCORSSupport, long companyId) {
+
+		for (Dictionary<String, ?> properties :
+				_configurationPidsProperties.values()) {
+
+			if (companyId != GetterUtil.getLong(properties.get("companyId"))) {
+				continue;
+			}
+
+			PortalCORSConfiguration portalCORSConfiguration =
+				ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, properties);
+
+			_buildCORSSupportMaps(
+				portalCORSConfiguration, exactPatternCORSSupport,
+				extensionPatternCORSSupport, wildcardPatternCORSSupport);
+		}
+	}
+
+	private void _rebuild() {
+		Map<String, CORSSupport> exactPatternCORSSupport = new HashMap<>();
+		Map<String, CORSSupport> extensionPatternCORSSupport = new HashMap<>();
+		Map<String, CORSSupport> wildcardPatternCORSSupport = new HashMap<>();
+
+		_mergeCORSConfiguration(
+			exactPatternCORSSupport, extensionPatternCORSSupport,
+			wildcardPatternCORSSupport, CompanyConstants.SYSTEM);
+
+		// A system level CORSSupport is always required even if it's empty
+
+		_urlPatternMatchers.put(
+			CompanyConstants.SYSTEM,
+			new URLPatternMatcher(
+				exactPatternCORSSupport, wildcardPatternCORSSupport,
+				extensionPatternCORSSupport));
+
+		for (long companyId : _urlPatternMatchers.keySet()) {
+			if (companyId != CompanyConstants.SYSTEM) {
+				_rebuild(companyId);
+			}
+		}
+	}
+
+	private void _rebuild(long companyId) {
+		Map<String, CORSSupport> exactPatternCORSSupport = new HashMap<>();
+		Map<String, CORSSupport> extensionPatternCORSSupport = new HashMap<>();
+		Map<String, CORSSupport> wildcardPatternCORSSupport = new HashMap<>();
+
+		// If there are same patterns in both instance settings and system
+		// settings, the pattern in instance settings will be used.
+
+		_mergeCORSConfiguration(
+			exactPatternCORSSupport, extensionPatternCORSSupport,
+			wildcardPatternCORSSupport, companyId);
+
+		if (_isCORSSupportEmpty(
+				exactPatternCORSSupport, extensionPatternCORSSupport,
+				wildcardPatternCORSSupport)) {
+
+			_urlPatternMatchers.remove(companyId);
+
+			return;
+		}
+
+		// If there are patterns not in instance settings but in system
+		// settings, these patterns will also be used.
+
+		_mergeCORSConfiguration(
+			exactPatternCORSSupport, extensionPatternCORSSupport,
+			wildcardPatternCORSSupport, CompanyConstants.SYSTEM);
+
+		_urlPatternMatchers.put(
+			companyId,
+			new URLPatternMatcher(
+				exactPatternCORSSupport, wildcardPatternCORSSupport,
+				extensionPatternCORSSupport));
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		PortalCORSServletFilter.class);
 
+	private final Map<String, Dictionary<String, ?>>
+		_configurationPidsProperties = Collections.synchronizedMap(
+			new LinkedHashMap<>());
 	private String _contextPath;
+	private URLPatternMatcher _defaultURLPatternMatcher;
 
 	@Reference
 	private Http _http;
@@ -198,5 +434,7 @@ public class PortalCORSServletFilter extends BaseFilter {
 
 	private ServiceRegistration<ConfigurationModelListener>
 		_serviceRegistration;
+	private final Map<Long, URLPatternMatcher> _urlPatternMatchers =
+		Collections.synchronizedMap(new LinkedHashMap<>());
 
 }
