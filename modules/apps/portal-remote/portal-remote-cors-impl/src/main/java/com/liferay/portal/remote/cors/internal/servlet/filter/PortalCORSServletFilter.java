@@ -404,8 +404,6 @@ public class PortalCORSServletFilter
 
 		_mergeCORSConfiguration(urlPatternMap, CompanyConstants.SYSTEM);
 
-		// A system level CORSSupport is always required even if it's empty
-
 		_urlPatternMatchers.put(
 			CompanyConstants.SYSTEM,
 			_urlPatternMatcherFactory.createURLPatternMatcher(urlPatternMap));
@@ -420,9 +418,6 @@ public class PortalCORSServletFilter
 	private void _rebuild(long companyId) {
 		Map<String, CORSSupport> urlPatternMap = new HashMap<>();
 
-		// If there are same patterns in both instance settings and system
-		// settings, the pattern in instance settings will be used.
-
 		_mergeCORSConfiguration(urlPatternMap, companyId);
 
 		if (urlPatternMap.isEmpty()) {
@@ -430,9 +425,6 @@ public class PortalCORSServletFilter
 
 			return;
 		}
-
-		// If there are patterns not in instance settings but in system
-		// settings, these patterns will also be used.
 
 		_mergeCORSConfiguration(urlPatternMap, CompanyConstants.SYSTEM);
 
