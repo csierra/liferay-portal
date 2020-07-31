@@ -24,7 +24,7 @@ public class SimpleURLPatternMatcher<T> extends URLPatternMatcher<T> {
 
 	@Override
 	public T getValue(String urlPath) {
-		T value = _exactPatternCORSSupports.get(urlPath);
+		T value = _exactURLPatternMap.get(urlPath);
 
 		if (value != null) {
 			return value;
@@ -33,8 +33,7 @@ public class SimpleURLPatternMatcher<T> extends URLPatternMatcher<T> {
 		int lastDot = 0;
 
 		for (int i = urlPath.length(); i > 0; --i) {
-			value = _wildcardPatternCORSSupports.get(
-				urlPath.substring(0, i) + "*");
+			value = _wildcardURLPatternMap.get(urlPath.substring(0, i) + "*");
 
 			if (value != null) {
 				return value;
@@ -45,8 +44,7 @@ public class SimpleURLPatternMatcher<T> extends URLPatternMatcher<T> {
 			}
 		}
 
-		return _extensionPatternCORSSupports.get(
-			"*" + urlPath.substring(lastDot));
+		return _extensionURLPatternMap.get("*" + urlPath.substring(lastDot));
 	}
 
 	@Override
@@ -54,29 +52,28 @@ public class SimpleURLPatternMatcher<T> extends URLPatternMatcher<T> {
 		throws IllegalArgumentException {
 
 		if (URLPatternMatcher.isWildcardPattern(urlPattern)) {
-			if (!_wildcardPatternCORSSupports.containsKey(urlPattern)) {
-				_wildcardPatternCORSSupports.put(urlPattern, value);
+			if (!_wildcardURLPatternMap.containsKey(urlPattern)) {
+				_wildcardURLPatternMap.put(urlPattern, value);
 			}
 
 			return;
 		}
 
 		if (URLPatternMatcher.isExtensionPattern(urlPattern)) {
-			if (!_extensionPatternCORSSupports.containsKey(urlPattern)) {
-				_extensionPatternCORSSupports.put(urlPattern, value);
+			if (!_extensionURLPatternMap.containsKey(urlPattern)) {
+				_extensionURLPatternMap.put(urlPattern, value);
 			}
 
 			return;
 		}
 
-		if (!_exactPatternCORSSupports.containsKey(urlPattern)) {
-			_exactPatternCORSSupports.put(urlPattern, value);
+		if (!_exactURLPatternMap.containsKey(urlPattern)) {
+			_exactURLPatternMap.put(urlPattern, value);
 		}
 	}
 
-	private final Map<String, T> _exactPatternCORSSupports = new HashMap<>();
-	private final Map<String, T> _extensionPatternCORSSupports =
-		new HashMap<>();
-	private final Map<String, T> _wildcardPatternCORSSupports = new HashMap<>();
+	private final Map<String, T> _exactURLPatternMap = new HashMap<>();
+	private final Map<String, T> _extensionURLPatternMap = new HashMap<>();
+	private final Map<String, T> _wildcardURLPatternMap = new HashMap<>();
 
 }

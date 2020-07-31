@@ -24,17 +24,17 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = URLPatternMatcherFactory.class)
 public class URLPatternMatcherFactory {
 
-	public <T> URLPatternMatcher<T> createPatternMatcher(
+	public <T> URLPatternMatcher<T> createURLPatternMatcher(
 		Map<String, T> urlPatternMap) {
 
-		URLPatternMatcher<T> urlPathPatternMatcher =
+		URLPatternMatcher<T> urlPatternMatcher =
 			new SimpleURLPatternMatcher<>();
 
 		for (Map.Entry<String, T> entry : urlPatternMap.entrySet()) {
-			urlPathPatternMatcher.putValue(entry.getKey(), entry.getValue());
+			urlPatternMatcher.putValue(entry.getKey(), entry.getValue());
 		}
 
-		return urlPathPatternMatcher;
+		return urlPatternMatcher;
 	}
 
 }

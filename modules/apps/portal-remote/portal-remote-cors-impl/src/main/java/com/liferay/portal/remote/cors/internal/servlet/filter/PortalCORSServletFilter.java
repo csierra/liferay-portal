@@ -332,7 +332,7 @@ public class PortalCORSServletFilter
 				PortalCORSConfiguration.class, new HashMapDictionary<>()));
 
 		_defaultURLPatternMatcher =
-			_urlPatternMatcherFactory.createPatternMatcher(urlPatternMap);
+			_urlPatternMatcherFactory.createURLPatternMatcher(urlPatternMap);
 	}
 
 	private void _buildURLPatternMap(
@@ -414,7 +414,7 @@ public class PortalCORSServletFilter
 
 		_urlPatternMatchers.put(
 			CompanyConstants.SYSTEM,
-			_urlPatternMatcherFactory.createPatternMatcher(urlPatternMap));
+			_urlPatternMatcherFactory.createURLPatternMatcher(urlPatternMap));
 
 		for (long companyId : _urlPatternMatchers.keySet()) {
 			if (companyId != CompanyConstants.SYSTEM) {
@@ -444,7 +444,7 @@ public class PortalCORSServletFilter
 
 		_urlPatternMatchers.put(
 			companyId,
-			_urlPatternMatcherFactory.createPatternMatcher(urlPatternMap));
+			_urlPatternMatcherFactory.createURLPatternMatcher(urlPatternMap));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
