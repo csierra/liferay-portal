@@ -93,7 +93,7 @@ public abstract class URLPatternMatcher<T> {
 	 * https://download.oracle.com/otndocs/jcp/servlet-4-final-eval-spec/index.html#12.2
 	 *
 	 * @param urlPattern the pattern of urlPath, used for pattern matching
-	 * @param value an non null object associated with urlPathPattern
+	 * @param value an non null object associated with urlPattern
 	 */
 	public abstract void putValue(String urlPattern, T value)
 		throws IllegalArgumentException;
