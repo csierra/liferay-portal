@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration;
 import com.liferay.portal.remote.cors.internal.CORSSupport;
 import com.liferay.portal.remote.cors.internal.url.pattern.matcher.URLPatternMatcher;
+import com.liferay.portal.remote.cors.internal.url.pattern.matcher.URLPatternMatcherFactory;
 
 import java.util.Collections;
 import java.util.Dictionary;
@@ -71,9 +72,30 @@ import org.osgi.service.component.annotations.Reference;
 		"dispatcher=REQUEST", "servlet-context-name=",
 		"servlet-filter-name=Portal CORS Servlet Filter", "url-pattern=/*"
 	},
-	service = Filter.class
+	service = {Filter.class, ManagedServiceFactory.class}
 )
-public class PortalCORSServletFilter extends BaseFilter {
+public class PortalCORSServletFilter
+	extends BaseFilter implements ManagedServiceFactory {
+
+	@Override
+	public void deleted(String pid) {
+		Dictionary<String, ?> properties = _configurationPidsProperties.remove(
+			pid);
+
+		long companyId = GetterUtil.getLong(properties.get("companyId"));
+
+		if (companyId == CompanyConstants.SYSTEM) {
+			_rebuild();
+		}
+		else {
+			_rebuild(companyId);
+		}
+	}
+
+	@Override
+	public String getName() {
+		return StringPool.BLANK;
+	}
 
 	@Override
 	public void init(FilterConfig filterConfig) {
@@ -94,9 +116,45 @@ public class PortalCORSServletFilter extends BaseFilter {
 		return false;
 	}
 
+	@Override
+	public void updated(String pid, Dictionary<String, ?> properties)
+		throws ConfigurationException {
+
+		Dictionary<String, ?> oldProperties = _configurationPidsProperties.put(
+			pid, properties);
+
+		long companyId = GetterUtil.getLong(
+			properties.get("companyId"), CompanyConstants.SYSTEM);
+
+		if (companyId == CompanyConstants.SYSTEM) {
+			_rebuild();
+
+			return;
+		}
+
+		if (oldProperties != null) {
+			long oldCompanyId = GetterUtil.getLong(
+				oldProperties.get("companyId"));
+
+			if (oldCompanyId == CompanyConstants.SYSTEM) {
+				_rebuild();
+
+				return;
+			}
+
+			if (oldCompanyId != companyId) {
+				_rebuild(oldCompanyId);
+			}
+		}
+
+		_rebuild(companyId);
+	}
+
 	@Activate
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
+
+		_buildDefault();
 	}
 
 	@Deactivate
@@ -136,9 +194,10 @@ public class PortalCORSServletFilter extends BaseFilter {
 			return;
 		}
 
-		URLPatternMatcher urlPatternMatcher = _getURLPatternMatcher(companyId);
+		URLPatternMatcher<CORSSupport> urlPatternMatcher =
+			_getURLPatternMatcher(companyId);
 
-		CORSSupport corsSupport = urlPatternMatcher.getCORSSupport(
+		CORSSupport corsSupport = urlPatternMatcher.getValue(
 			getURI(httpServletRequest));
 
 		if (corsSupport != null) {
@@ -172,6 +231,63 @@ public class PortalCORSServletFilter extends BaseFilter {
 		filterChain.doFilter(httpServletRequest, httpServletResponse);
 	}
 
+	/**
+	 * Backward compatibility with current portal behavior:
+	 * Add default configuration to CORSSupport when there is no entry in
+	 * properties map, because empty properties map means no CORS
+	 * settings is configured.
+	 */
+	private void _buildDefault() {
+		Map<String, CORSSupport> urlPatternMap = new HashMap<>();
+
+		_buildURLPatternMap(
+			urlPatternMap,
+			ConfigurableUtil.createConfigurable(
+				PortalCORSConfiguration.class, new HashMapDictionary<>()));
+
+		_defaultURLPatternMatcher =
+			_urlPatternMatcherFactory.createPatternMatcher(urlPatternMap);
+	}
+
+	private void _buildURLPatternMap(
+		Map<String, CORSSupport> urlPatternMap,
+		PortalCORSConfiguration portalCORSConfiguration) {
+
+		Map<String, String> corsHeaders = CORSSupport.buildCORSHeaders(
+			portalCORSConfiguration.headers());
+
+		CORSSupport corsSupport = new CORSSupport();
+
+		corsSupport.setCORSHeaders(corsHeaders);
+
+		for (String pattern :
+				portalCORSConfiguration.filterMappingURLPatterns()) {
+
+			if (!urlPatternMap.containsKey(pattern)) {
+				urlPatternMap.put(pattern, corsSupport);
+			}
+		}
+	}
+
+	private URLPatternMatcher<CORSSupport> _getURLPatternMatcher(
+		long companyId) {
+
+		URLPatternMatcher<CORSSupport> urlPatternMatcher =
+			_urlPatternMatchers.get(companyId);
+
+		if (urlPatternMatcher != null) {
+			return urlPatternMatcher;
+		}
+
+		urlPatternMatcher = _urlPatternMatchers.get(CompanyConstants.SYSTEM);
+
+		if (urlPatternMatcher != null) {
+			return urlPatternMatcher;
+		}
+
+		return _defaultURLPatternMatcher;
+	}
+
 	private boolean _isGuest() {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -185,10 +301,74 @@ public class PortalCORSServletFilter extends BaseFilter {
 		return user.isDefaultUser();
 	}
 
+	private void _mergeCORSConfiguration(
+		Map<String, CORSSupport> urlPatternMap, long companyId) {
+
+		for (Dictionary<String, ?> properties :
+				_configurationPidsProperties.values()) {
+
+			if (companyId != GetterUtil.getLong(properties.get("companyId"))) {
+				continue;
+			}
+
+			PortalCORSConfiguration portalCORSConfiguration =
+				ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, properties);
+
+			_buildURLPatternMap(urlPatternMap, portalCORSConfiguration);
+		}
+	}
+
+	private void _rebuild() {
+		Map<String, CORSSupport> urlPatternMap = new HashMap<>();
+
+		_mergeCORSConfiguration(urlPatternMap, CompanyConstants.SYSTEM);
+
+		// A system level CORSSupport is always required even if it's empty
+
+		_urlPatternMatchers.put(
+			CompanyConstants.SYSTEM,
+			_urlPatternMatcherFactory.createPatternMatcher(urlPatternMap));
+
+		for (long companyId : _urlPatternMatchers.keySet()) {
+			if (companyId != CompanyConstants.SYSTEM) {
+				_rebuild(companyId);
+			}
+		}
+	}
+
+	private void _rebuild(long companyId) {
+		Map<String, CORSSupport> urlPatternMap = new HashMap<>();
+
+		// If there are same patterns in both instance settings and system
+		// settings, the pattern in instance settings will be used.
+
+		_mergeCORSConfiguration(urlPatternMap, companyId);
+
+		if (urlPatternMap.isEmpty()) {
+			_urlPatternMatchers.remove(companyId);
+
+			return;
+		}
+
+		// If there are patterns not in instance settings but in system
+		// settings, these patterns will also be used.
+
+		_mergeCORSConfiguration(urlPatternMap, CompanyConstants.SYSTEM);
+
+		_urlPatternMatchers.put(
+			companyId,
+			_urlPatternMatcherFactory.createPatternMatcher(urlPatternMap));
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		PortalCORSServletFilter.class);
 
+	private final Map<String, Dictionary<String, ?>>
+		_configurationPidsProperties = Collections.synchronizedMap(
+			new LinkedHashMap<>());
 	private String _contextPath;
+	private URLPatternMatcher<CORSSupport> _defaultURLPatternMatcher;
 
 	@Reference
 	private Http _http;
@@ -198,5 +378,12 @@ public class PortalCORSServletFilter extends BaseFilter {
 
 	private ServiceRegistration<ConfigurationModelListener>
 		_serviceRegistration;
+
+	@Reference
+	private URLPatternMatcherFactory _urlPatternMatcherFactory;
+
+	private final Map<Long, URLPatternMatcher<CORSSupport>>
+		_urlPatternMatchers = Collections.synchronizedMap(
+			new LinkedHashMap<>());
 
 }
