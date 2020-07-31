@@ -149,11 +149,93 @@ public class PortalCORSServletFilter
 		_rebuild(companyId);
 	}
 
+	public class PortalCORSConfigurationModelListener
+		implements ConfigurationModelListener {
+
+		@Override
+		public void onBeforeSave(
+				String pid, Dictionary<String, Object> newProperties)
+			throws ConfigurationModelListenerException {
+
+			Set<String> urlPatternSet = new HashSet<>();
+			Set<String> duplicatedURLPatternSet = new HashSet<>();
+
+			long companyId = GetterUtil.getLong(newProperties.get("companyId"));
+
+			PortalCORSConfiguration portalCORSConfiguration =
+				ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, newProperties);
+
+			String[] urlPatterns =
+				portalCORSConfiguration.filterMappingURLPatterns();
+
+			for (String urlPattern : urlPatterns) {
+				if (urlPatternSet.contains(urlPattern)) {
+					throw new ConfigurationModelListenerException(
+						"Duplicated url path patterns: " + urlPattern,
+						PortalCORSConfiguration.class,
+						PortalCORSConfigurationModelListener.class,
+						newProperties);
+				}
+
+				urlPatternSet.add(urlPattern);
+			}
+
+			for (Map.Entry<String, Dictionary<String, ?>> entry :
+					_configurationPidsProperties.entrySet()) {
+
+				if (StringUtil.equals(pid, entry.getKey())) {
+					continue;
+				}
+
+				Dictionary<String, ?> properties = entry.getValue();
+
+				if (companyId != GetterUtil.getLong(
+						properties.get("companyId"))) {
+
+					continue;
+				}
+
+				portalCORSConfiguration = ConfigurableUtil.createConfigurable(
+					PortalCORSConfiguration.class, properties);
+
+				urlPatterns =
+					portalCORSConfiguration.filterMappingURLPatterns();
+
+				for (String urlPattern : urlPatterns) {
+					if (!urlPatternSet.add(urlPattern)) {
+						duplicatedURLPatternSet.add(urlPattern);
+					}
+				}
+			}
+
+			if (!duplicatedURLPatternSet.isEmpty()) {
+				throw new ConfigurationModelListenerException(
+					"Duplicated url patterns: " + duplicatedURLPatternSet,
+					PortalCORSConfiguration.class,
+					PortalCORSConfigurationModelListener.class, newProperties);
+			}
+		}
+
+	}
+
 	@Activate
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
 		_buildDefault();
+
+		_serviceRegistration = bundleContext.registerService(
+			ConfigurationModelListener.class,
+			new PortalCORSConfigurationModelListener(),
+			new HashMapDictionary<>(
+				HashMapBuilder.putAll(
+					properties
+				).put(
+					"model.class.name",
+					"com.liferay.portal.remote.cors.configuration." +
+						"PortalCORSConfiguration"
+				).build()));
 	}
 
 	@Deactivate
