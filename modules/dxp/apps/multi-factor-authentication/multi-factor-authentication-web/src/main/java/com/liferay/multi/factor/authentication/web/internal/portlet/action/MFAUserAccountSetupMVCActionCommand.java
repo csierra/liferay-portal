@@ -84,15 +84,15 @@ public class MFAUserAccountSetupMVCActionCommand extends BaseMVCActionCommand {
 			return;
 		}
 
-		long setupMFAUserId = ParamUtil.getLong(
+		long setupMFACheckerUserId = ParamUtil.getLong(
 			actionRequest, "setupMFACheckerUserId");
 
 		if (ParamUtil.getBoolean(actionRequest, "mfaRemoveExistingSetup")) {
-			setupMFAChecker.removeExistingSetup(setupMFAUserId);
+			setupMFAChecker.removeExistingSetup(setupMFACheckerUserId);
 		}
 		else if (!setupMFAChecker.setUp(
 					_portal.getHttpServletRequest(actionRequest),
-					setupMFAUserId)) {
+					setupMFACheckerUserId)) {
 
 			SessionErrors.add(actionRequest, "userAccountSetupFailed");
 		}
