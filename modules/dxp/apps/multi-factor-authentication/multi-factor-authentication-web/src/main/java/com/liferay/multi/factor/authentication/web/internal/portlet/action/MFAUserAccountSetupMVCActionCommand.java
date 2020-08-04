@@ -46,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ACCOUNT,
+		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
 		"mvc.command.name=/my_account/setup_mfa"
 	},
 	service = MVCActionCommand.class
@@ -83,21 +84,24 @@ public class MFAUserAccountSetupMVCActionCommand extends BaseMVCActionCommand {
 			return;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		long setupMFAUserId = ParamUtil.getLong(
+			actionRequest, "setupMFACheckerUserId");
 
 		if (ParamUtil.getBoolean(actionRequest, "mfaRemoveExistingSetup")) {
-			setupMFAChecker.removeExistingSetup(themeDisplay.getUserId());
+			setupMFAChecker.removeExistingSetup(setupMFAUserId);
 		}
 		else if (!setupMFAChecker.setUp(
 					_portal.getHttpServletRequest(actionRequest),
-					themeDisplay.getUserId())) {
+					setupMFAUserId)) {
 
 			SessionErrors.add(actionRequest, "userAccountSetupFailed");
 		}
 
 		String redirect = _portal.escapeRedirect(
 			ParamUtil.getString(actionRequest, "redirect"));
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		if (Validator.isBlank(redirect)) {
 			redirect = themeDisplay.getPortalURL();
