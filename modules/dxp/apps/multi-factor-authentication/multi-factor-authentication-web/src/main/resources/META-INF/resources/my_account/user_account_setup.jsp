@@ -18,9 +18,9 @@
 
 <%
 String mfaUserAccountLabel = GetterUtil.getString(request.getAttribute(MFAWebKeys.MFA_USER_ACCOUNT_LABEL));
+User selectedUser = PortalUtil.getSelectedUser(request);
 SetupMFAChecker setupMFAChecker = (SetupMFAChecker)request.getAttribute(SetupMFAChecker.class.getName());
 long setupMFACheckerServiceId = GetterUtil.getLong(request.getAttribute(MFAWebKeys.SETUP_MFA_CHECKER_SERVICE_ID));
-User selectedUser = PortalUtil.getSelectedUser(request);
 %>
 
 <portlet:actionURL name="/my_account/setup_mfa" var="actionURL">
