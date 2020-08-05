@@ -27,9 +27,9 @@ public class URLtoCORSSupportMapperTest {
 
 	@Test
 	public void testURLPatternType() throws Exception {
-		Set<String> wildcardURLPatterns = new HashSet<>();
-		Set<String> extensionURLPatterns = new HashSet<>();
 		Set<String> exactURLPatterns = new HashSet<>();
+		Set<String> extensionURLPatterns = new HashSet<>();
+		Set<String> wildcardURLPatterns = new HashSet<>();
 
 		for (String urlPattern : URL_PATTERNS) {
 			if (URLtoCORSSupportMapper.isWildcardURLPattern(urlPattern)) {
