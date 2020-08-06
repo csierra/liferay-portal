@@ -31,9 +31,9 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 			_maxURLPatternLength = maxURLPatternLength;
 		}
 
-		_trieMatrixExtension =
+		_extensionTrieMatrix =
 			new long[2][maxURLPatternLength][ASCII_CHARACTER_RANGE];
-		_trieMatrixWildcard =
+		_wilcardTrieMatrix =
 			new long[2][maxURLPatternLength][ASCII_CHARACTER_RANGE];
 	}
 
@@ -55,7 +55,7 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 
 			int column = character - ASCII_PRINTABLE_OFFSET;
 
-			currentBitMask &= _trieMatrixExtension[0][row][column];
+			currentBitMask &= _extensionTrieMatrix[0][row][column];
 
 			if (currentBitMask == 0) {
 				break;
@@ -64,7 +64,7 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 			if ((character == '.') && ((row + 1) < _maxURLPatternLength)) {
 				long bitMask =
 					currentBitMask &
-					_trieMatrixExtension[1][row + 1][_INDEX_STAR];
+					_extensionTrieMatrix[1][row + 1][_INDEX_STAR];
 
 				if (bitMask != 0) {
 					return _corsSupports.get(_getFirstSetBitIndex(bitMask));
@@ -108,7 +108,7 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 
 			col = character - ASCII_PRINTABLE_OFFSET;
 
-			currentBitMask &= _trieMatrixWildcard[0][row][col];
+			currentBitMask &= _wilcardTrieMatrix[0][row][col];
 
 			if (currentBitMask == 0) {
 				break;
@@ -119,7 +119,7 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 
 				long bitMask =
 					currentBitMask &
-					_trieMatrixWildcard[1][row + 1][_INDEX_STAR];
+					_wilcardTrieMatrix[1][row + 1][_INDEX_STAR];
 
 				if (bitMask != 0) {
 					bestMatchBitMask = bitMask;
@@ -136,8 +136,7 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 		}
 
 		if (onlyExact) {
-			long bitMask =
-				currentBitMask & _trieMatrixWildcard[1][row - 1][col];
+			long bitMask = currentBitMask & _wilcardTrieMatrix[1][row - 1][col];
 
 			if (bitMask != 0) {
 				return _corsSupports.get(_getFirstSetBitIndex(bitMask));
@@ -147,8 +146,7 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 		}
 
 		if (!onlyWildcard) {
-			long bitMask =
-				currentBitMask & _trieMatrixWildcard[1][row - 1][col];
+			long bitMask = currentBitMask & _wilcardTrieMatrix[1][row - 1][col];
 
 			if (bitMask != 0) {
 				return _corsSupports.get(_getFirstSetBitIndex(bitMask));
@@ -156,10 +154,10 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 		}
 
 		long extraBitMask =
-			currentBitMask & _trieMatrixWildcard[0][row][_INDEX_SLASH];
+			currentBitMask & _wilcardTrieMatrix[0][row][_INDEX_SLASH];
 
-		extraBitMask &= _trieMatrixWildcard[0][row + 1][_INDEX_STAR];
-		extraBitMask &= _trieMatrixWildcard[1][row + 1][_INDEX_STAR];
+		extraBitMask &= _wilcardTrieMatrix[0][row + 1][_INDEX_STAR];
+		extraBitMask &= _wilcardTrieMatrix[1][row + 1][_INDEX_STAR];
 
 		if (extraBitMask != 0) {
 			return _corsSupports.get(_getFirstSetBitIndex(extraBitMask));
@@ -180,10 +178,10 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 		long[][][] trieMatrix = null;
 
 		if (forward) {
-			trieMatrix = _trieMatrixWildcard;
+			trieMatrix = _wilcardTrieMatrix;
 		}
 		else {
-			trieMatrix = _trieMatrixExtension;
+			trieMatrix = _extensionTrieMatrix;
 		}
 
 		int index = _getExactIndex(urlPattern, trieMatrix);
@@ -311,9 +309,9 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 	private static final int _INDEX_STAR = '*' - ASCII_PRINTABLE_OFFSET;
 
 	private List<CORSSupport> _corsSupports = new ArrayList<>(Long.SIZE);
+	private final long[][][] _extensionTrieMatrix;
 	private final int _maxURLPatternLength;
 	private int _storedURLPatterns;
-	private final long[][][] _trieMatrixExtension;
-	private final long[][][] _trieMatrixWildcard;
+	private final long[][][] _wilcardTrieMatrix;
 
 }
