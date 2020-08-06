@@ -168,7 +168,7 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 
 	@Override
 	protected void put(
-		String urlPattern, CORSSupport corsSupport, boolean forward) {
+		String urlPattern, CORSSupport corsSupport, boolean wildcard) {
 
 		if (_storedURLPatterns > 63) {
 			throw new IllegalArgumentException(
@@ -177,7 +177,7 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 
 		long[][][] trieMatrix = null;
 
-		if (forward) {
+		if (wildcard) {
 			trieMatrix = _wilcardTrieMatrix;
 		}
 		else {
@@ -201,7 +201,7 @@ public class StaticURLtoCORSSupportMapper extends BaseURLtoCORSSupportMapper {
 		for (; row < urlPattern.length(); ++row) {
 			char character = urlPattern.charAt(row);
 
-			if (!forward) {
+			if (!wildcard) {
 				character = urlPattern.charAt(urlPattern.length() - 1 - row);
 			}
 
