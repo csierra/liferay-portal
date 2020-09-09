@@ -19,8 +19,8 @@ import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.events.Action;
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.events.LifecycleAction;
-import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -89,10 +89,7 @@ public class ImpersonationAction extends Action {
 			if (impersonatingUser == null) {
 				session.setAttribute(_IMPERSONATING_USER, Boolean.TRUE);
 
-				JSONObject additionalInfoJSONObject =
-					_jsonFactory.createJSONObject();
-
-				additionalInfoJSONObject.put(
+				JSONObject additionalInfoJSONObject = JSONUtil.put(
 					"userId", user.getUserId()
 				).put(
 					"userName", user.getFullName()
@@ -117,8 +114,5 @@ public class ImpersonationAction extends Action {
 
 	@Reference
 	private AuditRouter _auditRouter;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }
