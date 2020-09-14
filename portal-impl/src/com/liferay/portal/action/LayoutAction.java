@@ -307,11 +307,10 @@ public class LayoutAction implements Action {
 
 					User user = themeDisplay.getUser();
 					User realUser = themeDisplay.getRealUser();
-					String doAsUserId = themeDisplay.getDoAsUserId();
 
 					JSONObject additionalInfoJSONObject = null;
 
-					if (Validator.isNotNull(doAsUserId) &&
+					if (Validator.isNotNull(themeDisplay.getDoAsUserId()) &&
 						(user.getUserId() != realUser.getUserId())) {
 
 						additionalInfoJSONObject = JSONUtil.put(
