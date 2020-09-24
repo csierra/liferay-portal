@@ -4678,17 +4678,6 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
-	public String getQueryString(HttpServletRequest httpServletRequest) {
-		if (isForwarded(httpServletRequest)) {
-			return GetterUtil.getString(
-				httpServletRequest.getAttribute(
-					JavaConstants.JAVAX_SERVLET_FORWARD_QUERY_STRING));
-		}
-
-		return httpServletRequest.getQueryString();
-	}
-
-	@Override
 	public String getRelativeHomeURL(HttpServletRequest httpServletRequest)
 		throws PortalException {
 
@@ -6205,18 +6194,6 @@ public class PortalImpl implements Portal {
 		}
 
 		return true;
-	}
-
-	@Override
-	public boolean isForwarded(HttpServletRequest httpServletRequest) {
-		String forwardedRequestURI = (String)httpServletRequest.getAttribute(
-			JavaConstants.JAVAX_SERVLET_FORWARD_REQUEST_URI);
-
-		if (forwardedRequestURI != null) {
-			return true;
-		}
-
-		return false;
 	}
 
 	@Override
