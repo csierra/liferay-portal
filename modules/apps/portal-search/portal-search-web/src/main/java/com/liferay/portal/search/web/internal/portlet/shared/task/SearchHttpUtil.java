@@ -40,7 +40,7 @@ public class SearchHttpUtil {
 		String requestURL = null;
 		String queryString = null;
 
-		if (_portal.isForwarded(httpServletRequest)) {
+		if (_http.isForwarded(httpServletRequest)) {
 			requestURL = _portal.getAbsoluteURL(
 				httpServletRequest,
 				(String)httpServletRequest.getAttribute(
@@ -94,12 +94,18 @@ public class SearchHttpUtil {
 	}
 
 	@Reference(unbind = "-")
+	protected void setHttp(Http http) {
+		_http = http;
+	}
+
+	@Reference(unbind = "-")
 	protected void setPortal(Portal portal) {
 		_portal = portal;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(SearchHttpUtil.class);
 
+	private static Http _http;
 	private static Portal _portal;
 
 }
