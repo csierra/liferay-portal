@@ -6588,14 +6588,22 @@ public class PortalImpl implements Portal {
 		runCompanyIds(unsafeConsumer, getCompanyIds());
 	}
 
-	@SuppressWarnings("all")
 	public <E extends Exception> void runCompanyIds(
 		UnsafeConsumer<Long, E> unsafeConsumer,
 		long[] companyIds) throws E {
 
-		runCompanyIds(
-			unsafeConsumer, (__, e) -> ReflectionUtil.throwException(e),
-			companyIds);
+		long currentCompanyId = CompanyThreadLocal.getCompanyId();
+
+		try {
+			for (long companyId : companyIds) {
+				CompanyThreadLocal.setCompanyId(companyId);
+
+				unsafeConsumer.accept(companyId);
+			}
+		}
+		finally {
+			CompanyThreadLocal.setCompanyId(currentCompanyId);
+		}
 	}
 
 
