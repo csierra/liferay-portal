@@ -89,7 +89,7 @@ public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 
 	@Activate
 	protected void activate() throws Exception {
-		_portal.runCompanies(company -> createIndex(company.getCompanyId()));
+		portal.runCompanies(company -> createIndex(company.getCompanyId()));
 	}
 
 	protected boolean hasIndex(String indexName) {
@@ -113,6 +113,9 @@ public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
+	@Reference
+	protected Portal portal;
+
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
 		policy = ReferencePolicy.DYNAMIC,
@@ -123,8 +126,5 @@ public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 
 	@Reference
 	protected WorkflowMetricsPortalExecutor workflowMetricsPortalExecutor;
-
-	@Reference
-	private Portal _portal;
 
 }
