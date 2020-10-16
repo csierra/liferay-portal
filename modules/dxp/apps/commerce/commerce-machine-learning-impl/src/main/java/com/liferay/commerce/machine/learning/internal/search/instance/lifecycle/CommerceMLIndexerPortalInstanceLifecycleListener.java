@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.util.Collections;
@@ -86,7 +85,7 @@ public class CommerceMLIndexerPortalInstanceLifecycleListener
 
 		_commerceMLIndexers.add(commerceMLIndexer);
 
-		if (_companyLocalService == null) {
+		if (_portal == null) {
 			_queuedCommerceMLIndexers.add(commerceMLIndexer);
 
 			return;
@@ -95,11 +94,14 @@ public class CommerceMLIndexerPortalInstanceLifecycleListener
 		verifyCompanies(commerceMLIndexer);
 	}
 
-	@Reference(unbind = "-")
-	protected void setCompanyLocalService(
-		CompanyLocalService companyLocalService) {
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
 
-		_companyLocalService = companyLocalService;
+	@Reference(unbind = "-")
+	protected void setPortal(Portal portal) {
+		_portal = portal;
 
 		for (CommerceMLIndexer queuedCommerceMLIndexer :
 				_queuedCommerceMLIndexers) {
@@ -108,11 +110,6 @@ public class CommerceMLIndexerPortalInstanceLifecycleListener
 		}
 
 		_queuedCommerceMLIndexers.clear();
-	}
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	protected void unsetCommerceMachineLearningIndexer(
@@ -131,7 +128,6 @@ public class CommerceMLIndexerPortalInstanceLifecycleListener
 
 	private final List<CommerceMLIndexer> _commerceMLIndexers =
 		new CopyOnWriteArrayList<>();
-	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private Portal _portal;
