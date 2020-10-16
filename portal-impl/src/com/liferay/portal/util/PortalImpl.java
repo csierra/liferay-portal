@@ -24,7 +24,6 @@ import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.layout.admin.kernel.model.LayoutTypePortletConstants;
 import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.petra.function.UnsafeConsumer;
-import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -6552,16 +6551,17 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
-	public <E extends Throwable> void runCompanies(
-		UnsafeConsumer<Company, E> unsafeConsumer) throws E {
+	public <E extends Exception> void runCompanies(
+			UnsafeConsumer<Company, E> unsafeConsumer)
+		throws E {
 
 		runCompanies(unsafeConsumer, CompanyLocalServiceUtil.getCompanies());
 	}
 
 	@Override
-	public <E extends Throwable> void runCompanies(
-		UnsafeConsumer<Company, E> unsafeConsumer,
-		List<Company> companies) throws E {
+	public <E extends Exception> void runCompanies(
+			UnsafeConsumer<Company, E> unsafeConsumer, List<Company> companies)
+		throws E {
 
 		long currentCompanyId = CompanyThreadLocal.getCompanyId();
 
@@ -6578,15 +6578,17 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
-	public <E extends Throwable> void runCompanyIds(
-		UnsafeConsumer<Long, E> unsafeConsumer) throws E {
+	public <E extends Exception> void runCompanyIds(
+			UnsafeConsumer<Long, E> unsafeConsumer)
+		throws E {
 
 		runCompanyIds(unsafeConsumer, getCompanyIds());
 	}
 
 	@Override
-	public <E extends Throwable> void runCompanyIds(
-		UnsafeConsumer<Long, E> unsafeConsumer, long[] companyIds) throws E {
+	public <E extends Exception> void runCompanyIds(
+			UnsafeConsumer<Long, E> unsafeConsumer, long[] companyIds)
+		throws E {
 
 		long currentCompanyId = CompanyThreadLocal.getCompanyId();
 
