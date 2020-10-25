@@ -18,7 +18,6 @@ import com.liferay.document.library.kernel.antivirus.AntivirusScanner;
 import com.liferay.document.library.kernel.util.DLProcessor;
 import com.liferay.document.library.kernel.util.DLProcessorRegistryUtil;
 import com.liferay.mail.kernel.util.Hook;
-import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
@@ -38,7 +37,6 @@ import com.liferay.portal.kernel.deploy.hot.HotDeployException;
 import com.liferay.portal.kernel.deploy.hot.HotDeployListener;
 import com.liferay.portal.kernel.deploy.hot.HotDeployUtil;
 import com.liferay.portal.kernel.events.Action;
-import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.events.InvokerAction;
 import com.liferay.portal.kernel.events.InvokerSessionAction;
 import com.liferay.portal.kernel.events.InvokerSimpleAction;
@@ -787,10 +785,9 @@ public class HookHotDeployListener
 			SimpleAction simpleAction = new InvokerSimpleAction(
 				(SimpleAction)clazz.newInstance(), portletClassLoader);
 
-			CompaniesUtil.runCompanyIds(
-				(UnsafeConsumer<Long, ActionException>)
-					companyId -> simpleAction.run(
-						new String[] {String.valueOf(companyId)}));
+			CompaniesUtil.forEachCompanyId(
+				companyId -> simpleAction.run(
+					new String[] {String.valueOf(companyId)}));
 		}
 
 		if (_propsKeysEvents.contains(eventName)) {
@@ -1253,7 +1250,7 @@ public class HookHotDeployListener
 		if (GetterUtil.getBoolean(
 				SystemProperties.get("company-id-properties"))) {
 
-			CompaniesUtil.run(
+			CompaniesUtil.forEach(
 				company -> PropsUtil.addProperties(company, portalProperties));
 		}
 		else {
