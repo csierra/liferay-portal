@@ -30,6 +30,7 @@ import com.liferay.multi.factor.authentication.spi.checker.browser.BrowserMFAChe
 import com.liferay.multi.factor.authentication.spi.checker.setup.SetupMFAChecker;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -189,6 +190,18 @@ public class FIDO2BrowserSetupMFAChecker
 		}
 
 		return false;
+	}
+
+	public void removeCredentialEntry(long credentialEntryId) {
+		try {
+			_mfaFIDO2CredentialEntryLocalService.deleteMFAFIDO2CredentialEntry(
+				credentialEntryId);
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(portalException, portalException);
+			}
+		}
 	}
 
 	@Override
