@@ -14,9 +14,9 @@
 
 package com.liferay.frontend.taglib.servlet.taglib;
 
+import com.liferay.frontend.taglib.form.navigator.FormNavigatorCategoryProvider;
+import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntryProvider;
 import com.liferay.frontend.taglib.internal.servlet.ServletContextUtil;
-import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategoryUtil;
-import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -112,21 +112,30 @@ public class FormNavigatorStepsTag extends IncludeTag {
 	}
 
 	protected String[] getCategoryKeys() {
-		return FormNavigatorCategoryUtil.getKeys(_id);
+		FormNavigatorCategoryProvider formNavigatorCategoryProvider =
+			ServletContextUtil.getFormNavigatorCategoryProvider();
+
+		return formNavigatorCategoryProvider.getKeys(_id);
 	}
 
 	protected String[] getCategoryLabels() {
+		FormNavigatorCategoryProvider formNavigatorCategoryProvider =
+			ServletContextUtil.getFormNavigatorCategoryProvider();
+
 		HttpServletRequest httpServletRequest = getRequest();
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return FormNavigatorCategoryUtil.getLabels(
+		return formNavigatorCategoryProvider.getLabels(
 			_id, themeDisplay.getLocale());
 	}
 
 	protected String[][] getCategorySectionKeys() {
+		FormNavigatorEntryProvider formNavigatorEntryProvider =
+			ServletContextUtil.getFormNavigatorEntryProvider();
+
 		HttpServletRequest httpServletRequest = getRequest();
 
 		ThemeDisplay themeDisplay =
@@ -140,7 +149,7 @@ public class FormNavigatorStepsTag extends IncludeTag {
 		for (String categoryKey : categoryKeys) {
 			categorySectionKeys = ArrayUtil.append(
 				categorySectionKeys,
-				FormNavigatorEntryUtil.getKeys(
+				formNavigatorEntryProvider.getKeys(
 					_id, categoryKey, themeDisplay.getUser(), _formModelBean));
 		}
 
@@ -148,6 +157,9 @@ public class FormNavigatorStepsTag extends IncludeTag {
 	}
 
 	protected String[][] getCategorySectionLabels() {
+		FormNavigatorEntryProvider formNavigatorEntryProvider =
+			ServletContextUtil.getFormNavigatorEntryProvider();
+
 		HttpServletRequest httpServletRequest = getRequest();
 
 		ThemeDisplay themeDisplay =
@@ -161,7 +173,7 @@ public class FormNavigatorStepsTag extends IncludeTag {
 		for (String categoryKey : categoryKeys) {
 			categorySectionLabels = ArrayUtil.append(
 				categorySectionLabels,
-				FormNavigatorEntryUtil.getLabels(
+				formNavigatorEntryProvider.getLabels(
 					_id, categoryKey, themeDisplay.getUser(), _formModelBean,
 					themeDisplay.getLocale()));
 		}
