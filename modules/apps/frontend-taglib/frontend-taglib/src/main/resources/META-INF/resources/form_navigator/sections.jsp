@@ -40,15 +40,7 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 	>
 
 		<%
-		PortalIncludeUtil.include(
-			pageContext,
-			new PortalIncludeUtil.HTMLRenderer() {
-
-				public void renderHTML(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-					formNavigatorEntry.include(request, response);
-				}
-
-			});
+		PortalIncludeUtil.include(pageContext, formNavigatorEntry::include);
 
 		errorSection = (String)request.getAttribute(WebKeys.ERROR_SECTION);
 
@@ -79,15 +71,7 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 		>
 
 			<%
-			PortalIncludeUtil.include(
-				pageContext,
-				new PortalIncludeUtil.HTMLRenderer() {
-
-					public void renderHTML(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-						curFormNavigatorEntry.include(request, response);
-					}
-
-				});
+			PortalIncludeUtil.include(pageContext, curFormNavigatorEntry::include);
 			%>
 
 		</liferay-frontend:fieldset>
