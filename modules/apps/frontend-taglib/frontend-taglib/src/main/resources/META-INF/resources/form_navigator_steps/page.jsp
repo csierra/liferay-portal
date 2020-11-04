@@ -17,38 +17,42 @@
 <%@ include file="/form_navigator_steps/init.jsp" %>
 
 <%
-String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_form_navigator_steps_init") + StringPool.UNDERLINE;
+FormNavigatorStepsDisplayContext formNavigatorStepsDisplayContext = new FormNavigatorStepsDisplayContext(request, liferayPortletResponse);
 
-String tabs1Param = randomNamespace + "tabs1";
-String tabs1Value = GetterUtil.getString(SessionClicks.get(request, namespace + id, null));
+List<String> filterCategoryKeys = new ArrayList<>();
+List<String> filterCategoryLabels = new ArrayList<>();
 
-List<String> filterCategoryKeys = new ArrayList<String>();
-List<String> filterCategoryLabels = new ArrayList<String>();
+String[] categoryKeys = formNavigatorStepsDisplayContext.getCategoryKeys();
+String[] categoryLabels = formNavigatorStepsDisplayContext.getCategoryLabels();
+String[][] categorySectionKeys = formNavigatorStepsDisplayContext.getCategorySectionKeys();
+String[][] categorySectionLabels = formNavigatorStepsDisplayContext.getCategorySectionLabels();
 
 for (int i = 0; i < categoryKeys.length; i++) {
 	String categoryKey = categoryKeys[i];
 
-	List<FormNavigatorEntry<Object>> formNavigatorEntries = FormNavigatorEntryUtil.getFormNavigatorEntries(id, categoryKey, user, formModelBean);
+	List<FormNavigatorEntry<Object>> formNavigatorEntries = formNavigatorStepsDisplayContext.getFormNavigatorEntries(categoryKey);
 
 	if (ListUtil.isNotEmpty(formNavigatorEntries)) {
 		filterCategoryKeys.add(categoryKey);
 		filterCategoryLabels.add(categoryLabels[i]);
 	}
 }
+
+String curSection = formNavigatorStepsDisplayContext.getCurSection();
 %>
 
 <c:choose>
 	<c:when test="<%= filterCategoryKeys.size() > 1 %>">
 		<liferay-ui:tabs
 			names="<%= StringUtil.merge(filterCategoryLabels) %>"
-			param="<%= tabs1Param %>"
+			param="<%= formNavigatorStepsDisplayContext.getTabs1Param() %>"
 			refresh="<%= false %>"
-			value="<%= tabs1Value %>"
+			value="<%= formNavigatorStepsDisplayContext.getTabs1Value() %>"
 		>
 
 			<%
 			for (String categoryKey : filterCategoryKeys) {
-				List<FormNavigatorEntry<Object>> formNavigatorEntries = FormNavigatorEntryUtil.getFormNavigatorEntries(id, categoryKey, user, formModelBean);
+				List<FormNavigatorEntry<Object>> formNavigatorEntries = formNavigatorStepsDisplayContext.getFormNavigatorEntries(categoryKey);
 
 				request.setAttribute("currentTab", categoryKey);
 			%>
@@ -72,18 +76,18 @@ for (int i = 0; i < categoryKeys.length; i++) {
 	<c:otherwise>
 
 		<%
-		List<FormNavigatorEntry<Object>> formNavigatorEntries = FormNavigatorEntryUtil.getFormNavigatorEntries(id, user, formModelBean);
+		List<FormNavigatorEntry<Object>> formNavigatorEntries = formNavigatorStepsDisplayContext.getFormNavigatorEntries();
 		%>
 
 		<%@ include file="/form_navigator_steps/steps.jspf" %>
 	</c:otherwise>
 </c:choose>
 
-<c:if test="<%= showButtons %>">
+<c:if test="<%= formNavigatorStepsDisplayContext.isShowButtons() %>">
 	<aui:button-row>
 		<aui:button primary="<%= true %>" type="submit" />
 
-		<aui:button href="<%= backURL %>" type="cancel" />
+		<aui:button href="<%= formNavigatorStepsDisplayContext.getBackURL() %>" type="cancel" />
 	</aui:button-row>
 </c:if>
 
@@ -93,7 +97,7 @@ for (int i = 0; i < categoryKeys.length; i++) {
 	var redirectField = dom.toElement(
 		'input[name="<portlet:namespace />redirect"]'
 	);
-	var tabs1Param = '<portlet:namespace /><%= tabs1Param %>';
+	var tabs1Param = '<%= formNavigatorStepsDisplayContext.getTabs1Param() %>';
 
 	var updateRedirectField = function (event) {
 		var redirectURL = new URL(redirectField.value, window.location.origin);
@@ -102,7 +106,10 @@ for (int i = 0; i < categoryKeys.length; i++) {
 
 		redirectField.value = redirectURL.toString();
 
-		Liferay.Util.Session.set('<portlet:namespace /><%= id %>', event.id);
+		Liferay.Util.Session.set(
+			'<portlet:namespace /><%= formNavigatorStepsDisplayContext.getId() %>',
+			event.id
+		);
 	};
 
 	var clearFormNavigatorHandles = function (event) {
