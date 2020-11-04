@@ -17,6 +17,8 @@
 <%@ include file="/form_navigator/init.jsp" %>
 
 <%
+FormNavigatorDisplayContext formNavigatorDisplayContext = new FormNavigatorDisplayContext(request);
+
 List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry<Object>>)request.getAttribute(FormNavigatorWebKeys.FORM_NAVIGATOR_ENTRIES);
 %>
 
@@ -25,7 +27,7 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 	<%
 	final FormNavigatorEntry<Object> formNavigatorEntry = formNavigatorEntries.get(0);
 
-	String sectionId = namespace + _getSectionId(formNavigatorEntry.getKey());
+	String sectionId = namespace + formNavigatorDisplayContext.getSectionId(formNavigatorEntry.getKey());
 
 	String errorSection = null;
 	%>
@@ -34,8 +36,8 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 
 	<liferay-frontend:fieldset
 		collapsible="<%= formNavigatorEntries.size() > 1 %>"
-		cssClass="<%= fieldSetCssClass %>"
-		id="<%= _getSectionId(formNavigatorEntry.getKey()) %>"
+		cssClass="<%= formNavigatorDisplayContext.getFieldSetCssClass() %>"
+		id="<%= formNavigatorDisplayContext.getSectionId(formNavigatorEntry.getKey()) %>"
 		label="<%= (formNavigatorEntries.size() > 1) ? formNavigatorEntry.getLabel(locale) : StringPool.BLANK %>"
 	>
 
@@ -57,7 +59,7 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 	for (int i = 1; i < formNavigatorEntries.size(); i++) {
 		final FormNavigatorEntry<Object> curFormNavigatorEntry = formNavigatorEntries.get(i);
 
-		sectionId = namespace + _getSectionId(curFormNavigatorEntry.getKey());
+		sectionId = namespace + formNavigatorDisplayContext.getSectionId(curFormNavigatorEntry.getKey());
 	%>
 
 		<!-- Begin fragment <%= sectionId %> -->
@@ -65,8 +67,8 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 		<liferay-frontend:fieldset
 			collapsed="<%= true %>"
 			collapsible="<%= true %>"
-			cssClass="<%= fieldSetCssClass %>"
-			id="<%= _getSectionId(curFormNavigatorEntry.getKey()) %>"
+			cssClass="<%= formNavigatorDisplayContext.getFieldSetCssClass() %>"
+			id="<%= formNavigatorDisplayContext.getSectionId(curFormNavigatorEntry.getKey()) %>"
 			label="<%= curFormNavigatorEntry.getLabel(locale) %>"
 		>
 
@@ -81,7 +83,7 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 	<%
 		String curErrorSection = (String)request.getAttribute(WebKeys.ERROR_SECTION);
 
-		if (Objects.equals(_getSectionId(curFormNavigatorEntry.getKey()), _getSectionId(curErrorSection))) {
+		if (Objects.equals(formNavigatorDisplayContext.getSectionId(curFormNavigatorEntry.getKey()), formNavigatorDisplayContext.getSectionId(curErrorSection))) {
 			errorSection = curErrorSection;
 
 			request.setAttribute(WebKeys.ERROR_SECTION, null);
@@ -100,7 +102,7 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 			var focusField;
 
 			var sectionContent = document.querySelector(
-				'#<%= _getSectionId(errorSection) %>Content'
+				'#<%= formNavigatorDisplayContext.getSectionId(errorSection) %>Content'
 			);
 
 			<%
