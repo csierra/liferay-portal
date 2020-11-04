@@ -15,7 +15,6 @@
 package com.liferay.frontend.taglib.form.navigator;
 
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntry;
 
 import java.io.IOException;
 
