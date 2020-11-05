@@ -24,6 +24,7 @@ import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReference
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
@@ -36,13 +37,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Sergio González
@@ -185,10 +191,36 @@ public class FormNavigatorEntryProviderImpl
 				(Class<FormNavigatorContextProvider<?>>)
 					(Class<?>)FormNavigatorContextProvider.class,
 				FormNavigatorContextConstants.FORM_NAVIGATOR_ID);
+
+		_serviceTracker = ServiceTrackerFactory.open(
+			bundleContext,
+			(Class
+				<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntry
+					<?>>)
+						(Class<?>)
+							com.liferay.portal.kernel.servlet.taglib.ui.
+								FormNavigatorEntry.class,
+			new FormNavigatorEntryServiceTrackerCustomizer(
+				bundleContext, _serviceRegistrations));
 	}
 
 	@Deactivate
 	protected void deactivate() {
+		_serviceTracker.close();
+
+		for (ServiceRegistration<FormNavigatorEntry<?>> serviceRegistration :
+				_serviceRegistrations.values()) {
+
+			try {
+				serviceRegistration.unregister();
+			}
+			catch (IllegalStateException illegalStateException) {
+				_log.error(illegalStateException, illegalStateException);
+			}
+		}
+
+		_serviceRegistrations.clear();
+
 		_formNavigatorContextProviderMap.close();
 	}
 
@@ -283,5 +315,14 @@ public class FormNavigatorEntryProviderImpl
 	@Reference
 	private FormNavigatorEntryConfigurationRetriever
 		_formNavigatorEntryConfigurationRetriever;
+
+	private final Map
+		<ServiceReference
+			<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntry<?>>,
+		 ServiceRegistration<FormNavigatorEntry<?>>> _serviceRegistrations =
+			new ConcurrentHashMap<>();
+	private ServiceTracker
+		<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntry<?>,
+		 FormNavigatorEntry<?>> _serviceTracker;
 
 }
