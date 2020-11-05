@@ -56,9 +56,7 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 	<!-- End fragment <%= sectionId %> -->
 
 	<%
-	for (int i = 1; i < formNavigatorEntries.size(); i++) {
-		final FormNavigatorEntry<Object> curFormNavigatorEntry = formNavigatorEntries.get(i);
-
+	for (FormNavigatorEntry<Object> curFormNavigatorEntry : formNavigatorEntries) {
 		sectionId = namespace + formNavigatorDisplayContext.getSectionId(curFormNavigatorEntry.getKey());
 	%>
 
