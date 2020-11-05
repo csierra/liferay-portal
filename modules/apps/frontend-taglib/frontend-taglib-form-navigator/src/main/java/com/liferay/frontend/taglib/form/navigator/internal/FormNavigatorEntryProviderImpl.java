@@ -29,9 +29,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -71,6 +73,10 @@ public class FormNavigatorEntryProviderImpl
 		List<FormNavigatorEntry<T>> formNavigatorEntries =
 			_getFormNavigatorEntries(
 				formNavigatorId, categoryKey, formModelBean);
+
+		if (ListUtil.isEmpty(formNavigatorEntries)) {
+			return Collections.emptyList();
+		}
 
 		return filterVisibleFormNavigatorEntries(
 			formNavigatorEntries, user, formModelBean);
