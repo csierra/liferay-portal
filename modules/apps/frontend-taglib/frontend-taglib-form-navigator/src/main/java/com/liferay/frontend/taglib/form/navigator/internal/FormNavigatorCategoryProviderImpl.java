@@ -20,6 +20,9 @@ import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReference
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -27,10 +30,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Sergio González
@@ -111,9 +120,45 @@ public class FormNavigatorCategoryProviderImpl
 					formNavigatorCategory.getFormNavigatorId())),
 			new PropertyServiceReferenceComparator<>(
 				"form.navigator.category.order"));
+
+		_serviceTracker = ServiceTrackerFactory.open(
+			bundleContext,
+			com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategory.
+				class,
+			new FormNavigatorCategoryServiceTrackerCustomizer(
+				bundleContext, _serviceRegistrations));
 	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTracker.close();
+
+		for (ServiceRegistration<FormNavigatorCategory> serviceRegistration :
+				_serviceRegistrations.values()) {
+
+			try {
+				serviceRegistration.unregister();
+			}
+			catch (IllegalStateException illegalStateException) {
+				_log.error(illegalStateException, illegalStateException);
+			}
+		}
+
+		_serviceRegistrations.clear();
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		FormNavigatorCategoryProviderImpl.class);
 
 	private ServiceTrackerMap<String, List<FormNavigatorCategory>>
 		_formNavigatorCategories;
+	private final Map
+		<ServiceReference
+			<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategory>,
+		 ServiceRegistration<FormNavigatorCategory>> _serviceRegistrations =
+			new ConcurrentHashMap<>();
+	private ServiceTracker
+		<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategory,
+		 FormNavigatorCategory> _serviceTracker;
 
 }
