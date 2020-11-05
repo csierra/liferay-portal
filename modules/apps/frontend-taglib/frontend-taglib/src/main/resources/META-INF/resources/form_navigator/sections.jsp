@@ -25,49 +25,28 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 <liferay-frontend:fieldset-group>
 
 	<%
-	final FormNavigatorEntry<Object> formNavigatorEntry = formNavigatorEntries.get(0);
-
-	String sectionId = namespace + formNavigatorDisplayContext.getSectionId(formNavigatorEntry.getKey());
-
 	String errorSection = null;
-	%>
 
-	<!-- Begin fragment <%= sectionId %> -->
+	int i = 0;
 
-	<liferay-frontend:fieldset
-		collapsible="<%= formNavigatorEntries.size() > 1 %>"
-		cssClass="<%= formNavigatorDisplayContext.getFieldSetCssClass() %>"
-		id="<%= formNavigatorDisplayContext.getSectionId(formNavigatorEntry.getKey()) %>"
-		label="<%= (formNavigatorEntries.size() > 1) ? formNavigatorEntry.getLabel(locale) : StringPool.BLANK %>"
-	>
-
-		<%
-		PortalIncludeUtil.include(pageContext, formNavigatorEntry::include);
-
-		errorSection = (String)request.getAttribute(WebKeys.ERROR_SECTION);
-
-		if (Objects.equals(formNavigatorEntry.getKey(), errorSection)) {
-			request.setAttribute(WebKeys.ERROR_SECTION, null);
-		}
-		%>
-
-	</liferay-frontend:fieldset>
-
-	<!-- End fragment <%= sectionId %> -->
-
-	<%
 	for (FormNavigatorEntry<Object> curFormNavigatorEntry : formNavigatorEntries) {
-		sectionId = namespace + formNavigatorDisplayContext.getSectionId(curFormNavigatorEntry.getKey());
+		String sectionId = namespace + formNavigatorDisplayContext.getSectionId(curFormNavigatorEntry.getKey());
+
+		String label = curFormNavigatorEntry.getLabel(locale);
+
+		if ((i == 0) && (formNavigatorEntries.size() == 1)) {
+			label = StringPool.BLANK;
+		}
 	%>
 
 		<!-- Begin fragment <%= sectionId %> -->
 
 		<liferay-frontend:fieldset
-			collapsed="<%= true %>"
-			collapsible="<%= true %>"
+			collapsed="<%= i != 0 %>"
+			collapsible="<%= (i != 0) || (formNavigatorEntries.size() > 1) %>"
 			cssClass="<%= formNavigatorDisplayContext.getFieldSetCssClass() %>"
 			id="<%= formNavigatorDisplayContext.getSectionId(curFormNavigatorEntry.getKey()) %>"
-			label="<%= curFormNavigatorEntry.getLabel(locale) %>"
+			label="<%= label %>"
 		>
 
 			<%
@@ -86,10 +65,10 @@ List<FormNavigatorEntry<Object>> formNavigatorEntries = (List<FormNavigatorEntry
 
 			request.setAttribute(WebKeys.ERROR_SECTION, null);
 		}
-	}
-	%>
 
-	<%
+		i++;
+	}
+
 	if (Validator.isNotNull(errorSection)) {
 		String currentTab = (String)request.getAttribute(FormNavigatorWebKeys.CURRENT_TAB);
 
