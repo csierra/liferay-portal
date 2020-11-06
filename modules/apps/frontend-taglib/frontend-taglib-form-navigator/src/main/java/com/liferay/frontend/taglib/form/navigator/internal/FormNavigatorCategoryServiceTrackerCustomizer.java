@@ -30,7 +30,7 @@ import java.util.Dictionary;
 public class FormNavigatorCategoryServiceTrackerCustomizer
 	implements ServiceTrackerCustomizer
 		<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategory,
-		 FormNavigatorCategory> {
+		 ServiceRegistration<FormNavigatorCategory>> {
 
 	public FormNavigatorCategoryServiceTrackerCustomizer(
 		BundleContext bundleContext) {
@@ -39,28 +39,16 @@ public class FormNavigatorCategoryServiceTrackerCustomizer
 	}
 
 	@Override
-	public FormNavigatorCategory addingService(
+	public ServiceRegistration<FormNavigatorCategory> addingService(
 		ServiceReference
 			<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategory>
 				serviceReference) {
 
-		FormNavigatorCategory formNavigatorCategory =
+		return _bundleContext.registerService(
+			FormNavigatorCategory.class,
 			new WrapperFormNavigatorCategory(
-				_bundleContext.getService(serviceReference));
-
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put(
-			"form.navigator.category.order",
-			serviceReference.getProperty("form.navigator.category.order"));
-
-		ServiceRegistration<FormNavigatorCategory> serviceRegistration =
-			_bundleContext.registerService(
-				FormNavigatorCategory.class, formNavigatorCategory, properties);
-
-		_serviceRegistrations.put(serviceReference, serviceRegistration);
-
-		return formNavigatorCategory;
+				_bundleContext.getService(serviceReference)),
+			_buildProperties(serviceReference));
 	}
 
 	@Override
@@ -68,11 +56,9 @@ public class FormNavigatorCategoryServiceTrackerCustomizer
 		ServiceReference
 			<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategory>
 				serviceReference,
-		FormNavigatorCategory formNavigatorCategory) {
+		ServiceRegistration<FormNavigatorCategory> serviceRegistration) {
 
-		removedService(serviceReference, formNavigatorCategory);
-
-		addingService(serviceReference);
+		serviceRegistration.setProperties(_buildProperties(serviceReference));
 	}
 
 	@Override
@@ -80,10 +66,23 @@ public class FormNavigatorCategoryServiceTrackerCustomizer
 		ServiceReference
 			<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategory>
 				serviceReference,
-		FormNavigatorCategory formNavigatorCategory) {
-
+		ServiceRegistration<FormNavigatorCategory> serviceRegistration) {
 
 		serviceRegistration.unregister();
+	}
+
+	private Dictionary<String, Object> _buildProperties(
+		ServiceReference
+			<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategory>
+				serviceReference) {
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put(
+			"form.navigator.category.order",
+			serviceReference.getProperty("form.navigator.category.order"));
+
+		return properties;
 	}
 
 	private final BundleContext _bundleContext;
