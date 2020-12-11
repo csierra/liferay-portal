@@ -16,16 +16,19 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import java.io.Serializable;
 
 import java.text.DateFormat;
 import java.text.Normalizer;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 
@@ -2335,7 +2338,10 @@ public class ParamUtil {
 	 *         parameter
 	 * @param  param the name of the parameter
 	 * @return the request parameter value as a String
+	 * @deprecated as of Cavanaugh in favor of
+	 * {@link ParamUtil#getUserInputString(HttpServletRequest, String)}
 	 */
+	@Deprecated
 	public static String getString(
 		HttpServletRequest httpServletRequest, String param) {
 
@@ -2353,6 +2359,7 @@ public class ParamUtil {
 	 * @param  defaultValue a default value
 	 * @return the request parameter value as a String
 	 */
+	@Deprecated
 	public static String getString(
 		HttpServletRequest httpServletRequest, String param,
 		String defaultValue) {
@@ -2369,6 +2376,7 @@ public class ParamUtil {
 	 * @param  param the name of the parameter
 	 * @return the portlet request parameter value as a String
 	 */
+	@Deprecated
 	public static String getString(
 		PortletRequest portletRequest, String param) {
 
@@ -2386,6 +2394,7 @@ public class ParamUtil {
 	 * @param  defaultValue a default value
 	 * @return the portlet request parameter value as a String
 	 */
+	@Deprecated
 	public static String getString(
 		PortletRequest portletRequest, String param, String defaultValue) {
 
@@ -2401,6 +2410,7 @@ public class ParamUtil {
 	 * @param  param the name of the parameter
 	 * @return the service context parameter value as a String
 	 */
+	@Deprecated
 	public static String getString(
 		ServiceContext serviceContext, String param) {
 
@@ -2418,6 +2428,7 @@ public class ParamUtil {
 	 * @param  defaultValue a default value
 	 * @return the service context parameter value as a String
 	 */
+	@Deprecated
 	public static String getString(
 		ServiceContext serviceContext, String param, String defaultValue) {
 
@@ -2434,6 +2445,7 @@ public class ParamUtil {
 	 * @param  param the name of the parameter
 	 * @return the request parameter value as a String array
 	 */
+	@Deprecated
 	public static String[] getStringValues(
 		HttpServletRequest httpServletRequest, String param) {
 
@@ -2451,6 +2463,7 @@ public class ParamUtil {
 	 * @param  defaultValue a default value
 	 * @return the request parameter value as a String array
 	 */
+	@Deprecated
 	public static String[] getStringValues(
 		HttpServletRequest httpServletRequest, String param,
 		String[] defaultValue) {
@@ -2470,6 +2483,7 @@ public class ParamUtil {
 	 * @param  param the name of the parameter
 	 * @return the portlet request parameter value as a String array
 	 */
+	@Deprecated
 	public static String[] getStringValues(
 		PortletRequest portletRequest, String param) {
 
@@ -2487,6 +2501,7 @@ public class ParamUtil {
 	 * @param  defaultValue a default value
 	 * @return the portlet request parameter value as a String array
 	 */
+	@Deprecated
 	public static String[] getStringValues(
 		PortletRequest portletRequest, String param, String[] defaultValue) {
 
@@ -2505,6 +2520,7 @@ public class ParamUtil {
 	 * @param  param the name of the parameter
 	 * @return the service context parameter value as a String array
 	 */
+	@Deprecated
 	public static String[] getStringValues(
 		ServiceContext serviceContext, String param) {
 
@@ -2522,11 +2538,229 @@ public class ParamUtil {
 	 * @param  defaultValue a default value
 	 * @return the service context parameter value as a String array
 	 */
+	@Deprecated
 	public static String[] getStringValues(
 		ServiceContext serviceContext, String param, String[] defaultValue) {
 
 		return GetterUtil.getStringValues(
 			serviceContext.getAttribute(param), () -> _normalize(defaultValue));
+	}
+
+	/**
+	 * Returns the request parameter value as a String. If the parameter is
+	 * missing or not convertible to a String, a blank string is returned.
+	 *
+	 * @param  httpServletRequest the servlet request from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @return the request parameter value as a String
+	 */
+	public static UserInputString getUserInputString(
+		HttpServletRequest httpServletRequest, String param) {
+
+		return new UserInputString(_normalize(
+			GetterUtil.getString(httpServletRequest.getParameter(param))));
+	}
+
+	/**
+	 * Returns the request parameter value as a String. If the parameter is
+	 * missing or not convertible to a String, the default value is returned.
+	 *
+	 * @param  httpServletRequest the servlet request from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @param  defaultValue a default value
+	 * @return the request parameter value as a String
+	 */
+	public static UserInputString getUserInputString(
+		HttpServletRequest httpServletRequest, String param,
+		String defaultValue) {
+
+		return new UserInputString(
+			get(httpServletRequest, param, defaultValue));
+	}
+
+	/**
+	 * Returns the portlet request parameter value as a String. If the parameter
+	 * is missing or not convertible to a String, a blank string is returned.
+	 *
+	 * @param  portletRequest the portlet request from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @return the portlet request parameter value as a String
+	 */
+	public static UserInputString getUserInputString(
+		PortletRequest portletRequest, String param) {
+
+		return new UserInputString(_normalize(
+			GetterUtil.getString(portletRequest.getParameter(param))));
+	}
+
+	/**
+	 * Returns the portlet request parameter value as a String. If the parameter
+	 * is missing or not convertible to a String, the default value is returned.
+	 *
+	 * @param  portletRequest the portlet request from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @param  defaultValue a default value
+	 * @return the portlet request parameter value as a String
+	 */
+	public static UserInputString getUserInputString(
+		PortletRequest portletRequest, String param, String defaultValue) {
+
+		return new UserInputString(get(portletRequest, param, defaultValue));
+	}
+
+	/**
+	 * Returns the service context parameter value as a String. If the parameter
+	 * is missing or not convertible to a String, a blank string is returned.
+	 *
+	 * @param  serviceContext the service context from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @return the service context parameter value as a String
+	 */
+	public static UserInputString getUserInputString(
+		ServiceContext serviceContext, String param) {
+
+		return new UserInputString(_normalize(
+			GetterUtil.getString(serviceContext.getAttribute(param))));
+	}
+
+	/**
+	 * Returns the service context parameter value as a String. If the parameter
+	 * is missing or not convertible to a String, the default value is returned.
+	 *
+	 * @param  serviceContext the service context from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @param  defaultValue a default value
+	 * @return the service context parameter value as a String
+	 */
+	public static UserInputString getUserInputString(
+		ServiceContext serviceContext, String param, String defaultValue) {
+
+		return new UserInputString(get(serviceContext, param, defaultValue));
+	}
+
+	/**
+	 * Returns the request parameter value as a String array. In the returned
+	 * array, each parameter value not convertible to a String is replaced by a
+	 * blank string.
+	 *
+	 * @param  httpServletRequest the servlet request from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @return the request parameter value as a String array
+	 */
+	public static UserInputString[] getUserInputStrings(
+		HttpServletRequest httpServletRequest, String param) {
+
+		return _wrap(getStringValues(httpServletRequest, param, new String[0]));
+	}
+
+	private static UserInputString[] _wrap(String[] strings) {
+		return Arrays.stream(
+			strings
+		).map(
+			UserInputString::new
+		).toArray(
+			UserInputString[]::new
+		);
+	}
+
+	/**
+	 * Returns the request parameter value as a String array. In the returned
+	 * array, each parameter value not convertible to a String is replaced by
+	 * the default value.
+	 *
+	 * @param  httpServletRequest the servlet request from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @param  defaultValue a default value
+	 * @return the request parameter value as a String array
+	 */
+	public static UserInputString[] getUserInputStrings(
+		HttpServletRequest httpServletRequest, String param,
+		String[] defaultValue) {
+
+		return _wrap(
+			GetterUtil.getStringValues(
+				getParameterValues(httpServletRequest, param, null),
+				() -> _normalize(defaultValue)));
+	}
+
+	/**
+	 * Returns the portlet request parameter value as a String array. In the
+	 * returned array, each parameter value not convertible to a String is
+	 * replaced by a blank string.
+	 *
+	 * @param  portletRequest the portlet request from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @return the portlet request parameter value as a String array
+	 */
+	public static UserInputString[] getUserInputStrings(
+		PortletRequest portletRequest, String param) {
+
+		return _wrap(getStringValues(portletRequest, param, new String[0]));
+	}
+
+	/**
+	 * Returns the portlet request parameter value as a String array. In the
+	 * returned array, each parameter value not convertible to a String is
+	 * replaced by the default value.
+	 *
+	 * @param  portletRequest the portlet request from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @param  defaultValue a default value
+	 * @return the portlet request parameter value as a String array
+	 */
+	public static UserInputString[] getUserInputStrings(
+		PortletRequest portletRequest, String param, String[] defaultValue) {
+
+		return _wrap(
+				GetterUtil.getStringValues(
+					getParameterValues(portletRequest, param, null),
+					() -> _normalize(defaultValue)));
+	}
+
+	/**
+	 * Returns the service context parameter value as a String array. In the
+	 * returned array, each parameter value not convertible to a String is
+	 * replaced by a blank string.
+	 *
+	 * @param  serviceContext the service context from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @return the service context parameter value as a String array
+	 */
+	public static UserInputString[] getUserInputStrings(
+		ServiceContext serviceContext, String param) {
+
+		return _wrap(getStringValues(serviceContext, param, new String[0]));
+	}
+
+	/**
+	 * Returns the service context parameter value as a String array. In the
+	 * returned array, each parameter value not convertible to a String is
+	 * replaced by the default value.
+	 *
+	 * @param  serviceContext the service context from which to read the
+	 *         parameter
+	 * @param  param the name of the parameter
+	 * @param  defaultValue a default value
+	 * @return the service context parameter value as a String array
+	 */
+	public static UserInputString[] getUserInputStrings(
+		ServiceContext serviceContext, String param, String[] defaultValue) {
+
+		return _wrap(
+			GetterUtil.getStringValues(
+				serviceContext.getAttribute(param),
+				() -> _normalize(defaultValue)));
 	}
 
 	/**
