@@ -37,7 +37,7 @@ public class DropdownMenuTag extends ButtonTag {
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getLabel()}
 	 */
 	@Deprecated
-	public String getButtonLabel() {
+	public CharSequence getButtonLabel() {
 		return getLabel();
 	}
 
@@ -115,7 +115,7 @@ public class DropdownMenuTag extends ButtonTag {
 	 *             #setLabel(String)}
 	 */
 	@Deprecated
-	public void setButtonLabel(String buttonLabel) {
+	public void setButtonLabel(CharSequence buttonLabel) {
 		setLabel(buttonLabel);
 	}
 

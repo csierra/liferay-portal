@@ -96,8 +96,8 @@ public class ButtonTag extends BaseContainerTag {
 		return _icon;
 	}
 
-	public String getLabel() {
-		return _label;
+	public CharSequence getLabel() {
+		return _label.toString();
 	}
 
 	public boolean getMonospaced() {
@@ -185,7 +185,7 @@ public class ButtonTag extends BaseContainerTag {
 		_icon = icon;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(CharSequence label) {
 		_label = label;
 	}
 
@@ -275,7 +275,7 @@ public class ButtonTag extends BaseContainerTag {
 				"label",
 				LanguageUtil.get(
 					TagResourceBundleUtil.getResourceBundle(pageContext),
-					_label));
+					_label.toString()));
 		}
 
 		props.put("monospaced", _monospaced);
@@ -361,7 +361,7 @@ public class ButtonTag extends BaseContainerTag {
 				jspWriter.write(
 					LanguageUtil.get(
 						TagResourceBundleUtil.getResourceBundle(pageContext),
-						_label));
+						_label.toString()));
 			}
 
 			return SKIP_BODY;
@@ -379,7 +379,7 @@ public class ButtonTag extends BaseContainerTag {
 	private boolean _disabled;
 	private String _displayType = "primary";
 	private String _icon;
-	private String _label;
+	private CharSequence _label;
 	private boolean _monospaced;
 	private boolean _outline;
 	private boolean _small;
