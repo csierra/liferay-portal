@@ -11,6 +11,7 @@
 
 package com.liferay.portal.kernel.service.persistence.impl;
 
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -27,6 +28,26 @@ public final class UserInputString implements CharSequence {
 
 	public UserInputString(String string) {
 		_string = string;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (object == null || getClass() != object.getClass()) {
+			return false;
+		}
+
+		UserInputString userInputString = (UserInputString)object;
+
+		return Objects.equals(_string, userInputString._string);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(_string);
 	}
 
 	@Override
