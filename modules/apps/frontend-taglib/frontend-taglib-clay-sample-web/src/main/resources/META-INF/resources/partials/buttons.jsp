@@ -1,4 +1,5 @@
-<%--
+<%@ page
+	import="com.liferay.portal.kernel.service.persistence.impl.UserInputString" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -76,7 +77,8 @@
 				<clay:row
 					cssClass="flex-md-nowrap mb-2"
 				>
-					<clay:col><clay:button label="Borderless" style="borderless" /></clay:col>
+					<% UserInputString userInputString = new UserInputString("hola");%>
+						<clay:col><clay:button label="<%= userInputString %>" style="borderless" /></clay:col>
 					<clay:col><clay:button ariaLabel="Page Template" icon="page-template" style="borderless" /></clay:col>
 				</clay:row>
 
