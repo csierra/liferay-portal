@@ -22,6 +22,8 @@ import com.liferay.frontend.taglib.clay.internal.util.ReactRendererProvider;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
+import com.liferay.portal.kernel.service.persistence.impl.Escaper;
+import com.liferay.portal.kernel.service.persistence.impl.EscaperContext;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.template.react.renderer.ComponentDescriptor;
 import com.liferay.portal.template.react.renderer.ReactRenderer;
@@ -335,9 +337,11 @@ public class BaseContainerTag extends AttributesTagSupport {
 			ReactRenderer reactRenderer =
 				ReactRendererProvider.getReactRenderer();
 
-			reactRenderer.renderReact(
-				componentDescriptor, prepareProps(new HashMap<>()), request,
-				jspWriter);
+			EscaperContext.withEscaper(
+				Escaper.JS,
+				() -> reactRenderer.renderReact(
+					componentDescriptor, prepareProps(new HashMap<>()), request,
+					jspWriter));
 
 			jspWriter.write("</");
 			jspWriter.write(_hydratedContainerElement);
