@@ -1591,6 +1591,15 @@ public class ServiceBuilder {
 
 			return "VARCHAR";
 		}
+		else if (type.equals("XSSProofString")) {
+			int maxLength = getMaxLength(model, field);
+
+			if (maxLength == 2000000) {
+				return "CLOB";
+			}
+
+			return "VARCHAR";
+		}
 
 		return null;
 	}
@@ -2502,14 +2511,14 @@ public class ServiceBuilder {
 				new EntityColumn(
 					this, "ctCollectionId", null, "ctCollectionId", "long",
 					true, false, false, null, null, true, true, false, null,
-					null, false, null, null, true, true, false, false,
+					null, false, null, null, true, true, false, false, false,
 					CTColumnResolutionType.STRICT, false, false, null, false));
 
 			entityColumns.add(
 				new EntityColumn(
 					this, "ctChangeType", null, "ctChangeType", "boolean",
 					false, false, false, null, null, true, true, false, null,
-					null, false, null, null, true, true, false, false,
+					null, false, null, null, true, true, false, false, false,
 					CTColumnResolutionType.STRICT, false, false, null, false));
 		}
 
@@ -6228,6 +6237,8 @@ public class ServiceBuilder {
 				columnElement.attributeValue("localized"));
 			boolean colJsonEnabled = GetterUtil.getBoolean(
 				columnElement.attributeValue("json-enabled"), jsonEnabled);
+			boolean colOptional = GetterUtil.getBoolean(
+				columnElement.attributeValue("optional"));
 
 			String changeTrackingResolutionType = "STRICT";
 
@@ -6272,8 +6283,8 @@ public class ServiceBuilder {
 				this, columnName, columnPluralName, columnDBName, columnType,
 				primary, accessor, filterPrimary, columnEntityName,
 				mappingTableName, idType, idParam, convertNull, lazy, localized,
-				colJsonEnabled, ctColumnResolutionType, containerModel,
-				parentContainerModel, uadAnonymizeFieldName,
+				colJsonEnabled, colOptional, ctColumnResolutionType,
+				containerModel, parentContainerModel, uadAnonymizeFieldName,
 				uadNonanonymizable);
 
 			if (primary) {
@@ -6772,7 +6783,7 @@ public class ServiceBuilder {
 		if (versioned) {
 			EntityColumn headEntityColumn = new EntityColumn(
 				this, "head", null, "head", "boolean", false, false, false,
-				null, null, null, null, true, false, false, false,
+				null, null, null, null, true, false, false, false, false,
 				CTColumnResolutionType.STRICT, false, false, null, false);
 
 			headEntityColumn.setComparator("=");

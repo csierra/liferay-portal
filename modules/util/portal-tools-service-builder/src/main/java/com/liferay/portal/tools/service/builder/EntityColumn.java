@@ -36,8 +36,8 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 		this(
 			serviceBuilder, name, null, null, null, false, false, false, null,
 			null, true, true, false, null, null, false, null, null, true, true,
-			false, false, CTColumnResolutionType.STRICT, false, false, null,
-			false);
+			false, false, false, CTColumnResolutionType.STRICT, false, false,
+			null, false);
 	}
 
 	public EntityColumn(
@@ -45,7 +45,7 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 
 		this(
 			serviceBuilder, name, null, dbName, "String", false, false, false,
-			null, null, null, null, true, false, false, false,
+			null, null, null, null, true, false, false, false, false,
 			CTColumnResolutionType.STRICT, false, false, null, false);
 	}
 
@@ -57,9 +57,10 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 		String comparator, String arrayableOperator,
 		boolean arrayablePagination, String idType, String idParam,
 		boolean convertNull, boolean lazy, boolean localized,
-		boolean jsonEnabled, CTColumnResolutionType ctColumnResolutionType,
-		boolean containerModel, boolean parentContainerModel,
-		String uadAnonymizeFieldName, boolean uadNonanonymizable) {
+		boolean jsonEnabled, boolean optional,
+		CTColumnResolutionType ctColumnResolutionType, boolean containerModel,
+		boolean parentContainerModel, String uadAnonymizeFieldName,
+		boolean uadNonanonymizable) {
 
 		_serviceBuilder = serviceBuilder;
 		_name = name;
@@ -99,7 +100,7 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 		String dbName, String type, boolean primary, boolean accessor,
 		boolean filterPrimary, String ejbName, String mappingTable,
 		String idType, String idParam, boolean convertNull, boolean lazy,
-		boolean localized, boolean jsonEnabled,
+		boolean localized, boolean jsonEnabled, boolean optional,
 		CTColumnResolutionType ctColumnResolutionType, boolean containerModel,
 		boolean parentContainerModel, String uadAnonymizeFieldName,
 		boolean uadNonanonymizable) {
@@ -108,8 +109,8 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 			serviceBuilder, name, pluralName, dbName, type, primary, accessor,
 			filterPrimary, ejbName, mappingTable, true, true, false, null, null,
 			false, idType, idParam, convertNull, lazy, localized, jsonEnabled,
-			ctColumnResolutionType, containerModel, parentContainerModel,
-			uadAnonymizeFieldName, uadNonanonymizable);
+			optional, ctColumnResolutionType, containerModel,
+			parentContainerModel, uadAnonymizeFieldName, uadNonanonymizable);
 	}
 
 	@Override
@@ -121,7 +122,7 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 			isOrderColumn(), getComparator(), getArrayableOperator(),
 			hasArrayablePagination(), getIdType(), getIdParam(),
 			isConvertNull(), isLazy(), isLocalized(), isJsonEnabled(),
-			getCTColumnResolutionType(), isContainerModel(),
+			isOptional(), getCTColumnResolutionType(), isContainerModel(),
 			isParentContainerModel(), getUADAnonymizeFieldName(),
 			isUADNonanonymizable());
 	}
@@ -382,6 +383,10 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 		return Validator.isNotNull(_mappingTableName);
 	}
 
+	public boolean isOptional() {
+		return _optional;
+	}
+
 	public boolean isOrderByAscending() {
 		return _orderByAscending;
 	}
@@ -640,6 +645,7 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 	private final String _mappingTableName;
 	private final String _methodName;
 	private final String _name;
+	private boolean _optional;
 	private boolean _orderByAscending;
 	private boolean _orderColumn;
 	private boolean _parentContainerModel;
