@@ -1548,6 +1548,9 @@ public class ServiceBuilder {
 		else if (type.equals("String")) {
 			return "VARCHAR";
 		}
+		else if (type.equals("UserInputString")) {
+			return "VARCHAR";
+		}
 
 		return null;
 	}
@@ -1592,7 +1595,7 @@ public class ServiceBuilder {
 
 			return "VARCHAR";
 		}
-		else if (type.equals("XSSProofString")) {
+		else if (type.equals("UserInputString")) {
 			int maxLength = getMaxLength(model, field);
 
 			if (maxLength == 2000000) {

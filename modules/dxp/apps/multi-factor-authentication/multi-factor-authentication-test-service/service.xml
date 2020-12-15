@@ -11,6 +11,6 @@
 		<column name="mfaTestEntryId" primary="true" type="long" />
 
 		<column name="testString" type="String" />
-		<column name="testXSSProofString" optional="true" type="XSSProofString" />
+		<column name="testUserInputString" type="UserInputString" />
 	</entity>
 </service-builder>
