@@ -11,6 +11,9 @@
 
 package com.liferay.portal.kernel.service.persistence.impl;
 
+import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeRunnable;
+import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 
 /**
@@ -24,6 +27,34 @@ public final class EscaperContext {
 
 	public static Escaper getEscaper() {
 		return _escaperThreadLocal.get();
+	}
+
+	public static <T, E extends Throwable> T withEscaper(
+			Escaper escaper, UnsafeSupplier<T, E> unsafeSupplier)
+		throws E {
+
+		final Escaper currentEscaper = getEscaper();
+
+		try {
+			return unsafeSupplier.get();
+		}
+		finally {
+			setEscaper(currentEscaper);
+		}
+	}
+
+	public static <E extends Throwable> void withEscaper(
+		Escaper escaper, UnsafeRunnable<E> unsafeRunnable)
+		throws E {
+
+		final Escaper currentEscaper = getEscaper();
+
+		try {
+			unsafeRunnable.run();
+		}
+		finally {
+			setEscaper(currentEscaper);
+		}
 	}
 
 	private static ThreadLocal<Escaper> _escaperThreadLocal =

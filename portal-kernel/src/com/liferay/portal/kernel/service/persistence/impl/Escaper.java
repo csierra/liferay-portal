@@ -11,11 +11,33 @@
 
 package com.liferay.portal.kernel.service.persistence.impl;
 
+import com.liferay.portal.kernel.util.HtmlUtil;
+
+import java.util.function.Function;
+
 /**
  * @author Carlos Sierra Andrés
  */
-public interface Escaper {
+public enum Escaper {
 
-	public String escape(String string);
+	ATTRIBUTE(HtmlUtil::escapeAttribute),
+	CSS(HtmlUtil::escapeCSS),
+	HREF(HtmlUtil::escapeHREF),
+	HTML(HtmlUtil::escape),
+	JS(HtmlUtil::escapeJS),
+	JS_LINK(HtmlUtil::escapeJSLink),
+	URL(HtmlUtil::escapeURL),
+	XPATH(HtmlUtil::escapeXPath),
+	XPATH_ATTRIBUTE(HtmlUtil::escapeXPathAttribute);
+
+	private final Function<String, String> _escaper;
+
+	private Escaper(Function<String, String> escaper) {
+		_escaper = escaper;
+	}
+
+	String escape(String string) {
+		return _escaper.apply(string);
+	}
 
 }
