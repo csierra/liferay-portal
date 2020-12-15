@@ -1,0 +1,8 @@
+Bundle-Name: Liferay Multi-Factor Authentication Test API
+Bundle-SymbolicName: com.liferay.multi.factor.authentication.test.api
+Bundle-Version: 3.0.0
+Export-Package:\
+	com.liferay.multi.factor.authentication.test.exception,\
+	com.liferay.multi.factor.authentication.test.model,\
+	com.liferay.multi.factor.authentication.test.service,\
+	com.liferay.multi.factor.authentication.test.service.persistence
