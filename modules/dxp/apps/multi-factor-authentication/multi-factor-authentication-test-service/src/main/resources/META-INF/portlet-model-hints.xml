@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="com.liferay.multi.factor.authentication.test.model.MFATestEntry">
+		<field name="mvccVersion" type="long" />
+		<field name="mfaTestEntryId" type="long" />
+		<field name="testString" type="String" />
+		<field name="testUserInputString" type="UserInputString" />
+	</model>
+</model-hints>
