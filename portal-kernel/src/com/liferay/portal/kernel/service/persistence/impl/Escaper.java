@@ -12,6 +12,7 @@
 package com.liferay.portal.kernel.service.persistence.impl;
 
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.function.Function;
 
@@ -26,6 +27,7 @@ public enum Escaper {
 	HTML(HtmlUtil::escape),
 	JS(HtmlUtil::escapeJS),
 	JS_LINK(HtmlUtil::escapeJSLink),
+	REDIRECT(PortalUtil::escapeRedirect),
 	URL(HtmlUtil::escapeURL),
 	XPATH(HtmlUtil::escapeXPath),
 	XPATH_ATTRIBUTE(HtmlUtil::escapeXPathAttribute);
