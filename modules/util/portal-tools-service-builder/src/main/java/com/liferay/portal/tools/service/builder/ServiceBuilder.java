@@ -1544,7 +1544,7 @@ public class ServiceBuilder {
 		else if (type.equals("Date")) {
 			return "TIMESTAMP";
 		}
-		else if (type.equals("String")) {
+		else if (type.equals("String") || type.equals("UserInputString")) {
 			return "VARCHAR";
 		}
 
@@ -1582,7 +1582,7 @@ public class ServiceBuilder {
 		else if (type.equals("Map")) {
 			return "CLOB";
 		}
-		else if (type.equals("String")) {
+		else if (type.equals("String") || type.equals("UserInputString")) {
 			int maxLength = getMaxLength(model, field);
 
 			if (maxLength == 2000000) {
