@@ -630,7 +630,11 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 			});
 	<#else>
-		attributeSetterBiConsumers.put("${entityColumn.name}", (BiConsumer<${entity.name}, ${entityColumnType}>)${entity.name}::set${entityColumn.methodName});
+		<#if entityColumn.isUserInputString()>
+			attributeSetterBiConsumers.put("${entityColumn.name}", (${entity.name} entity, String s) -> entity.set${entityColumn.methodName}(new UserInputString(s)));
+		<#else>
+			attributeSetterBiConsumers.put("${entityColumn.name}", (BiConsumer<${entity.name}, ${entityColumnType}>)${entity.name}::set${entityColumn.methodName});
+		</#if>
 	</#if>
 </#list>
 

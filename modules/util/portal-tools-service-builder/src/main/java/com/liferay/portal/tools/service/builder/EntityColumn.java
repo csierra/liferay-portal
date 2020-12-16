@@ -477,6 +477,10 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 		return false;
 	}
 
+	public boolean isUserInputString() {
+		return _type.equals("UserInputString");
+	}
+
 	public void setArrayableOperator(String arrayableOperator) {
 		_arrayableOperator = StringUtil.toUpperCase(arrayableOperator);
 	}
