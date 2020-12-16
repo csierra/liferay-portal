@@ -13,6 +13,7 @@ package com.liferay.portal.kernel.service.persistence.impl;
 
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 /**
@@ -88,6 +89,10 @@ public final class UserInputString implements CharSequence {
 
 	public UserInputString map(Function<String, String> function) {
 		return new UserInputString(function.apply(_string));
+	}
+
+	public boolean test(Predicate<String> predicate) {
+		return predicate.test(_string);
 	}
 
 }
