@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -984,6 +985,10 @@ public class Validator {
 		}
 
 		return false;
+	}
+
+	public static boolean isNull(UserInputString userInputString) {
+		return userInputString.test(Validator::isNull);
 	}
 
 	/**
