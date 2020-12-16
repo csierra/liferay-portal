@@ -1,5 +1,6 @@
 package ${apiPackagePath}.model;
 
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.base.BaseTable;
 

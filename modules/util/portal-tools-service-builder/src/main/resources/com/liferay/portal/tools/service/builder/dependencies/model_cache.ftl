@@ -11,6 +11,7 @@ import ${apiPackagePath}.model.${entity.name};
 
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import java.io.Externalizable;
 import java.io.IOException;
