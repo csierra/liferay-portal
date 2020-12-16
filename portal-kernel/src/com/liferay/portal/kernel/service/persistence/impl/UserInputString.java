@@ -95,4 +95,8 @@ public final class UserInputString implements CharSequence {
 		return predicate.test(_string);
 	}
 
+	public boolean equalsString(String string) {
+		return this.test(string::equals);
+	}
+
 }
