@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.xml.Document;
@@ -167,6 +168,53 @@ public interface Localization {
 		String defaultValue);
 
 	/**
+	 * Returns the localized string from the localizations XML in the language.
+	 * The default language is used if no localization exists for the requested
+	 * language.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  requestedLanguageId the ID of the language
+	 * @return the localized string
+	 */
+	public UserInputString getLocalization(
+		UserInputString xml, String requestedLanguageId);
+
+	/**
+	 * Returns the localized string from the localizations XML in the language,
+	 * optionally using the default language if no localization exists for the
+	 * requested language.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  requestedLanguageId the ID of the language
+	 * @param  useDefault whether to use the default language if no localization
+	 *         exists for the requested language
+	 * @return the localized string, or an empty string if
+	 *         <code>useDefault</code> is <code>false</code> and no localization
+	 *         exists for the requested language
+	 */
+	public UserInputString getLocalization(
+		UserInputString xml, String requestedLanguageId, boolean useDefault);
+
+	/**
+	 * Returns the localized string from the localizations XML in the language,
+	 * optionally using the default language if no localization exists for the
+	 * requested language. If no localization exists, the default value is
+	 * returned.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  requestedLanguageId the ID of the language
+	 * @param  useDefault whether to use the default language if no localization
+	 *         exists for the requested language
+	 * @param  defaultValue the value returned if no localization exists
+	 * @return the localized string, or the <code>defaultValue</code> if
+	 *         <code>useDefault</code> is <code>false</code> and no localization
+	 *         exists for the requested language
+	 */
+	public UserInputString getLocalization(
+		UserInputString xml, String requestedLanguageId, boolean useDefault,
+		UserInputString defaultValue);
+
+	/**
 	 * Returns a map of locales and localized strings for the key. If no
 	 * localization exists for a locale or the localization matches the default
 	 * locale, that locale is not included in the map.
@@ -272,6 +320,29 @@ public interface Localization {
 	 */
 	public Map<Locale, String> getLocalizationMap(
 		String[] languageIds, String[] values);
+
+	/**
+	 * Returns a map of locales and localized strings for the given languageIds
+	 * and values.
+	 *
+	 * @param  languageIds the languageIds of the localized Strings
+	 * @param  values the localized strings for the different languageId
+	 * @return the map of locales and values for the given parameters
+	 */
+	public Map<Locale, UserInputString> getLocalizationMap(
+		String[] languageIds, UserInputString[] values);
+
+	/**
+	 * Returns a map of locales and localized strings from the localizations
+	 * XML.
+	 *
+	 * @param  xml the localizations XML
+	 * @return the locales and localized strings
+	 */
+	public Map<Locale, UserInputString> getLocalizationMap(UserInputString xml);
+
+	public Map<Locale, UserInputString> getLocalizationMap(
+		UserInputString xml, boolean useDefault);
 
 	/**
 	 * Returns the localizations XML for the parameter from the portlet request,
@@ -513,6 +584,47 @@ public interface Localization {
 		boolean localized);
 
 	/**
+	 * Removes the localization for the language from the localizations XML. The
+	 * localized strings are stored as characters in the XML.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  requestedLanguageId the ID of the language
+	 * @return the localizations XML with the language removed
+	 */
+	public UserInputString removeLocalization(
+		UserInputString xml, String key, String requestedLanguageId);
+
+	/**
+	 * Removes the localization for the language from the localizations XML,
+	 * optionally storing the localized strings as CDATA in the XML.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  requestedLanguageId the ID of the language
+	 * @param  cdata whether to store localized strings as CDATA in the XML
+	 * @return the localizations XML with the language removed
+	 */
+	public UserInputString removeLocalization(
+		UserInputString xml, String key, String requestedLanguageId,
+		boolean cdata);
+
+	/**
+	 * Removes the localization for the language from the localizations XML,
+	 * optionally storing the localized strings as CDATA in the XML.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  requestedLanguageId the ID of the language
+	 * @param  cdata whether to store localized strings as CDATA in the XML
+	 * @param  localized whether there is a localized field
+	 * @return the localizations XML with the language removed
+	 */
+	public UserInputString removeLocalization(
+		UserInputString xml, String key, String requestedLanguageId,
+		boolean cdata, boolean localized);
+
+	/**
 	 * Sets the localized preferences values for the parameter in the portlet
 	 * request.
 	 *
@@ -571,6 +683,22 @@ public interface Localization {
 	public String updateLocalization(
 		Map<Locale, String> localizationMap, String xml, String key,
 		String defaultLanguageId);
+
+	/**
+	 * Updates the localized string for all the available languages in the
+	 * localizations XML for the map of locales and localized strings and
+	 * changes the default language. The localized strings are stored as
+	 * characters in the XML.
+	 *
+	 * @param  localizationMap the locales and localized strings
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  defaultLanguageId the ID of the default language
+	 * @return the updated localizations XML
+	 */
+	public UserInputString updateLocalization(
+		Map<Locale, UserInputString> localizationMap, UserInputString xml,
+		String key, String defaultLanguageId);
 
 	/**
 	 * Updates the localized string for the system default language in the
@@ -647,5 +775,84 @@ public interface Localization {
 	public String updateLocalization(
 		String xml, String key, String value, String requestedLanguageId,
 		String defaultLanguageId, boolean cdata, boolean localized);
+
+	/**
+	 * Updates the localized string for the system default language in the
+	 * localizations XML. The localized strings are stored as characters in the
+	 * XML.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  value the localized string
+	 * @return the updated localizations XML
+	 */
+	public UserInputString updateLocalization(
+		UserInputString xml, String key, UserInputString value);
+
+	/**
+	 * Updates the localized string for the language in the localizations XML.
+	 * The localized strings are stored as characters in the XML.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  value the localized string
+	 * @param  requestedLanguageId the ID of the language
+	 * @return the updated localizations XML
+	 */
+	public UserInputString updateLocalization(
+		UserInputString xml, String key, UserInputString value,
+		String requestedLanguageId);
+
+	/**
+	 * Updates the localized string for the language in the localizations XML
+	 * and changes the default language. The localized strings are stored as
+	 * characters in the XML.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  value the localized string
+	 * @param  requestedLanguageId the ID of the language
+	 * @param  defaultLanguageId the ID of the default language
+	 * @return the updated localizations XML
+	 */
+	public UserInputString updateLocalization(
+		UserInputString xml, String key, UserInputString value,
+		String requestedLanguageId, String defaultLanguageId);
+
+	/**
+	 * Updates the localized string for the language in the localizations XML
+	 * and changes the default language, optionally storing the localized
+	 * strings as CDATA in the XML.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  value the localized string
+	 * @param  requestedLanguageId the ID of the language
+	 * @param  defaultLanguageId the ID of the default language
+	 * @param  cdata whether to store localized strings as CDATA in the XML
+	 * @return the updated localizations XML
+	 */
+	public UserInputString updateLocalization(
+		UserInputString xml, String key, UserInputString value,
+		String requestedLanguageId, String defaultLanguageId, boolean cdata);
+
+	/**
+	 * Updates the localized string for the language in the localizations XML
+	 * and changes the default language, optionally storing the localized
+	 * strings as CDATA in the XML.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  value the localized string
+	 * @param  requestedLanguageId the ID of the language
+	 * @param  defaultLanguageId the ID of the default language
+	 * @param  cdata whether to store localized strings as CDATA in the XML
+	 * @param  localized whether there is a localized field
+	 * @return the updated localizations XML
+	 */
+	public UserInputString updateLocalization(
+		UserInputString xml, String key, UserInputString value,
+		String requestedLanguageId, String defaultLanguageId, boolean cdata,
+		boolean localized);
 
 }
