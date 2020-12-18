@@ -21,6 +21,7 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
@@ -39,8 +40,8 @@ public class PollsChoiceLocalServiceImpl
 
 	@Override
 	public PollsChoice addChoice(
-			long userId, long questionId, String name, String description,
-			ServiceContext serviceContext)
+			long userId, long questionId, UserInputString name,
+			UserInputString description, ServiceContext serviceContext)
 		throws PortalException {
 
 		validate(name, description);
@@ -80,8 +81,8 @@ public class PollsChoiceLocalServiceImpl
 
 	@Override
 	public PollsChoice updateChoice(
-			long choiceId, long questionId, String name, String description,
-			ServiceContext serviceContext)
+			long choiceId, long questionId, UserInputString name,
+			UserInputString description, ServiceContext serviceContext)
 		throws PortalException {
 
 		validate(name, description);
@@ -97,7 +98,7 @@ public class PollsChoiceLocalServiceImpl
 		return pollsChoicePersistence.update(choice);
 	}
 
-	protected void validate(String name, String description)
+	protected void validate(UserInputString name, UserInputString description)
 		throws PortalException {
 
 		if (Validator.isNull(name) || Validator.isNull(description)) {

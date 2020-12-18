@@ -17,12 +17,8 @@ package com.liferay.polls.service.http;
 import com.liferay.polls.service.PollsQuestionServiceUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 
 import java.rmi.RemoteException;
-
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * Provides the SOAP utility for the
@@ -67,42 +63,6 @@ import java.util.Map;
 @Deprecated
 public class PollsQuestionServiceSoap {
 
-	public static com.liferay.polls.model.PollsQuestionSoap addQuestion(
-			String[] titleMapLanguageIds, String[] titleMapValues,
-			String[] descriptionMapLanguageIds, String[] descriptionMapValues,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire,
-			com.liferay.polls.model.PollsChoiceSoap[] choices,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
-				titleMapLanguageIds, titleMapValues);
-			Map<Locale, String> descriptionMap =
-				LocalizationUtil.getLocalizationMap(
-					descriptionMapLanguageIds, descriptionMapValues);
-
-			com.liferay.polls.model.PollsQuestion returnValue =
-				PollsQuestionServiceUtil.addQuestion(
-					titleMap, descriptionMap, expirationDateMonth,
-					expirationDateDay, expirationDateYear, expirationDateHour,
-					expirationDateMinute, neverExpire,
-					com.liferay.polls.model.impl.PollsChoiceModelImpl.toModels(
-						choices),
-					serviceContext);
-
-			return com.liferay.polls.model.PollsQuestionSoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
 	public static void deleteQuestion(long questionId) throws RemoteException {
 		try {
 			PollsQuestionServiceUtil.deleteQuestion(questionId);
@@ -121,43 +81,6 @@ public class PollsQuestionServiceSoap {
 		try {
 			com.liferay.polls.model.PollsQuestion returnValue =
 				PollsQuestionServiceUtil.getQuestion(questionId);
-
-			return com.liferay.polls.model.PollsQuestionSoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static com.liferay.polls.model.PollsQuestionSoap updateQuestion(
-			long questionId, String[] titleMapLanguageIds,
-			String[] titleMapValues, String[] descriptionMapLanguageIds,
-			String[] descriptionMapValues, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire,
-			com.liferay.polls.model.PollsChoiceSoap[] choices,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
-				titleMapLanguageIds, titleMapValues);
-			Map<Locale, String> descriptionMap =
-				LocalizationUtil.getLocalizationMap(
-					descriptionMapLanguageIds, descriptionMapValues);
-
-			com.liferay.polls.model.PollsQuestion returnValue =
-				PollsQuestionServiceUtil.updateQuestion(
-					questionId, titleMap, descriptionMap, expirationDateMonth,
-					expirationDateDay, expirationDateYear, expirationDateHour,
-					expirationDateMinute, neverExpire,
-					com.liferay.polls.model.impl.PollsChoiceModelImpl.toModels(
-						choices),
-					serviceContext);
 
 			return com.liferay.polls.model.PollsQuestionSoap.toSoapModel(
 				returnValue);

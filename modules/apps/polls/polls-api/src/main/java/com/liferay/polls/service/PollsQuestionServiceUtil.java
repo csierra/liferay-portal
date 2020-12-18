@@ -38,8 +38,14 @@ public class PollsQuestionServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.polls.service.impl.PollsQuestionServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.polls.model.PollsQuestion addQuestion(
-			java.util.Map<java.util.Locale, String> titleMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
+			java.util.Map
+				<java.util.Locale,
+				 com.liferay.portal.kernel.service.persistence.impl.
+					 UserInputString> titleMap,
+			java.util.Map
+				<java.util.Locale,
+				 com.liferay.portal.kernel.service.persistence.impl.
+					 UserInputString> descriptionMap,
 			int expirationDateMonth, int expirationDateDay,
 			int expirationDateYear, int expirationDateHour,
 			int expirationDateMinute, boolean neverExpire,
@@ -76,8 +82,15 @@ public class PollsQuestionServiceUtil {
 	}
 
 	public static com.liferay.polls.model.PollsQuestion updateQuestion(
-			long questionId, java.util.Map<java.util.Locale, String> titleMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
+			long questionId,
+			java.util.Map
+				<java.util.Locale,
+				 com.liferay.portal.kernel.service.persistence.impl.
+					 UserInputString> titleMap,
+			java.util.Map
+				<java.util.Locale,
+				 com.liferay.portal.kernel.service.persistence.impl.
+					 UserInputString> descriptionMap,
 			int expirationDateMonth, int expirationDateDay,
 			int expirationDateYear, int expirationDateHour,
 			int expirationDateMinute, boolean neverExpire,

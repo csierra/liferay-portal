@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -66,12 +67,12 @@ public class PollsQuestionLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public PollsQuestion addQuestion(
-			long userId, Map<Locale, String> titleMap,
-			Map<Locale, String> descriptionMap, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, List<PollsChoice> choices,
-			ServiceContext serviceContext)
+		long userId, Map<Locale, UserInputString> titleMap,
+		Map<Locale, UserInputString> descriptionMap, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear,
+		int expirationDateHour, int expirationDateMinute,
+		boolean neverExpire, List<PollsChoice> choices,
+		ServiceContext serviceContext)
 		throws PortalException {
 
 		// Question
@@ -302,12 +303,12 @@ public class PollsQuestionLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public PollsQuestion updateQuestion(
-			long userId, long questionId, Map<Locale, String> titleMap,
-			Map<Locale, String> descriptionMap, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, List<PollsChoice> choices,
-			ServiceContext serviceContext)
+			long userId, long questionId, Map<Locale, UserInputString> titleMap,
+			Map<Locale, UserInputString> descriptionMap,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire,
+			List<PollsChoice> choices, ServiceContext serviceContext)
 		throws PortalException {
 
 		// Question
@@ -343,8 +344,8 @@ public class PollsQuestionLocalServiceImpl
 		deleteRemovedPollsChoices(questionId, choices);
 
 		for (PollsChoice choice : choices) {
-			String choiceName = choice.getName();
-			String choiceDescription = choice.getDescription();
+			UserInputString choiceName = choice.getName();
+			UserInputString choiceDescription = choice.getDescription();
 
 			choice = pollsChoicePersistence.fetchByQ_N(questionId, choiceName);
 
@@ -374,10 +375,10 @@ public class PollsQuestionLocalServiceImpl
 
 		Stream<PollsChoice> stream = choices.stream();
 
-		Stream<String> choiceNamesStream = stream.map(
+		Stream<UserInputString> choiceNamesStream = stream.map(
 			choice -> choice.getName());
 
-		List<String> choiceNames = choiceNamesStream.collect(
+		List<UserInputString> choiceNames = choiceNamesStream.collect(
 			Collectors.toList());
 
 		List<PollsChoice> oldChoices = pollsChoicePersistence.findByQuestionId(
@@ -392,19 +393,20 @@ public class PollsQuestionLocalServiceImpl
 	}
 
 	protected void validate(
-			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+			Map<Locale, UserInputString> titleMap,
+			Map<Locale, UserInputString> descriptionMap,
 			List<PollsChoice> choices, Date expirationDate)
 		throws PortalException {
 
 		Locale locale = LocaleUtil.getSiteDefault();
 
-		String title = titleMap.get(locale);
+		UserInputString title = titleMap.get(locale);
 
 		if (Validator.isNull(title)) {
 			throw new QuestionTitleException();
 		}
 
-		String description = descriptionMap.get(locale);
+		UserInputString description = descriptionMap.get(locale);
 
 		if (Validator.isNull(description)) {
 			throw new QuestionDescriptionException();
@@ -415,10 +417,11 @@ public class PollsQuestionLocalServiceImpl
 		}
 
 		if (choices != null) {
-			Set<String> choiceDescriptions = new HashSet<>();
+			Set<UserInputString> choiceDescriptions = new HashSet<>();
 
 			for (PollsChoice choice : choices) {
-				String choiceDescription = choice.getDescription(locale);
+				UserInputString choiceDescription = choice.getDescription(
+					locale);
 
 				if (Validator.isNull(choiceDescription) ||
 					choiceDescriptions.contains(choiceDescription)) {

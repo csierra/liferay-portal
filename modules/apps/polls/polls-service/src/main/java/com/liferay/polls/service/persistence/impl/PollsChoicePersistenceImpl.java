@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -1964,7 +1965,7 @@ public class PollsChoicePersistenceImpl
 	 * @throws NoSuchChoiceException if a matching polls choice could not be found
 	 */
 	@Override
-	public PollsChoice findByQ_N(long questionId, String name)
+	public PollsChoice findByQ_N(long questionId, UserInputString name)
 		throws NoSuchChoiceException {
 
 		PollsChoice pollsChoice = fetchByQ_N(questionId, name);
@@ -2000,7 +2001,7 @@ public class PollsChoicePersistenceImpl
 	 * @return the matching polls choice, or <code>null</code> if a matching polls choice could not be found
 	 */
 	@Override
-	public PollsChoice fetchByQ_N(long questionId, String name) {
+	public PollsChoice fetchByQ_N(long questionId, UserInputString name) {
 		return fetchByQ_N(questionId, name, true);
 	}
 
@@ -2014,9 +2015,7 @@ public class PollsChoicePersistenceImpl
 	 */
 	@Override
 	public PollsChoice fetchByQ_N(
-		long questionId, String name, boolean useFinderCache) {
-
-		name = Objects.toString(name, "");
+		long questionId, UserInputString name, boolean useFinderCache) {
 
 		Object[] finderArgs = null;
 
@@ -2049,8 +2048,8 @@ public class PollsChoicePersistenceImpl
 
 			boolean bindName = false;
 
-			if (name.isEmpty()) {
-				sb.append(_FINDER_COLUMN_Q_N_NAME_3);
+			if (name == null) {
+				sb.append(_FINDER_COLUMN_Q_N_NAME_1);
 			}
 			else {
 				bindName = true;
@@ -2115,7 +2114,7 @@ public class PollsChoicePersistenceImpl
 	 * @return the polls choice that was removed
 	 */
 	@Override
-	public PollsChoice removeByQ_N(long questionId, String name)
+	public PollsChoice removeByQ_N(long questionId, UserInputString name)
 		throws NoSuchChoiceException {
 
 		PollsChoice pollsChoice = findByQ_N(questionId, name);
@@ -2131,9 +2130,7 @@ public class PollsChoicePersistenceImpl
 	 * @return the number of matching polls choices
 	 */
 	@Override
-	public int countByQ_N(long questionId, String name) {
-		name = Objects.toString(name, "");
-
+	public int countByQ_N(long questionId, UserInputString name) {
 		FinderPath finderPath = _finderPathCountByQ_N;
 
 		Object[] finderArgs = new Object[] {questionId, name};
@@ -2149,8 +2146,8 @@ public class PollsChoicePersistenceImpl
 
 			boolean bindName = false;
 
-			if (name.isEmpty()) {
-				sb.append(_FINDER_COLUMN_Q_N_NAME_3);
+			if (name == null) {
+				sb.append(_FINDER_COLUMN_Q_N_NAME_1);
 			}
 			else {
 				bindName = true;
@@ -2193,11 +2190,11 @@ public class PollsChoicePersistenceImpl
 	private static final String _FINDER_COLUMN_Q_N_QUESTIONID_2 =
 		"pollsChoice.questionId = ? AND ";
 
+	private static final String _FINDER_COLUMN_Q_N_NAME_1 =
+		"pollsChoice.name IS NULL";
+
 	private static final String _FINDER_COLUMN_Q_N_NAME_2 =
 		"pollsChoice.name = ?";
-
-	private static final String _FINDER_COLUMN_Q_N_NAME_3 =
-		"(pollsChoice.name IS NULL OR pollsChoice.name = '')";
 
 	public PollsChoicePersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
@@ -2849,12 +2846,16 @@ public class PollsChoicePersistenceImpl
 
 		_finderPathFetchByQ_N = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByQ_N",
-			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {
+				Long.class.getName(), UserInputString.class.getName()
+			},
 			new String[] {"questionId", "name"}, true);
 
 		_finderPathCountByQ_N = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByQ_N",
-			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {
+				Long.class.getName(), UserInputString.class.getName()
+			},
 			new String[] {"questionId", "name"}, false);
 	}
 

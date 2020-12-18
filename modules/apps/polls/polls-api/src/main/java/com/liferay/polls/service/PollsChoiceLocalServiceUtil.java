@@ -38,7 +38,11 @@ public class PollsChoiceLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.polls.service.impl.PollsChoiceLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.polls.model.PollsChoice addChoice(
-			long userId, long questionId, String name, String description,
+			long userId, long questionId,
+			com.liferay.portal.kernel.service.persistence.impl.UserInputString
+				name,
+			com.liferay.portal.kernel.service.persistence.impl.UserInputString
+				description,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -384,7 +388,11 @@ public class PollsChoiceLocalServiceUtil {
 	}
 
 	public static com.liferay.polls.model.PollsChoice updateChoice(
-			long choiceId, long questionId, String name, String description,
+			long choiceId, long questionId,
+			com.liferay.portal.kernel.service.persistence.impl.UserInputString
+				name,
+			com.liferay.portal.kernel.service.persistence.impl.UserInputString
+				description,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 

@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -150,20 +151,8 @@ public class PollsChoiceCacheModel
 		}
 
 		pollsChoiceImpl.setQuestionId(questionId);
-
-		if (name == null) {
-			pollsChoiceImpl.setName("");
-		}
-		else {
-			pollsChoiceImpl.setName(name);
-		}
-
-		if (description == null) {
-			pollsChoiceImpl.setDescription("");
-		}
-		else {
-			pollsChoiceImpl.setDescription(description);
-		}
+		pollsChoiceImpl.setName(name);
+		pollsChoiceImpl.setDescription(description);
 
 		if (lastPublishDate == Long.MIN_VALUE) {
 			pollsChoiceImpl.setLastPublishDate(null);
@@ -178,7 +167,9 @@ public class PollsChoiceCacheModel
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput) throws IOException {
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
@@ -194,8 +185,8 @@ public class PollsChoiceCacheModel
 		modifiedDate = objectInput.readLong();
 
 		questionId = objectInput.readLong();
-		name = objectInput.readUTF();
-		description = objectInput.readUTF();
+		name = (UserInputString)objectInput.readObject();
+		description = (UserInputString)objectInput.readObject();
 		lastPublishDate = objectInput.readLong();
 	}
 
@@ -229,21 +220,8 @@ public class PollsChoiceCacheModel
 		objectOutput.writeLong(modifiedDate);
 
 		objectOutput.writeLong(questionId);
-
-		if (name == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(name);
-		}
-
-		if (description == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(description);
-		}
-
+		objectOutput.writeObject(name);
+		objectOutput.writeObject(description);
 		objectOutput.writeLong(lastPublishDate);
 	}
 
@@ -257,8 +235,8 @@ public class PollsChoiceCacheModel
 	public long createDate;
 	public long modifiedDate;
 	public long questionId;
-	public String name;
-	public String description;
+	public UserInputString name;
+	public UserInputString description;
 	public long lastPublishDate;
 
 }

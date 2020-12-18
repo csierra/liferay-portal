@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -65,8 +66,8 @@ public interface PollsChoiceLocalService
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.polls.service.impl.PollsChoiceLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the polls choice local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link PollsChoiceLocalServiceUtil} if injection and service tracking are not available.
 	 */
 	public PollsChoice addChoice(
-			long userId, long questionId, String name, String description,
-			ServiceContext serviceContext)
+			long userId, long questionId, UserInputString name,
+			UserInputString description, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -319,8 +320,8 @@ public interface PollsChoiceLocalService
 	public int getPollsChoicesCount();
 
 	public PollsChoice updateChoice(
-			long choiceId, long questionId, String name, String description,
-			ServiceContext serviceContext)
+			long choiceId, long questionId, UserInputString name,
+			UserInputString description, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**

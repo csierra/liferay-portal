@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -46,7 +47,8 @@ public class PollsQuestionServiceImpl extends PollsQuestionServiceBaseImpl {
 
 	@Override
 	public PollsQuestion addQuestion(
-			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+			Map<Locale, UserInputString> titleMap,
+			Map<Locale, UserInputString> descriptionMap,
 			int expirationDateMonth, int expirationDateDay,
 			int expirationDateYear, int expirationDateHour,
 			int expirationDateMinute, boolean neverExpire,
@@ -85,12 +87,12 @@ public class PollsQuestionServiceImpl extends PollsQuestionServiceBaseImpl {
 
 	@Override
 	public PollsQuestion updateQuestion(
-			long questionId, Map<Locale, String> titleMap,
-			Map<Locale, String> descriptionMap, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, List<PollsChoice> choices,
-			ServiceContext serviceContext)
+			long questionId, Map<Locale, UserInputString> titleMap,
+			Map<Locale, UserInputString> descriptionMap,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire,
+			List<PollsChoice> choices, ServiceContext serviceContext)
 		throws PortalException {
 
 		_pollsQuestionModelResourcePermission.check(

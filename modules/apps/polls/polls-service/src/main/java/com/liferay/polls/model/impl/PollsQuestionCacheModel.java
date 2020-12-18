@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -151,19 +152,8 @@ public class PollsQuestionCacheModel
 			pollsQuestionImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		if (title == null) {
-			pollsQuestionImpl.setTitle("");
-		}
-		else {
-			pollsQuestionImpl.setTitle(title);
-		}
-
-		if (description == null) {
-			pollsQuestionImpl.setDescription("");
-		}
-		else {
-			pollsQuestionImpl.setDescription(description);
-		}
+		pollsQuestionImpl.setTitle(title);
+		pollsQuestionImpl.setDescription(description);
 
 		if (expirationDate == Long.MIN_VALUE) {
 			pollsQuestionImpl.setExpirationDate(null);
@@ -192,7 +182,9 @@ public class PollsQuestionCacheModel
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput) throws IOException {
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
@@ -206,8 +198,8 @@ public class PollsQuestionCacheModel
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
-		title = objectInput.readUTF();
-		description = objectInput.readUTF();
+		title = (UserInputString)objectInput.readObject();
+		description = (UserInputString)objectInput.readObject();
 		expirationDate = objectInput.readLong();
 		lastPublishDate = objectInput.readLong();
 		lastVoteDate = objectInput.readLong();
@@ -241,21 +233,8 @@ public class PollsQuestionCacheModel
 
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
-
-		if (title == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(title);
-		}
-
-		if (description == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(description);
-		}
-
+		objectOutput.writeObject(title);
+		objectOutput.writeObject(description);
 		objectOutput.writeLong(expirationDate);
 		objectOutput.writeLong(lastPublishDate);
 		objectOutput.writeLong(lastVoteDate);
@@ -270,8 +249,8 @@ public class PollsQuestionCacheModel
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
-	public String title;
-	public String description;
+	public UserInputString title;
+	public UserInputString description;
 	public long expirationDate;
 	public long lastPublishDate;
 	public long lastVoteDate;

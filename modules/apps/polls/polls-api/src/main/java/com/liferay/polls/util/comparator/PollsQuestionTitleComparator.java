@@ -15,6 +15,7 @@
 package com.liferay.polls.util.comparator;
 
 import com.liferay.polls.model.PollsQuestion;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -42,8 +43,8 @@ public class PollsQuestionTitleComparator
 	public int compare(
 		PollsQuestion pollsQuestion1, PollsQuestion pollsQuestion2) {
 
-		String title1 = StringUtil.toLowerCase(pollsQuestion1.getTitle());
-		String title2 = StringUtil.toLowerCase(pollsQuestion2.getTitle());
+		String title1 = pollsQuestion1.getTitle();
+		String title2 = pollsQuestion2.getTitle();
 
 		int value = title1.compareTo(title2);
 

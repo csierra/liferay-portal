@@ -142,9 +142,9 @@ public class PollsChoicePersistenceTest {
 
 		newPollsChoice.setQuestionId(RandomTestUtil.nextLong());
 
-		newPollsChoice.setName(RandomTestUtil.randomString());
+		newPollsChoice.setName();
 
-		newPollsChoice.setDescription(RandomTestUtil.randomString());
+		newPollsChoice.setDescription();
 
 		newPollsChoice.setLastPublishDate(RandomTestUtil.nextDate());
 
@@ -223,11 +223,10 @@ public class PollsChoicePersistenceTest {
 
 	@Test
 	public void testCountByQ_N() throws Exception {
-		_persistence.countByQ_N(RandomTestUtil.nextLong(), "");
+		_persistence.countByQ_N(
+			RandomTestUtil.nextLong(), (UserInputString)null);
 
-		_persistence.countByQ_N(0L, "null");
-
-		_persistence.countByQ_N(0L, (String)null);
+		_persistence.countByQ_N(0L, (UserInputString)null);
 	}
 
 	@Test
@@ -563,9 +562,9 @@ public class PollsChoicePersistenceTest {
 
 		pollsChoice.setQuestionId(RandomTestUtil.nextLong());
 
-		pollsChoice.setName(RandomTestUtil.randomString());
+		pollsChoice.setName();
 
-		pollsChoice.setDescription(RandomTestUtil.randomString());
+		pollsChoice.setDescription();
 
 		pollsChoice.setLastPublishDate(RandomTestUtil.nextDate());
 

@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.model.LocalizedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedGroupedModel;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import java.util.Date;
 import java.util.Locale;
@@ -243,7 +244,6 @@ public interface PollsChoiceModel
 	 *
 	 * @return the name of this polls choice
 	 */
-	@AutoEscape
 	public String getName();
 
 	/**
@@ -251,7 +251,7 @@ public interface PollsChoiceModel
 	 *
 	 * @param name the name of this polls choice
 	 */
-	public void setName(String name);
+	public void setName(UserInputString name);
 
 	/**
 	 * Returns the description of this polls choice.
@@ -267,7 +267,7 @@ public interface PollsChoiceModel
 	 * @return the localized description of this polls choice
 	 */
 	@AutoEscape
-	public String getDescription(Locale locale);
+	public UserInputString getDescription(Locale locale);
 
 	/**
 	 * Returns the localized description of this polls choice in the language, optionally using the default language if no localization exists for the requested language.
@@ -277,7 +277,7 @@ public interface PollsChoiceModel
 	 * @return the localized description of this polls choice. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
 	 */
 	@AutoEscape
-	public String getDescription(Locale locale, boolean useDefault);
+	public UserInputString getDescription(Locale locale, boolean useDefault);
 
 	/**
 	 * Returns the localized description of this polls choice in the language. Uses the default language if no localization exists for the requested language.
@@ -286,7 +286,7 @@ public interface PollsChoiceModel
 	 * @return the localized description of this polls choice
 	 */
 	@AutoEscape
-	public String getDescription(String languageId);
+	public UserInputString getDescription(String languageId);
 
 	/**
 	 * Returns the localized description of this polls choice in the language, optionally using the default language if no localization exists for the requested language.
@@ -296,27 +296,28 @@ public interface PollsChoiceModel
 	 * @return the localized description of this polls choice
 	 */
 	@AutoEscape
-	public String getDescription(String languageId, boolean useDefault);
+	public UserInputString getDescription(
+		String languageId, boolean useDefault);
 
 	@AutoEscape
 	public String getDescriptionCurrentLanguageId();
 
 	@AutoEscape
-	public String getDescriptionCurrentValue();
+	public UserInputString getDescriptionCurrentValue();
 
 	/**
 	 * Returns a map of the locales and localized descriptions of this polls choice.
 	 *
 	 * @return the locales and localized descriptions of this polls choice
 	 */
-	public Map<Locale, String> getDescriptionMap();
+	public Map<Locale, UserInputString> getDescriptionMap();
 
 	/**
 	 * Sets the description of this polls choice.
 	 *
 	 * @param description the description of this polls choice
 	 */
-	public void setDescription(String description);
+	public void setDescription(UserInputString description);
 
 	/**
 	 * Sets the localized description of this polls choice in the language.
@@ -334,7 +335,7 @@ public interface PollsChoiceModel
 	 * @param defaultLocale the default locale
 	 */
 	public void setDescription(
-		String description, Locale locale, Locale defaultLocale);
+		UserInputString description, Locale locale, Locale defaultLocale);
 
 	public void setDescriptionCurrentLanguageId(String languageId);
 
@@ -343,7 +344,7 @@ public interface PollsChoiceModel
 	 *
 	 * @param descriptionMap the locales and localized descriptions of this polls choice
 	 */
-	public void setDescriptionMap(Map<Locale, String> descriptionMap);
+	public void setDescriptionMap(Map<Locale, UserInputString> descriptionMap);
 
 	/**
 	 * Sets the localized descriptions of this polls choice from the map of locales and localized descriptions, and sets the default locale.
@@ -352,7 +353,7 @@ public interface PollsChoiceModel
 	 * @param defaultLocale the default locale
 	 */
 	public void setDescriptionMap(
-		Map<Locale, String> descriptionMap, Locale defaultLocale);
+		Map<Locale, UserInputString> descriptionMap, Locale defaultLocale);
 
 	/**
 	 * Returns the last publish date of this polls choice.
