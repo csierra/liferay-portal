@@ -19,7 +19,8 @@ import java.util.stream.IntStream;
 /**
  * @author Carlos Sierra Andrés
  */
-public final class UserInputString implements CharSequence {
+public final class UserInputString
+	implements CharSequence, Comparable<UserInputString> {
 
 	private final String _string;
 
@@ -97,6 +98,11 @@ public final class UserInputString implements CharSequence {
 
 	public boolean equalsString(String string) {
 		return this.test(string::equals);
+	}
+
+	@Override
+	public int compareTo(UserInputString userInputString) {
+		return _string.compareTo(userInputString._string);
 	}
 
 }

@@ -38,8 +38,12 @@ public enum Escaper {
 		_escaper = escaper;
 	}
 
-	String escape(String string) {
+	public String escape(String string) {
 		return _escaper.apply(string);
+	}
+
+	public String escape(UserInputString userInputString) {
+		return _escaper.apply(userInputString.getString());
 	}
 
 }
