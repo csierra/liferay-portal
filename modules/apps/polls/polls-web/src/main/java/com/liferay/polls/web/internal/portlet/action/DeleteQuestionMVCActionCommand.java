@@ -55,8 +55,8 @@ public class DeleteQuestionMVCActionCommand
 			deleteQuestionIds = new long[] {questionId};
 		}
 		else {
-			deleteQuestionIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "deleteQuestionIds"), 0L);
+			deleteQuestionIds = ParamUtil.getLongValues(
+				actionRequest, "deleteQuestionIds");
 		}
 
 		for (long deleteQuestionId : deleteQuestionIds) {

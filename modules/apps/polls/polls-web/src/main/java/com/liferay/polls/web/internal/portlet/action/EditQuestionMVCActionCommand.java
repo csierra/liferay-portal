@@ -35,6 +35,9 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.service.persistence.impl.Escaper;
+import com.liferay.portal.kernel.service.persistence.impl.EscaperContext;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -87,7 +90,7 @@ public class EditQuestionMVCActionCommand extends BaseMVCActionCommand {
 			PortletRequest portletRequest, PollsQuestion question)
 		throws Exception {
 
-		String referringPortletResource = ParamUtil.getString(
+		UserInputString referringPortletResource = ParamUtil.getUserInputString(
 			portletRequest, "referringPortletResource");
 
 		if (Validator.isNull(referringPortletResource)) {
@@ -129,30 +132,32 @@ public class EditQuestionMVCActionCommand extends BaseMVCActionCommand {
 		PortletConfig portletConfig = (PortletConfig)actionRequest.getAttribute(
 			JavaConstants.JAVAX_PORTLET_CONFIG);
 
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+		UserInputString cmd = ParamUtil.getUserInputString(
+			actionRequest, Constants.CMD);
 
 		try {
 			if (Validator.isNull(cmd)) {
 				return;
 			}
-			else if (cmd.equals(Constants.ADD) ||
-					 cmd.equals(Constants.UPDATE) ||
-					 cmd.equals(Constants.VOTE)) {
+			else if (cmd.equalsString(Constants.ADD) ||
+					 cmd.equalsString(Constants.UPDATE) ||
+					 cmd.equalsString(Constants.VOTE)) {
 
 				updateQuestion(portletConfig, actionRequest, actionResponse);
 			}
-			else if (cmd.equals(Constants.DELETE)) {
+			else if (cmd.equalsString(Constants.DELETE)) {
 				deleteQuestion(actionRequest);
 			}
 
 			WindowState windowState = actionRequest.getWindowState();
 
 			if (windowState.equals(LiferayWindowState.POP_UP)) {
-				String redirect = portal.escapeRedirect(
-					ParamUtil.getString(actionRequest, "redirect"));
+				UserInputString redirect = ParamUtil.getUserInputString(
+					actionRequest, "redirect");
 
-				if (Validator.isNotNull(redirect)) {
-					actionResponse.sendRedirect(redirect);
+				if (Validator.isNull(redirect)) {
+					actionResponse.sendRedirect(
+						Escaper.REDIRECT.escape(redirect));
 				}
 			}
 			else {
@@ -201,10 +206,12 @@ public class EditQuestionMVCActionCommand extends BaseMVCActionCommand {
 
 		long questionId = ParamUtil.getLong(actionRequest, "questionId");
 
-		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
-			actionRequest, "title");
-		Map<Locale, String> descriptionMap =
-			LocalizationUtil.getLocalizationMap(actionRequest, "description");
+		Map<Locale, UserInputString> titleMap =
+			LocalizationUtil.getLocalizationMapFromInput(
+				actionRequest, "title");
+		Map<Locale, UserInputString> descriptionMap =
+			LocalizationUtil.getLocalizationMapFromInput(
+				actionRequest, "description");
 
 		int expirationDateMonth = ParamUtil.getInteger(
 			actionRequest, "expirationDateMonth");
@@ -251,11 +258,11 @@ public class EditQuestionMVCActionCommand extends BaseMVCActionCommand {
 				continue;
 			}
 
-			String choiceName = ParamUtil.getString(
+			UserInputString choiceName = ParamUtil.getUserInputString(
 				actionRequest, CHOICE_NAME_PREFIX + id);
 
-			Map<Locale, String> localeChoiceDescriptionMap =
-				LocalizationUtil.getLocalizationMap(
+			Map<Locale, UserInputString> localeChoiceDescriptionMap =
+				LocalizationUtil.getLocalizationMapFromInput(
 					actionRequest, CHOICE_DESCRIPTION_PREFIX + id);
 
 			PollsChoice choice = PollsChoiceUtil.create(0);

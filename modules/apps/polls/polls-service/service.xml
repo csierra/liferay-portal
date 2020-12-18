@@ -24,8 +24,8 @@
 		<!-- Other fields -->
 
 		<column name="questionId" type="long" />
-		<column name="name" type="String" />
-		<column localized="true" name="description" type="String" />
+		<column name="name" type="UserInputString" />
+		<column localized="true" name="description" type="UserInputString" />
 		<column name="lastPublishDate" type="Date" />
 
 		<!-- Order -->
@@ -70,8 +70,8 @@
 
 		<!-- Other fields -->
 
-		<column localized="true" name="title" type="String" />
-		<column localized="true" name="description" type="String" />
+		<column localized="true" name="title" type="UserInputString" />
+		<column localized="true" name="description" type="UserInputString" />
 		<column name="expirationDate" type="Date" />
 		<column name="lastPublishDate" type="Date" />
 		<column name="lastVoteDate" type="Date" />
