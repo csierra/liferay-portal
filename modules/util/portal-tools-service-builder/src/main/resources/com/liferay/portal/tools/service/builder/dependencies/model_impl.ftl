@@ -661,12 +661,10 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		}
 
 		<#list entity.localizedEntityColumns as entityColumn>
-			<#if !entityColumn.isUserInputString()>
-				@Override
-				public String get${entityColumn.methodName}() {
-					return get${entityColumn.methodName}(getDefaultLanguageId(), false);
-				}
-			</#if>
+			@Override
+			public String get${entityColumn.methodName}() {
+				return get${entityColumn.methodName}(getDefaultLanguageId(), false);
+			}
 
 			@Override
 			<#if entityColumn.isUserInputString()>
@@ -823,41 +821,43 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			@JSON(include = false)
 		</#if>
 
-		<#if !entityColumn.isUserInputString()>
-			<#if !entity.versionEntity?? || !stringUtil.equals(entityColumn.name, "head")>
-				@Override
-			</#if>
-			public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
-				<#if stringUtil.equals(entityColumn.type, "String") && entityColumn.isConvertNull()>
-					if (_${entityColumn.name} == null) {
-						return "";
-					}
-					else {
-						return _${entityColumn.name};
-					}
-				<#else>
-					<#if stringUtil.equals(entityColumn.type, "Blob") && entityColumn.lazy>
-						if (_${entityColumn.name}BlobModel == null) {
-							try {
-								_${entityColumn.name}BlobModel = ${entity.name}LocalServiceUtil.get${entityColumn.methodName}BlobModel(getPrimaryKey());
-							}
-							catch (Exception exception) {
-							}
-						}
-	
-						Blob blob = null;
-	
-						if (_${entityColumn.name}BlobModel != null) {
-							blob = _${entityColumn.name}BlobModel.get${entityColumn.methodName}Blob();
-						}
-	
-						return blob;
-					<#else>
-						return _${entityColumn.name};
-					</#if>
-				</#if>
-			}
+		<#if !entity.versionEntity?? || !stringUtil.equals(entityColumn.name, "head")>
+			@Override
 		</#if>
+		<#if !entityColumn.isUserInputString()>
+			public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
+		<#else>
+			public String get${entityColumn.methodName}() {
+		</#if>
+			<#if stringUtil.equals(entityColumn.type, "String") && entityColumn.isConvertNull()>
+				if (_${entityColumn.name} == null) {
+					return "";
+				}
+				else {
+					return _${entityColumn.name};
+				}
+			<#else>
+				<#if stringUtil.equals(entityColumn.type, "Blob") && entityColumn.lazy>
+					if (_${entityColumn.name}BlobModel == null) {
+						try {
+							_${entityColumn.name}BlobModel = ${entity.name}LocalServiceUtil.get${entityColumn.methodName}BlobModel(getPrimaryKey());
+						}
+						catch (Exception exception) {
+						}
+					}
+
+					Blob blob = null;
+
+					if (_${entityColumn.name}BlobModel != null) {
+						blob = _${entityColumn.name}BlobModel.get${entityColumn.methodName}Blob();
+					}
+
+					return blob;
+				<#else>
+					return _${entityColumn.name};
+				</#if>
+			</#if>
+		}
 
 		<#if entityColumn.localized>
 			@Override
@@ -949,7 +949,11 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		<#if !entity.versionEntity?? || !stringUtil.equals(entityColumn.name, "head")>
 			@Override
 		</#if>
-		public void set${entityColumn.methodName}(${entityColumn.genericizedType} ${entityColumn.name}) {
+		<#if entityColumn.isUserInputString()>
+			public void set${entityColumn.methodName}(String ${entityColumn.name}) {
+		<#else>
+			public void set${entityColumn.methodName}(${entityColumn.genericizedType} ${entityColumn.name}) {
+		</#if>
 			<#if entity.hasEntityColumn("createDate", "Date") && entity.hasEntityColumn("modifiedDate", "Date") && stringUtil.equals(entityColumn.name, "modifiedDate")>
 				_setModifiedDate = true;
 			</#if>
@@ -1972,7 +1976,11 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		<#if stringUtil.equals(entityColumn.type, "Blob") && entityColumn.lazy>
 			private ${entity.name}${entityColumn.methodName}BlobModel _${entityColumn.name}BlobModel;
 		<#else>
-			private ${entityColumn.genericizedType} _${entityColumn.name};
+			<#if entityColumn.isUserInputString()>
+				private String _${entityColumn.name};
+			<#else>
+				private ${entityColumn.genericizedType} _${entityColumn.name};
+			</#if>
 
 			<#if entityColumn.localized>
 				private String _${entityColumn.name}CurrentLanguageId;

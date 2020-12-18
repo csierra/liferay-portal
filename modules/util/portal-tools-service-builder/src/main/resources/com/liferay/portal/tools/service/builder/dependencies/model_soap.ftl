@@ -114,7 +114,12 @@ public class ${entity.name}Soap implements Serializable {
 	}
 
 	<#list entity.regularEntityColumns as entityColumn>
-		public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
+		<#if entityColumn.isUserInputString()>
+			public String get${entityColumn.methodName}() {
+		<#else>
+			public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
+		</#if>
+			
 			return _${entityColumn.name};
 		}
 
@@ -124,13 +129,21 @@ public class ${entity.name}Soap implements Serializable {
 			}
 		</#if>
 
-		public void set${entityColumn.methodName}(${entityColumn.genericizedType} ${entityColumn.name}) {
+		<#if entityColumn.isUserInputString()>
+			public void set${entityColumn.methodName}(String ${entityColumn.name}) {
+		<#else>
+			public void set${entityColumn.methodName}(${entityColumn.genericizedType} ${entityColumn.name}) {
+		</#if>
 			_${entityColumn.name} = ${entityColumn.name};
 		}
 	</#list>
 
 	<#list entity.regularEntityColumns as entityColumn>
-		private ${entityColumn.genericizedType} _${entityColumn.name};
+		<#if entityColumn.isUserInputString()>
+			private String _${entityColumn.name};
+		<#else>
+			private ${entityColumn.genericizedType} _${entityColumn.name};
+		</#if>
 	</#list>
 
 }
