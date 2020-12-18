@@ -661,14 +661,12 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		}
 
 		<#list entity.localizedEntityColumns as entityColumn>
-			@Override
-			<#if entityColumn.isUserInputString()>
-				public UserInputString get${entityColumn.methodName}() {
-			<#else>
+			<#if !entityColumn.isUserInputString()>
+				@Override
 				public String get${entityColumn.methodName}() {
+					return get${entityColumn.methodName}(getDefaultLanguageId(), false);
+				}
 			</#if>
-				return get${entityColumn.methodName}(getDefaultLanguageId(), false);
-			}
 
 			@Override
 			<#if entityColumn.isUserInputString()>
@@ -825,39 +823,41 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			@JSON(include = false)
 		</#if>
 
-		<#if !entity.versionEntity?? || !stringUtil.equals(entityColumn.name, "head")>
-			@Override
-		</#if>
-		public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
-			<#if stringUtil.equals(entityColumn.type, "String") && entityColumn.isConvertNull()>
-				if (_${entityColumn.name} == null) {
-					return "";
-				}
-				else {
-					return _${entityColumn.name};
-				}
-			<#else>
-				<#if stringUtil.equals(entityColumn.type, "Blob") && entityColumn.lazy>
-					if (_${entityColumn.name}BlobModel == null) {
-						try {
-							_${entityColumn.name}BlobModel = ${entity.name}LocalServiceUtil.get${entityColumn.methodName}BlobModel(getPrimaryKey());
-						}
-						catch (Exception exception) {
-						}
-					}
-
-					Blob blob = null;
-
-					if (_${entityColumn.name}BlobModel != null) {
-						blob = _${entityColumn.name}BlobModel.get${entityColumn.methodName}Blob();
-					}
-
-					return blob;
-				<#else>
-					return _${entityColumn.name};
-				</#if>
+		<#if !entityColumn.isUserInputString()>
+			<#if !entity.versionEntity?? || !stringUtil.equals(entityColumn.name, "head")>
+				@Override
 			</#if>
-		}
+			public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
+				<#if stringUtil.equals(entityColumn.type, "String") && entityColumn.isConvertNull()>
+					if (_${entityColumn.name} == null) {
+						return "";
+					}
+					else {
+						return _${entityColumn.name};
+					}
+				<#else>
+					<#if stringUtil.equals(entityColumn.type, "Blob") && entityColumn.lazy>
+						if (_${entityColumn.name}BlobModel == null) {
+							try {
+								_${entityColumn.name}BlobModel = ${entity.name}LocalServiceUtil.get${entityColumn.methodName}BlobModel(getPrimaryKey());
+							}
+							catch (Exception exception) {
+							}
+						}
+	
+						Blob blob = null;
+	
+						if (_${entityColumn.name}BlobModel != null) {
+							blob = _${entityColumn.name}BlobModel.get${entityColumn.methodName}Blob();
+						}
+	
+						return blob;
+					<#else>
+						return _${entityColumn.name};
+					</#if>
+				</#if>
+			}
+		</#if>
 
 		<#if entityColumn.localized>
 			@Override
