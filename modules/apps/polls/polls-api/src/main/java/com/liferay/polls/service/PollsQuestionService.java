@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -56,7 +57,8 @@ public interface PollsQuestionService extends BaseService {
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.polls.service.impl.PollsQuestionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the polls question remote service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link PollsQuestionServiceUtil} if injection and service tracking are not available.
 	 */
 	public PollsQuestion addQuestion(
-			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+			Map<Locale, UserInputString> titleMap,
+			Map<Locale, UserInputString> descriptionMap,
 			int expirationDateMonth, int expirationDateDay,
 			int expirationDateYear, int expirationDateHour,
 			int expirationDateMinute, boolean neverExpire,
@@ -76,12 +78,12 @@ public interface PollsQuestionService extends BaseService {
 	public PollsQuestion getQuestion(long questionId) throws PortalException;
 
 	public PollsQuestion updateQuestion(
-			long questionId, Map<Locale, String> titleMap,
-			Map<Locale, String> descriptionMap, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, List<PollsChoice> choices,
-			ServiceContext serviceContext)
+			long questionId, Map<Locale, UserInputString> titleMap,
+			Map<Locale, UserInputString> descriptionMap,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire,
+			List<PollsChoice> choices, ServiceContext serviceContext)
 		throws PortalException;
 
 }

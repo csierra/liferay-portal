@@ -16,6 +16,7 @@ package com.liferay.polls.model;
 
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.base.BaseTable;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import java.sql.Types;
 
@@ -50,10 +51,13 @@ public class PollsQuestionTable extends BaseTable<PollsQuestionTable> {
 		"createDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 	public final Column<PollsQuestionTable, Date> modifiedDate = createColumn(
 		"modifiedDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
-	public final Column<PollsQuestionTable, String> title = createColumn(
-		"title", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<PollsQuestionTable, String> description = createColumn(
-		"description", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<PollsQuestionTable, UserInputString> title =
+		createColumn(
+			"title", UserInputString.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<PollsQuestionTable, UserInputString> description =
+		createColumn(
+			"description", UserInputString.class, Types.VARCHAR,
+			Column.FLAG_DEFAULT);
 	public final Column<PollsQuestionTable, Date> expirationDate = createColumn(
 		"expirationDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 	public final Column<PollsQuestionTable, Date> lastPublishDate =

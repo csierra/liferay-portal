@@ -1,4 +1,4 @@
-create unique index IX_D76DD2CF on PollsChoice (questionId, name[$COLUMN_LENGTH:75$]);
+create unique index IX_D76DD2CF on PollsChoice (questionId, name);
 create index IX_8AE746EF on PollsChoice (uuid_[$COLUMN_LENGTH:75$], companyId);
 create unique index IX_C222BD31 on PollsChoice (uuid_[$COLUMN_LENGTH:75$], groupId);
 

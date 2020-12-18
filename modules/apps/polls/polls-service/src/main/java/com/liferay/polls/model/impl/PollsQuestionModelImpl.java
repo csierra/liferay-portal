@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -112,7 +113,7 @@ public class PollsQuestionModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table PollsQuestion (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,questionId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title STRING null,description STRING null,expirationDate DATE null,lastPublishDate DATE null,lastVoteDate DATE null)";
+		"create table PollsQuestion (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,questionId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title invalid,description invalid,expirationDate DATE null,lastPublishDate DATE null,lastVoteDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table PollsQuestion";
 
@@ -389,12 +390,14 @@ public class PollsQuestionModelImpl
 		attributeGetterFunctions.put("title", PollsQuestion::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
-			(BiConsumer<PollsQuestion, String>)PollsQuestion::setTitle);
+			(PollsQuestion entity, String s) -> entity.setTitle(
+				new UserInputString(s)));
 		attributeGetterFunctions.put(
 			"description", PollsQuestion::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
-			(BiConsumer<PollsQuestion, String>)PollsQuestion::setDescription);
+			(PollsQuestion entity, String s) -> entity.setDescription(
+				new UserInputString(s)));
 		attributeGetterFunctions.put(
 			"expirationDate", PollsQuestion::getExpirationDate);
 		attributeSetterBiConsumers.put(
@@ -615,35 +618,30 @@ public class PollsQuestionModelImpl
 	@JSON
 	@Override
 	public String getTitle() {
-		if (_title == null) {
-			return "";
-		}
-		else {
-			return _title;
-		}
+		return _title;
 	}
 
 	@Override
-	public String getTitle(Locale locale) {
+	public UserInputString getTitle(Locale locale) {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
 		return getTitle(languageId);
 	}
 
 	@Override
-	public String getTitle(Locale locale, boolean useDefault) {
+	public UserInputString getTitle(Locale locale, boolean useDefault) {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
 		return getTitle(languageId, useDefault);
 	}
 
 	@Override
-	public String getTitle(String languageId) {
+	public UserInputString getTitle(String languageId) {
 		return LocalizationUtil.getLocalization(getTitle(), languageId);
 	}
 
 	@Override
-	public String getTitle(String languageId, boolean useDefault) {
+	public UserInputString getTitle(String languageId, boolean useDefault) {
 		return LocalizationUtil.getLocalization(
 			getTitle(), languageId, useDefault);
 	}
@@ -655,14 +653,14 @@ public class PollsQuestionModelImpl
 
 	@JSON
 	@Override
-	public String getTitleCurrentValue() {
+	public UserInputString getTitleCurrentValue() {
 		Locale locale = getLocale(_titleCurrentLanguageId);
 
 		return getTitle(locale);
 	}
 
 	@Override
-	public Map<Locale, String> getTitleMap() {
+	public Map<Locale, UserInputString> getTitleMap() {
 		return LocalizationUtil.getLocalizationMap(getTitle());
 	}
 
@@ -676,12 +674,14 @@ public class PollsQuestionModelImpl
 	}
 
 	@Override
-	public void setTitle(String title, Locale locale) {
+	public void setTitle(UserInputString title, Locale locale) {
 		setTitle(title, locale, LocaleUtil.getSiteDefault());
 	}
 
 	@Override
-	public void setTitle(String title, Locale locale, Locale defaultLocale) {
+	public void setTitle(
+		UserInputString title, Locale locale, Locale defaultLocale) {
+
 		String languageId = LocaleUtil.toLanguageId(locale);
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
@@ -703,13 +703,13 @@ public class PollsQuestionModelImpl
 	}
 
 	@Override
-	public void setTitleMap(Map<Locale, String> titleMap) {
+	public void setTitleMap(Map<Locale, UserInputString> titleMap) {
 		setTitleMap(titleMap, LocaleUtil.getSiteDefault());
 	}
 
 	@Override
 	public void setTitleMap(
-		Map<Locale, String> titleMap, Locale defaultLocale) {
+		Map<Locale, UserInputString> titleMap, Locale defaultLocale) {
 
 		if (titleMap == null) {
 			return;
@@ -724,35 +724,32 @@ public class PollsQuestionModelImpl
 	@JSON
 	@Override
 	public String getDescription() {
-		if (_description == null) {
-			return "";
-		}
-		else {
-			return _description;
-		}
+		return _description;
 	}
 
 	@Override
-	public String getDescription(Locale locale) {
+	public UserInputString getDescription(Locale locale) {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
 		return getDescription(languageId);
 	}
 
 	@Override
-	public String getDescription(Locale locale, boolean useDefault) {
+	public UserInputString getDescription(Locale locale, boolean useDefault) {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
 		return getDescription(languageId, useDefault);
 	}
 
 	@Override
-	public String getDescription(String languageId) {
+	public UserInputString getDescription(String languageId) {
 		return LocalizationUtil.getLocalization(getDescription(), languageId);
 	}
 
 	@Override
-	public String getDescription(String languageId, boolean useDefault) {
+	public UserInputString getDescription(
+		String languageId, boolean useDefault) {
+
 		return LocalizationUtil.getLocalization(
 			getDescription(), languageId, useDefault);
 	}
@@ -764,14 +761,14 @@ public class PollsQuestionModelImpl
 
 	@JSON
 	@Override
-	public String getDescriptionCurrentValue() {
+	public UserInputString getDescriptionCurrentValue() {
 		Locale locale = getLocale(_descriptionCurrentLanguageId);
 
 		return getDescription(locale);
 	}
 
 	@Override
-	public Map<Locale, String> getDescriptionMap() {
+	public Map<Locale, UserInputString> getDescriptionMap() {
 		return LocalizationUtil.getLocalizationMap(getDescription());
 	}
 
@@ -785,13 +782,13 @@ public class PollsQuestionModelImpl
 	}
 
 	@Override
-	public void setDescription(String description, Locale locale) {
+	public void setDescription(UserInputString description, Locale locale) {
 		setDescription(description, locale, LocaleUtil.getSiteDefault());
 	}
 
 	@Override
 	public void setDescription(
-		String description, Locale locale, Locale defaultLocale) {
+		UserInputString description, Locale locale, Locale defaultLocale) {
 
 		String languageId = LocaleUtil.toLanguageId(locale);
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
@@ -815,13 +812,13 @@ public class PollsQuestionModelImpl
 	}
 
 	@Override
-	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
+	public void setDescriptionMap(Map<Locale, UserInputString> descriptionMap) {
 		setDescriptionMap(descriptionMap, LocaleUtil.getSiteDefault());
 	}
 
 	@Override
 	public void setDescriptionMap(
-		Map<Locale, String> descriptionMap, Locale defaultLocale) {
+		Map<Locale, UserInputString> descriptionMap, Locale defaultLocale) {
 
 		if (descriptionMap == null) {
 			return;
@@ -923,24 +920,26 @@ public class PollsQuestionModelImpl
 	public String[] getAvailableLanguageIds() {
 		Set<String> availableLanguageIds = new TreeSet<String>();
 
-		Map<Locale, String> titleMap = getTitleMap();
+		Map<Locale, UserInputString> titleMap = getTitleMap();
 
-		for (Map.Entry<Locale, String> entry : titleMap.entrySet()) {
+		for (Map.Entry<Locale, UserInputString> entry : titleMap.entrySet()) {
 			Locale locale = entry.getKey();
-			String value = entry.getValue();
+			UserInputString value = entry.getValue();
 
-			if (Validator.isNotNull(value)) {
+			if (Validator.isNotNull(value.toString())) {
 				availableLanguageIds.add(LocaleUtil.toLanguageId(locale));
 			}
 		}
 
-		Map<Locale, String> descriptionMap = getDescriptionMap();
+		Map<Locale, UserInputString> descriptionMap = getDescriptionMap();
 
-		for (Map.Entry<Locale, String> entry : descriptionMap.entrySet()) {
+		for (Map.Entry<Locale, UserInputString> entry :
+				descriptionMap.entrySet()) {
+
 			Locale locale = entry.getKey();
-			String value = entry.getValue();
+			UserInputString value = entry.getValue();
 
-			if (Validator.isNotNull(value)) {
+			if (Validator.isNotNull(value.toString())) {
 				availableLanguageIds.add(LocaleUtil.toLanguageId(locale));
 			}
 		}
@@ -986,7 +985,7 @@ public class PollsQuestionModelImpl
 
 		String modelDefaultLanguageId = getDefaultLanguageId();
 
-		String title = getTitle(defaultLocale);
+		UserInputString title = getTitle(defaultLocale);
 
 		if (Validator.isNull(title)) {
 			setTitle(getTitle(modelDefaultLanguageId), defaultLocale);
@@ -995,7 +994,7 @@ public class PollsQuestionModelImpl
 			setTitle(getTitle(defaultLocale), defaultLocale, defaultLocale);
 		}
 
-		String description = getDescription(defaultLocale);
+		UserInputString description = getDescription(defaultLocale);
 
 		if (Validator.isNull(description)) {
 			setDescription(
@@ -1167,19 +1166,7 @@ public class PollsQuestionModelImpl
 
 		pollsQuestionCacheModel.title = getTitle();
 
-		String title = pollsQuestionCacheModel.title;
-
-		if ((title != null) && (title.length() == 0)) {
-			pollsQuestionCacheModel.title = null;
-		}
-
 		pollsQuestionCacheModel.description = getDescription();
-
-		String description = pollsQuestionCacheModel.description;
-
-		if ((description != null) && (description.length() == 0)) {
-			pollsQuestionCacheModel.description = null;
-		}
 
 		Date expirationDate = getExpirationDate();
 

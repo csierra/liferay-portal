@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -110,7 +111,7 @@ public class PollsChoiceModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table PollsChoice (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,choiceId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,questionId LONG,name VARCHAR(75) null,description STRING null,lastPublishDate DATE null)";
+		"create table PollsChoice (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,choiceId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,questionId LONG,name invalid,description invalid,lastPublishDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table PollsChoice";
 
@@ -390,12 +391,15 @@ public class PollsChoiceModelImpl
 			(BiConsumer<PollsChoice, Long>)PollsChoice::setQuestionId);
 		attributeGetterFunctions.put("name", PollsChoice::getName);
 		attributeSetterBiConsumers.put(
-			"name", (BiConsumer<PollsChoice, String>)PollsChoice::setName);
+			"name",
+			(PollsChoice entity, String s) -> entity.setName(
+				new UserInputString(s)));
 		attributeGetterFunctions.put(
 			"description", PollsChoice::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
-			(BiConsumer<PollsChoice, String>)PollsChoice::setDescription);
+			(PollsChoice entity, String s) -> entity.setDescription(
+				new UserInputString(s)));
 		attributeGetterFunctions.put(
 			"lastPublishDate", PollsChoice::getLastPublishDate);
 		attributeSetterBiConsumers.put(
@@ -631,12 +635,7 @@ public class PollsChoiceModelImpl
 	@JSON
 	@Override
 	public String getName() {
-		if (_name == null) {
-			return "";
-		}
-		else {
-			return _name;
-		}
+		return _name;
 	}
 
 	@Override
@@ -653,42 +652,39 @@ public class PollsChoiceModelImpl
 	 *             #getColumnOriginalValue(String)}
 	 */
 	@Deprecated
-	public String getOriginalName() {
+	public UserInputString getOriginalName() {
 		return getColumnOriginalValue("name");
 	}
 
 	@JSON
 	@Override
 	public String getDescription() {
-		if (_description == null) {
-			return "";
-		}
-		else {
-			return _description;
-		}
+		return _description;
 	}
 
 	@Override
-	public String getDescription(Locale locale) {
+	public UserInputString getDescription(Locale locale) {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
 		return getDescription(languageId);
 	}
 
 	@Override
-	public String getDescription(Locale locale, boolean useDefault) {
+	public UserInputString getDescription(Locale locale, boolean useDefault) {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
 		return getDescription(languageId, useDefault);
 	}
 
 	@Override
-	public String getDescription(String languageId) {
+	public UserInputString getDescription(String languageId) {
 		return LocalizationUtil.getLocalization(getDescription(), languageId);
 	}
 
 	@Override
-	public String getDescription(String languageId, boolean useDefault) {
+	public UserInputString getDescription(
+		String languageId, boolean useDefault) {
+
 		return LocalizationUtil.getLocalization(
 			getDescription(), languageId, useDefault);
 	}
@@ -700,14 +696,14 @@ public class PollsChoiceModelImpl
 
 	@JSON
 	@Override
-	public String getDescriptionCurrentValue() {
+	public UserInputString getDescriptionCurrentValue() {
 		Locale locale = getLocale(_descriptionCurrentLanguageId);
 
 		return getDescription(locale);
 	}
 
 	@Override
-	public Map<Locale, String> getDescriptionMap() {
+	public Map<Locale, UserInputString> getDescriptionMap() {
 		return LocalizationUtil.getLocalizationMap(getDescription());
 	}
 
@@ -721,13 +717,13 @@ public class PollsChoiceModelImpl
 	}
 
 	@Override
-	public void setDescription(String description, Locale locale) {
+	public void setDescription(UserInputString description, Locale locale) {
 		setDescription(description, locale, LocaleUtil.getSiteDefault());
 	}
 
 	@Override
 	public void setDescription(
-		String description, Locale locale, Locale defaultLocale) {
+		UserInputString description, Locale locale, Locale defaultLocale) {
 
 		String languageId = LocaleUtil.toLanguageId(locale);
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
@@ -751,13 +747,13 @@ public class PollsChoiceModelImpl
 	}
 
 	@Override
-	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
+	public void setDescriptionMap(Map<Locale, UserInputString> descriptionMap) {
 		setDescriptionMap(descriptionMap, LocaleUtil.getSiteDefault());
 	}
 
 	@Override
 	public void setDescriptionMap(
-		Map<Locale, String> descriptionMap, Locale defaultLocale) {
+		Map<Locale, UserInputString> descriptionMap, Locale defaultLocale) {
 
 		if (descriptionMap == null) {
 			return;
@@ -829,13 +825,15 @@ public class PollsChoiceModelImpl
 	public String[] getAvailableLanguageIds() {
 		Set<String> availableLanguageIds = new TreeSet<String>();
 
-		Map<Locale, String> descriptionMap = getDescriptionMap();
+		Map<Locale, UserInputString> descriptionMap = getDescriptionMap();
 
-		for (Map.Entry<Locale, String> entry : descriptionMap.entrySet()) {
+		for (Map.Entry<Locale, UserInputString> entry :
+				descriptionMap.entrySet()) {
+
 			Locale locale = entry.getKey();
-			String value = entry.getValue();
+			UserInputString value = entry.getValue();
 
-			if (Validator.isNotNull(value)) {
+			if (Validator.isNotNull(value.toString())) {
 				availableLanguageIds.add(LocaleUtil.toLanguageId(locale));
 			}
 		}
@@ -846,7 +844,7 @@ public class PollsChoiceModelImpl
 
 	@Override
 	public String getDefaultLanguageId() {
-		String xml = getDescription();
+		UserInputString xml = getDescription();
 
 		if (xml == null) {
 			return "";
@@ -881,7 +879,7 @@ public class PollsChoiceModelImpl
 
 		String modelDefaultLanguageId = getDefaultLanguageId();
 
-		String description = getDescription(defaultLocale);
+		UserInputString description = getDescription(defaultLocale);
 
 		if (Validator.isNull(description)) {
 			setDescription(
@@ -1065,19 +1063,7 @@ public class PollsChoiceModelImpl
 
 		pollsChoiceCacheModel.name = getName();
 
-		String name = pollsChoiceCacheModel.name;
-
-		if ((name != null) && (name.length() == 0)) {
-			pollsChoiceCacheModel.name = null;
-		}
-
 		pollsChoiceCacheModel.description = getDescription();
-
-		String description = pollsChoiceCacheModel.description;
-
-		if ((description != null) && (description.length() == 0)) {
-			pollsChoiceCacheModel.description = null;
-		}
 
 		Date lastPublishDate = getLastPublishDate();
 

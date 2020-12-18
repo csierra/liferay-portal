@@ -17,6 +17,7 @@ package com.liferay.polls.service.persistence;
 import com.liferay.polls.exception.NoSuchChoiceException;
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -539,7 +540,7 @@ public interface PollsChoicePersistence extends BasePersistence<PollsChoice> {
 	 * @return the matching polls choice
 	 * @throws NoSuchChoiceException if a matching polls choice could not be found
 	 */
-	public PollsChoice findByQ_N(long questionId, String name)
+	public PollsChoice findByQ_N(long questionId, UserInputString name)
 		throws NoSuchChoiceException;
 
 	/**
@@ -549,7 +550,7 @@ public interface PollsChoicePersistence extends BasePersistence<PollsChoice> {
 	 * @param name the name
 	 * @return the matching polls choice, or <code>null</code> if a matching polls choice could not be found
 	 */
-	public PollsChoice fetchByQ_N(long questionId, String name);
+	public PollsChoice fetchByQ_N(long questionId, UserInputString name);
 
 	/**
 	 * Returns the polls choice where questionId = &#63; and name = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
@@ -560,7 +561,7 @@ public interface PollsChoicePersistence extends BasePersistence<PollsChoice> {
 	 * @return the matching polls choice, or <code>null</code> if a matching polls choice could not be found
 	 */
 	public PollsChoice fetchByQ_N(
-		long questionId, String name, boolean useFinderCache);
+		long questionId, UserInputString name, boolean useFinderCache);
 
 	/**
 	 * Removes the polls choice where questionId = &#63; and name = &#63; from the database.
@@ -569,7 +570,7 @@ public interface PollsChoicePersistence extends BasePersistence<PollsChoice> {
 	 * @param name the name
 	 * @return the polls choice that was removed
 	 */
-	public PollsChoice removeByQ_N(long questionId, String name)
+	public PollsChoice removeByQ_N(long questionId, UserInputString name)
 		throws NoSuchChoiceException;
 
 	/**
@@ -579,7 +580,7 @@ public interface PollsChoicePersistence extends BasePersistence<PollsChoice> {
 	 * @param name the name
 	 * @return the number of matching polls choices
 	 */
-	public int countByQ_N(long questionId, String name);
+	public int countByQ_N(long questionId, UserInputString name);
 
 	/**
 	 * Caches the polls choice in the entity cache if it is enabled.

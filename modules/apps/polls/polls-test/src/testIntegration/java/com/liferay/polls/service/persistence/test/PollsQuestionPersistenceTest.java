@@ -140,9 +140,9 @@ public class PollsQuestionPersistenceTest {
 
 		newPollsQuestion.setModifiedDate(RandomTestUtil.nextDate());
 
-		newPollsQuestion.setTitle(RandomTestUtil.randomString());
+		newPollsQuestion.setTitle();
 
-		newPollsQuestion.setDescription(RandomTestUtil.randomString());
+		newPollsQuestion.setDescription();
 
 		newPollsQuestion.setExpirationDate(RandomTestUtil.nextDate());
 
@@ -564,9 +564,9 @@ public class PollsQuestionPersistenceTest {
 
 		pollsQuestion.setModifiedDate(RandomTestUtil.nextDate());
 
-		pollsQuestion.setTitle(RandomTestUtil.randomString());
+		pollsQuestion.setTitle();
 
-		pollsQuestion.setDescription(RandomTestUtil.randomString());
+		pollsQuestion.setDescription();
 
 		pollsQuestion.setExpirationDate(RandomTestUtil.nextDate());
 

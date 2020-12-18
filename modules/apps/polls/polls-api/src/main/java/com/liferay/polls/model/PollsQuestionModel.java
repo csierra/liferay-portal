@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.model.LocalizedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedGroupedModel;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import java.util.Date;
 import java.util.Locale;
@@ -238,7 +239,7 @@ public interface PollsQuestionModel
 	 * @return the localized title of this polls question
 	 */
 	@AutoEscape
-	public String getTitle(Locale locale);
+	public UserInputString getTitle(Locale locale);
 
 	/**
 	 * Returns the localized title of this polls question in the language, optionally using the default language if no localization exists for the requested language.
@@ -248,7 +249,7 @@ public interface PollsQuestionModel
 	 * @return the localized title of this polls question. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
 	 */
 	@AutoEscape
-	public String getTitle(Locale locale, boolean useDefault);
+	public UserInputString getTitle(Locale locale, boolean useDefault);
 
 	/**
 	 * Returns the localized title of this polls question in the language. Uses the default language if no localization exists for the requested language.
@@ -257,7 +258,7 @@ public interface PollsQuestionModel
 	 * @return the localized title of this polls question
 	 */
 	@AutoEscape
-	public String getTitle(String languageId);
+	public UserInputString getTitle(String languageId);
 
 	/**
 	 * Returns the localized title of this polls question in the language, optionally using the default language if no localization exists for the requested language.
@@ -267,27 +268,27 @@ public interface PollsQuestionModel
 	 * @return the localized title of this polls question
 	 */
 	@AutoEscape
-	public String getTitle(String languageId, boolean useDefault);
+	public UserInputString getTitle(String languageId, boolean useDefault);
 
 	@AutoEscape
 	public String getTitleCurrentLanguageId();
 
 	@AutoEscape
-	public String getTitleCurrentValue();
+	public UserInputString getTitleCurrentValue();
 
 	/**
 	 * Returns a map of the locales and localized titles of this polls question.
 	 *
 	 * @return the locales and localized titles of this polls question
 	 */
-	public Map<Locale, String> getTitleMap();
+	public Map<Locale, UserInputString> getTitleMap();
 
 	/**
 	 * Sets the title of this polls question.
 	 *
 	 * @param title the title of this polls question
 	 */
-	public void setTitle(String title);
+	public void setTitle(UserInputString title);
 
 	/**
 	 * Sets the localized title of this polls question in the language.
@@ -304,7 +305,8 @@ public interface PollsQuestionModel
 	 * @param locale the locale of the language
 	 * @param defaultLocale the default locale
 	 */
-	public void setTitle(String title, Locale locale, Locale defaultLocale);
+	public void setTitle(
+		UserInputString title, Locale locale, Locale defaultLocale);
 
 	public void setTitleCurrentLanguageId(String languageId);
 
@@ -313,7 +315,7 @@ public interface PollsQuestionModel
 	 *
 	 * @param titleMap the locales and localized titles of this polls question
 	 */
-	public void setTitleMap(Map<Locale, String> titleMap);
+	public void setTitleMap(Map<Locale, UserInputString> titleMap);
 
 	/**
 	 * Sets the localized titles of this polls question from the map of locales and localized titles, and sets the default locale.
@@ -321,7 +323,8 @@ public interface PollsQuestionModel
 	 * @param titleMap the locales and localized titles of this polls question
 	 * @param defaultLocale the default locale
 	 */
-	public void setTitleMap(Map<Locale, String> titleMap, Locale defaultLocale);
+	public void setTitleMap(
+		Map<Locale, UserInputString> titleMap, Locale defaultLocale);
 
 	/**
 	 * Returns the description of this polls question.
@@ -337,7 +340,7 @@ public interface PollsQuestionModel
 	 * @return the localized description of this polls question
 	 */
 	@AutoEscape
-	public String getDescription(Locale locale);
+	public UserInputString getDescription(Locale locale);
 
 	/**
 	 * Returns the localized description of this polls question in the language, optionally using the default language if no localization exists for the requested language.
@@ -347,7 +350,7 @@ public interface PollsQuestionModel
 	 * @return the localized description of this polls question. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
 	 */
 	@AutoEscape
-	public String getDescription(Locale locale, boolean useDefault);
+	public UserInputString getDescription(Locale locale, boolean useDefault);
 
 	/**
 	 * Returns the localized description of this polls question in the language. Uses the default language if no localization exists for the requested language.
@@ -356,7 +359,7 @@ public interface PollsQuestionModel
 	 * @return the localized description of this polls question
 	 */
 	@AutoEscape
-	public String getDescription(String languageId);
+	public UserInputString getDescription(String languageId);
 
 	/**
 	 * Returns the localized description of this polls question in the language, optionally using the default language if no localization exists for the requested language.
@@ -366,27 +369,28 @@ public interface PollsQuestionModel
 	 * @return the localized description of this polls question
 	 */
 	@AutoEscape
-	public String getDescription(String languageId, boolean useDefault);
+	public UserInputString getDescription(
+		String languageId, boolean useDefault);
 
 	@AutoEscape
 	public String getDescriptionCurrentLanguageId();
 
 	@AutoEscape
-	public String getDescriptionCurrentValue();
+	public UserInputString getDescriptionCurrentValue();
 
 	/**
 	 * Returns a map of the locales and localized descriptions of this polls question.
 	 *
 	 * @return the locales and localized descriptions of this polls question
 	 */
-	public Map<Locale, String> getDescriptionMap();
+	public Map<Locale, UserInputString> getDescriptionMap();
 
 	/**
 	 * Sets the description of this polls question.
 	 *
 	 * @param description the description of this polls question
 	 */
-	public void setDescription(String description);
+	public void setDescription(UserInputString description);
 
 	/**
 	 * Sets the localized description of this polls question in the language.
@@ -404,7 +408,7 @@ public interface PollsQuestionModel
 	 * @param defaultLocale the default locale
 	 */
 	public void setDescription(
-		String description, Locale locale, Locale defaultLocale);
+		UserInputString description, Locale locale, Locale defaultLocale);
 
 	public void setDescriptionCurrentLanguageId(String languageId);
 
@@ -413,7 +417,7 @@ public interface PollsQuestionModel
 	 *
 	 * @param descriptionMap the locales and localized descriptions of this polls question
 	 */
-	public void setDescriptionMap(Map<Locale, String> descriptionMap);
+	public void setDescriptionMap(Map<Locale, UserInputString> descriptionMap);
 
 	/**
 	 * Sets the localized descriptions of this polls question from the map of locales and localized descriptions, and sets the default locale.
@@ -422,7 +426,7 @@ public interface PollsQuestionModel
 	 * @param defaultLocale the default locale
 	 */
 	public void setDescriptionMap(
-		Map<Locale, String> descriptionMap, Locale defaultLocale);
+		Map<Locale, UserInputString> descriptionMap, Locale defaultLocale);
 
 	/**
 	 * Returns the expiration date of this polls question.

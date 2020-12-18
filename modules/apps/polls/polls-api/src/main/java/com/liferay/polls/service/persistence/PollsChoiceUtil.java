@@ -17,6 +17,7 @@ package com.liferay.polls.service.persistence;
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.io.Serializable;
@@ -711,7 +712,7 @@ public class PollsChoiceUtil {
 	 * @return the matching polls choice
 	 * @throws NoSuchChoiceException if a matching polls choice could not be found
 	 */
-	public static PollsChoice findByQ_N(long questionId, String name)
+	public static PollsChoice findByQ_N(long questionId, UserInputString name)
 		throws com.liferay.polls.exception.NoSuchChoiceException {
 
 		return getPersistence().findByQ_N(questionId, name);
@@ -724,7 +725,9 @@ public class PollsChoiceUtil {
 	 * @param name the name
 	 * @return the matching polls choice, or <code>null</code> if a matching polls choice could not be found
 	 */
-	public static PollsChoice fetchByQ_N(long questionId, String name) {
+	public static PollsChoice fetchByQ_N(
+		long questionId, UserInputString name) {
+
 		return getPersistence().fetchByQ_N(questionId, name);
 	}
 
@@ -737,7 +740,7 @@ public class PollsChoiceUtil {
 	 * @return the matching polls choice, or <code>null</code> if a matching polls choice could not be found
 	 */
 	public static PollsChoice fetchByQ_N(
-		long questionId, String name, boolean useFinderCache) {
+		long questionId, UserInputString name, boolean useFinderCache) {
 
 		return getPersistence().fetchByQ_N(questionId, name, useFinderCache);
 	}
@@ -749,7 +752,7 @@ public class PollsChoiceUtil {
 	 * @param name the name
 	 * @return the polls choice that was removed
 	 */
-	public static PollsChoice removeByQ_N(long questionId, String name)
+	public static PollsChoice removeByQ_N(long questionId, UserInputString name)
 		throws com.liferay.polls.exception.NoSuchChoiceException {
 
 		return getPersistence().removeByQ_N(questionId, name);
@@ -762,7 +765,7 @@ public class PollsChoiceUtil {
 	 * @param name the name
 	 * @return the number of matching polls choices
 	 */
-	public static int countByQ_N(long questionId, String name) {
+	public static int countByQ_N(long questionId, UserInputString name) {
 		return getPersistence().countByQ_N(questionId, name);
 	}
 
