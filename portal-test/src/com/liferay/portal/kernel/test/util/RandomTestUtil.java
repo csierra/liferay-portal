@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.test.util;
 
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.test.randomizerbumpers.RandomizerBumper;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -100,6 +101,20 @@ public class RandomTestUtil {
 	public static Map<Locale, String> randomLocaleStringMap(Locale locale) {
 		return HashMapBuilder.put(
 			LocaleUtil.getDefault(), randomString()
+		).build();
+	}
+
+	public static Map<Locale, UserInputString>
+		randomLocaleUserInputStringMap() {
+
+		return randomLocaleUserInputStringMap(LocaleUtil.getDefault());
+	}
+
+	public static Map<Locale, UserInputString> randomLocaleUserInputStringMap(
+		Locale locale) {
+
+		return HashMapBuilder.put(
+			LocaleUtil.getDefault(), new UserInputString(randomString())
 		).build();
 	}
 
