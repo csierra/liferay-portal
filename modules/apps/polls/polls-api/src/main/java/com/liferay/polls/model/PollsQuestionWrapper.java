@@ -119,14 +119,13 @@ public class PollsQuestionWrapper
 			setModifiedDate(modifiedDate);
 		}
 
-		UserInputString title = (UserInputString)attributes.get("title");
+		String title = (String)attributes.get("title");
 
 		if (title != null) {
 			setTitle(title);
 		}
 
-		UserInputString description = (UserInputString)attributes.get(
-			"description");
+		String description = (String)attributes.get("description");
 
 		if (description != null) {
 			setDescription(description);
@@ -532,24 +531,26 @@ public class PollsQuestionWrapper
 	}
 
 	/**
+	 * Sets the description of this polls question.
+	 *
+	 * @param description the description of this polls question
+	 */
+	@Override
+	public void setDescription(String description) {
+		model.setDescription(description);
+	}
+
+	/**
 	 * Sets the localized description of this polls question in the language.
 	 *
 	 * @param description the localized description of this polls question
 	 * @param locale the locale of the language
 	 */
 	@Override
-	public void setDescription(String description, java.util.Locale locale) {
-		model.setDescription(description, locale);
-	}
+	public void setDescription(
+		UserInputString description, java.util.Locale locale) {
 
-	/**
-	 * Sets the description of this polls question.
-	 *
-	 * @param description the description of this polls question
-	 */
-	@Override
-	public void setDescription(UserInputString description) {
-		model.setDescription(description);
+		model.setDescription(description, locale);
 	}
 
 	/**
@@ -679,24 +680,24 @@ public class PollsQuestionWrapper
 	}
 
 	/**
+	 * Sets the title of this polls question.
+	 *
+	 * @param title the title of this polls question
+	 */
+	@Override
+	public void setTitle(String title) {
+		model.setTitle(title);
+	}
+
+	/**
 	 * Sets the localized title of this polls question in the language.
 	 *
 	 * @param title the localized title of this polls question
 	 * @param locale the locale of the language
 	 */
 	@Override
-	public void setTitle(String title, java.util.Locale locale) {
+	public void setTitle(UserInputString title, java.util.Locale locale) {
 		model.setTitle(title, locale);
-	}
-
-	/**
-	 * Sets the title of this polls question.
-	 *
-	 * @param title the title of this polls question
-	 */
-	@Override
-	public void setTitle(UserInputString title) {
-		model.setTitle(title);
 	}
 
 	/**

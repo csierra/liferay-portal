@@ -345,7 +345,7 @@ public class PollsQuestionLocalServiceImpl
 
 		for (PollsChoice choice : choices) {
 			UserInputString choiceName = choice.getName();
-			UserInputString choiceDescription = choice.getDescription();
+			String choiceDescription = choice.getDescription();
 
 			choice = pollsChoicePersistence.fetchByQ_N(questionId, choiceName);
 

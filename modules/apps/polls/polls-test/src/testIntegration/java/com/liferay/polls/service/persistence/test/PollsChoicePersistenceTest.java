@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -142,9 +143,10 @@ public class PollsChoicePersistenceTest {
 
 		newPollsChoice.setQuestionId(RandomTestUtil.nextLong());
 
-		newPollsChoice.setName();
+		newPollsChoice.setName(
+			new UserInputString(RandomTestUtil.randomString()));
 
-		newPollsChoice.setDescription();
+		newPollsChoice.setDescription(RandomTestUtil.randomString());
 
 		newPollsChoice.setLastPublishDate(RandomTestUtil.nextDate());
 
@@ -224,7 +226,9 @@ public class PollsChoicePersistenceTest {
 	@Test
 	public void testCountByQ_N() throws Exception {
 		_persistence.countByQ_N(
-			RandomTestUtil.nextLong(), (UserInputString)null);
+			RandomTestUtil.nextLong(), new UserInputString(""));
+
+		_persistence.countByQ_N(0L, new UserInputString("null"));
 
 		_persistence.countByQ_N(0L, (UserInputString)null);
 	}
@@ -562,9 +566,9 @@ public class PollsChoicePersistenceTest {
 
 		pollsChoice.setQuestionId(RandomTestUtil.nextLong());
 
-		pollsChoice.setName();
+		pollsChoice.setName(new UserInputString(RandomTestUtil.randomString()));
 
-		pollsChoice.setDescription();
+		pollsChoice.setDescription(RandomTestUtil.randomString());
 
 		pollsChoice.setLastPublishDate(RandomTestUtil.nextDate());
 

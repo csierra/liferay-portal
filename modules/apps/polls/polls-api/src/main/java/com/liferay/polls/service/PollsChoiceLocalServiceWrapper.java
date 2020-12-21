@@ -38,8 +38,7 @@ public class PollsChoiceLocalServiceWrapper
 			long userId, long questionId,
 			com.liferay.portal.kernel.service.persistence.impl.UserInputString
 				name,
-			com.liferay.portal.kernel.service.persistence.impl.UserInputString
-				description,
+			String description,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -413,8 +412,7 @@ public class PollsChoiceLocalServiceWrapper
 			long choiceId, long questionId,
 			com.liferay.portal.kernel.service.persistence.impl.UserInputString
 				name,
-			com.liferay.portal.kernel.service.persistence.impl.UserInputString
-				description,
+			String description,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 

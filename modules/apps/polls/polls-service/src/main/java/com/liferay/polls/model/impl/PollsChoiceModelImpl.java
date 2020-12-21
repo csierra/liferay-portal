@@ -392,14 +392,12 @@ public class PollsChoiceModelImpl
 		attributeGetterFunctions.put("name", PollsChoice::getName);
 		attributeSetterBiConsumers.put(
 			"name",
-			(PollsChoice entity, String s) -> entity.setName(
-				new UserInputString(s)));
+			(BiConsumer<PollsChoice, UserInputString>)PollsChoice::setName);
 		attributeGetterFunctions.put(
 			"description", PollsChoice::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
-			(PollsChoice entity, String s) -> entity.setDescription(
-				new UserInputString(s)));
+			(BiConsumer<PollsChoice, String>)PollsChoice::setDescription);
 		attributeGetterFunctions.put(
 			"lastPublishDate", PollsChoice::getLastPublishDate);
 		attributeSetterBiConsumers.put(
@@ -634,12 +632,12 @@ public class PollsChoiceModelImpl
 
 	@JSON
 	@Override
-	public String getName() {
+	public UserInputString getName() {
 		return _name;
 	}
 
 	@Override
-	public void setName(String name) {
+	public void setName(UserInputString name) {
 		if (_columnOriginalValues == Collections.EMPTY_MAP) {
 			_setColumnOriginalValues();
 		}
@@ -678,15 +676,17 @@ public class PollsChoiceModelImpl
 
 	@Override
 	public UserInputString getDescription(String languageId) {
-		return LocalizationUtil.getLocalization(getDescription(), languageId);
+		return new UserInputString(
+			LocalizationUtil.getLocalization(getDescription(), languageId));
 	}
 
 	@Override
 	public UserInputString getDescription(
 		String languageId, boolean useDefault) {
 
-		return LocalizationUtil.getLocalization(
-			getDescription(), languageId, useDefault);
+		return new UserInputString(
+			LocalizationUtil.getLocalization(
+				getDescription(), languageId, useDefault));
 	}
 
 	@Override
@@ -704,7 +704,19 @@ public class PollsChoiceModelImpl
 
 	@Override
 	public Map<Locale, UserInputString> getDescriptionMap() {
-		return LocalizationUtil.getLocalizationMap(getDescription());
+		Map<Locale, String> stringLocalizationMap =
+			LocalizationUtil.getLocalizationMap(getDescription());
+
+		Map<Locale, UserInputString> localizationMap = new HashMap<>();
+
+		for (Map.Entry<Locale, String> entry :
+				stringLocalizationMap.entrySet()) {
+
+			localizationMap.put(
+				entry.getKey(), new UserInputString(entry.getValue()));
+		}
+
+		return localizationMap;
 	}
 
 	@Override
@@ -760,7 +772,7 @@ public class PollsChoiceModelImpl
 		}
 
 		setDescription(
-			LocalizationUtil.updateLocalization(
+			LocalizationUtil.updateLocalizationFromUserInput(
 				descriptionMap, getDescription(), "Description",
 				LocaleUtil.toLanguageId(defaultLocale)));
 	}
@@ -844,7 +856,7 @@ public class PollsChoiceModelImpl
 
 	@Override
 	public String getDefaultLanguageId() {
-		UserInputString xml = getDescription();
+		String xml = getDescription();
 
 		if (xml == null) {
 			return "";
@@ -1158,7 +1170,7 @@ public class PollsChoiceModelImpl
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;
 	private long _questionId;
-	private String _name;
+	private UserInputString _name;
 	private String _description;
 	private String _descriptionCurrentLanguageId;
 	private Date _lastPublishDate;

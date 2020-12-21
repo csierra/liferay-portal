@@ -19,7 +19,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
-import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -198,8 +197,8 @@ public class PollsQuestionCacheModel
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
-		title = (UserInputString)objectInput.readObject();
-		description = (UserInputString)objectInput.readObject();
+		title = objectInput.readUTF();
+		description = objectInput.readUTF();
 		expirationDate = objectInput.readLong();
 		lastPublishDate = objectInput.readLong();
 		lastVoteDate = objectInput.readLong();
@@ -249,8 +248,8 @@ public class PollsQuestionCacheModel
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
-	public UserInputString title;
-	public UserInputString description;
+	public String title;
+	public String description;
 	public long expirationDate;
 	public long lastPublishDate;
 	public long lastVoteDate;

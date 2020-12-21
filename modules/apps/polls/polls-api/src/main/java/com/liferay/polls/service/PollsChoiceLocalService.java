@@ -67,7 +67,7 @@ public interface PollsChoiceLocalService
 	 */
 	public PollsChoice addChoice(
 			long userId, long questionId, UserInputString name,
-			UserInputString description, ServiceContext serviceContext)
+			String description, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -321,7 +321,7 @@ public interface PollsChoiceLocalService
 
 	public PollsChoice updateChoice(
 			long choiceId, long questionId, UserInputString name,
-			UserInputString description, ServiceContext serviceContext)
+			String description, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**

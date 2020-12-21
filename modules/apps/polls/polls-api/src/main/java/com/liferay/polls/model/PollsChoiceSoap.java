@@ -14,6 +14,8 @@
 
 package com.liferay.polls.model;
 
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
+
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -179,11 +181,11 @@ public class PollsChoiceSoap implements Serializable {
 		_questionId = questionId;
 	}
 
-	public String getName() {
+	public UserInputString getName() {
 		return _name;
 	}
 
-	public void setName(String name) {
+	public void setName(UserInputString name) {
 		_name = name;
 	}
 
@@ -213,7 +215,7 @@ public class PollsChoiceSoap implements Serializable {
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _questionId;
-	private String _name;
+	private UserInputString _name;
 	private String _description;
 	private Date _lastPublishDate;
 

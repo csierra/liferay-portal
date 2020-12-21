@@ -17,6 +17,7 @@ package com.liferay.polls.search.test;
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.util.test.PollsTestUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 
 import java.util.ArrayList;
@@ -44,7 +45,8 @@ public class PollsQuestionFixture {
 	}
 
 	public PollsQuestion createPollsQuestion(
-			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap)
+			Map<Locale, UserInputString> titleMap,
+			Map<Locale, UserInputString> descriptionMap)
 		throws Exception {
 
 		PollsQuestion pollsQuestion = PollsTestUtil.addQuestion(

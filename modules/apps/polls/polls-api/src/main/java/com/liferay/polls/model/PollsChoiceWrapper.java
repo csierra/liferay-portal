@@ -129,8 +129,7 @@ public class PollsChoiceWrapper
 			setName(name);
 		}
 
-		UserInputString description = (UserInputString)attributes.get(
-			"description");
+		String description = (String)attributes.get("description");
 
 		if (description != null) {
 			setDescription(description);
@@ -309,7 +308,7 @@ public class PollsChoiceWrapper
 	 * @return the name of this polls choice
 	 */
 	@Override
-	public String getName() {
+	public UserInputString getName() {
 		return model.getName();
 	}
 
@@ -429,24 +428,26 @@ public class PollsChoiceWrapper
 	}
 
 	/**
+	 * Sets the description of this polls choice.
+	 *
+	 * @param description the description of this polls choice
+	 */
+	@Override
+	public void setDescription(String description) {
+		model.setDescription(description);
+	}
+
+	/**
 	 * Sets the localized description of this polls choice in the language.
 	 *
 	 * @param description the localized description of this polls choice
 	 * @param locale the locale of the language
 	 */
 	@Override
-	public void setDescription(String description, java.util.Locale locale) {
-		model.setDescription(description, locale);
-	}
+	public void setDescription(
+		UserInputString description, java.util.Locale locale) {
 
-	/**
-	 * Sets the description of this polls choice.
-	 *
-	 * @param description the description of this polls choice
-	 */
-	@Override
-	public void setDescription(UserInputString description) {
-		model.setDescription(description);
+		model.setDescription(description, locale);
 	}
 
 	/**
