@@ -662,9 +662,14 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 		<#list entity.localizedEntityColumns as entityColumn>
 			@Override
-			public String get${entityColumn.methodName}() {
-				return get${entityColumn.methodName}(getDefaultLanguageId(), false);
-			}
+			<#if entityColumn.isUserInputString() && entityColumn.localized>
+				public String get${entityColumn.methodName}() {
+			<#else>
+				public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
+			</#if>
+					return get${entityColumn.methodName}(getDefaultLanguageId(), false);
+				}
+
 
 			@Override
 			<#if entityColumn.isUserInputString()>
@@ -824,11 +829,12 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		<#if !entity.versionEntity?? || !stringUtil.equals(entityColumn.name, "head")>
 			@Override
 		</#if>
-		<#if !entityColumn.isUserInputString()>
-			public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
+		<#if entityColumn.isUserInputString() && entityColumn.localized>
+				public String get${entityColumn.methodName}() {
 		<#else>
-			public String get${entityColumn.methodName}() {
+			public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
 		</#if>
+
 			<#if stringUtil.equals(entityColumn.type, "String") && entityColumn.isConvertNull()>
 				if (_${entityColumn.name} == null) {
 					return "";
@@ -950,7 +956,11 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			@Override
 		</#if>
 		<#if entityColumn.isUserInputString()>
-			public void set${entityColumn.methodName}(String ${entityColumn.name}) {
+			<#if entityColumn.localized>
+				public void set${entityColumn.methodName}(String ${entityColumn.name}) {
+			<#else>
+				public void set${entityColumn.methodName}(UserInputString ${entityColumn.name}) {
+			</#if>
 		<#else>
 			public void set${entityColumn.methodName}(${entityColumn.genericizedType} ${entityColumn.name}) {
 		</#if>
@@ -1976,7 +1986,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		<#if stringUtil.equals(entityColumn.type, "Blob") && entityColumn.lazy>
 			private ${entity.name}${entityColumn.methodName}BlobModel _${entityColumn.name}BlobModel;
 		<#else>
-			<#if entityColumn.isUserInputString()>
+			<#if entityColumn.isUserInputString() && entityColumn.localized>
 				private String _${entityColumn.name};
 			<#else>
 				private ${entityColumn.genericizedType} _${entityColumn.name};

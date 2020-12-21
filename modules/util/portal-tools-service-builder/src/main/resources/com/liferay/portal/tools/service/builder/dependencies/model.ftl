@@ -145,10 +145,10 @@ public interface ${entity.name}Model extends ${entity.getModelBaseInterfaceNames
 			@Override
 		</#if>
 
-		<#if !entityColumn.isUserInputString()>
-			public ${entityColumn.genericizedType} get${entityColumn.methodName}();
-		<#else>
+		<#if entityColumn.isUserInputString() && entityColumn.localized>
 			public String get${entityColumn.methodName}();
+		<#else>
+			public ${entityColumn.genericizedType} get${entityColumn.methodName}();
 		</#if>
 
 		<#if entityColumn.localized>
@@ -336,8 +336,12 @@ public interface ${entity.name}Model extends ${entity.getModelBaseInterfaceNames
 
 		<#list entity.localizedEntityColumns as entityColumn>
 			<#if entityColumn.isUserInputString()>
-				public String get${entityColumn.methodName}();
-	
+
+				<#if entityColumn.localized>
+					public String get${entityColumn.methodName}();
+				<#else>
+					public UserInputString get${entityColumn.methodName}();
+				</#if>
 				public UserInputString get${entityColumn.methodName}(String languageId);
 	
 				public UserInputString get${entityColumn.methodName}(String languageId, boolean useDefault);
