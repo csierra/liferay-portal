@@ -249,7 +249,11 @@ public interface ${entity.name}Model extends ${entity.getModelBaseInterfaceNames
 		<#if overrideColumnNames?seq_contains(entityColumn.name)>
 			@Override
 		</#if>
-		public void set${entityColumn.methodName}(${entityColumn.genericizedType} ${entityColumn.name});
+		<#if entityColumn.isUserInputString() && entityColumn.localized>
+			public void set${entityColumn.methodName}(String ${entityColumn.name});
+		<#else>
+			public void set${entityColumn.methodName}(${entityColumn.genericizedType} ${entityColumn.name});
+		</#if>
 
 		<#if entityColumn.localized>
 			/**
@@ -258,7 +262,11 @@ public interface ${entity.name}Model extends ${entity.getModelBaseInterfaceNames
 			 * @param ${entityColumn.name} the localized ${entityColumn.humanName} of this ${entity.humanName}
 			 * @param locale the locale of the language
 			 */
-			public void set${entityColumn.methodName}(String ${entityColumn.name}, Locale locale);
+			<#if entityColumn.isUserInputString()>
+				public void set${entityColumn.methodName}(UserInputString ${entityColumn.name}, Locale locale);
+			<#else>
+				public void set${entityColumn.methodName}(String ${entityColumn.name}, Locale locale);
+			</#if>
 
 			/**
 			 * Sets the localized ${entityColumn.humanName} of this ${entity.humanName} in the language, and sets the default locale.

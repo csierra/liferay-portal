@@ -630,8 +630,8 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 			});
 	<#else>
-		<#if entityColumn.isUserInputString()>
-			attributeSetterBiConsumers.put("${entityColumn.name}", (${entity.name} entity, String s) -> entity.set${entityColumn.methodName}(new UserInputString(s)));
+		<#if entityColumn.isUserInputString() && entityColumn.localized>
+			attributeSetterBiConsumers.put("${entityColumn.name}", (BiConsumer<${entity.name}, String>)${entity.name}::set${entityColumn.methodName});
 		<#else>
 			attributeSetterBiConsumers.put("${entityColumn.name}", (BiConsumer<${entity.name}, ${entityColumnType}>)${entity.name}::set${entityColumn.methodName});
 		</#if>
@@ -687,12 +687,13 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 				public String get${entityColumn.methodName}(String languageId, boolean useDefault) {
 			</#if>
 				if (useDefault) {
-					return LocalizationUtil.getLocalization(
-						<#if entityColumn.isUserInputString()>
+					<#if entityColumn.isUserInputString()>
+						return New UserInputString(LocalizationUtil.getLocalization(
 							new Function<String, UserInputString> () {
-						<#else>
+					<#else>
+						return LocalizationUtil.getLocalization(
 							new Function<String, String> () {
-						</#if>
+					</#if>
 
 							@Override
 							public String apply(String languageId) {
@@ -700,7 +701,12 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 							}
 
 						},
-						languageId, getDefaultLanguageId());
+						languageId, getDefaultLanguageId())
+						<#if entityColumn.isUserInputString()>
+							);
+						<#else>
+							;
+						</#if>
 				}
 
 				return _get${entityColumn.methodName}(languageId);
@@ -893,20 +899,24 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			@Override
 			<#if entityColumn.isUserInputString()>
 				public UserInputString get${entityColumn.methodName}(String languageId) {
+					return new UserInputString(LocalizationUtil.getLocalization(get${entityColumn.methodName}(), languageId));
+				}
 			<#else>
 				public String get${entityColumn.methodName}(String languageId) {
+					return LocalizationUtil.getLocalization(get${entityColumn.methodName}(), languageId);
+				}
 			</#if>
-				return LocalizationUtil.getLocalization(get${entityColumn.methodName}(), languageId);
-			}
 
 			@Override
 			<#if entityColumn.isUserInputString()>
 				public UserInputString get${entityColumn.methodName}(String languageId, boolean useDefault) {
+				return new UserInputString(LocalizationUtil.getLocalization(get${entityColumn.methodName}(), languageId, useDefault));
+				}
 			<#else>
 				public String get${entityColumn.methodName}(String languageId, boolean useDefault) {
+					return LocalizationUtil.getLocalization(get${entityColumn.methodName}(), languageId, useDefault);
+				}
 			</#if>
-				return LocalizationUtil.getLocalization(get${entityColumn.methodName}(), languageId, useDefault);
-			}
 
 			@Override
 			public String get${entityColumn.methodName}CurrentLanguageId() {
@@ -928,11 +938,22 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			@Override
 			<#if entityColumn.isUserInputString()>
 				public Map<Locale, UserInputString> get${entityColumn.methodName}Map() {
+
+					Map<Locale, String> stringLocalizationMap = LocalizationUtil.getLocalizationMap(get${entityColumn.methodName}());
+
+					Map<Locale, UserInputString> localizationMap = new HashMap<>();
+
+					for (Map.Entry<Locale, String> entry : stringLocalizationMap.entrySet()) {
+						localizationMap.put(entry.getKey(), new UserInputString(entry.getValue()));
+					}
+			
+					return localizationMap;
+				}
 			<#else>
 				public Map<Locale, String> get${entityColumn.methodName}Map() {
+					return LocalizationUtil.getLocalizationMap(get${entityColumn.methodName}());
+				}
 			</#if>
-				return LocalizationUtil.getLocalizationMap(get${entityColumn.methodName}());
-			}
 		</#if>
 
 		<#if entityColumn.type== "boolean">
