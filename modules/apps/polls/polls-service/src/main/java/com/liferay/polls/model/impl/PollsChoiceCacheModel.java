@@ -186,7 +186,7 @@ public class PollsChoiceCacheModel
 
 		questionId = objectInput.readLong();
 		name = (UserInputString)objectInput.readObject();
-		description = (UserInputString)objectInput.readObject();
+		description = objectInput.readUTF();
 		lastPublishDate = objectInput.readLong();
 	}
 
@@ -236,7 +236,7 @@ public class PollsChoiceCacheModel
 	public long modifiedDate;
 	public long questionId;
 	public UserInputString name;
-	public UserInputString description;
+	public String description;
 	public long lastPublishDate;
 
 }

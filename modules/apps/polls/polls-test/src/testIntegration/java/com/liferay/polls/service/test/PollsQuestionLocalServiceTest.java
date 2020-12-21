@@ -21,6 +21,7 @@ import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.polls.service.persistence.PollsChoiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -52,9 +53,9 @@ public class PollsQuestionLocalServiceTest {
 
 	@Test(expected = QuestionChoiceException.class)
 	public void testAddQuestion() throws Exception {
-		Map<Locale, String> titleMap = createLocalizedMap(
+		Map<Locale, UserInputString> titleMap = createLocalizedMap(
 			RandomTestUtil.randomString());
-		Map<Locale, String> descriptionMap = createLocalizedMap(
+		Map<Locale, UserInputString> descriptionMap = createLocalizedMap(
 			RandomTestUtil.randomString());
 		int expirationDateHour = 0;
 		int expirationDateMinute = 0;
@@ -79,9 +80,9 @@ public class PollsQuestionLocalServiceTest {
 
 	@Test(expected = QuestionChoiceException.class)
 	public void testUpdateQuestion() throws Exception {
-		Map<Locale, String> titleMap = createLocalizedMap(
+		Map<Locale, UserInputString> titleMap = createLocalizedMap(
 			RandomTestUtil.randomString());
-		Map<Locale, String> descriptionMap = createLocalizedMap(
+		Map<Locale, UserInputString> descriptionMap = createLocalizedMap(
 			RandomTestUtil.randomString());
 		int expirationDateHour = 0;
 		int expirationDateMinute = 0;
@@ -117,16 +118,18 @@ public class PollsQuestionLocalServiceTest {
 			neverExpire, pollChoices, serviceContext);
 	}
 
-	protected Map<Locale, String> createLocalizedMap(String localizedValue) {
+	protected Map<Locale, UserInputString> createLocalizedMap(
+		String localizedValue) {
+
 		return HashMapBuilder.put(
-			LocaleUtil.US, localizedValue
+			LocaleUtil.US, new UserInputString(localizedValue)
 		).build();
 	}
 
 	protected PollsChoice createPollsChoice(String value) {
 		PollsChoice choice = PollsChoiceUtil.create(0);
 
-		choice.setName(value);
+		choice.setName(new UserInputString(value));
 		choice.setDescriptionMap(createLocalizedMap(value));
 
 		return choice;

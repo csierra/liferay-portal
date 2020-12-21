@@ -41,7 +41,7 @@ public class PollsChoiceLocalServiceImpl
 	@Override
 	public PollsChoice addChoice(
 			long userId, long questionId, UserInputString name,
-			UserInputString description, ServiceContext serviceContext)
+			String description, ServiceContext serviceContext)
 		throws PortalException {
 
 		validate(name, description);
@@ -82,7 +82,7 @@ public class PollsChoiceLocalServiceImpl
 	@Override
 	public PollsChoice updateChoice(
 			long choiceId, long questionId, UserInputString name,
-			UserInputString description, ServiceContext serviceContext)
+			String description, ServiceContext serviceContext)
 		throws PortalException {
 
 		validate(name, description);
@@ -98,7 +98,7 @@ public class PollsChoiceLocalServiceImpl
 		return pollsChoicePersistence.update(choice);
 	}
 
-	protected void validate(UserInputString name, UserInputString description)
+	protected void validate(UserInputString name, String description)
 		throws PortalException {
 
 		if (Validator.isNull(name) || Validator.isNull(description)) {

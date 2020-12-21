@@ -288,7 +288,7 @@ public interface PollsQuestionModel
 	 *
 	 * @param title the title of this polls question
 	 */
-	public void setTitle(UserInputString title);
+	public void setTitle(String title);
 
 	/**
 	 * Sets the localized title of this polls question in the language.
@@ -296,7 +296,7 @@ public interface PollsQuestionModel
 	 * @param title the localized title of this polls question
 	 * @param locale the locale of the language
 	 */
-	public void setTitle(String title, Locale locale);
+	public void setTitle(UserInputString title, Locale locale);
 
 	/**
 	 * Sets the localized title of this polls question in the language, and sets the default locale.
@@ -390,7 +390,7 @@ public interface PollsQuestionModel
 	 *
 	 * @param description the description of this polls question
 	 */
-	public void setDescription(UserInputString description);
+	public void setDescription(String description);
 
 	/**
 	 * Sets the localized description of this polls question in the language.
@@ -398,7 +398,7 @@ public interface PollsQuestionModel
 	 * @param description the localized description of this polls question
 	 * @param locale the locale of the language
 	 */
-	public void setDescription(String description, Locale locale);
+	public void setDescription(UserInputString description, Locale locale);
 
 	/**
 	 * Sets the localized description of this polls question in the language, and sets the default locale.

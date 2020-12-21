@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -79,7 +80,10 @@ public class PollsQuestionIndexerIndexedFieldsTest {
 		PollsQuestion pollsQuestion =
 			pollsQuestionFixture.createPollsQuestion();
 
-		String searchTerm = pollsQuestion.getDescription(LocaleUtil.US);
+		final UserInputString description = pollsQuestion.getDescription(
+			LocaleUtil.US);
+
+		String searchTerm = description.unsafeGetString();
 
 		Document document = pollsQuestionIndexerFixture.searchOnlyOne(
 			searchTerm);

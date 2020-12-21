@@ -244,7 +244,7 @@ public interface PollsChoiceModel
 	 *
 	 * @return the name of this polls choice
 	 */
-	public String getName();
+	public UserInputString getName();
 
 	/**
 	 * Sets the name of this polls choice.
@@ -317,7 +317,7 @@ public interface PollsChoiceModel
 	 *
 	 * @param description the description of this polls choice
 	 */
-	public void setDescription(UserInputString description);
+	public void setDescription(String description);
 
 	/**
 	 * Sets the localized description of this polls choice in the language.
@@ -325,7 +325,7 @@ public interface PollsChoiceModel
 	 * @param description the localized description of this polls choice
 	 * @param locale the locale of the language
 	 */
-	public void setDescription(String description, Locale locale);
+	public void setDescription(UserInputString description, Locale locale);
 
 	/**
 	 * Sets the localized description of this polls choice in the language, and sets the default locale.

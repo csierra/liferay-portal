@@ -20,6 +20,7 @@ import com.liferay.polls.model.PollsQuestion;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -138,14 +139,14 @@ public class PollsQuestionMultiLanguageSearchTest {
 	private void _createPollsQuestionMultiLanguage() throws Exception {
 		pollsQuestionFixture.createPollsQuestion(
 			HashMapBuilder.put(
-				LocaleUtil.JAPAN, _KEYWORD_JP
+				LocaleUtil.JAPAN, new UserInputString(_KEYWORD_JP)
 			).put(
-				LocaleUtil.US, _KEYWORD_US
+				LocaleUtil.US, new UserInputString(_KEYWORD_US)
 			).build(),
 			HashMapBuilder.put(
-				LocaleUtil.JAPAN, _KEYWORD_JP
+				LocaleUtil.JAPAN, new UserInputString(_KEYWORD_JP)
 			).put(
-				LocaleUtil.US, _KEYWORD_US
+				LocaleUtil.US, new UserInputString(_KEYWORD_US)
 			).build());
 	}
 

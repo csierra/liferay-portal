@@ -20,6 +20,7 @@ import com.liferay.polls.model.PollsVote;
 import com.liferay.polls.service.PollsChoiceLocalServiceUtil;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.polls.service.PollsVoteLocalServiceUtil;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -37,19 +38,21 @@ public class PollsTestUtil {
 
 		return PollsChoiceLocalServiceUtil.addChoice(
 			TestPropsValues.getUserId(), questionId,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			new UserInputString(RandomTestUtil.randomString()),
+			RandomTestUtil.randomString(),
 			ServiceContextTestUtil.getServiceContext(groupId));
 	}
 
 	public static PollsQuestion addQuestion(long groupId) throws Exception {
 		return addQuestion(
-			groupId, RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap());
+			groupId,
+			RandomTestUtil.randomLocaleUserInputStringMap(),
+			RandomTestUtil.randomLocaleUserInputStringMap());
 	}
 
 	public static PollsQuestion addQuestion(
-			long groupId, Map<Locale, String> titleMap,
-			Map<Locale, String> descriptionMap)
+			long groupId, Map<Locale, UserInputString> titleMap,
+			Map<Locale, UserInputString> descriptionMap)
 		throws Exception {
 
 		return PollsQuestionLocalServiceUtil.addQuestion(

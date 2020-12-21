@@ -19,6 +19,7 @@ import com.liferay.polls.model.PollsQuestion;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -66,20 +67,20 @@ public class PollsQuestionIndexerReindexTest {
 		PollsQuestion pollsQuestion =
 			pollsQuestionFixture.createPollsQuestion();
 
-		String searchTerm = pollsQuestion.getTitle(LocaleUtil.US);
+		UserInputString searchTerm = pollsQuestion.getTitle(LocaleUtil.US);
 
-		pollsQuestionIndexerFixture.searchOnlyOne(searchTerm);
+		pollsQuestionIndexerFixture.searchOnlyOne(searchTerm.unsafeGetString());
 
 		Document document = pollsQuestionIndexerFixture.searchOnlyOne(
-			searchTerm);
+			searchTerm.unsafeGetString());
 
 		pollsQuestionIndexerFixture.deleteDocument(document);
 
-		pollsQuestionIndexerFixture.searchNoOne(searchTerm);
+		pollsQuestionIndexerFixture.searchNoOne(searchTerm.unsafeGetString());
 
 		pollsQuestionIndexerFixture.reindex(pollsQuestion.getCompanyId());
 
-		pollsQuestionIndexerFixture.searchOnlyOne(searchTerm);
+		pollsQuestionIndexerFixture.searchOnlyOne(searchTerm.unsafeGetString());
 	}
 
 	@Rule
