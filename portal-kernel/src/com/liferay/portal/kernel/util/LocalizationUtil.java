@@ -202,6 +202,21 @@ public class LocalizationUtil {
 			portletRequest, parameter, defaultValues);
 	}
 
+	public static Map<Locale, UserInputString> getLocalizationMapFromInput(
+		PortletRequest portletRequest, String parameter) {
+
+		return getLocalization().getLocalizationMapFromInput(
+			portletRequest, parameter);
+	}
+
+	public static Map<Locale, UserInputString> getLocalizationMapFromInput(
+		PortletRequest portletRequest, String parameter,
+		Map<Locale, String> defaultValues) {
+
+		return getLocalization().getLocalizationMapFromInput(
+			portletRequest, parameter, defaultValues);
+	}
+
 	public static Map<Locale, String> getLocalizationMap(String xml) {
 		return getLocalization().getLocalizationMap(xml);
 	}
@@ -455,11 +470,11 @@ public class LocalizationUtil {
 			localizationMap, xml, key, defaultLanguageId);
 	}
 
-	public static UserInputString updateLocalization(
-		Map<Locale, UserInputString> localizationMap, UserInputString xml,
+	public static String updateLocalizationFromUserInput(
+		Map<Locale, UserInputString> localizationMap, String xml,
 		String key, String defaultLanguageId) {
 
-		return getLocalization().updateLocalization(
+		return getLocalization().updateLocalizationFromUserInput(
 			localizationMap, xml, key, defaultLanguageId);
 	}
 
@@ -501,38 +516,38 @@ public class LocalizationUtil {
 			localized);
 	}
 
-	public static UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value) {
+	public static String updateLocalization(
+		String xml, String key, UserInputString value) {
 
 		return getLocalization().updateLocalization(xml, key, value);
 	}
 
-	public static UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public static String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId) {
 
 		return getLocalization().updateLocalization(
 			xml, key, value, requestedLanguageId);
 	}
 
-	public static UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public static String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId, String defaultLanguageId) {
 
 		return getLocalization().updateLocalization(
 			xml, key, value, requestedLanguageId, defaultLanguageId);
 	}
 
-	public static UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public static String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId, String defaultLanguageId, boolean cdata) {
 
 		return getLocalization().updateLocalization(
 			xml, key, value, requestedLanguageId, defaultLanguageId, cdata);
 	}
 
-	public static UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public static String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId, String defaultLanguageId, boolean cdata,
 		boolean localized) {
 

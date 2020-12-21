@@ -294,6 +294,13 @@ public interface Localization {
 		PortletRequest portletRequest, String parameter,
 		Map<Locale, String> defaultValues);
 
+	public Map<Locale, UserInputString> getLocalizationMapFromInput(
+		PortletRequest portletRequest, String parameter);
+
+	public Map<Locale, UserInputString> getLocalizationMapFromInput(
+		PortletRequest portletRequest, String parameter,
+		Map<Locale, String> defaultValues);
+
 	/**
 	 * Returns a map of locales and localized strings from the localizations
 	 * XML.
@@ -696,8 +703,8 @@ public interface Localization {
 	 * @param  defaultLanguageId the ID of the default language
 	 * @return the updated localizations XML
 	 */
-	public UserInputString updateLocalization(
-		Map<Locale, UserInputString> localizationMap, UserInputString xml,
+	public String updateLocalizationFromUserInput(
+		Map<Locale, UserInputString> localizationMap, String xml,
 		String key, String defaultLanguageId);
 
 	/**
@@ -786,8 +793,8 @@ public interface Localization {
 	 * @param  value the localized string
 	 * @return the updated localizations XML
 	 */
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value);
+	public String updateLocalization(
+		String xml, String key, UserInputString value);
 
 	/**
 	 * Updates the localized string for the language in the localizations XML.
@@ -799,8 +806,8 @@ public interface Localization {
 	 * @param  requestedLanguageId the ID of the language
 	 * @return the updated localizations XML
 	 */
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId);
 
 	/**
@@ -815,8 +822,8 @@ public interface Localization {
 	 * @param  defaultLanguageId the ID of the default language
 	 * @return the updated localizations XML
 	 */
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId, String defaultLanguageId);
 
 	/**
@@ -832,8 +839,8 @@ public interface Localization {
 	 * @param  cdata whether to store localized strings as CDATA in the XML
 	 * @return the updated localizations XML
 	 */
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId, String defaultLanguageId, boolean cdata);
 
 	/**
@@ -850,8 +857,8 @@ public interface Localization {
 	 * @param  localized whether there is a localized field
 	 * @return the updated localizations XML
 	 */
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId, String defaultLanguageId, boolean cdata,
 		boolean localized);
 
