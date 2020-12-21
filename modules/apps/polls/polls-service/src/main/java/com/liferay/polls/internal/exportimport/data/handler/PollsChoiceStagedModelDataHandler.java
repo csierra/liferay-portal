@@ -26,6 +26,7 @@ import com.liferay.polls.service.PollsChoiceLocalService;
 import com.liferay.polls.service.PollsQuestionLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 
@@ -86,7 +87,9 @@ public class PollsChoiceStagedModelDataHandler
 
 	@Override
 	public String getDisplayName(PollsChoice choice) {
-		return choice.getName();
+		final UserInputString name = choice.getName();
+
+		return name.unsafeGetString();
 	}
 
 	@Override
