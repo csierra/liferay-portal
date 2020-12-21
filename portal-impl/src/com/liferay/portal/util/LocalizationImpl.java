@@ -530,6 +530,35 @@ public class LocalizationImpl implements Localization {
 	}
 
 	@Override
+	public Map<Locale, UserInputString> getLocalizationMapFromInput(
+		PortletRequest portletRequest, String parameter) {
+
+		return getLocalizationMapFromInput(
+			portletRequest, parameter, new HashMap<Locale, String>());
+	}
+
+	@Override
+	public Map<Locale, UserInputString> getLocalizationMapFromInput(
+		PortletRequest portletRequest, String parameter,
+		Map<Locale, String> defaultValues) {
+
+		Map<Locale, UserInputString> map = new HashMap<>();
+
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
+			String localizedParameter = getLocalizedName(
+				parameter, LocaleUtil.toLanguageId(locale));
+
+			map.put(
+				locale,
+				ParamUtil.getUserInputString(
+					portletRequest, localizedParameter,
+					defaultValues.get(locale)));
+		}
+
+		return map;
+	}
+
+	@Override
 	public Map<Locale, String> getLocalizationMap(String xml) {
 		return getLocalizationMap(xml, false);
 	}
@@ -1244,8 +1273,8 @@ public class LocalizationImpl implements Localization {
 	}
 
 	@Override
-	public UserInputString updateLocalization(
-		Map<Locale, UserInputString> localizationMap, UserInputString xml,
+	public String updateLocalizationFromUserInput(
+		Map<Locale, UserInputString> localizationMap, String xml,
 		String key, String defaultLanguageId) {
 
 		Map<Locale, String> localizationStringMap = new HashMap<>();
@@ -1259,9 +1288,8 @@ public class LocalizationImpl implements Localization {
 				entry.getKey(), userInputString.toString());
 		}
 
-		return new UserInputString(
-			updateLocalization(
-				localizationStringMap, xml.toString(), key, defaultLanguageId));
+		return updateLocalization(
+			localizationStringMap, xml, key, defaultLanguageId);
 	}
 
 	@Override
@@ -1429,8 +1457,8 @@ public class LocalizationImpl implements Localization {
 	}
 
 	@Override
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value) {
+	public String updateLocalization(
+		String xml, String key, UserInputString value) {
 
 		String defaultLanguageId = LocaleUtil.toLanguageId(
 			LocaleUtil.getSiteDefault());
@@ -1440,8 +1468,8 @@ public class LocalizationImpl implements Localization {
 	}
 
 	@Override
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId) {
 
 		String defaultLanguageId = LocaleUtil.toLanguageId(
@@ -1452,8 +1480,8 @@ public class LocalizationImpl implements Localization {
 	}
 
 	@Override
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId, String defaultLanguageId) {
 
 		return updateLocalization(
@@ -1461,8 +1489,8 @@ public class LocalizationImpl implements Localization {
 	}
 
 	@Override
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId, String defaultLanguageId, boolean cdata) {
 
 		return updateLocalization(
@@ -1471,15 +1499,14 @@ public class LocalizationImpl implements Localization {
 	}
 
 	@Override
-	public UserInputString updateLocalization(
-		UserInputString xml, String key, UserInputString value,
+	public String updateLocalization(
+		String xml, String key, UserInputString value,
 		String requestedLanguageId, String defaultLanguageId, boolean cdata,
 		boolean localized) {
 
-		return new UserInputString(
-			updateLocalization(
-				xml.toString(), key, value.toString(), requestedLanguageId,
-				defaultLanguageId, cdata, localized));
+		return updateLocalization(
+				xml, key, value.toString(), requestedLanguageId,
+				defaultLanguageId, cdata, localized);
 	}
 
 	private void _close(XMLStreamWriter xmlStreamWriter) {
