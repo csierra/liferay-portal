@@ -24,7 +24,7 @@ public final class UserInputString
 
 	private final String _string;
 
-	String getString() {
+	public String unsafeGetString() {
 		return _string;
 	}
 
