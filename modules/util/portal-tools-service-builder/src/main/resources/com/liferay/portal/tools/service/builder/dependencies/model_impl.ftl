@@ -1088,8 +1088,11 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 				if (${entityColumn.name}Map == null) {
 					return;
 				}
-
-				set${entityColumn.methodName}(LocalizationUtil.updateLocalization(${entityColumn.name}Map, get${entityColumn.methodName}(), "${entityColumn.methodName}", LocaleUtil.toLanguageId(defaultLocale)));
+				<#if entityColumn.isUserInputString()>
+					set${entityColumn.methodName}(LocalizationUtil.updateLocalizationFromUserInput(${entityColumn.name}Map, get${entityColumn.methodName}(), "${entityColumn.methodName}", LocaleUtil.toLanguageId(defaultLocale)));
+				<#else>
+					set${entityColumn.methodName}(LocalizationUtil.updateLocalization(${entityColumn.name}Map, get${entityColumn.methodName}(), "${entityColumn.methodName}", LocaleUtil.toLanguageId(defaultLocale)));
+                </#if>
 			}
 		</#if>
 
@@ -1556,15 +1559,12 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		public String getDefaultLanguageId() {
 			<#list entity.regularEntityColumns as entityColumn>
 				<#if entityColumn.localized>
-					<#if entityColumn.isUserInputString()>
-						UserInputString xml = get${entityColumn.methodName}();
-					<#else>
-						String xml = get${entityColumn.methodName}();
-					</#if>
+					String xml = get${entityColumn.methodName}();
 
 					if (xml == null) {
 						return "";
 					}
+
 
 					<#if entity.isGroupedModel()>
 						Locale defaultLocale = LocaleUtil.getSiteDefault();

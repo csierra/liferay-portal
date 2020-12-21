@@ -89,7 +89,11 @@ public class ${entity.name}Wrapper
 			<#if entityColumn.isPrimitiveType()>
 				${serviceBuilder.getPrimitiveObj(entityColumn.type)}
 			<#else>
-				${entityColumn.genericizedType}
+				<#if entityColumn.isLocalized() && entityColumn.isUserInputString()>
+					String
+				<#else>
+					${entityColumn.genericizedType}
+				</#if>
 			</#if>
 
 			${entityColumn.name} =
@@ -97,7 +101,11 @@ public class ${entity.name}Wrapper
 			<#if entityColumn.isPrimitiveType()>
 				(${serviceBuilder.getPrimitiveObj(entityColumn.type)})
 			<#else>
-				(${entityColumn.genericizedType})
+                <#if entityColumn.isLocalized() && entityColumn.isUserInputString()>
+					(String)
+                <#else>
+					(${entityColumn.genericizedType})
+                </#if>
 			</#if>
 
 			attributes.get("${entityColumn.name}");

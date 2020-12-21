@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.service.persistence.impl.UserInputString;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -145,6 +146,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+				<#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+					<#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+					<#if maxLength < 8>
+						<#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+						<#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+						</#if>
+					<#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+					</#if>
 				</#if>
 
 				<#if entityColumn_has_next>
@@ -170,6 +187,22 @@ public class ${entity.name}PersistenceTest {
 				<#else>
 					RandomTestUtil.randomString()
 				</#if>
+            <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                <#if maxLength < 8>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString(${maxLength})
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                    </#if>
+                <#else>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString()
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString())
+                    </#if>
+                </#if>
 			</#if>
 
 			;
@@ -216,6 +249,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				<#if entityColumn_has_next>
@@ -241,6 +290,22 @@ public class ${entity.name}PersistenceTest {
 				<#else>
 					RandomTestUtil.randomString()
 				</#if>
+            <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                <#if maxLength < 8>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString(${maxLength})
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                    </#if>
+                <#else>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString()
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString())
+                    </#if>
+                </#if>
 			</#if>
 
 			;
@@ -290,8 +355,23 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
-				</#if>
+				<#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+					<#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
 
+					<#if maxLength < 8>
+						<#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+						<#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+						</#if>
+					<#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+					</#if>
+				</#if>
 				);
 			</#if>
 		</#list>
@@ -347,6 +427,14 @@ public class ${entity.name}PersistenceTest {
 					<#assign hasString = true />
 
 					""
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign hasString = true />
+
+					<#if entityColumn.isLocalized()>
+						""
+					<#else>
+						new UserInputString("")
+					</#if>
 				<#else>
 					(${entityColumn.type})null
 				</#if>
@@ -374,6 +462,12 @@ public class ${entity.name}PersistenceTest {
 							RandomTestUtil.nextDate()
 						<#elseif stringUtil.equals(entityColumn.type, "String")>
 							"null"
+                        <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+							<#if entityColumn.isLocalized()>
+								"null"
+							<#else>
+								new UserInputString("null")
+							</#if>
 						<#else>
 							(${entityColumn.type})null
 						</#if>
@@ -438,6 +532,22 @@ public class ${entity.name}PersistenceTest {
 							<#else>
 								RandomTestUtil.randomString(), "", "null", null, null
 							</#if>
+                        <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                            <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                            <#if maxLength < 8>
+                                <#if entityColumn.isLocalized()>
+									RandomTestUtil.randomString(${maxLength})
+                                <#else>
+									new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                                </#if>
+                            <#else>
+                                <#if entityColumn.isLocalized()>
+									RandomTestUtil.randomString()
+                                <#else>
+									new UserInputString(RandomTestUtil.randomString())
+                                </#if>
+                            </#if>
 						<#else>
 							null
 						</#if>
@@ -460,6 +570,22 @@ public class ${entity.name}PersistenceTest {
 							<#else>
 								RandomTestUtil.randomString()
 							</#if>
+                        <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                            <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                            <#if maxLength < 8>
+                                <#if entityColumn.isLocalized()>
+									RandomTestUtil.randomString(${maxLength})
+                                <#else>
+									new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                                </#if>
+                            <#else>
+                                <#if entityColumn.isLocalized()>
+									RandomTestUtil.randomString()
+                                <#else>
+									new UserInputString(RandomTestUtil.randomString())
+                                </#if>
+                            </#if>
 						<#else>
 							null
 						</#if>
@@ -506,6 +632,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				<#if entityColumn_has_next>
@@ -531,6 +673,22 @@ public class ${entity.name}PersistenceTest {
 				<#else>
 					RandomTestUtil.randomString()
 				</#if>
+            <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                <#if maxLength < 8>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString(${maxLength})
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                    </#if>
+                <#else>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString()
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString())
+                    </#if>
+                </#if>
 			</#if>
 
 			;
@@ -607,6 +765,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				<#if entityColumn_has_next>
@@ -632,6 +806,22 @@ public class ${entity.name}PersistenceTest {
 				<#else>
 					RandomTestUtil.randomString()
 				</#if>
+            <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                <#if maxLength < 8>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString(${maxLength})
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                    </#if>
+                <#else>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString()
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString())
+                    </#if>
+                </#if>
 			</#if>
 
 			;
@@ -677,6 +867,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				<#if entityColumn_has_next>
@@ -701,6 +907,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				<#if entityColumn_has_next>
@@ -726,6 +948,22 @@ public class ${entity.name}PersistenceTest {
 				<#else>
 					RandomTestUtil.randomString()
 				</#if>
+            <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                <#if maxLength < 8>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString(${maxLength})
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                    </#if>
+                <#else>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString()
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString())
+                    </#if>
+                </#if>
 			</#if>
 
 			;
@@ -744,6 +982,22 @@ public class ${entity.name}PersistenceTest {
 				<#else>
 					RandomTestUtil.randomString()
 				</#if>
+            <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                <#if maxLength < 8>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString(${maxLength})
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                    </#if>
+                <#else>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString()
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString())
+                    </#if>
+                </#if>
 			</#if>
 
 			;
@@ -779,6 +1033,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				<#if entityColumn_has_next>
@@ -802,6 +1072,22 @@ public class ${entity.name}PersistenceTest {
 				<#else>
 					RandomTestUtil.randomString()
 				</#if>
+            <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                <#if maxLength < 8>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString(${maxLength})
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                    </#if>
+                <#else>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString()
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString())
+                    </#if>
+                </#if>
 			</#if>
 
 			;
@@ -911,6 +1197,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				));
@@ -932,6 +1234,22 @@ public class ${entity.name}PersistenceTest {
 				<#else>
 					RandomTestUtil.randomString()
 				</#if>
+            <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                <#if maxLength < 8>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString(${maxLength})
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                    </#if>
+                <#else>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString()
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString())
+                    </#if>
+                </#if>
 			</#if>
 
 			));
@@ -999,6 +1317,22 @@ public class ${entity.name}PersistenceTest {
 			<#else>
 				RandomTestUtil.randomString()
 			</#if>
+        <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+            <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+            <#if maxLength < 8>
+                <#if entityColumn.isLocalized()>
+					RandomTestUtil.randomString(${maxLength})
+                <#else>
+					new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                </#if>
+            <#else>
+                <#if entityColumn.isLocalized()>
+					RandomTestUtil.randomString()
+                <#else>
+					new UserInputString(RandomTestUtil.randomString())
+                </#if>
+            </#if>
 		</#if>
 
 		}));
@@ -1114,6 +1448,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				<#if entityColumn_has_next>
@@ -1139,6 +1489,22 @@ public class ${entity.name}PersistenceTest {
 				<#else>
 					RandomTestUtil.randomString()
 				</#if>
+            <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                <#if maxLength < 8>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString(${maxLength})
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                    </#if>
+                <#else>
+                    <#if entityColumn.isLocalized()>
+						RandomTestUtil.randomString()
+                    <#else>
+						new UserInputString(RandomTestUtil.randomString())
+                    </#if>
+                </#if>
 			</#if>
 
 			;
@@ -1182,6 +1548,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				);
@@ -1378,8 +1760,23 @@ public class ${entity.name}PersistenceTest {
 						<#else>
 							RandomTestUtil.randomString()
 						</#if>
-					</#if>
+                    <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                        <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
 
+                        <#if maxLength < 8>
+                            <#if entityColumn.isLocalized()>
+								RandomTestUtil.randomString(${maxLength})
+                            <#else>
+								new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                            </#if>
+                        <#else>
+                            <#if entityColumn.isLocalized()>
+								RandomTestUtil.randomString()
+                            <#else>
+								new UserInputString(RandomTestUtil.randomString())
+                            </#if>
+                        </#if>
+					</#if>
 					<#if entityColumn_has_next>
 						,
 					</#if>
@@ -1403,6 +1800,22 @@ public class ${entity.name}PersistenceTest {
 					<#else>
 						RandomTestUtil.randomString()
 					</#if>
+                <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                    <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                    <#if maxLength < 8>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString(${maxLength})
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                        </#if>
+                    <#else>
+                        <#if entityColumn.isLocalized()>
+							RandomTestUtil.randomString()
+                        <#else>
+							new UserInputString(RandomTestUtil.randomString())
+                        </#if>
+                    </#if>
 				</#if>
 
 				;
@@ -1445,6 +1858,22 @@ public class ${entity.name}PersistenceTest {
 							<#else>
 								RandomTestUtil.randomString()
 							</#if>
+                        <#elseif stringUtil.equals(entityColumn.type, "UserInputString")>
+                            <#assign maxLength = serviceBuilder.getMaxLength(entity.getName(), entityColumn.getName()) />
+
+                            <#if maxLength < 8>
+                                <#if entityColumn.isLocalized()>
+									RandomTestUtil.randomString(${maxLength})
+                                <#else>
+									new UserInputString(RandomTestUtil.randomString(${maxLength}))
+                                </#if>
+                            <#else>
+                                <#if entityColumn.isLocalized()>
+									RandomTestUtil.randomString()
+                                <#else>
+									new UserInputString(RandomTestUtil.randomString())
+                                </#if>
+                            </#if>
 						<#elseif stringUtil.equals(entityColumn.type, "Map")>
 							new HashMap();
 						</#if>

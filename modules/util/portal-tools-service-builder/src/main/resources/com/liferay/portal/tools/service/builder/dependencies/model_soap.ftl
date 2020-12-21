@@ -114,7 +114,7 @@ public class ${entity.name}Soap implements Serializable {
 	}
 
 	<#list entity.regularEntityColumns as entityColumn>
-		<#if entityColumn.isUserInputString()>
+		<#if entityColumn.isLocalized() && entityColumn.isUserInputString()>
 			public String get${entityColumn.methodName}() {
 		<#else>
 			public ${entityColumn.genericizedType} get${entityColumn.methodName}() {
@@ -129,7 +129,7 @@ public class ${entity.name}Soap implements Serializable {
 			}
 		</#if>
 
-		<#if entityColumn.isUserInputString()>
+		<#if entityColumn.isLocalized() && entityColumn.isUserInputString()>
 			public void set${entityColumn.methodName}(String ${entityColumn.name}) {
 		<#else>
 			public void set${entityColumn.methodName}(${entityColumn.genericizedType} ${entityColumn.name}) {
@@ -139,7 +139,7 @@ public class ${entity.name}Soap implements Serializable {
 	</#list>
 
 	<#list entity.regularEntityColumns as entityColumn>
-		<#if entityColumn.isUserInputString()>
+		<#if entityColumn.isLocalized() && entityColumn.isUserInputString()>
 			private String _${entityColumn.name};
 		<#else>
 			private ${entityColumn.genericizedType} _${entityColumn.name};
