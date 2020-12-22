@@ -94,7 +94,7 @@ if (question != null) {
 							%>
 
 								<aui:field-wrapper cssClass="radio">
-									<aui:input label='<%= choice.getName() + ". " + choiceDescription.unsafeGetString() %>' name="choiceId" type="radio" value="<%= choice.getChoiceId() %>" />
+									<aui:input label='<%= choice.getName().flatMap(s -> choiceDescription.map(s1 -> s + "." + s1)) %>' name="choiceId" type="radio" value="<%= choice.getChoiceId() %>" />
 								</aui:field-wrapper>
 
 							<%
