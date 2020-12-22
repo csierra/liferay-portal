@@ -137,7 +137,7 @@ public abstract class BaseInputTag extends com.liferay.taglib.BaseValidatorTagSu
 		return _inlineLabel;
 	}
 
-	public java.lang.String getLabel() {
+	public CharSequence getLabel() {
 		return _label;
 	}
 
@@ -345,7 +345,7 @@ public abstract class BaseInputTag extends com.liferay.taglib.BaseValidatorTagSu
 		_inlineLabel = inlineLabel;
 	}
 
-	public void setLabel(java.lang.String label) {
+	public void setLabel(java.lang.CharSequence label) {
 		_label = label;
 	}
 
@@ -599,7 +599,7 @@ public abstract class BaseInputTag extends com.liferay.taglib.BaseValidatorTagSu
 	private boolean _ignoreRequestValue = false;
 	private boolean _inlineField = false;
 	private java.lang.String _inlineLabel = null;
-	private java.lang.String _label = null;
+	private CharSequence _label = null;
 	private java.lang.String _labelCssClass = null;
 	private java.lang.String _languageId = null;
 	private boolean _last = false;

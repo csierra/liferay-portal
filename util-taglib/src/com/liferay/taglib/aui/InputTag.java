@@ -260,7 +260,7 @@ public class InputTag extends BaseInputTag {
 			forLabel = LocalizationUtil.getLocalizedName(forLabel, languageId);
 		}
 
-		String label = getLabel();
+		CharSequence label = getLabel();
 
 		if (label == null) {
 			label = TextFormatter.format(name, TextFormatter.K);
