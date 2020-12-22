@@ -49,14 +49,13 @@
 				rowURL.setParameter("redirect", currentURL);
 				rowURL.setParameter("questionId", String.valueOf(question.getQuestionId()));
 
-				UserInputString questionTitle = question.getTitle(locale);
 				%>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand table-cell-minw-200 table-title"
 					href="<%= rowURL %>"
 					name="title"
-					value="<%= questionTitle.toString() %>"
+					value="<%= question.getTitle(locale) %>"
 				/>
 
 				<liferay-ui:search-container-column-text
