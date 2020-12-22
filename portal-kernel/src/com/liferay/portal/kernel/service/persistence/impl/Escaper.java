@@ -43,7 +43,7 @@ public enum Escaper {
 	}
 
 	public String escape(UserInputString userInputString) {
-		return _escaper.apply(userInputString.getString());
+		return _escaper.apply(userInputString.unsafeGetString());
 	}
 
 }
