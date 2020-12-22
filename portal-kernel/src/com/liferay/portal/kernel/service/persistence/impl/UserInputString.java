@@ -105,4 +105,7 @@ public final class UserInputString
 		return _string.compareTo(userInputString._string);
 	}
 
+	public UserInputString flatMap(Function<String, UserInputString> function) {
+		return function.apply(_string);
+	}
 }
