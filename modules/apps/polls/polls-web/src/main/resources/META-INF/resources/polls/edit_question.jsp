@@ -60,7 +60,9 @@ else if (StringUtil.equals(choicesAction, "deleteChoice")) {
 }
 
 if (showHeader) {
-	renderResponse.setTitle((question == null) ? LanguageUtil.get(request, "new-poll") : question.getTitle(locale));
+	UserInputString questionTitle = question.getTitle(locale);
+
+	renderResponse.setTitle((question == null) ? LanguageUtil.get(request, "new-poll") : questionTitle.unsafeGetString());
 }
 
 portletDisplay.setShowBackIcon(true);
@@ -113,14 +115,16 @@ portletDisplay.setURLBack(redirect);
 						paramName = EditQuestionMVCActionCommand.CHOICE_DESCRIPTION_PREFIX + c;
 					}
 
-					Map<Locale, String> localeChoiceDescriptionMap = LocalizationUtil.getLocalizationMap(renderRequest, paramName);
+					Map<Locale, UserStringString> localeChoiceDescriptionMap = LocalizationUtil.getLocalizationMap(renderRequest, paramName);
 
-					String value = GetterUtil.getString(LocalizationUtil.updateLocalization(localeChoiceDescriptionMap, "", "Description", LocaleUtil.toLanguageId(locale)));
+					String value = GetterUtil.getString(LocalizationUtil.updateLocalizationFromUserInput(localeChoiceDescriptionMap, "", "Description", LocaleUtil.toLanguageId(locale)));
 
 					if ((question != null) && !addChoice && !deleteChoice) {
 						choice = choices.get(i - 1);
 
-						value = choice.getDescription();
+						UserInputString choiceDescription = choice.getDescription();
+
+						value = choiceDescription.toString();
 					}
 				%>
 
@@ -303,7 +307,9 @@ portletDisplay.setURLBack(redirect);
 
 <%
 if (question != null) {
-	PortalUtil.addPortletBreadcrumbEntry(request, question.getTitle(locale), null);
+	UserInputString questionTitle = question.getTitle(locale);
+
+	PortalUtil.addPortletBreadcrumbEntry(request, questionTitle.unsafeGetString(), null);
 	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
 }
 else {

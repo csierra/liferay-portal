@@ -21,7 +21,9 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 PollsQuestion question = (PollsQuestion)request.getAttribute(PollsWebKeys.POLLS_QUESTION);
 
-question = question.toEscapedModel();
+UserInputString questionTitle = question.getTitle(locale);
+
+UserInputString questionDescription = question.getDescription(locale);
 
 List<PollsChoice> choices = PollsChoiceLocalServiceUtil.getChoices(question.getQuestionId());
 
@@ -33,7 +35,7 @@ if (viewResults && !PollsQuestionPermission.contains(permissionChecker, question
 	viewResults = false;
 }
 
-renderResponse.setTitle(HtmlUtil.unescape(question.getTitle(locale)));
+renderResponse.setTitle(questionTitle.unsafeGetString());
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
@@ -60,7 +62,7 @@ portletDisplay.setURLBack(redirect);
 	<aui:fieldset-group markupView="lexicon">
 		<aui:fieldset>
 			<h2>
-				<%= StringUtil.replace(question.getDescription(locale), CharPool.NEW_LINE, "<br />") %>
+				<%= StringUtil.replace(questionDescription.toString(), CharPool.NEW_LINE, "<br />") %>
 			</h2>
 
 			<c:choose>
@@ -68,11 +70,11 @@ portletDisplay.setURLBack(redirect);
 
 					<%
 					for (PollsChoice choice : choices) {
-						choice = choice.toEscapedModel();
+						UserInputString choiceDescription = choice.getDescription(locale);
 					%>
 
 						<aui:field-wrapper cssClass="radio">
-							<aui:input label='<%= choice.getName() + ". " + choice.getDescription(locale) %>' name="choiceId" type="radio" value="<%= choice.getChoiceId() %>" />
+							<aui:input label='<%= choice.getName() + ". " + choiceDescription.unsafeGetString() %>' name="choiceId" type="radio" value="<%= choice.getChoiceId() %>" />
 						</aui:field-wrapper>
 
 					<%
@@ -103,7 +105,7 @@ portletDisplay.setURLBack(redirect);
 					</aui:button-row>
 
 					<%
-					PortalUtil.addPortletBreadcrumbEntry(request, HtmlUtil.unescape(question.getTitle(locale)), currentURL);
+					PortalUtil.addPortletBreadcrumbEntry(request, questionTitle.unsafeGetString(), currentURL);
 					%>
 
 				</c:when>
@@ -125,7 +127,7 @@ portletDisplay.setURLBack(redirect);
 					</div>
 
 					<%
-					PortalUtil.addPortletBreadcrumbEntry(request, HtmlUtil.unescape(question.getTitle(locale)), viewQuestionURL.toString());
+					PortalUtil.addPortletBreadcrumbEntry(request, questionTitle.unsafeGetString(), viewQuestionURL.toString());
 					PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "results"), currentURL);
 					%>
 

@@ -20,6 +20,8 @@
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
 PollsQuestion question = (PollsQuestion)row.getObject();
+
+UserInputString questionTitle = question.getTitle(locale);
 %>
 
 <liferay-ui:icon-menu
@@ -45,7 +47,7 @@ PollsQuestion question = (PollsQuestion)row.getObject();
 	<c:if test="<%= PollsQuestionPermission.contains(permissionChecker, question, ActionKeys.PERMISSIONS) %>">
 		<liferay-security:permissionsURL
 			modelResource="<%= PollsQuestion.class.getName() %>"
-			modelResourceDescription="<%= question.getTitle(locale) %>"
+			modelResourceDescription="<%= questionTitle.unsafeGetString() %>"
 			resourcePrimKey="<%= String.valueOf(question.getQuestionId()) %>"
 			var="permissionsURL"
 			windowState="<%= LiferayWindowState.POP_UP.toString() %>"

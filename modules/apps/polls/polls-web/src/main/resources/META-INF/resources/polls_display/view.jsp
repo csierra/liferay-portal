@@ -26,9 +26,9 @@ catch (PortalException pe) {
 }
 
 if (question != null) {
-	question = question.toEscapedModel();
+	UserInputString questionTitle = question.getTitle(locale);
 
-	renderResponse.setTitle(HtmlUtil.unescape(question.getTitle(locale)));
+	renderResponse.setTitle(questionTitle.unsafeGetString());
 }
 %>
 
@@ -62,6 +62,8 @@ if (question != null) {
 		List<PollsChoice> choices = question.getChoices();
 
 		boolean hasVoted = PollsUtil.hasVoted(request, question.getQuestionId());
+
+		UserInputString questionDescription = question.getDescription(locale);
 		%>
 
 		<portlet:actionURL name="/polls_display/vote_question" var="voteQuestionURL">
@@ -80,7 +82,7 @@ if (question != null) {
 			<aui:fieldset-group markupView="lexicon">
 				<aui:fieldset>
 					<h2>
-						<%= StringUtil.replace(question.getDescription(locale), CharPool.NEW_LINE, "<br />") %>
+						<%= StringUtil.replace(questionDescription.toString(), CharPool.NEW_LINE, "<br />") %>
 					</h2>
 
 					<c:choose>
@@ -88,11 +90,11 @@ if (question != null) {
 
 							<%
 							for (PollsChoice choice : choices) {
-								choice = choice.toEscapedModel();
+								UserInputString choiceDescription = choice.getDescription(locale);
 							%>
 
 								<aui:field-wrapper cssClass="radio">
-									<aui:input label='<%= choice.getName() + ". " + choice.getDescription(locale) %>' name="choiceId" type="radio" value="<%= choice.getChoiceId() %>" />
+									<aui:input label='<%= choice.getName() + ". " + choiceDescription.unsafeGetString() %>' name="choiceId" type="radio" value="<%= choice.getChoiceId() %>" />
 								</aui:field-wrapper>
 
 							<%
