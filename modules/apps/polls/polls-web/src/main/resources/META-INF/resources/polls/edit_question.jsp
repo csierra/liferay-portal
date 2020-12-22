@@ -115,16 +115,14 @@ portletDisplay.setURLBack(redirect);
 						paramName = EditQuestionMVCActionCommand.CHOICE_DESCRIPTION_PREFIX + c;
 					}
 
-					Map<Locale, UserStringString> localeChoiceDescriptionMap = LocalizationUtil.getLocalizationMap(renderRequest, paramName);
+					Map<Locale, UserInputString> localeChoiceDescriptionMap = LocalizationUtil.getLocalizationMapFromInput(renderRequest, paramName);
 
 					String value = GetterUtil.getString(LocalizationUtil.updateLocalizationFromUserInput(localeChoiceDescriptionMap, "", "Description", LocaleUtil.toLanguageId(locale)));
 
 					if ((question != null) && !addChoice && !deleteChoice) {
 						choice = choices.get(i - 1);
 
-						UserInputString choiceDescription = choice.getDescription();
-
-						value = choiceDescription.toString();
+						value = choice.getDescription();
 					}
 				%>
 
