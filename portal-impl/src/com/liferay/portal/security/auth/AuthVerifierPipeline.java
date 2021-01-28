@@ -213,7 +213,7 @@ public class AuthVerifierPipeline {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AuthVerifierPipeline.class);
 
-	private static ServiceTracker
+	private static final ServiceTracker
 		<AuthVerifierConfiguration, AuthVerifierConfiguration> _serviceTracker;
 
 	static {
@@ -283,17 +283,6 @@ public class AuthVerifierPipeline {
 	private static class AuthVerifierConfigurationConsumer
 		implements Consumer<List<AuthVerifierConfiguration>> {
 
-		public AuthVerifierConfigurationConsumer(
-			AccessControlContext accessControlContext,
-			URLPatternMapper<List<AuthVerifierConfiguration>>
-				excludeURLPatternMapper,
-			String requestURI) {
-
-			_accessControlContext = accessControlContext;
-			_excludeURLPatternMapper = excludeURLPatternMapper;
-			_requestURI = requestURI;
-		}
-
 		@Override
 		public void accept(
 			List<AuthVerifierConfiguration> authVerifierConfigurations) {
@@ -329,6 +318,17 @@ public class AuthVerifierPipeline {
 
 		public AuthVerifierResult getAuthVerifierResult() {
 			return _authVerifierResult;
+		}
+
+		private AuthVerifierConfigurationConsumer(
+			AccessControlContext accessControlContext,
+			URLPatternMapper<List<AuthVerifierConfiguration>>
+				excludeURLPatternMapper,
+			String requestURI) {
+
+			_accessControlContext = accessControlContext;
+			_excludeURLPatternMapper = excludeURLPatternMapper;
+			_requestURI = requestURI;
 		}
 
 		private Map<String, Object> _mergeSettings(
