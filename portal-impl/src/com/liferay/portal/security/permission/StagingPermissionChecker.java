@@ -47,10 +47,6 @@ public class StagingPermissionChecker implements PermissionChecker {
 		return groupId;
 	}
 
-	public static void setGroupId(Long groupId) {
-		_groupId.setWithSafeClosable(groupId);
-	}
-
 	public static SafeClosable setGroupIdWithSafeClosable(Group group) {
 		if (group != null) {
 			return _groupId.setWithSafeClosable(group.getGroupId());
