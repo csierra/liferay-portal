@@ -377,20 +377,36 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		}
 	}
 
-	protected void addTeamRoles(long userId, long groupId, Set<Long> roleIds)
+	protected void addTeamRoles(long userId, Group group, Set<Long> roleIds)
 		throws Exception {
 
-		int count = TeamLocalServiceUtil.getGroupTeamsCount(groupId);
+		int count = TeamLocalServiceUtil.getGroupTeamsCount(group.getGroupId());
 
-		if (count == 0) {
-			return;
+		List<Role> roles;
+
+		if (count > 0) {
+			roles = RoleLocalServiceUtil.getUserTeamRoles(
+				userId, group.getGroupId());
+
+			for (Role role : roles) {
+				roleIds.add(role.getRoleId());
+			}
 		}
 
-		List<Role> roles = RoleLocalServiceUtil.getUserTeamRoles(
-			userId, groupId);
+		if (group.isStaged()) {
+			Group stagingGroup = group.getStagingGroup();
 
-		for (Role role : roles) {
-			roleIds.add(role.getRoleId());
+			count = TeamLocalServiceUtil.getGroupTeamsCount(
+				stagingGroup.getGroupId());
+
+			if (count > 0) {
+				roles = RoleLocalServiceUtil.getUserTeamRoles(
+					userId, stagingGroup.getGroupId());
+
+				for (Role role : roles) {
+					roleIds.add(role.getRoleId());
+				}
+			}
 		}
 	}
 
@@ -427,11 +443,8 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return getGuestUserRoleIds();
 		}
 
-		long currentGroupId = GetterUtil.getLong(
-			StagingPermissionChecker.getGroupId(), groupId);
-
 		long[] roleIds = PermissionCacheUtil.getUserGroupRoleIds(
-			userId, currentGroupId);
+			userId, groupId);
 
 		if (roleIds != null) {
 			return roleIds;
@@ -530,7 +543,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			if ((group.isOrganization() && userBag.hasUserOrgGroup(group)) ||
 				(group.isSite() && userBag.hasUserGroup(group))) {
 
-				addTeamRoles(userId, currentGroupId, roleIdsSet);
+				addTeamRoles(userId, group, roleIdsSet);
 			}
 		}
 
@@ -544,8 +557,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 
 		Arrays.sort(roleIds);
 
-		PermissionCacheUtil.putUserGroupRoleIds(
-			userId, currentGroupId, roleIds);
+		PermissionCacheUtil.putUserGroupRoleIds(userId, groupId, roleIds);
 
 		return roleIds;
 	}

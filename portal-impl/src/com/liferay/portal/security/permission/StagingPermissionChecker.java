@@ -17,12 +17,7 @@ package com.liferay.portal.security.permission;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
-import com.liferay.petra.lang.CentralizedThreadLocal;
-import com.liferay.petra.lang.SafeClosable;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -36,25 +31,6 @@ import java.util.Objects;
  * @author Tomas Polesovsky
  */
 public class StagingPermissionChecker implements PermissionChecker {
-
-	public static Long getGroupId() {
-		Long groupId = _groupId.get();
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("getGroupId " + groupId);
-		}
-
-		return groupId;
-	}
-
-	public static SafeClosable setGroupIdWithSafeClosable(Group group) {
-		if (group != null) {
-			return _groupId.setWithSafeClosable(group.getGroupId());
-		}
-
-		return () -> {
-		};
-	}
 
 	public StagingPermissionChecker(PermissionChecker permissionChecker) {
 		_permissionChecker = permissionChecker;
@@ -138,10 +114,8 @@ public class StagingPermissionChecker implements PermissionChecker {
 			primKey = liveGroup.getGroupId();
 		}
 
-		try (SafeClosable safeClosable = setGroupIdWithSafeClosable(group)) {
-			return _permissionChecker.hasPermission(
-				liveGroup, name, primKey, actionId);
-		}
+		return _permissionChecker.hasPermission(
+			liveGroup, name, primKey, actionId);
 	}
 
 	@Override
@@ -160,10 +134,8 @@ public class StagingPermissionChecker implements PermissionChecker {
 			primKey = String.valueOf(liveGroup.getGroupId());
 		}
 
-		try (SafeClosable safeClosable = setGroupIdWithSafeClosable(group)) {
-			return _permissionChecker.hasPermission(
-				liveGroup, name, primKey, actionId);
-		}
+		return _permissionChecker.hasPermission(
+			liveGroup, name, primKey, actionId);
 	}
 
 	@Override
@@ -258,14 +230,6 @@ public class StagingPermissionChecker implements PermissionChecker {
 
 		return false;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		StagingPermissionChecker.class);
-
-	private static final CentralizedThreadLocal<Long> _groupId =
-		new CentralizedThreadLocal<>(
-			StagingPermissionChecker.class + "._groupId",
-			() -> GroupConstants.DEFAULT_LIVE_GROUP_ID);
 
 	private final PermissionChecker _permissionChecker;
 
